@@ -1,15 +1,6 @@
-UIS3     = ${shell ls *.ui3 2>/dev/null}
 UIS4     = ${shell ls *.ui 2>/dev/null}
 include defines
-.ui-forms: $(UIS3:%.ui3=%.h) $(UIS3:%.ui3=%.cpp) $(UIS4:%.ui=%.h)
-
-%.cpp: %.ui3
-	@echo "  [uic] "$@
-	@$(UIC3) -i `basename $< .ui3`.h -o $@ $<
-
-%.h: %.ui3
-	@echo "  [uic] "$@
-	@$(UIC3) -o `basename $< .ui3`.h $<
+.ui-forms: $(UIS4:%.ui=%.h)
 
 %.h: %.ui
 	@echo "  [uic] "$@

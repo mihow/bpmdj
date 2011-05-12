@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__qsong_h__
 #define __loaded__qsong_h__
@@ -47,7 +43,7 @@ using namespace std;
 #define LIST_MEAN 15
 #define LIST_POWER 16
 #define LIST_HISTOGRAM 17
-#define LIST_RYTHM 18
+#define LIST_RHYTHM 18
 #define LIST_COMPOSITION 19
 
 #define singleton_array_accessors(type,type2,var)  \
@@ -68,11 +64,22 @@ public:
   static void setVector(Song** arr, int cnt);
   static void addVector(Song** arr, int cnt);
   virtual int vectorSize() const;
-  virtual bool isSelected(int i) const { assert(i>=0); return get_selected(i); };
-  virtual void setSelected(int i, bool val=true) {get_selected()[i]=val;};
+  virtual bool isSelected(int i) const 
+  {
+    assert(i>=0); 
+    return get_selected(i); 
+  };
+  virtual void setSelected(int i, bool val=true) 
+  {
+    get_selected()[i]=val;
+  };
   virtual void sort(int col, bool ascending);
-  virtual void paintCell(QVectorView* vv, int i, QPainter *p, const QColorGroup &cg, int col, int wid, int align);
-  virtual QString text(int j, int i) const { return Text(get_songs(j),i); };
+  virtual void paintCell(QVectorView* vv, int i, QPainter *p, 
+			 const QColorGroup &cg, int col, int wid, int align);
+  virtual QString text(int j, int i) const 
+  {
+    return Text(get_songs(j),i); 
+  };
   static  void Sort();
   QSong();
   static Song * songEssence(int i);
@@ -80,7 +87,10 @@ public:
   static QColor * colorOfAuthorCol(Song * song);
   static QColor * colorOfPlaycount(Song * song);
   static QColor * colorOfdColorCol(Song* song);
-  static void playedAuthorAtTime(int i, int t) {get_songs(i)->set_played_author_at_time(t);};
+  static void playedAuthorAtTime(int i, int t) 
+  {
+    get_songs(i)->set_played_author_at_time(t);
+  };
   static QString Text(Song * j, int i);
 };
 #endif // __loaded__qsong_h__

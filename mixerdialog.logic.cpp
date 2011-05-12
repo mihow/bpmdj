@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__mixerdialog_logic_cpp__
 #define __loaded__mixerdialog_logic_cpp__
@@ -44,7 +40,8 @@ using namespace std;
 #include "mixerdialog.logic.h"
 #include "memory.h"
 
-MixerDialogLogic::MixerDialogLogic(QWidget*parent,const char*name, bool modal,Qt::WindowFlags f) :
+MixerDialogLogic::MixerDialogLogic(QWidget*parent,const char*name, bool modal,
+Qt::WindowFlags f) :
   MixerDialog(parent,name,modal,f)
 {
   volumesChanged();
@@ -73,7 +70,8 @@ void balance(int &a, int &b)
       // printf("c: %d  d: %d\n",c,d);
       a = c;
       b = d;
-      // since the mixing process will assume two channels we multiply the volume by 2
+      // since the mixing process will assume two channels we multiply the 
+      // volume by 2
       a *= 2;
       b *= 2;
     }

@@ -41,47 +41,47 @@ typedef enum{RevisitLater, Revisit, RevisitAfterIncoming, Done, Interrupt} eleme
  *
  * The past few years have seen a growing proliferation of threading
  * libraries. This has been mainly fueled by the problems of crunching 
- * more bytes per second. Instead its seems easier for chip fabricants 
+ * more bytes per second. Instead its seems easier for chip manufacturers 
  * to provide parallelism. A second reason, why more parallelism is 
- * found in programming langauges is that certain libraries force 
+ * found in programming languages is that certain libraries force 
  * multi-threading upon the programmer. Especially Java comes to mind 
  * here. Another example is Qt, which in release 3 could lead to all 
- * kinds of interesting concurrency problems. A third readon is the 
+ * kinds of interesting concurrency problems. A third reason is the 
  * growing use of distributed systems, which are inherent concurrent 
  * systems as well. Given these major driving forces, we find that 
- * there are still very few useable programming abstractions that shield
+ * there are still very few usable programming abstractions that shield
  * the programmer from the intrinsic problems of concurrency. Common 
  * Threading Problems:
  * 
- * - concurrent data accses messes up program execution if done improperly
+ * - concurrent data access messes up program execution if done improperly
  *   and slows down program execution if done properly (locking).
- * - often threads are in an undefined state: is the threath being started, 
+ * - often threads are in an undefined state: is the thread being started, 
  *   is it stopping ? Can we start it again or will the message that I sent 
  *   it now really be delivered ?
  * - Where is the code located that runs in this thread. Or rather how 
- *   does the thread weave itself througout the program ?
+ *   does the thread weave itself throughout the program ?
  *
- * To remedy these problmems we, you guessed it, developed our own threading/process
+ * %To remedy these problems we, you guessed it, developed our own threading/process
  * library :) In Borg4 all threads are syntactically encapsulated in one file. At runtime they
  * are isolated in space (memory) and time (messages are delivered asynchronously)
  *
  * The entire architecture is build around 'active queues'. These are objects
- * aimed to faciliate inter thread communication thereby sepearting different
+ * aimed to facilitate inter thread communication thereby separating different
  * threads in space and time from each other. Next to this they also aim to 
  * improve performance of typical 'waiting' loops by automatically activating 
- * those queues where necessary. An active queue consits logically out of a queue
+ * those queues where necessary. An active queue consists logically out of a queue
  * and a message handler inside the queue. The message handler will be called 
  * when necessary and must return its control flow back to the caller as soon 
  * as the message is handled. During message handling new information might be
  * put into the queue. Since this might lead to interesting concurrency 
  * problems we chose to adapt a 'stable state view' onto the queue, meaning that
  * during handling of a message the state of the queue will remain stable. This 
- * is achieved by seperating the internals of an active queue in 3 different 
+ * is achieved by separating the internals of an active queue in 3 different 
  * queues. The first queue is the queue with incoming messages. Anybody wanting
  * to push data into this queue need to lock the active queue. The second queue
  * is the handling queue, which is automatically copied from the incoming queue
  * as soon as new information arrives. The queue's actives side should only access
- * the handling queue. To allow messages to be passed to other entitites that 
+ * the handling queue. %To allow messages to be passed to other entities that 
  * might be interested in receiving data from the queue, an outgoing queue is available.
  *
  * These pages document the active objects as used in Borg4. 
@@ -95,11 +95,11 @@ typedef enum{RevisitLater, Revisit, RevisitAfterIncoming, Done, Interrupt} eleme
  * outside (the meta-object) will accept all the incoming calls and forward them 
  * to the active object. The following header file, demo1.ao declares two active objects, Sender and Receiver. 
  * The sender will accept startSending. The receiver will accept printNumber. The aoc compiler will automatically
- * generate an appropriate header that will declare two seperate object. In the case of the sender 
+ * generate an appropriate header that will declare two separate object. In the case of the sender 
  * active object, these will be called Sender and ActiveSender. The ActiveSender will contain 
  * all the methods we declared (except for the meta method). The Sender class will be a proxy 
  * and can be accessed concurrently. All the arguments to each call will be wrapped into a 
- * message and passed to the underlying activeObject. If access to the object fields is necessary
+ * message and passed to the underlying ActiveObject. If access to the object fields is necessary
  * then a meta method must be declared.
  *
  * File: demo1.ao; compile with aoc demo1.ao >demo1.h
@@ -161,7 +161,7 @@ typedef enum{RevisitLater, Revisit, RevisitAfterIncoming, Done, Interrupt} eleme
 /**
  * @ingroup ao
  * @brief Active Objects perform their task 
- * seperated in time (control flow) and space (data) from the rest of the program.
+ * separated in time (control flow) and space (data) from the rest of the program.
  *
  * Active objects do not share data between each other and they can only be accessed
  * through message transfer (@ref push). As a simple (but powerful) process model they
@@ -172,7 +172,7 @@ typedef enum{RevisitLater, Revisit, RevisitAfterIncoming, Done, Interrupt} eleme
  * - nobody else will be accessing the fields.
  * 
  * When using an active object we know that
- * - sending a message to it will return immediatelly. 
+ * - sending a message to it will return immediately. 
  * - the message will arrive at a later time and will be handled in its
  *   own virtual thread.
  * - messages will arrive in the order they were queued.
@@ -180,8 +180,8 @@ typedef enum{RevisitLater, Revisit, RevisitAfterIncoming, Done, Interrupt} eleme
  * An active object can be locked to gain access to its outgoing queues 
  * (if these are present). When an active object is locked, it does not mean 
  * that the object cannot run. It merely means, that the incoming and outgoing 
- * queues are locked. To avoid concurrency problems at this front, the active object
- * will copy the messages that require handling to a sepearte queue before 
+ * queues are locked. %To avoid concurrency problems at this front, the active object
+ * will copy the messages that require handling to a separate queue before 
  * calling handle.
  */
 template <class message>
@@ -195,7 +195,7 @@ class ActiveObject: public Lock, protected Runnable
   deque<message> incoming;
  protected:
   /**
-   * To make the lockign window as small as possible, we use two queues. 
+   * %To make the locking window as small as possible, we use two queues. 
    * The incoming queue accepts incoming messages and can only be altered when
    * the active object is synchronized. The handling queue can be modified only
    * by the active object and will contain the transferred messages from the
@@ -246,7 +246,7 @@ public:
   virtual ~ActiveObject()
   {
     if (active)
-      cerr << "Active Object " << name << " is still activate\n";
+      cerr << "Active Object " << name << " is still active\n";
     if (scheduler)
       cerr << "Active Object " << name << " can still be activated\n";
   }
@@ -304,7 +304,7 @@ private:
   volatile bool changed;
   /**
    * The activation of the queues is a rather complicated
-   * manner. We have two locks involved. The first ist the
+   * manner. We have two locks involved. The first is the
    * active object lock. The second one is the @ref updating_state
    * lock. When the control flow enters the activate method, the
    * situation is as follows.
@@ -317,15 +317,15 @@ private:
    * - we can also not be sure that the active thread is not
    *   finishing and will thus not see the freshly pushed message.
    * 
-   * To avoid confusion on these matters, we work with a boolean flag
+   * %To avoid confusion on these matters, we work with a boolean flag
    * (active) that reflects the fact that we started a scheduler, which 
    * has not yet ended. The active flag will be reset by the handler
-   * thread if nothing has potentially changed. To know wheter
-   * a change could have occured we use the changed flag, which is true
-   * if we want to activate the queue but diod not do so since a thread
+   * thread if nothing has potentially changed. %To know whether
+   * a change could have occurred we use the changed flag, which is true
+   * if we want to activate the queue but did not do so since a thread
    * request was already sent out.
    *
-   * To summarize: if we want to start a thread we 1st) set the changed 
+   * %To summarize: if we want to start a thread we 1st) set the changed 
    * flag and 2nd) if not active, set the active flag and start a 
    * scheduler. When the handler thread wants to stop, it first checks
    * the changed flag, and if it is true, starts another round of message
@@ -334,7 +334,7 @@ private:
    * atomically. For that purpose we use the updating_stat lock.
    * We do not use the active object lock since that would interfere
    * with the push call. Effectively: as long as we are pushing, the
-   * object could not start, which is an unncessary restriction.
+   * object could not start, which is an unnecessary restriction.
    */
   void activate()
     {
@@ -352,12 +352,26 @@ protected:
   /**
    * Tells the object to no longer start a thread when a message arrives
    * It also signals that the handle() routine should stop its work as 
-   * well.
+   * well. The result of deactivate is always Done, which can be passed
+   * back to the outer handler directly. E.g:
+   *
+   *   elementResult terminate()
+   *      {
+   *      ...
+   *      return deactive();
+   *      }
    */
-  void deactivate()
+  elementResult deactivate()
   {
+#ifdef DEBUG_ACTIVATION
+    cerr << "Deactivating " << name << '\n';
+#endif 
+    fflush(stderr);
     assert(scheduler);
     scheduler = false;
+    if (aoPool)
+      aoPool->sunset(name);
+    return Done;
   }
 private:
   /**
@@ -397,7 +411,7 @@ private:
        * @internal We had a logic here that would handle as many message as possible with a 
        * routine such as 'if (handle_as_many_as_possible) while(handle());' but that
        * broke the semantics of the handle routine. Between calls to the handle routine
-       * one can assume that the incoming messages have been trasnferred. With the 
+       * one can assume that the incoming messages have been transferred. With the 
        * above statement, we could no longer assume that and needed an artificial fetch_incoming
        * routine.
        */
@@ -446,7 +460,7 @@ protected:
    * do (handling empty for instance, or no useful message left in handling).
    * The standard implementation will take the front of the handling queue and 
    * present it to the more specific handle(T) member. Based on the return of that 
-   * function a decission is made for the specif handling element.
+   * function a decision is made for the specif handling element.
    */
   virtual bool handle()
     {

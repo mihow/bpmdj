@@ -52,26 +52,26 @@ template <int D, class T, bool PT, int SM, bool O> class ArrayIterator;
  * Some of the uses:
  *
  * BpmDj
- * - In bpmdj this kind of arrays is used to access audio on disk. There we need to load left/right samples one by one an
- *   put them into an output stream. As such we need a physical addressing of streamlength x 2 short ints.
- * - The fourier transofmration that we realize on some of the data chunks works on a channel per channel bases. There we
- *   need an internal representation of 2 x streamlength data (doubles) then.
+ * - In BpmDj this kind of arrays is used to access audio on disk. There we need to load left/right samples one by one an
+ *   put them into an output stream. As such we need a physical addressing of stream length x 2 short integers.
+ * - The Fourier transformation that we realize on some of the data chunks works on a channel per channel bases. There we
+ *   need an internal representation of 2 x stream length data (doubles) then.
  *
  * Gel Analysis
  *
  * - In the gel analysis soft we need images that have a number of channels and then the standard x en y coordinates. 
  *   Often the 3 colors are accessed at the same time.
- * - In the gel analysis soft we also need a arrayhandler that transfomrs the input coordinate system into an orthonormal
+ * - In the gel analysis soft we also need a array handler that transforms the input coordinate system into an orthonormal
  *   basis in which -1:1 always will capture the entire image.
  * 
  * Petri-nets
  * 
- * - In the petrinet usage we have tokens that are placed in queues. To this end a general purpose array can be used. 
+ * - In the Petri-Net usage we have tokens that are placed in queues. To this end a general purpose array can be used. 
  *   However, since theoretically tokens must be of a specified type we might as well give a limitation on what kind 
  *   of content can be stored into an array.
  * 
  * The problem of cross platform access to data has not yet vanished, as such most of these data expression are still 
- * usefull to read data from files and save it if we write our own flow modules. 
+ * useful to read data from files and save it if we write our own flow modules. 
  */
 template <int D, class T> class Array: public DataClass
 {
@@ -147,7 +147,7 @@ template <int D, class T> class Array: public DataClass
 
   /**
    * This constructor accepts a SpecialStorage type (see array-storage). It will increase
-   * the reference counter immediatelly with one, effectively taking ownership of the data
+   * the reference counter immediately with one, effectively taking ownership of the data
    * since it will also delete the data when the counter reaches zero.
    */
   Array(SpecialStorage<T> *store, Size<D> sizes)
@@ -248,14 +248,14 @@ template <int D, class T> class Array: public DataClass
   void printMetaInfo() const;
   
   /**
-   * will copy the data in source to target using the asignment operator
+   * will copy the data in source to target using the assignment operator
    * Both sizes must be equal and valid
    */
   template <class F> void copyFrom(const Array<D,F> &source);
   
   /**
    * Will set an area of this area to the array given in o.
-   * No boundary warings are given, but no ill result should happen either.
+   * No boundary warnings are given, but no ill result should happen either.
    * In other words, the copy area will be limited to the size of the possible
    * target area.
    */

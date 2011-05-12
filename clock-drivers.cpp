@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,25 +10,25 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__clock_drivers_cpp__
 #define __loaded__clock_drivers_cpp__
 using namespace std;
 #line 1 "clock-drivers.c++"
 #include "clock-drivers.h"
+#include "player-core.h"
+
 quad_period_type targetperiod;
 quad_period_type currentperiod;
 quad_period_type normalperiod;
 signed8 x=0;
 signed8 y=0;
 clock_driver *metronome = NULL;
+unsigned8 beat, bar, tick, clockframes;
+bool timemaster = false;
 
 void changetempo(signed8 period)
 {
@@ -52,5 +52,12 @@ signed8 x_normalise(signed8 y)
 signed8 y_normalise(signed8 x)
 {
   return x*currentperiod/normalperiod;
+}
+
+void set_normalperiod(quad_period_type newnormalperiod, bool update_on_disk)
+{
+  assert(metronome);
+  metronome->set_normalperiod(newnormalperiod);
+  playing->set_period(newnormalperiod/4,update_on_disk);
 }
 #endif // __loaded__clock_drivers_cpp__

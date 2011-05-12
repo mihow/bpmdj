@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__player_cpp__
 #define __loaded__player_cpp__
@@ -51,7 +47,7 @@ using namespace std;
 #include "bpm-analyzer.h"
 #include "beatgraph-analyzer.h"
 #include "spectrum-analyzer.h"
-#include "rythm-analyzer.h"
+#include "rhythm-analyzer.h"
 #include "memory.h"
 #include "dsp-drivers.h"
 #include "about.h"
@@ -59,6 +55,11 @@ using namespace std;
 #include "ao-som-beatgraph.h"
 #include "clock-drivers.h"
 #include "scripts.h"
+#include "dsp-jack.h"
+#include "clock-jack.h"
+#include "clock-drivers.h"
+
+#define REFRESH_TIME 1000
 
 void fetch_config_from(PlayerConfig * target, const Player& song_player);
 void store_config_into(PlayerConfig * from,   Player* song_player);
@@ -68,9 +69,9 @@ void fetch_config_from(PlayerConfig * target, const Player& player)
   if (player.raw_directory->text()!=target->get_core_rawpath())
     {
       QMessageBox::information(NULL,".raw file directory",
-			       "Changes to the temporary storage will only be in effect the next\n"
-			       "time you start bpm-play with this configuration\n",
-			       QMessageBox::Ok,QMessageBox::NoButton);
+	"Changes to the temporary storage will only be in effect the next\n"
+	"time you start bpmplay with this configuration\n",
+	QMessageBox::Ok,QMessageBox::NoButton);
       if (player.raw_directory->text().isEmpty())
 	target->set_core_rawpath("./");
       else if (!player.raw_directory->text().endsWith("/"))
@@ -83,9 +84,9 @@ void fetch_config_from(PlayerConfig * target, const Player& player)
   if (target->get_disabled_capacities()!=cap)
     {
       QMessageBox::information(NULL,"Decoder option",
-			       "The new decoding capacities will only be in effect the next\n"
-			       "time you start bpm-play with this configuration\n",
-			       QMessageBox::Ok,QMessageBox::NoButton);
+       "The new decoding capacities will only be in effect the next\n"
+       "time you start bpmplay with this configuration\n",
+       QMessageBox::Ok,QMessageBox::NoButton);
       target->set_disabled_capacities(cap);
     }
   
@@ -98,7 +99,16 @@ void fetch_config_from(PlayerConfig * target, const Player& player)
     target->set_player_dsp(3);
   if (player.jack->isChecked())
     target->set_player_dsp(4);
-  
+
+  if (player.jack_noclock->isChecked())
+    target->set_jack_clock(0);
+  else if (player.jack_autoclock->isChecked())
+    target->set_jack_clock(1);
+  else if (player.jack_masterclock->isChecked())
+    target->set_jack_clock(2);
+  else if (player.jack_slaveclock->isChecked())
+    target->set_jack_clock(3);
+
 #define BOOL(a) target->set_##a(player.a->isChecked());
 #define NR(a) target->set_##a(player.a->value());
 #define TEXT(a) target->set_##a(player.a->text());
@@ -116,6 +126,10 @@ void fetch_config_from(PlayerConfig * target, const Player& player)
    TEXT(jack_dev);
    NR(bpm_channel);
    BOOL(jack_lowlatency);
+   BOOL(jack_emittempo);
+   BOOL(jack_emitposition);
+   BOOL(jack_receivetempo);
+   BOOL(jack_receiveposition);
 #undef TEXT
 #undef NR
 #undef BOOL
@@ -131,6 +145,11 @@ void store_config_into(PlayerConfig * from, Player* player)
   player->oss->setChecked(from->get_player_dsp()==1);
   player->bpm->setChecked(from->get_player_dsp()==3);
   player->jack->setChecked(from->get_player_dsp()==4);
+
+  player->jack_noclock->setChecked(from->get_jack_clock()==0);
+  player->jack_autoclock->setChecked(from->get_jack_clock()==1);
+  player->jack_masterclock->setChecked(from->get_jack_clock()==2);
+  player->jack_slaveclock->setChecked(from->get_jack_clock()==3);
   
 #define BOOL(a) player->a->setChecked(from->get_##a())
 #define NR(a) player->a->setValue(from->get_##a())
@@ -148,6 +167,10 @@ void store_config_into(PlayerConfig * from, Player* player)
   TEXT(jack_dev);     
   NR(bpm_channel);
   BOOL(jack_lowlatency);
+  BOOL(jack_emittempo);
+  BOOL(jack_emitposition);
+  BOOL(jack_receivetempo);
+  BOOL(jack_receiveposition);
 #undef TEXT
 #undef NR
 #undef BOOL
@@ -181,16 +204,16 @@ void Player::init_tempo_switch_time()
   else percentage -= 100;
   // 1 percent difference is 10 seconds switch time
   int time = percentage * 10;
-  // we limit this time to half of the songlength
+  // we limit this time to half of the song length
   int total_time = 0;
   if (playing) total_time = playing->get_time_in_seconds();
   total_time/=2;
-  // if the songlength is known of cours
+  // if the song length is known of course
   if (total_time<=0) total_time=180;
   if (time > total_time) time = total_time;
-  // we don't want switching times smalelr than 10 seconds 
+  // we don't want switching times smaller than 10 seconds 
   if (time < 10) time = 10;
-  // and not larger than 180 s
+  // and not larger than 180s
   if (time > 180) time = 180;
   // finally we set the value
   tempoSwitchTime->setValue(time);
@@ -207,7 +230,7 @@ Player::Player():
   map_scale = 16;
   mapLengthChanged(64);
   connect(timer,SIGNAL(timeout()), SLOT(timerTick()));
-  timer->start(1000);
+  timer->start(REFRESH_TIME);
   tempo_fade=-1;
   fade_time=0;
   wantedcurrentperiod=0;
@@ -224,7 +247,13 @@ Player::Player():
 #endif
 #ifndef COMPILE_JACK
   jacktab->setDisabled(true);
+  jackbox->setDisabled(true);
+  jackbox->setHidden(true);
 #endif  
+#ifndef JACK_TRANSPORT
+  jackbox->setDisabled(true);
+  jackbox->setHidden(true);
+#endif
   smallmixertab->setDisabled(true);
 
   // set colors of tempo change buttons
@@ -473,7 +502,6 @@ void Player::keyPressEvent(QKeyEvent * e)
 	case Qt::Key_Comma:
 	case Qt::Key_Space: start_stop(); ACCEPT;
 	case Qt::Key_Enter: retrieveNextCue(); ACCEPT;
-	  //	case Qt::Key_I: if (e->state() & Qt::AltButton) { openInfo(); ACCEPT; }
 	}
     }
   QDialog::keyPressEvent(e);
@@ -481,12 +509,7 @@ void Player::keyPressEvent(QKeyEvent * e)
 
 void Player::shift_playpos(signed4 direction)
 {
-  ::y+=direction;
-  if (::y<0)
-    {
-      printf("y underflow, setting to zero\n");
-      ::y=0;
-    }
+  ::metronome->shift(direction);
   startStopButton->setFocus();
 }
 
@@ -585,10 +608,11 @@ void Player::timerTick()
       if (m==0 && no_raw_file_error_box==0 && playing)
 	{
 	  QMessageBox::information(NULL,"No .raw file",
-				   "It seems like there is no .raw file on disk. "
-				   "Check whether the bpmdjraw script behaves properly (look at the console output) "
-				   "or check whether the target direcotry is valid and accessable (in the options tab)",
-				   QMessageBox::Ok,QMessageBox::NoButton);
+	     "It seems like there is no .raw file on disk. Check whether the "
+	     "bpmdjraw script behaves properly (inspect the console output) "
+  	     "or check whether the target directory is valid and accessible "
+             "(in the options tab)",
+	     QMessageBox::Ok,QMessageBox::NoButton);
 	}
     }
   
@@ -616,6 +640,20 @@ void Player::timerTick()
       NormalTempoLCD -> display(T1);
       TempoLd->display(100.0*(float4)normalperiod/(float4)currentperiod);
       updateTempoColors();
+#ifdef JACK_TRANSPORT
+      char bbtstr[20];
+      char timestr[20];
+      unsigned8 clocktime = samples2s(clockframes);
+      sprintf(timestr,"%02d:%02d:%02d",(int)(clocktime/3600),
+	      (int)(clocktime%3600)/60,(int)(clocktime%60));
+      jacktime->display(timestr);
+      sprintf(bbtstr, "%02d:%02d", (int)bar, (int)beat);
+      jackbbt->display(bbtstr);
+      if (timemaster)
+	jackmaster->setText("Jack Master");
+      else	  
+	jackmaster->setText("Jack Slave");
+#endif
     }
   else
     {
@@ -709,10 +747,10 @@ void Player::checkCueNonZero()
 {
   if (::cue==0)
     QMessageBox::warning(this,"Cue Zero ?",
-			 "If you want to store the current playing position in a cue,\n"
-			 "you must first create a cue. You can do this by selecting\n"
-			 "'set Cue' (or pressing '/') at that point. Afterwards you can\n"
-			 "store it in any of the 4 positions");
+	 "If you want to store the current playing position in a cue,\n"
+	 "you must first create a cue. You can do this by selecting\n"
+	 "'set Cue' (or pressing '/') at that point. Afterward you can\n"
+	 "store it in any of the 4 positions");
 }
 
 #define knick 15
@@ -782,7 +820,7 @@ void Player::mediumSwitch()
 
 void Player::targetStep()
 {
-  tempo_fade++;
+  tempo_fade += ((float4) REFRESH_TIME/1000);
   if (tempo_fade>fade_time)
     {
       tempo_fade=0;
@@ -791,23 +829,24 @@ void Player::targetStep()
       switcherButton->setText("Fade");
       return;
     }
-  if (tempo_fade==1)
+  if (tempo_fade <= 1.)
     {
       updateTempoColors();
     }
   if (tempo_fade>0)
     {
-      switcherButton->setText(QString::number(fade_time-tempo_fade));
+      switcherButton->setText(QString::number((int)(fade_time-tempo_fade)));
       updateTempoColors();
     }
   
   /**
-   * We dont change the period lineary !
-   * See report 'Stepwiose Tempo Changes in BpmDj'
+   * We don't change the period linearly !
+   * See report 'Stepwise Tempo Changes in BpmDj'
    * at http://werner.yellowcouch.org/Papers/stepwise/index.html
    */
-  float4 result = (float4)targetperiod*pow((float4)normalperiod/(float4)targetperiod,
-					   (float4)tempo_fade/(float4)fade_time);
+  float4 result = (float4)targetperiod*
+    pow((float4)normalperiod/(float4)targetperiod,
+	(float4)tempo_fade/(float4)fade_time);
   changeTempo((int)result);
 }
 
@@ -944,7 +983,8 @@ void Player::mapLengthChanged(int new_size)
 
 void Player::saveMap()
 {
-  QString s = QFileDialog::getSaveFileName("sequences","Beat Patterns (*.map)",this,"Save pattern","Choose a filename" );
+  QString s = QFileDialog::getSaveFileName("sequences","Beat Patterns (*.map)",
+	        this,"Save pattern","Choose a filename" );
   if (s.isNull()) return;
   const char* filename = s;
   FILE *f =fopen(filename,"wb");
@@ -987,7 +1027,8 @@ void Player::saveMap()
 
 void Player::loadMap()
 {
-  QString s = QFileDialog::getOpenFileName("sequences","Beat Patterns (*.map)",this,"Load Pattern","Choose a file");
+  QString s = QFileDialog::getOpenFileName("sequences","Beat Patterns (*.map)",
+		this,"Load Pattern","Choose a file");
   if (s.isNull()) return;
   const char* filename = s;
   FILE *f =fopen(filename,"rb");
@@ -1080,7 +1121,8 @@ void Player::mapStart()
     mexit = map_exit_stop;
   else
     assert(0);
-  map_set(map_size,mapcopy,normalperiod*map_size/map_scale,mexit,atend_loop->isOn());
+  map_set(map_size,mapcopy,normalperiod*map_size/map_scale,mexit,
+	  atend_loop->isOn());
 }
 
 void Player::mapStop()
@@ -1326,11 +1368,30 @@ void Player::setJack()
   bpm->setChecked(false);
 }
 
+static void init_dsp_and_clock()
+{
+  dsp = dsp_driver::get_driver(config);
+  // grab old
+  clock_driver* old=metronome;
+  // replace with new
+#ifdef COMPILE_JACK
+#ifdef JACK_TRANSPORT
+  if (is_jack_driver() && config->get_jack_clock()!=0)
+    metronome=new clock_jack(*config);
+  else
+#endif
+#endif
+    metronome=new clock_driver();
+
+  // delete old
+  delete old;
+}
+
 void Player::restartCore()
 {
   fetch_config_from(config,*this);
   stopCore();
-  dsp = dsp_driver::get_driver(config);
+  init_dsp_and_clock();
   startCore(0);
   config->save();
   store_config_into(config,this);
@@ -1339,7 +1400,9 @@ void Player::restartCore()
 void InitAndStart::run(Player * player)
 {
   player->initCore();
+  init_dsp_and_clock();
   player->startCore();
+  metronome->init();
 }
 
 void PlayingStateChanged::run(Player * player)
@@ -1360,7 +1423,7 @@ void Player::customEvent(QEvent * e)
 
 /**
  * Here we assume that the core dsp device has been 
- * set to something usefull
+ * set to something useful
  */
 void Player::startCore(int opening_tries)
 {
@@ -1375,20 +1438,10 @@ void Player::startCore(int opening_tries)
     }
   else
     {
-      /**
-       * Because of a concurrency problem in the kernel we try again until we succeed here.
-       * The problem is that between telling the kernel to close the dsp device and opening it from another 
-       * application. Since neither the bpmdj selector nor the bpm player can know whether the device is
-       * really closed or whether it has been hijacked by anoither program, we need to spend some time on
-       * trying to access it. If it doesn't work, then we forget it completely and give an error message.
-       */
       if (err==err_dsp)
 	{
 	  if (opening_tries==0)
-	    {
-	      config->set_player_dsp(0);
-	      dsp = dsp_driver::get_driver(config);
-	    }
+	    config->set_player_dsp(0);
 	  else
 	    {
 	      sleep(1);
@@ -1413,9 +1466,11 @@ void Player::initCore()
 {
   // if we check the raw file, we want to write the information synchronous
   int err = core_object_init(opt_check);
-  if (  show_error(err, err_noraw, "No raw file to be read. Probably the .mp3 is broken.\n")
-     || show_error(err, err_nospawn, "Unable to spawn decoding process.\nPlease check your PATH environment variable\n")
-     )
+  if (  show_error(err, err_noraw, "No raw file to be read. Probably the .mp3 "
+		   "is broken.\n")
+	|| show_error(err, err_nospawn, "Unable to spawn decoding process.\n"
+		      "Please check your PATH environment variable\n")
+	)
     if (opt_check)
       reject();
 };
@@ -1437,7 +1492,7 @@ public:
     if (normalperiod.valid())
       {
 	if (sp->tab->currentIndex()==TAB_BEATGRAPH)
-	  // it didn't change, but we want a recalcualtion anyway
+	  // it didn't change, but we want a recalculation anyway
 	  sp->tabChanged(); 
 	else if (sp->tab->currentIndex()==TAB_PLAYER)
 	  sp->tab->setCurrentIndex(TAB_BEATGRAPH);
@@ -1450,5 +1505,12 @@ void msg_writing_finished()
   if (opt_check || opt_setup) return;
   if (player_window)
     app->postEvent(player_window,new WritingFinished());
+}
+
+void Player::sync() 
+{
+#ifdef JACK_TRANSPORT
+  ::metronome->request_sync(3);
+#endif
 }
 #endif // __loaded__player_cpp__

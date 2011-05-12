@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__song_metric_cpp__
 #define __loaded__song_metric_cpp__
@@ -31,7 +27,6 @@ using namespace std;
 #include <sys/stat.h>
 #include <qpainter.h>
 #include "qsong.h"
-#include "process-manager.h"
 #include "history.h"
 #include "dirscanner.h"
 #include "spectrum-type.h"
@@ -47,7 +42,7 @@ SongMetriek::SongMetriek(float4 tw, float4 sw, float4 hw, float4 rw, float4 cw)
   tempo = tw;
   spectrum = sw;
   histogram = hw;
-  rythm = rw;
+  rhythm = rw;
   composition = cw;
   harmonic545 = harmonic646 = harmonic747 = harmonic848 = false;
   unknown_tempo_matches = false;
@@ -56,14 +51,16 @@ SongMetriek::SongMetriek(float4 tw, float4 sw, float4 hw, float4 rw, float4 cw)
 SongMetriek::SongMetriek(MetricWidget & take_from)
 {
   set_tempo_limits(std.get_tempo_limits());
-  set_show_harmonics(std.harmonic54_term, std.harmonic64_term, std.harmonic74_term, std.harmonic84_term);
+  set_show_harmonics(std.harmonic54_term, std.harmonic64_term, 
+		     std.harmonic74_term, std.harmonic84_term);
   unknown_tempo_matches = false;
   
   set_tempo_weight(    (float4)(take_from.tempoDistanceSpin->value())/100.0 );
   set_spectrum_weight( (float4)(take_from.spectrumSpin->value())/100.0);
   set_echo_weight(     (float4)(take_from.echoSpin->value())/100.0);
-  set_rythm_weight(    (float4)(take_from.rythmSpin->value())/100.0);
-  std.set_composition_weight( (float4)(take_from.compositionSpin->value())/100.0);
+  set_rhythm_weight(    (float4)(take_from.rhythmSpin->value())/100.0);
+  std.set_composition_weight((float4)(take_from.compositionSpin->value())/
+			     100.0);
   
   prepare();
 }
@@ -124,7 +121,8 @@ float4 SongMetriek::spectrum_dist(const Song & self, const Song & song) const
   return distance;
 }
 
-float4 SongMetriek::histogram_dist(const Song& self, const Song & song, float8 breakat) const
+float4 SongMetriek::histogram_dist(const Song& self, const Song & song, 
+				   float8 breakat) const
 {
   echo_property b = song.get_histogram();
   echo_property a = self.get_histogram();
@@ -176,17 +174,18 @@ float4 SongMetriek::histogram_dist(const Song& self, const Song & song, float8 b
   return distance;
 }
 
-float4 SongMetriek::rythm_dist(const Song& self, const Song & song, float8 breakat) const
+float4 SongMetriek::rhythm_dist(const Song& self, const Song & song, 
+				float8 breakat) const
 {
-  rythm_property b = song.get_rythm();
-  rythm_property a = self.get_rythm();
+  rhythm_property b = song.get_rhythm();
+  rhythm_property a = self.get_rhythm();
   if (a.empty() || b.empty()) return 1000000;
   float4 distance=0;
   // recalculate the breakat argument
-  breakat *= (spectrum_size*rythm_prop_sx)/100;
+  breakat *= (spectrum_size*rhythm_prop_sx)/100;
   breakat *= breakat;
   for (int x = 0; x < spectrum_size && distance < breakat; x ++ )
-    for(int y = 0 ; y < rythm_prop_sx; y++)
+    for(int y = 0 ; y < rhythm_prop_sx; y++)
       {
 	float4 c = a.get_energy(x,y)/255.0;
 	if (c<0.5) c=0.5;
@@ -199,11 +198,12 @@ float4 SongMetriek::rythm_dist(const Song& self, const Song & song, float8 break
       }
   if (distance>=breakat) return 1000000;
   distance = sqrt(distance);
-  distance /= (spectrum_size*rythm_prop_sx)/100;
+  distance /= (spectrum_size*rhythm_prop_sx)/100;
   return distance /* * Config::get_distance_spectrumscale() */;
 }
 
-float4 SongMetriek::composition_dist(const Song & self, const Song & song, float8 breakat) const
+float4 SongMetriek::composition_dist(const Song & self, const Song & song, 
+				     float8 breakat) const
 {
   composition_property b = song.get_composition();
   composition_property a = self.get_composition();
@@ -231,9 +231,9 @@ float4 SongMetriek::composition_dist(const Song & self, const Song & song, float
 }
 
 /**
- * These should better be sorted according to the metric. The one with the highest
- * impact should be measured first. Currenlty we only do this for the intensive 
- * histogram and ryhtm matchings.
+ * These should better be sorted according to the metric. The one with the 
+ * highest impact should be measured first. Currently we only do this for the 
+ * intensive histogram and rhythm matching.
  */
 float4 SongMetriek::distance(const Song &a, const Song &b, float8 limit) const
 {
@@ -247,21 +247,21 @@ float4 SongMetriek::distance(const Song &a, const Song &b, float8 limit) const
   if (spectrum > 0  &&  (breakat = ( limit - sum ) / spectrum) > 0)
     sum+=spectrum_dist(a,b)*spectrum;
   
-  if (histogram > rythm)
+  if (histogram > rhythm)
     {
       if (histogram > 0 
 	  && (breakat = ( limit - sum ) / histogram) > 0)
 	sum+=histogram_dist(a,b,breakat) * histogram;
       
-      if (rythm > 0
-	  && (breakat= ( limit - sum ) / rythm)>0)
-	sum+=rythm_dist(a,b,breakat) * rythm;
+      if (rhythm > 0
+	  && (breakat= ( limit - sum ) / rhythm)>0)
+	sum+=rhythm_dist(a,b,breakat) * rhythm;
     }
   else
     {
-      if (rythm > 0
-	  && (breakat= ( limit - sum ) / rythm)>0)
-	sum+=rythm_dist(a,b,breakat) * rythm;
+      if (rhythm > 0
+	  && (breakat= ( limit - sum ) / rhythm)>0)
+	sum+=rhythm_dist(a,b,breakat) * rhythm;
       
       if (histogram > 0 
 	  && (breakat = ( limit - sum ) / histogram) > 0)
@@ -293,7 +293,7 @@ void SongMetriek::set_show_harmonics(bool h5, bool h6,bool h7,bool h8)
 
 void SongMetriek::prepare()
 {
-  total = tempo + spectrum + histogram + rythm + composition;
+  total = tempo + spectrum + histogram + rhythm + composition;
   if (total<1.0) total = 1.0;
   tempo_scale = log(1+get_tempo_limits());
   harmonic54_term=calculate_harmonic_term(5.0/4.0,get_tempo_limits());

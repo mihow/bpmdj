@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__dsp_jack_cpp__
 #define __loaded__dsp_jack_cpp__
@@ -42,18 +38,17 @@ using namespace std;
 typedef jack_default_audio_sample_t sample_t;
 pthread_mutex_t thread_lock = PTHREAD_MUTEX_INITIALIZER;
 
-/* Stolen from alsaplayer */
-const float4 SAMPLE_MAX_16BIT =32768.0f;
-
-void sample_move_dS_s16 (sample_t *dst, char *src, unsigned long nsamples, unsigned long src_skip) 
+void source_to_jack_buffers(unsigned4* _src, sample_t *l, sample_t*r,
+			    unsigned4 nsamples) 
 {
+  stereo_sample2* src=(stereo_sample2*)_src;
   while (nsamples--) 
     {
-      *dst = (*((signed2 *) src)) / SAMPLE_MAX_16BIT;
-      dst++;
-      src += src_skip;
+      *l++ = src->left / signed2_sample_max_f;
+      *r++ = src->right / signed2_sample_max_f;
+      src++;
     }
-}     
+}
 
 void dsp_jack::start(audio_source* s)
 {
@@ -86,15 +81,19 @@ void dsp_jack::internal_unpause()
 void dsp_jack::write(stereo_sample2 value)
 {
   assert(synchronous);
-  /* Jack is not using blocking I/O, so everything is buffered until 
-     the callback is called */
+  /**
+   * Jack is not using blocking I/O, so everything is buffered until the
+   * callback is called 
+   */
   pthread_mutex_lock (&thread_lock);
   buffer[filled++]=value.value();
-  // WVB - i don't think this should happen, since you nicely wait 
-  // with the usleep below. It can normally happen only when the
-  // consumer threat does not eat the data sufficient, but how 
-  // this could happen is not yet clear to me at the moment. 
-  // If it does we should know when and why it happens and solve it
+  /**
+   * WVB - i don't think this should happen, since you nicely wait with the 
+   * usleep below. It can normally happen only when the consumer thread does not
+   * eat the data sufficient, but how this could happen is not yet clear to me 
+   * at the moment. If it does we should know when and why it happens and solve
+   * it.
+   */
   assert(filled<=buffer_size);
   pthread_mutex_unlock (&thread_lock);
   if (filled > position) 
@@ -126,18 +125,22 @@ dsp_jack::~dsp_jack()
 }
 
 /**
- * The callback called from within the jack thread. We simply pass the control flow through to 
- * the jack dsp driver which will handle the request in a better manner.
+ * The callback called from within the jack thread. We simply pass the control 
+ * flow through to the jack dsp driver which will handle the request in a better
+ * manner.
  */
 int chunk_getter(jack_nframes_t nframes, void *dsp) 
 {
   dsp_jack* dj=(dsp_jack*)dsp;
   assert(dj);
 #ifdef DEBUG_WAIT_STATES
-  // WVB -- I suspect we might have a concurrencvy problem here. Suppose the jack driver is stopped and 
-  // the dsp_jack object deleted. If a callback comes in then we have a problem with the callback because
-  // the object referred to no longer exists at all.
-  // I added a quick check here to see whether this occurs and if it does it will crash.
+  /**
+   * WVB -- I suspect we might have a concurrency problem here. Suppose the 
+   * jack driver is stopped and the dsp_jack object deleted. If a callback 
+   * comes in then we have a problem with the callback because the object 
+   * referred to no longer exists at all. I added a quick check here to see 
+   * whether this occurs and if it does it will crash.
+   */
   {
     Synchronized(jack_set_lock);
     assert(jack_dsps.find(dj)!=jack_dsps.end());
@@ -185,8 +188,8 @@ int dsp_jack::generate_buffer(jack_nframes_t nframes)
       else
 	{
 	  stereo_sample2 value=audio->read();
-	  b1[k] = value.left / SAMPLE_MAX_16BIT;
-	  b2[k] = value.right / SAMPLE_MAX_16BIT;
+	  b1[k] = value.left / signed2_sample_max_f;
+	  b2[k] = value.right / signed2_sample_max_f;
 	}
     }
   jack_time += nframes;
@@ -228,7 +231,7 @@ void dsp_jack::stop()
 #endif
   stopped=true;
   stop_request=false;
-  // close the dsp device immediatelly
+  // close the dsp device immediately
   close(true);
 #ifdef DEBUG_WAIT_STATES
   Debug("dsp_jack_stop(): finished");
@@ -240,24 +243,26 @@ int dsp_jack::get_buffer(jack_nframes_t nframes)
   sample_t *b1 = (sample_t *) jack_port_get_buffer (output_port_1, nframes);
   sample_t *b2 = (sample_t *) jack_port_get_buffer (output_port_2, nframes);
   
-  // WVB - I moved this to the front to avoid a change in the position and filled
-  // variables during updating of them
+  /**
+   * WVB - I moved this to the front to avoid a change in the position and 
+   * filled variables during updating of them
+   */
   pthread_mutex_lock (&thread_lock);
   
-  // WVB - I modified this a bit to handle the cases where position < filled and position + nframes > filled
-  // the idea is to copy everything necessary.
+  /**
+   *  WVB - I modified this a bit to handle the cases where position < filled 
+   * and position + nframes > filled. The idea is to copy everything necessary.
+   */
   if (position + nframes <= filled) 
     {
-      sample_move_dS_s16(b1, (char *) (buffer + position), nframes, sizeof(signed4));
-      sample_move_dS_s16(b2, (char *) (buffer + position) + sizeof(signed2), nframes, sizeof(signed4));
+      source_to_jack_buffers(buffer+position,b1,b2,nframes);
       position += nframes;
     }
   else if (position < filled)
     {
       assert(filled-position<nframes);
       int todo=filled-position;
-      sample_move_dS_s16(b1, (char *) (buffer + position), todo, sizeof(signed4));
-      sample_move_dS_s16(b2, (char *) (buffer + position) + sizeof(signed2), todo, sizeof(signed4));
+      source_to_jack_buffers(buffer+position,b1,b2,nframes);
       position += todo;
       memset(b1+todo, 0, (nframes-todo)*(sizeof(sample_t)));
       memset(b2+todo, 0, (nframes-todo)*(sizeof(sample_t)));
@@ -270,9 +275,11 @@ int dsp_jack::get_buffer(jack_nframes_t nframes)
   
   if ((filled > position) && (position > buffer_size / 2)) 
     {
-      // WVB - there is a small reason to start allocating new buffers
-      // although I believe we can be much more optimal here by using 
-      // some modulo arithmetic.
+      /**
+       * WVB - there is a small reason to start allocating new buffers although
+       * I believe we can be much more optimal here by using some modulo 
+       * arithmetic.
+       */
       unsigned4 *newbuf = bpmdj_allocate(buffer_size,unsigned4);  
       memcpy(newbuf, buffer + position, (filled - position)*sizeof(sample_t));
       bpmdj_deallocate(buffer);
@@ -316,8 +323,10 @@ int dsp_jack::open(bool ui)
   buffer = bpmdj_allocate(buffer_size,unsigned4);
   
   /* opening jack port */
-  output_port_1 = jack_port_register (client, "output_1", JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
-  output_port_2 = jack_port_register (client, "output_2", JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
+  output_port_1 = jack_port_register (client, "output_1", 
+		      JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
+  output_port_2 = jack_port_register (client, "output_2", 
+		      JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
   jack_set_process_callback (client, chunk_getter, this);
   
   /* activating client */

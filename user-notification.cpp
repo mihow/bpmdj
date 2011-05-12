@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__user_notification_cpp__
 #define __loaded__user_notification_cpp__
@@ -26,9 +22,10 @@ using namespace std;
 #include "bpmdj.h"
 #include "user-notification.h"
 
-UserNotification::UserNotification(): update_view(false), main_changed(false), 
-				      status(""), status_time(2000), title(""), error(""),
-				      update_item_list(false)
+UserNotification::UserNotification(): 
+  update_view(false), main_changed(false), 
+  status(""), status_time(2000), title(""), error(""),
+  update_item_list(false)
 {
 }
 
@@ -41,18 +38,18 @@ void UserNotification::updateProcessView(bool mc)
 void UserNotification::send()
 {
   if (app)
-    app->postEvent(song_selector_window,this);
+    app->postEvent(selector,this);
 }
 
-void UserNotification::run(SongSelectorLogic * window)
+void UserNotification::run()
 {
   if (!status.isEmpty())
     ::status->message(status,status_time);
   if (!error.isEmpty())
-    QMessageBox::warning(window,title,error);
+    QMessageBox::warning(selector,title,error);
   if (update_item_list)
-    window->updateItemList();
+    selector->updateItemList();
   if (update_view)
-    window->updateProcessView(main_changed);
+    selector->updateProcessView(main_changed);
 };
 #endif // __loaded__user_notification_cpp__

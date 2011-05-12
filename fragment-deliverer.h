@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__fragment_deliverer_h__
 #define __loaded__fragment_deliverer_h__
@@ -44,16 +40,17 @@ public:
     playing = m;
     curpos = 0;
     samples = playing.get_samples();
-    if (samples) 
+    if (samples)
       finished=false;
   }
+  void markFinished();
   virtual stereo_sample2 read()
   {
     if (finished) return stereo_sample2();
     stereo_sample2 value=samples[curpos++];
     curpos%=playing.get_size();
-    if (curpos==0) 
-      finished=true;
+    if (curpos==0)
+      markFinished();
     return value;
   }
 };

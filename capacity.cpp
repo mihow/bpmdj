@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__capacity_cpp__
 #define __loaded__capacity_cpp__
@@ -32,11 +28,16 @@ using namespace std;
 Capacity get_ext_disabled_capacities(QString ext)
 {
   ext = ext.lower();
-  if (ext.endsWith(".mp3"))  return CAPACITY_OGG123                                                             ;
-  if (ext.endsWith(".ogg"))  return                   CAPACITY_MPG123059R | CAPACITY_MPG321;
-  if (ext.endsWith(".m4a"))  return CAPACITY_OGG123 | CAPACITY_MPG123059R | CAPACITY_MPG321;
-  if (ext.endsWith(".mpc"))  return CAPACITY_OGG123 | CAPACITY_MPG123059R | CAPACITY_MPG321;
-  if (ext.endsWith(".flac")) return                   CAPACITY_MPG123059R | CAPACITY_MPG321;
+  if (ext.endsWith(".mp3"))  
+    return CAPACITY_OGG123                                        ;
+  if (ext.endsWith(".ogg"))  
+    return                   CAPACITY_MPG123059R | CAPACITY_MPG321;
+  if (ext.endsWith(".m4a"))  
+    return CAPACITY_OGG123 | CAPACITY_MPG123059R | CAPACITY_MPG321;
+  if (ext.endsWith(".mpc"))  
+    return CAPACITY_OGG123 | CAPACITY_MPG123059R | CAPACITY_MPG321;
+  if (ext.endsWith(".flac")) 
+    return                   CAPACITY_MPG123059R | CAPACITY_MPG321;
   return ~0;
 }
 
@@ -66,7 +67,8 @@ int capacity_to_prognr(int full_capacity)
   return nr;
 }
 
-int get_decoder_program(Capacity host_disabled, Capacity ext_disabled, Capacity song_disabled)
+int get_decoder_program(Capacity host_disabled, Capacity ext_disabled,
+			Capacity song_disabled)
 {
   Capacity full_capacity=(CAPACITY_LAST*2)-1;
   full_capacity&=~host_disabled;
@@ -101,11 +103,15 @@ void init_capacity_widget(CapacityWidget * cw, Capacity c)
   cw->mplayer1pre7->setChecked(c &  CAPACITY_MPLAYER1PRE7);
   cw->ogg123->setChecked(c &        CAPACITY_OGG123);
 
-  // inform user on unavailble decoders
-  if (unavailable_capacities & CAPACITY_MPG123059R) unavailable(cw->mpg123059r);
-  if (unavailable_capacities & CAPACITY_MPG321)      unavailable(cw->mpg321);
-  if (unavailable_capacities & CAPACITY_MPLAYER1PRE6) unavailable(cw->mplayer1pre6);
-  if (unavailable_capacities & CAPACITY_MPLAYER1PRE7) unavailable(cw->mplayer1pre7);
+  // inform user on unavailable decoders
+  if (unavailable_capacities & CAPACITY_MPG123059R) 
+    unavailable(cw->mpg123059r);
+  if (unavailable_capacities & CAPACITY_MPG321)      
+    unavailable(cw->mpg321);
+  if (unavailable_capacities & CAPACITY_MPLAYER1PRE6) 
+    unavailable(cw->mplayer1pre6);
+  if (unavailable_capacities & CAPACITY_MPLAYER1PRE7) 
+    unavailable(cw->mplayer1pre7);
   if (unavailable_capacities & CAPACITY_OGG123) unavailable(cw->ogg123);
 
   // make the used capacity text somewhat different

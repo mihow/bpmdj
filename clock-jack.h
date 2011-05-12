@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__clock_jack_h__
 #define __loaded__clock_jack_h__
@@ -26,19 +22,25 @@ using namespace std;
 #ifdef JACK_TRANSPORT
 #include "clock-drivers.h"
 #include <jack/jack.h>
+#include "player-config.h"
 #include "types.h"
 
 class clock_jack: public clock_driver
 {
+  bool sync;
+public:
+  clock_jack(const PlayerConfig& config);
   virtual void init();
+  virtual void shift(signed4);
   virtual void cue_start();
   virtual void tempo_will_change(signed8);
+  virtual void request_sync(int retries);
 };
 
 void update_first_beat();
-void timebase(jack_transport_state_t state, jack_nframes_t nframes, jack_position_t *pos, int new_pos, void *arg);
+void timebase(jack_transport_state_t state, jack_nframes_t nframes, 
+	      jack_position_t *pos, int new_pos, void *arg);
 void * sync_with_jack(void* neglect);
-void request_sync(int retries);
 void become_master(int cond);
 
 #endif

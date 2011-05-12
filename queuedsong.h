@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__queuedsong_h__
 #define __loaded__queuedsong_h__
@@ -29,24 +25,25 @@ using namespace std;
 class QueuedSong: 
   public Q3ListViewItem
 {
-  private:
-    Song * song;
-    int    pos;
-    float8 distance;
-    bool anker;
-  public:
-    bool mark;
-  public:
-    void setSong(Song* s, float8 d);
-    Song* getSong() {return song;};
-    void setPos(int p) {pos=p;};
-    int getPos() {return pos;};
-    QueuedSong(Song *song, Q3ListView* parent);
-    QueuedSong(Q3ListView* parent, Q3ListViewItem* after);
-    bool ankered() {return anker;};
-    void setAnkered(bool b) {anker = b; if (anker) distance=0;};
-    virtual void paintCell(QPainter *p, const QColorGroup &cg, int col, int wid, int align);
-    virtual QString text(int i) const;
+private:
+  Song * song;
+  int    pos;
+  float8 distance;
+  bool anker;
+public:
+  bool mark;
+public:
+  void setSong(Song* s, float8 d);
+  Song* getSong() {return song;};
+  void setPos(int p) {pos=p;};
+  int getPos() {return pos;};
+  QueuedSong(Song *song, Q3ListView* parent);
+  QueuedSong(Q3ListView* parent, Q3ListViewItem* after);
+  bool ankered() {return anker;};
+  void setAnkered(bool b) {anker = b; if (anker) distance=0;};
+  virtual void paintCell(QPainter *p, const QColorGroup &cg, int col, 
+			 int wid, int align);
+  virtual QString text(int i) const;
 };
 
 #define ANAL_TITLE 0
@@ -55,11 +52,11 @@ class QueuedSong:
 #define ANAL_SPECTRUM 3
 #define ANAL_ECHO 4
 #define ANAL_TEMPO 5
-#define ANAL_RYTHM 6
+#define ANAL_RHYTHM 6
 #define ANAL_COMPOSITION 7
 #define ANAL_INDEX 8
 
-class SongProcess;
+class SongSlot;
 class QueuedAnalSong: 
   public Q3ListViewItem
 {
@@ -69,13 +66,14 @@ class QueuedAnalSong:
     bool needs_tempo() const { return song->needs_tempo(); };
     bool needs_spectrum() const { return song->needs_spectrum();};
     bool needs_echo() const { return song->needs_echo();};
-    bool needs_rythm() const { return song->needs_rythm();};
+    bool needs_rhythm() const { return song->needs_rhythm();};
     bool needs_composition() const { return song->needs_composition();};
   public:
     Song* getSong() { return song; };
     QString getDisplayTitle() {return song->getDisplayTitle();};
     QueuedAnalSong(Q3ListView* parent,Song *song);
     virtual QString text(int i) const;
-    QString getCommand(SongProcess& p);
+    QString getCommand(SongSlot& p);
+    QString getDescription(SongSlot &analyzer);
 };
 #endif // __loaded__queuedsong_h__

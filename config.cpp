@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__config_cpp__
 #define __loaded__config_cpp__
@@ -112,7 +108,7 @@ init_singleton_var(Config,distance_temposcale,float4,0.06);
 init_singleton_var(Config,distance_spectrumweight,float4,0.11);
 ConfigState Config::ask_mix(true);
 ConfigState Config::auto_popqueue(false);
-SongProcess Config::players[4];
+SongSlot Config::players[4];
 //init_singleton_var(Config,mixer_command,QString,"");
 init_singleton_var(Config,color_tempo44,QColor,QColor(0,255,0));
 init_singleton_var(Config,color_tempo54,QColor,QColor(255,0,0));
@@ -141,11 +137,11 @@ init_singleton_var(Config,header,Q3Header*,NULL);
 // ConfigState Config::open_bpmmixer(false);
 init_singleton_var(Config,distance_tempoweight,float4,0.02);
 init_singleton_var(Config,distance_echoweight,float4,0.62);
-init_singleton_var(Config,distance_rythmweight,float4,0.26);
+init_singleton_var(Config,distance_rhythmweight,float4,0.26);
 init_singleton_var(Config,distance_compositionweight,float4,0.33);
 init_singleton_var(Config,max_songs,int,100);
 init_singleton_var(Config,color_unchecked,QColor,QColor(219,219,219));
-SongProcess Config::analyzers[8];
+SongSlot Config::analyzers[8];
 init_singleton_var(Config,anal_bpm_from,float4,90);
 init_singleton_var(Config,anal_bpm_to,float4,160);
 init_singleton_var(Config,anal_bpm_technique,int,1);
@@ -224,7 +220,7 @@ void Config::save()
   s << (Q_INT8)limit_authornonplayed;
   s << (Q_INT8)get_shown_aboutbox();
   s << QString(""); // get_mixer_command();
-  s << (Q_INT8)0; // the obsolte open_mixer flag
+  s << (Q_INT8)0; // the obsolete open_mixer flag
   s << (Q_INT8)ask_mix;
   s << (Q_INT8)auto_popqueue;
   s << QString(""); // get_record_command();
@@ -255,7 +251,7 @@ void Config::save()
   s << (Q_INT8)0 ; // open_bpmmixer;
   Q_UINT16 nr = 0;
   s << nr;
-  // export the header (tricky thing (tm)
+  // export the header (tricky thing (TM)
   nr = get_header()->count();
   s << nr;
   for(int i = 0 ; i < nr ; i ++)
@@ -266,7 +262,7 @@ void Config::save()
     }
   s << get_distance_tempoweight();
   s << get_distance_echoweight();
-  s << get_distance_rythmweight();
+  s << get_distance_rhythmweight();
   s << get_distance_compositionweight();
   s << (Q_UINT16)get_max_songs();
   // save pixmap if it is there
@@ -338,7 +334,7 @@ bool Config::load()
 	  s >> b; limit_indistance.state=b;
 	  for(int i = 0 ; i < 4 ; i ++)
 	    {
-	      s >> w;   players[i].setCommand((SongProcess::command_type)w);
+	      s >> w;   players[i].setCommand((SongSlot::command_type)w);
 	      s >> str; players[i].setName(str);
 	      s >> str; players[i].setRemote(str);
 	    }
@@ -402,13 +398,13 @@ bool Config::load()
 	  float4 F;
 	  s >> F; set_distance_tempoweight(F);
 	  s >> F; set_distance_echoweight(F);
-	  s >> F; set_distance_rythmweight(F);
+	  s >> F; set_distance_rhythmweight(F);
 	  s >> F; set_distance_compositionweight(F);
 	  s >> w; set_max_songs(w);
 	  s >> clr; set_color_unchecked(clr);
 	  for(int i = 0 ; i < 8 ; i ++)
 	    {
-	      s >> w;   analyzers[i].setCommand((SongProcess::command_type)w);
+	      s >> w;   analyzers[i].setCommand((SongSlot::command_type)w);
 	      s >> str; analyzers[i].setName(str);
 	      s >> str; analyzers[i].setRemote(str);
 	    }
@@ -419,7 +415,7 @@ bool Config::load()
 	  s >> clr; set_color_alltime(clr);
 	  s >> b;   play_fragments.set(b);
 	}
-      else if (magic == MAGIC_3_5 || magic == MAGIC_3_6)
+      else if (magic == MAGIC_3_5 || magic == MAGIC_3_6 || magic == MAGIC_3_7)
 	{
 	  s >> w; set_file_count (w);
 	  s >> w; set_yellowTime (w);
@@ -441,7 +437,7 @@ bool Config::load()
 	  s >> b; limit_indistance.state=b;
 	  for(int i = 0 ; i < 4 ; i ++)
 	    {
-	      s >> w;   players[i].setCommand((SongProcess::command_type)w);
+	      s >> w;   players[i].setCommand((SongSlot::command_type)w);
 	      s >> str; players[i].setName(str);
 	      s >> str; players[i].setRemote(str);
 	    }
@@ -506,13 +502,13 @@ bool Config::load()
 	  float4 F;
 	  s >> F; set_distance_tempoweight(F);
 	  s >> F; set_distance_echoweight(F);
-	  s >> F; set_distance_rythmweight(F);
+	  s >> F; set_distance_rhythmweight(F);
 	  s >> F; set_distance_compositionweight(F);
 	  s >> w; set_max_songs(w);
 	  s >> clr; set_color_unchecked(clr);
 	  for(int i = 0 ; i < 8 ; i ++)
 	    {
-	      s >> w;   analyzers[i].setCommand((SongProcess::command_type)w);
+	      s >> w;   analyzers[i].setCommand((SongSlot::command_type)w);
 	      s >> str; analyzers[i].setName(str);
 	      s >> str; analyzers[i].setRemote(str);
 	    }
@@ -527,16 +523,17 @@ bool Config::load()
 	  s >> str; set_tag_exclude(str);
 	}
       else
-	printf("Wrong config file format\n");
+	printf("Wrong configuration file format\n");
       calc_and_cache();
       if (magic < MAGIC_3_5)
 	taglist2config(taglist);
     }
-  // if the magic was csmaller than 3_5 WE CONVER THTE TAGLIST
+  // if the magic was smaller than 3_5 WE convert the TAGLIST
   return true;
 }
 
-void taglist2strings(Q3ListView * tagList, QString &in, QString& must, QString&out)
+void taglist2strings(Q3ListView * tagList, QString &in, QString& must, 
+		     QString&out)
 {
   Q3ListViewItemIterator t(tagList);
   while(t.current())
@@ -571,14 +568,21 @@ bool Config::open_ui(int pane)
   preferences.orangeTime->setText(tmp);
   sprintf(tmp,"%d",get_redTime());
   preferences.redTime->setText(tmp);
-  preferences.greenTimeColor -> setPaletteBackgroundColor( get_color_green_time ());
-  preferences.yellowTimeColor -> setPaletteBackgroundColor( get_color_yellow_time ());
-  preferences.orangeTimeColor -> setPaletteBackgroundColor( get_color_orange_time ());
-  preferences.redTimeColor -> setPaletteBackgroundColor( get_color_red_time ());
-  preferences.color_main_window -> setChecked(get_color_main_window());
+  preferences.greenTimeColor->
+    setPaletteBackgroundColor( get_color_green_time ());
+  preferences.yellowTimeColor->
+    setPaletteBackgroundColor( get_color_yellow_time ());
+  preferences.orangeTimeColor->
+    setPaletteBackgroundColor( get_color_orange_time ());
+  preferences.redTimeColor->
+    setPaletteBackgroundColor( get_color_red_time ());
+  preferences.color_main_window->
+    setChecked(get_color_main_window());
   
-  preferences.authorDecay  -> setValue ( get_authorDecay() ) ;
-  preferences.tempoSpin    -> setValue ( lround(get_distance_temposcale()*100.0) ) ;
+  preferences.authorDecay->
+    setValue ( get_authorDecay() ) ;
+  preferences.tempoSpin->
+    setValue ( lround(get_distance_temposcale()*100.0) ) ;
   // preferences.mixerCommand -> setText  ( get_mixer_command() ) ;
 
   preferences.colorTempo44 -> setPaletteBackgroundColor( get_color_tempo44 ());
@@ -586,7 +590,8 @@ bool Config::open_ui(int pane)
   preferences.colorTempo64 -> setPaletteBackgroundColor( get_color_tempo64 ());
   preferences.colorTempo74 -> setPaletteBackgroundColor( get_color_tempo74 ());
   preferences.colorTempo84 -> setPaletteBackgroundColor( get_color_tempo84 ());
-  preferences.colorAlltimePlaycount -> setPaletteBackgroundColor( get_color_alltime ());
+  preferences.colorAlltimePlaycount->
+    setPaletteBackgroundColor( get_color_alltime ());
   
   preferences.showTempo54 -> setChecked( get_show_tempo54 ());
   preferences.showTempo64 -> setChecked( get_show_tempo64 ());
@@ -594,17 +599,27 @@ bool Config::open_ui(int pane)
   preferences.showTempo84 -> setChecked( get_show_tempo84 ());
   preferences.showUnknownTempo -> setChecked( get_show_unknown_tempo ());
 
-  preferences.colorPlayedSong -> setPaletteBackgroundColor( get_color_played_song ());
-  preferences.colorPlayedAuthor -> setPaletteBackgroundColor( get_color_played_author ());
-  preferences.colorUnavailableSong -> setPaletteBackgroundColor( get_color_unavailable ());
-  preferences.colorUncheckedSong -> setPaletteBackgroundColor( get_color_unchecked ());
-  preferences.colordColorCol -> setPaletteBackgroundColor( get_color_dcolor_col ());
+  preferences.colorPlayedSong -> 
+    setPaletteBackgroundColor( get_color_played_song ());
+  preferences.colorPlayedAuthor -> 
+    setPaletteBackgroundColor( get_color_played_author ());
+  preferences.colorUnavailableSong -> 
+    setPaletteBackgroundColor( get_color_unavailable ());
+  preferences.colorUncheckedSong -> 
+    setPaletteBackgroundColor( get_color_unchecked ());
+  preferences.colordColorCol -> 
+    setPaletteBackgroundColor( get_color_dcolor_col ());
 
-  preferences.dColorMetric->spectrumSpin -> setValue ( (int)(0.5+get_distance_spectrumweight()*100.0) );
-  preferences.dColorMetric->tempoDistanceSpin -> setValue( (int)(0.5+get_distance_tempoweight()*100.0) );
-  preferences.dColorMetric->echoSpin -> setValue( (int)(0.5+get_distance_echoweight()*100.0) );
-  preferences.dColorMetric->rythmSpin -> setValue( (int)(0.5+get_distance_rythmweight()*100.0) );
-  preferences.dColorMetric->compositionSpin -> setValue( (int)(0.5+get_distance_compositionweight()*100.0) );
+  preferences.dColorMetric->spectrumSpin -> 
+    setValue ( (int)(0.5+get_distance_spectrumweight()*100.0) );
+  preferences.dColorMetric->tempoDistanceSpin -> 
+    setValue( (int)(0.5+get_distance_tempoweight()*100.0) );
+  preferences.dColorMetric->echoSpin -> 
+    setValue( (int)(0.5+get_distance_echoweight()*100.0) );
+  preferences.dColorMetric->rhythmSpin -> 
+    setValue( (int)(0.5+get_distance_rhythmweight()*100.0) );
+  preferences.dColorMetric->compositionSpin -> 
+    setValue( (int)(0.5+get_distance_compositionweight()*100.0) );
   preferences.max_songs->setValue(get_max_songs());
 
   preferences.clusterDepth -> setValue (get_color_cluster_depth ());
@@ -612,8 +627,10 @@ bool Config::open_ui(int pane)
   // preferences.bpmmixcmd -> setText( get_bpm_mixer_command () );
   preferences.subtabs -> setCurrentIndex( pane );
 
-  preferences.From -> setText(get_anal_bpm_from() ? QString::number(get_anal_bpm_from()) : "");
-  preferences.To   -> setText(get_anal_bpm_to() ? QString::number(get_anal_bpm_to()): "");
+  preferences.From -> setText(get_anal_bpm_from() ? 
+			      QString::number(get_anal_bpm_from()) : "");
+  preferences.To   -> setText(get_anal_bpm_to() ? 
+			      QString::number(get_anal_bpm_to()): "");
   preferences.bpmalgo -> setButton(get_anal_bpm_technique()-1);
 
   if (preferences.exec()==QDialog::Accepted)
@@ -630,7 +647,8 @@ bool Config::open_ui(int pane)
       set_color_tempo64(preferences.colorTempo64->paletteBackgroundColor());
       set_color_tempo74(preferences.colorTempo74->paletteBackgroundColor());
       set_color_tempo84(preferences.colorTempo84->paletteBackgroundColor());
-      set_color_alltime(preferences.colorAlltimePlaycount->paletteBackgroundColor());
+      set_color_alltime(preferences.colorAlltimePlaycount->
+			paletteBackgroundColor());
 
       set_show_tempo54 (preferences.showTempo54->isChecked());
       set_show_tempo64 (preferences.showTempo64->isChecked());
@@ -639,26 +657,38 @@ bool Config::open_ui(int pane)
       set_show_unknown_tempo(preferences.showUnknownTempo->isChecked());
       
       set_color_red_time(preferences.redTimeColor -> paletteBackgroundColor( ));
-      set_color_orange_time(preferences.orangeTimeColor -> paletteBackgroundColor( ));
-      set_color_yellow_time(preferences.yellowTimeColor -> paletteBackgroundColor( ));
-      set_color_green_time(preferences.greenTimeColor -> paletteBackgroundColor( ));
+      set_color_orange_time(preferences.orangeTimeColor -> 
+			    paletteBackgroundColor( ));
+      set_color_yellow_time(preferences.yellowTimeColor -> 
+			    paletteBackgroundColor( ));
+      set_color_green_time(preferences.greenTimeColor -> 
+			   paletteBackgroundColor( ));
       set_color_main_window(preferences.color_main_window->isChecked());
 
-      set_color_played_song(preferences.colorPlayedSong -> paletteBackgroundColor( ));
-      set_color_played_author(preferences.colorPlayedAuthor -> paletteBackgroundColor( ));
-      set_color_unavailable(preferences.colorUnavailableSong -> paletteBackgroundColor( ));
-      set_color_unchecked(preferences.colorUncheckedSong -> paletteBackgroundColor( ));
-      set_color_dcolor_col(preferences.colordColorCol -> paletteBackgroundColor( ));
+      set_color_played_song(preferences.colorPlayedSong -> 
+			    paletteBackgroundColor( ));
+      set_color_played_author(preferences.colorPlayedAuthor -> 
+			      paletteBackgroundColor( ));
+      set_color_unavailable(preferences.colorUnavailableSong -> 
+			    paletteBackgroundColor( ));
+      set_color_unchecked(preferences.colorUncheckedSong -> 
+			  paletteBackgroundColor( ));
+      set_color_dcolor_col(preferences.colordColorCol -> 
+			   paletteBackgroundColor( ));
       set_color_cluster_depth(preferences.clusterDepth -> value());
-      // set_bpm_mixer_command(preferences.bpmmixcmd -> text());
       
-      set_distance_tempoweight       ( (float4)(preferences.dColorMetric->tempoDistanceSpin->value())/100.0);
-      set_distance_spectrumweight    ( (float4)(preferences.dColorMetric->spectrumSpin->value())/100.0);
-      set_distance_echoweight        ( (float4)(preferences.dColorMetric->echoSpin->value())/100.0);
-      set_distance_rythmweight       ( (float4)(preferences.dColorMetric->rythmSpin->value())/100.0);
-      set_distance_compositionweight ( (float4)(preferences.dColorMetric->compositionSpin->value())/100.0);
+      set_distance_tempoweight((float4)(preferences.dColorMetric->
+					tempoDistanceSpin->value())/100.0);
+      set_distance_spectrumweight((float4)(preferences.dColorMetric->
+					   spectrumSpin->value())/100.0);
+      set_distance_echoweight((float4)(preferences.dColorMetric->
+				       echoSpin->value())/100.0);
+      set_distance_rhythmweight((float4)(preferences.dColorMetric->
+					 rhythmSpin->value())/100.0);
+      set_distance_compositionweight((float4)(preferences.dColorMetric->
+					      compositionSpin->value())/100.0);
       set_max_songs(preferences.max_songs->value());
-
+      
       set_anal_bpm_from(atof(preferences.From -> text()));
       set_anal_bpm_to(  atof(preferences.To   -> text()));
       set_anal_bpm_technique(preferences.bpmalgo -> selectedId()+1);
@@ -679,12 +709,15 @@ bool Config::open_ui(int pane)
 void Config::calc_and_cache()
 {
   SongMetriek::std.set_tempo_limits(get_distance_temposcale());
-  SongMetriek::std.set_show_harmonics(get_show_tempo54(),get_show_tempo64(),get_show_tempo74(),get_show_tempo84());
+  SongMetriek::std.set_show_harmonics(get_show_tempo54(),
+				      get_show_tempo64(),
+				      get_show_tempo74(),
+				      get_show_tempo84());
   SongMetriek::std.set_unknown_tempo_matches(get_show_unknown_tempo());
   SongMetriek::std.set_tempo_weight(get_distance_tempoweight());
   SongMetriek::std.set_spectrum_weight(get_distance_spectrumweight());
   SongMetriek::std.set_echo_weight(get_distance_echoweight());
-  SongMetriek::std.set_rythm_weight(get_distance_rythmweight());
+  SongMetriek::std.set_rhythm_weight(get_distance_rhythmweight());
   SongMetriek::std.set_composition_weight(get_distance_compositionweight());
   SongMetriek::std.prepare();
 }

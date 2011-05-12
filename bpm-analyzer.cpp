@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__bpm_analyzer_cpp__
 #define __loaded__bpm_analyzer_cpp__
@@ -117,21 +113,21 @@ unsigned4 BpmAnalyzerDialog::phasefit(unsigned4 i, unsigned4 clip)
 
 void BpmAnalyzerDialog::setBpmBounds(signed4 start, signed4 stop)
 {
-   char tmp[500];
-   char tmp2[500];
-   startbpm=start;
-   stopbpm=stop;
-   sprintf(tmp,"%d",startbpm);
-   FromBpmEdit->setText(tmp);
-   sprintf(tmp2,"%d",stopbpm);
-   ToBpmEdit->setText(tmp2);
+  char tmp[500];
+  char tmp2[500];
+  startbpm=start;
+  stopbpm=stop;
+  sprintf(tmp,"%d",startbpm);
+  FromBpmEdit->setText(tmp);
+  sprintf(tmp2,"%d",stopbpm);
+  ToBpmEdit->setText(tmp2);
 }
 
 void BpmAnalyzerDialog::updateReadingProgress(signed4 val)
 {
   if (reading_progress!=val)
     {
-      reading_progress = val;
+      reading_progress=val;
       updateInfo();
     }
 }
@@ -220,7 +216,7 @@ void BpmAnalyzerDialog::readAudioBlock(signed4 blocksize)
   audiosize /= blocksize;        // uitgedrukt in blokken
   audio = bpmdj_allocate(audiosize, unsigned1);
   updateProcessingProgress(0);
-  status("Reading audio (blocksize "+QString::number(blocksize)+")");
+  status("Reading audio (block size "+QString::number(blocksize)+")");
   unsigned4 pos = 0;
   signed4 count;
   stereo_sample2 buffer[blocksize];
@@ -288,7 +284,8 @@ fft_type index2autocortempo(signed4 i)
   return beat_frequency_in_bpm;
 }
 
-void BpmAnalyzerDialog::autocorrelate_draw(QPainter &p, signed4 xs, signed4 ys, signed4 shifter)
+void BpmAnalyzerDialog::autocorrelate_draw(QPainter &p, signed4 xs, signed4 ys,
+signed4 shifter)
 {
   if (!freq) return;
   p.setPen(Qt::gray);
@@ -339,7 +336,8 @@ void BpmAnalyzerDialog::autocorrelate_draw(QPainter &p, signed4 xs, signed4 ys, 
     }
 }
 
-void BpmAnalyzerDialog::fft_draw(QPainter &p, signed4 xs, signed4 ys, signed4 shifter, float8 bpm_divisor)
+void BpmAnalyzerDialog::fft_draw(QPainter &p, signed4 xs, signed4 ys, 
+signed4 shifter, float8 bpm_divisor)
 {
   if (!freq) return;
   p.setPen(Qt::gray);
@@ -356,10 +354,10 @@ void BpmAnalyzerDialog::fft_draw(QPainter &p, signed4 xs, signed4 ys, signed4 sh
   signed4 lastx = 0, lasty = 0, lastcount = 0;
   for(signed4 i = 0 ; i <windowsize/2; i ++)
     {
-      // calculate bpm
-      float8 bpm = Index_to_frequency(windowsize,i);  // relatief tov WAVRATE
-      bpm*=(float8)WAVRATE;                           // in Hz tov non collapsed WAVRATE
-      for(signed4 j = 0 ; j < shifter; j ++) bpm/=2.0;    // in collapsed WAVRATE
+      // calculate BPM
+      float8 bpm = Index_to_frequency(windowsize,i);  // relative wrt WAVRATE
+      bpm*=(float8)WAVRATE;                // in Hz tov non collapsed WAVRATE
+      for(signed4 j = 0 ; j < shifter; j ++) bpm/=2.0;  // collapsed WAVRATE
       bpm*=60.0/bpm_divisor;                                      // in BPM.
       // calculate position
       signed4 x = (signed4)((float8)xs*(bpm-startbpm)/(stopbpm-startbpm));
@@ -405,7 +403,8 @@ void BpmAnalyzerDialog::fft()
   float8 *audio = (float8*)fftw_malloc(audiosize*sizeof(float8));
   windowsize = lower_power_of_two(audiosize);
   freq = (fft_type*)fftw_malloc(windowsize*sizeof(fft_type));
-  fftw_plan plan = fftw_plan_r2r_1d(windowsize,audio,freq,FFTW_R2HC,FFTW_MEASURE);
+  fftw_plan plan = fftw_plan_r2r_1d(windowsize,audio,freq,FFTW_R2HC,
+				    FFTW_MEASURE);
   for(signed4 i = 0 ; i < audiosize; i++)
     {
       signed8 sum = 0;
@@ -445,14 +444,18 @@ void BpmAnalyzerDialog::fft()
       for(signed4 i = 0 ; i <halfwindow ; i ++)
 	{
 	  // obtain bpm
-	  float8 bpm = Index_to_frequency(windowsize,i);         // uitgedruk relatief tov WAVRATE
-	  bpm*=(float8)WAVRATE;                           // uitgedrukt in Hz tov non collapsed WAVRATE
-	  for(signed4 j = 0 ; j < shifter; j ++) bpm/=2.0;    // uitgedrukt in collapsed WAVRATE
-	  bpm*=60.0;                                      // uitgedrukt in BPM.
+	  // uitgedruk relatief tov WAVRATE
+	  float8 bpm = Index_to_frequency(windowsize,i);
+	  // uitgedrukt in Hz tov non collapsed WAVRATE
+	  bpm*=(float8)WAVRATE;                           
+	  // uitgedrukt in collapsed WAVRATE
+	  for(signed4 j = 0 ; j < shifter; j ++) bpm/=2.0;  
+	  // uitgedrukt in BPM.
+	  bpm*=60.0;                         
 	  // skip or break ?
 	  if (bpm<startbpm) continue;
 	  if (bpm>stopbpm) break;
-	  // is larger than any of the nown peaks ?
+	  // is larger than any of the known peaks ?
 	  if (copy[i]>energy)
 	    {
 	      energy = copy[i];
@@ -466,11 +469,15 @@ void BpmAnalyzerDialog::fft()
       // clear neighbors
       for(signed4 i = 0 ; i <halfwindow ; i ++)
 	{
-	  // obtain bpm
-	  float8 bpm = Index_to_frequency(windowsize,i);         // uitgedruk relatief tov WAVRATE
-	  bpm*=(float8)WAVRATE;                           // uitgedrukt in Hz tov non collapsed WAVRATE
-	  for(signed4 j = 0 ; j < shifter; j ++) bpm/=2.0;    // uitgedrukt in collapsed WAVRATE
-	  bpm*=60.0;                                      // uitgedrukt in BPM.
+	  // obtain BPM
+	  // uitgedruk relatief tov WAVRATE
+	  float8 bpm = Index_to_frequency(windowsize,i);         
+	  // uitgedrukt in Hz tov non collapsed WAVRATE
+	  bpm*=(float8)WAVRATE;            
+	  // uitgedrukt in collapsed WAVRATE
+	  for(signed4 j = 0 ; j < shifter; j ++) bpm/=2.0;
+	  // uitgedrukt in BPM.
+	  bpm*=60.0;                        
 	  if (bpm>=at-range && bpm<=at+range)
 	    copy[i]=0;
 	  if (bpm>at+range) break;
@@ -494,7 +501,8 @@ void BpmAnalyzerDialog::enveloppe_spectrum()
   stereo_sample2 *block = bpmdj_allocate(blocksize,stereo_sample2);
   fft_type *audio = (fft_type*)fftw_malloc(audiosize*sizeof(fft_type));
   freq = (fft_type*)fftw_malloc(windowsize*sizeof(fft_type));
-  fftw_plan plan = fftw_plan_r2r_1d(windowsize,audio,freq,FFTW_R2HC,FFTW_ESTIMATE);
+  fftw_plan plan = fftw_plan_r2r_1d(windowsize,audio,freq,FFTW_R2HC,
+				    FFTW_ESTIMATE);
   for(signed4 i = 0 ; i < audiosize; i++)
     {
       signed8 sum = 0;
@@ -515,8 +523,9 @@ void BpmAnalyzerDialog::enveloppe_spectrum()
   for(signed4 i = 0 ; i <windowsize/2 ; i ++)
     {
       fft_type bpm = Index_to_frequency(windowsize,i); // tov WAVRATE
-      bpm*=(fft_type)WAVRATE;                          // in Hz tov non collapsed WAVRATE
-      for(signed4 j = 0 ; j < spectrum_shifter; j ++) bpm/=2.0;    // uitgedrukt in collapsed WAVRATE
+      bpm*=(fft_type)WAVRATE;      // in Hz tov non collapsed WAVRATE
+      // uitgedrukt in collapsed WAVRATE
+      for(signed4 j = 0 ; j < spectrum_shifter; j ++) bpm/=2.0; 
       bpm*=60.0;                                      // uitgedrukt in BPM.
       if (bpm<startbpm) continue;
       if (bpm>stopbpm) break;
@@ -535,16 +544,19 @@ void BpmAnalyzerDialog::enveloppe_spectrum()
   peak_energy = bpmdj_allocate(peaks, fft_type);
   fft_type *copy = bpmdj_allocate(windowsize / 2, fft_type);
   for(signed4 i = 0 ; i < windowsize/2 ; i++) copy[i]=freq[i];
-  fft_type range = 0.5; // bpm left and right...
+  fft_type range = 0.5; // BPM left and right...
   
   for(signed4 j = 0 ; j < peaks ; j ++)
     {
       fft_type  energy = 0, at = 0;
       for(signed4 i = 0 ; i <windowsize/2 ; i ++)
 	{
-	  fft_type bpm = Index_to_frequency(windowsize,i); // tov WAVRATE
-	  bpm*=(fft_type)WAVRATE;                          // in Hz tov non collapsed WAVRATE
-	  for(signed4 j = 0 ; j < spectrum_shifter; j ++) bpm/=2.0;    // uitgedrukt in collapsed WAVRATE
+	  // tov WAVRATE
+	  fft_type bpm = Index_to_frequency(windowsize,i); 
+	  // in Hz tov non collapsed WAVRATE
+	  bpm*=(fft_type)WAVRATE; 
+	  // uitgedrukt in collapsed WAVRATE
+	  for(signed4 j = 0 ; j < spectrum_shifter; j ++) bpm/=2.0;
 	  bpm*=60.0;                                      // uitgedrukt in BPM.
 	  // skip or break ?
 	  if (bpm<startbpm) continue;
@@ -562,17 +574,17 @@ void BpmAnalyzerDialog::enveloppe_spectrum()
       peak_energy[j]=energy;
       printf("Peak %d at %g with strength %g\n",j,at,energy);
       if (j == 0) 
-	{
-	  set_measured_period("Enveloppe",(signed4)(4.0*11025.0*60.0*4.0/at));
-	}
+	set_measured_period("Envelope",(signed4)(4.0*11025.0*60.0*4.0/at));
       
       // clear neighbors
       for(signed4 i = 0 ; i <windowsize/2 ; i ++)
 	{
-	  // obtain bpm
-	  fft_type bpm = Index_to_frequency(windowsize,i); // relatief tov WAVRATE
-	  bpm*=(float8)WAVRATE;                           // in Hz tov non collapsed WAVRATE
-	  for(signed4 j = 0 ; j < spectrum_shifter; j ++) bpm/=2.0;    // in collapsed WAVRATE
+	  // obtain BPM
+	  // relatief tov WAVRATE
+	  fft_type bpm = Index_to_frequency(windowsize,i);
+	  bpm*=(float8)WAVRATE;             // in Hz tov non collapsed WAVRATE
+	  // in collapsed WAVRATE
+	  for(signed4 j = 0 ; j < spectrum_shifter; j ++) bpm/=2.0;    
 	  bpm*=60.0;                                      // in BPM.
 	  if (bpm>=at-range && bpm<=at+range)
 	    copy[i]=0;
@@ -590,16 +602,19 @@ void BpmAnalyzerDialog::autocorrelate_spectrum()
   fseek(raw,0,SEEK_END);
   audiosize = ftell(raw) / 4;
   fseek(raw,0,SEEK_SET);
-  // owkee, nu moeten we dat delen door 2^spectrum_shifter
+  // OK, nu moeten we dat delen door 2^spectrum_shifter
   audiosize>>=spectrum_shifter;
   windowsize = lower_power_of_two(audiosize);
   signed4 blocksize = 1 << spectrum_shifter;
   stereo_sample2 *block = bpmdj_allocate(blocksize,stereo_sample2);
   fft_type *audio = (fft_type*)fftw_malloc(audiosize*sizeof(fft_type));
-  fftw_complex* freq_tmp = (fftw_complex*)fftw_malloc(windowsize*sizeof(fftw_complex));
-  fftw_plan forward_plan = fftw_plan_dft_r2c_1d(windowsize,audio,freq_tmp,FFTW_ESTIMATE);
+  fftw_complex* freq_tmp = (fftw_complex*)fftw_malloc(windowsize*
+						      sizeof(fftw_complex));
+  fftw_plan forward_plan = fftw_plan_dft_r2c_1d(windowsize,audio,freq_tmp,
+						FFTW_ESTIMATE);
   freq = (fft_type*)fftw_malloc(windowsize*sizeof(fft_type));
-  fftw_plan backward_plan = fftw_plan_dft_c2r_1d(windowsize,freq_tmp,freq,FFTW_ESTIMATE);
+  fftw_plan backward_plan = fftw_plan_dft_c2r_1d(windowsize,freq_tmp,freq,
+						 FFTW_ESTIMATE);
   for(signed4 i = 0 ; i < audiosize; i++)
     {
       signed8 sum = 0;
@@ -628,7 +643,7 @@ void BpmAnalyzerDialog::autocorrelate_spectrum()
     }
   printf("Copy has been made\n");
   
-  // 3. do an inverse fourier transform of freq[i]
+  // 3. do an inverse Fourier transform of freq[i]
   fftw_execute(backward_plan);
   fftw_destroy_plan(backward_plan);
   fftw_free(freq_tmp);
@@ -659,7 +674,7 @@ void BpmAnalyzerDialog::autocorrelate_spectrum()
   peak_energy = bpmdj_allocate(peaks, fft_type);
   fft_type *copy = bpmdj_allocate(windowsize / 2, fft_type);
   for(signed4 i = 0 ; i < windowsize/2 ; i++) copy[i]=freq[i];
-  fft_type range = 0.5; // bpm left and right...
+  fft_type range = 0.5; // BPM left and right...
   
   for(signed4 j = 0 ; j < peaks ; j ++)
     {
@@ -682,9 +697,8 @@ void BpmAnalyzerDialog::autocorrelate_spectrum()
       peak_bpm[j]=at;
       peak_energy[j]=energy;
       if (j == 0)
-	{
-	  set_measured_period("Autocorrelation",(signed4)(4.0*11025.0*60.0*4.0/at));
-	}
+	set_measured_period("Autocorrelation",
+			    (signed4)(4.0*11025.0*60.0*4.0/at));
       printf("Peak %d at %g with strength %g\n",j,at,energy);
       
       // clear neighbors
@@ -704,7 +718,8 @@ void BpmAnalyzerDialog::wec()
   assert(file);
   int fd = fileno(file);
   unsigned4 map_length = fsize(file);
-  stereo_sample2 * audio = (stereo_sample2*)mmap(NULL,map_length,PROT_READ,MAP_SHARED,fd,0);
+  stereo_sample2 * audio = (stereo_sample2*)mmap(NULL,map_length,PROT_READ,
+						 MAP_SHARED,fd,0);
   assert(audio!=MAP_FAILED);
   assert(audio);
   BpmCounter bc(stderr,audio,map_length/4,WAVRATE,startbpm,stopbpm);
@@ -798,7 +813,8 @@ void BpmAnalyzerDialog::rayshoot_scan()
   unsigned4 minima[blockshifter_max+1];
   for (unsigned4 i = 0 ; i <= blockshifter_max; i++) mean[i]=0;
   unsigned4 maxima[blockshifter_max+1];
-  // depending on the audiorate we should stop at a certain blockshift minimum...
+  // depending on the audiorate we should stop at a certain block shift 
+  // minimum...
   unsigned4 blockshifter_min; 
   if (audiorate == 44100) blockshifter_min = 0;
   else if (audiorate == 22050) blockshifter_min = 1;
@@ -835,14 +851,16 @@ void BpmAnalyzerDialog::rayshoot_scan()
 	  {
 	    unsigned4 phase = i >> blockshifter;
 	    unsigned4 store = phase << blockshifter;
-	    updateProcessingProgress((i - startshift) *100 / (stopshift - startshift));
+	    updateProcessingProgress((i - startshift) *100 / 
+				     (stopshift - startshift));
 	    if (store!=i) continue;
 	    unsigned4 m = phasefit(phase);
 	    mismatch[store]=m;
 	  }
       else
 	{
-	  // first a dry run to see how many times we would execute the phasefit;
+	  // first a dry run to see how many times we would execute the 
+	  // phasefit;
 	  signed4 phasefit_called = 0;
 	  signed4 phasefit_total = 0;
 	  for (unsigned4 i = startshift ; i < stopshift && ! stop_signal; i++ )
@@ -854,8 +872,10 @@ void BpmAnalyzerDialog::rayshoot_scan()
 	      unsigned4 next_store = (((phase / 2) + 1 ) * 2) << blockshifter;
 	      if (prev_store < startshift ) continue;
 	      if (next_store >= stopshift ) break;
-	      unsigned4 prev_val = prev_mismatch[prev_store]; // sign is important !
-	      unsigned4 next_val = prev_mismatch[next_store]; // sign is important !
+	      // sign is important !
+	      unsigned4 prev_val = prev_mismatch[prev_store]; 
+	      // sign is important !
+	      unsigned4 next_val = prev_mismatch[next_store]; 
 	      if (prev_val < prev_maximum || next_val < prev_maximum)
 		phasefit_total++;
 	    }
@@ -873,12 +893,15 @@ void BpmAnalyzerDialog::rayshoot_scan()
 	      unsigned4 next_store = (((phase / 2) + 1 ) * 2) << blockshifter;
 	      if (prev_store < startshift ) continue;
 	      if (next_store >= stopshift ) break;
-	      unsigned4 prev_val = prev_mismatch[prev_store]; // sign is important !
-	      unsigned4 next_val = prev_mismatch[next_store]; // sign is important !
+	      // sign is important !
+	      unsigned4 prev_val = prev_mismatch[prev_store]; 
+	      // sign is important !
+	      unsigned4 next_val = prev_mismatch[next_store]; 
 	      if (prev_val < prev_maximum || next_val < prev_maximum)
 		{
 		  unsigned4 m = phasefit(phase);  
-		  // we moeten de phase kleiner maken omdat de array geresampled is op blocksize
+		  // we moeten de phase kleiner maken omdat de array
+		  //  geresampled is op blocksize
 		  mismatch[store]=m;
 		  phasefit_called++;
 		}
@@ -925,9 +948,11 @@ void BpmAnalyzerDialog::rayshoot_scan()
 	{
 	  unsigned4 slice_maximum = maxima[i];
 	  if (!slice_maximum) slice_maximum=1;
-	  unsigned4 pos = r.height() - ((signed8)mean[i] * (signed8) r.height() / (signed8)slice_maximum);
+	  unsigned4 pos = r.height() - ((signed8)mean[i] * (signed8) r.height()
+					/ (signed8)slice_maximum);
 	  QColor c(0,0,0);
-	  signed4 kleur = (i - blockshifter_min) * 128 / (blockshifter_max - blockshifter_min);
+	  signed4 kleur = (i - blockshifter_min) * 128 /
+	    (blockshifter_max - blockshifter_min);
 	  c.setHsv(kleur, 255, 255);
 	  p.setPen(c);
 	  p.drawLine(0,pos,r.width(),pos);
@@ -944,7 +969,8 @@ void BpmAnalyzerDialog::rayshoot_scan()
 		  y /= (signed8) slice_maximum;
 		  y = r.height() - y;
 		  bpm = (float8)(4.0*60.0*44100.0)/(float8)j;
-		  unsigned4 x = (signed4)((float8)r.width()*(bpm-startbpm)/(stopbpm-startbpm));
+		  unsigned4 x = (signed4)((float8)r.width()*(bpm-startbpm)/
+					  (stopbpm-startbpm));
 		  p.drawPoint(x,y);
 		  p.drawPoint(x+1,y);
 		  p.drawPoint(x,y+1);
@@ -966,11 +992,10 @@ void BpmAnalyzerDialog::rayshoot_scan()
     }
 }
 
-void BpmAnalyzerDialog::set_measured_period(QString technique, signed4 p)
+void BpmAnalyzerDialog::set_measured_period(QString technique, signed4 p, 
+bool update_on_disk)
 {
-  playing->set_period(p/4);
-  normalperiod=period_to_quad(playing->get_period());
-  currentperiod=normalperiod;
+  set_normalperiod(p,update_on_disk);
 }
 
 void BpmAnalyzerDialog::peak_scan()
@@ -1032,7 +1057,8 @@ void BpmAnalyzerDialog::peak_scan()
       return;
     }
   
-  // now we have all peaks, it is time to do a fine scan of the missing information...
+  // now we have all peaks, it is time to do a fine scan of the missing 
+  // information...
   for (signed4 peak = 0 ; peak < peaks; peak ++)
     {
       if (peak_fit[peak]==0) continue;
@@ -1078,14 +1104,8 @@ void BpmAnalyzerDialog::peak_scan()
   processing_progress = 100;
   status("Ready");
   
-  playing->set_period(global_minimum_at);
-  normalperiod=period_to_quad(playing->get_period());
-  currentperiod=normalperiod;
-  if (WAVRATE==22050)
-    {
-      currentperiod=currentperiod.halved();
-      normalperiod=normalperiod.halved();
-    }
+  set_measured_period("Peak Scanning",global_minimum_at);
+
   QPixmap *pm = new QPixmap(IMAGE_XS,IMAGE_YS);
   QPainter p;
   p.begin(pm);
@@ -1111,7 +1131,8 @@ void BpmAnalyzerDialog::peak_scan()
 	  fout -= global_minimum;
 	  bpm = (float8)(4*60*audiorate)/(float8)i;
 	  X = (signed4)((float8)r.width()*(bpm-startbpm)/(stopbpm-startbpm));
-	  Y = (signed4)((signed8)fout * (signed8)r.height() / (signed8) (maximum-global_minimum));
+	  Y = (signed4)((signed8)fout * (signed8)r.height() / 
+			(signed8) (maximum-global_minimum));
 	  Y = r.height() - Y;
 	  p.drawPoint(X,Y);
 	  p.drawPoint(X+1,Y);
@@ -1165,20 +1186,31 @@ void BpmAnalyzerDialog::tap()
     starttime=times(NULL);
   else
     {
-      // we have to decrease tapcount with one because at tick 2 the 
-      // time passed counts for only one beat.
-      signed4 p = (((signed8)times(NULL)-(signed8)starttime)/(tapcount-1));
+      /**
+       * we have to decrease tapcount with one because at tick 2 the 
+       * time passed counts for only one beat.
+       */
+      signed8 p = (((signed8)times(NULL)-(signed8)starttime)/(tapcount-1));
+      p *= normalperiod;
+      p /= currentperiod;
       p /= SkipBox->value();
       p *= 11025*4;
       p /= CLOCK_FREQ;
-      playing->set_period(p,false);
-      normalperiod=period_to_quad(playing->get_period());
-      currentperiod=normalperiod;
-      if (WAVRATE==22050)
-	{
-	  currentperiod=currentperiod.halved();
-	  normalperiod=normalperiod.halved();
-	}
+      
+      /**
+       * This is tricky. Because we modify the native tempo
+       * the player will start playing faster because it tries 
+       * to honour the current requested tempo (given by currentperiod). 
+       * However, since we are tapping the tempo it is unwanted 
+       * that the playing speed changes. Hence, we need to reset
+       * the currentperiod so that it plays equally fast after the 
+       * change in the native tempo.
+       */
+      signed8 oldcurrentperiod=currentperiod;
+      signed8 oldnormalperiod=normalperiod;
+      set_measured_period("Tap measurement",period_to_quad(p),false);
+      changetempo(normalperiod*oldcurrentperiod/oldnormalperiod);
+      
       tempo_type tempo = playing->get_tempo();
       setBpmBounds(tempo.lower(10),tempo.higher(10));
     }

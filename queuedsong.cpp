@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__queuedsong_cpp__
 #define __loaded__queuedsong_cpp__
@@ -28,7 +24,6 @@ using namespace std;
 #include <stdlib.h>
 #include <qlistview.h>
 #include "qsong.h"
-#include "process-manager.h"
 #include "history.h"
 #include "dirscanner.h"
 #include "queuedsong.h"
@@ -62,13 +57,14 @@ QString QueuedAnalSong::text(int i) const
     case ANAL_TEMPO : return needs_tempo() ? ANAL_NEC : ANAL_NOTNEC;
     case ANAL_SPECTRUM : return needs_spectrum() ? ANAL_NEC : ANAL_NOTNEC;
     case ANAL_ECHO : return needs_echo() ? ANAL_NEC : ANAL_NOTNEC;
-    case ANAL_RYTHM : return needs_rythm() ? ANAL_NEC : ANAL_NOTNEC;
+    case ANAL_RHYTHM : return needs_rhythm() ? ANAL_NEC : ANAL_NOTNEC;
     case ANAL_COMPOSITION : return needs_composition() ? ANAL_NEC : ANAL_NOTNEC;
     }
   return Q3ListViewItem::text(i);
 }
 
-void QueuedSong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid, int align)
+void QueuedSong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid, 
+int align)
 {
   if (col!=QUEUED_ANKER && !song)
     {
@@ -225,14 +221,19 @@ void QueuedSong::setSong(Song* s, float8 d)
     setText(QUEUED_TEMPO, song->tempo_str());
 }
 
-QString QueuedAnalSong::getCommand(SongProcess &analyzer)
+QString QueuedAnalSong::getCommand(SongSlot &analyzer)
 {
   return analyzer.getAnalCommand(needs_tempo(),
-				 Config::get_anal_bpm_technique(),
-				 Config::get_anal_bpm_from(), Config::get_anal_bpm_to(),
-				 needs_spectrum() || needs_echo(),
-				 needs_energy(),
-				 needs_rythm() || needs_composition(),
-				 song->get_storedin());
+		 Config::get_anal_bpm_technique(),
+		 Config::get_anal_bpm_from(), Config::get_anal_bpm_to(),
+		 needs_spectrum() || needs_echo(),
+		 needs_energy(),
+		 needs_rhythm() || needs_composition(),
+		 song->get_storedin());
+}
+
+QString QueuedAnalSong::getDescription(SongSlot &analyzer)
+{
+  return "Analysis " + song->getDisplayTitle() + " at " + analyzer.getName();
 }
 #endif // __loaded__queuedsong_cpp__

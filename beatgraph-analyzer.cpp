@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__beatgraph_analyzer_cpp__
 #define __loaded__beatgraph_analyzer_cpp__
@@ -56,9 +52,10 @@ using namespace std;
 #include <math.h>
 #include <sys/mman.h>
 #include <Qt/qmessagebox.h>
+#include <set>
 #include "beatgraph-label.h"
 #include "beatgraph-analyzer.h"
-#include "rythm-analyzer.h"
+#include "rhythm-analyzer.h"
 #include "sys/times.h"
 #include "bpmplay.h"
 #include "version.h"
@@ -66,11 +63,10 @@ using namespace std;
 #include "memory.h"
 #include "signals.h"
 #include "clock-drivers.h"
+#include "hues.h"
 
 #define COLLAPSE 4
 const int maxslice = 8;
-// maxslice 10 with HAAR_COLLAPSE 4: blokes van 1024 samples, samplerate van 11025, measured frequency = 10 Hz
-// maxslice 8  with HAAR_COLLAPSE 4: blokes van 256 samples, samplerate van 11025, measured frequency = 40 Hz
 
 BeatGraphAnalyzer::BeatGraphAnalyzer(QWidget * parent, const char* name) :
   QWidget(parent,name)
@@ -80,6 +76,7 @@ BeatGraphAnalyzer::BeatGraphAnalyzer(QWidget * parent, const char* name) :
   audiosize = 0;
   data = NULL;
   bank = NULL;
+  hue = NULL;
   signed_data = NULL;
 }
 
@@ -145,7 +142,7 @@ void BeatGraphAnalyzer::readFileSigned()
 	      sum+=buffer[i*COLLAPSE+j].left;
 	      sum+=buffer[i*COLLAPSE+j].right;
 	    }
-	  sum /= COLLAPSE*2;
+	  sum /= COLLAPSE*2; // *2 because we take both channels
 	  assert(i + pos/COLLAPSE < audiosize/COLLAPSE);
 	  signed_data[i+pos/COLLAPSE]=sum;
 	}
@@ -223,7 +220,6 @@ void getBandColor(int band, QColor &color, float4 val)
 void BeatGraphAnalyzer::calculateEnergy()
 {
   if (data) return;
-  // unsigned4 collapsed_period = period  / COLLAPSE ;
   unsigned4 collapsed_size = audiosize / COLLAPSE ;
   data = bpmdj_allocate(collapsed_size,compressed);
   
@@ -236,7 +232,6 @@ void BeatGraphAnalyzer::calculateEnergy()
   bpmdj_array(rr,fs,float4);
   for(unsigned4 i = 0 ; i < fs ; i++)
     rr[i]=0;
-  float8 S = 0;
   // we measure energy content
   for(unsigned4 x = 0 ; x < collapsed_size ; x ++)
     {
@@ -246,7 +241,7 @@ void BeatGraphAnalyzer::calculateEnergy()
   // we sum the area and sqrt it
   for(unsigned4 i = 0 ; i < fs ; i++)
     rr[i]=0;
-  S = 0;
+  float8 S = 0;
   for(unsigned4 x = 0 ; x < collapsed_size ; x ++)
     {
       S-=rr[x%fs];
@@ -261,7 +256,8 @@ void BeatGraphAnalyzer::calculateEnergy()
   for(unsigned4 x = 0 ; x < collapsed_size ; x ++)
     data[x]=(unsigned1)(bt[x]*255.0/me);
   
-  // now we have the joy to run through the entire set and select the first maximas
+  // now we have the joy to run through the entire set and select the first
+  //  maximum
   /*  int cs = collapsed_period / 4;
       printf("ms\tintensity\n---in steps of %d-----------\n",cs);
       for(unsigned4 x = 0 ; x < collapsed_size - cs ; x += cs)
@@ -273,7 +269,8 @@ void BeatGraphAnalyzer::calculateEnergy()
       m=bt[z=x+y];
       for(int y = 0 ; y < 100 ; y++)
       data[z+y]=(100-y)*255/100;
-      printf("%g\t%g\n",(float8)z*((float8)COLLAPSE*1000.0/(float8)WAVRATE),bt[z]/me);
+      printf("%g\t%g\n",(float8)z*((float8)COLLAPSE*1000.0/(float8)WAVRATE),
+      bt[z]/me);
       }*/
   bpmdj_deallocate(bt);
 }
@@ -290,7 +287,7 @@ void BeatGraphAnalyzer::calculateHaar()
   bool power = false;
   for(int filter = maxslice ; filter >= 0 ; filter --)
     {
-      // calculate content of entry 'filter' of filterbank 'bank'
+      // calculate content of entry 'filter' of filter bank 'bank'
       int window_size = 1 << filter;
       int haar_size = collapsed_size / window_size;
       float4 * filtered = NULL;
@@ -318,7 +315,8 @@ void BeatGraphAnalyzer::calculateHaar()
 		for(int x = 0 ; x < window_size ; x++)
 		  signed_data[x+d]-=mean;
 	      }
-	  else // to show the power we must calculate the block content differently
+	  else // to show the power we must calculate the block content 
+	    // differently
 	    for(int y = 0 ; y < haar_size ; y ++)
 	      {
 		int d = y * window_size;
@@ -343,7 +341,8 @@ void BeatGraphAnalyzer::calculateHaar()
 	filtered[y]=fabs(filtered[y]);
       
       // find the mean of this bank entry
-      // RMS power of this bank = square root of the mean of the squared amplitude
+      // RMS power of this bank = square root of the mean of the squared 
+      // amplitude
       float8 mean=0;
       float8 max =0;
       float8 power = 0;
@@ -359,7 +358,7 @@ void BeatGraphAnalyzer::calculateHaar()
       power = sqrt(power/haar_size);
       // printf("power of bank %d is %g\n",filter,power);
       
-      // find the std dev of this bank entry
+      // find the std deviation of this bank entry
       float8 dev = 0;
       int devcnt = 0;
 
@@ -374,7 +373,8 @@ void BeatGraphAnalyzer::calculateHaar()
       bank_energy[filter]*=window_size;
       dev/=devcnt;
 
-      // printf("Slice %d has mean energy of %g and deviation of %g and max of %g\n",filter,mean,dev,max);
+      // printf("Slice %d has mean energy of %g and deviation of %g and max 
+      // of %g\n",filter,mean,dev,max);
       if (dev>0)
 	for(int y = 0 ; y < haar_size ; y++)
 	  {
@@ -398,6 +398,279 @@ void BeatGraphAnalyzer::calculateHaar()
       bank_energy[i]/=maxe;
   //  for(int i = 0 ; i <= maxslice ; i++)
   //    printf("bank entry %d has %g energy\n",i,bank_energy[i]);
+}
+
+
+/**
+ * ws = the window size over which we calculate the rms value
+ * n = the length of the input and output channels
+ * data = the start of the input and output channel (This is an in-place 
+ *        transform) 
+ * stride = how to go from one sample to the next. 1 is a standard array. 2 
+ *          will skip 1
+ *
+ * This function does what I hate in biological data analysis. It THRESHOLDS. 
+ * The horror but it works quite well. I would never do this if it had not to 
+ * do with the speed of computation. Whoever reads this: please forgive me for 
+ * this random collection of thresholds. Well.... They are not that random. The
+ * mean is move to 0 and then the average distance to the mean is used to 
+ * reposition the mean.
+ *
+ * A second disaster with this function is that it receives an area and treats 
+ * it as signed4 integers and then write the result back as if it were 
+ * unsigned4 !
+ */
+void channel_to_energy(unsigned4 ws, unsigned4 n, void*D, unsigned4 stride)
+{
+  assert(ws<=n);
+  assert(ws>0);
+
+  /**
+   * First we convert the signed integers to unsigned integers that can be 
+   * added ws times and we also square them already
+   */
+  {
+    signed4* cur_i=(signed4*)D;
+    signed4* sa=cur_i+n*stride;
+    signed8 Mx=0;
+    while(cur_i<sa)
+      {
+	if (abs(*cur_i)>Mx)
+	  Mx=abs(*cur_i);
+	cur_i+=stride;
+      }
+    cur_i=(signed4*)D;
+    while(cur_i<sa)
+      {
+	signed8 v=*cur_i; 
+	// v*v has a range 0 to Mx*Mx
+	// we want it in range 0..65535/ws
+	v*=v;
+	v/=Mx;
+	v*=65535;
+	v/=Mx*ws;
+	*(unsigned4*)cur_i=v;
+	cur_i+=stride;
+      }
+  }
+  
+  unsigned4 S = 0;
+  unsigned4* cur_u=(unsigned4*)D;
+  unsigned4* sa=cur_u+ws*stride;
+  unsigned8 me = 0; 
+  while(cur_u<sa)
+    {
+      signed8 v=*cur_u;
+      S+=v;
+      me+=S;
+      cur_u+=stride;
+    }
+  unsigned4* target=(unsigned4*)D;
+  assert(cur_u==target+ws*stride);
+  assert(n<65536);
+  for(unsigned4 x = ws ; x < n ; x ++)
+    {
+      S-=*target;
+      S+=*cur_u;
+      cur_u+=stride;
+      *target=S;
+      target+=stride; 
+      me+=S;
+    }
+  me/=n;
+  
+  unsigned4 Me=me;
+  unsigned4* cur=(unsigned4*)D;
+  unsigned4* saf=cur+n*stride;
+  unsigned4 mx=0;
+  while(cur<saf)
+    {
+      /** 
+       * To normalize the signal here we tested a number of different approaches
+       * subtraction of the mean; division by the mean and log(v/me) 
+       * there was not much qualitative difference between subtraction and log,
+       * except that we
+       * had gray faster than with subtraction. Division underperformed
+       // v/=me; // division method
+       // v=log(v/me);  // log method
+       */
+      unsigned4 v=*cur;
+      if (v<Me) *cur=0;
+      else
+	{
+	  v-=Me;
+	  if (v>mx) mx=v;
+	  *cur=v;
+	}
+      cur+=stride;
+    }
+  cur=(unsigned4*)D;
+  while(cur<saf)
+    {
+      *(unsigned4*)cur=*cur*255.0/mx;
+      cur+=stride;
+    }
+}
+
+void BeatGraphAnalyzer::calculateF1()
+{
+  Debug("Beatgraph-F1: Calculating standard energybands");
+  calculateEnergy();
+  if (hue) return;
+  Debug("Beatgraph-F1: First band");
+  const int maxlevel=9;
+  unsigned4 collapsed_size = audiosize / COLLAPSE;
+  /**
+   * Beware: In this function multi refers to the data in float format
+   * however during the computation of the wavelet transform we 
+   * only work with integers due to the efficiency it provides
+   * the conversion from integer to float is later performed in the
+   * calculate_energy function
+   */
+  float4* multi_f = bpmdj_allocate(collapsed_size,float4);
+  {
+    signed4* multi_i = (signed4*)multi_f;
+    // this is an optimization by directly calculating the first decomposition
+    // we don't need to read the same variable again afterward. This saves an 
+    // entire scan through the song. Normally we would simply write
+    //
+    // | for(unsigned4 i = 0 ; i < collapsed_size; i++)
+    // |   multi[i]=signed_data[i];
+    //
+    // however now we do it as
+    
+    uncompressed* stopat=signed_data+collapsed_size-1;
+    uncompressed* re=signed_data;
+    signed4* wr=multi_i;
+    while(re < stopat)
+      {
+	signed4 a=*(re++)*16384.;
+	signed4 b=*(re++)*16384.;
+	*(wr++)=a+b;
+	*(wr++)=a-b;
+      }
+    
+    /**
+     * I think this is the shortest wavelet decomposition I wrote so far, 
+     * this could be useful to integrate into the old wavelet decomposer. 
+     * Although with the current optimization it became somewhat less readable.
+     */
+    Debug("Beatgraph-F1: Remaining frequency bands");
+    for(unsigned1 level = 1 ; level<maxlevel; level++)
+      {
+	unsigned2 stride= 1<<level; 
+	for(unsigned4 j = 0 ; j < stride ; j++)
+	  {
+	    // Normal:
+	    // for(unsigned4 i = j ; i+stride < collapsed_size; i+=2*stride)
+	    //   {
+	    //   uncompressed a=multi[i];
+	    //   uncompressed b=multi[i+stride];
+	    //   multi[i]=a+b;
+	    //   multi[i+stride]=a-b;
+	    //   }
+	    // 
+	    // Optimized:	 
+	    signed4* d1=multi_i+j;
+	    signed4* d2=multi_i+j+stride;
+	    signed4* sa=multi_i+collapsed_size;
+	    unsigned2 dstride=stride*2;
+	    while(d2<sa)
+	      {
+		signed4 a=*d1; // fetch
+		signed4 b=*d2; // fetch 
+		*d1=a+b;  // 1 flop, store
+		*d2=b-a;  // 1 flop, store
+		d1+=dstride; // 1 flop
+		d2+=dstride; // 1 flop
+	      }
+	  }
+      }
+  }
+  
+  unsigned2 channelcount=1<<maxlevel;
+  unsigned4 channelsize=collapsed_size/channelcount;
+  unsigned4* channels[channelcount];
+  // to map the band to a sorted channel we need to reverse the index bits
+  for(int i = 0 ; i < channelcount ; i++)
+    {
+      int j=0;
+      int t=i;
+      for(int k=0; k < maxlevel; k++)
+	{
+	  j<<=1;
+	  j+=t%2;
+	  t>>=1;
+	}
+      channels[i]=(unsigned4*)multi_f+j;
+    }
+  
+  unsigned4 ws = ::normalperiod/(COLLAPSE*4*(1<<maxlevel));
+  if (ws<1) ws=1;
+  Debug("Beatgraph-F1: Energy calculations using a windowsize of %d",ws);
+  for(int i = 0 ; i < channelcount ; i++)
+    channel_to_energy(ws,channelsize,channels[i],channelcount);
+  
+  Debug("Beatgraph-F1: Distances");
+  float4 channel_energy[channelcount];
+  for(int tofill = 1 ; tofill < channelcount; tofill++)
+    {
+      unsigned4* prev=channels[tofill-1];
+      unsigned8 dist=0;
+      unsigned4* cur=channels[tofill];
+      unsigned4 last=channelsize*channelcount;
+      for(unsigned4 y = 0 ; y < last; y+=channelcount)
+	dist+=abs(cur[y]-prev[y]);
+      channel_energy[tofill]=sqrt(dist);
+    }
+  
+  float8 total_energy=0;
+  for(int i = 0 ; i < channelcount; i++)
+    total_energy+=channel_energy[i];
+  
+  float8 energy_so_far=0;
+  unsigned1 channel2hue[1<<maxlevel];
+  for(int i = 0 ; i < channelcount; i++)
+    {
+      channel2hue[i]=(float4)i*240.0/channelcount;
+      energy_so_far+=channel_energy[i];
+    }
+  
+  Debug("Beatgraph-F1: Setting hues");
+  hue = bpmdj_allocate(collapsed_size,compressed);
+  sat = bpmdj_allocate(collapsed_size,compressed);
+  signed4 oj=-1;
+  unsigned4 m=0;
+  int ma=0;
+  unsigned4 S=0;
+  for(unsigned4 i = 0 ; i < collapsed_size ; i++)
+    {
+      // here we need to determine which wavepacket we need
+      signed4 j=(i/channelcount)*channelcount;
+      if (j!=oj)
+	{
+	  ma=0;
+	  m=0;
+	  S=0;
+	  for(int k=0;k<channelcount; k++)
+	    {
+	      unsigned4 v=channels[k][j];
+	      S+=v;
+	      if (v>m)
+		{
+		  ma=k;
+		  m=v;
+		}
+	    }
+	  oj=j;
+	}
+      // an interesting side effect from all these
+      // calculations is that we can see how many sounds
+      // we have at the same time
+      sat[i]=S/channelcount;
+      hue[i]=channel2hue[ma];
+    }
+  Debug("Beatgraph-F1: Finished");
 }
 
 void BeatGraphAnalyzer::showHaarPattern()
@@ -459,20 +732,61 @@ void BeatGraphAnalyzer::showHaarPattern()
   pattern->setImage(pm,samples_per_column);
 }
 
+void BeatGraphAnalyzer::showF1Pattern()
+{ 
+  unsigned4 collapsed_period = period  / COLLAPSE ;
+  unsigned4 collapsed_size = audiosize / COLLAPSE ;
+  int window_xsize = collapsed_size / collapsed_period - 1 ;
+  int samples_per_column = collapsed_period * COLLAPSE;
+  int window_ysize = pattern->contentsRect().height();
+  assert(window_ysize>0);
+  QImage pm(window_xsize,window_ysize,QImage::Format_RGB32);
+  QPainter p;
+  p.begin(&pm);
+  float4 yscale = collapsed_period - 1 ;
+  yscale /= window_ysize;
+  for(int column = 0 ; column < window_xsize ; column++)
+    {
+      unsigned4 idx = column * collapsed_period;
+      QColor C;
+      for(int row = 0 ; row < window_ysize ; row++)
+	{
+	  unsigned4 idx2 = (int)((float4)row*yscale);
+	  assert(idx+idx2<collapsed_size);
+	  int val = data[idx+idx2];
+	  int h = hue[idx+idx2];
+	  int s2 = sat[idx+idx2];
+	  int s1 = 255-s2;
+	  assert(h>=0 && h<huecolors);
+	  QRgb c=get_hue(h,val);
+	  // add a specific amount of gray 
+	  c=qRgb((qRed(c)*s1+val*s2)/255,
+		 (qGreen(c)*s1+val*s2)/255,
+		 (qBlue(c)*s1+val*s2)/255);
+	  pm.setPixel(column,row,c);
+	}
+    }
+  p.setPen(QColor(0,128,0));
+  for(int row = 0 ; row < window_ysize ; row+=window_ysize/8)
+    p.drawLine(0,row,window_xsize-1,row);
+  p.end(); 
+  pattern->setImage(pm,samples_per_column);
+}
+
 bool BeatGraphAnalyzer::check_visualisation_conditions(bool file_read)
 {
   if (!period)
     {
       QMessageBox::warning(this,"No period estimate",
-			   "No period estimate, hence cannot show the beat graph.\n"
-			   "Please go to the bpm counter and measure the tempo first");
+	   "No period estimate, hence cannot show the beat graph.\n"
+	   "Please go to the BPM counter and measure the tempo first");
       return false;
     }
   if (!audiosize && file_read)
     {
       QMessageBox::warning(this,"Fragment too small",
-			   "There is simply no raw data on disk,\n"
-			   "Hence, I can't display the beat graph");
+	   "There is simply no raw data on disk,\n"
+	   "Hence, I can't display the beat graph");
       return false;
     }
   return true;
@@ -481,23 +795,27 @@ bool BeatGraphAnalyzer::check_visualisation_conditions(bool file_read)
 void BeatGraphAnalyzer::showPattern()
 {
   if (!check_visualisation_conditions()) return;
-  if (haar->isChecked())
+  if (bg_haar->isChecked())
     showHaarPattern();
+  else if (bg_f1->isChecked())
+    showF1Pattern();
   else
     showEnergyPattern();
   update();
 }
 
 /**
- * This function must be called when the visualisation modus changes
+ * This function must be called when the visualization mode changes
  */
 void BeatGraphAnalyzer::changeVisualisation()
 {
   if (!check_visualisation_conditions(false)) return;
   readFileSigned(); 
   if (!check_visualisation_conditions()) return;
-  if (haar->isChecked())
+  if (bg_haar->isChecked())
     calculateHaar();
+  else if (bg_f1->isChecked())
+    calculateF1();
   else
     calculateEnergy();
   showPattern();
@@ -521,12 +839,13 @@ void BeatGraphAnalyzer::setTempo()
   if (!playing) return;
   bool was_normal = normalperiod == currentperiod;
   bool was_target = targetperiod == currentperiod;
-  normalperiod = normalperiod+periodDelta->value()+periodDelta10->value();
-  if (normalperiod<=0) normalperiod = 1;
-  ::y = ::x * currentperiod / normalperiod;
+  assert(metronome);
+  signed8 newnormalperiod=normalperiod+periodDelta->value()+
+    periodDelta10->value();
+  if (newnormalperiod<=0) newnormalperiod = 1;
+  set_normalperiod(newnormalperiod);
   periodDelta->setValue(0);
   periodDelta10->setValue(0);
-  playing->set_period(normalperiod/4);
   if (was_target) emit targetTempo();
   if (was_normal) emit normalTempo();
   pattern->setFocus();
@@ -537,5 +856,4 @@ void BeatGraphAnalyzer::cuesChanged()
   pattern->cues_changed=true;
   pattern->update();
 }
-
 #endif // __loaded__beatgraph_analyzer_cpp__

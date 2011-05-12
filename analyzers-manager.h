@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,47 +10,25 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__analyzers_manager_h__
 #define __loaded__analyzers_manager_h__
 using namespace std;
 #line 1 "analyzers-manager.h++"
-#include "basic-process-manager.h"
+#include "song-process.h"
 class Song;
-class SongProcess;
+class SongSlot;
+class SongSelectorLogic;
 
-class AnalyzerChanged
+class AnalyzersManager: public DeathProcessListener
 {
- public: 
-  AnalyzerChanged() {};
-  virtual ~AnalyzerChanged() {};
-  /**
-   * This function is called by the processmanager when slot 'on_slot'
-   * becomes available again. This function should be overridden.
-   */
-  virtual void startAnotherAnalyzer(Song* previous, int on_slot) = 0;
-};
-
-class AnalyzersManager:
-  public BasicProcessManager
-{
-  private:
-    int      limit_time;                // the timeout before considering child non responsive
-    AnalyzerChanged * listener;
-    virtual void clearId(int id);
-  public:
-    AnalyzersManager(int nr, AnalyzerChanged *sel, int timeout);
-    virtual ~AnalyzersManager() {};
-    virtual void start(int id, Song* song, const char* command);
-    virtual void checkSignals();
-    void songKilled(SongProcess*);
-    virtual bool slot_free(int slot);
+private:
+  virtual void process_died(SongSlot*);
+public:
+  virtual void start(SongSlot*, Song* song, const char* command, 
+		     const char* description);
 };
 #endif // __loaded__analyzers_manager_h__

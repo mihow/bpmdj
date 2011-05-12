@@ -32,7 +32,7 @@ class NoElement{};
 
 // this class keeps the next index in the first index
 // we do this because the parse can only pass along Data
-// types, so we need a good method in which we don't continuiosly
+// types, so we need a good method in which we don't continuously
 // relocate the entire array.
 class Creator
 {

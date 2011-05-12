@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__resampler_cpp__
 #define __loaded__resampler_cpp__
@@ -68,7 +64,7 @@ ImpulseResponse& ImpulseResponse::operator /=(float8 v)
 
 ImpulseResponse ImpulseResponse::shrink()
 {
-  // find minimium and maximum indices
+  // find minimum and maximum indices
   int mi = index[0];
   int ma = index[0];
   for(int i = 0 ; i < length ; i++)
@@ -120,7 +116,8 @@ void ImpulseResponse::set_amp(float8 a)
 
 void create_lowpass(ImpulseResponse & target, float8 cutoff, int Num)
 {
-  printf("create_lowpass called with length = %d and cutoff %g\n",target.length,cutoff);
+  printf("create_lowpass called with length = %d and cutoff %g\n",
+	 target.length,cutoff);
   float8 c[target.length/2];
   LpFilter(c,target.length/2,cutoff,100,Num);
   /*  float8 sum = 0;
@@ -166,10 +163,11 @@ void Resampler::generate_table()
 ImpulseResponse Resampler::generate_table(int playpos)
 {
   /**
-   * Here we have a tricky situation. We need to determine a proper number of taps for the 
-   * filter. The first zero crossing of the filter should be at L (or M). The number of 
-   * taps on the other hand should cross also at a zero crossing to avoid introducing 
-   * new aliasing. The last taps amplitude is given as sin(2.0*Pi*length*0.5/(FS*FS))
+   * Here we have a tricky situation. We need to determine a proper number of 
+   * taps for the filter. The first zero crossing of the filter should be at L
+   * (or M). The number of taps on the other hand should cross also at a zero 
+   * crossing to avoid introducing new aliasing. The last taps amplitude is 
+   * given as sin(2.0*Pi*length*0.5/(FS*FS))
    * = sin(Pi*length/(FS*FS)). A sinus becomes 0 at multiples of Pi, so 
    * length/(FS*FS) should be an integer. Lets try 5
    * 1 = length/(FS*FS) or FS*FS*5 = length;

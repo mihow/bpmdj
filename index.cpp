@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__index_cpp__
 #define __loaded__index_cpp__
@@ -74,7 +70,7 @@ static Symbol key_mean("mean");
 static Symbol key_power("power");
 static Symbol key_albums("albums");
 static Symbol key_echo("histogram");
-static Symbol key_rythm("rythm");
+static Symbol key_rhythm("rythm");
 static Symbol key_composition("composition");
 static Symbol key_spectrum("spectrum");
 static Symbol key_md5sum("md5sum");
@@ -110,7 +106,7 @@ void Index::init()
   index_cue = 0;
   index_spectrum = NULL;
   index_histogram.clear();
-  index_rythm.clear();
+  index_rhythm.clear();
   index_composition.clear();
   title = "";
   author = "";
@@ -240,7 +236,7 @@ void Index::write_idx()
   
   const int versionnr = -1;
   token[key_echo]=index_histogram.get_data(versionnr);
-  token[key_rythm]=index_rythm.get_data(versionnr);
+  token[key_rhythm]=index_rhythm.get_data(versionnr);
   token[key_composition]=index_composition.get_data(versionnr);
   token[key_min]=index_min.get_data(versionnr);
   token[key_max]=index_max.get_data(versionnr);
@@ -342,7 +338,7 @@ bool Index::fix_tagline()
 
 void Index::add_history(HistoryField **& history, HistoryField * field)
 {
-  // we assume that the historyfield itself is not yet available !
+  // we assume that the history field itself is not yet available !
   int c=0;
   HistoryField* *tmp = history;
   while(*tmp) {c++; tmp++;};
@@ -454,7 +450,7 @@ void Index::read_idx(QString indexn)
       if (!d.isNull())
 	index_spectrum=new spectrum_type(d);
       index_histogram.set_data(token[key_echo]);
-      index_rythm.set_data(token[key_rythm]);
+      index_rhythm.set_data(token[key_rhythm]);
       index_composition.set_data(token[key_composition]);
       index_disabled_capacities=(Unsigned2)token[key_disabled_capacities];
       // the previous and next fields are somewhat more interesting...
@@ -531,11 +527,13 @@ QString Index::get_display_title()
 
 void Index::set_period(period_type t, bool update_on_disk)
 {
-  // if the period is different from the old period then we remove the rythm information
-  // and compostion information
+  /**
+   * If the period is different from the old period then we remove the rhythm 
+   * information and composition information
+   */
   if (t.period!=index_period.period)
     {
-      index_rythm.clear();
+      index_rhythm.clear();
       index_composition.clear();
     }
   index_period = t;
@@ -750,7 +748,6 @@ bool Index::set_title_author_remix(QString meta_filename)
     }
   if (busy==4)
     {
-      // printf("OldIndex: fixed %s { %s } [ %s ] %s\n",title,remix, author, version);
       if (_title) 
 	title = _title;
       if (_version)
@@ -783,12 +780,12 @@ Index* createNewIndexFor(QString filename, QString directory)
   // create an index and set the file in which it is stored
   Index *index = new Index();
   index->set_storedin(indexname);
-  // set the songname 
+  // set the song name 
   index->set_filename(filename);
   index->set_tags("New");
   index->set_title_author_remix(indexname);
   // we set the period to unknown, which will also 
-  // immediatelly write the index to disk
+  // immediately write the index to disk
   index->set_period(-1,true);
   return index;
 }

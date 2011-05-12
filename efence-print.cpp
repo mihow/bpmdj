@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__efence_print_cpp__
 #define __loaded__efence_print_cpp__
@@ -31,9 +27,9 @@ using namespace std;
  * malloc buffer, or touching free memory.
  *
  * It arranges for each malloc buffer to be followed (or preceded)
- * in the address space by an inaccessable virtual memory page,
- * and for free memory to be inaccessable. If software touches the
- * inaccessable page, it will get an immediate segmentation
+ * in the address space by an inaccessible virtual memory page,
+ * and for free memory to be inaccessible. If software touches the
+ * inaccessible page, it will get an immediate segmentation
  * fault. It is then trivial to uncover the offending code using a debugger.
  *
  * An advantage of this product over most malloc debuggers is that this one
@@ -54,7 +50,10 @@ using namespace std;
  * perform lots of allocation, because of the per-buffer overhead.
  */
 
-// WVB - since we do not debug the C library we can safely use existing functions
+/**
+ * WVB - since we do not debug the C library we can safely use existing 
+ * functions
+ */
 
 #ifdef EFENCE
 

@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__capacity_checker_cpp__
 #define __loaded__capacity_checker_cpp__
@@ -62,7 +58,7 @@ bool DecoderChecker::works()
       sprintf(environment,"DECODER=%d",progr_nr);
       putenv(strdup(environment));
       // start decoding it
-      start_bpmdj_raw(get_rawpath(),filename);
+      bpmdjraw(true,filename,get_rawpath());
       // gather the output of the writing process [NYI]
       // check the existence of the target raw file
       char * wave_name=getRawFilename(get_rawpath(),filename);
@@ -139,7 +135,9 @@ void check_capacities()
   if (!Ogg123Decoder().works()) unavailable_capacities |= CAPACITY_OGG123;
   if (!Mpg123Decoder().works()) unavailable_capacities |= CAPACITY_MPG123059R;
   if (!Mpg321Decoder().works()) unavailable_capacities |= CAPACITY_MPG321;
-  if (!Mp3Decoder(CAPACITY_MPLAYER1PRE6).works()) unavailable_capacities |= CAPACITY_MPLAYER1PRE6;
-  if (!Mp3Decoder(CAPACITY_MPLAYER1PRE7).works()) unavailable_capacities |= CAPACITY_MPLAYER1PRE7;
+  if (!Mp3Decoder(CAPACITY_MPLAYER1PRE6).works()) 
+    unavailable_capacities |= CAPACITY_MPLAYER1PRE6;
+  if (!Mp3Decoder(CAPACITY_MPLAYER1PRE7).works()) 
+    unavailable_capacities |= CAPACITY_MPLAYER1PRE7;
 }
 #endif // __loaded__capacity_checker_cpp__

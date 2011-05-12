@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__song_metric_h__
 #define __loaded__song_metric_h__
@@ -44,7 +40,7 @@ public:
   float4 tempo;
   float4 spectrum;
   float4 histogram;
-  float4 rythm;
+  float4 rhythm;
   float4 composition;
 
   // ranges
@@ -75,16 +71,20 @@ public:
   void  set_tempo_weight(float4 val) {tempo = val;};
   void  set_spectrum_weight(float4 val) {spectrum = val;};
   void  set_echo_weight(float4 val) { histogram = val;};
-  void  set_rythm_weight(float4 val) { rythm = val; };
+  void  set_rhythm_weight(float4 val) { rhythm = val; };
   void  set_composition_weight(float4 val) { composition = val; };
   
   void  prepare(); 
   float4 tempo_diff(const Song& a, const Song& b) const;
-  float4 tempo_dist(const Song& a, const Song& b) const {return fabs(tempo_diff(a,b));};
+  float4 tempo_dist(const Song& a, const Song& b) const 
+  {
+    return fabs(tempo_diff(a,b));
+  };
   float4 spectrum_dist(const Song &, const Song & song) const;
   float4 histogram_dist(const Song &, const Song & song, float8 breakat) const;
-  float4 rythm_dist(const Song &, const Song & song, float8 breakat) const;
-  float4 composition_dist(const Song & a, const Song & song, float8 breakat) const;
+  float4 rhythm_dist(const Song &, const Song & song, float8 breakat) const;
+  float4 composition_dist(const Song & a, const Song & song, 
+			  float8 breakat) const;
   float4 find_harmonic(float4 td, int & which) const;
   float4 distance(const Song &a, const Song &b, float8 limit) const;
 

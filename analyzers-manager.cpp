@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__analyzers_manager_cpp__
 #define __loaded__analyzers_manager_cpp__
@@ -24,50 +20,20 @@ using namespace std;
 #line 1 "analyzers-manager.c++"
 #include <qstring.h>
 #include "analyzers-manager.h"
-#include "config.h"
-#include "memory.h"
+#include "selector.h"
 
-AnalyzersManager::AnalyzersManager(int count, AnalyzerChanged * sel, int timeout) :
-  BasicProcessManager(count)
+void AnalyzersManager::start(SongSlot* slot, Song * song, const char* command, 
+const char* description)
 {
-  listener = sel;
-  limit_time = timeout;
-};
-
-void AnalyzersManager::start(int id,Song * song, const char* command)
-{
-  BasicProcessManager::start(id, command,
-			     Config::analyzers[id].getLogName(),
-			     true);
-  Config::analyzers[id].start(song);
+  SongProcess* p=new SongProcess(slot,this);
+  p->start(command,description,true);
+  slot->start(song,p);
 }
 
-void AnalyzersManager::checkSignals()
+void AnalyzersManager::process_died(SongSlot* slot)
 {
-  BasicProcessManager::checkSignals();
-  for(int i = 0 ; i < pid_count ; i ++)
-    if (Config::analyzers[i].inc_running_time()==limit_time) 
-      clearId(i);
+  Song * song = slot->getSong();
+  slot->stop();
+  selector->startAnotherAnalyzer(song,slot->getId());
 }
-
-void AnalyzersManager::songKilled(SongProcess * song)
-{
-  for(int i = 0 ; i < 8 ; i ++)
-    if (&Config::analyzers[i]==song)
-      clearId(i);
-}
-
-bool AnalyzersManager::slot_free(int i)
-{
-  return (active_pids[i]==0);
-}
-
-void AnalyzersManager::clearId(int id)
-{
-  Song * song = Config::analyzers[id].getSong();
-  Config::analyzers[id].stop();
-  BasicProcessManager::clearId(id);
-  listener->startAnotherAnalyzer(song,id);
-}
-
 #endif // __loaded__analyzers_manager_cpp__

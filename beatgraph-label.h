@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__beatgraph_label_h__
 #define __loaded__beatgraph_label_h__
@@ -34,12 +30,13 @@ using namespace std;
  * The port from Qt3 to Qt4 is a bit tricky here. First: the new painter system
  * does not allow us to draw outside a paintevent message, so we need to fake 
  * these. Secondly: the double buffering makes the xor operation effectively
- * useless. Third: removing the old line with a small redraw will redraw the entire
- * bitmap regardless. These 3 reasons forced me to redraw the content of the window
- * myself by updating the resized pixmap. The result is that drawCursor will always
- * update the image in a way that only leaves 1 line on the image. Once the image
- * is updated we either request two paint operations (if the lines are far apart), 
- * or 1 merged operation if they are close to each other.
+ * useless. Third: removing the old line with a small redraw will redraw the
+ * entire bitmap regardless. These 3 reasons forced me to redraw the content of
+ * the window myself by updating the resized pixmap. The result is that 
+ * drawCursor will always update the image in a way that only leaves 1 line on 
+ * the image. Once the image is updated we either request two paint operations 
+ * (if the lines are far apart), or 1 merged operation if they are close to each
+ * other.
  */
 class BeatGraphLabel: public QWidget
 {
@@ -68,8 +65,8 @@ protected:
    */
   virtual void paintEvent(QPaintEvent *);
   /**
-   * When a resize of the widget occur, we recalculate the resized image and redraw
-   * the cursor
+   * When a resize of the widget occur, we recalculate the resized image and 
+   * redraw the cursor
    */
   virtual void resizeEvent(QResizeEvent * event);
   /**
@@ -79,7 +76,8 @@ protected:
    */
   QImage original;
   /**
-   * The resized image which fits the width() and height() of the widget perfectly.
+   * The resized image which fits the width() and height() of the widget
+   * perfectly.
    */
   QImage resized;
   /**
@@ -97,8 +95,8 @@ protected:
   void moveRuler(int &x1, int &x2, int &x3, int &x4);
 public:
   /**
-   * The timer used to update the image if necessary. This timer will be connected
-   * to the drawCursor slot.
+   * The timer used to update the image if necessary. This timer will be 
+   * connected to the drawCursor slot.
    */
   QTimer timer;
   /**

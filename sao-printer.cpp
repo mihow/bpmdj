@@ -34,4 +34,13 @@ void print(outputbuf& where, const char* script, ...)
   where.push_back(toexecute);
 };
 
+void print(outputbuf& where, string script, ...)
+{
+  char toexecute[1024];
+  va_list ap;
+  va_start(ap,script);
+  vsprintf(toexecute,script.c_str(),ap);
+  va_end(ap);
+  where.push_back(toexecute);  
+}
 #endif // __loaded__sao_printer_cpp__

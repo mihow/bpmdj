@@ -1,6 +1,8 @@
 /****
- Borg IV compiled file
- Copyright (C) 2006-2007 Werner Van Belle
+ Active Object compiled file
+ Copyright (C) 2006-2009 Werner Van Belle
+ Do not modify. Changes might be lost
+ --------------------------------------------
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -72,27 +74,24 @@ class ActiveFragmentPlayer: public ActiveObject<Smart< ActiveFragmentPlayer_msg_
       };
   FragmentDeliverer delivery;
   bool finished;
-  volatile dsp_driver_ptr dsp;
   int player_slot;
   volatile bool stopped;
   public: elementResult playWave(FragmentInMemory fragment);
   protected: void queue_playWave(FragmentInMemory fragment);
+  public: elementResult delivererFinished();
+  protected: void queue_delivererFinished();
   public: elementResult stopOutput();
   protected: void queue_stopOutput();
   public: elementResult startOutput();
   protected: void queue_startOutput();
   void checkValidDsp();
   void closeDsp();
-  int expected_playchunk;
-  public: elementResult playChunk(int t);
-  protected: void queue_playChunk(int t);
   public: elementResult terminate();
   protected: void queue_terminate();
   protected:
     ActiveFragmentPlayer(FragmentPlayer* s, string name):
       ActiveObject<Smart< ActiveFragmentPlayer_msg_ > >(name), self(s)
       {
-      dsp = NULL;
       finished = false;
       player_slot = -1;
       stopped = false;
@@ -118,6 +117,26 @@ class ActiveFragmentPlayer_msg_playWave: public ActiveFragmentPlayer_msg_
       {
         ENTER_MSG;
         elementResult res = ao->playWave(fragment);
+        LEAVE_MSG;
+        return res;
+      };
+};
+
+class ActiveFragmentPlayer_msg_delivererFinished: public ActiveFragmentPlayer_msg_
+{
+    ;
+  public:
+    ActiveFragmentPlayer_msg_delivererFinished()
+      {
+      };
+    virtual string declaration()
+    {
+      return "FragmentPlayer::delivererFinished()";
+    }
+    virtual elementResult run(ActiveFragmentPlayer * ao)
+      {
+        ENTER_MSG;
+        elementResult res = ao->delivererFinished();
         LEAVE_MSG;
         return res;
       };
@@ -163,26 +182,6 @@ class ActiveFragmentPlayer_msg_startOutput: public ActiveFragmentPlayer_msg_
       };
 };
 
-class ActiveFragmentPlayer_msg_playChunk: public ActiveFragmentPlayer_msg_
-{
-    int t;
-  public:
-    ActiveFragmentPlayer_msg_playChunk(int t) : t(t)
-      {
-      };
-    virtual string declaration()
-    {
-      return "FragmentPlayer::playChunk(int t)";
-    }
-    virtual elementResult run(ActiveFragmentPlayer * ao)
-      {
-        ENTER_MSG;
-        elementResult res = ao->playChunk(t);
-        LEAVE_MSG;
-        return res;
-      };
-};
-
 class ActiveFragmentPlayer_msg_terminate: public ActiveFragmentPlayer_msg_
 {
     ;
@@ -219,6 +218,11 @@ class FragmentPlayer
       object.queue_playWave(fragment);
     };
   public:
+    void delivererFinished()
+    {
+      object.queue_delivererFinished();
+    };
+  public:
     void stopOutput()
     {
       object.queue_stopOutput();
@@ -227,11 +231,6 @@ class FragmentPlayer
     void startOutput()
     {
       object.queue_startOutput();
-    };
-  public:
-    void playChunk(int t)
-    {
-      object.queue_playChunk(t);
     };
   public:
     void waitForStop();
@@ -253,6 +252,11 @@ inline void ActiveFragmentPlayer::queue_playWave(FragmentInMemory fragment)
     push(Smart<ActiveFragmentPlayer_msg_playWave>(
         new ActiveFragmentPlayer_msg_playWave(fragment)));
   };
+inline void ActiveFragmentPlayer::queue_delivererFinished()
+  {
+    push(Smart<ActiveFragmentPlayer_msg_delivererFinished>(
+        new ActiveFragmentPlayer_msg_delivererFinished()));
+  };
 inline void ActiveFragmentPlayer::queue_stopOutput()
   {
     push(Smart<ActiveFragmentPlayer_msg_stopOutput>(
@@ -262,11 +266,6 @@ inline void ActiveFragmentPlayer::queue_startOutput()
   {
     push(Smart<ActiveFragmentPlayer_msg_startOutput>(
         new ActiveFragmentPlayer_msg_startOutput()));
-  };
-inline void ActiveFragmentPlayer::queue_playChunk(int t)
-  {
-    push(Smart<ActiveFragmentPlayer_msg_playChunk>(
-        new ActiveFragmentPlayer_msg_playChunk(t)));
   };
 inline void ActiveFragmentPlayer::queue_terminate()
   {

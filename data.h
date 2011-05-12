@@ -52,29 +52,29 @@ using namespace std;
  *
  * The data layer was written in order to solve a number of annoyances when programming in C++
  * 
- * - C++ does not provide automatic serialisation/deserialisation and data compatibility between 
- *   different hosts and procesess is a modern necessity when writing applications.
+ * - C++ does not provide automatic serialization/deserialization and data compatibility between 
+ *   different hosts and processes is a modern necessity when writing applications.
  * - There is no generic 'object' type in C++ and simply implementations (e.g : creating a library/application Object
  *   root) easily leads to inefficient representations with generic types such as Integers, Floats,... are subclassed
  *   from such a root. For instance: an array of native integers versus 'object' based integers might be twice as large.
- * - Many generic dataformats lacks multidimensional arrays, requiring the user to wrap arrays within arrays, which in 
- *   itself might make specific optimalisations impossible. Traversing through multi- dimensional operations can often be
+ * - Many generic data formats lacks multidimensional arrays, requiring the user to wrap arrays within arrays, which in 
+ *   itself might make specific optimizations impossible. Traversing through multi- dimensional operations can often be
  *   optimized by properly sorting the stride, sizes and offsets before iteration. This can lead to efficient use of 
- *   specialized opeations for lineair blocks of data. E.g MMX optimized array operations. By providing an array data
- *   type this kind of use has become feasable.
- * - Often, when working with generic data types in C++, downcasting is a necessity. However, downcasts themselve
- *   override compiler warnings and bypasisng the typechecking. Since many errors ocucr due to wrong downcasts, it is 
+ *   specialized operations for linear blocks of data. E.g MMX optimized array operations. By providing an array data
+ *   type this kind of use has become feasible.
+ * - Often, when working with generic data types in C++, downcasting is a necessity. However, downcasts themselves
+ *   override compiler warnings and bypassing the type checking. Since many errors occur due to wrong downcasts, it is 
  *   necessary to integrate a type checking operator into a generic data framework.
  * - Memory allocation of generic data types is often overlooked, leading to memory leaks or inefficient use of memory. 
- *   In the Data library memory allocation is performed using reference counting, which leads to one of the more efficient
- *   implementations as observed by [REF]. The requirement on the aplpication program is not to introduce loops, but this 
- *   is not a problem, since those clases are aimed to provide an efficient serialisation/deserialisation interface.
- * - Languages that provide generic data types often also include garbage colelction features. Those languages are often
+ *   In the data library memory allocation is performed using reference counting, which leads to one of the more efficient
+ *   implementations as observed by [REF]. The requirement on the application program is not to introduce loops, but this 
+ *   is not a problem, since those classes are aimed to provide an efficient serialization/deserialization interface.
+ * - Languages that provide generic data types often also include garbage collection features. Those languages are often
  *   too impractical for heavy duty operations such as image processing and sound processing. (however their 'heaviness' 
- *   is not necesarily linked to the garbage collection as such)
+ *   is not necessarily linked to the garbage collection as such)
  * 
  * @todo We should replace the template array class with the generic message class which still resides in the hatchery. 
- * There is no need to use this complicated templating since it does not make programs perform much faster. Instead we 
+ * There is no need to use this complicated template since it does not make programs perform much faster. Instead we 
  * seem to loose a lot of flexibility by using these templates. 
  */
 
@@ -93,7 +93,7 @@ using namespace std;
  * the DataClass. This class includes an allocation_count, which 
  * remembers how many time the object is supposed to be on the heap. 
  * This is similar to a reference counter. However, the first bump from
- * zero allocation count to 1 is performed by making an explcit shallow copy
+ * zero allocation count to 1 is performed by making an explicit shallow copy
  * towards the heap and returning that as value.
  */
 class DataClass
@@ -108,7 +108,7 @@ class DataClass
   int allocation_count;
 
   /**
-   * returns a copy to the dataclass object, by either making a shallowcopy 
+   * returns a copy to the dataclass object, by either making a shallow copy 
    * (when going from allocation count 0 to 1) or by returning the this pointer. 
    * In all cases the allocation_count will be increased. The memory_copy and 
    * memory_release functions are only available from within the Data class, 
@@ -168,11 +168,11 @@ class DataClass
  * 
  * The class 'Data' represents a generic dataclass. It will take care
  * to count the references of the content it refers to and will deallocate
- * when the referencecounter reaches zero. It will also automatically copy
+ * when the reference counter reaches zero. It will also automatically copy
  * local allocated objects towards the heap when necessary. 
  * 
- * All data is shared explicitel, thus a dataclass can be passed along as if 
- * it were a pointer itself. The content will be explicitely shared. Data should
+ * All data is shared explicitly, thus a dataclass can be passed along as if 
+ * it were a pointer itself. The content will be explicitly shared. Data should
  * never be assigned in such a way that loops occur.
  *
  * The dataclass provides functions for easy downcasting, with automatically
@@ -208,9 +208,9 @@ class Data
 
   /**
    * Will copy the data by taking a memory copy of the content.
-   * If the content is not yet allcoated on the heap it will be copied
+   * If the content is not yet allocated on the heap it will be copied
    * as well. The copy is only of the internal references. The data
-   * objects behave explicitely shared.
+   * objects behave explicitly shared.
    */
   Data(const Data& data);
   
@@ -218,13 +218,13 @@ class Data
    * Will take a copy of the given class, which can be anything, 
    * ranging from Null, Numbers, Floats, Arrays to Tokens...
    * The copy is only of the internal references. The data
-   * objects behave explicitely shared.
+   * objects behave explicitly shared.
    */
   Data(const DataClass & blah);
 
   /**
    * Will assign to this class by releasing the old content 
-   * and refitting it with a pointer to the new. Refernce counts
+   * and refitting it with a pointer to the new. Reference counts
    * are updated automatically.
    */
   Data & operator =(const Data& from);

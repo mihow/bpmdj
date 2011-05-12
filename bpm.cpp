@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__bpm_cpp__
 #define __loaded__bpm_cpp__
@@ -31,12 +27,14 @@ using namespace std;
 
 typedef stereo_sample2 sample_type;
 
-void BpmCounter::init(unsigned4 slen, sample_type *blk, int inrate, float8 lower_boundary, float8 higher_boundary)
+void BpmCounter::init(unsigned4 slen, sample_type *blk, int inrate, 
+float8 lower_boundary, float8 higher_boundary)
 {
   /** 
-   * We calculate the length of an analysis block. We aim to include all frequencies starting from
-   * at least 50 Hz. If we start at 44100 Hz we must halve the value 11 times. Which means that we 
-   * must have at least a buffer of 1<<11
+   * We calculate the length of an analysis block. We aim to include all 
+   * frequencies starting from at least 50 Hz. If we start at 44100 Hz we must
+   * halve the value 11 times. Which means that we must have at least a buffer
+   * of 1<<11
    */
   block=blk;
   input_rate = inrate;
@@ -49,9 +47,9 @@ void BpmCounter::init(unsigned4 slen, sample_type *blk, int inrate, float8 lower
   audio = bpmdj_allocate(measured,float8);
   
   /**
-   * Preparation of the fourier windows, for every band we will have
-   * a separate plan available. All output is stored in the energy
-   * array, which is then used to compute the autocorrelation sequence
+   * Preparation of the Fourier windows, for every band we will have a separate
+   * plan available. All output is stored in the energy array, which is then 
+   * used to compute the autocorrelation sequence
    */
   FILE * wisdom_file = fopen(".bpmdj_fftw_wisdom","rb");
   if (wisdom_file)
@@ -63,17 +61,19 @@ void BpmCounter::init(unsigned4 slen, sample_type *blk, int inrate, float8 lower
   else
     {
       if (log) 
-	fprintf(log,"Information: The first analysis might take a long time (>15 minutes)"
-		    "due to calibration of the fftw lib\n");
+	fprintf(log,"Information: The first analysis might take a long time "
+		"(>15 minutes) due to calibration of the fftw lib\n");
     }
   
   en = bpmdj_allocate(measured, float8);
   ts = bpmdj_allocate(measured, float8);
   co = bpmdj_allocate(measured, float8);
   
-  if (log) fprintf(log,"Preparing fourier transform (%d)\n",measured);
-  forward = fftw_plan_r2r_1d(measured, &(audio[0]), en, FFTW_R2HC, FFTW_MEASURE);
-  backward = fftw_plan_r2r_1d(measured, ts, co, FFTW_HC2R, FFTW_MEASURE);
+  if (log) fprintf(log,"Preparing Fourier transform (%d)\n",measured);
+  forward = fftw_plan_r2r_1d(measured, &(audio[0]), en, FFTW_R2HC, 
+			     FFTW_MEASURE);
+  backward = fftw_plan_r2r_1d(measured, ts, co, FFTW_HC2R, 
+			      FFTW_MEASURE);
   
   wisdom_file = fopen(".bpmdj_fftw_wisdom","wb");
   if (wisdom_file)

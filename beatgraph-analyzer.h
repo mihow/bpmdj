@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__beatgraph_analyzer_h__
 #define __loaded__beatgraph_analyzer_h__
@@ -35,20 +31,26 @@ class BeatGraphAnalyzer : public QWidget, public Ui::BeatGraph
 private: 
   // the signed data is used as input into the energy and haar calculations
   signed4 audiosize;
-  uncompressed * signed_data;
+  uncompressed * signed_data;  // contains audiosize/COLLAPSED samples
   void readFileSigned();
   // the period under which the beatgraph is being visualized
   signed4 period;
   void getTempo();
   bool check_visualisation_conditions(bool file_read=true);
   // energy calculation, storage & visualisation
-  compressed   * data;
+  compressed  * data;
   void calculateEnergy();
   void showEnergyPattern();
   // haar calculation, storage & visualisation
-  float4 * * bank;
+  float4 ** bank;
+  unsigned1* f1;
   void calculateHaar();
   void showHaarPattern();
+
+  compressed * hue;
+  compressed * sat;
+  void calculateF1();
+  void showF1Pattern();
 public:
   BeatGraphAnalyzer(QWidget * parent = 0, const char * name=0);
   void readFileSigned(bool showreaderprogress);

@@ -41,8 +41,15 @@ bool Lock::try_lock(string w)
   if (cmpxchg(&locked,locked,this)==before)
     {
       who=w;
+#ifdef DEBUG_LOCKING
+      cerr << "Locked " << locked << " by " << w << "\n";
+#endif
       return true;
     }
+#ifdef DEBUG_LOCKING
+  cerr << "Tried locked of " << locked << " by " << w << 
+    " could not due to " << who << "\n";
+#endif
   return false;
 }
 

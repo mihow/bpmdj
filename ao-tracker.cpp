@@ -29,7 +29,12 @@ elementResult ActiveAoTracker::sunset(string s)
 #ifdef SUNSET_CHECK
   cerr << "The sun is setting for " << s << "\n";
 #endif
-  assert(alive.find(s)!=alive.end());
+  if (alive.find(s)==alive.end())
+    {
+      cerr << "sunset for unknown active object in " << (long)(void*)this << '\n';
+      print();
+      assert(0);
+    }
   alive.erase(s);
   if (alive.empty())
     {
@@ -44,7 +49,7 @@ elementResult ActiveAoTracker::sunset(string s)
 elementResult ActiveAoTracker::sunrise(string s)
 {
 #ifdef SUNSET_CHECK
-  cerr << "The sun is rising for " << s << "\n";
+  cerr << "The sun is rising for " << s << " in " << (long)(void*)this << "\n";
 #endif
   if (alive.find(s)!=alive.end())
     {
@@ -58,7 +63,7 @@ elementResult ActiveAoTracker::sunrise(string s)
 
 elementResult ActiveAoTracker::print()
 {
-  // prints the obejcts that are still active
+  // prints the objects that are still active
   set<string>::iterator sit=alive.begin();
   cerr << "Active Objects still alive:\n";
   while(sit!=alive.end())

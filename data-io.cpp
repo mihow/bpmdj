@@ -338,7 +338,7 @@ void DataTexter::padded(QString str)
 
 void DataTexter::padded(const char *t)
 {
-  // if it is a new line, pad the lenght up to margin
+  // if it is a new line, pad the length up to margin
   int text_length = strlen(t);
   while(text_length>0)
     {
@@ -607,7 +607,7 @@ void DataBinner::mmap_textfile()
 #ifdef WINDOWS
   /**
    * I have no idea how to mmap files in windows so we stick to
-   * copyying the entire file in memory
+   * copying the entire file in memory
    */
   fseek(text,0,SEEK_END);
   file_size = mapped_size = ftell(text);

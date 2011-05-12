@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__qvectorview_cpp__
 #define __loaded__qvectorview_cpp__
@@ -82,7 +78,8 @@ void QVectorViewData::setup(QVectorView * v)
   ownHeight = h;
 }
 
-void QVectorViewData::paintCell(QVectorView* lv, int number, QPainter * p, const QColorGroup & cg, int column, int width, int align )
+void QVectorViewData::paintCell(QVectorView* lv, int number, QPainter * p, 
+const QColorGroup & cg, int column, int width, int align )
 {
   if ( !p ) return;
   QFontMetrics fm( p->fontMetrics() );
@@ -104,8 +101,9 @@ void QVectorViewData::paintCell(QVectorView* lv, int number, QPainter * p, const
     p->drawText(marg , 0, width, height(), Qt::AlignVCenter, t );
 }
 
-QVectorView::QVectorView(QWidget * parent, QVectorViewData * container, Qt::WindowFlags f):
-  Q3ScrollView( parent, "VectorView", f | Qt::WStaticContents | Qt::WNoAutoErase )
+QVectorView::QVectorView(QWidget * parent, QVectorViewData * container, 
+Qt::WindowFlags f): Q3ScrollView( parent, "VectorView", f | 
+Qt::WStaticContents | Qt::WNoAutoErase )
 {
   item_container = container;
   init();
@@ -159,15 +157,24 @@ void QVectorView::init()
     d_inMenuMode = FALSE;
     setMouseTracking( TRUE );
     viewport()->setMouseTracking( TRUE );
-    connect( d_timer, SIGNAL(timeout()), this, SLOT(updateContents()) );
-    connect( d_dirtyItemTimer, SIGNAL(timeout()), this, SLOT(updateDirtyItems()) );
-    connect( d_visibleTimer, SIGNAL(timeout()), this, SLOT(makeVisible()) );
-    connect( d_h, SIGNAL(sizeChange( int, int, int )), this, SLOT(handleSizeChange( int, int, int )) );
-    connect( d_h, SIGNAL(moved( int, int )), this, SLOT(triggerUpdate()) );
-    connect( d_h, SIGNAL(sectionClicked( int )), this, SLOT(changeSortColumn( int )) );
-    connect( d_h, SIGNAL(sectionHandleDoubleClicked( int )), this, SLOT(adjustColumn( int )) );
-    connect( horizontalScrollBar(), SIGNAL(sliderMoved(int)), d_h, SLOT(setOffset(int)) );
-    connect( horizontalScrollBar(), SIGNAL(valueChanged(int)), d_h, SLOT(setOffset(int)) );
+    connect(d_timer, SIGNAL(timeout()), 
+	    this, SLOT(updateContents()) );
+    connect(d_dirtyItemTimer, SIGNAL(timeout()), 
+	    this, SLOT(updateDirtyItems()) );
+    connect(d_visibleTimer, SIGNAL(timeout()), 
+	    this, SLOT(makeVisible()) );
+    connect(d_h, SIGNAL(sizeChange( int, int, int )), 
+	    this, SLOT(handleSizeChange( int, int, int )) );
+    connect(d_h, SIGNAL(moved( int, int )), 
+	    this, SLOT(triggerUpdate()) );
+    connect(d_h, SIGNAL(sectionClicked( int )), 
+	    this, SLOT(changeSortColumn( int )) );
+    connect(d_h, SIGNAL(sectionHandleDoubleClicked( int )), 
+	    this, SLOT(adjustColumn( int )) );
+    connect(horizontalScrollBar(), SIGNAL(sliderMoved(int)), 
+	    d_h, SLOT(setOffset(int)) );
+    connect(horizontalScrollBar(), SIGNAL(valueChanged(int)), 
+	    d_h, SLOT(setOffset(int)) );
     viewport()->setFocusProxy( this );
     viewport()->setFocusPolicy( Qt::WheelFocus );
     viewport()->setBackgroundRole( QPalette::Base );
@@ -200,11 +207,10 @@ QVectorView::ResizeMode QVectorView::resizeMode() const
     return d_resizeMode;
 }
 
-/*!
-    Destroys the list view, deleting all its items, and frees up all
-    allocated resources.
-*/
-
+/**
+ * Destroys the list view, deleting all its items, and frees up all allocated
+ * resources.
+ */
 QVectorView::~QVectorView()
 {
   d_focusItem = -1;
@@ -260,7 +266,8 @@ void QVectorView::drawContentsOffset( QPainter * p, int ox, int oy,
   int tx = -1;
   int ih = item_container->height();
   if (ih>0)
-    for(int current = top_line_number ; current <=bottom_line_number ; current++)
+    for(int current = top_line_number ; current <=bottom_line_number ; 
+	current++)
       {
 	int c;
 	int cs;
@@ -295,8 +302,9 @@ void QVectorView::drawContentsOffset( QPainter * p, int ox, int oy,
 	    x = fx;
 	    c = fc;
 	    // draw to last interesting column
-	    bool drawActiveSelection = hasFocus() || d_inMenuMode; // !style().styleHint( QStyle::SH_ItemView_ChangeHighlightOnFocus, this );
-	    const QColorGroup &cg = ( drawActiveSelection ? colorGroup() : palette().inactive() );
+	    bool drawActiveSelection = hasFocus() || d_inMenuMode; 
+	    const QColorGroup &cg = ( drawActiveSelection ? colorGroup() : 
+				      palette().inactive() );
       
 	    while ( c < lc )
 	      {
@@ -309,7 +317,8 @@ void QVectorView::drawContentsOffset( QPainter * p, int ox, int oy,
 		  {
 		    p->translate( r.left(), r.top() );
 		    int ac = d_h->mapToLogical( c );
-		    item_container->paintCell(this, current, p, cg, ac, r.width(), Qt::AlignLeft);
+		    item_container->paintCell(this, current, p, cg, ac, 
+					      r.width(), Qt::AlignLeft);
 		  }
 		p->restore();
 		x += cs;
@@ -323,7 +332,8 @@ void QVectorView::drawContentsOffset( QPainter * p, int ox, int oy,
 	  tx = d_h->cellPos( cell );
       }
   if ( totalHeight < cy + ch )
-    paintEmptyArea( p, QRect( cx - ox, totalHeight - oy, cw, cy + ch - totalHeight ) );
+    paintEmptyArea( p, QRect( cx - ox, totalHeight - oy, 
+			      cw, cy + ch - totalHeight ) );
   int c = d_h->count()-1;
   if ( c >= 0 &&
        d_h->cellPos( c ) + d_h->cellSize( c ) < cx + cw ) {
@@ -333,12 +343,7 @@ void QVectorView::drawContentsOffset( QPainter * p, int ox, int oy,
 }
 
 void QVectorView::paintEmptyArea( QPainter * p, const QRect & rect )
-{
-  //  QStyleOption opt( 0, 0 ); // ### hack; in 3.1, add a property in QVectorView and Q3Header
-  //  QStyle::SFlags how = QStyle::Style_Default;
-  //  if ( isEnabled() )
-  //    how |= QStyle::Style_Enabled;
-  
+{  
   QStyleOptionQ3ListView options;
   options.rect=rect;
   options.palette=palette();
@@ -396,16 +401,6 @@ void QVectorView::setColumnText( int column, const QString &label )
     }
 }
 
-/*void QVectorView::setColumnText( int column, const QIconSet& iconset, const QString &label )
-{
-  if ( column < d_h->count() ) 
-    {
-      d_h->setLabel( column, iconset, label );
-      updateGeometries();
-    }
-}
-*/
-
 void QVectorView::setColumnWidth( int column, int w )
 {
   if ( column < d_h->count() && d_h->sectionSize( column ) != w ) 
@@ -448,8 +443,9 @@ QVectorView::WidthMode QVectorView::columnWidthMode( int c ) const
 
 void QVectorView::show()
 {
-  // Reimplemented to setx the correct background mode and viewed
-  // area size.
+  /**
+   * Reimplemented to setx the correct background mode and viewed area size.
+   */
   if ( !isVisible() ) 
     {
       reconfigureItems();
@@ -503,8 +499,9 @@ void QVectorView::handleSizeChange( int section, int os, int ns )
     int sx = horizontalScrollBar()->value();
     bool sv = horizontalScrollBar()->isVisible();
     updateGeometries();
-    bool fullRepaint = d_fullRepaintOnComlumnChange || sx != horizontalScrollBar()->value()
-		       || sv != horizontalScrollBar()->isVisible();
+    bool fullRepaint = d_fullRepaintOnComlumnChange 
+      || sx != horizontalScrollBar()->value()
+      || sv != horizontalScrollBar()->isVisible();
     d_fullRepaintOnComlumnChange = FALSE;
     viewport()->setUpdatesEnabled( upe );
 
@@ -519,16 +516,12 @@ void QVectorView::handleSizeChange( int section, int os, int ns )
     if ( dx > 0 )
 	left -= dx;
     if ( left < visibleWidth() )
-	viewport()->scroll( dx, 0, QRect( left, 0, visibleWidth() - left, visibleHeight() ) );
+      viewport()->scroll( dx, 0, QRect( left, 0, visibleWidth() - left, 
+					visibleHeight() ) );
+    // don't forget border between the items and ellipses width
     viewport()->repaint( left - 4 - d_ellipsisWidth, 0, 4 + d_ellipsisWidth,
-			 visibleHeight(), FALSE ); // border between the items and ellipses width
+			 visibleHeight(), FALSE ); 
 
-    // map auto to left for now. Need to fix this once we support
-    // reverse layout on the listview.
-    // int align = Qt::AlignLeft;
-    //    if ( align != AlignAuto && align != AlignLeft )
-    //      viewport()->repaint( d_h->cellPos( actual ) - contentsX(), 0,
-    //			   d_h->cellSize( actual ), visibleHeight() );
 }
 
 void QVectorView::updateDirtyItems()
@@ -684,7 +677,8 @@ void QVectorView::contentsMousePressEventEx( QMouseEvent * e )
       {
 	if ( e->state() & Qt::ShiftButton )
 	  d_pressedSelected = FALSE;
-	if ( (e->state() & Qt::ControlButton) && !(e->state() & Qt::ShiftButton) && i>=0 ) 
+	if ( (e->state() & Qt::ControlButton) && 
+	     !(e->state() & Qt::ShiftButton) && i>=0 ) 
 	  {
 	    setSelected(i,!isSelected(i) );
 	    changed = TRUE;
@@ -732,10 +726,11 @@ void QVectorView::contentsMouseReleaseEventEx( QMouseEvent * e )
 {
   bool emitClicked = !d_pressedItem || d_buttonDown;
   d_buttonDown = FALSE;
-  // delete and disconnect autoscroll timer, if we have one
+  // delete and disconnect auto-scroll timer, if we have one
   if ( d_scrollTimer ) 
     {
-      disconnect( d_scrollTimer, SIGNAL(timeout()), this, SLOT(doAutoScroll()) );
+      disconnect( d_scrollTimer, SIGNAL(timeout()), 
+		  this, SLOT(doAutoScroll()) );
       //printf("Disconnected scrolling timer\n");
       d_scrollTimer->stop();
       delete d_scrollTimer;
@@ -767,8 +762,11 @@ void QVectorView::contentsMouseReleaseEventEx( QMouseEvent * e )
   if ( emitClicked ) 
     {
       emit clicked( i );
-      emit clicked( i, viewport()->mapToGlobal( vp ), d_h->mapToLogical( d_h->cellAt( vp.x() ) ) );
-      emit mouseButtonClicked( e->button(), i, viewport()->mapToGlobal( vp ), i ? d_h->mapToLogical( d_h->cellAt( vp.x() ) ) : -1 );
+      emit clicked( i, viewport()->mapToGlobal( vp ), 
+		    d_h->mapToLogical( d_h->cellAt( vp.x() ) ) );
+      emit mouseButtonClicked( e->button(), i, viewport()->mapToGlobal( vp ), 
+			       i ? d_h->mapToLogical( d_h->cellAt( vp.x() ) ) 
+			         : -1 );
       if ( e->button() == Qt::RightButton ) {
 	if ( i<0 ) 
 	  {
@@ -789,8 +787,9 @@ void QVectorView::contentsMouseDoubleClickEvent( QMouseEvent * e )
   if ( !e || e->button() != Qt::LeftButton )
     return;
   
-  // ensure that the following mouse moves and eventual release is
-  // ignored.
+  /**
+   * Ensures that the following mouse moves and eventual release is ignored.
+   */
   d_buttonDown = FALSE;
   
   if ( d_ignoreDoubleClick ) 
@@ -803,12 +802,17 @@ void QVectorView::contentsMouseDoubleClickEvent( QMouseEvent * e )
 
   int i = itemAt( vp );
   
-  // we emit doubleClicked when the item is null (or enabled) to be consistent with
-  // rightButtonClicked etc.
+  /**
+   * Emit doubleClicked when the item is null (or enabled) to be consistent with
+   * rightButtonClicked etc.
+   */
   int c = d_h->mapToLogical( d_h->cellAt( vp.x() ) );
   emit doubleClicked( i, viewport()->mapToGlobal( vp ), c );
 
-  // we emit the 'old' obsolete doubleClicked only if the item is not null and enabled
+  /**
+   * Emit the 'old' obsolete doubleClicked only if the item is not null and
+   * enabled
+   */
   emit doubleClicked( i );
 }
 
@@ -837,7 +841,7 @@ void QVectorView::contentsMouseMoveEvent( QMouseEvent * e )
   if ( vp.y() > visibleHeight() || vp.y() < 0 )
     needAutoScroll = TRUE;
   
-  // if we need to scroll and no autoscroll timer is started,
+  // if we need to scroll and no auto-scroll timer is started,
   // connect the timer
   if ( needAutoScroll && !d_scrollTimer ) 
     {
@@ -850,13 +854,14 @@ void QVectorView::contentsMouseMoveEvent( QMouseEvent * e )
       doAutoScroll( vp );
     }
 
-  // if we don't need to autoscroll
+  // if we don't need to auto-scroll
   if ( !needAutoScroll ) 
     {
-      // if there is a autoscroll timer, delete it
+      // if there is a auto-scroll timer, delete it
       if ( d_scrollTimer ) 
 	{
-	  disconnect( d_scrollTimer, SIGNAL(timeout()), this, SLOT(doAutoScroll()) );
+	  disconnect( d_scrollTimer, SIGNAL(timeout()), 
+		      this, SLOT(doAutoScroll()) );
 	  d_scrollTimer->stop();
 	  //printf("Disconnected scrolling timer\n");
 	  delete d_scrollTimer;
@@ -877,7 +882,8 @@ void QVectorView::doAutoScroll()
 void QVectorView::doAutoScroll( const QPoint &cursorPos )
 {
   //printf(" ... autoscroll ...\n");
-  QPoint pos = cursorPos.isNull() ? viewport()->mapFromGlobal( QCursor::pos() ) :  cursorPos;
+  QPoint pos = cursorPos.isNull() ? viewport()->mapFromGlobal( QCursor::pos() ) 
+                                  :  cursorPos;
   if ( d_focusItem<0 || ( d_pressedEmptyArea && pos.y() > contentsHeight() ) ) 
     {
       //printf("aborted %d\n",d_focusItem);
@@ -951,35 +957,12 @@ void QVectorView::focusInEvent( QFocusEvent* e)
       emit currentChanged( d_focusItem );
       repaintItem( d_focusItem );
     }
-  //if ( style().styleHint( QStyle::SH_ItemView_ChangeHighlightOnFocus, this ) ) 
-  //{
-  //viewport()->repaint( FALSE );
-  //}
-  //  QRect mfrect = itemRect( d_focusItem );
-  //  if ( mfrect.isValid() ) 
-  //    {
-  //      if ( header() && header()->isVisible() )
-  //	setMicroFocusHint( mfrect.x(), mfrect.y()+header()->height(), mfrect.width(), mfrect.height(), FALSE );
-  //      else
-  //	setMicroFocusHint( mfrect.x(), mfrect.y(), mfrect.width(), mfrect.height(), FALSE );
-  //    }
 }
 
 void QVectorView::focusOutEvent( QFocusEvent*e )
 {
   if ( e->reason() == Qt::PopupFocusReason && d_buttonDown )
-    d_buttonDown = FALSE;
-  //  if ( style().styleHint( QStyle::SH_ItemView_ChangeHighlightOnFocus, this ) ) 
-  //    {
-  //      d_inMenuMode =
-  //	QFocusEvent::reason() == QFocusEvent::Popup
-  //	|| (qApp->focusWidget() && qApp->focusWidget()->inherits("QMenuBar"));
-  //      if ( !d_inMenuMode ) 
-  //	{
-  //	  viewport()->repaint( FALSE );
-  //	}
-  //    }
-  
+    d_buttonDown = FALSE;  
   if ( d_focusItem>=0 )
     repaintItem( d_focusItem );
 }
@@ -1133,7 +1116,8 @@ void QVectorView::keyPressEvent( QKeyEvent * e )
     d_selectAnchor = i;
   
   setCurrentItem( i );
-  handleItemChange( old, e->state() & Qt::ShiftButton, e->state() & Qt::ControlButton );
+  handleItemChange( old, e->state() & Qt::ShiftButton, 
+		    e->state() & Qt::ControlButton );
   
   if ( singleStep )
     {
@@ -1240,15 +1224,7 @@ void QVectorView::setCurrentItem( int i )
   
   int prev = d_focusItem;
   d_focusItem = i;
-  
-  //  QRect mfrect = itemRect( i );
-  //  if ( mfrect.isValid() ) {
-  //    if ( header() && header()->isVisible() )
-  //      setMicroFocusHint( mfrect.x(), mfrect.y()+header()->height(), mfrect.width(), mfrect.height(), FALSE );
-  //    else
-  //      setMicroFocusHint( mfrect.x(), mfrect.y(), mfrect.width(), mfrect.height(), FALSE );
-  //  }
-  
+    
   if ( i != prev ) 
     {
       if ( i )
@@ -1426,7 +1402,10 @@ void QVectorView::handleItemChange( int old, bool shift, bool control )
     }
 } 
 
-/* unselects items from to, including children, returns TRUE if any items were unselected */
+/**
+ * Unselects items from to, including children, returns TRUE if any items were
+ * unselected 
+ */
 bool QVectorView::clearRange( int from, int to, bool includeFirst )
 {
   if ( from<0 || to<0 ) return FALSE;
@@ -1457,7 +1436,8 @@ bool QVectorView::clearRange( int from, int to, bool includeFirst )
   return changed;
 }
 
-void QVectorView::selectRange(int from, int to, bool invert, bool includeFirst, bool clearSel )
+void QVectorView::selectRange(int from, int to, bool invert, 
+			      bool includeFirst, bool clearSel )
 {
   if ( from<0 || to<0 ) return;
   if ( from == to && !includeFirst ) return;
@@ -1476,7 +1456,8 @@ void QVectorView::selectRange(int from, int to, bool invert, bool includeFirst, 
   bool changed = FALSE;
   if ( clearSel ) 
     {
-      for(int clearing = 0 ; clearing < item_container->vectorSize() ; clearing ++)
+      for(int clearing = 0 ; clearing < item_container->vectorSize() ; 
+	  clearing ++)
 	{
 	  if ( isSelected(clearing)) 
 	    {
@@ -1511,7 +1492,10 @@ void QVectorView::selectRange(int from, int to, bool invert, bool includeFirst, 
     }
 }
 
-/* clears selection from anchor to old, selects from anchor to new, does not emit selectionChanged on change */
+/**
+ * Clears selection from anchor to old, selects from anchor to new, does not 
+ * emit selectionChanged on change 
+ */
 bool QVectorView::selectRange( int newItem, int oldItem, int anchorItem )
 {
   if ( newItem<0 || oldItem<0 || !anchorItem<0 )

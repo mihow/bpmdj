@@ -28,8 +28,8 @@ using namespace std;
 #include "reference-count.h"
 
 /**
- * @brief counts the number of smartpointers refering to it and also keeps a 
- * readable/writeable flag.
+ * @brief counts the number of smart pointers referring to it and also keeps a 
+ * readable/writable flag.
  */
 #ifdef DATA_RO_FIELD
 typedef enum {ReadOnly, Writeable} DataAccessFlag;
@@ -54,9 +54,9 @@ public:
   bool readonly;
 #endif
   /**
-   * if the object is being cloned to a readonly copy
-   * then this variable will point to the readonly clone. This 
-   * variable is cleared as soobn as we write anything to this object;
+   * if the object is being cloned to a read only copy
+   * then this variable will point to the read only clone. This 
+   * variable is cleared as soon as we write anything to this object;
    */
   Smart<ReferenceCount> readonly_clone;
   DataReferenceCount()
@@ -72,7 +72,7 @@ public:
    */
   virtual DataReferenceCount* clone() = 0;
   /**
-   * should make all the values in this object readonly.
+   * should make all the values in this object read only.
    */
 #ifdef DATA_RO_FIELD
   virtual void change_access(DataAccessFlag flag)
@@ -90,7 +90,7 @@ public:
   }
 #endif
   /**
-   * Dont assign. Bad idea :)
+   * Don't assign. Bad idea :)
    */
   DataReferenceCount& operator =(const DataReferenceCount& r)
   {
@@ -122,9 +122,9 @@ extern long w2r_unknown_singleref;
 #endif
 
 /**
- * This class uses an ugly trick in which we misalign the last bit of the pointer
- * as an indication of the fact that we should clone the pointer to a writeable
- * one. As soon as this poitner is copied, we check whether we really need to clone 
+ * This class uses an ugly trick in which we wrongly align the last bit of the pointer
+ * as an indication of the fact that we should clone the pointer to a writable
+ * one. As soon as this pointer is copied, we check whether we really need to clone 
  * the original or not
  */
 template <class ReferenceCountedObject> 
@@ -190,14 +190,14 @@ public:
   
 #ifdef DATA_RO_FIELD
   /**
-   * Makes the content of this pointer readonly by copying it if necessary
+   * Makes the content of this pointer read only by copying it if necessary
    */
   void make_readonly()
   {
     if (this->ptr==NULL) return;
     if (this->ptr->readonly) return;
     /** 
-     * if we have aprevious readonly clone of this object then we create 
+     * if we have a previous read only clone of this object then we create 
      * a new pointer to it
      */
 #ifdef W2R_CACHING

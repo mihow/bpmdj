@@ -32,7 +32,7 @@ using namespace std;
 //               The Array Creator
 //---------------------------------------------------------------
 // this class is used by the lexer to read arrays in memory
-// it is not the most efficient class since it relies on convertion
+// it is not the most efficient class since it relies on conversion
 // to solve this the parser must be changed to fill in the specific
 // positions during parsing.
 void Creator::ensure_size(int S)
@@ -74,8 +74,8 @@ Data Creator::createAndFillTarget(Size<8> s)
      {
 	Content cur = getContentData();
 	// here we navigate down to the right dimension. 
-	// Because the first element is ourselve we need to add one to the coordinate
-	// for all the subelements we can be confident that the content is a proper 
+	// Because the first element is ourselves we need to add one to the coordinate
+	// for all the sub-elements we can be confident that the content is a proper 
 	// matrix already
 	int idx;
 	for(int d = 0 ; d < D-1 ; d++)

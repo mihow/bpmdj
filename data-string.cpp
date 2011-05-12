@@ -39,7 +39,7 @@ void frontup(char* target, char * source)
   memmove(target,source,strlen(source)+1);
 }
 
-// When reading a string all data is read and afterwards filtered out. 
+// When reading a string all data is read and afterward filtered out. 
 // '' is replaced with '
 // \n\ *| is removed from the string.
 // \n\ *> is replaced with \n  

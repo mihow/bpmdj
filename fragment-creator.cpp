@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__fragment_creator_cpp__
 #define __loaded__fragment_creator_cpp__
@@ -30,7 +26,8 @@ using namespace std;
 elementResult ActiveFragmentCreator::createOneFor(Song* song)
 {
   QString music_filename = song->get_file();
-  QString fragment_filename = FragmentsDir+"/nr"+QString::number((intptr_t)(void*)song)+".wav";
+  QString fragment_filename = FragmentsDir+"/nr"+
+    QString::number((intptr_t)(void*)song)+".wav";
   Index index(song->get_storedin());
   unsigned8 pos = index.get_cue();
   int startsec=pos/44100;
@@ -41,10 +38,12 @@ elementResult ActiveFragmentCreator::createOneFor(Song* song)
   
   if (!exists(fragment_filename.ascii()))
     {
-      // this is a bit experimental and relies hevaily onmplayer its
-      // excellent capabilities to seek to the right position.
-      QString toexecute = 
-	QString("mplayer -vc null -vo null -ss ")
+      /**
+       * this relies heavily on mplayer its
+       * excellent capabilities to seek to the right position.
+       */
+      QString description=QString("Creating fragment ")+song->getDisplayTitle();
+      QString toexecute=QString("mplayer -vc null -vo null -ss ")
 	+ QString::number(startsec)
 	+ QString(" -endpos ")
 	+ QString::number(stopsec-startsec)
@@ -53,8 +52,9 @@ elementResult ActiveFragmentCreator::createOneFor(Song* song)
 	+ OneSpace
 	+ QString(MusicDir)
 	+ slash
-	+ QString(escape(music_filename));
-      execute(toexecute.ascii());
+	+ QString(escape(music_filename))
+	+ QString(">/dev/null 2>/dev/null");
+      execute(description.ascii(),toexecute.ascii());
     }
   if (exists(fragment_filename.ascii()))
     {
@@ -73,8 +73,7 @@ elementResult ActiveFragmentCreator::createOneFor(Song* song)
 	ready.push_back(ff);
       }
       if (app)
-	app->postEvent(song_selector_window,
-		       new FragmentCreated(ff));
+	app->postEvent(selector, new FragmentCreated(ff));
     }
   return Done;
 }
@@ -98,8 +97,7 @@ deque<FragmentFile> FragmentCreator::getReadyOnes()
 
 elementResult ActiveFragmentCreator::terminate()
 {
-  deactivate();
-  return Done;
+  return deactivate();
 }
 
 FragmentCreator fragmentCreator;

@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__scripts_h__
 #define __loaded__scripts_h__
@@ -24,6 +20,7 @@ using namespace std;
 #line 1 "scripts.h++"
 #include <stdio.h>
 #include "index.h"
+#include "process.h"
 #include "common.h"
 
 // adding new extensions can be done in dirscanner.cpp
@@ -31,7 +28,6 @@ using namespace std;
 #define IDX_EXT ".idx"
 #define SHELL_HEADER "#!/bin/bash\n"
 // commands
-#define CDROM "/cdrom"
 #define RAW2WAV "sox -r 44100 -s -w -c 2 "
 #define BPLAY "bplay -s 44100 -S -b 16 "
 
@@ -50,19 +46,19 @@ void   removeRawFile(Index* index, const char* dir);
 void   removeAllRaw(const char* dir);
 void   removeAllLog();
 void   dumpAudio(const char* fname, unsigned4 * buffer, long length);
-void   spawn(const char* script);
-bool   execute(const char* script);
-bool   vexecute(const char* script,...);
-int    bpmdj_fork();
 
-// external programs
-int    start_bpmdj_raw(const char* where, const char* file);
-void   start_mkdir(const char* dir);
-void   start_cp(const char* from, const char* to);
-int    start_mv(const char* from, const char* to);
-void   start_rm(const char* what);
-int    start_mount_cdrom();
-int    start_umount_cdrom(bool eject = true);
+/**
+ * Will start bpmdjraw and wait for the result or not depending on the 
+ * syncrhonous flag. The return value is the process id in the asynchronous
+ * case, 0 when there was an error. The location to place the rawfile is 
+ * obtained through the raw_location() function call.
+ */
+int bpmdjraw(bool synchronous, const char* fname, const char* where);
+
+void start_mkdir(const char* dir);
+void start_cp(const char* from, const char* to);
+int  start_mv(const char* from, const char* to);
+void start_rm(const char* what);
 
 // logging, warning, and other similar functions
 void Log(const char* prefix, const char* text);
@@ -79,5 +75,13 @@ void Remote(const char* script,...);
  * be necessary. For instance when trying to pass a parameter through
  * a secure shell command.
  */
-char * escape(const char * in);
+char *escape(const char * in);
+
+/**
+ * executes the given command. Returns a simple true
+ * if successful, false otherwise. The description will be
+ * printed to the terminal. The script will be executed.
+ */
+bool execute(const char* description, const char* script);
+bool vexecute(const char* script,...);
 #endif // __loaded__scripts_h__

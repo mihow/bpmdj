@@ -1,2 +1,2 @@
-#define VERSION "3.9"
+#define VERSION "4.0"
 #define CLOCK_FREQ (100)

@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__database_cpp__
 #define __loaded__database_cpp__
@@ -28,7 +24,7 @@ using namespace std;
 #include "song-metric.h"
 #include "qsong.h"
 #include "selector.h"
-#include "process-manager.h"
+#include "players-manager.h"
 #include "vector-iterator.h"
 #include "tags.h"
 #include "heap.h"
@@ -183,9 +179,11 @@ ITERATE_OVER(song)
 /* WVB -- the thing below can be further optimized
  * 1 - get all flags and pass them in one flag
  */
-bool DataBase::filter(SongSelectorLogic* selector, Song *item, Song* main, float4 limit)
+bool DataBase::filter(SongSelectorLogic* selector, Song *item, Song* main, 
+		      float4 limit)
 {
-  if (main!=NULL && main->get_author()==item->get_author() && !main->get_author().isEmpty())
+  if (main!=NULL && main->get_author()==item->get_author() && 
+      !main->get_author().isEmpty())
     item->set_played_author_at_time(History::get_songs_played());
   // song on disk ?
   if (Config::limit_ondisk && !item->get_ondisk())
@@ -195,7 +193,8 @@ bool DataBase::filter(SongSelectorLogic* selector, Song *item, Song* main, float
     return false;
   // okay, no similar authors please..
   if (Config::limit_authornonplayed && 
-      History::get_songs_played() - item->get_played_author_at_time() < Config::get_authorDecay())
+      History::get_songs_played() - item->get_played_author_at_time() < 
+      Config::get_authorDecay())
     return false;
   // now check the tempo stuff
   if (main && (Config::limit_uprange || Config::limit_downrange))
@@ -218,9 +217,10 @@ bool DataBase::filter(SongSelectorLogic* selector, Song *item, Song* main, float
   return true;
 }
 
-int DataBase::get_unheaped_selection(SongSelectorLogic* selector, Song* main, QVectorView* target)
+int DataBase::get_unheaped_selection(SongSelectorLogic* selector, Song* main, 
+				     QVectorView* target)
 {
-  // to get an appropriate selection we allocate the nessary vector
+  // to get an appropriate selection we allocate the necessary vector
   int itemcount=0;
   updateCache(selector);
   Song ** show = bpmdj_allocate(cache.size(),Song*);
@@ -263,7 +263,8 @@ int DataBase::set_answer(Song ** show, int itemcount, QVectorView* target)
   return itemcount;
 }
  
-int DataBase::getSelection(SongSelectorLogic* selector, QVectorView* target, int count)
+int DataBase::getSelection(SongSelectorLogic* selector, QVectorView* target, 
+			   int count)
 {
   Song* main=::main_song;
   // only when we have a dcolor limitation can we use the amount limitation
@@ -286,13 +287,17 @@ ITERATE_OVER(song)
   return set_answer(show,itemcount,target);
 }
 
-void DataBase::addNewSongs(SongSelectorLogic* selector, QVectorView* target, vector<Song*> *newsongs)
+void DataBase::addNewSongs(SongSelectorLogic* selector, QVectorView* target, 
+			   vector<Song*> *newsongs)
 {
-  // since these come from the indexreader we do not want to limit the selection to a heap
-  // since that would slow everything down. Instead we simply extende the current selection
-  // if the song satisfies all other criterias (in tempo, proper tag etc)
-  // we also do not check cache updates or the likes, this means that the filter must be
-  // applied in 2 steps. First to check the tag, then to check its distance to the mainsong
+  /**
+   * Since these come from the index reader we do not want to limit the 
+   * selection to a heap since that would slow everything down. Instead we 
+   * simply extend the current selection if the song satisfies all other 
+   * criteria (in tempo, proper tag etc) we also do not check cache updates 
+   * or the likes, this means that the filter must be applied in 2 steps. 
+   * First to check the tag, then to check its distance to the main song
+   */
   assert(newsongs);
   if (!newsongs->size()) return;
   Song* show[newsongs->size()];
@@ -311,7 +316,7 @@ ITERATE_OVER(song)
   }
   assert(count<=newsongs->size());
   QSong::addVector(show,count);
-  // printf("Acceping %x\n",(unsigned4)newsongs); fflush(stdout);
+  // printf("Accepting %x\n",(unsigned4)newsongs); fflush(stdout);
   target->vectorChanged();
 }
 
@@ -339,7 +344,8 @@ Song * * DataBase::closestSongs(SongSelectorLogic * selector,
 				SongMetriek * metriek, int maximum, int &count)
 {
   /*
-  cerr << "Looking for a song between " << target1->getDisplayTitle().toStdString()
+  cerr << "Looking for a song between " << target1->getDisplayTitle().
+  toStdString()
   << " and " << target2->getDisplayTitle().toStdString() 
   << " weight1 = " << weight1 
   << " weight2 = " << weight2

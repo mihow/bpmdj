@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__statistics_cpp__
 #define __loaded__statistics_cpp__
@@ -43,8 +39,11 @@ using namespace std;
 #include "vector-iterator.h"
 #include "database.h"
 
-spectrum_freq devs[spectrum_size] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-spectrum_freq means[spectrum_size] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+spectrum_freq devs[spectrum_size] = 
+  {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+spectrum_freq means[spectrum_size] = 
+  {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+
 // unsigned8 total_music_body = 0;
 static int spectra = 0;
 
@@ -54,11 +53,11 @@ float8 **echo_dev=NULL;
 static int echos = 0;
 
 /**
- * in comparison to pre2.7 versions, the spectrum scale is now calculated differently
- * first we take the mean value. Based on this we also take the mean variation
- * rescaling happend by subtracting the mean and then dividing by the standard deviation
+ * In comparison to pre2.7 versions, the spectrum scale is now calculated
+ * differently first we take the mean value. Based on this we also take the 
+ * mean variation rescaling happened by subtracting the mean and then dividing
+ * by the standard deviation
  */
-
 void mean_spectrum(spectrum_type *spectrum)
 {
   if (spectrum==no_spectrum) return;
@@ -231,7 +230,8 @@ static int compare_int(const void * a, const void * b)
   return A < B ? -1 : (A > B ? 1 : 0);
 }
 
-Statistics::Statistics(QWidget *parent, DataBase *db): QDialog(parent), database(db)
+Statistics::Statistics(QWidget *parent, DataBase *db): 
+  QDialog(parent), database(db)
 {
   setupUi(this);
 }
@@ -248,7 +248,8 @@ void Statistics::update()
   //---------------------------------------
   //    Music body size
   //---------------------------------------
-  //  statistics->bodysize->setText(QString("Music body size ")+readable(total_music_body));
+  // statistics->bodysize->setText(QString("Music body size ")+
+  // readable(total_music_body));
   
   //---------------------------------------
   //    The mean spectrum characteristics
@@ -333,7 +334,8 @@ ITERATE_OVER(song)
       echo_stack[nr] = bpmdj_allocate(vec_size,float4);
       for(int x = 0 ; x < echo_prop_sx ; x++)
 	for(int y = 0 ; y < spectrum_size ; y++)
-	  echo_stack[nr][x+y*echo_prop_sx]=echo.get_freq_energy_probability_scaled(y,x);
+	  echo_stack[nr][x+y*echo_prop_sx]=echo.
+	    get_freq_energy_probability_scaled(y,x);
       nr++;
     }
   }
@@ -405,9 +407,11 @@ ITERATE_OVER(song)
 	    }
 	}
 
-      status->setText(QString("5- correlating color ")+QString::number(c)+"/"+QString::number(nr_colors-1));
+      status->setText(QString("5- correlating color ")+QString::number(c)+"/"+
+		      QString::number(nr_colors-1));
       app->processEvents();
-      // printf("5- correlating with vector (%d,%d)=%g nr %d/%d\n",x%echo_prop_sx,x/echo_prop_sx,v,c,nr_colors-1);
+      // printf("5- correlating with vector (%d,%d)=%g nr %d/%d\n",
+      // x%echo_prop_sx,x/echo_prop_sx,v,c,nr_colors-1);
       
       // 5b - fill in this color position with the new correlation analysis
       for(int i = 0 ; i < vec_size ; i++)
@@ -480,7 +484,7 @@ ITERATE_OVER(song)
   if (err) printf("Error %s\n",err);
   
   // 6c - translate central position
-  printf("Translateing mean\n");
+  printf("Translating mean\n");
   float8 cx =0, cy=0;
   for(int y = 1 ; y <=nr_colors ; y++)
     {
@@ -509,7 +513,7 @@ ITERATE_OVER(song)
     }
   // we have a set of angles for every color, we now want
   // to make the contrast between every two angles as large
-  // as possible by hussling 'em around
+  // as possible by tossing 'em around
   qsort(tmphue,nr_colors,sizeof(int),compare_int);
   // the new tmphue array has the sorted indices if we divide it by 
   // 1000. So c=tmphue[idx]/1000 specifies that c is the color which
@@ -525,7 +529,7 @@ ITERATE_OVER(song)
   bpmdj_deallocate(tmphue);
   
   // 6d - to determine the colors for every position we select which
-  //     correlation vectort had the most influence
+  //     correlation vector had the most influence
 
   status->setText("Preparing Pixmap");
   app->processEvents();
@@ -541,7 +545,7 @@ ITERATE_OVER(song)
     if (values[i]>m) m = values[i];
   for(int i = 1 ; i < vec_size ; i ++)
     values[i]/=m;
-  // noramlisation of the stddev
+  // normalization of the stddev
   float8 stddev_max = 0;
   for(int j = 0 ; j < vec_size ; j++)
     if (stddev[j]>stddev_max) stddev_max=stddev[j];
@@ -596,7 +600,7 @@ ITERATE_OVER(song)
   // - free all data used to analyze echo characteristic
   free_matrix(pca_in_out,nr_colors,vec_size/8);
 
-  // execute the dialogbox
+  // execute the dialog box
   status->setText("");
 }
 

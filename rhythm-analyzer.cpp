@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,18 +10,14 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-#ifndef __loaded__rythm_analyzer_cpp__
-#define __loaded__rythm_analyzer_cpp__
+#ifndef __loaded__rhythm_analyzer_cpp__
+#define __loaded__rhythm_analyzer_cpp__
 using namespace std;
-#line 1 "rythm-analyzer.c++"
+#line 1 "rhythm-analyzer.c++"
 #include <qapplication.h>
 #include <qlineedit.h>
 #include <qpixmap.h>
@@ -55,8 +51,8 @@ using namespace std;
 #include <assert.h>
 #include <math.h>
 #include "memory.h"
-#include "rythm-analyzer.h"
-#include "rythm-property.h"
+#include "rhythm-analyzer.h"
+#include "rhythm-property.h"
 #include "bpmplay.h"
 #include "version.h"
 #include "scripts.h"
@@ -86,7 +82,7 @@ void fft_to_bark(float8 * in_r, int window_size, spectrum_type &out)
     } 
 };
 
-RythmAnalyzer::RythmAnalyzer(QWidget*parent) : QWidget(parent)
+RhythmAnalyzer::RhythmAnalyzer(QWidget*parent) : QWidget(parent)
 {
   setupUi(this);
   QPixmap *pm = new QPixmap(10,10);
@@ -95,7 +91,7 @@ RythmAnalyzer::RythmAnalyzer(QWidget*parent) : QWidget(parent)
   QRect r(QRect(0,0,pm->width(),pm->height()));
   p.fillRect(r,Qt::white);
   p.end();
-  rythm->setPixmap(*pm);
+  rhythm->setPixmap(*pm);
 }
 
 static float8 tovol(float8 a)
@@ -115,7 +111,8 @@ float8 xy_dist(float8 x1, float8 y1, float8 x2, float8 y2)
   return sqrt(a+b);
 }
 
-void wavelet_subtraction_test(long slice_size, unsigned4* phases, int maximum_slice, const char* target)
+void wavelet_subtraction_test(long slice_size, unsigned4* phases, 
+			      int maximum_slice, const char* target)
 {
   int window_size = higher_power_of_two(slice_size);
   maximum_slice--;
@@ -174,7 +171,8 @@ void wavelet_subtraction_test(long slice_size, unsigned4* phases, int maximum_sl
     }
 }
 
-void subtraction_test(long slice_size, unsigned4* phases, int maximum_slice, const char* target)
+void subtraction_test(long slice_size, unsigned4* phases, int maximum_slice, 
+const char* target)
 {
   int window_size = higher_power_of_two(slice_size);
   maximum_slice--;
@@ -234,7 +232,8 @@ static float8 perfectspectrum[barksize] =
 void shape(Signal<float8,2> &in)
 {
   in.normalize_abs_max();
-  HalfComplex<float8,2> *freq = new HalfComplex<float8,2>(in.length/2,in.length/2);
+  HalfComplex<float8,2> *freq = new HalfComplex<float8,2>(in.length/2,
+							  in.length/2);
   Fft<2> forward(in,*freq);
   forward.execute();
   Signal<float8,2> energy(in.length/2);
@@ -279,7 +278,8 @@ void shape(Signal<float8,2> &in)
   delete(freq);
 }
 
-void pattern_shaped_test(long slice_size, unsigned4* phases, int maximum_slice, const char* target)
+void pattern_shaped_test(long slice_size, unsigned4* phases, int maximum_slice,
+const char* target)
 {
   int window_size = higher_power_of_two(slice_size);
   maximum_slice--;
@@ -311,7 +311,8 @@ void pattern_shaped_test(long slice_size, unsigned4* phases, int maximum_slice, 
 /**
  * Calculates the raw overlay pattern and writes it out to disk 
  */
-void pattern_test(long slice_size, unsigned4* phases, int maximum_slice, const char* target)
+void pattern_test(long slice_size, unsigned4* phases, int maximum_slice, 
+const char* target)
 {
   int window_size = higher_power_of_two(slice_size);
   maximum_slice--;
@@ -342,8 +343,9 @@ void pattern_test(long slice_size, unsigned4* phases, int maximum_slice, const c
 }  
 
 
-#ifdef TEST_RYTHM_PROJECTIONS
-void write_out_projection(long slice_size, unsigned4* phases, int maximum_slice, const char* target)
+#ifdef TEST_RHYTHM_PROJECTIONS
+void write_out_projection(long slice_size, unsigned4* phases, int maximum_slice,
+const char* target)
 {
   int frame_size = higher_power_of_two(2 * WAVRATE / 40);
   Signal<float8,2> curr_frame(frame_size);
@@ -377,7 +379,8 @@ void write_out_projection(long slice_size, unsigned4* phases, int maximum_slice,
   if (ignore) printf("%s\n",ignore);
   else
     for(unsigned4 x = 0 ; x + frame_size < l ; x+=frame_size)
-      printf("%g %g\n",target_m[(x/frame_size)+1][1],target_m[(x/frame_size)+1][2]);
+      printf("%g %g\n",target_m[(x/frame_size)+1][1],
+	     target_m[(x/frame_size)+1][2]);
   fflush(stdout);
   _exit(0);
 }  
@@ -386,7 +389,8 @@ void write_out_projection(long slice_size, unsigned4* phases, int maximum_slice,
  * In this routine we go through the song window size by window size and 
  * we subtract the energy of x windows ago, we keep the phase as it was. 
  */
-void write_out_projection_hald_working(unsigned4 slice_size, unsigned4* phases, int maximum_slice, const char* target)
+void write_out_projection_hald_working(unsigned4 slice_size, unsigned4* phases,
+int maximum_slice, const char* target)
 {
   int frame_size = higher_power_of_two(2 * WAVRATE / 40);
   Signal<float8,2> curr_frame(frame_size);
@@ -435,20 +439,20 @@ void write_out_projection_hald_working(unsigned4 slice_size, unsigned4* phases, 
   _exit(0);
 }  
 
-// deconvolution really messes it up because we need to describe all the
-// remaining as superpositions of the entire wave...
-// we don't want that. We want to filter out those frequencies
-// I still do have a problem with the theory:
-// a single pulse convolved with the full measure = measure
-// however, if we divide this in the specrtaldomain by itself 
-// we get white noise, in which all frequencies are present.
-// this is the good thing, we really get whiteish noise.
-// if we then remove any frequency smaller < 1
-// what we are looking for is (* = convolution)
-// a = p*s+r >==> A=P.S+R
-// we want s to be as sparse as possible and a the remainder
-// we also want p to be the mean measure, so we now have 
-void write_out_projection_old(long slice_size, unsigned4* phases, int maximum_slice, const char* target)
+/**
+ * Deconvolution really messes it up because we need to describe all the
+ * remaining as superpositions of the entire wave... we don't want that. We 
+ * want to filter out those frequencies. I still do have a problem with the 
+ * theory: a single pulse convolved with the full measure = measure however, if
+ * we divide this in the spectral domain by itself we get white noise, in which
+ * all frequencies are present. this is the good thing, we really get white 
+ * like noise. if we then remove any frequency smaller < 1  what we are looking
+ * for is (* = convolution) a = p*s+r >==> A=P.S+R  we want s to be as sparse 
+ * as possible and a the remainder we also want p to be the mean measure, so 
+ * we now have again no sentence end :-)
+ */
+void write_out_projection_old(long slice_size, unsigned4* phases, 
+int maximum_slice, const char* target)
 {
   int     window_size = higher_power_of_two(slice_size);
   maximum_slice--;
@@ -516,7 +520,7 @@ void write_out_projection_old(long slice_size, unsigned4* phases, int maximum_sl
   
   // secondly, we go through the entire file again,
   // calculate the energies and obtain the angle variance
-  // this time. This variance will afterwards be used to alter
+  // this time. This variance will afterward be used to alter
   // the strength of the output signal
   printf("Second run\n");
   f = openCoreRawFile();
@@ -558,7 +562,7 @@ void write_out_projection_old(long slice_size, unsigned4* phases, int maximum_sl
     }
   fclose(f);
 
-  // the final step is the noramlisation of the allowable
+  // the final step is the normalization of the allowable
   // phase differences. We do this by finding the mean phase
   // then the deviation and scale everything from m-d to m+d
   float8 ml=0,mr=0;
@@ -600,7 +604,7 @@ void write_out_projection_old(long slice_size, unsigned4* phases, int maximum_sl
     }
   // now we can write out the inverse transform of the mean spectra
   // by storing everything back into the pattern and normalizing it
-  // afterwards
+  // afterward
   printf("Creating mean stuff\n");
   fftw_execute(plan_lr);
   fftw_execute(plan_rr);
@@ -664,24 +668,24 @@ static void free_bark_fft2()
   fftw_free(plan);
 }
 
-void RythmAnalyzer::calculateRythmPattern2()
+void RhythmAnalyzer::calculateRhythmPattern2()
 {
   // check premises
   if (!normalperiod)
     { 
       QMessageBox::critical(NULL,
-			    "Rhythm analyzer",
-			    QString("Need tempo before rhythm can be analyzed"),
-			    QMessageBox::Ok,0,0);
+	    "Rhythm analyzer",
+	    QString("Need tempo before rhythm can be analyzed"),
+	    QMessageBox::Ok,0,0);
       return;
     }
   spectrum_type * spectrum = playing->get_spectrum();
   if (!spectrum)
     {
       QMessageBox::critical(NULL,
-			    "Rhythm analyzer",
-			    QString("Need spectrum before rhythm can be analyzed"),
-			    QMessageBox::Ok,0,0);
+	    "Rhythm analyzer",
+	    QString("Need spectrum before rhythm can be analyzed"),
+	    QMessageBox::Ok,0,0);
       return;
     }
   // constants and some variables
@@ -731,7 +735,7 @@ void RythmAnalyzer::calculateRythmPattern2()
 	  assert(s + window_size < slice_samples);
 	  for(int i = 0 ; i < window_size ; i++)
 	    buffer_fft[i]=slice_audio[i+s].left+slice_audio[i+s].right;
-	  // convert to fft and normalize
+	  // convert to spectrum and normalize
 	  bark_fft2(window_size,slice_freq[a]);
 	  for(int i = 0 ; i < 24 ; i ++)
 	    {
@@ -771,7 +775,8 @@ void RythmAnalyzer::calculateRythmPattern2()
 	{
 	  int z = (y + a)%slice_frames;
 	  for(int b = 0 ; b < 24 ; b++)
-	    slice_prot[y].set_bark(b,slice_prot[y].get_bark(b)+slice_freq[z].get_bark(b));
+	    slice_prot[y].set_bark(b,slice_prot[y].get_bark(b)
+				   +slice_freq[z].get_bark(b));
 	}
       // find best rotational fit tov last measure
       if (slice>0)
@@ -864,15 +869,15 @@ void RythmAnalyzer::calculateRythmPattern2()
 	}
     }
 
-  // fix the rythm information for this file
-  rythm_property R;
+  // fix the rhythm information for this file
+  rhythm_property R;
   R.init();
   for(int y = 0 ; y < 24 ; y++)
     {
       R.set_scale(y,scale.get_bark(y));
-      for(int x = 0 ; x < rythm_prop_sx ; x ++)
+      for(int x = 0 ; x < rhythm_prop_sx ; x ++)
 	{
-	  int z = x * slice_frames / rythm_prop_sx; 
+	  int z = x * slice_frames / rhythm_prop_sx; 
 	  z += startpos;
 	  z %= slice_frames;
 	  float8 dB = slice_prot[z].get_bark(y);
@@ -883,7 +888,7 @@ void RythmAnalyzer::calculateRythmPattern2()
 	  R.set_energy(x,y,(unsigned1)dB);
 	}
     }
-  playing->set_rythm(R);
+  playing->set_rhythm(R);
 
   // now draw the different distribution on the different axis
   QPixmap *pm = new QPixmap(view_xs, 24);
@@ -926,9 +931,8 @@ void RythmAnalyzer::calculateRythmPattern2()
     }
   p.end(); 
   q.end();
-  rythm->setPixmap(*pm);
+  rhythm->setPixmap(*pm);
   projection->setPixmap(*pr);
-
   
   // normalize the composition bar & draw it
   {
@@ -980,7 +984,8 @@ void RythmAnalyzer::calculateRythmPattern2()
   composition->setPixmap(*pm);
 
   // calculate the frequency content of the composition
-  const int ps = 33; // we take 33 measures because the first will always be zero
+  // we take 33 measures because the first will always be zero
+  const int ps = 33; 
   int ws = higher_power_of_two(max_slices);
   if (ps>ws) 
     ws = higher_power_of_two(ps);
@@ -1031,7 +1036,8 @@ void RythmAnalyzer::calculateRythmPattern2()
 	  p.drawPoint(x,23-y);
 	}
     }
-  // the data which we will write out in the index file are the non absed periods
+  // the data which we will write out in the index file are the non 
+  // absolute periods
   bpmdj_deallocate(aio);
   bpmdj_deallocate(aou);
   bpmdj_deallocate(ain);
@@ -1042,4 +1048,4 @@ void RythmAnalyzer::calculateRythmPattern2()
   status_bar->setText("Done");
   free_bark_fft2();
 }
-#endif // __loaded__rythm_analyzer_cpp__
+#endif // __loaded__rhythm_analyzer_cpp__

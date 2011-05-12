@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__config_h__
 #define __loaded__config_h__
@@ -27,7 +23,7 @@ using namespace std;
 #include <Qt3Support/q3header.h>
 #include <Qt3Support/q3popupmenu.h>
 #include "data.h"
-#include "song-process.h"
+#include "song-slot.h"
 #include "accessors.h"
 
 // constants that should not be modified
@@ -43,28 +39,28 @@ class Q3PopupMenu;
 
 class ConfigState: public QObject
 {
-    Q_OBJECT
-  protected:
-    bool state;
-    friend class Config;
-    QString menu_text;
-    Q3PopupMenu * menu;
-    int item;
-    void update();
-  public:
-    ConfigState(bool init = false);
-    virtual void setMenuText ( const QString & );
-    bool isOn() const;
-    virtual void addTo ( Q3PopupMenu * w );
-    operator bool() const {return state;};  
-    // the set function bypasses the signal emit phase and does not update the UI
-    void set(bool);
-  public slots:
-    void toggle ();
-    // setOn will emit a modification signal to the relevant partners.
-    virtual void setOn ( bool );
-  signals:
-    void toggled();
+  Q_OBJECT
+protected:
+  bool state;
+  friend class Config;
+  QString menu_text;
+  Q3PopupMenu * menu;
+  int item;
+  void update();
+public:
+  ConfigState(bool init = false);
+  virtual void setMenuText ( const QString & );
+  bool isOn() const;
+  virtual void addTo ( Q3PopupMenu * w );
+  operator bool() const {return state;};  
+  // the set function bypasses the signal emit phase and does not update the UI
+  void set(bool);
+public slots:
+  void toggle ();
+  // setOn will emit a modification signal to the relevant partners.
+  virtual void setOn ( bool );
+signals:
+  void toggled();
 };
 
 class Config
@@ -80,7 +76,7 @@ class Config
   static ConfigState color_played;
   static ConfigState color_authorplayed;
   singleton_accessors(int,authorDecay);
-  static SongProcess players[4];
+  static SongSlot players[4];
   static ConfigState color_ondisk;
   static ConfigState color_cues;
   static ConfigState color_dcolor;
@@ -142,13 +138,13 @@ class Config
   // 2.7
   singleton_accessors(float4,distance_tempoweight);
   singleton_accessors(float4,distance_echoweight);
-  singleton_accessors(float4,distance_rythmweight);
+  singleton_accessors(float4,distance_rhythmweight);
   singleton_accessors(float4,distance_compositionweight);
   singleton_accessors(int,  max_songs);
   // 2.8
   singleton_accessors(QColor,color_unchecked);
   // 2.9
-  static SongProcess analyzers[8];
+  static SongSlot analyzers[8];
   // from here on the options are saved again
   singleton_accessors(float4, anal_bpm_from);
   singleton_accessors(float4, anal_bpm_to);

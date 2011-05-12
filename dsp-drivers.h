@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__dsp_drivers_h__
 #define __loaded__dsp_drivers_h__
@@ -60,7 +56,7 @@ class PlayerConfig;
  * which should use it to obtain the audio to be played
  * read should be invoked pseudo-realtime. This class
  * should not be used to buffer 3 minutes of music before
- * playing :-) 
+ * playing.
  */
 class audio_source
 {
@@ -78,13 +74,14 @@ public:
 
 /**
  * BpmDj can use any sound device driver necessary given that a class exists to
- * support such a driver. For instance, we scurrently have an Alsa driver, an old 
- * fashioned Oss driver and an experimental Jack driver. Examnples of drivers
- * can be found in dsp-alsa.h and dsp-oss.h.
+ * support such a driver. For instance, we scurrently have an Alsa driver, an 
+ * old fashioned Oss driver and an experimental Jack driver. Examnples of 
+ * drivers can be found in dsp-alsa.h and dsp-oss.h.
  *
- * The dsp driver is responsible for having its own thread of control, created when
- * the start() method is called. The standard dsp_driver will generate a thread
- * that will take samples from the input and place them into the write thread.
+ * The dsp driver is responsible for having its own thread of control, created
+ * when the start() method is called. The standard dsp_driver will generate a
+ * thread that will take samples from the input and place them into the write 
+ * thread.
  */
 class dsp_driver
 {
@@ -106,10 +103,9 @@ protected:
   audio_source* audio;
 public:
   /**
-   * A method which will performs a continuous
-   * data pull from the core and push it to the driver. 
-   * This function should be called by nobody but
-   * the go2 function in dsp-drivers.cpp
+   * A method which will performs a continuous data pull from the core and push
+   * it to the driver. This function should be called by nobody but the go2 
+   * function in dsp-drivers.cpp
    */
   void run_pusher_thread();
 public:
@@ -133,39 +129,48 @@ public:
    * The stop method is called from an external thread. It should signal 
    * the driver that any playing thread should stop and the dsp device closed
    * once  done. When all this is finished, the method should return.
+   * This should be a synchronous call.
    */
   virtual void stop(); 
 public:
   /**
    * The pause function is called from within the player to signal that the
-   * dsp driver should stop playback immediatelly, in such a manner that it can later
-   * contiunue directly. The pause() function just signals the request and shoudl 
-   * return directly. It is the internal_pause which should perfom the appropriate
-   * dsp alterations to actually stop the playback.
+   * dsp driver should stop playback immediatelly, in such a manner that it can
+   * later contiunue directly. The pause() function just signals the request 
+   * and should return directly. It is the internal_pause which should perfom
+   * the appropriate dsp alterations to actually stop the playback.
    * 
-   * In case of the internal synchronous driver (the one which relies on the run_pusher_thread,
-   * the control flow consists of the following threads and steps.
-   * - an external thread (the user interface thread for instance) will call the pause() 
-   *   function. This function will set the paused flag to true and return.
-   * - the transfer thread running in run_pusher_thread will detect this flag and call
-   *   the internal_pause() routine which should actually stop the dsp playback
-   * - the transfer thread will then wait until the pause flag is again set to false
-   * - the user interface thread calls the unpause() method which sets the pause flag to false;
-   * - the transfer thread will then call internal_unpause to reenable the dsp playback
+   * In case of the internal synchronous driver (the one which relies on the 
+   * run_pusher_thread, the control flow consists of the following threads and
+   * steps.
+   * - an external thread (the user interface thread for instance) will call
+   *   the pause() function. This function will set the paused flag to true 
+   *   and return.
+   * - the transfer thread running in run_pusher_thread will detect this flag 
+   *   and call the internal_pause() routine which should actually stop the dsp
+   *   playback
+   * - the transfer thread will then wait until the pause flag is again set to
+   *   false
+   * - the user interface thread calls the unpause() method which sets the 
+   *   pause flag to false;
+   * - the transfer thread will then call internal_unpause to reenable the dsp
+   *   playback
    * - the transfer thread will then continue playing.
    * 
-   * When writing a dsp driver it is unlikely that you need to override the pause
-   * function. It is more likely that yuou want to override the internal_pause() and internal_unpause() 
-   * methods.
+   * When writing a dsp driver it is unlikely that you need to override the 
+   * pause function. It is more likely that yuou want to override the 
+   * internal_pause() and internal_unpause() methods.
    */ 
   virtual void pause();
   /**
-   * The unpause method signals tat playback should continnue. The function should return directly
-   * It is up to the internal_unpause to alter the dsp configuration. See pause() for more information.
+   * The unpause method signals that playback should continnue. The function 
+   * should return directly. It is up to the internal_unpause to alter the dsp
+   * configuration. See pause() for more information.
    */
   virtual void unpause();
   /**
-   * Returns the current pause state. ture if playback is temporarily halted. False otherwise.
+   * Returns the current pause state. ture if playback is temporarily halted. 
+   * False otherwise.
    */
   bool get_paused() 
   { 
@@ -173,33 +178,34 @@ public:
   }
 protected: 
   /**
-   * The internal pause mnethod is the one responsible for altering the dsp configuration
-   * This function should return as well. After pause_internal, and internal_unpause will 
-   * be called to signal the end of the pause.
+   * The internal pause method is the one responsible for altering the dsp 
+   * configuration. This function should return as well. After pause_internal, 
+   * and internal_unpause will be called to signal the end of the pause.
    * See pause() for more information.
    */
   virtual void internal_pause()=0; 
   virtual void internal_unpause()=0;
   /**
-   * The paused field is set to true when no shound should be produced. To pause 
-   * the output of a dsp driver call the pause() function. To unpause the playback
-   * call the unpause function. When using the standard threaded pusher one can/should
-   * rely on the wait_for_unpause function to continue playing back.
+   * The paused field is set to true when no shound should be produced. To 
+   * pause the output of a dsp driver call the pause() function. To unpause 
+   * the playback call the unpause function. When using the standard threaded
+   * pusher one can/should rely on the wait_for_unpause function to continue 
+   * playing back.
    */
   volatile bool paused;
   volatile bool starting;
 private:  
   /**
-   * If the player was pause, will wait until some other thread
-   * sets the paused flag to false again.
+   * If the player was pause, will wait until some other thread sets the 
+   * paused flag to false again.
    */
   void wait_for_unpause();
 public:
   /**
-   * The write function should write out the specified
-   * value and block when necessary.It is mainly used by the pusher thread
-   * at the moment. If you plan to write a complete asynchronous driver
-   * you might not need to implement this function.
+   * The write function should write out the specified value and block when
+   * necessary.It is mainly used by the pusher thread at the moment. If you plan
+   * to write a complete asynchronous driver you might not need to implement 
+   * this function.
    */
   virtual void write(stereo_sample2 value) = 0;
   /**
@@ -227,6 +233,10 @@ public:
   virtual ~dsp_driver() 
   {
   };
+  /**
+   * This method is called once by each started application.
+   */
+  static void init();
   static dsp_driver * get_driver(PlayerConfig * cfg);
   bool get_stopped() { return stopped; }
 };

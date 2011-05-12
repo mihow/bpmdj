@@ -123,7 +123,7 @@
       <enum>QTabWidget::Triangular</enum>
      </property>
      <property name="currentIndex" >
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="readme" >
       <attribute name="title" >
@@ -157,10 +157,9 @@
 - helping extend the software (see the webpages)
 
 --
-January 2007
+January 2009
 Werner Van Belle
-werner.van.belle@gmail.com
-werner@onlinux.be
+werner@yellowcouch.org
 
 </string>
          </property>
@@ -185,9 +184,7 @@ werner@onlinux.be
        <item row="0" column="0" >
         <widget class="QLabel" name="versionLabel" >
          <property name="sizePolicy" >
-          <sizepolicy>
-           <hsizetype>5</hsizetype>
-           <vsizetype>7</vsizetype>
+          <sizepolicy vsizetype="Expanding" hsizetype="Preferred" >
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -248,9 +245,7 @@ werner@onlinux.be
        <item row="3" column="0" colspan="2" >
         <widget class="QLabel" name="textLabel1_2" >
          <property name="sizePolicy" >
-          <sizepolicy>
-           <hsizetype>5</hsizetype>
-           <vsizetype>7</vsizetype>
+          <sizepolicy vsizetype="Expanding" hsizetype="Preferred" >
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -312,9 +307,7 @@ werner@onlinux.be
        <item row="2" column="0" colspan="2" >
         <widget class="QLabel" name="TextLabel11" >
          <property name="sizePolicy" >
-          <sizepolicy>
-           <hsizetype>5</hsizetype>
-           <vsizetype>7</vsizetype>
+          <sizepolicy vsizetype="Expanding" hsizetype="Preferred" >
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -364,11 +357,11 @@ werner@onlinux.be
           </font>
          </property>
          <property name="text" >
-          <string>(c) Werner Van Belle  2001-2007&lt;br>
-&lt;font size="-1">werner@yellowcouch.org
-&lt;br>
-http://werner.yellowcouch.org/&lt;br>
-http://bpmdj.yellowcouch.org/&lt;/font></string>
+          <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:16pt; font-weight:600; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">(c) Werner Van Belle 2001-2009&lt;br />&lt;span style=" font-size:small;">werner@yellowcouch.org &lt;br />http://werner.yellowcouch.org/&lt;br />http://bpmdj.yellowcouch.org/&lt;/span>&lt;/p>&lt;/body>&lt;/html></string>
          </property>
          <property name="textFormat" >
           <enum>Qt::RichText</enum>
@@ -384,9 +377,7 @@ http://bpmdj.yellowcouch.org/&lt;/font></string>
        <item row="1" column="0" colspan="2" >
         <widget class="QLabel" name="TextLabel10" >
          <property name="sizePolicy" >
-          <sizepolicy>
-           <hsizetype>5</hsizetype>
-           <vsizetype>7</vsizetype>
+          <sizepolicy vsizetype="Expanding" hsizetype="Preferred" >
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -829,7 +820,7 @@ POSSIBILITY OF SUCH DAMAGES.
      <property name="sizeType" >
       <enum>QSizePolicy::Expanding</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0" >
       <size>
        <width>40</width>
        <height>20</height>

@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__pca_cpp__
 #define __loaded__pca_cpp__
@@ -37,10 +33,10 @@ using namespace std;
    Internet:     murtagh@scivax.stsci.edu
    F. Murtagh, Munich, 6 June 1989                                   */   
 /*********************************************************************/
-// WVB -- modified to incorporate it into bpmdj
+// WVB -- modified to incorporate it into BpmDj
 // WVB -- added DUMP_INFO variable to print out data
 // WVB -- modified malloc to allocate
-// WVB -- added progressbar support..
+// WVB -- added progress bar support..
 // WVB -- added better error handling...
 
 #include <stdio.h>
@@ -59,7 +55,8 @@ using namespace std;
 static void corcol(float4 **data, int n, int m, float4 **symmat);
 static float4 *pca_vector(int n);
 static void tred2(float4 **a, int n, float4 *d, float4 *e);
-static void tqli(float4 d[], float4 e[], int n, float4 ** z, const char* &error_msg);
+static void tqli(float4 d[], float4 e[], int n, float4 ** z, 
+const char* &error_msg);
 static void free_pca_vector(float4 *v, int n);
 
 // WVB -- this function is a modified version of the original code
@@ -88,8 +85,10 @@ void do_pca(int n, int m, float4** data, const char* &error_msg)
       symmat2[i][j] = symmat[i][j]; /* Needed below for col. projections */
     }
   }
-  tred2(symmat, m, evals, interm);  /* Triangular decomposition */
-  tqli(evals, interm, m, symmat, error_msg);   /* Reduction of sym. trid. matrix */
+  /* Triangular decomposition */
+  tred2(symmat, m, evals, interm);  
+  /* Reduction of sym. trid. matrix */
+  tqli(evals, interm, m, symmat, error_msg);   
   if (error_msg) return;
   
   /* evals now contains the eigenvalues,
@@ -337,8 +336,10 @@ int old_main(int argc, char *argv[])
       symmat2[i][j] = symmat[i][j]; /* Needed below for col. projections */
     }
   }
-  tred2(symmat, m, evals, interm);  /* Triangular decomposition */
-  tqli(evals, interm, m, symmat, error_msg);   /* Reduction of sym. trid. matrix */
+  /* Triangular decomposition */
+  tred2(symmat, m, evals, interm);  
+  /* Reduction of sym. trid. matrix */
+  tqli(evals, interm, m, symmat, error_msg);   
   assert(!error_msg);
   /* evals now contains the eigenvalues,
      columns of symmat now contain the associated eigenpca_vectors. */
@@ -605,7 +606,8 @@ static void tred2(float4 **a, int n, float4 *d, float4 *e)
 }
 
 /**  Tridiagonal QL algorithm -- Implicit  **********************/
-static void tqli(float4 d[], float4 e[], int n, float4 ** z, const char* &error_occured)
+static void tqli(float4 d[], float4 e[], int n, float4 ** z, 
+		 const char* &error_occured)
 {
   int m, l, iter, i, k;
   float4 s, r, p, g, f, dd, c, b;

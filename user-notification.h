@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__user_notification_h__
 #define __loaded__user_notification_h__
@@ -29,7 +25,9 @@ using namespace std;
 /**
  * A user notification can contain information for dialog boxes
  * and status messages. It can also contain a flag
- * that updates the statusbar if needed.
+ * that updates the statusbar if needed. To use it you should
+ * create a new object because the object will automatically be 
+ * deleted by the receiver.
  */
 class UserNotification: public BpmDjEvent
 {
@@ -44,6 +42,6 @@ public:
   UserNotification();
   void updateProcessView(bool mc);
   void send();
-  virtual void run(SongSelectorLogic * window);
+  virtual void run();
 };
 #endif // __loaded__user_notification_h__

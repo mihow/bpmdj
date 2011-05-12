@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__profile_clock_cpp__
 #define __loaded__profile_clock_cpp__
@@ -36,9 +32,9 @@ int main(int argc, char**argv)
   int clock_freq;
   clock_t start,stop;
   start=times(NULL);
-  sleep(2);
+  sleep(10);
   stop=times(NULL);
-  stop = (stop-start)/2;
+  stop = (stop-start)/10;
   if (stop>900 && stop <1100) 
     stop = 1000;
   else if (stop>90 && stop <110)

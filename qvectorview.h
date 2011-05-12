@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__qvectorview_h__
 #define __loaded__qvectorview_h__
@@ -48,7 +44,8 @@ class QVectorViewData
   virtual int  vectorSize() const = 0;
   virtual QString text( int row, int col) const = 0;
   virtual void sort(int col, bool ascending) = 0;
-  virtual void paintCell( QVectorView*, int number, QPainter *, const QColorGroup & cg, int column, int width, int alignment );
+  virtual void paintCell(QVectorView*, int number, QPainter *, 
+	 const QColorGroup & cg, int column, int width, int alignment );
  private:
   friend class QVectorView;
 };
@@ -62,15 +59,17 @@ class QVectorView: public Q3ScrollView
   Q_OBJECT ;
   Q_ENUMS( ResizeMode RenameAction ) ;
   Q_PROPERTY( int columns READ columns ) ;
-  Q_PROPERTY( bool showSortIndicator READ showSortIndicator WRITE setShowSortIndicator ) ;
+  Q_PROPERTY( bool showSortIndicator READ showSortIndicator 
+	      WRITE setShowSortIndicator ) ;
   Q_PROPERTY( int itemMargin READ itemMargin WRITE setItemMargin ) ;
-  Q_PROPERTY( bool rootIsDecorated READ rootIsDecorated WRITE setRootIsDecorated ) ;
+  Q_PROPERTY( bool rootIsDecorated READ rootIsDecorated 
+	      WRITE setRootIsDecorated ) ;
   Q_PROPERTY( ResizeMode resizeMode READ resizeMode WRITE setResizeMode ) ;
   QVectorViewData *item_container;
   int totalHeight;
  public:
-  // Constructor
-  QVectorView( QWidget* parent, QVectorViewData * container, Qt::WindowFlags f = 0 );
+  QVectorView( QWidget* parent, QVectorViewData * container, 
+	       Qt::WindowFlags f = 0 );
   void setupItemContainer();
   void vectorChanged();
  signals:
@@ -83,7 +82,6 @@ class QVectorView: public Q3ScrollView
   Q3Header * header() const;
   virtual int addColumn( const QString &label, int size = -1);
   virtual void setColumnText( int column, const QString &label );
-  //  virtual void setColumnText( int column, const QIconSet& iconset, const QString &label );
   QString columnText( int column ) const;
   virtual void setColumnWidth( int column, int width );
   int columnWidth( int column ) const;
@@ -157,7 +155,8 @@ class QVectorView: public Q3ScrollView
   void resizeEvent( QResizeEvent *e );
   void viewportResizeEvent( QResizeEvent *e );
   void showEvent( QShowEvent * );
-  void drawContentsOffset( QPainter *, int ox, int oy,int cx, int cy, int cw, int ch );
+  void drawContentsOffset(QPainter *, int ox, int oy,int cx, int cy, 
+			  int cw, int ch );
   virtual void paintEmptyArea( QPainter *, const QRect & );
   void styleChange( QStyle& );
   void windowActivationChange( bool );
@@ -178,17 +177,31 @@ class QVectorView: public Q3ScrollView
   void reconfigureItems();
   void widthChanged(int c);
   void handleItemChange( int old, bool shift, bool control );
-  void selectRange( int from, int to, bool invert, bool includeFirst, bool clearSel = FALSE );
-  bool selectRange( int newItem, int oldItem, int anchorItem );
-  bool clearRange( int from, int to, bool includeFirst = TRUE );
+  void selectRange(int from, int to, bool invert, bool includeFirst, 
+		   bool clearSel = FALSE );
+  bool selectRange(int newItem, int oldItem, int anchorItem );
+  bool clearRange(int from, int to, bool includeFirst = TRUE );
   void doAutoScroll( const QPoint &cursorPos );
  private:	// Disabled copy constructor and operator
-  vector<int> dirty_items; // items that need repainting
-  int bottom_line_number;       // the lowest linenumber to on screen (the highest number)
-  int top_line_number;          // the highest linenumber to on screen (the lowest number)
- public:
-  void get_visible_range(int &lo, int &hi) {lo=top_line_number; hi=bottom_line_number;};
- private:
+  /**
+   * The items that need repainting
+   */
+  vector<int> dirty_items;
+  /**
+   * the lowest linenumber to on screen (the highest number)
+   */
+  int bottom_line_number; 
+  /**
+   * The highest linenumber to on screen (the lowest number)
+   */
+  int top_line_number;          
+public:
+  void get_visible_range(int &lo, int &hi)
+  {
+    lo=top_line_number;
+    hi=bottom_line_number;
+  };
+private:
   ViewColumnInfo * d_vci;
   Q3Header * d_h;
   int d_margin;
@@ -199,7 +212,7 @@ class QVectorView: public Q3ScrollView
   int d_topPixel;
   int d_bottomPixel;
   struct Column 
-    { QVectorView::WidthMode wmode; };
+  { QVectorView::WidthMode wmode; };
   Q3PtrVector<Column> d_column;
   int d_fontMetricsHeight;
   int d_minLeftBearing, d_minRightBearing;

@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__bpmdj_pref_cpp__
 #define __loaded__bpmdj_pref_cpp__
@@ -40,16 +36,19 @@ using namespace std;
 #include "common.h"
 #include "config.h"
 
-BpmDjPreferences::BpmDjPreferences(QWidget*parent,const char*name, bool modal, Qt::WindowFlags f):
+BpmDjPreferences::BpmDjPreferences(QWidget*parent,const char*name, bool modal, 
+				   Qt::WindowFlags f):
   QDialog(parent,name,modal,f)
 {
   setupUi(this);
   //  QWidget * w = widgetStack->widget(2);
   for(int i = 0 ; i < 8; i ++)
-    analyzerStack->layout()->add(new SongProcPrefView(analyzerStack,Config::analyzers[i]));
+    analyzerStack->layout()->add(new SongProcPrefView(analyzerStack,
+						      Config::analyzers[i]));
   //  w = widgetStack->widget(0);
   for(int i = 0 ; i < 4 ; i++)
-    playerStack->layout()->add(new SongProcPrefView(playerStack,Config::players[i]));
+    playerStack->layout()->add(new SongProcPrefView(playerStack,
+						    Config::players[i]));
 }
 
 void BpmDjPreferences::fixColorOf(QWidget *p)
@@ -130,7 +129,8 @@ void BpmDjPreferences::on_colordColorCol_clicked()
   fixColorOf(colordColorCol);
 }
 
-void BpmDjPreferences::copyProgramTo(QString program, QString host, Ui_InstallRemotes * dialog)
+void BpmDjPreferences::copyProgramTo(QString program, QString host, 
+				     Ui_InstallRemotes * dialog)
 {
   QString command = QString("scp -B ")+program+" "+host+":";
   QString makeexec = QString("ssh ")+host+" chmod +rx bpmplay bpmdjraw";
@@ -147,7 +147,8 @@ void BpmDjPreferences::copyProgramTo(QString program, QString host, Ui_InstallRe
   QFile log("install.log");
   log.open(IO_WriteOnly);
   log.close();
-  execute(command+" >>install.log 2>>install.log");
+  execute("Install "+command+" at "+host,
+	  command+" >>install.log 2>>install.log");
   log.open(IO_ReadOnly);
   char log_line[5000];
   while(log.readLine(log_line,5000)>=0)
@@ -161,7 +162,8 @@ void BpmDjPreferences::copyProgramTo(QString program, QString host, Ui_InstallRe
   log.open(IO_WriteOnly);
   log.close();
   
-  execute(makeexec+" >>install.log 2>>install.log");
+  execute("Making "+command+" at "+host+" executable",
+	  makeexec+" >>install.log 2>>install.log");
   
   log.open(IO_ReadOnly);
   while(log.readLine(log_line,5000)>=0)
@@ -175,7 +177,7 @@ void BpmDjPreferences::installRemotes(Ui_InstallRemotes * dialog)
    * find the positions of the programs
    */
   QString location_bpmplay = exists("./bpmplay") ? "./bpmplay" :
-    exists("/usr/bin/bpmplay") ? "/usr/bin/bpmplay" : ";";
+    exists("/usr/bin/bpmplay") ? "/usr/bin/bpmplay" : "";
   QString location_bpmdjraw = exists("./bpmdjraw") ? "./bpmdjraw" :
     exists("/usr/bin/bpmdjraw") ? "/usr/bin/bpmdjraw" : "";
   if (location_bpmplay.isEmpty())
@@ -185,7 +187,7 @@ void BpmDjPreferences::installRemotes(Ui_InstallRemotes * dialog)
     }
   if (location_bpmdjraw.isEmpty())
     {
-      QMessageBox::message("Install","I cannot find the pmdjraw script\n");
+      QMessageBox::message("Install","I cannot find the bpmdjraw script\n");
       return;
     }
 
@@ -234,7 +236,8 @@ void BpmDjPreferences::installRemotes()
     }
   if (dialog.hosts->childCount()==0)
     {
-      QMessageBox::message("Install","Install is only necessary for remote players\n"
+      QMessageBox::message("Install",
+			   "Install is only necessary for remote players\n"
 			   "There seem to be no remote players present.\n");
       return;
     }

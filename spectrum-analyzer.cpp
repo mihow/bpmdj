@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__spectrum_analyzer_cpp__
 #define __loaded__spectrum_analyzer_cpp__
@@ -132,8 +128,10 @@ static void bark_fft(int window_size, float8 * bark_energy)
   fft_to_bark(fft_out,window_size,bark_energy);
 }
 
-// the histogram can be used to see how the energy is used within a band. Where the 
-// central peaks are and how quickly they fall off. 
+/**
+ * The histogram can be used to see how the energy is used within a band. 
+ * Where the central peaks are and how quickly they fall off. 
+ */
 void SpectrumAnalyzer::fetchSpectrum_normal()
 {
   // Bug #963
@@ -151,14 +149,16 @@ void SpectrumAnalyzer::fetchSpectrum_normal()
   // allocate empty arrays
   float8 *  bark_energy = bpmdj_allocate(barksize,float8);
   float8 * fft_in = init_bark_fft(window_size);
-  // we need to go two times through the entire file 2 times. First to find the maxima
-  // then to obtain the distribution
+  // we need to go two times through the entire file 2 times. First to find 
+  // the maxima then to obtain the distribution
   FILE * raw = openCoreRawFile();
   long int fs = fsize(raw)/4;
   stereo_sample2 * block = bpmdj_allocate(window_size, stereo_sample2);
-  histogram_type * * bark_energy_distri = bpmdj_allocate (barksize,histogram_type *);
+  histogram_type * * bark_energy_distri = bpmdj_allocate(barksize,
+							 histogram_type *);
+ // 96 dB should suffice no ?
   for(int i = 0 ; i < barksize ; i++)
-    bark_energy_distri[i] = new histogram_type(0.0,96,distri_size); // 96 dB should suffice no ?
+    bark_energy_distri[i] = new histogram_type(0.0,96,distri_size);
   long indicate = fs/step_size;
   indicate/=100;
   Progress->setRange(0,fs);
@@ -228,7 +228,7 @@ void SpectrumAnalyzer::fetchSpectrum_normal()
   p.end(); 
   histo->setPixmap(*pm);
   
-  // normalisation usable for distance measurment  
+  // normalization usable for distance measurement  
   for(int i = 0 ; i < barksize ; i ++)
     {
       bark_energy_distri[i]->normalize_autocorrelation_diff(255);

@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__signals_h__
 #define __loaded__signals_h__
@@ -35,55 +31,65 @@ using namespace std;
 
 template <class Type, int Channels> class Sample
 {
-  private:
-    Type channel[Channels];
-  public:
-    Sample() {};
-    Sample(Type value);
-    template <class Type2> Sample(Sample<Type2,Channels>);
-    Type & operator[](unsigned1 idx) { assert(idx<Channels); return channel[idx]; };
-    Sample<Type,Channels> operator +(Sample<Type,Channels> b) const;
-    Sample<Type,Channels> operator -(Sample<Type,Channels> b) const;
-    Sample<Type,Channels> operator *(Type b) const;
-    Sample<Type,Channels> operator *(Sample<Type,Channels> b) const;
-    Sample<Type,Channels> operator /(Sample<Type,Channels> b) const;
-    Sample<Type,Channels> zero_to_one() const;
-    Sample<Type,Channels> & operator -=(Sample<Type,Channels> b);
-    Sample<Type,Channels> & operator +=(Sample<Type,Channels> b);
-    Sample<Type,Channels> & operator /=(Sample<Type,Channels> b);
-    Sample<Type,Channels> & operator /=(Type b);
+private:
+  Type channel[Channels];
+public:
+  Sample() 
+  {
+  };
+  Sample(Type value);
+  template <class Type2> Sample(Sample<Type2,Channels>);
+  Type & operator[](unsigned1 idx)
+  { 
+    assert(idx<Channels); 
+    return channel[idx]; 
+  };
+  Sample<Type,Channels> operator +(Sample<Type,Channels> b) const;
+  Sample<Type,Channels> operator -(Sample<Type,Channels> b) const;
+  Sample<Type,Channels> operator *(Type b) const;
+  Sample<Type,Channels> operator *(Sample<Type,Channels> b) const;
+  Sample<Type,Channels> operator /(Sample<Type,Channels> b) const;
+  Sample<Type,Channels> zero_to_one() const;
+  Sample<Type,Channels> & operator -=(Sample<Type,Channels> b);
+  Sample<Type,Channels> & operator +=(Sample<Type,Channels> b);
+  Sample<Type,Channels> & operator /=(Sample<Type,Channels> b);
+  Sample<Type,Channels> & operator /=(Type b);
 };
 
 /**
- * A basic signal covers all the operations necessary on a signal
- * but it does not store the data.
+ * A basic signal covers all the operations necessary on a signal but it does
+ * not store the data.
  */
 template <class Type, int Channels> class BasicSignal
 {
-  public:
-    unsigned4 length;
-    BasicSignal(unsigned4 l) {length = l;};
-    virtual ~BasicSignal() {};
-    // get operations
-    virtual Sample<Type,Channels> get(unsigned4 pos) const = 0;
-    virtual Type get(unsigned4 pos, unsigned1 chan) const = 0;
-    Sample<Type,Channels> operator[](unsigned4 idx) const { return get(idx); };
-    // set operations
-    void clear() { set(0); };
-    virtual void set(Type c);
-    virtual void set(unsigned4 pos, Type c);
-    virtual void set(unsigned4 pos, unsigned1 chan, Type c) = 0;
-    virtual void set(unsigned4 pos, Sample<Type,Channels> c) = 0;
-    template <class Type2> void add(const BasicSignal<Type2,Channels> &other);
-    template <class Type2> BasicSignal<Type,Channels>& operator -=(const BasicSignal<Type2,Channels> &other);
-    BasicSignal<Type,Channels>& operator >=(const Type &val);
-    void operator =(const BasicSignal<Type,Channels> &val);
-    void multiply(Type m);
-    void divide(Sample<Type,Channels> d);
-    virtual void absolute();
-    virtual void smooth(unsigned int nr);
-    Sample<Type,Channels> find_abs_max();
-    Sample<Type,Channels> normalize_abs_max();
+public:
+  unsigned4 length;
+  BasicSignal(unsigned4 l) {length = l;};
+  virtual ~BasicSignal() {};
+  // get operations
+  virtual Sample<Type,Channels> get(unsigned4 pos) const = 0;
+  virtual Type get(unsigned4 pos, unsigned1 chan) const = 0;
+  Sample<Type,Channels> operator[](unsigned4 idx) const 
+  { 
+    return get(idx); 
+  };
+  // set operations
+  void clear() { set(0); };
+  virtual void set(Type c);
+  virtual void set(unsigned4 pos, Type c);
+  virtual void set(unsigned4 pos, unsigned1 chan, Type c) = 0;
+  virtual void set(unsigned4 pos, Sample<Type,Channels> c) = 0;
+  template <class Type2> void add(const BasicSignal<Type2,Channels> &other);
+  template <class Type2> BasicSignal<Type,Channels>& 
+    operator -=(const BasicSignal<Type2,Channels> &other);
+  BasicSignal<Type,Channels>& operator >=(const Type &val);
+  void operator =(const BasicSignal<Type,Channels> &val);
+  void multiply(Type m);
+  void divide(Sample<Type,Channels> d);
+  virtual void absolute();
+  virtual void smooth(unsigned int nr);
+  Sample<Type,Channels> find_abs_max();
+  Sample<Type,Channels> normalize_abs_max();
 };
 
 template <int Channels> class Fft;
@@ -92,54 +98,55 @@ template <class input, class output, int Channels> class Haar;
 template <class Type, int Channels> class Signal: 
   public BasicSignal<Type, Channels>
 {
-  private:
-    void init_channels();
-  protected:
-    bool owner_of_data;
-    Type *channel[Channels];
-  public:
-    Signal(unsigned4 l);
-    template<class Type2> Signal(const BasicSignal<Type2,Channels> &init);
-    virtual Sample<Type,Channels> get(unsigned4 pos) const;
-    virtual Type get(unsigned4 pos, unsigned1 chan) const;
-    virtual void set(unsigned4 pos, Sample<Type,Channels> c);
-    virtual void set(unsigned4 pos, unsigned1 chan, Type c);
-    friend class Fft<Channels>;
-    virtual ~Signal();
+private:
+  void init_channels();
+protected:
+  bool owner_of_data;
+  Type *channel[Channels];
+public:
+  Signal(unsigned4 l);
+  template<class Type2> Signal(const BasicSignal<Type2,Channels> &init);
+  virtual Sample<Type,Channels> get(unsigned4 pos) const;
+  virtual Type get(unsigned4 pos, unsigned1 chan) const;
+  virtual void set(unsigned4 pos, Sample<Type,Channels> c);
+  virtual void set(unsigned4 pos, unsigned1 chan, Type c);
+  friend class Fft<Channels>;
+  virtual ~Signal();
 };
 
 template <class Type, int Channels> class SignalIO
 {
-  private:
-    FILE * file;
-    bool write;
-  public:
-    SignalIO(const char * fn, const char* mode);
-    SignalIO(FILE * f, bool write = false);
-    unsigned4 samples();
-    template <class Type2> void writeSamples(const BasicSignal<Type2,Channels>&, unsigned4 max_length);
-    template <class Type2> void readSamples(BasicSignal<Type2,Channels>&, unsigned4 starting_at_sample);
-    virtual ~SignalIO();
+private:
+  FILE * file;
+  bool write;
+public:
+  SignalIO(const char * fn, const char* mode);
+  SignalIO(FILE * f, bool write = false);
+  unsigned4 samples();
+  template <class Type2> void writeSamples(const BasicSignal<Type2,Channels>&, 
+					   unsigned4 max_length);
+  template <class Type2> void readSamples(BasicSignal<Type2,Channels>&, 
+					  unsigned4 starting_at_sample);
+  virtual ~SignalIO();
 };
 
 /**
- * A class which offers a translated view on data and some helper
- * functions.
+ * A class which offers a translated view on data and some helper functions.
  */
 template <class Type, int Channels> class Shift: 
   public BasicSignal<Type,Channels>
 {
-  private:
-    BasicSignal<Type,Channels> *basis;
-    int shift;
-    unsigned4 remap(unsigned4 i) const;
-  public:
-    Shift(BasicSignal<Type,Channels> &b, int shift);
-    virtual ~Shift() {};
-    virtual Sample<Type,Channels> get(unsigned4 pos) const;
-    virtual Type get(unsigned4 pos, unsigned1 chan) const;
-    virtual void set(unsigned4 pos, Sample<Type,Channels> c);
-    virtual void set(unsigned4 pos, unsigned1 chan, Type c);
+private:
+  BasicSignal<Type,Channels> *basis;
+  int shift;
+  unsigned4 remap(unsigned4 i) const;
+public:
+  Shift(BasicSignal<Type,Channels> &b, int shift);
+  virtual ~Shift() {};
+  virtual Sample<Type,Channels> get(unsigned4 pos) const;
+  virtual Type get(unsigned4 pos, unsigned1 chan) const;
+  virtual void set(unsigned4 pos, Sample<Type,Channels> c);
+  virtual void set(unsigned4 pos, unsigned1 chan, Type c);
 };
 
 /**
@@ -147,22 +154,26 @@ template <class Type, int Channels> class Shift:
  * follows the fftw convention. The first half is the real part and from 
  * end to start in the second part we find the complex coefficients.
  */
-template <class Type, int Channels> class HalfComplex: public Signal<Type, Channels>
+template <class Type, int Channels> class HalfComplex: 
+  public Signal<Type, Channels>
 {
-  public:
-    HalfComplex(unsigned4 real, unsigned4 com);
-    HalfComplex<Type,Channels>& operator /=(const HalfComplex<Type,Channels> &other);
-    virtual void toPolar(BasicSignal<Type,Channels> &energy);
-    virtual void toPolar(BasicSignal<Type,Channels> &energy, BasicSignal<Type,Channels> &angle);
-    virtual void fromPolar(const BasicSignal<Type,Channels> &energy, const BasicSignal<Type,Channels> &angle);
+public:
+  HalfComplex(unsigned4 real, unsigned4 com);
+  HalfComplex<Type,Channels>& operator /=(
+	  const HalfComplex<Type,Channels> &other);
+  virtual void toPolar(BasicSignal<Type,Channels> &energy);
+  virtual void toPolar(BasicSignal<Type,Channels> &energy, 
+		       BasicSignal<Type,Channels> &angle);
+  virtual void fromPolar(const BasicSignal<Type,Channels> &energy, 
+			 const BasicSignal<Type,Channels> &angle);
 };
 
 class BasicConvertor
 {
-  public:
-    BasicConvertor();
-    virtual ~BasicConvertor() {};
-    virtual void execute() = 0;
+public:
+  BasicConvertor();
+  virtual ~BasicConvertor() {};
+  virtual void execute() = 0;
 };
 
 /**
@@ -170,28 +181,36 @@ class BasicConvertor
  */
 template<int Channels> class Fft: public BasicConvertor
 {
-  private:
-    fftw_plan fftw[Channels];
-  public:
-    Fft(Signal<float8,Channels> &in, HalfComplex<float8,Channels> &out); // forward
-    Fft(HalfComplex<float8,Channels> &in, Signal<float8,Channels> &out); // backward
-    void execute();
+private:
+  fftw_plan fftw[Channels];
+public:
+  /**
+   * Forward transform
+   */
+  Fft(Signal<float8,Channels> &in, HalfComplex<float8,Channels> &out); 
+  /**
+   * Backward transform
+   */
+  Fft(HalfComplex<float8,Channels> &in, Signal<float8,Channels> &out);
+  void execute();
 };
 
 /**
  * The haar wavelet transform
  */
-template<class Input, class Output, int Channels> class Haar: public BasicConvertor
+template<class Input, class Output, int Channels> class Haar: 
+  public BasicConvertor
 {
-  private : 
-    BasicSignal<Input,Channels> &in;
-    BasicSignal<Output,Channels> &out;
-    bool fwd;
-    void forward(BasicSignal<Output,Channels> &a, int n);
-    void backward(BasicSignal<Output,Channels> &a, int n);
-  public:
-    Haar(BasicSignal<Input,Channels> &in, BasicSignal<Output,Channels> &out, bool forward);
-    void execute();
+private : 
+  BasicSignal<Input,Channels> &in;
+  BasicSignal<Output,Channels> &out;
+  bool fwd;
+  void forward(BasicSignal<Output,Channels> &a, int n);
+  void backward(BasicSignal<Output,Channels> &a, int n);
+public:
+  Haar(BasicSignal<Input,Channels> &in, BasicSignal<Output,Channels> &out, 
+       bool forward);
+  void execute();
 };
 
 /**
@@ -209,8 +228,6 @@ long   find_max_rpos(unsigned4 * data, long l);
 float8 find_mean(float8 * data, long l);
 float4  find_mean(float4 * data, long l);
 
-// template <class type> type find_abs_max(type * data, long l);
-// template <class type> type normalize_abs_max(type * data, long l);
 void   vector_mul_div(signed4 * data, long l, signed4 mul, signed4 div);
 void   normalize_mean(float8 * data, long l);
 void   normalize_mean(float4 * data, long l);
@@ -400,7 +417,8 @@ template <class Type2> void BASIC::add(const BasicSignal<Type2,Channels> &other)
 }
 
 DECLARE 
-template <class Type2> BASIC& BASIC::operator -=(const BasicSignal<Type2,Channels> &other)
+template <class Type2> BASIC& BASIC::operator -=(
+const BasicSignal<Type2,Channels> &other)
 {
   unsigned4 ml = minimum(length,other.length);
   for(unsigned C = 0 ; C < Channels ; C++)
@@ -545,13 +563,15 @@ DECLARE void SIGNL::set(unsigned4 pos, unsigned1 chan, Type c)
 /**
  * Halfcomplex storage
  */
-DECLARE HalfComplex<Type,Channels>::HalfComplex(unsigned4 real, unsigned4 com) : SIGNL(real*2)
+DECLARE HalfComplex<Type,Channels>::HalfComplex(unsigned4 real, 
+unsigned4 com) : SIGNL(real*2)
 {
   assert(real==com);
   assert(real);
 }
 
-DECLARE HalfComplex<Type,Channels>& HalfComplex<Type,Channels>::operator /=(const HalfComplex<Type,Channels> &other)
+DECLARE HalfComplex<Type,Channels>& HalfComplex<Type,Channels>::operator /=
+(const HalfComplex<Type,Channels> &other)
 {
   // this is a division of complex numbers
   for(int C = 0 ; C<Channels ; C++)
@@ -579,7 +599,8 @@ DECLARE HalfComplex<Type,Channels>& HalfComplex<Type,Channels>::operator /=(cons
   return *this;
 }
 
-DECLARE void HalfComplex<Type,Channels>::toPolar(BasicSignal<Type,Channels> &energy)
+DECLARE void HalfComplex<Type,Channels>::toPolar
+(BasicSignal<Type,Channels> &energy)
 {
   assert(energy.length == this->length/2);
   // this is a division of complex numbers
@@ -597,7 +618,8 @@ DECLARE void HalfComplex<Type,Channels>::toPolar(BasicSignal<Type,Channels> &ene
     }
 }
 
-DECLARE void HalfComplex<Type,Channels>::toPolar(BasicSignal<Type,Channels> &energy, BasicSignal<Type,Channels> &angle)
+DECLARE void HalfComplex<Type,Channels>::toPolar
+(BasicSignal<Type,Channels> &energy, BasicSignal<Type,Channels> &angle)
 {
   assert(energy.length == this->length/2);
   assert(angle.length == energy.length);
@@ -618,7 +640,9 @@ DECLARE void HalfComplex<Type,Channels>::toPolar(BasicSignal<Type,Channels> &ene
     }
 }
 
-DECLARE void HalfComplex<Type,Channels>::fromPolar(const BasicSignal<Type,Channels> &energy, const BasicSignal<Type,Channels> &angle)
+DECLARE void HalfComplex<Type,Channels>::fromPolar
+(const BasicSignal<Type,Channels> &energy, 
+const BasicSignal<Type,Channels> &angle)
 {
   assert(energy.length == this->length/2);
   assert(angle.length == energy.length);
@@ -676,8 +700,9 @@ DECLARE void SHIFT::set(unsigned4 pos, unsigned1 chan, Type c)
 /**
  * The FFT functionality
  */
-template <int Channels> Fft<Channels>::Fft(Signal<float8,Channels> &in, HalfComplex<float8,Channels> &out):
-  BasicConvertor(), fftw()
+template <int Channels> Fft<Channels>::Fft(Signal<float8,Channels> &in,
+HalfComplex<float8,Channels> &out):
+BasicConvertor(), fftw()
 {
   for(int i = 0 ; i < Channels ; i++)
     {
@@ -688,8 +713,9 @@ template <int Channels> Fft<Channels>::Fft(Signal<float8,Channels> &in, HalfComp
     }
 }
 
-template <int Channels> Fft<Channels>::Fft(HalfComplex<float8,Channels> &in, Signal<float8,Channels> &out):
-  BasicConvertor()
+template <int Channels> Fft<Channels>::Fft(HalfComplex<float8,Channels> &in, 
+Signal<float8,Channels> &out):
+BasicConvertor()
 {
   for(int i = 0 ; i < Channels ; i++)
     fftw[i] = fftw_plan_r2r_1d(in.length,in.channel[i],out.channel[i],
@@ -705,9 +731,9 @@ template <int Channels> void Fft<Channels>::execute()
 /**
  * Haar
  */
-
-DECLHAAR HAAR::Haar(BasicSignal<Input,Channels> &i, BasicSignal<Output, Channels> &o, bool f) :
-  in(i), out(o), fwd(f)
+DECLHAAR HAAR::Haar(BasicSignal<Input,Channels> &i, 
+BasicSignal<Output, Channels> &o, bool f) :
+in(i), out(o), fwd(f)
 {
   assert(in.length==out.length);
   int l = out.length;
@@ -807,7 +833,8 @@ DECLARE unsigned4 SIO::samples()
   return fsize(file)/(Channels*sizeof(Type));
 }
 
-DECLARE template <class Type2>  void SIO::writeSamples(const BasicSignal<Type2,Channels> &s, unsigned4 write_length)
+DECLARE template <class Type2>  void SIO::writeSamples
+(const BasicSignal<Type2,Channels> &s, unsigned4 write_length)
 {
   assert(write);
   unsigned l = minimum(write_length,s.length);
@@ -819,13 +846,15 @@ DECLARE template <class Type2>  void SIO::writeSamples(const BasicSignal<Type2,C
       }
 }
 
-DECLARE template <class Type2> void SIO::readSamples(BasicSignal<Type2,Channels>& s, unsigned4 starting_at_sample)
+DECLARE template <class Type2> void SIO::readSamples
+(BasicSignal<Type2,Channels>& s, unsigned4 starting_at_sample)
 {
   assert(file);
   int fd = fileno(file);
   const int unit = sizeof(Type);
   unsigned4 map_length = fsize(file);
-  unsigned char * data = (unsigned char*)mmap(NULL,map_length,PROT_READ,MAP_SHARED,fd,0);
+  unsigned char * data = (unsigned char*)mmap(NULL,map_length,PROT_READ,
+					      MAP_SHARED,fd,0);
   assert(data!=MAP_FAILED);
   assert(data);
   assert((s.length+starting_at_sample)*Channels*unit<map_length);

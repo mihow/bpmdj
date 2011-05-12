@@ -100,7 +100,7 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 82 "do-syntax.y"
+#line 69 "do-syntax.y"
 { 
   char           * token;
   s_arg            arg;

@@ -153,40 +153,27 @@ char* cat(const char* a, const char* b)
      return c;
    }
 
-char* args2str(vector<s_arg> * args, char* sep = ", ")
-  {
-    char* accu="";
-    for(unsigned i = 0 ; i < args->size() ; i++)
-      {
-	accu=cat(accu,args[0][i].type);
-	accu=cat(accu," ");
-	accu=cat(accu,args[0][i].name);
-	if (i<args->size()-1)
-	  accu=cat(accu,sep);
-      }
-    return accu;
-  }
+ char* args2str(vector<s_arg> * args, char* sep = NULL)
+{
+  if (sep==NULL) sep=strdup(", ");
+  char* accu=strdup("");
+  for(unsigned i = 0 ; i < args->size() ; i++)
+    {
+      accu=cat(accu,args[0][i].type);
+      accu=cat(accu," ");
+      accu=cat(accu,args[0][i].name);
+      if (i<args->size()-1)
+	accu=cat(accu,sep);
+    }
+  return accu;
+}
 
 char* argnames2str(vector<s_arg> * args)
   {
-    char* accu="";
+    char* accu=strdup("");
     for(unsigned i = 0 ; i < args->size() ; i++)
       {
 	accu=cat(accu,args[0][i].name);
-	if (i<args->size()-1)
-	  accu=cat(accu,", ");
-      }
-    return accu;
-  }
-
-char* copyargs(vector<s_arg> * args)
-  {
-    char* accu="";
-    for(unsigned i = 0 ; i < args->size() ; i++)
-      {
-	char temp[1000];
-	sprintf(temp,"%s(%s)",args[0][i].name,args[0][i].name);
-	accu=cat(accu,temp);
 	if (i<args->size()-1)
 	  accu=cat(accu,", ");
       }
@@ -230,14 +217,14 @@ extern char * makers_emitted_for;
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 82 "do-syntax.y"
+#line 69 "do-syntax.y"
 { 
   char           * token;
   s_arg            arg;
   vector<s_arg>  * args;
 }
 /* Line 187 of yacc.c.  */
-#line 241 "do-syntax.cpp"
+#line 228 "do-syntax.cpp"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -250,7 +237,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 254 "do-syntax.cpp"
+#line 241 "do-syntax.cpp"
 
 #ifdef short
 # undef short
@@ -547,10 +534,10 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,    94,    94,    95,    98,    99,   101,   100,   157,   156,
-     215,   216,   219,   253,   267,   281,   299,   300,   301,   302,
-     305,   308,   309,   310,   314,   315,   318,   319,   322,   325,
-     326,   327
+       0,    81,    81,    82,    85,    86,    88,    87,   144,   143,
+     202,   203,   206,   240,   254,   268,   286,   287,   288,   289,
+     292,   295,   296,   297,   301,   302,   305,   306,   309,   312,
+     313,   314
 };
 #endif
 
@@ -1492,17 +1479,17 @@ yyreduce:
   switch (yyn)
     {
         case 4:
-#line 98 "do-syntax.y"
+#line 85 "do-syntax.y"
     { print(globhead,"%s\n",(yyvsp[(1) - (1)].token)); ;}
     break;
 
   case 5:
-#line 99 "do-syntax.y"
+#line 86 "do-syntax.y"
     { print(globhead,"class %s;\n",(yyvsp[(2) - (3)].token)); ;}
     break;
 
   case 6:
-#line 101 "do-syntax.y"
+#line 88 "do-syntax.y"
     {
       current_do = strdup((yyvsp[(2) - (3)].token));
       print(object,"class %sData: public DataReferenceCount\n{\n",(yyvsp[(2) - (3)].token));
@@ -1548,7 +1535,7 @@ yyreduce:
     break;
 
   case 7:
-#line 144 "do-syntax.y"
+#line 131 "do-syntax.y"
     {
       if (makers_emitted_for!=current_do)
 	{
@@ -1564,7 +1551,7 @@ yyreduce:
     break;
 
   case 8:
-#line 157 "do-syntax.y"
+#line 144 "do-syntax.y"
     {
       current_do = strdup((yyvsp[(2) - (5)].token));
       current_pa = strdup((yyvsp[(4) - (5)].token));
@@ -1614,7 +1601,7 @@ yyreduce:
     break;
 
   case 9:
-#line 204 "do-syntax.y"
+#line 191 "do-syntax.y"
     {
       if (makers_emitted_for!=current_do)
 	{
@@ -1627,12 +1614,12 @@ yyreduce:
     break;
 
   case 11:
-#line 216 "do-syntax.y"
+#line 203 "do-syntax.y"
     {;}
     break;
 
   case 12:
-#line 220 "do-syntax.y"
+#line 207 "do-syntax.y"
     {
 			    print(object,"  protected: %s %s;\n",(yyvsp[(1) - (3)].token),(yyvsp[(2) - (3)].token)); 
 			    print(object,"  public: %s get_%s();\n",(yyvsp[(1) - (3)].token),(yyvsp[(2) - (3)].token)); 
@@ -1669,7 +1656,7 @@ yyreduce:
     break;
 
   case 13:
-#line 254 "do-syntax.y"
+#line 241 "do-syntax.y"
     {
 			    print(object,"  public: %s %s(%s);\n",(yyvsp[(1) - (5)].token),(yyvsp[(2) - (5)].token),args2str((yyvsp[(3) - (5)].args))); 
   			    print(meta,  "  public: %s %s(%s);\n",(yyvsp[(1) - (5)].token),(yyvsp[(2) - (5)].token),args2str((yyvsp[(3) - (5)].args))); 
@@ -1686,7 +1673,7 @@ yyreduce:
     break;
 
   case 14:
-#line 268 "do-syntax.y"
+#line 255 "do-syntax.y"
     {
 			    print(object,"  public: %s %s %s(%s);\n",(yyvsp[(1) - (6)].token), (yyvsp[(2) - (6)].token),(yyvsp[(3) - (6)].token),args2str((yyvsp[(4) - (6)].args))); 
   			    print(meta,  "  public: %s %s(%s);\n",(yyvsp[(2) - (6)].token),(yyvsp[(3) - (6)].token),args2str((yyvsp[(4) - (6)].args))); 
@@ -1703,7 +1690,7 @@ yyreduce:
     break;
 
   case 15:
-#line 282 "do-syntax.y"
+#line 269 "do-syntax.y"
     { 
 			    if (strcmp((yyvsp[(1) - (3)].token),current_do)!=0)
 			      {
@@ -1722,83 +1709,83 @@ yyreduce:
     break;
 
   case 16:
-#line 299 "do-syntax.y"
+#line 286 "do-syntax.y"
     {(yyval.token)=cat((yyvsp[(1) - (2)].token),"*");;}
     break;
 
   case 17:
-#line 300 "do-syntax.y"
+#line 287 "do-syntax.y"
     {(yyval.token)=cat("const ",(yyvsp[(2) - (2)].token));;}
     break;
 
   case 19:
-#line 302 "do-syntax.y"
+#line 289 "do-syntax.y"
     {(yyval.token)=cat(cat((yyvsp[(1) - (4)].token)," < "),cat((yyvsp[(3) - (4)].token)," > ")); ;}
     break;
 
   case 20:
-#line 305 "do-syntax.y"
-    {(yyval.token)="virtual";;}
+#line 292 "do-syntax.y"
+    {(yyval.token)=strdup("virtual");;}
     break;
 
   case 21:
-#line 308 "do-syntax.y"
-    {(yyval.token)="read"; check_access_access(true);;}
+#line 295 "do-syntax.y"
+    {(yyval.token)=strdup("read"); check_access_access(true);;}
     break;
 
   case 22:
-#line 309 "do-syntax.y"
-    {(yyval.token)="write"; check_access_access(true);;}
+#line 296 "do-syntax.y"
+    {(yyval.token)=strdup("write"); check_access_access(true);;}
     break;
 
   case 23:
-#line 310 "do-syntax.y"
-    {(yyval.token)="ignore"; check_access_access(false);;}
+#line 297 "do-syntax.y"
+    {(yyval.token)=strdup("ignore"); check_access_access(false);;}
     break;
 
   case 24:
-#line 314 "do-syntax.y"
+#line 301 "do-syntax.y"
     {(yyval.args)=(yyvsp[(2) - (3)].args);;}
     break;
 
   case 25:
-#line 315 "do-syntax.y"
+#line 302 "do-syntax.y"
     { (yyval.args)=new vector<s_arg>();;}
     break;
 
   case 26:
-#line 318 "do-syntax.y"
+#line 305 "do-syntax.y"
     {(yyval.args)=(yyvsp[(1) - (3)].args); (yyval.args)->push_back((yyvsp[(3) - (3)].arg));;}
     break;
 
   case 27:
-#line 319 "do-syntax.y"
+#line 306 "do-syntax.y"
     {(yyval.args)=new vector<s_arg>(); (yyval.args)->push_back((yyvsp[(1) - (1)].arg));;}
     break;
 
   case 28:
-#line 322 "do-syntax.y"
+#line 309 "do-syntax.y"
     {(yyval.arg).name = (yyvsp[(2) - (2)].token); (yyval.arg).type=(yyvsp[(1) - (2)].token);;}
     break;
 
   case 29:
-#line 325 "do-syntax.y"
-    {(yyval.token)="operator[]";;}
+#line 312 "do-syntax.y"
+    {(yyval.token)=strdup("operator[]");;}
     break;
 
   case 30:
-#line 326 "do-syntax.y"
-    {(yyval.token)="operator=";;}
+#line 313 "do-syntax.y"
+    {(yyval.token)=strdup("operator=");;}
     break;
 
   case 31:
-#line 327 "do-syntax.y"
+#line 314 "do-syntax.y"
     {(yyval.token)=(yyvsp[(1) - (1)].token);}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1802 "do-syntax.cpp"
+#line 1789 "do-syntax.cpp"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -2012,6 +1999,6 @@ yyreturn:
 }
 
 
-#line 329 "do-syntax.y"
+#line 316 "do-syntax.y"
 
 

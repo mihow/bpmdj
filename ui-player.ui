@@ -6,8 +6,14 @@
     <x>0</x>
     <y>0</y>
     <width>579</width>
-    <height>383</height>
+    <height>470</height>
    </rect>
+  </property>
+  <property name="sizePolicy" >
+   <sizepolicy vsizetype="MinimumExpanding" hsizetype="Preferred" >
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle" >
    <string>BpmPlayer</string>
@@ -38,7 +44,7 @@
        <property name="spacing" >
         <number>6</number>
        </property>
-       <item row="1" column="0" colspan="2" >
+       <item row="4" column="0" colspan="2" >
         <layout class="QHBoxLayout" >
          <property name="spacing" >
           <number>2</number>
@@ -49,7 +55,7 @@
          <item>
           <widget class="QGroupBox" name="groupBox" >
            <property name="title" >
-            <string>GroupBox</string>
+            <string>Control</string>
            </property>
            <layout class="QGridLayout" >
             <property name="margin" >
@@ -909,7 +915,7 @@
             <item>
              <widget class="QLCDNumber" name="CurrentTempoLCD" >
               <property name="sizePolicy" >
-               <sizepolicy vsizetype="Maximum" hsizetype="Minimum" >
+               <sizepolicy vsizetype="Minimum" hsizetype="Minimum" >
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
@@ -1325,6 +1331,9 @@
             <property name="checkable" >
              <bool>true</bool>
             </property>
+            <property name="autoExclusive" >
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
           <item row="0" column="0" >
@@ -1351,6 +1360,9 @@
             <property name="checkable" >
              <bool>true</bool>
             </property>
+            <property name="autoExclusive" >
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
           <item row="2" column="0" >
@@ -1369,6 +1381,9 @@
              <string>R</string>
             </property>
             <property name="checkable" >
+             <bool>true</bool>
+            </property>
+            <property name="autoExclusive" >
              <bool>true</bool>
             </property>
            </widget>
@@ -1391,6 +1406,9 @@
             <property name="checkable" >
              <bool>true</bool>
             </property>
+            <property name="autoExclusive" >
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
           <item row="1" column="1" >
@@ -1409,6 +1427,9 @@
              <string>Alt+S</string>
             </property>
             <property name="checkable" >
+             <bool>true</bool>
+            </property>
+            <property name="autoExclusive" >
              <bool>true</bool>
             </property>
            </widget>
@@ -1431,6 +1452,9 @@
             <property name="checkable" >
              <bool>true</bool>
             </property>
+            <property name="autoExclusive" >
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
           <item row="1" column="0" >
@@ -1449,6 +1473,9 @@
              <string>S</string>
             </property>
             <property name="checkable" >
+             <bool>true</bool>
+            </property>
+            <property name="autoExclusive" >
              <bool>true</bool>
             </property>
            </widget>
@@ -1470,6 +1497,276 @@
             </property>
             <property name="checkable" >
              <bool>true</bool>
+            </property>
+            <property name="autoExclusive" >
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="2" column="0" colspan="2" >
+        <widget class="QGroupBox" name="jackbox" >
+         <property name="sizePolicy" >
+          <sizepolicy vsizetype="Maximum" hsizetype="Preferred" >
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="title" >
+          <string>Jack</string>
+         </property>
+         <layout class="QGridLayout" >
+          <property name="margin" >
+           <number>2</number>
+          </property>
+          <property name="spacing" >
+           <number>2</number>
+          </property>
+          <item row="0" column="1" >
+           <widget class="QPushButton" name="jackmaster" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text" >
+             <string>Jack Master</string>
+            </property>
+            <property name="default" >
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3" >
+           <widget class="QLCDNumber" name="jacktime" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="palette" >
+             <palette>
+              <active>
+               <colorrole role="WindowText" >
+                <brush brushstyle="SolidPattern" >
+                 <color alpha="255" >
+                  <red>255</red>
+                  <green>255</green>
+                  <blue>0</blue>
+                 </color>
+                </brush>
+               </colorrole>
+               <colorrole role="Base" >
+                <brush brushstyle="SolidPattern" >
+                 <color alpha="255" >
+                  <red>255</red>
+                  <green>255</green>
+                  <blue>255</blue>
+                 </color>
+                </brush>
+               </colorrole>
+               <colorrole role="Window" >
+                <brush brushstyle="SolidPattern" >
+                 <color alpha="255" >
+                  <red>0</red>
+                  <green>0</green>
+                  <blue>0</blue>
+                 </color>
+                </brush>
+               </colorrole>
+              </active>
+              <inactive>
+               <colorrole role="WindowText" >
+                <brush brushstyle="SolidPattern" >
+                 <color alpha="255" >
+                  <red>255</red>
+                  <green>255</green>
+                  <blue>0</blue>
+                 </color>
+                </brush>
+               </colorrole>
+               <colorrole role="Base" >
+                <brush brushstyle="SolidPattern" >
+                 <color alpha="255" >
+                  <red>255</red>
+                  <green>255</green>
+                  <blue>255</blue>
+                 </color>
+                </brush>
+               </colorrole>
+               <colorrole role="Window" >
+                <brush brushstyle="SolidPattern" >
+                 <color alpha="255" >
+                  <red>0</red>
+                  <green>0</green>
+                  <blue>0</blue>
+                 </color>
+                </brush>
+               </colorrole>
+              </inactive>
+              <disabled>
+               <colorrole role="WindowText" >
+                <brush brushstyle="SolidPattern" >
+                 <color alpha="255" >
+                  <red>128</red>
+                  <green>128</green>
+                  <blue>128</blue>
+                 </color>
+                </brush>
+               </colorrole>
+               <colorrole role="Base" >
+                <brush brushstyle="SolidPattern" >
+                 <color alpha="255" >
+                  <red>0</red>
+                  <green>0</green>
+                  <blue>0</blue>
+                 </color>
+                </brush>
+               </colorrole>
+               <colorrole role="Window" >
+                <brush brushstyle="SolidPattern" >
+                 <color alpha="255" >
+                  <red>0</red>
+                  <green>0</green>
+                  <blue>0</blue>
+                 </color>
+                </brush>
+               </colorrole>
+              </disabled>
+             </palette>
+            </property>
+            <property name="autoFillBackground" >
+             <bool>true</bool>
+            </property>
+            <property name="smallDecimalPoint" >
+             <bool>false</bool>
+            </property>
+            <property name="numDigits" >
+             <number>8</number>
+            </property>
+            <property name="segmentStyle" >
+             <enum>QLCDNumber::Flat</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2" >
+           <widget class="QLCDNumber" name="jackbbt" >
+            <property name="palette" >
+             <palette>
+              <active>
+               <colorrole role="WindowText" >
+                <brush brushstyle="SolidPattern" >
+                 <color alpha="255" >
+                  <red>255</red>
+                  <green>255</green>
+                  <blue>0</blue>
+                 </color>
+                </brush>
+               </colorrole>
+               <colorrole role="Base" >
+                <brush brushstyle="SolidPattern" >
+                 <color alpha="255" >
+                  <red>255</red>
+                  <green>255</green>
+                  <blue>255</blue>
+                 </color>
+                </brush>
+               </colorrole>
+               <colorrole role="Window" >
+                <brush brushstyle="SolidPattern" >
+                 <color alpha="255" >
+                  <red>0</red>
+                  <green>0</green>
+                  <blue>0</blue>
+                 </color>
+                </brush>
+               </colorrole>
+              </active>
+              <inactive>
+               <colorrole role="WindowText" >
+                <brush brushstyle="SolidPattern" >
+                 <color alpha="255" >
+                  <red>255</red>
+                  <green>255</green>
+                  <blue>0</blue>
+                 </color>
+                </brush>
+               </colorrole>
+               <colorrole role="Base" >
+                <brush brushstyle="SolidPattern" >
+                 <color alpha="255" >
+                  <red>255</red>
+                  <green>255</green>
+                  <blue>255</blue>
+                 </color>
+                </brush>
+               </colorrole>
+               <colorrole role="Window" >
+                <brush brushstyle="SolidPattern" >
+                 <color alpha="255" >
+                  <red>0</red>
+                  <green>0</green>
+                  <blue>0</blue>
+                 </color>
+                </brush>
+               </colorrole>
+              </inactive>
+              <disabled>
+               <colorrole role="WindowText" >
+                <brush brushstyle="SolidPattern" >
+                 <color alpha="255" >
+                  <red>128</red>
+                  <green>128</green>
+                  <blue>128</blue>
+                 </color>
+                </brush>
+               </colorrole>
+               <colorrole role="Base" >
+                <brush brushstyle="SolidPattern" >
+                 <color alpha="255" >
+                  <red>0</red>
+                  <green>0</green>
+                  <blue>0</blue>
+                 </color>
+                </brush>
+               </colorrole>
+               <colorrole role="Window" >
+                <brush brushstyle="SolidPattern" >
+                 <color alpha="255" >
+                  <red>0</red>
+                  <green>0</green>
+                  <blue>0</blue>
+                 </color>
+                </brush>
+               </colorrole>
+              </disabled>
+             </palette>
+            </property>
+            <property name="autoFillBackground" >
+             <bool>true</bool>
+            </property>
+            <property name="numDigits" >
+             <number>6</number>
+            </property>
+            <property name="segmentStyle" >
+             <enum>QLCDNumber::Flat</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0" >
+           <widget class="QPushButton" name="autosync" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text" >
+             <string>Sync</string>
             </property>
            </widget>
           </item>
@@ -1874,7 +2171,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="rythmTab" >
+     <widget class="QWidget" name="rhythmTab" >
       <attribute name="title" >
        <string>Rhytm</string>
       </attribute>
@@ -1886,7 +2183,7 @@
         <number>6</number>
        </property>
        <item row="0" column="0" >
-        <widget class="RythmAnalyzer" native="1" name="widget" />
+        <widget class="RhythmAnalyzer" native="1" name="widget" />
        </item>
       </layout>
      </widget>
@@ -2379,8 +2676,8 @@
           <attribute name="title" >
            <string>Jack</string>
           </attribute>
-          <layout class="QGridLayout" name="gridLayout" >
-           <item row="0" column="0" colspan="2" >
+          <layout class="QGridLayout" name="subgridLayout" >
+           <item row="0" column="0" colspan="3" >
             <widget class="QCheckBox" name="jack" >
              <property name="enabled" >
               <bool>true</bool>
@@ -2409,7 +2706,7 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="1" >
+           <item row="1" column="1" colspan="2" >
             <layout class="QHBoxLayout" name="horizontalLayout" >
              <item>
               <widget class="QLineEdit" name="jack_dev" >
@@ -2447,7 +2744,7 @@
              </item>
             </layout>
            </item>
-           <item row="2" column="0" colspan="2" >
+           <item row="2" column="0" colspan="3" >
             <widget class="QCheckBox" name="jack_verbose" >
              <property name="enabled" >
               <bool>true</bool>
@@ -2457,25 +2754,146 @@
              </property>
             </widget>
            </item>
-           <item row="3" column="0" colspan="2" >
+           <item row="3" column="0" colspan="3" >
             <widget class="QCheckBox" name="jack_lowlatency" >
              <property name="text" >
               <string>Low Latency mode. Please first read http://bpmdj.yellowcouch.org/jack.html</string>
              </property>
             </widget>
            </item>
-           <item row="4" column="0" colspan="2" >
-            <spacer>
+           <item row="4" column="0" colspan="3" >
+            <widget class="Line" name="line" >
+             <property name="orientation" >
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="0" colspan="3" >
+            <widget class="QLabel" name="label" >
+             <property name="text" >
+              <string>Emitting and receiving tempo and/or position information</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="0" colspan="3" >
+            <layout class="QHBoxLayout" name="horizontalLayout_2" >
+             <item>
+              <widget class="QRadioButton" name="jack_noclock" >
+               <property name="text" >
+                <string>None</string>
+               </property>
+               <property name="checked" >
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="jack_autoclock" >
+               <property name="text" >
+                <string>Auto</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="jack_masterclock" >
+               <property name="text" >
+                <string>Master</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="jack_slaveclock" >
+               <property name="text" >
+                <string>Slave</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer" >
+               <property name="orientation" >
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0" >
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item rowspan="2" row="7" column="0" colspan="3" >
+            <layout class="QVBoxLayout" name="verticalLayout_2" >
+             <item>
+              <widget class="QCheckBox" name="jack_emittempo" >
+               <property name="sizePolicy" >
+                <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text" >
+                <string>Emit tempo when master</string>
+               </property>
+               <property name="checked" >
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="jack_receivetempo" >
+               <property name="sizePolicy" >
+                <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text" >
+                <string>Listen to tempo when slave</string>
+               </property>
+               <property name="checked" >
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="jack_emitposition" >
+               <property name="sizePolicy" >
+                <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text" >
+                <string>Emit position (bar/beat/tick) when master</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="jack_receiveposition" >
+               <property name="sizePolicy" >
+                <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text" >
+                <string>Follow position (bar/beat/tick) when slave</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="8" column="2" >
+            <spacer name="verticalSpacer" >
              <property name="orientation" >
               <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeType" >
-              <enum>QSizePolicy::Expanding</enum>
              </property>
              <property name="sizeHint" stdset="0" >
               <size>
                <width>20</width>
-               <height>90</height>
+               <height>124</height>
               </size>
              </property>
             </spacer>
@@ -2504,9 +2922,9 @@
    <header>beatgraph-analyzer.h</header>
   </customwidget>
   <customwidget>
-   <class>RythmAnalyzer</class>
+   <class>RhythmAnalyzer</class>
    <extends>QWidget</extends>
-   <header>rythm-analyzer.h</header>
+   <header>rhythm-analyzer.h</header>
   </customwidget>
   <customwidget>
    <class>SongInformation</class>
@@ -2590,8 +3008,8 @@
    <slot>openAbout()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>498</x>
+     <y>333</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -2606,8 +3024,8 @@
    <slot>nudgeMinus1M()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>28</x>
+     <y>265</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -2622,8 +3040,8 @@
    <slot>nudgeMinus4M()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>28</x>
+     <y>299</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -2638,8 +3056,8 @@
    <slot>nudgeMinus8M()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>28</x>
+     <y>333</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -2654,8 +3072,8 @@
    <slot>nudgeMinusHalfB()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>182</x>
+     <y>299</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -2670,8 +3088,8 @@
    <slot>nudgePlus1M()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>105</x>
+     <y>265</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -2686,8 +3104,8 @@
    <slot>nudgePlus4M()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>105</x>
+     <y>299</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -2702,8 +3120,8 @@
    <slot>nudgePlus8M()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>105</x>
+     <y>333</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -2718,8 +3136,8 @@
    <slot>nudgeMinus()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>28</x>
+     <y>231</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -2734,8 +3152,8 @@
    <slot>nudgePlus()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>105</x>
+     <y>231</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -2750,8 +3168,8 @@
    <slot>setCue()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>421</x>
+     <y>231</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -2766,8 +3184,8 @@
    <slot>retrieveZ()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>267</x>
+     <y>231</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -2782,8 +3200,8 @@
    <slot>retrieveX()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>267</x>
+     <y>265</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -2798,8 +3216,8 @@
    <slot>retrieveC()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>267</x>
+     <y>299</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -2814,8 +3232,8 @@
    <slot>retrieveV()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>267</x>
+     <y>333</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -2830,8 +3248,8 @@
    <slot>storeZ()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>344</x>
+     <y>231</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -2846,8 +3264,8 @@
    <slot>storeX()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>344</x>
+     <y>265</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -2862,8 +3280,8 @@
    <slot>storeC()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>344</x>
+     <y>299</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -2878,8 +3296,8 @@
    <slot>storeV()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>344</x>
+     <y>333</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -2894,8 +3312,8 @@
    <slot>nudgePlusB()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>182</x>
+     <y>333</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -2910,8 +3328,8 @@
    <slot>targetTempo()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>292</x>
+     <y>95</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -2926,8 +3344,8 @@
    <slot>normalTempo()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>292</x>
+     <y>65</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -2942,8 +3360,8 @@
    <slot>restart()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>182</x>
+     <y>231</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -2958,8 +3376,8 @@
    <slot>slowPan()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>503</x>
+     <y>70</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -2974,8 +3392,8 @@
    <slot>fastPan()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>535</x>
+     <y>70</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -2990,8 +3408,8 @@
    <slot>slowSaw()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>503</x>
+     <y>105</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -3006,8 +3424,8 @@
    <slot>fastSaw()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>535</x>
+     <y>105</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -3022,8 +3440,8 @@
    <slot>slowRevSaw()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>503</x>
+     <y>140</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -3038,8 +3456,8 @@
    <slot>fastRevSaw()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>535</x>
+     <y>140</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -3054,8 +3472,8 @@
    <slot>nudgeCueForward()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>498</x>
+     <y>265</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -3070,8 +3488,8 @@
    <slot>nudgeCueBack()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>421</x>
+     <y>265</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -3086,8 +3504,8 @@
    <slot>nudgeCueBack8M()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>421</x>
+     <y>299</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -3102,8 +3520,8 @@
    <slot>nudgeCueForward8M()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>498</x>
+     <y>299</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -3118,8 +3536,8 @@
    <slot>normalLfo()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>535</x>
+     <y>175</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -3134,8 +3552,8 @@
    <slot>metronome()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>421</x>
+     <y>333</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -3150,8 +3568,8 @@
    <slot>breakLfo()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>503</x>
+     <y>175</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -3166,8 +3584,8 @@
    <slot>setAlsa()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>25</x>
+     <y>69</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -3182,8 +3600,8 @@
    <slot>mapLoopChange()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>435</x>
+     <y>352</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -3198,8 +3616,8 @@
    <slot>setBpmMixingDesk()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>23</x>
+     <y>45</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -3214,12 +3632,12 @@
    <slot>setText(QString)</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>645</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>142</x>
+     <y>94</y>
     </hint>
    </hints>
   </connection>
@@ -3230,12 +3648,12 @@
    <slot>setText(QString)</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>639</x>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>134</x>
+     <y>94</y>
     </hint>
    </hints>
   </connection>
@@ -3246,8 +3664,8 @@
    <slot>mapLengthChanged(int)</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>94</x>
+     <y>324</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -3262,8 +3680,8 @@
    <slot>mapScaleChanged(int)</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>94</x>
+     <y>356</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -3278,8 +3696,8 @@
    <slot>setOss()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>25</x>
+     <y>69</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -3294,8 +3712,8 @@
    <slot>saveMap()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>491</x>
+     <y>354</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -3310,8 +3728,8 @@
    <slot>loadMap()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>491</x>
+     <y>322</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -3326,8 +3744,8 @@
    <slot>nudgeMinus()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>23</x>
+     <y>290</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -3342,8 +3760,8 @@
    <slot>mapStart()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>23</x>
+     <y>322</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -3358,8 +3776,8 @@
    <slot>nudgePlus()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>186</x>
+     <y>290</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -3374,8 +3792,8 @@
    <slot>mediumSwitch()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>384</x>
+     <y>290</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -3390,8 +3808,8 @@
    <slot>mapStop()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>23</x>
+     <y>354</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -3406,8 +3824,8 @@
    <slot>restartCore()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>492</x>
+     <y>345</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -3422,8 +3840,8 @@
    <slot>start_stop()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>182</x>
+     <y>265</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -3438,8 +3856,8 @@
    <slot>mediumSwitch()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>77</x>
+     <y>95</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -3454,8 +3872,8 @@
    <slot>tempoChanged()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>25</x>
+     <y>63</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -3470,8 +3888,8 @@
    <slot>setJack()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>25</x>
+     <y>69</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -3486,8 +3904,8 @@
    <slot>normalTempo()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>23</x>
+     <y>45</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -3502,8 +3920,8 @@
    <slot>targetTempo()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>23</x>
+     <y>45</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -3518,12 +3936,28 @@
    <slot>setText(QString)</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>512</x>
-     <y>122</y>
+     <x>209</x>
+     <y>123</y>
     </hint>
     <hint type="destinationlabel" >
-     <x>286</x>
+     <x>209</x>
      <y>123</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>autosync</sender>
+   <signal>clicked()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>sync(3)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>83</x>
+     <y>224</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>289</x>
+     <y>199</y>
     </hint>
    </hints>
   </connection>

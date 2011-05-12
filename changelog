@@ -1,9 +1,28 @@
+4.0:
+        - starting the checkers on machines under heavy load could
+	  crash due to an unpause of the dsp_none driver.
+	- there was still a bug in the process manager
+	- discovered and fixed alsa fork bug
+	+ added a new beatgraph visualization method based on detecting 
+	  the primary frequency band
+	+ added better process management through an overseer process.
+	  This should fix an important issues with dsp-alsa
+	+ The selector's fragment player does no longer hold on to the 
+	  DSP device if not necessary.
+	+ Improved the dsp_none driver by avoiding the creation of new threads
+	+ Transformed all old Qt User Interface files (ui3->ui4)
+	+ Added a configuration useable for ubuntu (we hope)
+	+ Tap tempo measurement takes playrate into account instead of
+	  resetting it to the normal tempo
 3.9:
-	+ added yet experimental jack synchronisation code. Use -DJACK_TRANSPORT to compile it in
+	+ added yet experimental jack synchronisation code. 
+	  Use -DJACK_TRANSPORT to compile it in
 	+ low latency/asynchronous implementation of the jack driver
 	+ reorganized the dsp driver layout to be slightly faster
-	! removed a bug that has been pestering the startup checks for the past 10 versions
-	+ improved the buildprocess. Modifications to the cflags will trigger a full source rebuild
+	! removed a bug that has been pestering the startup checks for the 
+	  past 10 versions
+	+ improved the buildprocess. Modifications to the cflags will
+	  trigger a full source rebuild
 3.8:
         + started with svn and seperate project directory
 	- Bug #975: unexpected process dies with a jackd driver
@@ -24,46 +43,58 @@
         - a bug in moc-qt4 from Qt 4.4.3 makes that the beatgraphlabel
           no longer compiled. We implemented a silly workaround
 	+ mirroring and entire song database is done asynchronously
-	- if the fragments were deleted while the selector was open, the program would crash
+	- if the fragments were deleted while the selector was open, 
+	  the program would crash
 	- if the selector could not open the dsp device it would crash
 	- Timer killed from wrong thread -> should be fixed now
-	- removed some warnings about char* depcreatead conversions with the new gcc compiler
+	- removed some warnings about char* depcreatead conversions with 
+	  the new gcc compiler
 3.6:
 	- fixed a compilation problem on debian platforms (moc-qt4 vc moc-qt3)
-	- the dsp flag in the fragment_player will no longer lockup optimized compilations
+	- the dsp flag in the fragment_player will no longer lockup 
+	  optimized compilations
 	- the fragments are removed when the program quits
 	+ if tempo is unknown the player jumps seconds forwards/backwards
 	- song information dialog layout sucked
 	- removed unused functions (tohex, write_idx, toint)
 	+ revised the bpm analyzer to be 64bit compatible
-	- check on the integer sizes and fix of the unsigned4 problem on 64bit processors
-	- some missing files that should never have been refered in the first place have now been 'removed'
+	- check on the integer sizes and fix of the unsigned4 problem on 
+	  64bit processors
+	- some missing files that should never have been refered in the first
+	  place have now been 'removed'
 	+ added 'use last cue' to the bpmmerger
 	- removed a bug in song insertion in the queue
-	- the playhistory would not remember a played song while the index was loading
+	- the playhistory would not remember a played song while the index 
+	  was loading
 	- the renamer scanner did not look for proper extensions
 	- the automixer would sort songs in the wrong order; this has been fixed
 	- .mpc files are recognized as well
 3.5:
-	- removed bpmmix, which was a nice idea but in the end not the goal of bpmdj
+	- removed bpmmix, which was a nice idea but in the end not the goal 
+	  of bpmdj
 	- the history thisisplaying function had a small bug
-	- the data reader will check the boundaries before addressing improper memory due to short files
+	- the data reader will check the boundaries before addressing 
+	  improper memory due to short files
         + added the location in the song information box
         - removed the similar scanner, since it didn't work that well
         + the statistics are calculated when calculate is pressed
         + removed the k letter from most binaries and programs
         + improved symbol/qstring singleton creation
-        + taglists are saved in the configuration as strings instead of the qlistviewitem lists 
+        + taglists are saved in the configuration as strings instead of 
+	  the qlistviewitem lists 
         + loading while the ui is already useable
         - removed a segfault from the data-io writer constructor
-        + removed unnecessary features such as player mixer / recorder and kbpm-mix starter
+        + removed unnecessary features such as player mixer / recorder and
+	  kbpm-mix starter
         + moved various analyzers into separate tabs
-        + improved updating process of the song cursor and removed a slight mismatch
+        + improved updating process of the song cursor and removed a 
+	  slight mismatch
         + remove sign warnings in the signals module
         - a 64 bit bug in fragment-creator.cpp
         + first port to Qt4
 3.4:
-  ksel  + removed the recording options. This can normally be done by a surrounding script or so
+  ksel  + removed the recording options. This can normally be done by a 
+	  surrounding script or so
   ksel  + improved the subprocess termination handling
   ksel  + when importing songs, the ondisk information is updated on the fly and strange songfilenames
 	  are reported

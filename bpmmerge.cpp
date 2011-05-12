@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__bpmmerge_cpp__
 #define __loaded__bpmmerge_cpp__
@@ -40,9 +36,6 @@ using namespace std;
 #include "smallhistogram-type.h"
 #include "signals.h"
 
-/*-------------------------------------------
- *         Vars
- *-------------------------------------------*/
 PlayerConfig * config;      // will be the standard configuration
 
 /*-------------------------------------------
@@ -50,27 +43,29 @@ PlayerConfig * config;      // will be the standard configuration
  *-------------------------------------------*/
 void options_failure(const char* err)
 {
-  printf("BpmDj Merger v%s, Copyright (c) 2001-2009 Werner Van Belle\n",VERSION);
-  printf("This software is distributed under the GPL2 license. See copyright.txt\n\n");
-  printf("Usage:  bpmmerge <options> [old-song] new-song\n\n"
-	 "  --mix         nbr  how many measures should be used to create the mix\n" 
-	 "  --slide       nbr  how many measures should be used to find the best match\n"
-	 "  --temposwitch nbr  how many measures should be used to switch tempos\n" 
-	 "  --verbose          print useles information\n"
-	 "  --rescantempo      do a fine scan of the tempo, suited for the mix\n"
-	 "  --accountvolume    do a volume accounting when sliding\n"
-	 "  --startpct    nbr  start the new song at %% of its time\n"
-	 "  --stoppct     nbr  stop each song at %% of its time\n"
-	 "  --startatcue       start the new song at the last cue\n"
-	 "    --beforecue      and make sure the cue appears at the end of the mix\n"
-	 "  --split            splits bpm-mixed.raw to seperate files\n"
-	 "    --beforemix      splits before a mix begins\n"
-	 "    --middlemix      splits in the middle of the mix\n"
-	 "    --aftermix       splits when the mix is done\n" 
-	 "    --aftertempo     split after tempo change\n"
-	 "    --number         number every part of the split process\n"
-	 "  old-song           the index file of the last song\n"
-	 "  new-song           the index file of the new song\n\n%s\n\n",err);
+  printf("BpmDj Merger v%s, Copyright (c) 2001-2009 Werner Van Belle\n",
+	 VERSION);
+  printf(
+"This software is distributed under the GPL2 license. See copyright.txt\n\n"
+"Usage:  bpmmerge <options> [old-song] new-song\n\n"
+"  --mix         nbr  how many measures should be used to create the mix\n" 
+"  --slide       nbr  how many measures should be used to find the best match\n"
+"  --temposwitch nbr  how many measures should be used to switch tempos\n" 
+"  --verbose          print useles information\n"
+"  --rescantempo      do a fine scan of the tempo, suited for the mix\n"
+"  --accountvolume    do a volume accounting when sliding\n"
+"  --startpct    nbr  start the new song at %% of its time\n"
+"  --stoppct     nbr  stop each song at %% of its time\n"
+"  --startatcue       start the new song at the last cue\n"
+"    --beforecue      and make sure the cue appears at the end of the mix\n"
+"  --split            splits bpm-mixed.raw to separate files\n"
+"    --beforemix      splits before a mix begins\n"
+"    --middlemix      splits in the middle of the mix\n"
+"    --aftermix       splits when the mix is done\n" 
+"    --aftertempo     split after tempo change\n"
+"    --number         number every part of the split process\n"
+"  old-song           the index file of the last song\n"
+"  new-song           the index file of the new song\n\n%s\n\n",err);
   _exit(1);
 }
 
@@ -95,7 +90,8 @@ void openlog()
   assert(automix_log);
 }
 
-void log_entry(unsigned8 position, const char* type, const char* text, const char* text2 = NULL)
+void log_entry(unsigned8 position, const char* type, const char* text, 
+	       const char* text2 = NULL)
 {
   position/=4;
   char * tmp = strdup(text);
@@ -244,7 +240,7 @@ void process_options(int argc, char* argv[])
     {
       if (argv[i][0]=='-')
 	{
-	  char* arg;
+	  char* arg=NULL;
 	  // check long opt ?
 	  if (argv[i][1]=='-')
 	    arg=argv[i]+2;
@@ -258,31 +254,36 @@ void process_options(int argc, char* argv[])
 	    {
 	      split_beforemix=true;
 	      if (!split)
-		options_failure("must specify --split before specifying where to split");
+		options_failure("must specify --split before specifying where "
+				"to split");
 	    }
 	  else if (strcmp(arg,"middlemix")==0)
 	    {
 	      split_middlemix=true;
 	      if (!split)
-		options_failure("must specify --split before specifying where to split");
+		options_failure("must specify --split before specifying where "
+				"to split");
 	    }
 	  else if (strcmp(arg,"aftermix")==0)
 	    {
 	      split_aftermix=true;
 	      if (!split)
-		options_failure("must specify --split before specifying where to split");
+		options_failure("must specify --split before specifying where "
+				"to split");
 	    }
 	  else if (strcmp(arg,"aftertempo")==0)
 	    {
 	      split_aftertempo=true;
 	      if (!split)
-		options_failure("must specify --split before specifying where to split");
+		options_failure("must specify --split before specifying where "
+				"to split");
 	    }
 	  else if (strcmp(arg,"number")==0)
 	    {
 	      split_number=true;
 	      if (!split)
-		options_failure("must specify --split before specifying where to split");
+		options_failure("must specify --split before specifying where "
+				"to split");
 	    }
 	  else if (strcmp(arg,"verbose")==0)
 	    verbose = true;
@@ -318,7 +319,8 @@ void process_options(int argc, char* argv[])
 		options_failure("slide argument scanning error");
 	      slide_measures = atoi(argv[i]);
 	      if (slide_measures<mix_measures)
-		options_failure("slide measures must be larger than mix measures");
+		options_failure("slide measures must be larger than mix "
+				"measures");
 	    }
 	  else if (strcmp(arg,"temposwitch")==0)
 	    {
@@ -414,7 +416,7 @@ bool createFiles(char* a, char* b)
   cue_b      = period_to_quad(idx_b.get_cue());
   set_decoder_environment(config,&idx_b);
   printf("Decoding %s\n",b);
-  if (!start_bpmdj_raw("./",filename_b)) _exit(100);
+  if (!bpmdjraw(true,filename_b,"./")) _exit(100);
   file_b=openRawFileForWriting(&idx_b, "./");
   if (normalize) normalize_file();
   
@@ -463,7 +465,8 @@ void readTail(signed8 measures)
 static unsigned4 filelength_b;
 static unsigned4 position_b;
 static unsigned4 length_b;
-static stereo_sample2 *buffer_b; // full new data at the beginning of the new file
+// full new data at the beginning of the new file
+static stereo_sample2 *buffer_b; 
 
 void readHead(signed8 percent, signed8 measures)
 {
@@ -522,13 +525,12 @@ static stereo_sample2 *buffer_c;  // stretched full data of head
 static unsigned4 length_c;
 void stretchHead(signed8 headmeasures)
 {
-  printf("Stretching head to fit (period_a = %d, period_b = %d)\n",(int)period_a,(int)period_b);
+  printf("Stretching head to fit (period_a = %d, period_b = %d)\n",
+	 (int)period_a,(int)period_b);
   length_c = period_a*headmeasures;
   buffer_c = bpmdj_allocate(length_c,stereo_sample2);
   for(unsigned4 i = 0 ; i < length_c ; i ++)
-    {
-      buffer_c[i]=buffer_b[(unsigned8)i*(unsigned8)length_b/(unsigned8)length_c];
-    }
+    buffer_c[i]=buffer_b[(unsigned8)i*(unsigned8)length_b/(unsigned8)length_c];
 }
 
 // WVB -- WARNING !!!
@@ -550,11 +552,13 @@ void collapseBuffers()
   buffer_f = bpmdj_allocate(length_f,compressed);
   // calculate absolute value
   for(unsigned4 pos = 0 ; pos < length_d ; pos++)
-    buffer_d[pos]=(((signed4)abs(((stereo_sample2*)buffer_a)[pos * COLLAPSE].left)+
-		    (signed4)abs(((stereo_sample2*)buffer_a)[pos * COLLAPSE].right))/2)>>8;
+    buffer_d[pos]=
+      (((signed4)abs(((stereo_sample2*)buffer_a)[pos * COLLAPSE].left)+
+	(signed4)abs(((stereo_sample2*)buffer_a)[pos * COLLAPSE].right))/2)>>8;
   for(unsigned4 pos = 0 ; pos < length_f ; pos++)
-    buffer_f[pos]=(((signed4)abs(((stereo_sample2*)buffer_b)[pos * COLLAPSE].left)+
-		    (signed4)abs(((stereo_sample2*)buffer_b)[pos * COLLAPSE].right))/2)>>8;
+    buffer_f[pos]=
+      (((signed4)abs(((stereo_sample2*)buffer_b)[pos * COLLAPSE].left)+
+	(signed4)abs(((stereo_sample2*)buffer_b)[pos * COLLAPSE].right))/2)>>8;
 }
 
 void collapseStretchedBuffer()
@@ -562,8 +566,9 @@ void collapseStretchedBuffer()
   length_e = length_c / COLLAPSE;
   buffer_e = bpmdj_allocate(length_e,compressed);
   for(unsigned4 pos = 0 ; pos < length_e ; pos++)
-    buffer_e[pos]=(((signed4)abs(((stereo_sample2*)buffer_c)[pos * COLLAPSE].left)+
-		    (signed4)abs(((stereo_sample2*)buffer_c)[pos * COLLAPSE].right))/2)>>8;
+    buffer_e[pos]=
+      (((signed4)abs(((stereo_sample2*)buffer_c)[pos * COLLAPSE].left)+
+	(signed4)abs(((stereo_sample2*)buffer_c)[pos * COLLAPSE].right))/2)>>8;
 }
 
 signed8 phaseFit(int period, compressed* buffer, int length)
@@ -612,7 +617,7 @@ void rescanTempo()
   printf("Rescanning frequency of tail ");
   period_a=rescanTempo(T1,T2,buffer_d,length_d)*4;
   T=4.0*(float8)11025*60.0/(float8)(period_a/4);
-  printf("(%g adjustement)\n",T-S);
+  printf("(%g adjustment)\n",T-S);
   
   S=T=4.0*(float8)11025*60.0/(float8)(period_b/4);
   T1=(signed8)(4.0*(float8)11025*60.0/(float8)(T-1));
@@ -620,7 +625,7 @@ void rescanTempo()
   printf("Rescanning frequency of head ");
   period_b=rescanTempo(T1,T2,buffer_f,length_f)*4;
   T=4.0*(float8)11025*60.0/(float8)(period_b/4);
-  printf("(%g adjustement)\n",T-S);
+  printf("(%g adjustment)\n",T-S);
 }
 
 unsigned4 findMatchWithVolumeAccounting()
@@ -796,7 +801,8 @@ void tempofade(int time)
   signed4 maxmeasures = (filelength_b - pos)/4;
   maxmeasures/=period_b;
   if (time > maxmeasures)
-    printf("Warning: tempo fade can only be done in %d measures\n",time=maxmeasures);
+    printf("Warning: tempo fade can only be done in %d measures\n",
+	   time=maxmeasures);
   printf("Doing tempo fade (%d measures)\n",time);
   log_entry(ftell(file_a),"T",new_index);
   while(now<time)
@@ -820,9 +826,9 @@ void closeFiles()
 }
 
 /**
- * Two seperate behaviors are offered by this program
+ * Two separate behaviors are offered by this program
  * - the first is to merge 2 songs together
- * - the second is to split one large song in seperate pieces
+ * - the second is to split one large song in separate pieces
  */
 int main(int argc, char* argv[])
 {

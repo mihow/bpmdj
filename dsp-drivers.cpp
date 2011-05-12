@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,18 +10,15 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__dsp_drivers_cpp__
 #define __loaded__dsp_drivers_cpp__
 using namespace std;
 #line 1 "dsp-drivers.c++"
+#include <pthread.h>
 #include <assert.h>
 #include <qdialog.h>
 #include <qstring.h>
@@ -44,6 +41,10 @@ using namespace std;
 #endif
 #endif
 #endif
+
+void dsp_driver::init()
+{
+}
 
 dsp_driver * dsp_driver::get_driver(PlayerConfig * cfg)
 {
@@ -92,8 +93,6 @@ void dsp_driver::run_pusher_thread()
   starting=false;
   while(!stop_request)
     {
-      // if a pause request came in we inform the dsp driver through a double callback
-      // the pause function waits until unpaused with wait_for_unpause.
       if (paused) 
 	{
 	  internal_pause();
@@ -132,7 +131,7 @@ void dsp_driver::stop()
       while (!stopped) usleep(10);
     }
   stop_request=false;
-  // close the dsp device immediatelly
+  // close the dsp device immediately
   close(true);
 #ifdef DEBUG_WAIT_STATES
   Debug("dsp_driver_stop(): finished");
@@ -156,8 +155,9 @@ void dsp_driver::unpause()
 }
 
 /**
- * This function is called from within the dsp driver itself and only when using the
- * synchronous pusher. It should return only when the pause got unpaused.
+ * This function is called from within the dsp driver itself and only when 
+ * using the synchronous pusher. It should return only when the pause got 
+ * unpaused.
  */
 void dsp_driver::wait_for_unpause()
 {

@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__signals_cpp__
 #define __loaded__signals_cpp__
@@ -280,59 +276,4 @@ void energize(float8*data, float8 audiosize, unsigned4 fs)
     }
   bpmdj_deallocate(rr);
 }
-
-/*
-int main(int argc, char*argv[])
-{
-  float8 data[8];
-  data[0]=1;
-  data[1]=-2;
-  data[2]=3;
-  data[3]=-4;
-  data[4]=10;
-  data[5]=-20;
-  data[6]=30;
-  data[7]=-44;
-  biased_autocorrelation(data,8);
-  dump("autocorrelated",data,8);
-  // in this test we verify whether the subtraction of the ubiased autocorrelation relates
-  // to the best L2 match
-
-  
-  float8 *a = bpmdj_allocate(512,float8);
-  float8 *b = bpmdj_allocate(512,float8);
-  for(int test = 0 ; test < 1000 ; test++)
-    {
-      for(int i = 0 ; i < 512; i ++)
-	{
-	  float8 r = (float8)random()/(float8)RAND_MAX;
-	     a[i]=sin(r+2*3.14*(float8)(i-256)/512.0);
-	     a[i]*=1+0.5*(float8)random()/(float8)RAND_MAX;
-	     r = (float8)random()/(float8)RAND_MAX;
-	     b[i]=sin(r+2*3.14*(float8)(i-256)*(1.0+(float8)test/50.0)/512.0);
-	     
-	     b[i]*=1+0.5*(float8)random()/(float8)RAND_MAX;
-	     
-	     // change total energy content
-	     r = (float8)random()/(float8)RAND_MAX;
-	     a[i]*=r;
-	     r = (float8)random()/(float8)RAND_MAX;
-	     b[i]*=r;
-	     
-	     // now the function will have a clear start and stop
-	     a[i]*=sin(3.14*(float8)i/512);
-	     b[i]*=sin(3.14*(float8)i/512);
-	  }
-	absolute(a,512);
-	absolute(b,512);
-	float8 l2d = biased_best_l2_circular_distance(a,b,512);
-	unbiased_autocorrelation(a,512);
-	unbiased_autocorrelation(b,512);
-	normalize_abs_max(a,512);
-	normalize_abs_max(b,512);
-	float8 a2d = unbiased_l2_distance(a,b,512);
-	printf("%d %g %g\n",test,l2d,a2d);
-     }
-}
-*/
 #endif // __loaded__signals_cpp__

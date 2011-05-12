@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__dirscanner_h__
 #define __loaded__dirscanner_h__
@@ -49,8 +45,8 @@ private:
     QString path;
   };
   /**
-   * The stack of open directory entries. Since we can a number of files per turn and then
-   * continue later on we need this.
+   * The stack of open directory entries. Since we can a number of files per 
+   * turn and then continue later on we need this.
    */
   stack<DirPos> dir_stack; 
   /**
@@ -99,15 +95,17 @@ public:
   DirectoryScanner(QString extension);
   /**
    * Creates a directoryscanner that will target the given extension and start
-   * searching for files under @arg dir. Normally recursion is enabled. Use the last
-   * parameter to turn it off if necessary
+   * searching for files under @arg dir. Normally recursion is enabled. Use the
+   * last parameter to turn it off if necessary
    */
   DirectoryScanner(QString dir, QString extension, bool rec=true);
   /**
-   * Will reset the scanner into a certain directory. Normally all files will be scanned
-   * at once. If necessary to use smaller chunk sizes use the files_per_turn argument.
+   * Will reset the scanner into a certain directory. Normally all files will
+   * be scanned at once. If necessary to use smaller chunk sizes use the 
+   * files_per_turn argument.
    */
-  virtual void reset(const QString dirname, unsigned4 files_per_turn=0xffffffff);
+  virtual void reset(const QString dirname, 
+		     unsigned4 files_per_turn=0xffffffff);
   static bool goodName(QString name);
   void set_file_per_turn(unsigned4 fpt)
     {

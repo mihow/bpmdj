@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__index_reader_cpp__
 #define __loaded__index_reader_cpp__
@@ -100,9 +96,9 @@ public:
     total_files(t),
     expected_files(e)
   {
-    if (app) app->postEvent(song_selector_window,this);
+    if (app) app->postEvent(selector,this);
   }
-  virtual void run(SongSelectorLogic * selector)
+  virtual void run()
   {
     int progress= total_files*100/(expected_files ? expected_files : 1);
     ::status->message("Reading index: "+QString::number(progress)+"%",5000);

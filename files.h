@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__files_h__
 #define __loaded__files_h__
@@ -41,12 +37,13 @@ long readsamples(sample_type* target, int count, FILE* file)
       int err = ferror(file);
       if (feof(file)) 
 	return 0;
-      printf("file: Could not read %d samples, errno = %d (%s)\n",count,err,strerror(err));
+      printf("Could not read %d samples, errno = %d (%s)\n",
+	     count,err,strerror(err));
       assert(0);
     }
   return result;
 }
 
-long   readsamples(Array<1,float4>& target, FILE* file);
-long   writesamples(void* target, int count, FILE* file);
+long readsamples(Array<1,float4>& target, FILE* file);
+long writesamples(void* target, int count, FILE* file);
 #endif // __loaded__files_h__

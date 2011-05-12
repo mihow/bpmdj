@@ -33,4 +33,5 @@ void print(outputbuf& where, const char* script, ...)
   where.push_back(toexecute);
 };
 
+
 #endif // __loaded__do_printer_cpp__

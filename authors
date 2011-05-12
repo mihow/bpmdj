@@ -1,5 +1,5 @@
 BpmDj: Free Dj Tools
- Copyright (C) 2001-2007 Werner Van Belle
+ Copyright (C) 2001-2009 Werner Van Belle
 
  BPM-code           : Werner Van Belle <werner.van.belle@gmail.com>
  PCA-code           : F. Murtagh <murtagh@scivax.stsci.edu>
@@ -7,7 +7,7 @@ BpmDj: Free Dj Tools
  slackware patches  : Majc_ <majci888@gmail.com>
  defines.suse.8.1   : Johan Fabry <johan.fabry@vub.ac.be>
  defines.fedora7    : Pierre Marc Dumuid <pierre.dumuid@adelaide.edu.au>
- windows port       : Luciano Genero <luciano.genero@softway.it>
+ defines.ubuntu64   : Mic Tamere <oinike@hotmail.fr>
  Low pass filter    : Julius O. Smith <http://www-ccrma.stanford.edu/~jos/>
  64bit support      : Detlef & Bernard Fortz <bernard.fortz@mobistarmail.be>
  Electric Fence     : Bruce Perens (bruce@pixar.com)

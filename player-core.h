@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__player_core_h__
 #define __loaded__player_core_h__
@@ -70,7 +66,8 @@ int       core_object_init(bool sync);
 #define   err_dsp     5
 
 /**
- * Asks the player to pause its playing. This function must return immediatelly and simply signals a pause request
+ * Asks the player to pause its playing. This function must return immediatelly
+ * and simply signals a pause request
  */
 void      pause_playing();
 void      unpause_playing();
@@ -107,7 +104,8 @@ typedef map_segment* map_data;
 #define map_exit_continue -2
 #define map_exit_stop -1000
 // the exit is expressed at the normal speed of playing
-void map_set(signed2 map_size, map_data m, unsigned8 size, signed8 exit, bool loop);
+void map_set(signed2 map_size, map_data m, unsigned8 size, 
+	     signed8 exit, bool loop);
 void map_loop_set(bool l);
 void map_stop();
 
@@ -125,7 +123,5 @@ extern void msg_playing_state_changed();
  * the writing process finished its execution.
  */
 extern void msg_writing_finished();
-
-// exported functions
 FILE * openCoreRawFile();
 #endif // __loaded__player_core_h__

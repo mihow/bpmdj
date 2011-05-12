@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__song_cpp__
 #define __loaded__song_cpp__
@@ -29,7 +25,7 @@ using namespace std;
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <qpainter.h>
-#include "process-manager.h"
+#include "players-manager.h"
 #include "history.h"
 #include "dirscanner.h"
 #include "spectrum-type.h"
@@ -65,9 +61,10 @@ void Song::refill(Index &reader, bool allowed_to_write)
   set_mean_amp(reader.get_mean());
   set_power(reader.get_power());
   set_histogram(reader.get_histogram());
-  set_rythm(reader.get_rythm());
+  set_rhythm(reader.get_rhythm());
   set_composition(reader.get_composition());
-  set_has_cues(reader.get_cue_z() || reader.get_cue_x() || reader.get_cue_c() || reader.get_cue_v());
+  set_has_cues(reader.get_cue_z() || reader.get_cue_x() || reader.get_cue_c()
+	       || reader.get_cue_v());
   int t = reader.get_playcount();
   set_alltime_playcount(t);
   if (t>get_max_alltime_total())
@@ -80,7 +77,7 @@ bool Song::has_all_cluster_fields()
     && get_tempo().valid()
     && !get_histogram().empty()
     && !get_composition().empty()
-    && !get_rythm().empty();
+    && !get_rhythm().empty();
 }
 
 void Song::checkondisk()
@@ -144,7 +141,7 @@ Song::Song()
   init_power();
   init_played_author_at_time();
   init_histogram();
-  init_rythm();
+  init_rhythm();
   init_composition();
   init_ondisk_checked();
   init_alltime_playcount();
@@ -286,7 +283,8 @@ bool Song::get_distance_to_main(float4 limit)
 	    set_color_distance(d);
 	  }
 	else
-	  set_color_distance(SongMetriek::std.distance(*this, *::main_song,limit));
+	  set_color_distance(SongMetriek::std.distance(*this, *::main_song,
+						       limit));
       }
   if (get_color_distance()>1.0)
     set_distance_string(QString::null);
@@ -320,7 +318,7 @@ bool Song::needs_analysis()
     || needs_tempo()
     || needs_spectrum()
     || needs_echo()
-    || needs_rythm()
+    || needs_rhythm()
     || needs_composition();
 }
 #endif // __loaded__song_cpp__

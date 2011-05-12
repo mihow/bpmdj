@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__qsong_cpp__
 #define __loaded__qsong_cpp__
@@ -29,15 +25,15 @@ using namespace std;
 #include <stdlib.h>
 #include "song-metric.h"
 #include "qsong.h"
-#include "process-manager.h"
 #include "history.h"
 #include "dirscanner.h"
 #include "tags.h"
 #include "memory.h"
 #include "pixmap-cache.h"
 #include "fragment-cache.h"
+#include "players-manager.h"
 
-//-----------------------------------------------------------
+//------------------------------------------------------------
 //            qsong
 //-----------------------------------------------------------
 init_singleton_var(QSong,selected,bool*,NULL);
@@ -47,13 +43,15 @@ init_singleton_var(QSong,songs,Song**,NULL);
 init_singleton_var(QSong,song_count,int,0);
     
 static PixmapCache echo_icon_cache; 
-static PixmapCache rythm_icon_cache;
+static PixmapCache rhythm_icon_cache;
 static PixmapCache composition_icon_cache;
 
-// if we would add 1 by 1 then we need to reallocate these vectors once in a while
-// this cannot be done when somebody is accessing the vector. Therefor we need to 
-// install a couple of locks her to avoid concurrent access. The problem is of course
-// the 
+/**
+ * If we would add 1 by 1 then we need to reallocate these vectors once in a 
+ * while this cannot be done when somebody is accessing the vector. Therefor we
+ * need to install a couple of locks her to avoid concurrent access. The problem
+ * is of course the end of the sentence here :-)
+ */
 void QSong::setVector(Song**arr, int cnt)
 {
   if (get_songs()) bpmdj_deallocate(get_songs());
@@ -125,9 +123,12 @@ QColor * QSong::colorOfTempoCol(const Song* main, Song* song)
 QColor * QSong::colorOfAuthorCol(Song* song)
 {
   if (!Config::color_authorplayed) return NULL;
-  int played_author_songs_ago = History::get_songs_played() - song->get_played_author_at_time();
+  int played_author_songs_ago = History::get_songs_played() - 
+    song->get_played_author_at_time();
   if (played_author_songs_ago < Config::get_authorDecay())
-    return mixColor(Config::get_color_played_author(), (float4)played_author_songs_ago/(float4)Config::get_authorDecay() ,Qt::white);
+    return mixColor(Config::get_color_played_author(), 
+		    (float4)played_author_songs_ago/
+		    (float4)Config::get_authorDecay() ,Qt::white);
   return NULL;
 }
 
@@ -144,10 +145,12 @@ QColor * QSong::colorOfdColorCol(Song* song)
 {
   if (!Config::color_dcolor) return NULL;
   if (song->get_color_distance() > 1.0) return NULL;
-  return mixColor(Config::get_color_dcolor_col(), song -> get_color_distance(), Qt::white);
+  return mixColor(Config::get_color_dcolor_col(), song -> get_color_distance(),
+		  Qt::white);
 }
 
-void QSong::paintCell(QVectorView* vv, int i, QPainter *p,const QColorGroup &cg, int col, int wid, int align)
+void QSong::paintCell(QVectorView* vv, int i, QPainter *p,const QColorGroup &cg,
+int col, int wid, int align)
 {
   Song * main = ::main_song;
   Song * song = get_songs(i);
@@ -236,8 +239,10 @@ void QSong::paintCell(QVectorView* vv, int i, QPainter *p,const QColorGroup &cg,
 		  for(int y = 0 ; y <= h ; y ++)
 		    {
 		      int z = y*23/h;
-		      smallhistogram_type<echo_prop_sx> his_band = his.get_band(z);
-		      smallhistogram_type<echo_prop_sx> mis_band = mis.get_band(z);
+		      smallhistogram_type<echo_prop_sx> his_band = 
+			his.get_band(z);
+		      smallhistogram_type<echo_prop_sx> mis_band =
+			mis.get_band(z);
 		      signed2 c1,c2;
 		      for(int x = 0 ; x < echo_prop_sx ; x ++)
 			{
@@ -252,7 +257,8 @@ void QSong::paintCell(QVectorView* vv, int i, QPainter *p,const QColorGroup &cg,
 		for(int y = 0 ; y <= h ; y ++)
 		  {
 		    int x,z = y*23/h;
-		    smallhistogram_type<echo_prop_sx> his_band = his.get_band(z);
+		    smallhistogram_type<echo_prop_sx> his_band = 
+		      his.get_band(z);
 		    unsigned1 c;
 		    for(x = 0 ; x < echo_prop_sx ; x ++)
 		      {
@@ -273,34 +279,36 @@ void QSong::paintCell(QVectorView* vv, int i, QPainter *p,const QColorGroup &cg,
 	  return;
 	}
       break;
-    case LIST_RYTHM:
-      if (!song->get_rythm().empty())
+    case LIST_RHYTHM:
+      if (!song->get_rhythm().empty())
 	{
 	  int h = height() - 1;
-	  QPixmap *picture = rythm_icon_cache.find(song,main,wid,h);
+	  QPixmap *picture = rhythm_icon_cache.find(song,main,wid,h);
 	  if (picture->isNull())
 	    {
 	      picture->resize(wid,h+1);
 	      QPainter icon;
 	      icon.begin(picture);
 	      
-	      rythm_property his = song->get_rythm();
+	      rhythm_property his = song->get_rhythm();
 	      QColor co;
-	      if (main && !main->get_rythm().empty())
+	      if (main && !main->get_rhythm().empty())
 		{
-		  rythm_property mis = main->get_rythm();
+		  rhythm_property mis = main->get_rhythm();
 		  for(int y = 0 ; y <= h ; y ++)
 		    {
 		      int z = y*23/h;
-		      smallhistogram_type<rythm_prop_sx> his_band = his.get_band(z);
-		      smallhistogram_type<rythm_prop_sx> mis_band = mis.get_band(z);
+		      smallhistogram_type<rhythm_prop_sx> his_band = 
+			his.get_band(z);
+		      smallhistogram_type<rhythm_prop_sx> mis_band = 
+			mis.get_band(z);
 		      co.setHsv(z*10,255,255);
 		      int r = co.red();
 		      int g = co.green();
 		      int b = co.blue();
 		      for(int v = 0 ; v < wid ; v ++)
 			{
-			  int x = v*rythm_prop_sx/wid;
+			  int x = v*rhythm_prop_sx/wid;
 			  signed2 c1 = his_band.get_energy(x);
 			  signed2 c2 = mis_band.get_energy(x);
 			  if (c1<86) c1=86;
@@ -316,14 +324,15 @@ void QSong::paintCell(QVectorView* vv, int i, QPainter *p,const QColorGroup &cg,
 		for(int y = 0 ; y <= h ; y ++)
 		  {
 		    int z = y*23/h;
-		    smallhistogram_type<rythm_prop_sx> his_band = his.get_band(z);
+		    smallhistogram_type<rhythm_prop_sx> his_band = 
+		      his.get_band(z);
 		    co.setHsv(z*10,255,255);
 		    int r = co.red();
 		    int g = co.green();
 		    int b = co.blue();
 		    for(int v = 0 ; v < wid; v ++)
 		      {
-			int x = v*rythm_prop_sx/wid;
+			int x = v*rhythm_prop_sx/wid;
 			signed2 c = his_band.get_energy(x);
 			if (c<86)
 			  c=0;
@@ -365,14 +374,18 @@ void QSong::paintCell(QVectorView* vv, int i, QPainter *p,const QColorGroup &cg,
 		  for(int y = 0 ; y <= h ; y ++)
 		    {
 		      int z = y*23/h;
-		      smallhistogram_type<composition_prop_sx> his_band = his.get_band(z);
-		      smallhistogram_type<composition_prop_sx> mis_band = mis.get_band(z);
+		      smallhistogram_type<composition_prop_sx> his_band = 
+			his.get_band(z);
+		      smallhistogram_type<composition_prop_sx> mis_band = 
+			mis.get_band(z);
 		      co.setHsv(z*10,255,255);
 		      for(int v = 0 ; v < wid ; v ++)
 			{
 			  int x = v*composition_prop_sx/wid;
-			  float4 c1 = (his_band.get_energy(x)-127.0)*his_band.scale;
-			  float4 c2 = (mis_band.get_energy(x)-127.0)*mis_band.scale;
+			  float4 c1 = (his_band.get_energy(x)-127.0)*
+			    his_band.scale;
+			  float4 c2 = (mis_band.get_energy(x)-127.0)*
+			    mis_band.scale;
 			  if (c1>c2)
 			    {
 			      int c = (int)((c1-c2)*10);
@@ -394,7 +407,8 @@ void QSong::paintCell(QVectorView* vv, int i, QPainter *p,const QColorGroup &cg,
 		for(int y = 0 ; y <= h ; y ++)
 		  {
 		    int z = y*23/h;
-		    smallhistogram_type<composition_prop_sx> his_band = his.get_band(z);
+		    smallhistogram_type<composition_prop_sx> his_band = 
+		      his.get_band(z);
 		    for(int v = 0 ; v < wid; v ++)
 		      {
 			int x = v*composition_prop_sx/wid;
@@ -421,7 +435,7 @@ void QSong::paintCell(QVectorView* vv, int i, QPainter *p,const QColorGroup &cg,
       break;
     }
   
-  // the normal color depends wether the song is on the disk or not
+  // the normal color depends whether the song is on the disk or not
   if (Config::color_ondisk)
     {
       if (!song->get_ondisk_checked())
@@ -479,25 +493,28 @@ QString QSong::Text(Song * j, int i)
       else                   return FALSE_TEXT;
     case LIST_MIN: 
       if (!j->get_min_amp().fully_defined()) return EMPTY;
-      return QString::number(j->get_min_amp().left)+" / "+QString::number(j->get_min_amp().right);
+      return QString::number(j->get_min_amp().left)+" / "+
+	QString::number(j->get_min_amp().right);
     case LIST_MAX: 
       if (!j->get_max_amp().fully_defined()) return EMPTY;
-      return QString::number(j->get_max_amp().left)+" / "+QString::number(j->get_max_amp().right);
+      return QString::number(j->get_max_amp().left)+" / "+
+	QString::number(j->get_max_amp().right);
     case LIST_MEAN:
       if (!j->get_mean_amp().fully_defined()) return EMPTY;
-      return QString::number(j->get_mean_amp().left)+" / "+QString::number(j->get_mean_amp().right);
+      return QString::number(j->get_mean_amp().left)+" / "+
+	QString::number(j->get_mean_amp().right);
     case LIST_POWER: 
       if (!j->get_power().fully_defined()) return EMPTY;
-      return QString::number(j->get_power().left)+" / "+QString::number(j->get_power().right);
+      return QString::number(j->get_power().left)+" / "+
+	QString::number(j->get_power().right);
     case LIST_HISTOGRAM:
-    case LIST_RYTHM:
+    case LIST_RHYTHM:
     case LIST_COMPOSITION:
       return EMPTY;
     default:
       assert(0);
     }
-  return "NA";
-  
+  return "NA";  
 }
 
 static int compare_songs_text(const void * a, const void * b)
@@ -531,7 +548,7 @@ static int compare_songs_histogram(const void * a, const void * b)
     else return 0;
 }
 
-static int compare_songs_rythm(const void * a, const void * b)
+static int compare_songs_rhythm(const void * a, const void * b)
 {
   assert(a);
   assert(b);
@@ -539,8 +556,8 @@ static int compare_songs_rythm(const void * a, const void * b)
   Song * B = *((Song **)b);
   assert(A);
   assert(B);
-  rythm_property AT = A->get_rythm();
-  rythm_property BT = B->get_rythm();
+  rhythm_property AT = A->get_rhythm();
+  rhythm_property BT = B->get_rhythm();
   if (AT.empty())
     if (BT.empty()) return 0;
     else return 1;
@@ -618,13 +635,14 @@ void QSong::Sort()
     {
       qsort(get_songs(),get_song_count(),sizeof(Song*),compare_songs_histogram);
     }
-  else if (get_compare_col()==LIST_RYTHM)
+  else if (get_compare_col()==LIST_RHYTHM)
     {
-      qsort(get_songs(),get_song_count(),sizeof(Song*),compare_songs_rythm);
+      qsort(get_songs(),get_song_count(),sizeof(Song*),compare_songs_rhythm);
     } 
   else if (get_compare_col()==LIST_COMPOSITION)
     {
-      qsort(get_songs(),get_song_count(),sizeof(Song*),compare_songs_composition);
+      qsort(get_songs(),get_song_count(),sizeof(Song*),
+	    compare_songs_composition);
     }
   else  
     {

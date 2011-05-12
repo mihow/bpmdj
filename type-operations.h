@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__type_operations_h__
 #define __loaded__type_operations_h__
@@ -32,9 +28,13 @@ using namespace std;
 #include "spectrum-type.h"
 #include "tag-type.h"
 
-// period_type      - describes the length of a period in the index file, normalized to 44100 Hz
-// quad_period_type - describes the length of a measure in the player, depending on different wavrates
-// tempo_type       - describes the BPM of the song, given a period_type
+/**
+ * period_type - describes the length of a period in the index file, 
+ *               normalized to 44100 Hz
+ * quad_period_type - describes the length of a measure in the player, 
+ *                    depending on different wavrates
+ * tempo_type - describes the BPM of the song, given a period_type
+ */
 
 inline tempo_type period_to_tempo(period_type a)
 {
@@ -62,7 +62,8 @@ inline tempo_type between_tempos(tempo_type a, tempo_type b, float4 percent)
   return tempo_type((b.tempo-a.tempo)*percent+a.tempo);
 }
 
-inline spectrum_type * between_spectra(spectrum_type *a, spectrum_type *b, float4 percent)
+inline spectrum_type * between_spectra(spectrum_type *a, spectrum_type *b,
+				       float4 percent)
 {
   if (a==no_spectrum) return no_spectrum;
   if (b==no_spectrum) return no_spectrum;

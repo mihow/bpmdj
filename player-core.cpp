@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,18 +10,16 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__player_core_cpp__
 #define __loaded__player_core_cpp__
 using namespace std;
 #line 1 "player-core.c++"
+#include <signal.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
@@ -62,7 +60,6 @@ char*   argument;
 Index*  playing = NULL;
 
 extern PlayerConfig * config;
-
 QString rawpath="";
 
 QString get_rawpath()
@@ -80,7 +77,7 @@ FILE * openCoreRawFile()
 }
 
 /*-------------------------------------------
- *         File input oprations
+ *         File input operations
  *-------------------------------------------*/
 char * wave_name = NULL;
 stereo_sample2 wave_buffer[wave_bufsize];
@@ -96,19 +93,8 @@ static int writing = false;
  * process we spawned, we retrieve the signal info and compare 
  * it against what we expect.
  */
-void writer_died(int sig, siginfo_t *info, void* hu)
+void writer_died()
 {
-  if (!info) 
-    Debug("No info available for signal %d\nAssuming something else but the writer process died",sig);
-  else
-    {
-      int blah;
-      waitpid(info->si_pid,&blah,0);
-      // if the process id is different then 
-      // we want to ignore the current state
-      if (info->si_pid!=writer) return;
-    }
-  
   char newstr[80];
   // now we have the complete length of the file...
   // if it differs from the length in the .ini file we update it
@@ -126,6 +112,29 @@ void writer_died(int sig, siginfo_t *info, void* hu)
   msg_writing_finished();
 }
 
+void something_died(int sig, siginfo_t *info, void* hu)
+{
+  ExitStatus es;
+  while(true)
+    {
+      es.pid=waitpid(-1,&es.status,WNOHANG);
+      if (es.pid==-1)
+	{
+	  if (errno==ECHILD) return;
+	  printf("Playercore: error %d during wait: %s\n",
+		 errno,strerror(errno));
+	}
+      else if (es.pid==0)
+	return;
+      
+      // check the ones we expect to die
+      if (es.pid==writer)
+	writer_died();
+      else
+	Debug("Unknown process %d died. Ignoring",sig);
+    }
+}
+
 int wave_open(Index * playing, bool synchronous)
 {
   if (!playing) return err_none;
@@ -135,11 +144,10 @@ int wave_open(Index * playing, bool synchronous)
   
   // start decoding the file; this means: fork bpmdjraw process
   // wait 1 second and start reading the file
-
   if (synchronous)
     {
       writing = true;
-      int result = start_bpmdj_raw(get_rawpath(),fname);
+      int result = bpmdjraw(true,fname,get_rawpath());
       writing = false;
       if (!result)
 	return err_nospawn;
@@ -148,28 +156,19 @@ int wave_open(Index * playing, bool synchronous)
     {
       // prepare signals
       struct sigaction *act = bpmdj_allocate(1,struct sigaction);
-      act->sa_sigaction = writer_died;
-      act->sa_flags = SA_SIGINFO;
+      act->sa_sigaction = something_died;
+      act->sa_flags = SA_SIGINFO | SA_NOCLDSTOP;
       sigaction(SIGCHLD,act,NULL);
       // fork and execute, send back signal when done 
       writing = true;
-      writer = bpmdj_fork();
-      if (!writer)
-	{
-	  start_bpmdj_raw(get_rawpath(),fname);
-	  // kill(getppid(),SIGUSR1);
-	  /**
-	   * If we use exit instead of _exit our own static data structures
-	   * will be destroyed !
-	   */
-	  _exit(0);
-	}
+      writer = bpmdjraw(false,fname,get_rawpath());
+      assert(writer);
     }
   wave_name=getRawFilename(get_rawpath(),fname);
   wave_file=fopen(wave_name,"rb");
   if (synchronous)
     {
-      writer_died(0,NULL,NULL);
+      writer_died();
       if (!wave_file)
 	return err_noraw;
     }
@@ -314,7 +313,8 @@ stereo_sample2 lfo_metronome(stereo_sample2 x)
    diff=(signed8)y-(signed8)lfo_phase;
    diff=diff%lfo_period;
    /* say ping */
-   val=sin(6.28*diff*(float8)(WAVRATE)/440.0)*4096.0*(1.0-(float8)diff/(float8)lfo_period);
+   val=sin(6.28*diff*(float8)(WAVRATE)/440.0)*4096.0*(1.0-(float8)diff
+						      /(float8)lfo_period);
    /* mix them */
    stereo_sample2 a =  x.muldiv(7,8);
    return a.add((signed4)val,(signed4)val);
@@ -329,14 +329,14 @@ stereo_sample2 lfo_pan(stereo_sample2 x)
   diff=(signed8)y-(signed8)lfo_phase;
   diff=diff%lfo_period;
   quart=lfo_period/4;
-  // at position 0, centre 
+  // at position 0, center 
   if (diff<quart)
     return lfo_volume(x,quart-diff,quart,1,1);
   // at position 0.25, right 
   diff-=quart;
   if (diff<quart)
     return lfo_volume(x,diff,quart,1,1);
-  // at position 0.5 centre 
+  // at position 0.5 center 
   diff-=quart;
   if (diff<quart)
     return lfo_volume(x,1,1,quart-diff,quart);
@@ -441,10 +441,10 @@ unsigned8 map_active(unsigned8 a)
     }
   assert(segment<map_size);
 #endif
-  // determine offset wrt actual segment start
+  // determine offset w.r.t. actual segment start
   unsigned8 segment_start = segment * (map_stop_pos-map_start_pos) / map_size;
   unsigned8 segment_offset = dx - segment_start;
-  // obtain segment of new postion
+  // obtain segment of new position
   signed2 new_segment = bpmdj_map[segment].take_from;
   
   // calculate speed
@@ -456,8 +456,10 @@ unsigned8 map_active(unsigned8 a)
   // transfer volume
   volume = bpmdj_map[segment].volume;
   // obtain new segment start position
-  unsigned8 new_segment_start = new_segment * (map_stop_pos-map_start_pos) / map_size;
-  // fix should play position with actual map_start_pos and fine grained segment offset
+  unsigned8 new_segment_start = new_segment 
+    * (map_stop_pos-map_start_pos) / map_size;
+  // fix should play position with actual map_start_pos and fine 
+  // grained segment offset
   return new_segment_start+segment_offset+map_start_pos;
 }
   
@@ -473,7 +475,8 @@ void map_stop()
     }
 }
 
-void map_set(signed2 size, map_data inmap, unsigned8 msize, signed8 mexit, bool l)
+void map_set(signed2 size, map_data inmap, unsigned8 msize, signed8 mexit, 
+	     bool l)
 {
   // if paused we start at the last cue position
   unsigned8 mstart;
@@ -552,7 +555,7 @@ void cue_store(int nr)
 /**
  * Will retrieve the cue from memory and place it in ::cue
  * It will effectively be used later in the jumpto function
- * which will also try to stay in syunc with the current
+ * which will also try to stay in sync with the current
  * position in the phrase.
  */
 void cue_retrieve(int nr)
@@ -613,18 +616,19 @@ void rms_init()
       mean.badly_defined() || 
       pow.badly_defined())
     {
-      Info("Switching of rms normalisation, this song has no known energy levels");
+      Info("Switching off RMS normalization, "
+	   "this song has no known energy levels");
       opt_rms=0;
       return;
     }
   
-  // obtain amplitude maximisation factor factor 
+  // obtain amplitude maximization factor factor 
   left_sub = mean.left;
   left_fact = normalization_factor(min.left,max.left,mean.left);
   right_sub = mean.right;
   right_fact = normalization_factor(min.right,max.right,mean.right);
   
-  // take into account the rms
+  // take into account the RMS
   left_fact *= arg_rms;
   left_fact /= pow.left;
   if (arg_rms > pow.left) left_fact = 1.0;
@@ -702,8 +706,10 @@ void jumpto(signed8 mes, int txt)
       // - first we have the position which _should_ be playing 'NOW'
       // - second, we have the data which is now queued
       // - third we have the latency
-      // - if we subtract the latency from the data being queued, we have the real playing position
-      // - if we subtract what should be playing with what is playing, we have a difference
+      // - if we subtract the latency from the data being queued, we have the 
+      //   real playing position
+      // - if we subtract what should be playing with what is playing, we have 
+      //   a difference
       // - we can fix this difference to fit a measure
       // - this fixed difference is added to gotopos
       signed8 gotopos=y_normalise(cue)-currentperiod*mes;
@@ -775,9 +781,11 @@ void unpause_playing()
  *-------------------------------------------*/ 
 void copyright()
 {
-  printf("BpmDj Player v%s, Copyright (c) 2001-2009 Werner Van Belle\n",VERSION);
-  printf("This software is distributed under the GPL2 license. See copyright.txt\n");
-  printf("--------------------------------------------------------------------\n");
+  printf(
+   "BpmDj Player v%s, Copyright (c) 2001-2009 Werner Van Belle\n"
+   "This software is distributed under the GPL2 license. See copyright.txt\n"
+   "--------------------------------------------------------------------\n\n\n",
+    VERSION);
   fflush(stdout);
   fflush(stderr);
 }
@@ -856,10 +864,12 @@ int core_start(bool ui)
     dsp->start(new normalized_source());
   else
     dsp->start(new bare_source());
-  if (metronome) metronome->init();
+
+  if (metronome) 
+    {
+    }
   
-  msg_playing_state_changed();
-  
+  msg_playing_state_changed();  
   return err_none;
 }
 

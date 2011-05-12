@@ -42,14 +42,14 @@ class Set
    typedef Array<1,Data> Content;
    
    /**
-    * The content of the set (a 1dimensional atrray of data)
+    * The content of the set (a 1dimensional array of data)
     */
    Content content;
    
    /**
-    * The position of the enxt_element. This might
+    * The position of the next_element. This might
     * be outside the current size, in which case a resize
-    * must be caleld before placing an element.
+    * must be called before placing an element.
     */
    int next_element;
  private:
@@ -86,7 +86,7 @@ class Set
      };
    
    /**
-    * Initialized the set with the given datam, which is casted
+    * Initialized the set with the given data, which is casted
     * to an array.
     */
    Set(Data data)

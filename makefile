@@ -1,5 +1,5 @@
-VERSION = 3.9
-BIN = bpmplay bpmdj bpmmerge bpmcount 
+VERSION = 4.0
+BIN = bos bpmdj bpmplay bpmmerge bpmcount
 .EXPORT_ALL_VARIABLES:
 all: .link-targets .ui-forms .rc-files .source-creator .depend .compile 
 
@@ -84,6 +84,10 @@ check-doc:
 	@test -s bpmdj-doc-errors.txt
 	@echo "Report is in bpmdj-doc-errors.txt"
 	@echo ============================================================
+
+clean:
+	@echo "[clean]"
+	@rm -f *.o *.a *.h *.cpp $(BIN) aoc soc sum.tmp 
 
 check: check-bin check-doc
 

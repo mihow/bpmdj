@@ -26,7 +26,7 @@ using namespace std;
  * @ingroup data
  * @brief backend multidimensional iterator
  * 
- * The array iterator is a very fast but flexible iterator it is used by combining different iterationwalks into one
+ * The array iterator is a very fast but flexible iterator it is used by combining different iteration walks into one
  * iterator (extend). This is then assigned in the ArrayIterator. After trying to use this a couple of times it seems
  * that it is somewhat too complex. We might want to rethink this one.
  */
@@ -120,7 +120,7 @@ template <class T, bool PT> class ArrayIteratorBacking
  * @ingroup data
  * @brief fast multidimensional iterator
  * 
- * The arrayiterator keeps track of the position within a matrix of dimension D
+ * The ArrayIterator keeps track of the position within a matrix of dimension D
  * The submatrix it returns is of dimension SM
  * position tracking can be enabled with PT, and ordered mode can be
  * selected with ORDERED. The type must be the same for all
@@ -143,7 +143,7 @@ class ArrayIterator: public ArrayIteratorBacking<T,PT>
 
   /**
    * When submitting an array, we will walk through
-   * every position, so the submatrix has actual dimesnion 0
+   * every position, so the submatrix has actual dimension 0
    */
   ArrayIterator<D,T,PT,SM,ORDERED>(const Array<D,T> &m)
     {
@@ -392,7 +392,7 @@ void ArrayIterator<D,T,PT,SM,ORDERED>::setup(const Array<D,T>& m,
   ArrayIteratorBacking<T,PT>::_more = next_iterator;
 
   /** 
-   * finally we initalize the submatrix by figuring
+   * finally we initialize the submatrix by figuring
    * out which dimensions remain variable
    */
   if (SM)

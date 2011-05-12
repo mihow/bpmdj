@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__bpmplay_cpp__
 #define __loaded__bpmplay_cpp__
@@ -51,7 +47,7 @@ using namespace std;
 #include "energy-analyzer.h"
 #include "bpm-analyzer.h"
 #include "spectrum-analyzer.h"
-#include "rythm-analyzer.h"
+#include "rhythm-analyzer.h"
 #include "md5-analyzer.h"
 #include "dsp-drivers.h"
 #include "dsp-oss.h"
@@ -67,18 +63,17 @@ using namespace std;
 #include "capacity-checker.h"
 #include "bpmplay-event.h"
 #include "clock-jack.h"
+#include "clock-drivers.h"
+#include "hues.h"
 
 /*-------------------------------------------
  *         Templates we need
  *-------------------------------------------*/
-
-// types
 template class smallhistogram_type<32>;
 template class smallhistogram_type<96>;
+
 template class histogram_property<32>;
 template class histogram_property<96>;
-
-// signals
 template float8 normalize_abs_max<float8>(float8*, long);
 template float8 find_abs_max<float8>(float8*, long);
 template class Fft<2>;
@@ -96,20 +91,39 @@ template       Sample<float8, 2>::Sample(Sample<short, 2>);
 template class Shift<short, 2>;
 template class Shift<float8,2>;
 
-template void BasicSignal<float8, 2>::add<short>(BasicSignal<short, 2> const&);
-template void BasicSignal<float8, 2>::add<float8>(BasicSignal<float8, 2> const&);
-template BasicSignal<float8, 2>& BasicSignal<float8, 2>::operator-=<float8>(BasicSignal<float8, 2> const&);
-template BasicSignal<short, 2>& BasicSignal<short, 2>::operator-=<short>(BasicSignal<short, 2> const&);
-template Signal<float8, 2>::Signal(BasicSignal<short, 2> const&);
-template Signal<float8, 2>::Signal(BasicSignal<float8, 2> const&);
+template void BasicSignal<float8, 2>::
+add<short>(BasicSignal<short, 2> const&);
+
+template void BasicSignal<float8, 2>::
+add<float8>(BasicSignal<float8, 2> const&);
+
+template BasicSignal<float8, 2>& BasicSignal<float8, 2>::
+operator-=<float8>(BasicSignal<float8, 2> const&);
+
+template BasicSignal<short, 2>& BasicSignal<short, 2>::
+operator-=<short>(BasicSignal<short, 2> const&);
+
+template Signal<float8, 2>::
+Signal(BasicSignal<short, 2> const&);
+
+template Signal<float8, 2>::
+Signal(BasicSignal<float8, 2> const&);
+
 template class Haar<float8, float8, 2>;
 template class Haar<short, float8, 2>;
 
 template class SignalIO<signed2,2>;
-template void SignalIO<short, 2>::writeSamples(BasicSignal<float8, 2> const&, unsigned4);
-template void SignalIO<short, 2>::readSamples(BasicSignal<float8, 2>&, unsigned4);
-template void SignalIO<short, 2>::writeSamples(BasicSignal<signed2, 2> const&, unsigned4);
-template void SignalIO<short, 2>::readSamples(BasicSignal<signed2, 2>&, unsigned4);
+template void SignalIO<short, 2>::
+writeSamples(BasicSignal<float8, 2> const&, unsigned4);
+
+template void SignalIO<short, 2>::
+readSamples(BasicSignal<float8, 2>&, unsigned4);
+
+template void SignalIO<short, 2>::
+writeSamples(BasicSignal<signed2, 2> const&, unsigned4);
+
+template void SignalIO<short, 2>::
+readSamples(BasicSignal<signed2, 2>&, unsigned4);
 
 /*-------------------------------------------
  *         Constants & Variables
@@ -120,7 +134,7 @@ static int    arg_bpm = 0;
 static int    opt_color = 0;
 static int    opt_create = 0;
 static int    opt_energy = 0;
-static int    opt_rythm = 0;
+static int    opt_rhythm = 0;
 static int    arg_low = 80;
 static int    arg_high = 160;
 static bool   opt_remote = false;
@@ -145,25 +159,26 @@ void options_failure(const char* err)
   
   // print options
   printf("Usage:  bpmplay <options> argument\n\n"
-	 "         --config name       name of the configfile\n"
-	 " -s      --setup             setup the configuration without opening dsp/playing song\n"
-	 " -c      --create            create an index file if none exists\n"
-	 " -q      --quiet             be quiet\n"
-	 " -m arg  --match arg         song to match tempo with\n"
-	 "         --remote user@host  copy necessary files (requires ssh & scp)\n"
-	 "--analysis------------------------------------\n"
-	 " -b      --batch             no ui output, md5sum is automatically checked\n"
-	 "         --bpm [1,2,3,4,5]   measure bpm with specified technique (default = 1)\n"
-	 " -l nbr  --low nbr           lowest bpm to look for (default = 120)\n"
-	 " -h nbr  --high nbr          highest bpm to look for (default = 160)\n"
-	 "         --spectrum          obtain color & echo information\n"
-	 "         --rythm             obtain rythm information\n"
-	 " -e      --energy            measure energy levels\n"
-	 " argument                    the index file of the song to handle\n\n%s\n\n",err);
+"        --config name     name of the configfile\n"
+" -s     --setup           setup a configuration\n"
+" -c     --create          create an index file if none exists\n"
+" -q     --quiet           be quiet\n"
+" -m arg --match arg       song to match tempo with\n"
+"      --remote user@host  copy necessary files (requires ssh & scp)\n"
+"--analysis------------------------------------\n"
+" -b     --batch           no ui output, md5sum is automatically checked\n"
+"        --bpm [1,2,3,4,5] measure bpm with specified technique (default = 1)\n"
+" -l nbr --low nbr         lowest bpm to look for (default = 120)\n"
+" -h nbr --high nbr        highest bpm to look for (default = 160)\n"
+"        --spectrum        obtain color & echo information\n"
+"        --rhythm          obtain rhythm information\n"
+" -e     --energy          measure energy levels\n"
+" argument                 the index file of the song to handle\n\n%s\n\n",err);
   _exit(1);
 }
 
-#define next_arg if (++i>=argc) options_failure("missing argument to last option");
+#define next_arg if (++i>=argc) \
+options_failure("missing argument to last option");
 #define arg_int(name) next_arg name=atoi(argv[i]);
 #define arg_str(name) next_arg name=argv[i];
 #define arg_float(name) next_arg name=atof(argv[i]);
@@ -185,22 +200,10 @@ void process_options(int argc, char* argv[])
 	  else arg=argv[i]+1;
 	  
 	  // check option
-	  if (option(arg,"quiet","q"))
-	    {
-	      opt_quiet = true;
-	    }
-	  else if (option(arg,"batch","b"))
-	    {
-	      opt_batch=true;
-	    }
-	  else if (option(arg,"setup","s"))
-	    {
-	      opt_setup=true;
-	    }
-	  else if (option(arg,"energy","e"))
-	    {
-	      opt_energy=true;
-	    } 
+	  if (option(arg,"quiet","q"))       opt_quiet = true;
+	  else if (option(arg,"batch","b"))  opt_batch=true;
+	  else if (option(arg,"setup","s"))  opt_setup=true;
+	  else if (option(arg,"energy","e")) opt_energy=true;
 	  else if (option(arg,"bpm"))
 	    {
 	      opt_bpm=true; 
@@ -217,12 +220,9 @@ void process_options(int argc, char* argv[])
 	      opt_config=true;
 	      arg_str(arg_config);
 	    } 
-	  else if (option(arg,"create","c"))
-	    opt_create=true;
-	  else if (option(arg,"spectrum"))
-	    opt_color = true;
-	  else if (option(arg,"rythm"))
-	    opt_rythm = true;
+	  else if (option(arg,"create","c")) opt_create = true;
+	  else if (option(arg,"spectrum"))   opt_color = true;
+	  else if (option(arg,"rhythm"))     opt_rhythm = true;
 	  else if (option(arg,"low","l"))
 	    {
 	      arg_int(arg_low);
@@ -237,7 +237,8 @@ void process_options(int argc, char* argv[])
 	      if (strcmp(argv[i],VERSION)!=0)
 		{
 		  char err[5000];
-		  sprintf(err,"version mismatch\nbpmplay (%s) is version "VERSION
+		  sprintf(err,"version mismatch\nbpmplay (%s) is version "
+			  VERSION
 			  "\nbpmdj is version %s",arg_config,argv[i]);
 		  options_failure(err);
 		  _exit(1);
@@ -284,27 +285,32 @@ void process_options(int argc, char* argv[])
 	    {
 	      if (!opt_check)
 		QMessageBox::information(NULL, "DSP Driver Selection",
-					 "No DSP driver has been selected. Go to the\n"
-					 "options tab and select an appropriate one.",
-					 QMessageBox::Ok,QMessageBox::NoButton);
+			 "No DSP driver has been selected. Go to the\n"
+			 "options tab and select an appropriate one.",
+			 QMessageBox::Ok,QMessageBox::NoButton);
 	    }
-#ifdef JACK_TRANSPORT
-	  metronome = new clock_jack();
-#endif
 	}
+
+      // we always need a clock driver also for the analyzers. 
+      // During analysis we might set the tempo with set_normal_period.
+      metronome = new clock_driver();
       
-      // initialize the dsp now
+      // initialize the DSP now
       if (argument==NULL)
-	options_failure("the program requires that at least one\n.idx file is passed as a command line argument");
+	options_failure("the program requires that at least one\n"
+			".idx file is passed as a command line argument");
       if (opt_bpm)
 	{
 	  if (arg_bpm<1) 
-	    options_failure("selected bpm analyzing technique too low (starts with 1)\n");
+	    options_failure("selected BPM analyzing technique too low (starts"
+			    " with 1)\n");
 	  if (arg_bpm>5)
-	    options_failure("selected bpm analyzing technique too hi (ends with 5)\n");
+	    options_failure("selected BPM analyzing technique too hi (ends"
+			    " with 5)\n");
 	}
       if ((opt_color || opt_bpm || opt_energy) && !opt_batch)
-	options_failure("to start an analyzer, you need to supply the --batch option");
+	options_failure("to start an analyzer, you need to supply the "
+			"--batch option");
     }
 }
 
@@ -322,7 +328,7 @@ bool show_error(int err, int err2, const char*text)
  * The main application thread must be the window thread. This is very annoying 
  * but that's the way it is. So, we create the application, create the window
  * and then initialize the core. This cannot be done in this function
- * this should be done when the applicaion is initialized and the event
+ * this should be done when the application is initialized and the event
  * loop running (otherwise we cannot give error boxes). Therefore we
  * post an event to the player_window which will be received as soon
  * as the event loop starts running 
@@ -373,13 +379,13 @@ void check_start()
   if (unavailable_capacities & ~config->get_disabled_capacities())
     {
       const QString a=QString("Mismatched capacities");
-      const QString b=QString("The enabled capacities include at least one capacity\n"
-			      "that cannot be found on this machine (")+QString(arg_config)+QString(")");
+      const QString b=QString("The enabled capacities include at least one "
+	"capacity\nthat cannot be found on this machine (")
+	+QString(arg_config)+QString(")");
       QMessageBox::critical(NULL,a,b,QMessageBox::Ok,0,0);
       _exit(10);
     }
   player_window = new Player();
-  //app->setMainWidget(player_window);
   player_window->showMinimized();
   app->postEvent(player_window,new InitAndStart());
   app->exec();
@@ -392,7 +398,7 @@ void check_start()
 void batch_start()
 {
   int nr=0;
-  // 0. core init: synchronous without opening dsp
+  // 0. core init: synchronous without opening DSP
   core_meta_init();
   core_object_init(true);
   if (!playing) 
@@ -400,7 +406,8 @@ void batch_start()
       Debug("No valid index file given to analyze");
       return;
     }
-  Info("%d. Wave written: %s",nr++,(const char*)playing->readable_description());
+  Info("%d. Wave written: %s",nr++,
+       (const char*)playing->readable_description());
   // 1. md5sum
   if (playing->get_md5sum().isEmpty())
     {
@@ -424,7 +431,7 @@ void batch_start()
 	   playing->get_power().left,
 	   playing->get_power().right);
     }
-  // 3. bpm
+  // 3. BPM
   if (opt_bpm)
     {
       if (playing->get_time_in_seconds()>=760)
@@ -451,25 +458,27 @@ void batch_start()
       SpectrumAnalyzer *counter = new SpectrumAnalyzer();
       counter->start();
     }
-  // 5. rythm
-  if (opt_rythm)
+  // 5. rhythm
+  if (opt_rhythm)
     {
       if (playing->get_time_in_seconds()>=760)
-	Info("%d. Rythm analysis skipped because song is longer than 760s",nr++);
+	Info("%d. Rhythm analysis skipped because song is longer than 760s",
+	     nr++);
       else if (!playing->get_spectrum())
-	Info("%d. Need spectrum before analyzing rythm",nr++);
+	Info("%d. Need spectrum before analyzing rhythm",nr++);
       else 
 	{
-	  RythmAnalyzer *r = new RythmAnalyzer();
+	  RhythmAnalyzer *r = new RhythmAnalyzer();
 	  r->start();
-	  Info("%d. Rythm",nr++);
+	  Info("%d. Rhythm",nr++);
 	}
     }
   
   // 98. Setting tags as necessary (Bug #195)
   if (playing->get_min()==playing->get_max())
     {
-      Info("%d. Tagging song as Empty because of no sensible energy levels",nr++);
+      Info("%d. Tagging song as Empty because of no sensible energy levels",
+	   nr++);
       playing->set_tags(playing->get_tags()+" Empty");
     }
   if (playing->get_time_in_seconds()>=760)
@@ -494,13 +503,16 @@ void batch_start()
 
 bool to_remote(char* filename)
 {
-  return vexecute(" ssh %s  mkdir -p %s",arg_remote,escape(escape(dirname(strdup(filename)))))
-    && vexecute(" scp -q %s %s:%s",escape(filename),arg_remote,escape(escape(dirname(strdup(filename)))));
+  return vexecute(" ssh %s  mkdir -p %s",arg_remote,
+		  escape(escape(dirname(strdup(filename)))))
+    && vexecute(" scp -q %s %s:%s",escape(filename),arg_remote,
+		escape(escape(dirname(strdup(filename)))));
 }
 
 bool from_remote(char* filename)
 {
-  return vexecute(" scp -q %s:%s %s ",arg_remote,escape(escape(filename)),escape(filename));
+  return vexecute(" scp -q %s:%s %s ",arg_remote,
+		  escape(escape(filename)),escape(filename));
 }
 
 bool delete_remote(char* filename)
@@ -518,7 +530,8 @@ int remote(int argc, char* argv[])
       sprintf(mp3,"./music/%s",(const char*)toplay->get_filename());
       if (!to_remote(mp3)) return 1;
       if (!to_remote(argument)) return 2;
-      if (opt_match && strcmp(arg_match,argument)) if (!to_remote(arg_match)) return 3;
+      if (opt_match && strcmp(arg_match,argument)) 
+	if (!to_remote(arg_match)) return 3;
     }
   char newcmd[2000];
   sprintf(newcmd," ssh -X %s ",arg_remote);
@@ -528,14 +541,15 @@ int remote(int argc, char* argv[])
       strcat(newcmd," ");
     }
   Remote("Executing remote player");
-  if (!execute(newcmd)) return 4;
+  if (!execute("Executing remote player",newcmd)) return 4;
   if (!opt_setup)
     {
       Remote("Downloading index file");
       if (!from_remote(argument)) return 5;
       if (!delete_remote(argument)) return 6;
       if (!delete_remote(mp3)) return 7;
-      if (opt_match && strcmp(arg_match,argument)) if (!delete_remote(arg_match)) return 8;
+      if (opt_match && strcmp(arg_match,argument)) 
+	if (!delete_remote(arg_match)) return 8;
     }
   return 0;
 }
@@ -543,7 +557,9 @@ int remote(int argc, char* argv[])
 int main(int argc, char *argv[])
 {
   init_embedded_files();
+  dsp_driver::init();
   app = new QApplication(argc,argv);
+  init_hues();
   process_options(argc,argv);
   if (opt_remote)
     _exit(remote(argc,argv));

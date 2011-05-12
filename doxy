@@ -5,7 +5,7 @@
 #---------------------------------------------------------------------------
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = BpmDj
-PROJECT_NUMBER         = 3.9
+PROJECT_NUMBER         = 4.0
 OUTPUT_DIRECTORY       = /E/werner/BpmDj/BpmDj/documentation/doxy/
 CREATE_SUBDIRS         = NO
 OUTPUT_LANGUAGE        = English
@@ -31,14 +31,13 @@ SHORT_NAMES            = NO
 JAVADOC_AUTOBRIEF      = NO
 QT_AUTOBRIEF           = NO
 MULTILINE_CPP_IS_BRIEF = NO
-DETAILS_AT_TOP         = NO
 INHERIT_DOCS           = YES
 SEPARATE_MEMBER_PAGES  = NO
 TAB_SIZE               = 8
 ALIASES                = 
 OPTIMIZE_OUTPUT_FOR_C  = NO
 OPTIMIZE_OUTPUT_JAVA   = NO
-BUILTIN_STL_SUPPORT    = NO
+BUILTIN_STL_SUPPORT    = YES
 CPP_CLI_SUPPORT        = NO
 SIP_SUPPORT            = NO
 DISTRIBUTE_GROUP_DOC   = NO

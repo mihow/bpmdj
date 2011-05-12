@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__database_h__
 #define __loaded__database_h__
@@ -35,8 +31,8 @@ class DataBase
 {
 private:
   /**
-   * The cache is the collection of songs that fall within the selected tags. This is
-   * a very important improvement in the speed of bpmdj since 
+   * The cache is the collection of songs that fall within the selected tags. 
+   * This is a very important improvement in the speed of bpmdj since 
    * we often reduce the large song collection to a certain style.
    */
   vector<Song*> cache;
@@ -50,19 +46,21 @@ private:
   bool cacheValid(SongSelectorLogic * selector);
   void copyTags(SongSelectorLogic * selector);
   bool tagFilter(Song*);
-  bool filter(SongSelectorLogic* selector, Song* song, Song* main, float4 limit);
+  bool filter(SongSelectorLogic* selector, Song* song, 
+	      Song* main, float4 limit);
 protected: 
   vector<Song*> all;
   map<QString,Song*> file2song;
   virtual void init();
   virtual void clear();
 private:
-  int      get_unheaped_selection(SongSelectorLogic* selector, Song* main, QVectorView* target);
+  int get_unheaped_selection(SongSelectorLogic* selector, Song* main, 
+			     QVectorView* target);
   /**
-   * Will update the target QVectorView by calling setVector (which in turn will sort the list
-   * and clear the selection). The show argument will be owned by the vectorview afterwards.
-   * Before changing the songilst, the current item will be determined and reset after we 
-   * changed the songlist.
+   * Will update the target QVectorView by calling setVector (which in turn
+   * will sort the list and clear the selection). The show argument will be 
+   * owned by the vectorview afterwards. Before changing the songilst, the 
+   * current item will be determined and reset after we changed the songlist.
    */
   int      set_answer(Song ** show, int length, QVectorView* target);
   bool     rebuild_cache;
@@ -100,8 +98,8 @@ public:
 		   QVectorView* target, 
 		   int nr  // if nr == 0 we will return an ungheaped selection
 		   );
-  void addNewSongs(SongSelectorLogic* selector,  // necessary for the searchline
-		   QVectorView* target,          // necessary to schedule a repaint
+  void addNewSongs(SongSelectorLogic* selector,  // for the searchline
+		   QVectorView* target,          // to schedule a repaint
 		   vector<Song*> *collection);
   Song * * closestSongs(SongSelectorLogic * selector,
 			Song * target1, float4 weight1, 

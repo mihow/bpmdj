@@ -886,25 +886,25 @@ case 18:
 YY_RULE_SETUP
 #line 31 "do-lexer.l"
 { 
-                            dolval = strdup(dotext);
-                            return NAME;
-                            }
+                             dolval = strdup(dotext);
+                             return NAME;
+                             }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
 #line 35 "do-lexer.l"
 { 
-                            dolval = strdup(dotext);
-                            return NUMBER;
-                            }
+                             dolval = strdup(dotext);
+                             return NUMBER;
+                             }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
 #line 39 "do-lexer.l"
 { 
-                            dolval = strdup(dotext);
-                            return PRECOMPILER;
-                            }
+                             dolval = strdup(dotext);
+                             return PRECOMPILER;
+                             }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
@@ -1986,6 +1986,6 @@ static int read_string(char openchar, char closechar)
 int dowrap()
   {
   return 1;
-  }
+  }   
 
 

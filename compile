@@ -72,7 +72,7 @@ ANALYZERS = analyzer.o \
         beatgraph-analyzer.o beatgraph-analyzer.moc.o \
 	bpm-analyzer.o bpm-analyzer.moc.o \
 	spectrum-analyzer.o spectrum-analyzer.moc.o \
-	rythm-analyzer.o rythm-analyzer.moc.o \
+	rhythm-analyzer.o rhythm-analyzer.moc.o \
 	wavelet-analyzer.o md5-analyzer.o energy-analyzer.o
 analyzers.a: $(ANALYZERS)
 	@echo "   [ar] analyzers.a"
@@ -81,13 +81,13 @@ analyzers.a: $(ANALYZERS)
 ACTIVE_OBJECTS = ao-scheduler.o lock.o
 KPLAY_OBJECTS = ao-tracker.o about.moc.o memory.o power-type.o files.o \
 	player.moc.o player.o constants.o $(ACTIVE_OBJECTS) \
-	sample4-type.o player-core.o spectrum-type.o \
- 	song-information.o song-information.moc.o \
+	sample4-type.o player-core.o spectrum-type.o process.o \
+ 	song-information.o song-information.moc.o hues.o \
 	pca.o capacity.o index.o bpmplay.o signals.o \
 	player-config.o data.a capacity-checker.o types.o dsp.a \
 	embedded.a efence.o page.o rc-player.o clock-drivers.o \
 	efence-print.o analyzers.a histogram-type.o \
-	common.o bpm.o ao-som-beatgraph.o ao-pool.o clock-jack.o
+	common.o bpm.o ao-som-beatgraph.o ao-pool.o clock-jack.o no-overseer.o
 
 BPM_LIB = bpm.o memory.o	
 BPMCOUNT_OBJECTS = bpmcount.o files.o signals.o bpm.a data.a
@@ -95,32 +95,29 @@ BPMCOUNT_OBJECTS = bpmcount.o files.o signals.o bpm.a data.a
 KCOUNT_OBJECTS = index.o kbpm-count.o \
 	kbpm-count.moc.o scripts.o merger.o
 
-FRAGMENTS = fragment-player.o fragment-cache.o fragment.o fragment-creator.o
-KSEL_OBJECTS = ao-tracker.o qstring-factory.o tags.o about.moc.o capacity.o \
-	renamerstart.o renamerstart.moc.o \
-	heap.o pixmap-cache.o song-process.o song-process.moc.o spectrum-type.o \
-	scripts.o cluster.o pca.o \
-	histogram-type.o qvectorview.o qvectorview.moc.o freq-mapping.o \
-	freq-mapping.moc.o memory.o analyzer.o \
+FRAGMENTS = fragment-player.o fragment-cache.o fragment.o fragment-creator.o fragment-deliverer.o
+KSEL_OBJECTS = ao-tracker.o qstring-factory.o tags.o about.moc.o capacity.o heap.o pixmap-cache.o \
+	song-slot.o song-slot.moc.o spectrum-type.o \
+	scripts.o cluster.o pca.o clusterer.o process.o \
+	histogram-type.o qvectorview.o qvectorview.moc.o \
+	memory.o analyzer.o \
 	types.o config.moc.o existence-scanner.o player-config.o song-information.o\
 	song-information.moc.o sample4-type.o music-scanner.o \
 	music-scanner.moc.o power-type.o analyzers-manager.o\
-	basic-process-manager.o spectrum-pca.o user-notification.o database.o \
+	song-process.o spectrum-pca.o user-notification.o database.o \
 	dirscanner.o efence.o page.o efence-print.o \
 	selector.o selector.moc.o constants.o \
-	process-manager.o $(FRAGMENTS) $(ACTIVE_OBJECTS) \
+	players-manager.o $(FRAGMENTS) $(ACTIVE_OBJECTS) \
 	dsp.a bpmdj-pref.o bpmdj-pref.moc.o \
 	song.o qsong.o queuedsong.o historysong.o signals.o\
 	index-reader.o index.o history.o albumitem.o files.o \
 	bpmdj.o edit-distance.o renamer.o renamer.moc.o \
-	renamer.logic.o renamer.logic.moc.o \
 	config.o common.o song-copier.o \
 	statistics.o statistics.moc.o song-metric.o \
-	cluster-dialog.o cluster-dialog.moc.o \
-	log-viewer.o log-viewer.moc.o data.a embedded.a ao-pool.o
+	log-viewer.o log-viewer.moc.o data.a embedded.a ao-pool.o overseer.o 
 
-MERGER_OBJECTS = bpmmerge.o index.o common.o scripts.o song-information.o \
-	song-information.moc.o capacity.o \
+MERGER_OBJECTS = bpmmerge.o no-overseer.o process.o index.o common.o \
+	scripts.o song-information.o song-information.moc.o capacity.o \
 	types.o player-config.o efence.o page.o efence-print.o memory.o \
 	sample4-type.o power-type.o spectrum-type.o signals.o files.o \
 	histogram-type.o data.a
@@ -132,6 +129,10 @@ bpmplay: $(KPLAY_OBJECTS)
 bpmcount: $(BPMCOUNT_OBJECTS)
 	@echo " [link] "$@
 	@$(LINK) $(BPMCOUNT_OBJECTS) -o bpmcount
+
+bos: bos.o lock.o overseer.o process.o
+	@echo " [link] "$@
+	@$(LINK) $^ -o bos
 
 bpm.a:  $(BPM_LIB)
 	@echo "   [ar] "$@

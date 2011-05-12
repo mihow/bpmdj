@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__bpmdj_event_h__
 #define __loaded__bpmdj_event_h__
@@ -27,11 +23,11 @@ using namespace std;
 class SongSelectorLogic;
 
 /**
- * A bpm dj event used to signal various things to the song selector.
+ * A BpmDjEvent signals various things to the song selector.
  * The selectorwindow will accept each bpmdjevent by executing the 
  * run method. This double dispatching makes it possible
  * to be thread safe while at the same time have the flexibility
- * to wrtie things outside the user interface itself.
+ * to write things outside the user interface itself.
  */
 class BpmDjEvent: public QEvent
 {
@@ -39,6 +35,6 @@ class BpmDjEvent: public QEvent
   BpmDjEvent() : QEvent((QEvent::Type)BpmDjCustom)
   {
   }
-  virtual void run(SongSelectorLogic * song_selector) = 0;
+  virtual void run() = 0;
 };
 #endif // __loaded__bpmdj_event_h__

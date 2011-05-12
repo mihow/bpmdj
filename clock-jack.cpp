@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__clock_jack_cpp__
 #define __loaded__clock_jack_cpp__
@@ -31,12 +27,19 @@ using namespace std;
 #include "scripts.h"
 
 signed8 first_beat=0;
-bool timemaster = false;
-int needs_sync = 0;
+bool autosync = false;
 unsigned4 last_seen;
+
+clock_jack::clock_jack(const PlayerConfig& config)
+{
+  // WVB -- whatever you need here
+  autosync = config.get_jack_receiveposition();
+  offset=0;
+}
 
 void clock_jack::init()
 {
+  printf("clock_jack::init()\n");
   if (is_jack_driver())
     {
       if (currentperiod > 0) 
@@ -50,13 +53,20 @@ void clock_jack::init()
     }
   else
     {
-      printf("The Jack Clock transport cannot be started without "
-	     "a jack dsp driver\n");
       /**
        * TODO: We don't have a possibility here to return
        * an error value and reset the clock driver
        */
+      Fatal("The Jack Clock transport cannot be started without "
+	    "a jack DSP driver\n");
     }
+  offset=0;
+}
+
+void clock_jack::shift(signed4 direction)
+{
+  clock_driver::shift(direction);
+  offset+=direction;
 }
 
 void clock_jack::cue_start()
@@ -76,16 +86,14 @@ void clock_jack::tempo_will_change(signed8 t)
 
 void update_first_beat() 
 {
-  first_beat = cues[0];
-  if (normalperiod > 0) {
+  first_beat = cue;
+  if (normalperiod > 0) 
     while (first_beat > normalperiod) 
-      {
-	first_beat -= normalperiod;
-      }
-  }
+      first_beat -= normalperiod;
 }
 
-void timebase(jack_transport_state_t state, jack_nframes_t nframes, jack_position_t *pos, int new_pos, void *arg) 
+void timebase(jack_transport_state_t state, jack_nframes_t nframes, 
+	      jack_position_t *pos, int new_pos, void *arg) 
 {
   jack_client_t *client = ((dsp_jack *)dsp)->get_client();
   float8 bpm;
@@ -113,7 +121,8 @@ void timebase(jack_transport_state_t state, jack_nframes_t nframes, jack_positio
     ((dsp_jack *)dsp)->set_jack_time(jack_time);
     pos->bar = (x-first_beat)/normalperiod;
     pos->beat = (x- first_beat - pos->bar*normalperiod)/(normalperiod/4); 
-    pos->tick = (x- first_beat - pos->bar*normalperiod - pos->beat*(normalperiod/4)) /(normalperiod/7680);
+    pos->tick = (x- first_beat - pos->bar*normalperiod - pos->beat*
+		 (normalperiod/4)) /(normalperiod/7680);
     pos->bar ++;
     pos->beat ++;
   }
@@ -136,23 +145,25 @@ void * sync_with_jack(void* neglect)
 	  timemaster = false;
 	  jack_release_timebase(((dsp_jack *)dsp)->get_client());
 	  if (dsp->get_stopped())
-	    {
-	      // WVB - What was the reason to call core_close here ?
-	      // this should not be done and is not in sync with the control flow 
-	      // of the player. It actually crashes with a segfault.
-	      return neglect;
-	    }
+	    return neglect;
 	}
       
       jack_transport_state_t state = jack_transport_query(client, &pos);
+
+      beat = pos.beat;
+      bar = pos.bar;
+      tick = pos.tick;
+      clockframes = pos.frame;
+
       if (timemaster) 
 	{
 	  if (state == JackTransportRolling) 
 	    {
-	      if (pos.frame-last_seen > 4096) 
+	      if (pos.frame > last_seen + 16384) 
 		{
 		  timemaster = false;
 		}
+	      
 	    }
 	}
       if (!timemaster) 
@@ -165,7 +176,7 @@ void * sync_with_jack(void* neglect)
 		}
 	      if (state == JackTransportRolling) 
 		{
-		  /* getting bpm from jack */
+		  /* getting BPM from jack */
 		  /* remark: mperiod2bpm also does the reverse, bpm2period */
 		  if (pos.valid & JackPositionBBT) 
 		    {
@@ -177,11 +188,14 @@ void * sync_with_jack(void* neglect)
 			}
 		    }
 		  
-		  if (needs_sync) 
+		  if (autosync) 
 		    {
-		      /* syncing position to the same position within bar as jack */
-		      
-		      z1 = (y-y_normalise(first_beat)) % currentperiod;
+		      /**
+		       * Syncing position to the same position within bar as
+		       * jack 
+		       */
+		      z1 = (y-metronome->get_offset()-y_normalise(first_beat))
+			% currentperiod;
 		      z2 = pos.frame % currentperiod;
 		      if (z2-z1 > currentperiod / 2) 
 			{
@@ -190,12 +204,11 @@ void * sync_with_jack(void* neglect)
 		      else if (z1-z2 > currentperiod / 2) 
 			{
 			  z2 += currentperiod;
-			}
-		      
-		      y += (z2-z1);
+			}		     
+		      if (abs(z2-z1) > 2048)
+			y += (z2-z1);
 		      while (y < 0)
 			y += currentperiod;
-		      needs_sync --;
 		    }
 		}
 	    }
@@ -206,9 +219,9 @@ void * sync_with_jack(void* neglect)
   return neglect;
 }
 
-void request_sync(int retries) 
+void clock_jack::request_sync(int retries) 
 {
-  needs_sync += retries;
+  //needs_sync += retries;
 }
 
 void become_master(int cond) 

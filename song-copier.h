@@ -1,6 +1,8 @@
 /****
- Borg IV compiled file
- Copyright (C) 2006-2007 Werner Van Belle
+ Active Object compiled file
+ Copyright (C) 2006-2009 Werner Van Belle
+ Do not modify. Changes might be lost
+ --------------------------------------------
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by

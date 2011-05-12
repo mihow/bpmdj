@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__efence_cpp__
 #define __loaded__efence_cpp__
@@ -31,9 +27,9 @@ using namespace std;
  * malloc buffer, or touching free memory.
  *
  * It arranges for each malloc buffer to be followed (or preceded)
- * in the address space by an inaccessable virtual memory page,
- * and for free memory to be inaccessable. If software touches the
- * inaccessable page, it will get an immediate segmentation
+ * in the address space by an inaccessible virtual memory page,
+ * and for free memory to be inaccessible. If software touches the
+ * inaccessible page, it will get an immediate segmentation
  * fault. It is then trivial to uncover the offending code using a debugger.
  *
  * An advantage of this product over most malloc debuggers is that this one
@@ -111,7 +107,8 @@ int            EF_DISABLE_BANNER = -1;
 
 /*
  * EF_ALIGNMENT is a global variable used to control the default alignment
- * of buffers returned by efence_malloc(), efence_calloc(), and efence_realloc(). It is all-caps
+ * of buffers returned by efence_malloc(), efence_calloc(), and 
+ * efence_realloc(). It is all-caps
  * so that its name matches the name of the environment variable that is used
  * to set it. This gives the programmer one less name to remember.
  * If the value is -1, it will be set from the environment or sizeof(int)
@@ -124,17 +121,17 @@ int		EF_ALIGNMENT = -1;
  * memory that is released using efence_free(). It is all-caps so that its name
  * matches the name of the environment variable that is used to set it.
  * If its value is greater non-zero, memory released by free is made
- * inaccessable and never allocated again. Any software that touches free
+ * inaccessible and never allocated again. Any software that touches free
  * memory will then get a segmentation fault. If its value is zero, freed
- * memory will be available for efence_reallocation, but will still be inaccessable
- * until it is efence_reallocated.
+ * memory will be available for efence_reallocation, but will still be 
+ * inaccessible until it is efence_reallocated.
  * If the value is -1, it will be set from the environment or to 0 at run-time.
  */
 int		EF_PROTECT_FREE = -1;
 
 /*
  * EF_PROTECT_BELOW is used to modify the behavior of the allocator. When
- * its value is non-zero, the allocator will place an inaccessable page
+ * its value is non-zero, the allocator will place an inaccessible page
  * immediately _before_ the malloc buffer in the address space, instead
  * of _after_ it. Use this to detect malloc buffer under-runs, rather than
  * over-runs. It won't detect both at the same time, so you should test your
@@ -188,13 +185,14 @@ static size_t		unUsedSlots = 0;
 static size_t		slotsPerPage = 0;
 
 /*
- * internalUse is set when allocating and freeing the allocatior-internal
+ * internalUse is set when allocating and freeing the allocator-internal
  * data structures.
  */
 static int		internalUse = 0;
 
 /*
- * noAllocationListProtection is set to tell efence_efence_malloc() and efence_free() not to
+ * noAllocationListProtection is set to tell efence_efence_malloc() and 
+ * efence_free() not to
  * manipulate the protection of the allocation list. This is only set in
  * efence_realloc(), which does it to save on slow system calls, and in
  * allocateMoreSlots(), which does it because it changes the allocation list.
@@ -418,14 +416,14 @@ static void allocateMoreSlots(void)
 
 /*
  * This is the memory allocator. When asked to allocate a buffer, allocate
- * it in such a way that the end of the buffer is followed by an inaccessable
+ * it in such a way that the end of the buffer is followed by an inaccessible
  * memory page. If software overruns that buffer, it will touch the bad page
  * and get an immediate segmentation fault. It's then easy to zero in on the
  * offending code with a debugger.
  *
  * There are a few complications. If the user asks for an odd-sized buffer,
  * we would have to have that buffer start on an odd address if the byte after
- * the end of the buffer was to be on the inaccessable page. Unfortunately,
+ * the end of the buffer was to be on the inaccessible page. Unfortunately,
  * there is lots of software that asks for odd-sized buffers and then
  * requires that the returned address be word-aligned, or the size of the
  * buffer be a multiple of the word size. An example are the string-processing
@@ -465,7 +463,7 @@ void * memalign(size_t alignment, size_t userSize)
 
 	/*
 	 * The internal size of the buffer is rounded up to the next page-size
-	 * boudary, and then we add another page's worth of memory for the
+	 * boundary, and then we add another page's worth of memory for the
 	 * dead page.
 	 */
 	internalSize = userSize + bytesPerPage;
@@ -482,7 +480,7 @@ void * memalign(size_t alignment, size_t userSize)
 
 	/*
 	 * The internal memory used by the allocator is currently
-	 * inaccessable, so that errant programs won't scrawl on the
+	 * inaccessible, so that errant programs won't scrawl on the
 	 * allocator's arena. I'll un-protect it here so that I can make
 	 * a new allocation. I'll re-protect it before I return.
  	 */
@@ -586,7 +584,7 @@ void * memalign(size_t alignment, size_t userSize)
 
 	if ( !EF_PROTECT_BELOW ) {
 		/*
-		 * Arrange the buffer so that it is followed by an inaccessable
+		 * Arrange the buffer so that it is followed by an inaccessible
 		 * memory page. A buffer overrun that touches that page will
 		 * cause a segmentation fault.
 		 */
@@ -608,7 +606,7 @@ void * memalign(size_t alignment, size_t userSize)
 	}
 	else {	/* EF_PROTECT_BELOW != 0 */
 		/*
-		 * Arrange the buffer so that it is preceded by an inaccessable
+		 * Arrange the buffer so that it is preceded by an inaccessible
 		 * memory page. A buffer underrun that touches that page will
 		 * cause a segmentation fault.
 		 */
@@ -628,7 +626,7 @@ void * memalign(size_t alignment, size_t userSize)
 	fullSlot->userSize = userSize;
 
 	/*
-	 * Make the pool's internal memory inaccessable, so that the program
+	 * Make the pool's internal memory inaccessible, so that the program
 	 * being debugged can't stomp on it.
 	 */
 	if ( !internalUse )
@@ -738,7 +736,8 @@ bool efence_free(void * address)
     memset(slot->userAddress, 0xbd, slot->userSize);
   
   previousSlot = slotForInternalAddressPreviousTo(slot->internalAddress);
-  nextSlot = slotForInternalAddress(((char *)slot->internalAddress) + slot->internalSize);
+  nextSlot = slotForInternalAddress(((char *)slot->internalAddress) + 
+				    slot->internalSize);
   
   if ( previousSlot
        && (previousSlot->mode == FREE || previousSlot->mode == PROTECTED) ) {
@@ -798,10 +797,9 @@ void * efence_realloc(void * oldBuffer, size_t newSize)
 		slot = slotForUserAddress(oldBuffer);
 
 		if ( slot == 0 )
-			EF_Abort(
-			 "efence_realloc(%a, %d): address not from efence_malloc()."
-			,oldBuffer
-			,newSize);
+		  EF_Abort(
+		   "efence_realloc(%a, %d): address not from efence_malloc()."
+		   ,oldBuffer ,newSize);
 
 		if ( newSize < (size = slot->userSize) )
 			size = newSize;

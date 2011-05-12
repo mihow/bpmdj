@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__song_information_cpp__
 #define __loaded__song_information_cpp__
@@ -55,6 +51,7 @@ void SongInformation::on_save_clicked()
   field2this(version, version);
   field2this(tag, index_tags);
   showing->index_disabled_capacities = get_capacity(capacity);
-  showing->meta_changed |= old_disabled_capacity!=showing->index_disabled_capacities;
+  showing->meta_changed |= old_disabled_capacity!=showing->
+    index_disabled_capacities;
 }
 #endif // __loaded__song_information_cpp__

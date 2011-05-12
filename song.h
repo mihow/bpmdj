@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__song_h__
 #define __loaded__song_h__
@@ -54,7 +50,7 @@ class Song: public Point
   accessors(sample4_type,mean_amp,sample4_type());
   accessors(power_type,power,power_type());
   accessors(echo_property,histogram,echo_property());
-  accessors(rythm_property,rythm,rythm_property());
+  accessors(rhythm_property,rhythm,rhythm_property());
   accessors(composition_property,composition,composition_property());
   // calculated as necessary
   accessors(QColor,color,QColor(127,127,127));
@@ -76,7 +72,6 @@ private:
  public:
   Song();
   Song(Index* idx, bool allow_write, bool checkondisk);
-  // WVB -- need to add delete operation here...
   void refill(Index &read, bool allowed_to_write=false);
   void reread();
   bool has_all_cluster_fields();
@@ -102,7 +97,7 @@ private:
   bool needs_tempo() const { return !get_tempo().valid(); };
   bool needs_spectrum() const { return get_spectrum()==no_spectrum; };
   bool needs_echo() const { return get_histogram().empty(); };
-  bool needs_rythm() const { return get_rythm().empty(); };
+  bool needs_rhythm() const { return get_rhythm().empty(); };
   bool needs_composition() const { return get_composition().empty(); };
   bool needs_analysis();
 };

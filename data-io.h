@@ -39,7 +39,7 @@ class DataIo: public DataVisitor
   // constructor
   DataIo(QString fn, const char* mode);
   DataIo(FILE *f);
-  // desructors
+  // destructors
   virtual ~DataIo(); 
   // read & write virtuals
   Data read();
@@ -94,7 +94,7 @@ class DataTexter: public DataIo
  protected:
   virtual void write_fileformat_versionnr();
   /**
-   * returns the fileformat version of the compiled version that saved
+   * returns the file format version of the compiled version that saved
    * the data. Returns 0 if it could not be read.
    */
   virtual int  read_fileformat_versionnr();

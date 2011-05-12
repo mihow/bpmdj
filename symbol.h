@@ -31,7 +31,7 @@ using namespace std;
 // symbols are represented as strings. Their
 // unique quality is to be found in the quick
 // comparators due to storing all symbols in a 
-// symboltable. The actual order might not be 
+// symbol table. The actual order might not be 
 // alphabetically.
 class symbolLesser;
 class Symbol: public DataClass

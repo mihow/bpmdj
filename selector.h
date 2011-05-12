@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__selector_h__
 #define __loaded__selector_h__
@@ -36,8 +32,8 @@ using namespace std;
 #include "database.h"
 #include "albumitem.h"
 #include "qvectorview.h"
-#include "freq-mapping.h"
-#include "process-manager.h"
+#include "ui-freq-mapping.h"
+#include "players-manager.h"
 #include "spectrum-pca.h"
 #include "analyzers-manager.h"
 #include "do-fragment.h"
@@ -58,13 +54,12 @@ class FragmentCreated;
 
 class SongSelectorLogic:
   public QDialog,
-  public Ui::SongSelector, 
-  public ProcessChanged, 
-  public AnalyzerChanged
+  public Ui::SongSelector
 {
   Q_OBJECT
 private:
-  FrequencyDialog *frequency_dialog;
+  Ui::FrequencyDialog  frequency_content;
+  QDialog             *frequency_dialog;
   ProcessManager *processManager;
   AnalyzersManager * analyzers;
   QTimer *timer;
@@ -84,9 +79,10 @@ public:
   virtual void updateProcessView(bool main_changed);
   virtual void startAnotherAnalyzer(Song * finished_analyzing, int on_slot);
 
-//--------------------------------------------------------------------------------
+//-----------------------------------------------------------------------
 // FUNCTIONS TO HELP THE INDEXREADER 
-//--------------------------------------------------------------------------------
+//-----------------------------------------------------------------------
+
   /**
    * Will start the indexreader active object, which will go through 
    * all the index files in the index directory and read them in memory. 
@@ -107,8 +103,7 @@ public:
    * It signals the finishing of reading the current index collection.
    */
   void stop_reading_indices(unsigned4 total);
-//--------------------------------------------------------------------------------
-
+  //--------------------------------------------------------------------------
 private:
   void parse_tags();
   void insertSongInAlbum(Song*, const QString & a, int nr);
@@ -133,7 +128,6 @@ public:
   virtual void findsimilarnames();
   virtual void findallsimilarnames();
   virtual void doMarkDups();
-  virtual void checkDisc();
 #endif
 public slots:
   virtual void updateItemList();
@@ -150,9 +144,9 @@ public slots:
   virtual void doAbout();
   virtual void doLicense();
   virtual void searchLineEntered();
-  virtual void fetchSelection();
   virtual void exportPlayList();
-  virtual void doSpectrumPca(bool fulldatabase = false, bool update_process_view = true);
+  virtual void doSpectrumPca(bool fulldatabase = false, 
+			     bool update_process_view = true);
   virtual void doClustering();
   virtual void doBackup();
   virtual void selectionAddTags();
@@ -220,5 +214,5 @@ public slots:
   void customEvent(QEvent * e);
 };
 
-extern SongSelectorLogic * song_selector_window;
+extern SongSelectorLogic *selector;
 #endif // __loaded__selector_h__

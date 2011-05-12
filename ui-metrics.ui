@@ -106,7 +106,7 @@
    <item row="7" column="0" >
     <widget class="QLabel" name="textLabel2_2_2_2" >
      <property name="text" >
-      <string>Rythm weight (default = 26)</string>
+      <string>Rhythm weight (default = 26)</string>
      </property>
      <property name="wordWrap" >
       <bool>false</bool>
@@ -140,7 +140,7 @@
     </widget>
    </item>
    <item row="8" column="0" >
-    <widget class="QSpinBox" name="rythmSpin" >
+    <widget class="QSpinBox" name="rhythmSpin" >
      <property name="minimum" >
       <number>0</number>
      </property>
@@ -173,7 +173,7 @@
   <tabstop>tempoDistanceSpin</tabstop>
   <tabstop>spectrumSpin</tabstop>
   <tabstop>echoSpin</tabstop>
-  <tabstop>rythmSpin</tabstop>
+  <tabstop>rhythmSpin</tabstop>
   <tabstop>compositionSpin</tabstop>
  </tabstops>
  <resources/>

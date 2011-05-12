@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__selector_cpp__
 #define __loaded__selector_cpp__
@@ -79,7 +75,7 @@ using namespace std;
 #include "version.h"
 #include "song-metric.h"
 #include "bpmdj.h"
-#include "process-manager.h"
+#include "players-manager.h"
 #include "cluster.h"
 #include "queuedsong.h"
 #include "historysong.h"
@@ -91,10 +87,10 @@ using namespace std;
 #include "qvectorview.h"
 #include "tags.h"
 #include "common.h"
-#include "freq-mapping.h"
+#include "ui-freq-mapping.h"
 #include "memory.h"
 #include "statistics.h"
-#include "cluster-dialog.h"
+#include "ui-clustering.h"
 #include "history.h"
 #include "log-viewer.h"
 #include <qaction.h>
@@ -106,7 +102,7 @@ using namespace std;
 #include "index-reader.h"
 #include "song-copier.h"
 
-SongSelectorLogic * song_selector_window = NULL;
+SongSelectorLogic * selector = NULL;
 
 SongSelectorLogic::~SongSelectorLogic()
 {
@@ -125,7 +121,8 @@ SongSelectorLogic::SongSelectorLogic(QWidget * parent) :
   status -> setFont(QFont("Arial",10,QFont::Normal));
   status -> message("BpmDj v"VERSION" (c) Werner Van Belle 2000-2009");
   layout()->addWidget(status);
-  QGridLayout* songListFrameLayout = new QGridLayout( songListFrame, 1, 1, 0, 0, "songListFrameLayout"); 
+  QGridLayout* songListFrameLayout = new QGridLayout( songListFrame, 1, 1, 
+					 0, 0, "songListFrameLayout"); 
   songList = new QVectorView( songListFrame, new QSong());
   songList->addColumn( tr( "Tempo" ) );
   songList->addColumn( tr( "Spectrum" ) );
@@ -145,29 +142,38 @@ SongSelectorLogic::SongSelectorLogic(QWidget * parent) :
   songList->addColumn( tr( "Mean" ) );
   songList->addColumn( tr( "Power" ) );
   songList->addColumn( tr( "Echo" ) );
-  songList->addColumn( tr( "Rythm" ) );
+  songList->addColumn( tr( "Rhythm" ) );
   songList->addColumn( tr( "Composition" ) );
   songList->setShowSortIndicator( TRUE );
-  songList->setSizePolicy( QSizePolicy( (QSizePolicy::SizeType)5, (QSizePolicy::SizeType)5, 0, 0, songList->sizePolicy().hasHeightForWidth() ) );
+  songList->setSizePolicy( 
+    QSizePolicy( (QSizePolicy::SizeType)5, 
+		 (QSizePolicy::SizeType)5, 
+		 0, 
+		 0, 
+		 songList->sizePolicy().hasHeightForWidth() ) );
   songList->setFrameShape( Q3ListView::Panel );
   songList->setResizePolicy( Q3ScrollView::Manual );
   songList->header()->moveSection(LIST_HISTOGRAM,2);
-  songList->header()->moveSection(LIST_RYTHM,2);
+  songList->header()->moveSection(LIST_RHYTHM,2);
   songList->header()->moveSection(LIST_COMPOSITION,2);
   songListFrameLayout->addWidget( songList, 0, 0 );
   
-  connect( songList, SIGNAL( doubleClicked(int) ), this, SLOT( selectSong(int) ) );
-  connect( songList, SIGNAL( ctrlReturnPressed(int) ), this, SLOT( selectSong(int) ) );
-  connect( songList, SIGNAL( returnPressed(int) ), this, SLOT( selectionMenu() ) );
-  connect( songList, SIGNAL( rightButtonPressed(int,const QPoint&,int) ), this, SLOT( selectionMenu() ) );
-  connect( songList, SIGNAL( clicked(int) ), this, SLOT( playFragment(int) ) );
+  connect(songList, SIGNAL(doubleClicked(int)), 
+	  this, SLOT( selectSong(int)));
+  connect(songList, SIGNAL(ctrlReturnPressed(int)), 
+	  this, SLOT( selectSong(int)));
+  connect(songList, SIGNAL(returnPressed(int)), 
+	  this, SLOT( selectionMenu()));
+  connect(songList, SIGNAL(rightButtonPressed(int,const QPoint&,int) ), 
+	  this, SLOT( selectionMenu()));
+  connect(songList, SIGNAL(clicked(int)), this, SLOT( playFragment(int) ) );
   
-  // link with the processmanager
-  processManager = new ProcessManager(this);
-  analyzers = new AnalyzersManager(8,this,480);
+  // link with the process manager
+  processManager = new ProcessManager();
+  analyzers = new AnalyzersManager();
   database = new DataBase();
   
-  // initialise fields
+  // initialize fields
   mainTicks=0;
   timer=new QTimer(this);
   connect(timer,SIGNAL(timeout()), SLOT(timerTick()));
@@ -201,74 +207,86 @@ SongSelectorLogic::SongSelectorLogic(QWidget * parent) :
   help->insertItem("L&icense",this,SLOT(doLicense()));
   
   // before menu
-  before->insertItem("&Import songs ("+extensionList()+")",this,SLOT(importSongs()));
-  before->insertItem("Check song availability",this,SLOT(startExistenceCheck()));
-  
-  before->insertItem("Rename songs with wrong title...",this,SLOT(startRenamer()));
+  before->insertItem("&Import songs ("+extensionList()+")",
+		     this, SLOT(importSongs()));
+  before->insertItem("Check song availability",
+		     this,SLOT(startExistenceCheck()));
+  before->insertItem("Rename songs with wrong title...",
+		     this,SLOT(startRenamer()));
   before->insertSeparator();
 #ifdef INCOMPLETE_FEATURES
-  before->insertItem("&Check/import cdrom content",this,SLOT(checkDisc())); 
-  // checks wether the songs on a disk can be found somewhere in the indices
-  before->insertItem("Find similar song names in directory...",this,SLOT(findallsimilarnames()));
+  // checks whether the songs on a disk can be found somewhere in the indices
+  before->insertItem("Find similar song names in directory...",
+		     this,SLOT(findallsimilarnames()));
 #endif
   before->insertItem("Backup indices",this,SLOT(doBackup()));
 
   // view color menu
   view->insertSeparator();
-  linkViewProp(Config::color_played,       view,"Color already played titles");
+  linkViewProp(Config::color_played, view,"Color already played titles");
   linkViewProp(Config::color_authorplayed, view,"Color already played authors");
-  linkViewProp(Config::color_songs_based_on_history, view,"Color songs based on history");
-  linkViewProp(Config::color_range,       view,"Color songs within tempo range");
-  linkViewProp(Config::color_ondisk,       view,"Color songs not on disk");
-  linkViewProp(Config::color_cues,         view,"Color songs without cues");
-  linkViewProp(Config::color_dcolor,       view,"Color spectrum distance");
-  linkViewProp(Config::color_spectrum,     view,"Color PCA of spectrum");
+  linkViewProp(Config::color_songs_based_on_history, 
+	       view,"Color songs based on history");
+  linkViewProp(Config::color_range, view,"Color songs within tempo range");
+  linkViewProp(Config::color_ondisk, view,"Color songs not on disk");
+  linkViewProp(Config::color_cues, view,"Color songs without cues");
+  linkViewProp(Config::color_dcolor, view,"Color spectrum distance");
+  linkViewProp(Config::color_spectrum, view,"Color PCA of spectrum");
   
   // view display part
   view->insertSeparator();
-  view -> insertItem("Limit selection to &Tempo range",this,SLOT(toggle_temporange()));
+  view -> insertItem("Limit selection to &Tempo range",
+		     this,SLOT(toggle_temporange()));
   
-  linkViewProp(Config::limit_uprange,         view,"&Up Tempo Range (0 < BPM < 0.06)");
-  linkViewProp(Config::limit_downrange,       view,"&Down Tempo Range (-0.06 < BPM < 0)");
-  linkViewProp(Config::limit_nonplayed,       view,"Limit selection to &Non-played songs");
-  linkViewProp(Config::limit_ondisk,          view,"Limit selection to &Files on disk");
-  linkViewProp(Config::limit_indistance,      view,"Limit selection to &dColor range");
-  linkViewProp(Config::limit_authornonplayed, view,"Limit selection to non played authors");
+  linkViewProp(Config::limit_uprange, 
+	       view,"&Up Tempo Range (0 < BPM < 0.06)");
+  linkViewProp(Config::limit_downrange, 
+	       view,"&Down Tempo Range (-0.06 < BPM < 0)");
+  linkViewProp(Config::limit_nonplayed, 
+	       view,"Limit selection to &Non-played songs");
+  linkViewProp(Config::limit_ondisk, 
+	       view,"Limit selection to &Files on disk");
+  linkViewProp(Config::limit_indistance,
+	       view,"Limit selection to &dColor range");
+  linkViewProp(Config::limit_authornonplayed, 
+	       view,"Limit selection to non played authors");
   
   // view dialog part
-  view -> insertSeparator();
-  view -> insertItem("Frequency shaping dialog",this,SLOT(show_freq_shaping_dialog()));
-  //  view->setCheckable(true);
+  view->insertSeparator();
+  view->insertItem("Frequency shaping dialog",
+		   this,SLOT(show_freq_shaping_dialog()));
   
   // auto menu
-  linkAutoProp(Config::auto_popqueue  ,autom,"Pop queue when monitor empty");
-  linkAutoProp(Config::ask_mix        ,autom,"Ask 'how did the mix go'");
-  //   linkAutoProp(Config::open_bpmmixer  ,autom,"Open Bpm Mixer when starting program");
+  linkAutoProp(Config::auto_popqueue ,autom,"Pop queue when monitor empty");
+  linkAutoProp(Config::ask_mix       ,autom,"Ask 'how did the mix go'");
   linkAutoProp(Config::play_fragments ,autom,"Play fragments within selector");
-  //  autom->setCheckable(true);
   
   // selection menu
   selection->insertItem("&Add tag...",this,SLOT(selectionAddTags()));
   selection->insertItem("&Delete tag...",this,SLOT(selectionDelTags()));
   selection->insertItem("Set Author...",this,SLOT(selectionSetAuthor()));
   selection->insertItem("&Edit info...",this,SLOT(selectionEditInfo()));
-  selection->insertItem("&Insert in album...",this,SLOT(selectionInsertInAlbum()));
+  selection->insertItem("&Insert in album...",
+			this,SLOT(selectionInsertInAlbum()));
   selection->insertItem("&Analyze",this,SLOT(queueAnalysis()));
   selection->insertItem("Pca Analysis Sound Color",this,SLOT(doSpectrumPca()));
   selection->insertItem("Cluster Analysis",this,SLOT(doClustering()));
   selection->insertSeparator();
-  selection->insertItem("This is the main song, but don't play it",this,SLOT(selectionSetMainSong()));
+  selection->insertItem("This is the main song, but don't play it",
+			this,SLOT(selectionSetMainSong()));
 #ifdef INCOMPLETE_FEATURES
   selection->insertItem("Avoid this song",this,SLOT(avoidSongs()));
   selection->insertItem("Clear Song Avoidance",this,SLOT(avoidNoSongs()));
-  selection->insertItem("Play in 1st Extra Player",this,SLOT(selectionPlayIn3th()));
-  selection->insertItem("Play in 2nd Extra Player",this,SLOT(selectionPlayIn4th()));
-  selection->insertItem("&Fetch selection from cdrom...",this,SLOT(fetchSelection()));
+  selection->insertItem("Play in 1st Extra Player",
+			this,SLOT(selectionPlayIn3th()));
+  selection->insertItem("Play in 2nd Extra Player",
+			this,SLOT(selectionPlayIn4th()));
 #endif
   selection->insertItem("Queue",this,SLOT(selectionAddQueue()));
   selection->insertSeparator();
   selection->insertSeparator();
-  selection->insertItem("Select all songs without tag",this,SLOT(selectAllButTagged()));
+  selection->insertItem("Select all songs without tag",
+			this,SLOT(selectAllButTagged()));
   selection->insertItem("Select all songs",this,SLOT(selectAllTags()));
 
   // queue menu
@@ -282,7 +300,8 @@ SongSelectorLogic::SongSelectorLogic(QWidget * parent) :
   queuemenu->insertItem("Delete Song",this,SLOT(queueDelete()));
   queuemenu->insertSeparator();
   queuemenu->insertItem("Export xmms playlist",this,SLOT(exportPlayList()));
-  queuemenu->insertItem("Copy songs to directory...",this,SLOT(queueCopySongs()));  
+  queuemenu->insertItem("Copy songs to directory...",
+			this,SLOT(queueCopySongs()));  
   
   // main menu
   main->insertItem("&Program",file);
@@ -295,11 +314,14 @@ SongSelectorLogic::SongSelectorLogic(QWidget * parent) :
   
   // create player views
   assert(playerLayout->layout());
-  playersLeft->addWidget(new SongSelectorPlayView(playerLayout,Config::players[0]));
-  playersLeft->addWidget(new SongSelectorPlayView(playerLayout,Config::players[1]));
-  playersRight->addWidget(new SongSelectorPlayView(playerLayout,Config::players[2]));
-  playersRight->addWidget(new SongSelectorPlayView(playerLayout,Config::players[3]));
-  //  playerLayout->layout()->addWidget(new SongSelectorPlayView(playerLayout,Config::players[3]));
+  playersLeft->addWidget(new SongSelectorPlayView(playerLayout,
+						  Config::players[0]));
+  playersLeft->addWidget(new SongSelectorPlayView(playerLayout,
+						  Config::players[1]));
+  playersRight->addWidget(new SongSelectorPlayView(playerLayout,
+						   Config::players[2]));
+  playersRight->addWidget(new SongSelectorPlayView(playerLayout,
+						   Config::players[3]));
 
   // create analyzer views
   assert(analLayout1->layout());
@@ -307,19 +329,24 @@ SongSelectorLogic::SongSelectorLogic(QWidget * parent) :
   for(int i = 0 ; i < 4 ; i ++)
     {
       SongSelectorAnalView * anal_view;
-      anal_view = new SongSelectorAnalView(analLayout1,analyzers,Config::analyzers[i]);
+      anal_view = new SongSelectorAnalView(analLayout1,analyzers,
+					   Config::analyzers[i]);
       analLayout1->layout()->addWidget(anal_view);
-      anal_view = new SongSelectorAnalView(analLayout2,analyzers,Config::analyzers[4+i]);
+      anal_view = new SongSelectorAnalView(analLayout2,analyzers,
+					   Config::analyzers[4+i]);
       analLayout2->layout()->addWidget(anal_view);
     }
-  //header_frame->resize(header_frame->minimumSizeHint());
   for(int i = 0 ; i < 8; i ++)
-    connect(&Config::analyzers[i],SIGNAL(stateChanged()),this,SLOT(toAnalyzeOrNot()));
+    connect(&Config::analyzers[i],SIGNAL(stateChanged()),
+	    this,SLOT(toAnalyzeOrNot()));
 
   // check which tags were marked in the previous session
-  QStringList ins = Config::get_tag_include().split(OneSpace,QString::SkipEmptyParts);
-  QStringList musts = Config::get_tag_mustbe().split(OneSpace,QString::SkipEmptyParts);
-  QStringList outs = Config::get_tag_exclude().split(OneSpace,QString::SkipEmptyParts);
+  QStringList ins = Config::get_tag_include().split(OneSpace,
+						    QString::SkipEmptyParts);
+  QStringList musts = Config::get_tag_mustbe().split(OneSpace,
+						     QString::SkipEmptyParts);
+  QStringList outs = Config::get_tag_exclude().split(OneSpace,
+						     QString::SkipEmptyParts);
   Tags::add_tag(""); addTag("");
   Q3ListViewItem *empty_tag = tagList->findItem("",TAGS_TEXT);
   assert(empty_tag);
@@ -354,12 +381,12 @@ SongSelectorLogic::SongSelectorLogic(QWidget * parent) :
       }
   }
   History::init(".played.log",playedList);
-  // copy the header information from the config file
+  // copy the header information from the configuration file
   Q3Header *h = songList->header();
   copy_header(Config::get_header(),h);
   Config::set_header(h);
   // will fetch the tags we already know so that the database
-  // can filter incoming songs immediatelly
+  // can filter incoming songs immediately
   database->updateCache(this); 
 };
 
@@ -402,7 +429,8 @@ void SongSelectorLogic::linkAutoProp(ConfigState & p, Q3PopupMenu *m, QString t)
 void SongSelectorLogic::toggle_temporange()
 {
   QMutexLocker _ml(&lock);
-  bool newstate =  !(Config::limit_uprange.isOn() || Config::limit_downrange.isOn());
+  bool newstate =  !(Config::limit_uprange.isOn() || 
+		     Config::limit_downrange.isOn());
   Config::limit_uprange.setOn(newstate);
   Config::limit_downrange.setOn(newstate);
 }
@@ -426,16 +454,17 @@ void SongSelectorLogic::doOnlineHelp()
       checkDocsAt(pos = pp) ||
       checkDocsAt(pos = pp+"/documentation") ||
 	checkDocsAt(pos = "/usr/share/doc/bpmdj-"VERSION)))
-    pos = "http://bpmdj.yellowcouch.org";
+    pos = "http://bpmdj.yellowcouch.org/";
 
   // code location
   QString bin;
   if (exists(bin="/usr/bin/firefox") ||
       exists(bin="/usr/bin/mozilla") ||
       exists(bin="/usr/bin/konqueror") )
-    spawn(bin+" "+pos+"/index.html");
+    spawn(bin+" "+pos+"/index.html","Documentation");
   else
-    QMessageBox::warning(this,"Online","Please browse to http://bpmdj.yellowcouch.org/");
+    QMessageBox::warning(this,"Online",
+			 "Please browse to http://bpmdj.yellowcouch.org/");
 }
 
 void SongSelectorLogic::doBackup()
@@ -494,7 +523,7 @@ ITERATE_OVER(song)
   }
   statistics_stop_second_pass();
   
-  // update albumlist
+  // update album list
   {
     constVectorIterator<Song*> song(songs);
 ITERATE_OVER(song)
@@ -569,14 +598,15 @@ void SongSelectorLogic::updateItemList()
     }
   // update selection
   Song * main = ::main_song;
-  int itemcount = database -> getSelection(this,songList,Config::get_max_songs());
+  int itemcount = database->getSelection(this,songList,Config::get_max_songs());
   songList->repaint();
   countLcd->display(itemcount);
   // nothing selected ?
   if (itemcount==0 && !alreadygavefilterwarning && Config::get_file_count())
     {
       alreadygavefilterwarning = true;
-      QMessageBox::warning(this,"Empty Selection","With the current selection of filters,\n"
+      QMessageBox::warning(this,"Empty Selection",
+			   "With the current selection of filters,\n"
 			   "there are no songs to be displayed.\n"
 			   "If you want to modify this, go to the View menu.");
     }
@@ -627,7 +657,7 @@ void SongSelectorLogic::updateItemList()
 }
 
 /**
- * This version of the item lis updater is used from within the index scanner
+ * This version of the item list updater is used from within the index scanner
  * It will not sort the data it retrieves from the database and will also
  * not report on the lack of exiting songs at the moment. The history view is
  * also not updated here.
@@ -676,10 +706,9 @@ void SongSelectorLogic::updateColors()
 void SongSelectorLogic::timerTick()
 {
   /**
-   * The timer thread wil periodically call this function. 
-   * Since it is the same thread it will be able to continue
-   * below. We don' want that because then we might have 
-   * race conditions.
+   * The timer thread will periodically call this function. Since it is the 
+   * same thread it will be able to continue below. We don' want that because 
+   * then we might have race conditions.
    */
   if (!lock.tryLock()) return;
   QMutexLocker _ml(&lock);
@@ -691,19 +720,19 @@ void SongSelectorLogic::timerTick()
       || mainTicks==Config::get_orangeTime()
       || mainTicks==Config::get_redTime())
     updateColors();
-  processManager->checkSignals();
-  analyzers->checkSignals();
-  checkers.checkSignals();
+  poll_death();
+  SongProcess::checkSignals();
   
-  // we can now check whether any button has been check to start
-  // an analyzer. We do this after the signal check because this
-  // function will also redraw the colors for the analyzer and will
-  // ensure an immediate color change when the text is updated in the 
-  // signal checking round.
+  /**
+   * We can now check whether any button has been check to start an analyzer. 
+   * We do this after the signal check because this function will also redraw 
+   * the colors for the analyzer and will ensure an immediate color change when
+   * the text is updated in the signal checking round.
+   */
   toAnalyzeOrNot();
   
   // auto pop queue
-  // we can only pop every 10 seconds and if the mainplayer
+  // we can only pop every 10 seconds and if the main player
   // reports an error we turn of auto-popping...
   static int pop_ticks = 0;
   pop_ticks++;
@@ -780,7 +809,10 @@ void SongSelectorLogic::show_freq_shaping_dialog()
 {
   QMutexLocker _ml(&lock);
   if (!frequency_dialog)
-    frequency_dialog = new FrequencyDialog();
+    {
+      frequency_dialog=new QDialog();
+      frequency_content.setupUi(frequency_dialog);
+    }
   if (frequency_dialog->isVisible())
     frequency_dialog->hide();
   else
@@ -843,7 +875,7 @@ void SongSelectorLogic::updateFrequencyMap()
 	}
     }
   p.end();
-  frequency_dialog->frequency_map->setPixmap(*pm);
+  frequency_content.frequency_map->setPixmap(*pm);
 }
 
 int songFileCompare(const void * a, const void* b)
@@ -855,28 +887,8 @@ int songFileCompare(const void * a, const void* b)
   return strcmp(A->get_file(),B->get_file());
 }
 
-#ifdef INCOMPLETE_FEATURES
-void SongSelectorLogic::checkDisc()
-{
-  QMutexLocker _ml(&lock);
-  // 0 - which CD is this ?
-  bool ok;
-  QString discname = QInputDialog::getText("Check/Import Disc"
-					   ,"1. Insert a CD\n2. Enter its number (without trailing slash)"
-					   ,QLineEdit::Normal,QString::null,&ok,this);
-  if (!ok || discname.isEmpty()) return;
-  // 1 - mount cdrom
-  start_mount_cdrom();
-  // 2 - Scan directory
-  MusicScanner scanner(this);
-  scanner.scan(CDROM,discname);
-  updateItemList();
-  // 3 - umount cdrom
-  start_umount_cdrom();
-}
-#endif
-
-void SongSelectorLogic::doSpectrumPca(bool fulldatabase, bool update_process_view)
+void SongSelectorLogic::doSpectrumPca(bool fulldatabase, 
+				      bool update_process_view)
 {
   QMutexLocker _ml(&lock);
   vector<Song*> *all;
@@ -909,25 +921,22 @@ ITERATE_OVER(i)
     i.val()->set_spectrum_string(EMPTY);
   }
   // 1. add all information in 1 cluster
-  Cluster cluster;
-  Cluster::reset();
+  clusterer.reset();
   selectedSongIterator svi;
 ITERATE_OVER(svi)
 
-    if (svi.val()->has_all_cluster_fields()) cluster.addPoint(svi.val()); 
+    if (svi.val()->has_all_cluster_fields()) 
+      clusterer.addPoint(svi.val()); 
   }
-  // 2. Do the Analysis
-  ClusterDialog dialog(this);
+  // 2. Get the information from the user
+  QDialog dialog(this);
+  Ui::ClusterDialog dialogcontent;
+  dialogcontent.setupUi(&dialog);
   if (dialog.exec()==Rejected) return;
-  SongMetriek metriek(*dialog.metrics);
-  Couple * result = cluster.agglomerate(&metriek);
-  // 3. Assign Colors
-  result->determine_color((float4)0,(float4)360,0,Config::get_color_cluster_depth() - 1);
-  // result->color_clusters_with_size(20,40);
-  // result->color_clusters_dw2();
-
-  // 4. Clean Up
-  updateProcessView(false);
+  SongMetriek metriek=*dialogcontent.metrics;
+  
+  // 3. Start the analysis
+  clusterer.agglomerate(metriek);
 }
 
 void SongSelectorLogic::exportPlayList()
@@ -972,82 +981,6 @@ ITERATE_OVER(svi)
   bpmdj_deallocate(current_directory);
 }
 
-void SongSelectorLogic::fetchSelection()
-{
-  QMutexLocker _ml(&lock);
-  /* count nr of files to get */
-  int selectionCount = 0;
-  selectedSongIterator svi;
-ITERATE_OVER(svi)
-selectionCount ++;};
-  /* allocate enough space to store the songs */
-  Song * * toFetch;
-  int next=0;
-  toFetch=(Song**)calloc(selectionCount,sizeof(Song*));
-  assert(toFetch);
-  next=0;
-  /* read all the songs */
-  selectedSongIterator svi2;
-ITERATE_OVER(svi2)
-toFetch[next++]=svi2.val();};
-  /* sort the list */
-  qsort(toFetch,next,sizeof(Song*),songFileCompare);
-  /* umount any left over cdrom */
-  start_umount_cdrom();
-  /* fetch the files one by one */
-  int i = 0;
-  char *currentcd = 0;
-  while(i<next)
-    {
-      Song* song=toFetch[i++];
-      const char* filename=song->get_file();
-      /* read the cd-entry */
-      char* newcd=strdup(filename);
-      char temp[500];
-      char* breakat=index(newcd,'/');
-      assert(breakat);
-      *breakat=0;
-      if (currentcd==0 || strcmp(currentcd,newcd)!=0)
-	{
-	  /* umount if necessarry */
-	  if (currentcd)
-	    {
-	      bpmdj_deallocate(currentcd);
-	      if (!start_umount_cdrom())
-		QMessageBox::warning(this,"CD","Cannot unmount "CDROM);
-	    }
-	  /* ask user to input new cd */
-	  currentcd=newcd;
-	  QMessageBox::information(this,"CD","Please insert "+QString(newcd));
-	  /* mount the cdrom */
-	  if (!start_mount_cdrom())
-	    QMessageBox::warning(this,"CD","Cannout mount " CDROM " (errno="+QString::number(errno)+")");
-	}
-      else 
-	bpmdj_deallocate(newcd);
-      /* create the target directory */
-      char* dirc=strdup(filename);
-      char* filenc=strdup(filename);
-      char* dir=dirname(dirc);
-      sprintf(temp,"./music/%s",dir);
-      char* target=strdup(temp);
-      start_mkdir(target);
-      /* read the given file from the cdrom */
-      sprintf(temp,CDROM"%s",index(filename,'/'));
-      char* source=strdup(temp);
-      start_cp(source,target);
-      /* mark it on disk */
-      song->set_ondisk(true);
-      /* free source & target */
-      bpmdj_deallocate(source);
-      bpmdj_deallocate(target);
-      bpmdj_deallocate(dirc);
-      bpmdj_deallocate(filenc);
-    }
-  /* finally umount the last cdrom */
-  start_umount_cdrom(false);
-}
-
 /**
  * This method queues all the selected songs in the analysis queue
  * If no analyzer is enabled we suggest the possibility to enable
@@ -1064,15 +997,15 @@ new QueuedAnalSong(anal_queue,svi.val());};
     there_is_one |= Config::analyzers[i].isEnabledOk();
   if (!there_is_one)
     QMessageBox::warning(NULL,"Analyzer needed",
-			 "In order to analyze songs you need to enabled at least one analyzer. "
-			 "Please check one of the checkboxes (#1 .. #8) in the top pane\n");
+         "To analyze songs you need to enabled at least one analyzer. "
+	 "Please check one of the checkboxes (#1 .. #8) in the analysis pane");
 }
 
 void SongSelectorLogic::toAnalyzeOrNot()
 {
   QMutexLocker _ml(&lock);
   for(int i = 0 ; i < 8 ; i ++)
-    if (analyzers->slot_free(i))
+    if (Config::analyzers[i].is_free())
       startAnotherAnalyzer(NULL,i);
 }
 
@@ -1081,7 +1014,8 @@ void SongSelectorLogic::toAnalyzeOrNot()
  * either due to a timeout or due to a descent stop. In any case we need
  * to start a new one here.
  */
-void SongSelectorLogic::startAnotherAnalyzer(Song * finished_analyzing, int on_slot)
+void SongSelectorLogic::startAnotherAnalyzer(Song * finished_analyzing, 
+					     int on_slot)
 {
   QMutexLocker _ml(&lock);
   // reread the song which has finished
@@ -1092,7 +1026,7 @@ void SongSelectorLogic::startAnotherAnalyzer(Song * finished_analyzing, int on_s
       if (finished_analyzing->needs_analysis())
 	{
 	  // if there are still missing properties then we mark it
-	  // as non analyzeable at the given slot and requeue the song
+	  // as non analyzable at the given slot and queue the song
 	  songAddTag(finished_analyzing,analTag);
 	  new QueuedAnalSong(anal_queue,finished_analyzing);
 	}
@@ -1106,7 +1040,8 @@ void SongSelectorLogic::startAnotherAnalyzer(Song * finished_analyzing, int on_s
   unsigned8 days = 0, hours = 0, minutes = 0, seconds = 0;
   if (current_speed != 0)
     {
-      unsigned8 expected_time = (unsigned8)((float4)anal_queue->childCount()/current_speed);
+      unsigned8 expected_time = (unsigned8)((float4)anal_queue->childCount()
+					    /current_speed);
       days =  expected_time / (24L*60L*60L);
       expected_time -= days * (24L*60L*60L);
       hours = expected_time / (60L*60L);
@@ -1136,9 +1071,11 @@ void SongSelectorLogic::startAnotherAnalyzer(Song * finished_analyzing, int on_s
     }
   if (!next) return;
   // create the command line options
-  QString command = next->getCommand(Config::analyzers[on_slot]);
+  SongSlot* slot=&Config::analyzers[on_slot];
+  QString command = next->getCommand(*slot);
+  QString description = next->getDescription(*slot);
   // start it
-  analyzers->start(on_slot, next->getSong(), command);
+  analyzers->start(slot, next->getSong(), command, description);
   // delete it
   delete(next);
 }
@@ -1151,8 +1088,9 @@ void SongSelectorLogic::selectSong(int i)
   if (Config::players[0].isEmpty() ||
       Config::players[1].isEmpty())
     {
-      QMessageBox::message(NULL,"You did not set the mandatory player commands.\n"
-			   "Please fix these in the preferences box","Very interesting");
+      QMessageBox::message(NULL,
+	   "You did not set the mandatory player commands.\n"
+	   "Please fix these in the preferences box","Very interesting");
       doPreferences();
     }
   processManager->startSong(song);
@@ -1210,11 +1148,11 @@ void SongSelectorLogic::songAddTag(Song *song, const QString & tag)
   // modify taglines
   QString newtags = Tags::full_string(song->get_tags())+" "+tag;
   idx->set_tags(strdup(newtags));
-  // write the indfex file
+  // write the index file
   idx->write_idx();
   // free the bastard
   delete idx;
-  // now update the local songdata
+  // now update the local song data
   reread_and_repaint(song);
 }
 
@@ -1230,7 +1168,8 @@ void SongSelectorLogic::songSetAuthor(Song *song, const QString & tag)
   reread_and_repaint(song);
 }
 
-void SongSelectorLogic::insertSongInAlbum(Song * song, const QString & album, int nr)
+void SongSelectorLogic::insertSongInAlbum(Song * song, const QString & album, 
+					  int nr)
 {
   QMutexLocker _ml(&lock);
   QString index = song->get_storedin();
@@ -1271,7 +1210,7 @@ void SongSelectorLogic::songDelTag(Song * song, const QString & tag)
   // read the index file
   Index * index = new Index(song->get_storedin());
   newtags=strdup(index->get_tags());
-  // modify taglines
+  // modify tag lines
   QString new_tags = index->get_tags();
   new_tags.replace(tag,OneSpace);
   index->set_tags(new_tags);
@@ -1279,7 +1218,7 @@ void SongSelectorLogic::songDelTag(Song * song, const QString & tag)
   index->write_idx();
   // free the bastard
   delete index;
-  // now update the local songdata
+  // now update the local song data
   reread_and_repaint(song);
 }
 
@@ -1287,9 +1226,9 @@ void SongSelectorLogic::selectionAddTags()
 {
   QMutexLocker _ml(&lock);
   bool ok;
-  QString tags = QInputDialog::getText("Tags"
-				       ,"Enter tags to add (seperated by spaces)"
-				       ,QLineEdit::Normal,QString::null,&ok,this);
+  QString tags = QInputDialog::getText("Tags",
+		       "Enter tags to add (separated by spaces)"
+		       ,QLineEdit::Normal,QString::null,&ok,this);
   if (ok && !tags.isEmpty())
     {
       selectedSongIterator svi;
@@ -1303,7 +1242,7 @@ void SongSelectorLogic::selectionSetAuthor()
   QMutexLocker _ml(&lock);
   bool ok;
   QString text = QInputDialog::getText("Set Author...", 
-				       "Please enther the author name to be", 
+				       "Please enter the author name to be", 
 				       QLineEdit::Normal,
 				       QString::null, &ok, this );
   if ( ok ) 
@@ -1330,7 +1269,8 @@ void SongSelectorLogic::selectionInsertInAlbum()
       lastnr = albumbox.number->value();
       selectedSongIterator s;
 ITERATE_OVER(s)
-insertSongInAlbum(s.val(),last,albumbox.number->value());};
+
+	insertSongInAlbum(s.val(),last,albumbox.number->value());};
     }
 }
 
@@ -1393,7 +1333,8 @@ void SongSelectorLogic::doAutoMix()
   // now we have a number of parameters...
   // time to construct them into a set of options
   char arguments[1024];
-  sprintf(arguments,"--mix %d --slide %d --temposwitch %d %s %s %s %s %s %s --startpct %d --stoppct %d",
+  sprintf(arguments,"--mix %d --slide %d --temposwitch "
+	  "%d %s %s %s %s %s %s --startpct %d --stoppct %d",
 	  mergerDialog.mixMeasures->value(),
 	  mergerDialog.slideMeasures->value(),
 	  mergerDialog.tempoMeasures->value(),
@@ -1401,7 +1342,8 @@ void SongSelectorLogic::doAutoMix()
 	  (mergerDialog.normalizeSongs->isChecked() ? "--normalize" : ""),
 	  (mergerDialog.volumeAccounting->isChecked() ? "--accountvolume" : ""),
 	  (mergerDialog.fineScan->isChecked() ? "--rescantempo" : ""),
-	  ((mergerDialog.startAtCue->isChecked() || mergerDialog.beforeCue->isChecked()) ? "--startcue" : ""),
+	  ((mergerDialog.startAtCue->isChecked() 
+	    || mergerDialog.beforeCue->isChecked()) ? "--startcue" : ""),
 	  (mergerDialog.beforeCue->isChecked() ? "--beforecue" : ""),
 	  mergerDialog.headPercent->value(),
 	  mergerDialog.tailPercent->value());
@@ -1450,7 +1392,8 @@ ITERATE_OVER(song)
   if (should_split)
     fprintf(out,split_arguments);
   if (mergerDialog.wavConvert->isChecked())
-    fprintf(out,"for a in *"RAW_EXT"; do "RAW2WAV" \"$a\" \"`basename $a "RAW_EXT"`\".wav; rm -- \"$a\"; done\n");
+    fprintf(out,"for a in *"RAW_EXT"; do "RAW2WAV" \"$a\" \"`basename $a "
+	    RAW_EXT"`\".wav; rm -- \"$a\"; done\n");
   fclose(out);
 }
 
@@ -1461,7 +1404,8 @@ void SongSelectorLogic::selectionSetMainSong()
   if (!dialog_shown)
     {
       dialog_shown=true;
-      QMessageBox::information(this,"Removing the main song...","To remove the main song go to\n"
+      QMessageBox::information(this,"Removing the main song...",
+			       "To remove the main song go to\n"
 			       "Program|Clear Main");
     }
   selectedSongIterator svi;
@@ -1494,9 +1438,9 @@ void SongSelectorLogic::selectionDelTags()
 {
   QMutexLocker _ml(&lock);
   bool ok;
-  QString tags = QInputDialog::getText("Tags"
-				       ,"Enter tags to delete (seperated by spaces)"
-				       ,QLineEdit::Normal,QString::null,&ok,this);
+  QString tags = QInputDialog::getText("Tags",
+	         "Enter tags to delete (separated by spaces)",
+		 QLineEdit::Normal,QString::null,&ok,this);
   if (ok && !tags.isEmpty())
     {
       selectedSongIterator svi;
@@ -1583,7 +1527,8 @@ void SongSelectorLogic::findallsimilarnames()
 {
   QMutexLocker _ml(&lock);
   
-  QString text = QFileDialog::getExistingDirectory(NULL,this,NULL,"Specify directory to compare with database");
+  QString text = QFileDialog::getExistingDirectory(NULL,this,NULL,
+		   "Specify directory to compare with database");
   // ask the name to start with
   if (!text.isEmpty())
     {
@@ -1619,7 +1564,9 @@ void SongSelectorLogic::importSongs()
     Config::set_file_count(1);
   if (::reading_index)
     {
-      QMessageBox::message(NULL,"The importer cannot be started while scanning the existing index files\n");
+      QMessageBox::message(NULL,
+			   "The importer cannot be started while "
+			   "scanning the existing index files\n");
       return;
     }
   MusicScanner scanner(this);
@@ -1630,10 +1577,11 @@ void SongSelectorLogic::importSongs()
   scanner.exec();
   if (explain_analysis)
     QMessageBox::message("What next ?",
-			 "The importer has created a number of empty index files. Before they are useful "
-			 "they should be filled with appropriate meta-data. This can be done by analyzing "
-			 "the songs. To do so. Select them in the Songs-tab, press the right mouse button "
-			 "and choose 'Analyzers' from the popup-menu.");
+      "The importer has created a number of empty index files. Before they "
+      "are useful they should be filled with appropriate meta-data. This can "
+      "be done by analyzing the songs. To do so. Select them in the Songs-tab, "
+      "press the right mouse button and choose 'Analyzers' from the "
+      "popup-menu.");
 }
 
 void SongSelectorLogic::selectionMenu()
@@ -1720,7 +1668,8 @@ ITERATE_OVER(entry)
 	  if (pos==queue->childCount())
 	    {
 	      QMessageBox::warning(NULL,"Cannot shift downwards",
-				   "Because you have selected the last song, I cannot shift the others songs downward.\n");
+		   "Because you have selected the last song, "
+		   "I cannot shift the others songs downward.\n");
 	      return;
 	    }
 	  queueFindAndRename(pos+1,pos);
@@ -1786,16 +1735,20 @@ void SongSelectorLogic::queueInsert(int count)
   
   int cur = count+1;
   if (count==0) return;
-  // eerst lopen we door de volledige list om elk element een rangnummer te geven dat
-  // een veelvoud van count is. We start at count+1, which is useful if we want
-  // to insert songs towards the main or current monitorsong.
+  /**
+   * First we run through the complete list to asisgn to each element a rank
+   * which is a multiple of the count. We start at count+1. This is useful
+   * if we want to insert songs directly after the main or monitor song
+   */
   listViewIterator<QueuedSong> entry(queue);
 ITERATE_OVER(entry)
 
     entry.val()->setPos(cur);
     cur+=count+1;}
-  // if there is a main or monitor then the randomization will
-  // use that one as anker. Otherwise we refrain from using any anker
+  /**
+   * if there is a main or monitor then the randomization will use that one as
+   * anker. Otherwise we refrain from using any anker
+   */
   int last_pos = (::main_song || monitor_song)  ? 1 : count + 2;
   {
     listViewIterator<QueuedSong> entry(queue);
@@ -1834,7 +1787,8 @@ void SongSelectorLogic::queueInsert()
   
   bool ok;
   int count = 5;
-  count = QInputDialog::getInteger("Insert Songs...","How many songs should be inserted ?",5,1,50,1,&ok);
+  count = QInputDialog::getInteger("Insert Songs...",
+	  "How many songs should be inserted ?",5,1,50,1,&ok);
   if (!ok) return;
   queueInsert(count);
 }
@@ -1855,7 +1809,7 @@ bool SongSelectorLogic::rejectQueueProposal(Song * song, int position)
 {
   QMutexLocker _ml(&lock);
   
-  // check the two things that are playhing
+  // check the two things that are playing
   if (song==::main_song) return true;
   if (song==::monitor_song) return true;
   // check the data in the queue so far
@@ -1866,17 +1820,18 @@ ITERATE_OVER(queuedsong)
     if (!entry) continue;
     if (weighDuplicateAuthors->isChecked())
     if (entry->get_author() == song->get_author())
-    if (abs(queuedsong.val()->getPos()-position)<=Config::get_authorDecay()) return true;
+    if (abs(queuedsong.val()->getPos()-position)<=Config::get_authorDecay()) 
+      return true;
     if (entry->get_file() == song->get_file()) return true;
   };
   return false;
 }
 
 
-void SongSelectorLogic::filterProposedList(Song ** list, int &count, int position)
+void SongSelectorLogic::filterProposedList(Song ** list, int &count, 
+					   int position)
 {
   QMutexLocker _ml(&lock);
-  
   int i = 0;
   while(i<count)
     {
@@ -1896,7 +1851,8 @@ extern SongCopier songCopier;
 void SongSelectorLogic::queueCopySongs()
 {
   QMutexLocker _ml(&lock);
-  QString target = QFileDialog::getExistingDirectory(NULL,this,NULL,"Specify directory to dump songs to");
+  QString target = QFileDialog::getExistingDirectory(NULL,this,NULL,
+		     "Specify directory to dump songs to");
   if (target.isEmpty()) return;
   songCopier.setTarget(target);
   listViewIterator<QueuedSong> qs(queue);
@@ -1912,10 +1868,11 @@ void SongSelectorLogic::queueRandom(bool userChoice)
   QMutexLocker _ml(&lock);
   
   SongMetriek * metriek = NULL;
-  // this loop will in every iteration try to find an 
-  // undefined element and then assign a value to it
-  // if there are no longer undefined elements, the 
-  // loop breaks.
+  /**
+   * This loop will in every iteration try to find an undefined element and
+   * then assign a value to it if there are no longer undefined elements, the
+   * loop breaks.
+   */
   Song * firstiflacking = ::monitor_song;
   if (!firstiflacking) firstiflacking = ::main_song;
   while(true)
@@ -1941,7 +1898,8 @@ ITERATE_OVER(entry)
       }
       // check boundaries
       if (!element) break;
-      // deselecting the element will make sure that this loop will always end, even if no filler song can be found.
+      // deselecting the element will make sure that this loop will always end,
+      // even if no filler song can be found.
       element->setSelected(false);
       if (element->ankered())
 	continue;
@@ -1952,14 +1910,14 @@ ITERATE_OVER(entry)
       if (!a)
 	{
 	  QMessageBox::warning(NULL,"Randomize",
-			       "Cannot randomize an element without an ankered element before");
+	     "Cannot randomize an element without an ankered element before");
 	  continue;
 	}
 
       if (!after)
 	{
 	  QMessageBox::warning(NULL,"Randomize",
-			       "Cannot randomize an element without an ankered element after");
+            "Cannot randomize an element without an ankered element after");
 	  continue;
 	}
       Song *c = after->getSong();
@@ -1973,10 +1931,12 @@ ITERATE_OVER(entry)
 
       // find a song close to the target position
       int count;
-      Song * * proposed = database->closestSongs(this, a, C-B, c, B-A, metriek, 100, count);
+      Song ** proposed = database->closestSongs(this, a, C-B, c, B-A,
+						metriek, 100, count);
       element -> setSong(NULL,-1);
       Song * choice = NULL;
-      // now run through the proposed list and remove anything duplicate depending on the users preferences
+      // now run through the proposed list and remove anything duplicate 
+      // depending on the users preferences
       filterProposedList(proposed,count,element->getPos());
       // let the user choose or choose self
       if (count>0)
@@ -1986,15 +1946,14 @@ ITERATE_OVER(entry)
 	      Q3PopupMenu * songs = new Q3PopupMenu(this);
 	      count = 20;
 	      for(int i = 0 ; i < count ; i ++)
-		songs -> insertItem ( proposed[i]->get_title()+"["+proposed[i]->get_author()+"]", i, i);
+		songs->insertItem( proposed[i]->get_title()+"["+
+				   proposed[i]->get_author()+"]", i, i);
 	      int result = songs->exec();
 	      if (result>=0 && result < count)
 		choice = proposed[result];
 	    }
 	  else
-	    {
-	      choice = proposed[0];
-	    }
+	    choice = proposed[0];
 	  bpmdj_deallocate(proposed);
 	  if (choice)
 	    element->setSong(choice,choice->distance(a,B-A,c,C-B,metriek));
@@ -2053,7 +2012,8 @@ void SongSelectorLogic::albumItemChanged(Q3ListViewItem* i, int col)
   AlbumField *album = index.find_album(i->parent()->text(0));
   if (!album) 
     {
-      printf("Error: album entry %s that is unknown in index file\n",(const char*)i->text(1));
+      Error("album entry %s that is unknown in index file",
+	    (const char*)i->text(1));
       return;
     }
   album -> nr = atoi(i->text(0));
@@ -2061,10 +2021,10 @@ void SongSelectorLogic::albumItemChanged(Q3ListViewItem* i, int col)
   item -> fixNr();
 }
 
-void SongSelectorLogic::changeTagList(Q3ListViewItem* item, const QPoint & pos, int col)
+void SongSelectorLogic::changeTagList(Q3ListViewItem* item, const QPoint & pos,
+				      int col)
 {
   QMutexLocker _ml(&lock);
-  ;
   if (col < TAGS_OR || col > TAGS_NOT) return;
   if (!item) return;
   QString c = item -> text(col);
@@ -2075,7 +2035,6 @@ void SongSelectorLogic::changeTagList(Q3ListViewItem* item, const QPoint & pos, 
 void SongSelectorLogic::deleteSongFromAlbum(AlbumItem * item)
 {
   QMutexLocker _ml(&lock);
-  ;
   if (!item) return;
   Song *song = item->get_song();
   if (!song) return;
@@ -2135,7 +2094,7 @@ void SongSelectorLogic::customEvent(QEvent * e)
     {
       QMutexLocker _ml(&lock);
       BpmDjEvent * E = (BpmDjEvent*)e;
-      E->run(this);
+      E->run();
     }
 }
 

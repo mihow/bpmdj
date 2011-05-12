@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__energy_analyzer_cpp__
 #define __loaded__energy_analyzer_cpp__
@@ -76,7 +72,7 @@ void EnergyAnalyzer::analyze()
   // fetch the mean values
   playing->clear_energy();
   if (audiosize == 0) return;
-  // scan for minima, maxima and mean
+  // scan for minimum, maximum and mean
   signed2 minl = audio[0].left;
   signed2 minr = audio[0].right;
   signed2 maxl = audio[0].left;
@@ -117,7 +113,7 @@ void EnergyAnalyzer::analyze()
       meanl/=bs;
       meanr/=bs;
       
-      // obtain rms of normalized sound
+      // obtain RMS of normalized sound
       float8 facl = normalization_factor(minl, maxl, meanl)/32767.0;
       float8 facr = normalization_factor(minr, maxr, meanr)/32767.0;
       float8 subl = meanl;

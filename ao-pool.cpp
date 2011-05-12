@@ -52,9 +52,10 @@ class StdDawnTilDusk: public DawnTilDusk
 public:
   StdDawnTilDusk(): scheduler()
   {
+    // printf("StdDawnTillDusk gefixed\n");
     tracker=NULL;
     aoPool=this;
-    tracker = new AoTracker();
+    tracker=new AoTracker();
     running=true;
   }
   ~StdDawnTilDusk()
@@ -77,23 +78,32 @@ public:
    */
   virtual void sunset(string who)
   {
+    assert(tracker);
     if (who=="AoTracker") running=false;
     else tracker->sunset(who);
   };
   virtual void wait_for_finish()
   {
     while(running) 
-      sleep(10);
+      {
+	sleep(1);
+	if (running)
+	  {
+	    printf("Waiting for objects to finish\n"); 
+	    print_active_object_list();
+	    fflush(stdout);
+	  }
+      }
   };
   /**
-   * can be called to print the list of active obejcts
+   * can be called to print the list of active objects
    */
   virtual void print_active_object_list()
   {
+    assert(tracker);
     tracker->print();
   }
 };
 
 DawnTilDusk * aoPool = new StdDawnTilDusk();
-
 #endif // __loaded__ao_pool_cpp__

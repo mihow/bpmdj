@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__fragment_player_cpp__
 #define __loaded__fragment_player_cpp__
@@ -27,26 +23,18 @@ using namespace std;
 #include "fragment-player.h"
 #include "player-config.h"
 #include "dsp-drivers.h"
-
-elementResult ActiveFragmentPlayer::playChunk(int t)
-{
-  // we only want the most recent playchunk, which 
-  // in our situation is known by its expected timestamp
-  if (t!=expected_playchunk) return Done;
-  checkValidDsp();
-  if (!delivery.playing || !dsp || delivery.finished || stopped) return Done;
-  usleep(333);
-  return RevisitAfterIncoming;
-};
+#include "dsp-none.h"
 
 elementResult ActiveFragmentPlayer::playWave(FragmentInMemory fragment)
 {
   if (stopped) return Done;
   checkValidDsp();
+  delivery.reset(fragment);
+  
   bool just_opened = false;
   if (!dsp)
     {
-      SongProcess *free_slot = NULL;
+      SongSlot *free_slot = NULL;
       for(int i = 0 ; i < 4 ; i++)
 	if (Config::players[i].canRun())
 	  {
@@ -58,7 +46,12 @@ elementResult ActiveFragmentPlayer::playWave(FragmentInMemory fragment)
 	return Done;
       PlayerConfig player_config(free_slot->getName());
       dsp = dsp_driver::get_driver(&player_config);
-      if (dsp->open(false)!=err_none)
+      if (is_none_driver(dsp))
+	{
+	  delete dsp;
+	  dsp=NULL;
+	}
+      else if (dsp->open(false)!=err_none)
 	{
 	  delete dsp;
 	  dsp=NULL;
@@ -69,13 +62,6 @@ elementResult ActiveFragmentPlayer::playWave(FragmentInMemory fragment)
 	  just_opened=true;
 	}
     }
-  if (!dsp) return Done;
-  delivery.reset(fragment);
-  
-  // this pause will drop any pending samples, and continue
-  // immediatelly since our wait_for_unpause returns immediatelly.
-  //if (!just_opened) dsp->pause();
-  queue_playChunk(++expected_playchunk);
   return Done;
 };
 
@@ -105,6 +91,12 @@ void ActiveFragmentPlayer::closeDsp()
   player_slot = -1;
 }
 
+elementResult ActiveFragmentPlayer::delivererFinished()
+{
+  closeDsp();
+  return Done;
+}
+
 elementResult ActiveFragmentPlayer::stopOutput()
 {
   closeDsp();
@@ -120,7 +112,7 @@ elementResult ActiveFragmentPlayer::startOutput()
 
 void FragmentPlayer::waitForStop()
 {
-  while(object.dsp || !object.stopped) ;
+  while(!object.stopped) ;
 }
 
 void FragmentPlayer::waitForStart()

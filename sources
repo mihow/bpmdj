@@ -12,7 +12,8 @@ DO      = ${shell ls *.do  2>/dev/null | grep -v .*\.L.c++ 2>/dev/null}
 	@if ! cmp /tmp/t .sources >/dev/null; then mv /tmp/t .sources; fi
 
 .cflags:
-	@echo $(CFLAGS) >/tmp/t
+	@echo $(VERSION) >/tmp/t
+	@echo $(CFLAGS) >>/tmp/t
 	@echo $(CPP) >>/tmp/t
 	@if ! [ -e .cflags ]; then cp /tmp/t .cflags; touch *.h *.c; fi
 	@if ! cmp /tmp/t .cflags >/dev/null; then mv /tmp/t .cflags; touch *.h *.cpp; fi
@@ -59,7 +60,7 @@ profile-clock: profile-clock.o
 	@$(LINK) $(CFLAGS) $< -o $@
 
 version.h: profile-clock
-	@echo " [test] clock"
+	@echo " [test] clock - 10 seconds"
 	@echo "#define VERSION \""$(VERSION)"\"" >version.h
 	@./profile-clock >>version.h
 

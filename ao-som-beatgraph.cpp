@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__ao_som_beatgraph_cpp__
 #define __loaded__ao_som_beatgraph_cpp__
@@ -29,7 +25,8 @@ using namespace std;
 #include "clock-drivers.h"
 
 /**
- * This function is used to find the best matching unit, so we skip the sqrt
+ * This function is used to find the best matching unit, so we skip the square
+ * root
  */
 bool min_dist(signed1* A, signed1* B, float8&mindist, int size)
 {
@@ -56,13 +53,15 @@ int gauss(int pos, int zeroat)
 {
   if (pos<0) return gauss(-pos,zeroat);
   if (pos>=zeroat) return 0;
-  // return (int)(cos((3.141592/2.0)*(float4)pos/(float4)zeroat)*255.0);
   return 255-pos*255/zeroat;
 }
 
-void merge(signed1* target, signed1* source, signed4 strength,unsigned4 dimensions)
-// strength is an integer from 0 to 255*255.
-// when strength is maximal, we simply overwrite target, otherwise we dont
+/**
+ * Strength is an integer from 0 to 255*255. When strength is maximal, we
+ * simply overwrite target, otherwise we don't
+ */
+void merge(signed1* target, signed1* source, signed4 strength,
+	   unsigned4 dimensions)
 {
   if (strength==0) return;
   assert(strength<=255*255);
@@ -88,7 +87,8 @@ elementResult ActiveSomBeatGraph::start()
   if (!normalperiod.valid()) return Done;
   unsigned4 size = wave_max();
 #ifdef BEATS
-  unsigned4 period = normalperiod/4; // we want to look at the beats, not the measures 
+  // we want to look at the beats, not the measures 
+  unsigned4 period = normalperiod/4; 
 #endif
 #ifdef MEASURES
   unsigned4 period = normalperiod; // we want to look at the measures
@@ -96,7 +96,7 @@ elementResult ActiveSomBeatGraph::start()
   vectors = size/period;
   if (vectors*period>size) vectors--;
   if (vectors<1) return Done;
-  dimensions = period / 4; // 11025 Hz is quite fine insterad of 44100
+  dimensions = period / 4; // 11025 Hz is quite fine instead of 44100
   
   //---------------------------
   // Allocation of the mapping & vectors
@@ -105,7 +105,8 @@ elementResult ActiveSomBeatGraph::start()
 	 "and we will be using a color scale of %d values\n"
 	 "In total we will need to allocate %d kB for our neural network\n"
 	 "and %d kB for our input vectors\n",
-	 vectors, dimensions, colors, colors*dimensions/1024,vectors*dimensions/1024);
+	 vectors, dimensions, colors, colors*dimensions/1024,
+	 vectors*dimensions/1024);
   mapping=bpmdj_allocate(colors,signed1*);
   newmapping=bpmdj_allocate(colors,signed4*);
   newmappingcount=bpmdj_allocate(colors,unsigned2);
@@ -123,7 +124,7 @@ elementResult ActiveSomBeatGraph::start()
   pointcolors=bpmdj_allocate(vectors,unsigned1);
   
   //---------------------------
-  // Initialisation with random values
+  // Initialization with random values
 #ifndef SAMPLED_INIT
   for(int c = 0 ; c < colors; c++)
     for(unsigned4 z = 0 ; z < dimensions ; z++)
@@ -137,17 +138,25 @@ elementResult ActiveSomBeatGraph::start()
   for(unsigned4 v = 0 ; v < vectors ; v++)
     {
 #ifdef BEATS
-      unsigned4 pos = v*normalperiod; // this includes all the convertions (44.1 -> 11.025 kHz, stereo->mono, 16b->8bit)
-      // and cancels nicely out to the normalperiod. If we use the understandable arithmetic we ewnd up with 
-      // slightly different positions.
+      unsigned4 pos = v*normalperiod; 
+      /**
+       * This includes all the conversions (44.1 -> 11.025 kHz, stereo->mono, 
+       * 16b->8bit) and cancels nicely out to the normal period. If we use the
+       * understandable arithmetic we end up with slightly different positions.
+       */
 #endif
 #ifdef MEASURES
-      unsigned4 pos = v*normalperiod*4; // this includes all the convertions (44.1 -> 11.025 kHz, stereo->mono, 16b->8bit)
+      /**
+       * This includes all the conversions (44.1 -> 11.025 kHz, stereo->mono, 
+       * 16b->8bit)
+       */
+      unsigned4 pos = v*normalperiod*4; 
 #endif
       // printf("%d - %ld\n",v,v*4*4*dimensions);
       assert(pos<size*2*2);
       fseek(raw,pos,SEEK_SET);
-      signed4 bufsize=dimensions*4;  // 4 because of the downsampling of 4 (which did not happen yet)
+      // 4 because of the down sampling of 4 (which did not happen yet)
+      signed4 bufsize=dimensions*4;
       stereo_sample2 buffer[bufsize];
       long count=readsamples(buffer,bufsize,raw);
       assert(count==bufsize);
@@ -189,13 +198,16 @@ elementResult ActiveSomBeatGraph::start()
     }
 #endif
   
-  // the target map must be signed and be able to accept a total of vectors vectors.
-  // we also want some detail like 
-  // 0-255 for the strength
-  // 0-255 for the distance
-  // vectors is the potential amount of additions
-  // 0-255 for the value we actually have
-  // 
+  /**
+   * The target map must be signed and be able to accept a total of vectors
+   * vectors.
+   *
+   * We also want some detail like 
+   *  0-255 for the strength
+   *  0-255 for the distance
+   * vectors is the potential amount of additions
+   *  0-255 for the value we actually have
+   */ 
   //---------------------------
   // Run an epoch
   int width = colors/2;
@@ -228,7 +240,10 @@ elementResult ActiveSomBeatGraph::start()
 	      bmu=c;
 	  assert(bmu>=0);
 	  pointcolors[v]=bmu;
-	  // B- update the map according to the current learning rate and distance
+	  /**
+	   * B- update the map according to the current learning rate and 
+	   * distance
+	   */
 	  if (lrate)
 	    for(int c = 0 ; c < colors ; c++)
 	      {
@@ -237,8 +252,12 @@ elementResult ActiveSomBeatGraph::start()
 		if (s1)
 		  {
 		    int s2=lrate;
-		    // instead of merging it into the existing map, we create a new target map
-		    // merge(mapping[c],V,s1*s2,dimensions);
+		    /**
+		     * Instead of merging it into the existing map, we create a
+		     * new target map
+		     *
+		     *   // merge(mapping[c],V,s1*s2,dimensions);
+		     */
 		    int strength = s1*s2; // maximum of 255*255
 		    signed4* nm = newmapping[c];
 		    for(unsigned4 z = 0 ; z < dimensions ; z++)
@@ -259,12 +278,14 @@ elementResult ActiveSomBeatGraph::start()
 	  if (!newmappingcount[c]) continue;
 	  sumtype maxll = 255*255*(unsigned8)newmappingcount[c];
 	  assert(maxll<127*255*255*255);
-	  sumtype sumst = newmappingstrength[c]; // the sum of all the strengths together
+	  // the sum of all the strengths together
+	  sumtype sumst = newmappingstrength[c]; 
 	  for(unsigned4 z = 0 ; z < dimensions ; z++)
 	    {
 	      sumtype A = mapping[c][z];  // the original mapping
 	      A*=(maxll-sumst);           // weighted properly
-	      A+=newmapping[c][z];        // summed with the already weighted new mapping
+	      // summed with the already weighted new mapping
+	      A+=newmapping[c][z];       
 #ifdef CHECK_BOUNDARIES
 	      assert(A<127L*256L*256L*256L);
 #endif

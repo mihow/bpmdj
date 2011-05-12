@@ -1,5 +1,4 @@
 CPP             = g++ -g -O3 -Wall
-UIC3            = uic3
 RCC             = rcc
 UIC             = uic-qt4
 MOC             = moc-qt4

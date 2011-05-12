@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__history_cpp__
 #define __loaded__history_cpp__
@@ -96,7 +92,9 @@ void History::mark_as_played(Song *song)
 void History::save_history()
 {
   // ask for filename
-  QString s = QFileDialog::getSaveFileName("","History (*.log)",NULL,"Save Play History","Choose a filename" );
+  QString s = QFileDialog::getSaveFileName("","History (*.log)",NULL,
+					   "Save Play History",
+					   "Choose a filename" );
   if (s.isNull()) return;
   start_cp(filename,s);
 }
@@ -154,12 +152,14 @@ void History::this_is_playing(Song * main_now)
 	  if (Config::ask_mix)
 	    {
 	      bool ok;
-	      QString from_text = t_1->get_title() + "[" + t_1->get_author()+"]" + t_1->get_version();
-	      QString to_text = t_0->get_title() + "[" + t_0->get_author() + "]" + t_0->get_version();
+	      QString from_text = t_1->get_title() + "[" +
+		t_1->get_author()+"]" + t_1->get_version();
+	      QString to_text = t_0->get_title() + "[" + 
+		t_0->get_author() + "]" + t_0->get_version();
 	      QString mixinfo = QInputDialog::getText("How did the mix go ?",
-						      "From : " + from_text + "\n"+
-						      "To: " + to_text + "\n",
-						      QLineEdit::Normal,info,&ok);
+				      "From : " + from_text + "\n"+
+				      "To: " + to_text + "\n",
+				      QLineEdit::Normal,info,&ok);
 	      if (ok) f->comment = strdup(mixinfo);
 	    }
 	}

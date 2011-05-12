@@ -84,7 +84,7 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 75 "ao-syntax.y"
+#line 80 "ao-syntax.y"
 { 
   char           * token;
   s_arg            arg;

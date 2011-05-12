@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__dsp_alsa_cpp__
 #define __loaded__dsp_alsa_cpp__
@@ -62,7 +58,7 @@ void dsp_alsa::internal_unpause()
     Warning("dsp: unpause error: %s",snd_strerror(err));
 }
 
-// the normal write routine without prebuffering...
+// the normal write routine without buffering...
 void dsp_alsa::wwrite(unsigned4 *value)
 {
   int err = 0;
@@ -74,10 +70,10 @@ void dsp_alsa::wwrite(unsigned4 *value)
   assert(err!=-ESTRPIPE);
   if (err==-EPIPE)
     {
-      Warning("underrun occured...");
+      Warning("underrun occurred...");
       err = snd_pcm_prepare(dsp);
       if (err < 0)
-	Error(true,"cant recover from underrun: %s",snd_strerror(err));
+	Error(false,"cant recover from underrun: %s",snd_strerror(err));
       return;
     }
 }
@@ -98,11 +94,12 @@ void dsp_alsa::write(stereo_sample2 value)
 	      assert(err!=-ESTRPIPE);
 	      if (err==-EPIPE)
 		{
-		  Warning("underrun occured...");
+		  Warning("underrun occurred...");
 		  filled = 0;
 		  err = snd_pcm_prepare(dsp);
 		  if (err < 0)
-		    Error(true,"cant recover from underrun: %s",snd_strerror(err));
+		    Error(true,"cant recover from underrun: %s",
+			  snd_strerror(err));
 		  return;
 		}
 	    }
@@ -148,12 +145,8 @@ int dsp_alsa::open(bool ui)
 {
   int err;
   unsigned int buffer_time, period_time;
-  //  snd_pcm_hw_params_t *hparams;
-  snd_pcm_hw_params_t *hparams;
-  snd_pcm_sw_params_t *sparams;
   snd_output_t * output = NULL;
-
-  // attach to something ???? 
+  
   // I don't have a clue why this is necessary, but all demo programs do this
   err = snd_output_stdio_attach(&output,stdout,0);
   if (err < 0 )
@@ -161,6 +154,7 @@ int dsp_alsa::open(bool ui)
       Error(ui,"attaching to stdio didn't succeed: %s",snd_strerror(err));
       return err_dsp;
     }
+  
   // open device
   err = snd_pcm_open(&dsp, arg_dev, SND_PCM_STREAM_PLAYBACK, 0);
   if (err < 0)
@@ -176,21 +170,27 @@ int dsp_alsa::open(bool ui)
   err = snd_pcm_hw_params_any(dsp, hparams);
   if (err<0)
     {
-      Error(ui,"Broken configuration file for pcm : %s",snd_strerror(err));
+      Error(ui,"Broken configuration file for PCM : %s",snd_strerror(err));
       return err_dsp;
     }
   
-  // interleaved reading and writing (in contrast to channel per channel read/write)
-  err = snd_pcm_hw_params_set_access(dsp, hparams, SND_PCM_ACCESS_RW_INTERLEAVED);
+  /**
+   * Interleaved reading and writing (in contrast to channel per channel 
+   * read/write)
+   */
+  err = snd_pcm_hw_params_set_access(dsp, hparams, 
+				     SND_PCM_ACCESS_RW_INTERLEAVED);
   if (err<0)
     {
-      Error(ui,"Unable to set interleaved access to pcm device: %s",snd_strerror(err));
+      Error(ui,"Unable to set interleaved access to PCM device: %s",
+	    snd_strerror(err));
       return err_dsp;
     }
   err = snd_pcm_hw_params_set_format(dsp, hparams, SND_PCM_FORMAT_S16);
   if (err<0)
     {
-      Error(ui,"Unable to set sample format to standard 16 bit: %s",snd_strerror(err));
+      Error(ui,"Unable to set sample format to standard 16 bit: %s",
+	    snd_strerror(err));
       return err_dsp;
     }
   err = snd_pcm_hw_params_set_channels(dsp, hparams, 2);
@@ -208,9 +208,10 @@ int dsp_alsa::open(bool ui)
       return err_dsp;
     }
   if (q != WAVRATE)
-      Warning("dsp: setting dsp speed (%d) failed, resulting rate = %d ",WAVRATE, q);
+      Warning("dsp: setting dsp speed (%d) failed, resulting rate = %d ",
+	      WAVRATE, q);
 
-  // playing latency instellen...
+  // playing latency ....
   period_time = arg_latency * 1000;
   // period_time /=2; // we do this so we can afterward use multiple periods
   buffer_time = period_time *2;
@@ -220,7 +221,8 @@ int dsp_alsa::open(bool ui)
     err = snd_pcm_hw_params_set_buffer_time_near(dsp,hparams,&t,&dir);
     if (err<0)
       {
-	Error(ui,"dsp-alsa: Impossible to set pcm buffer time to %i (%i): %s", buffer_time,t,snd_strerror(err));
+	Error(ui,"dsp-alsa: Impossible to set PCM buffer time to %i (%i): %s", 
+	      buffer_time,t,snd_strerror(err));
 	return err_dsp;
       }
     
@@ -235,20 +237,23 @@ int dsp_alsa::open(bool ui)
     err = snd_pcm_hw_params_set_period_time_near(dsp, hparams,&t,&dir);
     if (err<0)
       {
-	Error(ui,"     impossible to set pcm period time to %i (%i): %s", period_time,t,snd_strerror(err));
+	Error(ui,"     impossible to set PCM period time to %i (%i): %s", 
+	      period_time,t,snd_strerror(err));
 	return err_dsp;
       }
     err = snd_pcm_hw_params_get_period_size(hparams,&period_size,&dir);
     if (err<0)
       {
-	Error(ui,"     ompossible to obtain period data size: %s",snd_strerror(err));
+	Error(ui,"     impossible to obtain period data size: %s",
+	      snd_strerror(err));
 	return err_dsp;
       }
     if (period_size*2 - 1>buffer_size)
       {
-	Error(ui,"The alsa driver cannot allocate sufficiently large buffers due to the "
-	      "large requested latency. (playbuffer size   = %li, "
-	      "total buffer size = %li). Try decreasing the latency.",period_size,buffer_size);
+	Error(ui,"The alsa driver cannot allocate sufficiently large buffers "
+	      "due to the large requested latency. (playbuffer size   = %li, "
+	      "total buffer size = %li). Try decreasing the latency.",
+	      period_size,buffer_size);
 	return err_dsp;
       }
     dir = 0;
@@ -256,21 +261,23 @@ int dsp_alsa::open(bool ui)
   err = snd_pcm_hw_params(dsp,hparams);
   if (err < 0)
     {
-      Error(ui,"unable to set hw parameters for pcm: %s",snd_strerror(err));
+      Error(ui,"unable to set hardware parameters for PCM: %s",
+	    snd_strerror(err));
       return err_dsp;
     }
   
-  // nu moeten we nog de stop & start delays goed zetten (dit zijn de software parameters)
   err = snd_pcm_sw_params_current(dsp,sparams);
   if (err < 0)
     {
-      Error(ui,"unable to determine sw parameters for pcm: %s",snd_strerror(err));
+      Error(ui,"unable to determine software parameters for PCM: %s",
+	    snd_strerror(err));
       return err_dsp;
     }
   err = snd_pcm_sw_params_set_start_threshold(dsp,sparams,buffer_size);
   if (err < 0)
     {
-      Error(ui,"unable to set start to treshold mode: %s",snd_strerror(err));
+      Error(ui,"unable to set start to threshold mode: %s",
+	    snd_strerror(err));
       return err_dsp;
     }
   err = snd_pcm_sw_params_set_avail_min(dsp,sparams,period_size);
@@ -294,7 +301,7 @@ int dsp_alsa::open(bool ui)
 void dsp_alsa::close(bool flush_first)
 {
   if (!dsp) return;
-  // To flush the dsp we want to make sure that everyting that
+  // To flush the dsp we want to make sure that everything that
   // can be played is played. So we add a collection of zeros to
   // make sure a flush occurs.
 #ifdef DEBUG_WAIT_STATES
@@ -312,12 +319,11 @@ void dsp_alsa::close(bool flush_first)
 #endif
   int err = snd_pcm_close(dsp);
   if (err < 0)
-    Warning("cant close pcm device: %s",snd_strerror(err));
+    Warning("cant close PCM device: %s",snd_strerror(err));
 #ifdef DEBUG_WAIT_STATES
   Debug("dsp_alsa::close() finished");
 #endif
   dsp=0;
 }
-
 #endif
 #endif // __loaded__dsp_alsa_cpp__

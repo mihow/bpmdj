@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__bpmcount_cpp__
 #define __loaded__bpmcount_cpp__
@@ -54,7 +50,8 @@ template float8 find_abs_max<float8>(float8*, long);
 
 int main(int argc, char *argv[])
 {
-  printf("bpmcount v"VERSION" (c) Werner Van Belle 2000-2009, all rights reserved\n");
+  printf("bpmcount v"VERSION" (c) Werner Van Belle 2000-2009,"
+	 " all rights reserved\n");
   printf("http://bpmdj.yellowcouch.org/\n");
   printf("_________________________________________________________________\n");
 
@@ -79,7 +76,8 @@ int main(int argc, char *argv[])
 	}
       int fd = fileno(file);
       unsigned4 map_length = fsize(file);
-      stereo_sample2 * audio = (stereo_sample2*)mmap(NULL,map_length,PROT_READ,MAP_SHARED,fd,0);
+      stereo_sample2 * audio = (stereo_sample2*)mmap(NULL,map_length,
+						     PROT_READ,MAP_SHARED,fd,0);
       assert(audio!=MAP_FAILED);
       BpmCounter bc(NULL,audio,map_length/4,44100,startbpm,stopbpm);
       tempo_type result(bc.measure());

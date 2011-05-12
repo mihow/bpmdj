@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__player_config_h__
 #define __loaded__player_config_h__
@@ -37,8 +33,16 @@ class PlayerConfig
   accessors(int,ui_posx,-1);
   accessors(int,ui_posy,-1);
   accessors(QString,core_rawpath,"./"); // goes into the environment
-  accessors(int,player_dsp,0);          // which dsp do we want ?
-  accessors(int,alsa_latency,150);      // 0 = none; 1 = oss; 2 = alsa; 3 = mixed; 4 = jack
+  /**
+   * Which DSP do we want ?
+   * 0 = none; 
+   * 1 = oss; 
+   * 2 = alsa; 
+   * 3 = mixed; 
+   * 4 = jack
+   */
+  accessors(int,player_dsp,0);
+  accessors(int,alsa_latency,150);      
   accessors(bool,alsa_verbose,false);
   accessors(QString, alsa_dev, "hw:0,0");
   accessors(QString, oss_dsp,"/dev/dsp");
@@ -55,8 +59,21 @@ class PlayerConfig
   accessors(QString, jack_dev,"");
   accessors(int,jack_latency,150);
   accessors(bool,jack_verbose,true);
-  // versionh 3.9
+  // version 3.9
   accessors(bool,jack_lowlatency,false);
+  // version 4.0
+  /**
+   * Jack clock mode
+   * 0 - none
+   * 1 - auto
+   * 2 - master
+   * 3 - slave
+   */
+  accessors(int,jack_clock,false);
+  accessors(bool,jack_emittempo,true);
+  accessors(bool,jack_receivetempo,true);
+  accessors(bool,jack_emitposition,true);
+  accessors(bool,jack_receiveposition,true);
   PlayerConfig();
   PlayerConfig(QString configname);
   void load_ui_position(QDialog * dialog);

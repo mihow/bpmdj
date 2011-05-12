@@ -35,25 +35,21 @@ using namespace std;
 //---------------------------------------------------------------
 //                            Scheduling
 //---------------------------------------------------------------
-
 static void * startRunner(void* neglect)
 {
   assert(neglect);
   Runnable &info = *(Runnable*)neglect;
 #ifdef THREAD_LOGGING
   static int threadcount = 0;
-  string name = info->name;
-  printf("Start [%d]: %s\n",threadcount++,name.c_str());
+  int tn=++threadcount;
+  string name = info.name;
+  printf("Start [%d]: %s\n",tn,name.c_str());
 #endif
   info.run(true);
 #ifdef THREAD_LOGGING
-  printf(" Stop: %s\n",name.c_str());
+  printf(" Stop [%d]: %s\n",tn,name.c_str());
+  threadcount--;
 #endif
-  if (info.terminated())
-    {
-      assert(aoPool);
-      aoPool->sunset(info.name);
-    }
   return NULL;
 }
 

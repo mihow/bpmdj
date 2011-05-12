@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__smallhistogram_type_h__
 #define __loaded__smallhistogram_type_h__
@@ -79,13 +75,15 @@ template <int smallhistogram_size> class smallhistogram_type
     }
 };
 
-template <int smallhistogram_size> void smallhistogram_type<smallhistogram_size>::validate_scale()
+template <int smallhistogram_size> 
+void smallhistogram_type<smallhistogram_size>::validate_scale()
 {
   if (isnan(scale) || isinf(scale))
     scale = 0;
 }
 
-template <int smallhistogram_size> void smallhistogram_type<smallhistogram_size>::init(histogram_type * other)
+template <int smallhistogram_size> 
+void smallhistogram_type<smallhistogram_size>::init(histogram_type * other)
 {
   set_scale(other->scale);
   if (other->count<smallhistogram_size)
@@ -102,13 +100,15 @@ template <int smallhistogram_size> void smallhistogram_type<smallhistogram_size>
     }
 }
 
-template <int smallhistogram_size> void smallhistogram_type<smallhistogram_size>::init()
+template <int smallhistogram_size> 
+void smallhistogram_type<smallhistogram_size>::init()
 {
   for(int i = 0 ; i < smallhistogram_size; i++)
     bin[i]=0;
 }
 
-template <int smallhistogram_size> Data smallhistogram_type<smallhistogram_size>::get_data(int version) const
+template <int smallhistogram_size> 
+Data smallhistogram_type<smallhistogram_size>::get_data(int version) const
 {
   Token result;
   result[key_scale]=Float8(scale);

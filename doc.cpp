@@ -69,8 +69,10 @@ int main(int argc,char* argv[])
   fclose(f);
   ofstream out(ofn);
   out << "/****\n"
-    " Borg IV compiled file\n"
-    " Copyright (C) 2006-2007 Werner Van Belle\n"
+    " Data Object compiled file\n"
+    " Copyright (C) 2006-2009 Werner Van Belle\n"
+    " Do not change. Changes might be lost\n"
+    " ------------------------------------------\n"
     "\n"
     " This program is free software; you can redistribute it and/or modify\n"
     " it under the terms of the GNU General Public License as published by\n"

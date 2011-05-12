@@ -33,16 +33,16 @@ using namespace std;
 using namespace std;
 
 /**
- * @brief Atomic non-recursive wiaintg or non-waiting locking.
+ * @brief Atomic non-recursive waiting or non-waiting lock.
  * 
  * The lock class implements an atomic lock through a cmpxchg.
- * It does not provide a counting lock. The mainreason for this is that
+ * It does not provide a counting lock. The main reason for this is that
  * it forces the programmer to think about his locking system.
  * If he needs to avoid locking the same object multiple times then 
  * the performance of the program in general improves.
  * The lock will remember who currently obtained the lock through a string
  * that must be passed when locking
- * @see AutoLock for a handy oneliner.
+ * @see AutoLock for a handy one-liner.
  */
 class Lock
 {
@@ -68,7 +68,7 @@ public:
    * be a deadlock. I believe this annoyance forces the programmer to think and
    * improve his program. If wait is true then the call will try for
    * 60s to acquire the lock. If that fails, it will assert itself.
-   * if wait is false, the lock return true or false depending on a sucessful
+   * if wait is false, the lock return true or false depending on a successful
    * acquisition.
    */
   void wait_lock(string w);
@@ -85,7 +85,7 @@ public:
 /**
  * @brief Helper class to lock an object within a certain scope.
  * 
- * The Synchronized(Lock) macro aill allocate an AutoLock in the current scope.
+ * The Synchronized(Lock) macro will allocate an AutoLock in the current scope.
  * As soon as the control flow goes out of scope, the lock will automatically 
  * be released. E.g
  * Synchronized(active-object) will lock the object
@@ -118,7 +118,8 @@ public:
   }
 };
 
-#define Synchronized_(a,b,c) AutoLock tmp_auto_locker(a,#a #b)
+#define DamnPreprocessor(a) #a
+#define Synchronized_(a,b,c) AutoLock tmp_auto_locker(a,#a "_at_" b DamnPreprocessor(c))
 #define Synchronized(a) Synchronized_(a,__FILE__, __LINE__)
 
 #endif // __loaded__lock_h__

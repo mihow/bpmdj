@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__index_h__
 #define __loaded__index_h__
@@ -29,7 +25,7 @@ using namespace std;
 #include "spectrum-type.h"
 #include "echo-property.h"
 #include "composition-property.h"
-#include "rythm-property.h"
+#include "rhythm-property.h"
 #include "capacity.h"
 #include "om-data.h"
 
@@ -52,7 +48,12 @@ class AlbumField
 {
  public:
   QString name;    // name of the album
-  int     nr;      // position of the song on the album (-1 if no album is known)
+
+  /**
+   * Position of the song on the album (-1 if no album is known)
+   */
+  int nr;
+
   AlbumField(int, QString);
   AlbumField(Data &data)
     {
@@ -106,21 +107,51 @@ class Index
   unsigned4         index_cue_x;
   unsigned4         index_cue_c;
   unsigned4         index_cue_v;
-  QString           index_file;           // the mp3 file in the music/ directory
-  QString           index_tags;           // a alphabetically sorted tag list
-  QString           index_md5sum;         // the md5 sum of the mp3
-  QString           index_time;           // the normal playing time of the song
-  spectrum_type   * index_spectrum;       // the bark frequencies
-  echo_property     index_histogram;     // the histogram of the SFFT at the different bark bands
-  rythm_property    index_rythm;         // the slice rotated SFFT of measures
-  composition_property index_composition; // the autocorrelation of the composition of the song
+  /**
+   * The mp3 file in the music/ directory
+   */
+  QString           index_file;      
+  /**
+   * An alphabetically sorted tag list
+   */
+  QString           index_tags;      
+  /**
+   * MD5 sum of the mp3
+   */
+  QString           index_md5sum; 
+  /**
+   * Normal playing time of the song
+   */
+  QString           index_time;      
+  /**
+   * The bark frequencies
+   */
+  spectrum_type   * index_spectrum;  
+  /**
+   * The histogram of the SFFT at the different bark bands
+   */
+  echo_property     index_histogram; 
+  /**
+   * the slice rotated SFFT of the average measure
+   */
+  rhythm_property   index_rhythm;    
+  /**
+   * The autocorrelation of the composition of the song
+   */
+  composition_property index_composition; 
   // information only available from v2.2 on
   QString           title;
   QString           author;
   QString           remix;
   QString           version;
-  HistoryField   ** prev;         // contains all the songs after which this song has been played
-  HistoryField   ** next;         // contains all the songs before which this song has been played
+  /**
+   * Contains all the songs after which this song has been played
+   */
+  HistoryField   ** prev;         
+  /**
+   * Contains all the songs before which this song has been played
+   */
+  HistoryField   ** next;         
   AlbumField     ** albums;       // list of albums containing this song
   // information only available from v2.6 on
  public:
@@ -129,52 +160,79 @@ class Index
   sample4_type      index_mean;  // mean value
   power_type        index_power; // rms
   // information availble from v2.9 and above
-  capacity_type     index_disabled_capacities;  // disabled capacities for this song
+  /**
+   * Disabled capacities for this song
+   */
+  capacity_type     index_disabled_capacities;  
 
   //----------------------------------
   // creation, loading and storing
   //----------------------------------
  public:
-  // initalizes empty index
+  /** 
+   * Initalizes empty index
+   */
   Index();             
-  // reads index from disk
+  /**
+   * Reads index from disk
+   */
   Index(QString);  
-  // deep destroy of object
+  /**
+   * Deep destroy of object
+   */
   ~Index();          
-  // initializes the index by reading the data from the passed filename
+  /**
+   * Initializes the index by reading the data from the passed filename
+   */
   void read_idx(QString);
-  // writes the index to the file called meta_filename
+  /**
+   * Writes the index to the file called meta_filename
+   */
   void write_idx();
-  // writes the index to a new filename, repalces meta_filename
+  /**
+   * Writes the index to a new filename, replaces meta_filename first
+   */
   void write_idx(QString t) 
     {
       meta_filename = t; 
       write_idx();
     };
-  // returns the place where this index is stored in
+  /**
+   * Returns the place where this index is stored in
+   */
   QString get_storedin()
     {
       return meta_filename;
     };
-  // sets the place where this index is stored in
+  /**
+   * Sets the place where this index is stored in
+   */
   void set_storedin(QString t)
     {
       meta_filename = t;
     };
-  // returns whether the data has changed
+  /**
+   * Returns whether the data has changed
+   */
   bool changed()                
     {
       return meta_changed; 
     };
-  // marks the index as 'changed'
+  /**
+   * Marks the index as 'changed'
+   */
   void set_changed()            
     {
       meta_changed = true; 
     };
  private:
-  // initializes the object with empty values
+  /**
+   * Initializes the object with empty values
+   */
   void init();
-  // removes all the self allcoated objects
+  /**
+   * Removes all the self allcoated objects
+   */
   void free();
   
   //--------------------------
@@ -256,7 +314,10 @@ class Index
   QString get_display_title();
   // will append remix author and version if possible
   QString readable_description();
-  // will try to figure out the name, remix, author and version from the song filename
+  /**
+   * Tries to figure out the name, remix, author and version from the song 
+   * filename
+   */
   bool set_title_author_remix(QString filename);
 
   //-------------------
@@ -469,19 +530,19 @@ class Index
     };
 
   //--------------------------
-  // rythm
+  // rhythm
   //--------------------------
  public:
-  rythm_property   get_rythm() 
-    {
-      return index_rythm; 
-    };
-  void             set_rythm(rythm_property r) 
-    {
-      index_rythm = r ; 
-      meta_changed = true; 
-    } ;
-
+  rhythm_property get_rhythm() 
+  {
+    return index_rhythm; 
+  };
+  void set_rhythm(rhythm_property r) 
+  {
+    index_rhythm = r ; 
+    meta_changed = true; 
+  } ;
+  
   //--------------------------
   // composition
   //--------------------------
@@ -521,10 +582,13 @@ public:
 
 
 /**
- * Will create a new unique index filename and refer
- * to the song, thereby tagging it as New
+ * Creates a new unique index filename and refer to the song, thereby tagging
+ * it as New
  */ 
 Index * createNewIndexFor(QString song, QString directory);
-// will prefix the extention of filename with a number until a unique filename is found
+/**
+ * Prefixs the extention of filename with a number until a unique filename is
+ * found
+ */
 QString findUniqueName(QString directory, QString filename);
 #endif // __loaded__index_h__

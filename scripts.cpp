@@ -1,5 +1,5 @@
 /****
- BpmDj v3.8: Free Dj Tools
+ BpmDj v4.0: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -10,13 +10,9 @@
  (at your option) any later version.
  
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ but without any warranty; without even the implied warranty of
+ merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 #ifndef __loaded__scripts_cpp__
 #define __loaded__scripts_cpp__
@@ -31,10 +27,12 @@ using namespace std;
 #include <sys/wait.h>
 #include <sys/time.h>
 #include <sys/resource.h>
+#include <stdarg.h>
 #include "index.h"
 #include "scripts.h"
-#include "stdarg.h"
 #include "memory.h"
+#include "bpmplay.h"
+#include "overseer.h"
 
 char *getRawFilename(const char * rawpath, const char * n)
 {
@@ -78,69 +76,6 @@ void dumpAudio(const char* fname, unsigned4 *buffer, long length)
 }
 
 
-void spawn(const char* script)
-{
-  if (!bpmdj_fork())
-    {
-      execute(script);
-      /**
-       * If we use exit instead of _exit our own static data structures
-       * will be destroyed !
-       */
-      _exit(100);
-    }
-}
-
-bool execute(const char* script)
-{
-  Debug("Started %s",script);
-  int status = system(script);
-  if  (status == -1)
-    { 
-      Error(false,"couldn't execute [fork failed] %s",script);
-      return false;
-    }
-  if (WIFEXITED(status))
-    {
-      status = WEXITSTATUS(status);
-      return status==0;
-    }
-  if (WIFSIGNALED(status))
-    {
-      Error(false,"couldn't execute [signal] %s",script);
-      return false;
-    }
-  if (WCOREDUMP(status))
-    {
-      Error(false,"couldn't execute [core dumped] %s",script);
-      return false;
-    }
-  Fatal("Unknown exit status %d: %s",status,script);
-  return false;
-}
-
-bool vexecute(const char* script, ...)
-{
-  char toexecute[1024];
-  va_list ap;
-  va_start(ap,script);
-  vsprintf(toexecute,script,ap);
-  va_end(ap);
-  return execute(toexecute);
-}
-
-int bpmdj_fork()
-{
-  int fork_thread;
-  while((fork_thread=fork())==-1)
-    {
-      Debug("Could not fork process. Trying again in 10 seconds...");
-      fflush(stdout);
-      sleep(10);
-    }
-  return fork_thread;
-}
-
 FILE* openScriptFile(const char* name)
 {
   FILE * script = fopen(name,"wb");
@@ -177,7 +112,7 @@ void Info(const char* script, ...)
   char toexecute[1024];
   va_list ap;
   va_start(ap,script);
-  vsprintf(toexecute,script,ap);
+  vsnprintf(toexecute,1024,script,ap);
   va_end(ap);
   Log("Information: ", toexecute);
 };
@@ -187,7 +122,7 @@ void Warning(const char* script, ...)
   char toexecute[1024];
   va_list ap;
   va_start(ap,script);
-  vsprintf(toexecute,script,ap);
+  vsnprintf(toexecute,1024,script,ap);
   va_end(ap);
   Log("Warning: ", toexecute);
 };
@@ -197,7 +132,7 @@ void Debug(const char* script, ...)
   char toexecute[1024];
   va_list ap;
   va_start(ap,script);
-  vsprintf(toexecute,script,ap);
+  vsnprintf(toexecute,1024,script,ap);
   va_end(ap);
   Log("Debug: ", toexecute);
 };
@@ -207,7 +142,7 @@ void Fatal(const char* script, ...)
   char toexecute[1024];
   va_list ap;
   va_start(ap,script);
-  vsprintf(toexecute,script,ap);
+  vsnprintf(toexecute,1024,script,ap);
   va_end(ap);
   Log("Fatal: ", toexecute);
   _exit(100);
@@ -218,7 +153,7 @@ void Error(bool ui, const char* script, ...)
   char toexecute[1024];
   va_list ap;
   va_start(ap,script);
-  vsprintf(toexecute,script,ap);
+  vsnprintf(toexecute,1024,script,ap);
   va_end(ap);
   Log("Error: ", toexecute);
   if (ui)
@@ -230,15 +165,17 @@ void Remote(const char* script, ...)
   char toexecute[1024];
   va_list ap;
   va_start(ap,script);
-  vsprintf(toexecute,script,ap);
+  vsnprintf(toexecute,1024,script,ap);
   va_end(ap);
   Log("Remote: ", toexecute);
 };
 
-// The escaping necessary for ssh to work is ridicoulous..
-// An ordinary containement within " ... " does not work, so we must
-// escape every character on its own. Especially the & is important
-// because this would otherwise spawn a background procses.
+/**
+ * The escaping necessary for ssh to work is ridiculous..
+ * An ordinary containment within " ... " does not work, so we must
+ * escape every character on its own. Especially the & is important
+ * because this would otherwise spawn a background process.
+ */
 char * escape(const char * in)
 {
   assert(in);
@@ -259,40 +196,39 @@ char * escape(const char * in)
   return strdup(escaped);
 }
 
-int start_bpmdj_raw(const char* where, const char* file)
-{
-  char * w = escape(where);
-  char * f = escape(file);
-  int  err = vexecute("bpmdjraw %s %s",w,f);
-  bpmdj_deallocate(w);
-  bpmdj_deallocate(f);
-  return err;
-}
-
 void start_mkdir(const char* dir)
 {
   char * d = escape(dir);
-  vexecute("mkdir -p -- %s",d);
-  free(d);
+  char a[2048],b[2048];
+  sprintf(a,"Making directory %s",dir);
+  sprintf(b,"mkdir -p -- %s",d);
+  bpmdj_deallocate(d);
+  exec(b,a);
 }
 
 void start_cp(const char* from, const char* to)
 {
   char * a = escape(from);
   char * b = escape(to);
-  vexecute("cp -- %s %s",a,b);
+  char c[2048],d[2048];
+  sprintf(c,"Copying %s to %s",from,to);
+  sprintf(d,"cp -- %s %s",a,b);
   bpmdj_deallocate(a);
   bpmdj_deallocate(b);
+  exec(d,c);
 }
 
 int start_mv(const char* from, const char* to)
 {
   char * a = escape(from);
   char * b = escape(to);
-  int err = vexecute("mv -i -- %s %s",a,b);
+  char c[2048];
+  char d[2048];
+  sprintf(c,"Moving %s to %s",from,to);
+  sprintf(d,"mv -i -- %s %s",a,b);
   bpmdj_deallocate(a);
   bpmdj_deallocate(b);
-  return err;
+  return execute(c,d);
 }
 
 void start_rm(const char* what)
@@ -311,19 +247,62 @@ void removeAllRaw(const char* d)
 
 void removeAllLog()
 {
-  execute("rm -- /tmp/*.bpmdj.log");
+  execute("Removing logs","rm -- /tmp/*.bpmdj.log");
 }
 
-int start_umount_cdrom(bool eject)
+int bpmdjraw(bool synchronous, const char* fname, const char* where)
 {
-  int err = execute("umount "CDROM);
-  if (eject) execute("eject "CDROM);
-  return err;
+  char *w=escape(where);
+  char *f=escape(fname);
+  int pid;
+  char cmd[2048];
+  sprintf(cmd,"bpmdjraw %s %s",w,f);
+  bpmdj_deallocate(w);
+  bpmdj_deallocate(f);
+  if (synchronous)
+    pid=execute("BpmDjRaw",cmd);
+  else 
+    pid=spawn(cmd,"BpmDjRaw");
+  return pid;
 }
 
-int start_mount_cdrom()
+/**
+ * Two wrappers to make command line arguments easier
+ */
+ExitStatus vexec(const char* description, const char* script, ...)
 {
-  int err = execute("mount "CDROM);
-  return err;
+  char toexecute[1024];
+  va_list ap;
+  va_start(ap,script);
+  vsnprintf(toexecute,1024,script,ap);
+  va_end(ap);
+  return exec(toexecute,description);
+}
+
+/**
+ * Two wrappers which will simply return true or false
+ */
+bool execute(const char* description, const char* script)
+{
+  ExitStatus status=exec(script,description);
+  if (!status.exited())
+    {
+      char* err=status.error();
+      assert(err);
+      Error(false,"couldn't execute %s",err);
+      free(err);
+      return false;
+    }
+  return status.exit()==0;
+}
+
+bool vexecute(const char* script, ...)
+{
+  char toexecute[1024];
+  va_list ap;
+  va_start(ap,script);
+  vsnprintf(toexecute,1024,script,ap);
+  va_end(ap);
+  return execute(toexecute,toexecute);
 }
 #endif // __loaded__scripts_cpp__

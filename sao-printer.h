@@ -27,5 +27,5 @@ using namespace std;
 #include "stdarg.h"
 typedef vector<string> outputbuf;
 void print(outputbuf& where, const char* script, ...);
-
+void print(outputbuf& where, string script, ...);
 #endif // __loaded__sao_printer_h__
