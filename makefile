@@ -1,6 +1,6 @@
-VERSION        = 0.6
+VERSION        = 0.7
 MAJOR_VERSION  = 0
-MINOR_VERSION  = 6
+MINOR_VERSION  = 7
 
 AUTOGEN_PROGRAM=$(shell autoopts-config --autogen)
 AUTOGEN_DATADIR=$(shell autoopts-config --pkgdatadir)
@@ -24,8 +24,8 @@ all: cbpm-period cbpm-player
 cbpm-player: cbpm-playeropts.o cbpm-player.o 
 	gcc $^ $(CFLAGS) $(LDFLAGS) -DMAJOR_VERSION=$(MAJOR_VERSION) -DMINOR_VERSION=$(MINOR_VERSION) -o $@
 
-cbpm-period: cbpm-period.c
-	gcc $< $(CFLAGS) $(LDFLAGS) -DMAJOR_VERSION=$(MAJOR_VERSION) -DMINOR_VERSION=$(MINOR_VERSION) -o $@
+cbpm-period: cbpm-periodopts.o cbpm-period.c
+	gcc $^ $(CFLAGS) $(LDFLAGS) -DMAJOR_VERSION=$(MAJOR_VERSION) -DMINOR_VERSION=$(MINOR_VERSION) -o $@
 
 %.c: %.def
 	$(AUTOGEN_PROGRAM) $(AUTOGEN_FLAGS) $^
@@ -36,7 +36,7 @@ cbpm-period: cbpm-period.c
        
 clean:
 	rm -f *.log *.tex *.tex.dep *.toc *.dvi *.aux *.raw toplot.dat plot.ps
-	rm -f cbpm-player cbpm-period cbpm-playeropts.[ch] *.o
+	rm -f cbpm-player cbpm-period cbpm-playeropts.[ch] cbpm-periodopts.[ch] *.o
 	rm -fr BeatMixing
 
 very-clean: clean 
@@ -64,8 +64,14 @@ package:
 	mkdir cBpmDj-$(VERSION)/music
 	mkdir cBpmDj-$(VERSION)/index
 	cp -f * cBpmDj-$(VERSION); exit 0
+	make all
+	strip cbpm-player 
+	strip cbpm-period
+	cp cbpm-player cBpmDj-$(VERSION)
+	cp cbpm-period cBpmDj-$(VERSION)
 	tar -cvzf cBpmDj-$(VERSION).tgz cBpmDj-$(VERSION)
 	mv *.tgz ..
+	make very-clean
 
 BeatMixing.html: BeatMixing.tex
 

@@ -1,6 +1,4 @@
 - subdirectories toelaten
-- pause/play (rekening houdend met latency tijd)
-- manual updaten aangaande command line switches
 - logfile doc schrijven
 - eens testen of een kwadratische fout nog betere resultaten geeft of niet.
 - text schrijven over het begin van de 8 maten...

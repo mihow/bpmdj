@@ -19,61 +19,41 @@
 ****/
 
 /*-------------------------------------------
- *         Todo
- *-------------------------------------------
- * - playing < zero check when going forward/backward
- * - pause/play
-/*-------------------------------------------
  *         Headers
  *-------------------------------------------*/
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
-#include <sys/types.h>
-#include <signal.h>
-#include <sys/utsname.h>
-#include <unistd.h>
 #include <termios.h>
-#include <mntent.h>
-#include <getopt.h>
-#include <errno.h>
-#include <stdio.h>
-#include <assert.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include <fcntl.h>
-#include <time.h>
 #include <linux/soundcard.h>
-#include <math.h>
+#include <signal.h>
+#include <time.h>
+#include <assert.h>
 #include "cbpm-playeropts.h"
 
 /*-------------------------------------------
  *         Constants & Variables
  *-------------------------------------------*/
 #define            WAVRATE  (22050)
-#define            inbufsiz (32*1024)
-              char *dsp=NULL;
-              long dmabufsiz=0;
+#define            wave_bufsize (32*1024)
   signed long long targetperiod;
   signed long long currentperiod;
   signed long long normalperiod;
   signed long long latency;
   signed long long y,x=0;
-               int start=1;
                int stop=0;
-       static char *songname=NULL;
+               int paused=0;
 
 /*-------------------------------------------
- *         File output oprations
+ *         Clock oprations
  *-------------------------------------------*/
-int outfile;
 static clock_t starttick;
-void startdmaplaying()
+void clock_start()
 {
    starttick=times(NULL);
 }
 
-signed long long guessdmaplaycount()
+signed long long clock_ticks()
 {
    long long ticks=(long long)times(NULL)-(long long)starttick;
    long long answer=ticks*(long long)WAVRATE/(long long)CLK_TCK;
@@ -81,30 +61,60 @@ signed long long guessdmaplaycount()
    return answer;
 }
 
-signed long long checklatency()
+/*-------------------------------------------
+ *         Dsp operations
+ *-------------------------------------------*/ 
+static              int dsp;
+static signed long long dsp_writecount=0;
+
+void dsp_start()
 {
-   
+   dsp_writecount=0;
 }
 
-void open_outfile()
+signed long long dsp_playcount()
+{
+   count_info cnt;
+   ioctl(dsp,SNDCTL_DSP_GETOPTR,&cnt);
+   return cnt.bytes/4;
+}
+
+void dsp_pause()
+{
+   ioctl(dsp,SNDCTL_DSP_RESET);
+   while(paused);
+   dsp_writecount=0;
+}
+
+void dsp_write(unsigned long *value)
+{
+   dsp_writecount++;
+   write(dsp,value,4);
+}
+
+signed long long dsp_latency()
+{ 
+   return dsp_writecount-dsp_playcount();
+}
+
+void dsp_open()
 {
    int p;
    double latency;
    audio_buf_info ab;
-   outfile=open(dsp,O_WRONLY,0);
-   if (!outfile)
+   dsp=open(OPT_ARG(DEVICE),O_WRONLY,0);
+   if (!dsp)
      {
 	printf("unable to open /dev/dsp\n");
 	exit(2);
      }
    p=16;
-   ioctl(outfile,SOUND_PCM_WRITE_BITS,&p);
+   ioctl(dsp,SOUND_PCM_WRITE_BITS,&p);
    p=2;
-   ioctl(outfile,SOUND_PCM_WRITE_CHANNELS,&p);
+   ioctl(dsp,SOUND_PCM_WRITE_CHANNELS,&p);
    p=WAVRATE;
-   ioctl(outfile,SOUND_PCM_WRITE_RATE,&p);
-   ioctl(outfile,SNDCTL_DSP_GETOSPACE,&ab);
-   dmabufsiz=ab.bytes/4;
+   ioctl(dsp,SOUND_PCM_WRITE_RATE,&p);
+   ioctl(dsp,SNDCTL_DSP_GETOSPACE,&ab);
    if (HAVE_OPT(DEBUGLATENCY))
      {
 	latency=(double)ab.bytes;
@@ -112,37 +122,33 @@ void open_outfile()
 	latency/=(double)WAVRATE;
 	latency*=1000.0;
 	printf("Dsp device has %d bytes: latency = %g ms\n",ab.bytes,latency);
-	startdmaplaying();
+	dsp_start();
+	clock_start();
 	sleep(1);
-	printf("Clock gives %d ticks (should be around %d)\n",(long)guessdmaplaycount(),WAVRATE);
+	printf("Clock gives %d ticks (should be around %d)\n",(long)clock_ticks(),WAVRATE);
      }
 }
 
-void flushdsp()
+void dsp_flush()
 {
-   ioctl(outfile,SNDCTL_DSP_SYNC);
+   ioctl(dsp,SNDCTL_DSP_SYNC);
 }
 
-signed long long dmaplaycount()
+void dsp_close()
 {
-   count_info cnt;
-   ioctl(outfile,SNDCTL_DSP_GETOPTR,&cnt);
-   return cnt.bytes/4;
+   close(dsp);
 }
 
-int dmabufferpos()
-{
-   count_info cnt;
-   ioctl(outfile,SNDCTL_DSP_GETOPTR,&cnt);
-   /* printf("bufferpos = %d\n",cnt.ptr/4);
-    */
-   return cnt.ptr/2;
-}
 
 /*-------------------------------------------
  *         File input oprations
  *-------------------------------------------*/
-unsigned long fsize(FILE* wtf)
+         char * wave_name=NULL;
+unsigned long   wave_buffer[wave_bufsize];
+         FILE * wave_file;
+unsigned long   wave_bufferpos=-wave_bufsize;
+
+static unsigned long fsize(FILE* wtf)
 {
    unsigned long res;
    fseek(wtf,0,SEEK_END);
@@ -151,42 +157,312 @@ unsigned long fsize(FILE* wtf)
    return res;
 }
 
-unsigned long bufferin[inbufsiz];
-FILE*         infile;
-unsigned long bufferinpos=-inbufsiz;
-
-void open_infile(char* fname)
+void wave_open(char* fname)
 {
-   infile=fopen(fname,"rb");
-   if (!infile) 
+   wave_name=fname;
+   wave_file=fopen(fname,"rb");
+   if (!wave_file) 
      {
 	printf("unable to open %s\n",fname);
 	exit(3);
      }
 }
 
-unsigned long readat(unsigned long pos)
+void wave_close()
 {
-   if (pos-bufferinpos>=inbufsiz)
-     {
-	bufferinpos=pos;
-//	printf("Seeking to position %d k\n",pos*4/1024);
-	fseek(infile,pos*4,SEEK_SET);
-	fread(bufferin,4,inbufsiz,infile);
-     }
-   return bufferin[pos-bufferinpos];
+   fclose(wave_file);
 }
 
-unsigned long readmax()
+unsigned long wave_max()
 {
-   return fsize(infile)/4;
+   return fsize(wave_file)/4;
+}
+
+int wave_read(unsigned long pos, unsigned long *val)
+{
+   if (pos-wave_bufferpos>=wave_bufsize)
+     {
+	if (pos>wave_max()) return -1;
+	wave_bufferpos=pos;
+	fseek(wave_file,pos*4,SEEK_SET);
+	fread(wave_buffer,4,wave_bufsize,wave_file);
+     }
+   *val=wave_buffer[pos-wave_bufferpos];
+   return 0;
+}
+
+
+/*-------------------------------------------
+ *         Synth operations
+ *-------------------------------------------*/
+        unsigned long long  lfo_phase=0;
+          signed long long  lfo_period=0;
+typedef unsigned long       (*_lfo_)(unsigned long x);
+                     _lfo_  lfo_do;
+
+void lfo_set(char* name, _lfo_ l, unsigned long long freq, unsigned long long phase)
+{
+   lfo_phase=phase;
+   lfo_period=4*currentperiod/freq;
+   lfo_do=l;
+   printf("Switched to %s lfo at 4M/%d\n",name,freq);
+}
+
+unsigned long lfo_no(unsigned long x)
+{
+   return x;
+}
+
+typedef union
+{
+   unsigned long int value;
+   struct 
+     {
+	signed short int left;
+	signed short int right;
+     } leftright;
+} longtrick;
+
+unsigned long lfo_volume(unsigned long x, signed long multiplierleft, signed long divisorleft, signed long multiplierright,signed long divisorright)
+{
+   longtrick lt;
+   signed long int left;
+   signed long int right;
+   lt.value=x;
+   left=lt.leftright.left;
+   right=lt.leftright.right;
+   left*=multiplierleft;
+   right*=multiplierright;
+   left/=divisorleft;
+   right/=divisorright;
+   lt.leftright.left=left;
+   lt.leftright.right=right;
+   return lt.value;
+}
+
+unsigned long lfo_pan(unsigned long x)
+{
+   signed long long diff;
+   signed long quart;
+   diff=(signed long long)y-(signed long long)lfo_phase;
+   diff=diff%lfo_period;
+   quart=lfo_period/4;
+   /* at position 0, centre */
+   if (diff<quart)
+     return lfo_volume(x,quart-diff,quart,1,1);
+   /* at position 0.25, right */
+   diff-=quart;
+   if (diff<quart)
+     return lfo_volume(x,diff,quart,1,1);
+   /* at position 0.5 centre */
+   diff-=quart;
+   if (diff<quart)
+     return lfo_volume(x,1,1,quart-diff,quart);
+   /* at position 0.75 left */
+   diff-=quart;
+   return lfo_volume(x,1,1,diff,quart);
+}
+
+
+unsigned long lfo_saw(unsigned long x)
+{
+   signed long long diff;
+   diff=(signed long long)y-(signed long long)lfo_phase;
+   diff=diff%lfo_period;
+   return lfo_volume(x,diff,lfo_period,diff,lfo_period);
+}
+
+unsigned long lfo_break(unsigned long x)
+{
+   signed long long diff;
+   diff=(signed long long)y-(signed long long)lfo_phase;
+   diff=diff%lfo_period;
+   if (diff>lfo_period*95/100) 
+     return 0;
+   else 
+     return x;
+}
+
+unsigned long lfo_revsaw(unsigned long x)
+{
+   signed long long diff;
+   diff=(signed long long)y-(signed long long)lfo_phase;
+   diff=diff%lfo_period;
+   diff=lfo_period-diff;
+   return lfo_volume(x,diff,lfo_period,diff,lfo_period);
+}
+
+void lfo_init()
+{
+   lfo_do=lfo_no;
+}
+
+/*-------------------------------------------
+ *         Program logic
+ *-------------------------------------------*/
+void copyright();
+void help();
+
+void changetempo(signed long long period)
+{
+   /* change tempo to period
+    * - the current x should remain the same
+    * x = y * normalperiod / currentperiod
+    * y = x * currentperiod / normalperiod
+    */
+   currentperiod = period;
+   y = x * currentperiod / normalperiod;
+}
+
+void printpos(char* text)
+{
+   unsigned long m=wave_max();
+   printf("%s: %d % (%d/%d/%d)\n",text,(long)(y*100/m),(long)dsp_playcount()/1024,(long)y/1024,(long)m/1024);
+}
+
+void rewindto(unsigned long long qm, signed long long mes)
+{
+   unsigned long long gotopos=qm-currentperiod*mes;
+   signed long long fixit=(y%currentperiod)-(gotopos%currentperiod);
+   printf("Started at marked beat -%d measures\n",mes);
+   y=gotopos+fixit; 
+}
+
+void useraction(int neglect)
+{
+   static unsigned long long playing_mark=0;     // the mark at the beginning (playing end) of the Q
+   static unsigned long long queue_mark=0;       // the mark at the end of the Q
+   static unsigned long long dma_mark=0;         // the dma time mark
+   static unsigned long      time_mark=0;        // the clock time mark
+   static   signed long long tempo_fade=0;       // 0 = targetperiod; 10 = normalperiod
+   int c=0,nr=read(0,&c,1);
+   switch (c)
+     {
+      case  0  :  return;
+	/* forward backward movement */
+      case '*' :  y+=currentperiod/(8);  break;
+      case '\n':  y+=currentperiod/(4);  break;
+      case '+' :  y-=currentperiod/(4*32);  break;
+      case '-' :  y+=currentperiod/(4*32);  break;
+      case '1' :  y-=currentperiod;  printpos("-1 Measure");  break;
+      case '2' :  y+=currentperiod;  printpos("+1 Measure");  break;
+      case '4' :  y-=currentperiod*4; printpos("-4 Measure"); break;
+      case '5' :  y+=currentperiod*4; printpos("+4 Measure"); break;
+      case '7' :  y-=currentperiod*8; printpos("-8 Measure"); break;
+      case '8' :  y+=currentperiod*8; printpos("+8 Measure"); break;
+	/* lfo's */
+      case 'n' :  lfo_set("No",lfo_no,4,y-dsp_latency());  break;
+      case 's' :  lfo_set("Saw",lfo_saw,8,y-dsp_latency());  break;
+      case 'p' :  lfo_set("Pan",lfo_pan,8,y-dsp_latency());  break;
+      case 'S' :  lfo_set("Saw",lfo_saw,16,y-dsp_latency());  break;
+      case 'P' :  lfo_set("Pan",lfo_pan,16,y-dsp_latency());  break;
+      case 'b' :  lfo_set("Break",lfo_break,1,y-dsp_latency());  break;
+      case 'r' :  lfo_set("Reverse saw",lfo_revsaw,8,y-dsp_latency());  break;
+      case 'R' :  lfo_set("Reverse saw",lfo_revsaw,16,y-dsp_latency());  break;
+        /* tempo changes */
+      case '>' :
+      case '0' :  if (tempo_fade<10) tempo_fade=tempo_fade+1;
+	          printf("Tempo fade %d\n",tempo_fade);
+  	          changetempo(targetperiod+(normalperiod - targetperiod)*tempo_fade/10); break;
+      case '<' :  if (tempo_fade>0) tempo_fade=tempo_fade-1;
+ 	          printf("Tempo fade %d\n",tempo_fade);
+	          changetempo(targetperiod+(normalperiod - targetperiod)*tempo_fade/10); break;
+      case '.' :  changetempo(normalperiod);  printf("Tempo normal\n");  break;
+      case ',' :  changetempo(targetperiod);  printf("Tempo target\n");  break;
+      case 'l' :  changetempo(currentperiod/1.05946);  break;
+      case 'k' :  changetempo(currentperiod*1.05946);  break;
+	/* marking and jumping */
+      case '[' :
+      case '/' :  dma_mark=dsp_playcount();
+	          queue_mark=y;
+	          playing_mark=queue_mark-dsp_latency();
+	          printf("Marking master position\n");
+	          break;
+      case ']' :  y-=dsp_playcount()-dma_mark;
+	          printf("Fixing slave beat\n"); break;
+      case ' ' :  if (!paused) y-=dsp_latency();
+	          paused=~paused; break;
+      case '9' :  if (paused)
+	            {
+		       paused=0;
+		       y=playing_mark;
+		    }
+	          else rewindto(queue_mark,0);
+	          break;
+      case '6' :  rewindto(queue_mark,8); break;
+      case '3' :  rewindto(queue_mark,16); break;
+	/* misc */
+      case 't' :  if (time_mark)
+	            printf("Seconds elapsed sinds mark %d\n",time(NULL)-time_mark);
+	          else
+	            {
+		       printf("Time marked\n");
+		       time_mark=time(NULL);
+		    }
+	          break;
+      case '{' :  printf("Back to the beginning, normal tempo\n");
+	          x=y=0; changetempo(normalperiod); break;
+      case '%' :  printf("Song: %s\n",wave_name);  printpos("Current position: "); break;
+      case '?' :
+      case 'h' :  help(); break;
+      case 'q' :  stop=1;  break;
+      case 'c' :  copyright();  break;
+      default  :
+     }
+   
+   if (y<0)
+     {
+	printf("y underflow, setting to zero\n");
+	y=0;
+     }
+   useraction(neglect);
+}
+
+void read_write_loop()
+{
+   signed   long long selfplaycount=-latency;
+   signed   long long latencycheck;
+   unsigned long      value[1];
+   lfo_init();
+   dsp_start();
+   clock_start();
+   while(!stop)
+     {
+	// wait for pause
+	if (paused) 
+	  {
+	     dsp_pause();
+	     clock_start();
+	     selfplaycount=-latency;
+	  }
+	// calculate value
+	x=y*normalperiod/currentperiod;
+	if (wave_read(x,value)<0)
+	  {
+	     printf("End of song, going back 4 measures\n");
+	     y-=4*currentperiod;
+	     wave_read(x,value);
+	  };
+	value[0]=lfo_do(value[0]);
+	y=y+1;
+	// wait before writing
+	while(selfplaycount>clock_ticks()) ;
+	selfplaycount++;
+	// write value
+	dsp_write(value);
+     }
+   if (HAVE_OPT(DEBUGLATENCY))
+     {
+	latencycheck=dsp_playcount();
+	dsp_flush();
+	printf("Actual playing latency = %d ms\n",(long)((clock_ticks()-latencycheck)*(long long)1000/(long long)WAVRATE));
+     }
 }
 
 /*-------------------------------------------
  *         Terminal routines  
  *-------------------------------------------*/
-void useraction(int neglect);
-void rl_ttyset (int Reset)
+void terminal_blurb(int Reset)
 {
    long i;
    static struct termios old;
@@ -205,226 +481,14 @@ void rl_ttyset (int Reset)
    signal(SIGURG, useraction);
 }
 
-void printbar(signed short int val)
+void terminal_start()
 {
-   signed long res;
-   res=((long)val)*40/32768;
-   res+=40;
-   while(res>0)
-     {
-	printf(" ");
-	res--;
-     }
-   printf("|\n");
+   terminal_blurb(0);
 }
 
-/*-------------------------------------------
- *         Program logic
- *-------------------------------------------*/
-void copyright();
-void help();
-
-void changetempo(signed long long period)
+void terminal_stop()
 {
-   /* change tempo to period
-    * - the current x should remain the same
-    * x = y * normalperiod / currentperiod
-    * y = x * currentperiod / normalperiod
-    */
-//   printf("Tempo change to %d\n",period);
-   currentperiod = period;
-   y = x * currentperiod / normalperiod;
-}
-
-void printpos(char* text)
-{
-   unsigned long m=readmax();
-   printf("%s: %d % (%d/%d/%d)\n",text,(long)(y*100/m),(long)dmaplaycount()/1024,(long)y/1024,(long)m/1024);
-}
-
-void useraction(int neglect)
-{
-   static unsigned long marktime=0;
-   static unsigned long long markat=0;
-   static signed long long tempo_fade=0; // 0 = targetperiod; 10 = normalperiod
-   int c,nr;
-   c=0;
-   nr=read(0,&c,1);
-   if (c==0) return;
-   if (c=='q') 
-     stop=1;
-   else if (c=='+')
-     y-=currentperiod/(4*32);
-   else if (c=='-')
-     y+=currentperiod/(4*32);
-   else if (c=='*')
-     y+=currentperiod/(8);
-   else if (c=='\n')
-     y+=currentperiod/(4);
-   else if (c=='1')
-     {
-	y-=currentperiod;
-	printpos("-1 Measure");
-     }
-   else if (c=='2')
-     {
-	y+=currentperiod;
-	printpos("+1 Measure");
-     }
-   else if (c=='4')
-     {
-	y-=currentperiod*4;
-	printpos("-4 Measure");
-     }
-   else if (c=='5')
-     {
-	y+=currentperiod*4;
-	printpos("+4 Measure");
-     }
-   else if (c=='7')
-     {
-	y-=currentperiod*8;
-	printpos("-8 Measure");
-     }
-   else if (c=='8')
-     {
-	y+=currentperiod*8;
-	printpos("+8 Measure");
-     }
-   else if (c=='%')
-     {
-	printf("Song: %s\n",songname);
-	printpos("Current position: ");
-     }
-   else if (c=='[')
-     {
-	markat=dmaplaycount();
-	printf("Marking master beat\n");
-     }
-   else if (c==']')
-     {
-	unsigned long long fixit;
-	unsigned long long measures;
-	markat=dmaplaycount()-markat;
-	fixit=markat;
-	printf("Fixing slave beat\n");
-	y-=fixit;
-     }
-   else if (c=='/')
-     {
-	printf("Marking target beat;\n");
-	markat=y;
-     }
-   else if (c=='9')
-     {
-	signed long long fixit;
-	unsigned long long gotopos=markat;
-	fixit=(y%currentperiod)-(gotopos%currentperiod);
-	printf("Started at target beat (fixit = %d)\n",(signed long)fixit);
-	y=gotopos+fixit;
-     }
-   else if (c=='6')
-     {
-	signed long long fixit;
-	unsigned long long gotopos=markat-currentperiod*8;
-	fixit=(y%currentperiod)-(gotopos%currentperiod);
-	printf("Started at target beat -8 measures (fixit = %d)\n",(signed long)fixit);
-	y=gotopos+fixit;
-     }
-   else if (c=='3')
-     {
-	signed long long fixit;
-	unsigned long long gotopos=markat-currentperiod*16;
-	fixit=(y%currentperiod)-(gotopos%currentperiod);
-	printf("Started at target beat -16 measures (fixit = %d)\n",(signed long)fixit);
-	y=gotopos+fixit;
-     }
-   else if (c=='>' || c=='0')
-     {
-	if (tempo_fade<10) tempo_fade=tempo_fade+1;
-	printf("Tempo fade %d\n",tempo_fade);
-	
-	changetempo(targetperiod+(normalperiod - targetperiod)*tempo_fade/10);
-     }
-   else if (c=='<')
-     {
-	if (tempo_fade>0) tempo_fade=tempo_fade-1;
-	printf("Tempo fade %d\n",tempo_fade);
-	changetempo(targetperiod+(normalperiod - targetperiod)*tempo_fade/10);
-     }
-   else if (c=='.')
-     {
-	changetempo(normalperiod);
-	printf("Tempo normal\n");
-     }
-   else if (c==',')
-     {
-	changetempo(targetperiod);
-	printf("Tempo target\n");
-     }
-   else if (c=='l')
-     {
-	changetempo(currentperiod/1.05946);
-     }
-   else if (c=='k')
-     {
-	changetempo(currentperiod*1.05946);
-     }
-   else if (c=='t')
-     {
-	if (marktime)
-	  printf("Seconds elapsed sinds mark %d\n",time(NULL)-marktime);
-	else
-	  {
-	     printf("Time marked\n");
-	     marktime=time(NULL);
-	  }
-     }
-   else if (c=='{')
-     {
-	printf("Back to the beginning, normal tempo\n");
-	y=0;
-	x=0;
-	changetempo(normalperiod);
-     }
-   else if (c=='c')
-     {
-	copyright();
-     }
-   else if (c=='?' || c=='h')
-     {
-	help();
-     }
-   if (y<0)
-     {
-	printf("y underflow, setting to zero\n");
-	y=0;
-     }
-   useraction(neglect);
-}
-
-void fillbuffer()
-{
-   signed long long latencycheck;
-   signed long long selfplaycount=-latency;
-   unsigned long value[1];
-   startdmaplaying();
-   if (start) start=0;
-   while(!stop)
-     {
-	x=y*normalperiod/currentperiod;
-	value[0]=readat(x);
-	y++;
-	while(selfplaycount>guessdmaplaycount()) ;
-	selfplaycount++;
-	write(outfile,value,4);
-     }
-   if (HAVE_OPT(DEBUGLATENCY))
-     {
-	latencycheck=guessdmaplaycount();
-	flushdsp();
-	printf("Actual playing latency = %d ms\n",(long)((guessdmaplaycount()-latencycheck)*(long long)1000/(long long)WAVRATE));
-     }
+   terminal_blurb(1);
 }
 
 /*-------------------------------------------
@@ -452,11 +516,11 @@ void help()
 	  "     7 : -8M                   8 : +8M\n"
 	  "     + : -1/32N                - : +1/32N    \n"
 	  "     * : -1/2B           <ENTER> : +1B \n"
-	  "2) Sliding\n"
-	  "     [ : mark 'startbeat' in monitorred song\n"
-	  "     ] : mark 'startbeat' in playing song + set monitorred song to difference with 'startbeat'\n"
-	  "     / : Set song position mark\n"
-	  "     9 : Go to position mark\n"
+	  "2) Positioning\n"
+	  "     p or ' ' : pause\n"
+	  "     [ or / : mark position in song\n"
+	  "     ] : set monitorred song to _difference_ with mark\n"
+	  "     9 : Go to position mark or unpause at mark\n"
 	  "     6 : Go to position mark -8M\n"
 	  "     3 : Go to position mark -16M\n"
 	  "3) Tempo: change it to normal\n"
@@ -468,13 +532,16 @@ void help()
 	  "     < : Tempostep to target tempo\n"
 	  "     { : Beginning of song at normal tempo\n"
 	  "4) Misc\n"
-	  "     t : first press: marks time\n"
-	  "       : second press: shows time difference\n"
+	  "     t : marks/shows time\n"
 	  "     % : current position and name\n"
 	  "     q : quit the program\n"
 	  "     h or ? : This help\n"
 	  "     c : Copyrigth notice\n"
-	  );
+	  "5) Lfo\n"
+	  "     s or S : slow or fast saw (///)\n"
+	  "     r or R : slow or fast reversed saw (\\\\\\)\n"
+	  "     p or P : slow or fast pan lfo\n"
+	  "     b : break (----_)\n");
    line();
 }
 
@@ -482,6 +549,7 @@ int main(int argc, char *argv[])
 {
    int optct;
    copyright();
+   assert(sizeof(signed short int)==2);
    assert(sizeof(int)==4);
    assert(sizeof(long)==4);
    assert(sizeof(long long)==8);
@@ -489,14 +557,12 @@ int main(int argc, char *argv[])
    optct=optionProcess(&cbpmplayerOptions,argc,argv);
    if (argc-optct!=1) USAGE(EXIT_FAILURE);
    if (!HAVE_OPT(NORMAL)) USAGE(EXIT_FAILURE);
-   dsp=OPT_ARG(DEVICE);
    currentperiod=targetperiod=normalperiod=atoi(OPT_ARG(NORMAL))*4;
    if (HAVE_OPT(TARGET))
      currentperiod=targetperiod=atoi(OPT_ARG(TARGET))*4;
    latency=atoi(OPT_ARG(LATENCY));
    latency*=WAVRATE;
    latency/=1000;
-   rl_ttyset(0);
    if (WAVRATE==22050)
      {
 	currentperiod/=2;
@@ -514,13 +580,11 @@ int main(int argc, char *argv[])
 	printf(" speed(%g)\n",(double)normalperiod/(double)currentperiod);
      }
    // open dsp device
-   open_outfile(dsp);
-   // open input file
-   open_infile(songname=argv[optct]);
-   // read file and copy to dsp through a DDA
-   fillbuffer();
-   // close everything
-   close(outfile);
-   fclose(infile);
-   rl_ttyset(1);
+   terminal_start();
+   dsp_open();
+   wave_open(argv[optct]);
+   read_write_loop();
+   dsp_close();
+   wave_close();
+   terminal_stop();
 }

@@ -1,0 +1,28 @@
+Autogen Definitions options;
+prog_name  = cbpmperiod;
+prog_title = "cBpm-period";
+long_opts;
+
+flag = {
+  name = verbose;
+  descrip = "Verbose";
+  value = v;
+  };
+
+flag = {
+  name = to;
+  descrip = "To postion (%)";
+  value = t;
+  arg_type = number;
+  arg_default = 100;
+  };
+
+flag = {
+  name = from;
+  descrip = "From position (%)";
+  value = f;
+  arg_type = number;
+  arg_default = 0;
+  };
+
+argument=string;  

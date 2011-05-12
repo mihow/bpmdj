@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
+#include "cbpm-periodopts.h"
 
 unsigned char *audio;
 unsigned long audiosize;
@@ -33,18 +34,6 @@ unsigned long stopbpm=160;
 unsigned long startshift=0;
 unsigned long stopshift=0;
 long int bufsiz=32*1024;
-
-void drawbar(unsigned char val)
-{
-   signed long res;
-   res=((long)val)*80/256;
-   while(res>0)
-     {
-	printf(" ");
-	res--;
-     }
-   printf("|\n");
-}
 
 unsigned long phasefit(long i)
 {
@@ -72,7 +61,7 @@ long fsize(FILE * f)
 
 void copyright()
 {
-   printf("# cBpmDj Period v0.5, Copyright (c) 2001 Werner Van Belle\n");
+   printf("# cBpmDj Period v%d.%d, Copyright (c) 2001 Werner Van Belle\n",MAJOR_VERSION,MINOR_VERSION);
    printf("# This software is distributed under the GPL2 license. See Gpl2.txt for details\n");
    printf("# See BeatMixing.ps for details how to use the program.\n");
    printf("# --------------------------------------------------------------------\n");
@@ -81,28 +70,18 @@ void copyright()
 int main(int argc, char *argv[])
 {
    FILE *raw;
+   int optct;
    signed short buffer[bufsiz];
    long count,pos,i,redux,startpercent=0,stoppercent=100;
    copyright();
-   if (argc<2)
-     {
-	printf("Expecting 1, 2 or 3 argument(s)\n");
-	exit(1);
-     }
+   optct=optionProcess(&cbpmperiodOptions,argc,argv);
+   if (argc-optct!=1) USAGE(EXIT_FAILURE);
+   startpercent=OPT_VALUE_FROM;
+   stoppercent=OPT_VALUE_TO;
    raw=fopen(argv[1],"rb");
-   if (argc>=3)
+   if (!raw)
      {
-	startpercent=atoi(argv[2]);
-	printf("# Starting from position %ld\n",startpercent);
-     }
-   if (argc>=4)
-     {
-	stoppercent=atoi(argv[3]);
-	printf("# Stopping at position %ld\n",stoppercent);
-     }
-   if (!raw) 
-     {
-	printf("unable to open %s\n",argv[1]);
+	printf("Error: Unable to open %s\n",argv[1]);
 	exit(3);
      }
    // read complete file shrunken down into memory
@@ -110,13 +89,16 @@ int main(int argc, char *argv[])
    startpercent=(long)((long long)audiosize*(long long)startpercent/(long long)100);
    stoppercent=(long)((long long)audiosize*(long long)stoppercent/(long long)100);
    audiosize=stoppercent-startpercent;
-   printf("# Reading from %ldk to %ldk\n",startpercent/1024,stoppercent/1024);
    audiosize/=(4*(44100/audiorate));
-   printf("# Audiosize = %dk\n",audiosize/1024);
+   if (HAVE_OPT(VERBOSE)) 
+     {
+	printf("# Reading from %ldk to %ldk\n",startpercent/1024,stoppercent/1024);
+	printf("# Audiosize = %dk\n",audiosize/1024);
+     }
    audio=malloc(audiosize+1);
    if (!audio)
      {
-	printf("unable to allocate audio buffer\n");
+	printf("Error: unable to allocate audio buffer\n");
 	exit(4);
      }
    pos=0;
@@ -131,7 +113,6 @@ int main(int argc, char *argv[])
 	     right=abs(buffer[i+1]);
 	     mean=(left+right)/2;
 	     redux=abs(mean)/128;
-//	     drawbar(redux);
 	     if (pos+i/(2*(44100/audiorate))>=audiosize) break;
 	     assert(pos+i/(2*(44100/audiorate))<audiosize);
 	     audio[pos+i/(2*(44100/audiorate))]=(unsigned char)redux;

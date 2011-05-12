@@ -1,4 +1,12 @@
+0.7:
+  - rewind 4mes at end of song and keep on looping
+  - added lfo's (panning, break, saw, revsaw)
+  - added pausing and unpausing
+  - added option parsing for cbpm-period
+  - cleanup of the code
 0.6:
+  - added option parsing for cpm-player
+  - added latency support
   - changed name from DivineIntervention to BpmDj
   - project webpage added at sourceforge.net
   - decoding happens in background and in a smaller format 44100/16/2 is
