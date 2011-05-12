@@ -1,6 +1,16 @@
+- automatisch opstellen van playlist aan de hand van een aantal maten:
+  - tempo, spectrum, dcolor
+  - ook toelaten van een overgang van het ene nummer naar het andere te berekenen
+- zien wat er mis is met de .inf nummers
+- this is the mainsong in orde brengen...
+- dsp parameters die niet gezet kunnen worden moeten gemeld worden
+- fix de kleuren legende in about box
+- add pictures hier en daar
+- als de .raw file niet geschreven kan worden moet dit eveneens gemeld worden
+- als de .raw file al bestaat voordat we hem gaan creeeren moet hier ook iets mee aangevangen worden
+
 kbpm-play:
   - als de file al bestaat en we moeten correleren onmiddelijk binnen 10BPM bounds zoeken
-  - toelaten dat vanalles en nog wat geediteerd wordt binnen deze window, waaronder ook de indexname ??
   - eerst een volledige high energy scan doen over gans het tempo bereik
   - target tempo zetten laat de percent indicator niet volgen
   - als tempo = inf deftige errormelding geven
@@ -17,25 +27,22 @@ kbpm-play:
 documentation:
   - logfile doc schrijven
   - documentation for the browser
-  - text schrijven over begin phrases
 
 kbpm-dj:
   - nieuw tempo zou geen 132.4 moeten zijn maar iets gelijk unk
   - in de renamer box kunnen we normaal een aantal routines buiten haakskes brengen
   - nog eens een memorycheck erop los laten...
   - een player moet geindiceerd worden in een kleur
-    - gray: invalid
-    - blue: playing
-    - yellow: this is the main playing song
     - green: free
   - setup on a remote machine should be possible.
+  - downloaden van mp3's automatically
   - nfs-mounten ? Copying the same data ??
   - multiple players (asus, cubical, tnm etc ...) & automatically setup player on other machine
   - play songs at fixed given tempo instead of the tempo of the next song
   - renamer: de zaken voor de - beschouwen als author and naar achter moven 
 
   - startup of program:
-    - loading box: 
+    - loading box:
        - informatie laten geven over the played files
        - informatie laten geven over de configuratiefile die gelezen wordt
        - indien er .raw files achtergebleven zijn deze laten zien met de mogelijkheid tot deletion
@@ -43,9 +50,6 @@ kbpm-dj:
        - DSP-parameters verzamelen wanneer gestart wordt
        - Directories maken als het enigzins mogelijk is
        - Laten selecteren van de directory waar de interesante file steken
-
-  - there is still a race condition in the process-manager when a signal arrives. This should be solved in a decent way. When doing so we can immediatelly add a number of extra players.
-
   - Memory stuff:
     - remove duplicate strings (see qstring-factory.h/.cpp
     - version count should be a number instead of a QString

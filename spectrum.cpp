@@ -18,44 +18,38 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#include <fcntl.h>
-#include <stdlib.h>
-#include <malloc.h>
-#include <unistd.h>
-#include <dirent.h>
-#include <assert.h>
+#include <qstring.h>
 #include <stdio.h>
-#include <qlistview.h>
-#include <qlabel.h>
-#include <qprogressbar.h>
-#include "kbpm-index.h"
-#include "kbpm-dj.h"
-#include "qsong.h"
-#include "config.h"
 #include "spectrum.h"
 
-SongIndex::SongIndex(Loader *l, QListView *lv) : 
-  DirectoryScanner(".idx")
-{ 
-  view = lv;
-  loader = l;
-  total_files = 0;
-  loader->progressBar1->setTotalSteps(Config::file_count);
-  scan(IndexDir,IndexDir);
-  loader->progressBar1 -> setProgress(total_files);
-  lastSpectrum();
-};
+float scales[24] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
+int sums[24] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+static int spectra=0;
 
-
-void SongIndex::checkfile(const QString prefix, const QString  filename)
+void newSpectrum(QString spectrum)
 {
-  new QSong(filename,prefix,view);
-  ++total_files;
-  if (total_files%10 == 0)
+  if (spectrum.isNull()) return;
+  spectra++;
+  for(int i =0 ;i <24;i++)
     {
-      loader->readingFile -> setText(filename);
-      loader->progressBar1 -> setProgress(total_files);
-      app->processEvents();
+      char letter = spectrum.at(i).latin1();
+      int value = letter- 'a';
+      sums[i]+=value;
     }
 }
 
+void lastSpectrum()
+{
+  printf("Spectrum Scale\n");
+  for(int i =0 ;i<24;i++)
+    {
+      scales[i]=(float)spectra/(float)sums[i];
+      // deze dip in de curve is noodzakelijk om de 
+      // middenfrequenties anders te kwoteren...
+      float factor = ((i-12.0)/12.0);
+      factor*=factor;
+      factor+=5;
+      scales[i]*=factor;
+      //      printf("%d  %g\n",i,scales[i]);
+    }
+}

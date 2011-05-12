@@ -26,15 +26,15 @@ class QSong;
 class QListView;
 
 class SongIndex:
-  public DirectoryScanner,
-  public Loader
+  public DirectoryScanner
 {
   public: 
     int total_files;
   protected:
+    Loader * loader;
     virtual void checkfile(const QString prefix, const QString filename);
     QListView* view;
   public:
-    SongIndex(QListView * lv);
+    SongIndex(Loader * l, QListView * lv);
     void add(QSong* newsong);
 };

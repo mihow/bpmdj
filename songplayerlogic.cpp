@@ -397,12 +397,14 @@ void SongPlayerLogic::targetStep()
 
 void SongPlayerLogic::nudgeCueBack()
 {
-   cue_shift("Shifting cue 1/32 note backward",-normalperiod/128);
+  cue_shift("Shifting cue 1/32 note backward",-WAVRATE/80);
+  // normalperiod/128);
 }
 
 void SongPlayerLogic::nudgeCueForward()
 {
-   cue_shift("Shifting cue 1/32 note forward",+normalperiod/128); 
+  cue_shift("Shifting cue 1/32 note forward",+WAVRATE/80); 
+  // normalperiod/128
 }
 
 void SongPlayerLogic::nudgeCueBack8M()

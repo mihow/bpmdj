@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>672</width>
-            <height>76</height>
+            <width>703</width>
+            <height>148</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -27,7 +27,7 @@
         <property name="name">
             <cstring>unnamed</cstring>
         </property>
-        <widget class="QProgressBar" row="1" column="0">
+        <widget class="QProgressBar" row="3" column="0" rowspan="1" colspan="2">
             <property name="name">
                 <cstring>progressBar1</cstring>
             </property>
@@ -35,7 +35,7 @@
                 <bool>true</bool>
             </property>
         </widget>
-        <widget class="QLayoutWidget" row="0" column="0">
+        <widget class="QLayoutWidget" row="2" column="0" rowspan="1" colspan="2">
             <property name="name">
                 <cstring>layout1</cstring>
             </property>
@@ -45,7 +45,10 @@
                 </property>
                 <widget class="QLabel">
                     <property name="name">
-                        <cstring>textLabel1</cstring>
+                        <cstring>loading</cstring>
+                    </property>
+                    <property name="enabled">
+                        <bool>false</bool>
                     </property>
                     <property name="sizePolicy">
                         <sizepolicy>
@@ -56,12 +59,15 @@
                         </sizepolicy>
                     </property>
                     <property name="text">
-                        <string>Loading </string>
+                        <string>3. Loading </string>
                     </property>
                 </widget>
                 <widget class="QLabel">
                     <property name="name">
                         <cstring>readingFile</cstring>
+                    </property>
+                    <property name="enabled">
+                        <bool>false</bool>
                     </property>
                     <property name="text">
                         <string>............</string>
@@ -71,6 +77,39 @@
                     </property>
                 </widget>
             </hbox>
+        </widget>
+        <widget class="QLabel" row="0" column="0">
+            <property name="name">
+                <cstring>programs</cstring>
+            </property>
+            <property name="enabled">
+                <bool>false</bool>
+            </property>
+            <property name="text">
+                <string>1. Checking programs/directories and files</string>
+            </property>
+        </widget>
+        <widget class="QLabel" row="1" column="0">
+            <property name="name">
+                <cstring>config</cstring>
+            </property>
+            <property name="enabled">
+                <bool>false</bool>
+            </property>
+            <property name="text">
+                <string>2. Reading configuration</string>
+            </property>
+        </widget>
+        <widget class="QLabel" row="4" column="0" rowspan="1" colspan="2">
+            <property name="name">
+                <cstring>scanning</cstring>
+            </property>
+            <property name="enabled">
+                <bool>false</bool>
+            </property>
+            <property name="text">
+                <string>4. Scanning Spectrum and Tags</string>
+            </property>
         </widget>
     </grid>
 </widget>

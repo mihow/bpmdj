@@ -38,7 +38,7 @@ extern unsigned long      index_cue_z;
 extern unsigned long      index_cue_x;
 extern unsigned long      index_cue_c;
 extern unsigned long      index_cue_v;
-
+extern           char   * index_spectrum;
        void     index_init       ();
        void     index_setversion ();
        void     index_write      ();

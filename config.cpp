@@ -35,15 +35,28 @@ int  Config::authorDecay = 5;
 bool Config::color_range = true;
 bool Config::color_played = true;
 bool Config::color_authorplayed = true;
+bool Config::color_ondisk = true;
+bool Config::color_cues = true;
+bool Config::color_dcolor = true;
+bool Config::color_spectrum = true;
+bool Config::limit_ondisk = true;
+bool Config::limit_nonplayed = false;
+bool Config::limit_uprange = false;
+bool Config::limit_downrange = false;
+bool Config::limit_indistance = false;
+bool Config::limit_inspectrum = false;
+
 QString Config::playCommand1 = "kbpm-play -d /dev/dsp2 -x /dev/mixer1 -p 0 0   -m \"%s\" \"%s\"";
 QString Config::playCommand2 = "kbpm-play -d /dev/dsp1 -x /dev/mixer  -p 0 400 -m \"%s\" \"%s\"";
+QString Config::playCommand3 = "rbpm-play -m \"%s\" \"%s\"";
+QString Config::playCommand4 = "";
 
 void Config::save()
 {
   QFile f(".kbpmdj");
   f.open(IO_WriteOnly);
   QDataStream s(&f);
-  s << (Q_UINT16)0xBDE0;
+  s << (Q_UINT16)0xBDE1;
   s << (Q_UINT16)file_count;
   s << (Q_UINT16)yellowTime;
   s << (Q_UINT16)orangeTime;
@@ -52,9 +65,21 @@ void Config::save()
   s << (Q_INT8)color_range;
   s << (Q_INT8)color_played;
   s << (Q_INT8)color_authorplayed;
+  s << (Q_INT8)color_ondisk;
+  s << (Q_INT8)color_cues;
+  s << (Q_INT8)color_dcolor;
+  s << (Q_INT8)color_spectrum;
   s << (Q_INT8)authorDecay;
+  s << (Q_INT8)limit_ondisk;
+  s << (Q_INT8)limit_nonplayed;
+  s << (Q_INT8)limit_uprange;
+  s << (Q_INT8)limit_downrange;
+  s << (Q_INT8)limit_indistance;
+  s << (Q_INT8)limit_inspectrum;
   s << playCommand1;
   s << playCommand2;
+  s << playCommand3;
+  s << playCommand4;
 }
 
 void Config::load()
@@ -82,6 +107,33 @@ void Config::load()
 	  s >> playCommand1;
 	  s >> playCommand2;
 	}
+      if (w == 0xBDE1)
+	{
+	  printf("Loading config v1.7\n");
+	  s >> w; file_count = w;
+	  s >> w; yellowTime = w;
+	  s >> w; orangeTime = w;
+	  s >> w; redTime = w;
+	  s >> w; filterBpm = w;
+	  s >> b; color_range = b;
+	  s >> b; color_played = b;
+	  s >> b; color_authorplayed = b;
+	  s >> b; color_ondisk = b;
+	  s >> b; color_cues = b;
+	  s >> b; color_dcolor = b;
+	  s >> b; color_spectrum = b;
+	  s >> b; authorDecay = b;
+	  s >> b; limit_ondisk = b;
+	  s >> b; limit_nonplayed = b;
+	  s >> b; limit_uprange = b;
+	  s >> b; limit_downrange = b;
+	  s >> b; limit_indistance = b;
+	  s >> b; limit_inspectrum = b;
+	  s >> playCommand1;
+	  s >> playCommand2;
+	  s >> playCommand3;
+	  s >> playCommand4;
+	}
       else
 	printf("Wrong config file format\n");
     }
@@ -93,6 +145,8 @@ void Config::openUi()
   PreferencesDialog preferences(NULL,NULL,TRUE);
   preferences.playerCommand1->setText(playCommand1);
   preferences.playerCommand2->setText(playCommand2);
+  preferences.playerCommand3->setText(playCommand3);
+  preferences.playerCommand4->setText(playCommand4);
   sprintf(tmp,"%d",yellowTime);
   preferences.yellowTime->setText(tmp);
   sprintf(tmp,"%d",orangeTime);
@@ -104,6 +158,8 @@ void Config::openUi()
     {
       playCommand1=preferences.playerCommand1->text();
       playCommand2=preferences.playerCommand2->text();
+      playCommand3=preferences.playerCommand3->text();
+      playCommand4=preferences.playerCommand4->text();
       yellowTime=atoi(preferences.yellowTime->text());
       orangeTime=atoi(preferences.orangeTime->text());
       redTime=atoi(preferences.redTime->text());

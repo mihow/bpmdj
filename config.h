@@ -40,8 +40,20 @@ class Config
     static bool color_range;
     static bool color_played;
     static bool color_authorplayed;
+    static bool color_ondisk;
+    static bool color_cues;
+    static bool color_dcolor;
+    static bool color_spectrum;
+    static bool limit_ondisk;
+    static bool limit_nonplayed;
+    static bool limit_uprange;
+    static bool limit_downrange;
+    static bool limit_indistance;
+    static bool limit_inspectrum;
     static QString playCommand1;
     static QString playCommand2;
+    static QString playCommand3;
+    static QString playCommand4;
  public:
     static void openUi();
     static void save();

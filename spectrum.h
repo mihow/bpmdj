@@ -18,29 +18,7 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#include "config.h"
-
-class ProcessManager
-{
-  public:
-    // WVB -- TOFIX: maybe we should make this whole class static 
-    int monitorpid;
-    int died_pid1;
-    int died_pid2;
-    static double mainTempo;
-    static QSong* playingInMain;
-    static QSong* playingInMonitor;
-  private:
-    int monitorPlayCommand;
-    double monitorTempo;
-    void processDied(int pid);
-    SongSelectorLogic* selector;
-  public:
-    ProcessManager(SongSelectorLogic *sel);
-    void clearMonitor();
-    void switchMonitorToMain();
-    void setMainSong(QSong * song);
-    void checkSignals();
-    void startSong(QSong *song);
-    void startSongPlayer3(QSong *song);
-};
+class QString;
+extern float scales[24];
+void newSpectrum(QString spectrum);
+void lastSpectrum();

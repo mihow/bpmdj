@@ -1,0 +1,14 @@
+Fetching the directory structure from a remote machine
+  1. indien eerste keer. Create at target machine a file listing.done
+     with . on the first line. Indien niet eerste keer, zorg dat de
+     file listing.done in de homedirectory komt. (bv johanf.listing
+     -> listing.done)
+  2. cp fetchdirstruct naar die machine
+  3. go to targetdirectory and enter ~/fetchdirstruct
+  4. cp createdirstruct back to local machine and execute this
+  5. cp listing.done naar local machine and rename to something treffelijks
+  6. Gebruik de renamer box om alle files een consistente naam te geven. 
+
+Verwijder de dubbele .mp3 filename.
+Download diegene die nog niet gekend zijn.
+

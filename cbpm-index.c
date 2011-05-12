@@ -111,6 +111,7 @@ char   * index_remark;
 char   * index_tags;
 char   * index_md5sum;
 char   * index_time;
+char   * index_spectrum;
  int     index_changed;
  int     index_bpmcount_from;
  int     index_bpmcount_to;
@@ -141,6 +142,7 @@ void index_init()
    index_cue_c=0;
    index_cue_v=0;
    index_cue=0;
+   index_spectrum=NULL;
 }
 
 void index_setversion()
@@ -162,6 +164,7 @@ void index_free()
    if (index_tags) free(index_tags);
    if (index_md5sum) free(index_md5sum);
    if (index_time) free(index_time);
+   if (index_spectrum) free(index_spectrum);
 }
 
 void index_write()
@@ -194,6 +197,7 @@ void index_write()
    if (index_md5sum) fprintf(f,"md5sum : %s\n",index_md5sum);
    if (index_remark) fprintf(f,"remark   : %s\n",index_remark);
    if (index_time) fprintf(f,"time : %s\n",index_time);
+   if (index_spectrum) fprintf(f,"spectrum : %s\n",index_spectrum);
    fclose(f);
 }
 
@@ -263,21 +267,22 @@ void index_read(const char* indexn)
 	else if(strcmp(field,"cue-c")==0) index_cue_c=atol(value);
 	else if(strcmp(field,"cue-v")==0) index_cue_v=atol(value);
 	else if(strcmp(field,"md5sum")==0) index_md5sum=strldup(value,end-value);
+	else if(strcmp(field,"spectrum")==0) index_spectrum=strldup(value,end-value);
 	else if(strcmp(field,"tag")==0) 
 	  {
-	     if (!index_tags) index_tags=strldup(value,end-value);
-	     else 
-	       {
-		  char tmp[1000];
-		  sprintf(tmp,"%s %s",index_tags,value);
-		  free(index_tags);
-		  index_tags=strdup(tmp);
-	       }
+	    if (!index_tags) index_tags=strldup(value,end-value);
+	    else 
+	      {
+		char tmp[1000];
+		sprintf(tmp,"%s %s",index_tags,value);
+		free(index_tags);
+		index_tags=strdup(tmp);
+	      }
 	  }
 	else 
 	  {
-	     printf("Warning: Unknown field %s\n",field);
-	     continue;
+	    printf("Warning: Unknown field %s\n",field);
+	    continue;
 	  }
      }
    // finish file access
@@ -286,16 +291,17 @@ void index_read(const char* indexn)
    // check for old non-versioned files
    if (!index_version)
      {
-	char * y;
-	int idx;
-	printf("Error: too old index file %s\n",basename(index_readfrom));
-	exit(40);
+       char * y;
+       int idx;
+       printf("Error: too old index file %s\n",basename(index_readfrom));
+       exit(40);
      }
    if (index_period==-1)
      {
        printf("Error: no valid period given\n");
        exit(40);
      }
+
    // check for old versions running 22050 samplerate
    if ((strcmp(index_version,"BpmDj v1.5")==0)
        ||(strcmp(index_version,"BpmDj v1.4")==0)

@@ -1,3 +1,12 @@
+1.7:
+  ksel  ~ my machine was stolen, i had to move back to sourceforge	  
+  ksel  + added similar name scanner	 
+  ksel  + started with writing documentation for the programs	 
+  ksel  + added better loading information
+  ksel  - fixed bugs in loading and saving of the configuration file	 
+  ksel  + added measurement of sound color/spectrum
+  ksel  - mpeg3 decoding happens with nice value of 20
+  ksel  - race condition in signal handling. Solved.
 1.6: 
   ksel  + added showing of cues and length of a song
   ksel  + added legend, restart button, up/down tempo range selection	 

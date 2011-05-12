@@ -21,7 +21,7 @@
 #include "config.h"
 
 class QSong: 
-  public QListViewItem
+    public QListViewItem
 {
   public:
     QString song_title;
@@ -33,6 +33,12 @@ class QSong:
     QString song_file;
     QString song_time;
     QString song_md5sum;
+    QString song_spectrum;
+    short int hue;
+    short int sat;
+    QString spectrum_string;
+    QString distance_string;
+    int     color_distance;
     bool    song_played;
     bool    song_ondisk;
     int     has_cues;
@@ -45,6 +51,8 @@ class QSong:
     QSong(QString filename, QString currentpath, QListView* parent);
     bool obtainTitleAuthor(char * fulltitle);
     void reread();
+    void getColors();
+    bool getDistance();
     bool containsTag(const QString which);
     virtual void paintCell(QPainter *p, const QColorGroup &cg, int col, int wid, int align);
     virtual QString text(int i) const;

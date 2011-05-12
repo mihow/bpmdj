@@ -1,3 +1,17 @@
+This program is a fully automatic BPM counter ! Given an MP3 file it will
+automatically ind the tempo. The package contains a bpm-counter, a song-player
+which uses this information to play a song at a different tempo and a file 
+selector that offers the possibility to manage a large amount of mp3's.
+
+Probably, you will need to compile the package yourself. To do so, read 
+compile.txt. If you encounter any difficulties please contact me.
+
+WHEN USING THE PROGRAM BE SURE THAT YOUR PATH INCLUDES THE CURRENT DIRECTORY,
+OR DO A MAKE INSTALL !!!
+
 There is a complete manual in the file
 1) beatmixing.ps
 2) online at http://bpmdj.sourceforge.net/
+
+--
+author: werner.van.belle@vub.ac.be

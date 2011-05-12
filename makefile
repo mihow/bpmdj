@@ -1,4 +1,4 @@
-VERSION = 1.6
+VERSION = 1.7
 include defines
 
 all: cbpm-count cbpm-play kbpm-play kbpm-dj beatmixing.ps
@@ -50,10 +50,11 @@ clean:
 	$(RM) bpmbounds.h bpmbounds.cpp
 	$(RM) askinput.h askinput.cpp loader.h loader.cpp
 	$(RM) preferences.h preferences.cpp
-	$(RM) profile-clock process_bpm.sh
+	$(RM) profile-clock process_bpm.sh process_spectrum.sh
 	$(RM) renamer.h renamer.cpp
+	$(RM) similars.h similars.cpp
 	$(RM) -r kbpmdj-$(VERSION)
-	$(RM) -r beatmixing beatmixing.ps version.h
+	$(RM) -r beatmixing version.h
 
 mrproper: clean
 	$(RM) *~ playlist.xmms played.log
@@ -71,7 +72,7 @@ allhtml: beatmixing.html
 
 .PHONY: website allhtml all clean 
 website: allhtml
-	scp beatmixing/* bpmdj@bpmdj.strokemusic.org:/home/bpmdj/website
+	scp beatmixing/* krubbens@bpmdj.sourceforge.net:/home/groups/b/bp/bpmdj/htdocs/
 
 #############################################################################
 # Command line version
@@ -105,7 +106,9 @@ KPLAY_OBJECTS = about.o\
 	bpmcounter.o\
 	bpmcounter.moc.o\
 	kbpm-counter.o\
-	kbpm-counter.moc.o
+	kbpm-counter.moc.o\
+	fourierd.o\
+	fftmisc.o
 
 KCOUNT_OBJECTS = bpmcounter.o\
 	bpmcounter.moc.o\
@@ -114,10 +117,9 @@ KCOUNT_OBJECTS = bpmcounter.o\
 	kbpm-count.moc.o
 
 KSEL_OBJECTS = qstring-factory.o\
+	spectrum.o\
 	about.o\
 	about.moc.o\
-	legende.o\
-	legende.moc.o\
 	loader.o\
 	loader.moc.o\
 	askinput.o\
@@ -149,18 +151,24 @@ KSEL_OBJECTS = qstring-factory.o\
 	renamer.moc.o\
 	renamer.logic.o\
 	renamer.logic.moc.o\
+	similars.o\
+	similars.moc.o\
+	similarscanner.o\
+	similarscanner.moc.o\
 	config.o
 
 process-manager.cpp: process-manager.h
 importscanner.h: dirscanner.h
 dirscanner.o: dirscanner.h dirscanner.cpp
 importscanner.o: importscanner.cpp importscanner.h dirscanner.h
+similarscanner.h: similars.h
+similars.cpp: similars.h	
 renamer.logic.h: renamer.h
 renamer.logic.cpp: renamer.logic.h
 renamer.cpp: renamer.h
 kbpm-play.cpp: bpmcounter.h version.h
 bpmcounter.cpp: bpmcounter.h version.h
-songselector.cpp: songselector.h version.h renamer.logic.h
+songselector.cpp: songselector.h version.h renamer.logic.h similarscanner.h
 tagbox.cpp: tagbox.h
 songselector.logic.h: songselector.h version.h
 songselector.logic.cpp: songselector.logic.h about.h tagbox.h askinput.h\
@@ -168,7 +176,6 @@ songselector.logic.cpp: songselector.logic.h about.h tagbox.h askinput.h\
 preferences.logic.h: preferences.h version.h
 preferences.logic.cpp: preferences.logic.h version.h
 about.cpp: about.h version.h
-legende.cpp: legende.h
 loader.cpp: loader.h
 askinput.cpp: askinput.h version.h
 kbpm-dj.cpp: setupwizard.h

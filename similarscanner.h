@@ -18,19 +18,29 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-class SimilarScanner: public DirectoryScanner
+#include "dirscanner.h"
+#include "similars.h"
+#include "songselector.logic.h"
+
+class SimilarScanner:
+public Similars,
+  public DirectoryScanner
 {
+    Q_OBJECT
+  private:
     SongSelectorLogic * selector;
+    bool similarnames;
+    void findSimilarNames(QString text, QString fullname);
+    void similarNameFound(QString name, QString similar, QString fullname, QString fullsimilar, int dist);
+    void getRidOff(QString fullname);
+    void goFetch(QString name);
   protected:
-    virtual void checkfile(const QString pathname, const QString filename)
-      { 
-	QString stripped = filename.left(filename.length()-4);
-	QString fullname = pathname + "/" + filename;
-	selector->findsimilarnames(stripped,fullname); 
-      };
+    virtual void checkfile(const QString pathname, const QString filename);
   public:
-    SimilarScanner(SongSelectorLogic* sroot) : DirectoryScanner(".mp3")
-      { selector = sroot; };
-    virtual void scan(const QString dirname) 
-      { DirectoryScanner::scan(dirname,dirname); };
+    SimilarScanner(SongSelectorLogic* sroot);
+    virtual void scan(const QString dirname);
+  public slots:
+    virtual void alreadyHave();
+    virtual void ignore();
+    virtual void goFetch();
 };

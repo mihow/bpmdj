@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>555</width>
-            <height>297</height>
+            <width>582</width>
+            <height>313</height>
         </rect>
     </property>
     <property name="caption">
@@ -56,12 +56,46 @@
                         <property name="wordwrap" stdset="0">
                         </property>
                     </widget>
+                    <widget class="QLabel" row="1" column="0">
+                        <property name="name">
+                            <cstring>TextLabel1</cstring>
+                        </property>
+                        <property name="text">
+                            <string>First player</string>
+                        </property>
+                    </widget>
                     <widget class="QLabel" row="2" column="0">
                         <property name="name">
                             <cstring>TextLabel2</cstring>
                         </property>
                         <property name="text">
                             <string>Second player</string>
+                        </property>
+                    </widget>
+                    <widget class="QLabel" row="3" column="0">
+                        <property name="name">
+                            <cstring>TextLabel1_2</cstring>
+                        </property>
+                        <property name="text">
+                            <string>Third Player</string>
+                        </property>
+                    </widget>
+                    <widget class="QLabel" row="4" column="0">
+                        <property name="name">
+                            <cstring>TextLabel2_2</cstring>
+                        </property>
+                        <property name="text">
+                            <string>Fourth Player</string>
+                        </property>
+                    </widget>
+                    <widget class="QLineEdit" row="4" column="1">
+                        <property name="name">
+                            <cstring>playerCommand4</cstring>
+                        </property>
+                    </widget>
+                    <widget class="QLineEdit" row="3" column="1">
+                        <property name="name">
+                            <cstring>playerCommand3</cstring>
                         </property>
                     </widget>
                     <widget class="QLineEdit" row="2" column="1">
@@ -72,14 +106,6 @@
                     <widget class="QLineEdit" row="1" column="1">
                         <property name="name">
                             <cstring>playerCommand1</cstring>
-                        </property>
-                    </widget>
-                    <widget class="QLabel" row="1" column="0">
-                        <property name="name">
-                            <cstring>TextLabel1</cstring>
-                        </property>
-                        <property name="text">
-                            <string>First player</string>
                         </property>
                     </widget>
                 </grid>

@@ -64,4 +64,5 @@ class BpmCountDialog : public CountDialog
    virtual void incBpm();
    virtual void decBpm();
    virtual void about();
+   virtual void fetchSpectrum();
 };

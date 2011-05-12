@@ -57,6 +57,7 @@ extern "C"
  *         Constants & Variables
  *-------------------------------------------*/
 static int   opt_batch = 0;
+static int   opt_color = 0;
 static char* arg_posx = NULL;
 static char* arg_posy = NULL;
 static int   arg_low=120;
@@ -107,9 +108,10 @@ void options_failure(char* err)
 	  "   -m arg      --match arg         song to match tempo with\n"
 	  "   -L nbr      --latency nbr       required latency in ms (default = 744)\n"
 	  "   -p nbr nbr  --position nbr nbr  position to place the window\n"
-	  "   -b          --batch             start immediatelly, no sound, quit immidiatelly\n"
+	  "   -b          --batch             immediatelly obtain bpmcount, no sound, quit immidiatelly\n"
 	  "   -l nbr      --low nbr           lowest bpm to look for (default = 120)\n"
 	  "   -h nbr      --high nbr          highest bpm to look for (default = 160)\n"
+	  "   -s          --spectrum          immediatelly obtain color at cue-point, no sound, quit imm\n"
 	  "   argument                        the index file of the song to handle\n\n%s\n\n",err);
    exit(1);
 }
@@ -136,6 +138,9 @@ void process_options(int argc, char* argv[])
 	     else if (strcmp(arg,"batch")==0 ||
 		      strcmp(arg,"b")==0)
 	       opt_batch=1;
+	     else if (strcmp(arg,"spectrum")==0 ||
+		      strcmp(arg,"s")==0)
+	       opt_color=1;
 	     else if (strcmp(arg,"dsp")==0 ||
 		      strcmp(arg,"d")==0)
 	       {
@@ -211,32 +216,42 @@ void show_error(char*text)
 int main(int argc, char *argv[])
 {
    process_options(argc,argv);
+   // create an application
+   app = new QApplication(argc,argv);
    if (opt_batch)
      {
-	// create an application
-	app = new QApplication(argc,argv);
-	// init the core, we do not open it because
-	// we don't want any dsp access
-	core_init(1);
-	printf("Wave written\n");
-	// initialize the count dialog
-	BpmCountDialog *counter = new BpmCountDialog();
-	counter->setBpmBounds(arg_low,arg_high);
-	counter->doit();
-	counter->finish();
-	printf("Counting done\n");
-	// finish the core -> remove the raw file
-	core_done();
+       // init the core, we do not open it because
+       // we don't want any dsp access
+       core_init(1);
+       printf("Wave written\n");
+       // initialize the count dialog
+       BpmCountDialog *counter = new BpmCountDialog();
+       counter->setBpmBounds(arg_low,arg_high);
+       counter->doit();
+       counter->finish();
+       printf("Counting done\n");
+       // finish the core -> remove the raw file
+       core_done();
+     }
+   else if (opt_color)
+     {
+       core_init(1);
+       printf("Wave written\n");
+       // initialize the count dialog
+       BpmCountDialog *counter = new BpmCountDialog();
+       counter->fetchSpectrum();
+       counter->finish();
+       printf("Fetching Color done\n");
+       core_done();
      }
    else
      {
-	app=new QApplication(argc,argv);
-	core_init(0);
-	core_open();
-	terminal_start();
-	core_play();
-	terminal_stop();
-	core_close();
-	core_done();
+       core_init(0);
+       core_open();
+       terminal_start();
+       core_play();
+       terminal_stop();
+       core_close();
+       core_done();
      }
 }

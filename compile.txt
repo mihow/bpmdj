@@ -17,6 +17,8 @@ After creating such a file be sure to send it to me
 Requirements:
   - qt3-mt
   - qt3-designer
+  - qt3-mt-headers
+  - qt3-mt-dev
   - mpg123
   - gcc
   - make

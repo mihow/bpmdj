@@ -52,6 +52,7 @@
 #include "kbpm-counter.h"
 #include "sys/times.h"
 #include "about.h"
+#include "fourier.h"
 
 extern "C"
 {
@@ -71,49 +72,49 @@ static char * arg_write;
 */
 
 BpmCountDialog::BpmCountDialog(SongPlayer*parent, const char*name, bool modal, WFlags f) :
-CountDialog(0,name,modal,f)
+  CountDialog(0,name,modal,f)
 {
-   player=parent;
-   // owkee.. inbitialisation of everything.
-   tapcount=0;
-   audio=NULL;
-   audiorate = 11025;
-   startbpm = 120;
-   stopbpm = 160;
-   startshift = 0;
-   stopshift = 0;
-   index_bpmcount_from = 0;
-   index_bpmcount_to = 100;
-   bufsiz = 32 * 1024;
-   // internal communicative variables
-   reading_progress = 0;
-   processing_progress = 0;
-   stop_signal=false;
-   working=false;
-   // read the index file
-   char d[1024];
-   sprintf(d,"BpmDj v%s",VERSION);
-   index_version=strdup(d);
-   // clear the image
-   QPixmap *pm = new QPixmap(10,10);
-   QPainter p;
-   p.begin(pm);
-   QRect r(QRect(0,0,pm->width(),pm->height()));
-   p.fillRect(r,Qt::white);
-   p.end();
-   BpmPix->setPixmap(*pm);
-   // set index filen filename
-   IdxEdit->setText(index_readfrom);
-   // set tag line
-   if (index_tags)
-     TagEdit->setText(index_tags);
-   else
-     TagEdit->setText("");   
-   // init md5 sum
-   if (index_md5sum)
-     Md5Label->setText(index_md5sum);
-   // set song 
-   if (index_file)
+  player=parent;
+  // owkee.. initialisation of everything.
+  tapcount=0;
+  audio=NULL;
+  audiorate = 11025;
+  startbpm = 120;
+  stopbpm = 160;
+  startshift = 0;
+  stopshift = 0;
+  index_bpmcount_from = 0;
+  index_bpmcount_to = 100;
+  bufsiz = 32 * 1024;
+  // internal communicative variables
+  reading_progress = 0;
+  processing_progress = 0;
+  stop_signal=false;
+  working=false;
+  // read the index file
+  char d[1024];
+  sprintf(d,"BpmDj v%s",VERSION);
+  index_version=strdup(d);
+  // clear the image
+  QPixmap *pm = new QPixmap(10,10);
+  QPainter p;
+  p.begin(pm);
+  QRect r(QRect(0,0,pm->width(),pm->height()));
+  p.fillRect(r,Qt::white);
+  p.end();
+  BpmPix->setPixmap(*pm);
+  // set index filen filename
+  IdxEdit->setText(index_readfrom);
+  // set tag line
+  if (index_tags)
+    TagEdit->setText(index_tags);
+  else
+    TagEdit->setText("");   
+  // init md5 sum
+  if (index_md5sum)
+    Md5Label->setText(index_md5sum);
+  // set song 
+  if (index_file)
      Mp3Label->setText(index_file);
 }
 
@@ -536,6 +537,163 @@ void BpmCountDialog::doit()
 	p.end();
 	BpmPix->setPixmap(*pm);
      }
+}
+
+#define barksize 24
+static double barkbounds[barksize+1] =
+  {
+    0,100,200,300,
+    400,510,630,770,
+    920,1080,1270,1480,
+    1720,2000,2380,2700,
+    3150,3700,4400,5300,
+    6400,7700,9500,12000,
+    15500	
+  };
+
+void BpmCountDialog::fetchSpectrum()
+{
+  long int slidesize = WAVRATE*10;
+  long int slide;
+  long int blocksize = 65536;
+  double *fftdata;
+  double *fftfreq;
+  double *fftfreqi;
+  double *fftwindowfreq;
+  signed short *data;
+  double *barkscale;
+  int bark;
+  barkscale=(double*)malloc(sizeof(double)*barksize);
+  fftdata=(double*)malloc(sizeof(double)*(blocksize+slidesize));
+  fftwindowfreq=(double*)malloc(sizeof(double)*blocksize);
+  fftfreq=(double*)malloc(sizeof(double)*(blocksize/2));
+  fftfreqi=(double*)malloc(sizeof(double)*blocksize);
+  // hieronder x 2 omdat we zowel links als rechts binnen krijgen
+  data=(signed short*)malloc(sizeof(signed short)*(blocksize+slidesize)*2);
+  assert(data);
+
+  FILE * raw;
+  char d[500];
+  // the filename of the file to read is the basename 
+  // suffixed with .raw
+  sprintf(d,"%s.raw",basename(index_file));
+  raw=fopen(d,"rb");
+  if (!raw)
+    {
+      printf("Error: Unable to open %s\n",argument);
+      exit(3);
+    }
+
+  // reset the fftfreq
+  long pos;
+  for(pos=0;pos<blocksize/2;pos++)
+    fftwindowfreq[pos]=0.0;
+  // position file
+  unsigned long long int audiosize=fsize(raw)/4;
+  long startpos = cue*4;
+  printf("Fetching spectrum at position = %ld\n",startpos);
+  fseek(raw,startpos,SEEK_SET);
+  // read in memory
+  pos=0;
+  while(pos<blocksize+slidesize)
+    {
+      long count=fread(data+pos*2,2*sizeof(signed short),blocksize+slidesize-pos,raw);
+      assert(count>0);
+      pos+=count;
+    }
+  // shrink down
+  for(pos=0;pos<blocksize+slidesize;pos++)
+    fftdata[pos]=(double)data[pos*2];
+  // cummulate different windows
+  for(slide=0;slide<slidesize;slide+=slidesize/100)
+    {
+      printf("slide = %d\n",(int)slide);
+      // do an fft on that position and normalize the result
+      fft_double(blocksize,0,fftdata+slide,NULL,fftwindowfreq,fftfreqi);
+      for(pos=0;pos<blocksize/2;pos++)
+	fftfreq[pos]+=fftwindowfreq[pos];
+    }
+  fclose(raw);
+  // normalize the result
+  double max = 0;
+  for(pos=0;pos<blocksize/2;pos++)
+    // fftfreq[pos]=fabsl(fftfreq[pos]*(double)pos/((double)blocksize*10.0));
+    fftfreq[pos]=fabsl(fftfreq[pos]);
+  for(pos=0;pos<blocksize/2;pos++)
+    if (fftfreq[pos]>max) 
+      max=fftfreq[pos];
+  for(pos=0;pos<blocksize/2;pos++)
+    fftfreq[pos]=fftfreq[pos]*100.0/max;
+  
+  // bring all frequency relatively to the bark-scales
+  for(bark=0;bark<barksize;bark++)
+    barkscale[bark]=0;
+  for(pos=0;pos<blocksize/2;pos++)
+    {
+      double freq = Index_to_frequency(blocksize,pos)*(double)WAVRATE;
+      for(bark=0;bark<barksize;bark++)
+	if (freq>barkbounds[bark] &&
+	    freq<barkbounds[bark+1])
+	  {
+	    double length = barkbounds[bark+1]-barkbounds[bark];
+	    double barkcentre = barkbounds[bark]+length/2.0;
+	    double dist = fabsl(freq-barkcentre)*2.0/length;
+	    double scale = 1.0 - dist;
+	    assert(scale>=0.0);
+	    barkscale[bark]+=fftfreq[pos]*scale;
+	    assert(barkscale[bark]>=0.0);
+	  }
+    }
+  // rescale bark information..
+  // the first entry in the scale is always halved because this is the bass level
+  barkscale[0]/=2.0;
+  max=0;
+  for(bark=0;bark<barksize;bark++)
+    if (barkscale[bark]>max)
+      max=barkscale[bark];
+  for(bark=0;bark<barksize;bark++)
+    {
+      barkscale[bark]=barkscale[bark]*99.0/max;
+      assert(barkscale[bark]>=0.0);
+    }
+  
+  // show it...
+  QPixmap *pm = new QPixmap(barksize,100);
+  QPainter p;
+  p.begin(pm);
+  QRect r(QRect(0,0,pm->width(),pm->height()));
+  p.fillRect(r,Qt::white);
+  int X,Y;
+  p.setPen(Qt::black);
+  for(pos=0;pos<barksize;pos++)
+    {
+      X=pos;
+      Y=(int)barkscale[pos];
+      p.drawPoint(X,Y);
+    }
+  /*
+    for(pos=0;pos<blocksize/2;pos++)
+    {
+    X=(int)(r.width()*2.0*(double)pos/(double)blocksize);
+    Y=(int)fftfreq[pos];
+    p.drawPoint(X,Y);
+    }
+  */
+  p.end();
+  BpmPix->setPixmap(*pm);
+  // write out values...
+  char spectrum[barksize+1];
+  for(pos=0;pos<barksize;pos++)
+    spectrum[pos]='a'+(char)(barkscale[pos]/4);
+  spectrum[barksize]=0;
+  index_spectrum=strdup(spectrum);
+  index_changed=1;
+  // free everything involved
+  free(fftwindowfreq);
+  free(fftfreq);
+  free(fftfreqi);
+  free(fftdata);
+  free(data);
 }
 
 void BpmCountDialog::doitwrapper()
