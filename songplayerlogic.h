@@ -30,6 +30,7 @@ class SongPlayerLogic : public SongPlayer
    int fade_time;
    void setColor(QButton *button, bool enabled);
    void redrawCues();
+   void normalReached(bool yes);
  public:
    SongPlayerLogic::SongPlayerLogic(QWidget*parent=0,const char*name=0, bool modal=FALSE,WFlags f=0);
  public slots:
@@ -65,4 +66,6 @@ class SongPlayerLogic : public SongPlayer
    virtual void nudgeCueForward();
    virtual void nudgeCueBack8M();
    virtual void nudgeCueForward8M();
+   virtual void pcmVolume(int volume);
+   virtual void mainVolume(int volume);
 };

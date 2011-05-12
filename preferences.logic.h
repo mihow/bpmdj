@@ -18,9 +18,16 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-typedef signed   long long  int signed8;
-typedef unsigned long long  int unsigned8;
-typedef signed        long  int signed4;
-typedef unsigned      long  int unsigned4;
-typedef signed        short int signed2;
-typedef unsigned      short int unsigned2;
+#include <qtimer.h>
+#include <qlistview.h>
+#include "preferences.h"
+
+class PreferencesDialogLogic: public PreferencesDialog
+{
+   Q_OBJECT
+ private:
+ public:
+   PreferencesDialogLogic(QWidget*parent=0,const char*name=0, bool modal=FALSE,WFlags f=0) :
+     PreferencesDialog(parent,name,modal,f) {};
+ public slots:
+};

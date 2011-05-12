@@ -19,15 +19,16 @@
 ****/
 
 #include <qlcdnumber.h>
-#include "songplayerlogic.h"
 #include <stdio.h>
 #include <unistd.h>
-#include "kbpm-play.h"
 #include <malloc.h>
 #include <qpushbutton.h>
 #include <qcolor.h>
 #include <qlabel.h>
 #include <math.h>
+#include <qslider.h>
+#include "songplayerlogic.h"
+#include "kbpm-play.h"
 
 SongPlayerLogic::SongPlayerLogic(QWidget*parent=0,const char*name=0, bool modal=FALSE,WFlags f=0) :
   SongPlayer(parent,name,modal,f)
@@ -44,11 +45,19 @@ SongPlayerLogic::SongPlayerLogic(QWidget*parent=0,const char*name=0, bool modal=
    blah=strdup(wave_name);
    if (l>8) blah[l-8]=0;
    PlayingText->setText(blah);
-
+   
    TempoLd->display(100.0*(double)normalperiod/(double)currentperiod);
-   setColor(PushButton22,false);
-   setColor(PushButton36_2,false);
-   setColor(PushButton37,false);
+   // set colors of tempo change buttons
+   normalReached(currentperiod==normalperiod);
+   /* 
+    setColor(PushButton22,false);
+    setColor(PushButton36_2,false);
+    setColor(PushButton37,false);
+    */
+   
+   // set volume sliders
+   Slider3->setValue(100-mixer_get_main());
+   Slider4->setValue(100-mixer_get_pcm());
 }
 
 
@@ -62,13 +71,6 @@ void SongPlayerLogic::redrawCues()
 
 void SongPlayerLogic::setColor(QButton *button, bool enabled)
 {
-   // button//   PushButton11->setEnabled(enabled);
-     //     PushButton11->setBackgroundColor(QColor(0,255,0));
-  // else
-    // PushButton11->setBackgroundColor(QColor(255,0,0));
-    // 
-    // 
-    //
    QColor a, ad, am, aml, al;
    QPalette pal;
    QColorGroup cg;
@@ -207,16 +209,35 @@ void SongPlayerLogic::nudgeMinus8M()
 
 void SongPlayerLogic::accept()
 {
+   // if the song has been stopped, simply start and stop again.
    ::stop=1;
-   sleep(2);
+   ::paused=0;
+   // wait until finished
+   while(!finished) ;
+   // now finish
    SongPlayer::accept();
 }
 
 void SongPlayerLogic::timerTick()
 {
    unsigned4 m=wave_max();
+   // the position if kB
    LcdLeft->display((double)((int)(x_normalise(::y)*1000/m))/(double)10);
    LcdRight->display((int)(m/1024));
+   // times are displayed with respect to the current tempo
+   unsigned4 totaltime=y_normalise(m)/WAVRATE;
+   unsigned4 currenttime=::y/WAVRATE;
+   char totalstr[20], currentstr[20];
+   sprintf(totalstr,"%02d:%02d",totaltime/60,totaltime%60);
+   sprintf(currentstr,"%02d:%02d",currenttime/60,currenttime%60);
+   CurrentTimeLCD -> display(currentstr);
+   TotalTimeLCD -> display(totalstr);
+   // show current tempo
+   double  T0=4.0*(double)WAVRATE*60.0/(double)currentperiod;
+   double  T1=4.0*(double)WAVRATE*60.0/(double)normalperiod;
+   CurrentTempoLCD -> display(T0);
+   NormalTempoLCD -> display(T1);
+   // change tempo when necesarry
    if (fade_time>0)
      targetStep();
 }
@@ -293,11 +314,13 @@ void SongPlayerLogic::storeV()
 void SongPlayerLogic::targetTempo()
 {
    changetempo(targetperiod);
+   normalReached(false);
 }
 
 void SongPlayerLogic::normalTempo()
 {
    changetempo(normalperiod);
+   normalReached(true);
 }
 
 void SongPlayerLogic::fastSwitch()
@@ -318,29 +341,28 @@ void SongPlayerLogic::slowSwitch()
    tempo_fade=0;
 }
 
+void SongPlayerLogic::normalReached(bool t)
+  {
+     setColor(PushButton22,t);	
+     setColor(PushButton36_2,t);
+     setColor(PushButton37,t);
+  }
+
 void SongPlayerLogic::targetStep()
 {
-   /**
-    * Contrary to the command line player, when pressing the target-step
-    * we slowly fade to our target.
-    * Lets say we take 20 seconds.
-    */
    tempo_fade++;
    if (tempo_fade>fade_time)
      {
 	tempo_fade=0;
 	fade_time=0;
-	setColor(PushButton22,true);	
-	setColor(PushButton36_2,true);
-	setColor(PushButton37,true);
+	normalReached(true);
 	return;
      }
    if (tempo_fade==1)
      {
-	setColor(PushButton22,false);
-	setColor(PushButton36_2,false);
-	setColor(PushButton37,false);
+	normalReached(false);
      }
+   
    /**
     * Another enhancement is that we dont change the period lineary !
     */
@@ -368,4 +390,14 @@ void SongPlayerLogic::nudgeCueBack8M()
 void SongPlayerLogic::nudgeCueForward8M()
 {
    cue_shift("Shifting cue 8 measure forward",8*normalperiod);
+}
+
+void SongPlayerLogic::mainVolume(int v)
+{
+   mixer_set_main(100-v);
+}
+
+void SongPlayerLogic::pcmVolume(int v)
+{
+   mixer_set_pcm(100-v);
 }

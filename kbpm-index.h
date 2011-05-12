@@ -18,9 +18,35 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-typedef signed   long long  int signed8;
-typedef unsigned long long  int unsigned8;
-typedef signed        long  int signed4;
-typedef unsigned      long  int unsigned4;
-typedef signed        short int signed2;
-typedef unsigned      short int unsigned2;
+
+#include <qlistview.h>
+class Song
+{
+ public:
+   Song* next;
+   char *song_id;
+   char *song_title;
+   char *song_author;
+   char *song_version;
+   char *song_tempo;
+   char *song_index;
+   char *song_tags;
+   char *song_file;
+   char *song_md5sum;
+   bool song_played;
+   bool song_ondisk;
+ public:
+   Song();
+   Song(char*filename,char* currentpath,char* musicdir);
+   virtual bool isIndex() {return false;};
+   bool containsTag(const char* which);
+};
+
+class SongIndex: public Song
+{
+ public:
+   Song *list;
+   void add(Song*t);
+   SongIndex(char* filename, char*dirname, char* musicdir);
+   virtual bool isIndex() {return true;};
+};

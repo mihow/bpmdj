@@ -1,0 +1,18 @@
+CC=gcc -O9
+CPP=g++ -O9
+
+CFLAGS+=
+LDFLAGS+= -lpthread -lm
+
+CP = cp
+MV = mv
+TAR = tar
+LYX = lyx
+MKDIR = mkdir
+UIC = /usr/qt/2/bin/uic
+MOC = /usr/qt/2/bin/moc
+STRIP = strip
+
+QT_INCLUDE_PATH= -I /usr/qt/2/include/
+QT_LIBRARY_PATH= -L /usr/qt/2/lib/
+QT_LIBS= -lqt

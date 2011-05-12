@@ -1,0 +1,2 @@
+#!/bin/bash
+konsole -e ssh -t werner@asus /home/werner/play "$@"

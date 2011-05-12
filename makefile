@@ -1,116 +1,244 @@
-VERSION        = 1.0
-MAJOR_VERSION  = 1
-MINOR_VERSION  = 0
+VERSION = 1.1
+include defines
 
-AUTOGEN_PROGRAM=$(shell autoopts-config --autogen)
-AUTOGEN_DATADIR=$(shell autoopts-config --pkgdatadir)
-AUTOGEN_FLAGS=-L$(AUTOGEN_DATADIR) 
-AUTOGEN_CFLAGS=$(shell autoopts-config --cflags)
-AUTOGEN_LDFLAGS=$(shell autoopts-config --libs)
-CFLAGS+=$(AUTOGEN_CFLAGS)
-LDFLAGS+=$(AUTOGEN_LDFLAGS) -lpthread
-QT_INCLUDE_PATH=-I/usr/include/qt/
-QT_LIBRARY_PATH=-L/usr/X11R6/lib/
-QT_LIBS=-lqt -lX11 -lXext
-CPP=g++ -O0 -g -pg 
-CC=gcc -O0 -g -pg 
-GOALS = kbpm-play
-PROJECT = kBpmPlay
-MKDIR = mkdir 
-CP = cp
-MV = mv
-TAR = tar
+all: cbpm-count cbpm-play kbpm-play kbpm-dj beatmixing.ps
+	
+#############################################################################
+# Rulesets
+#############################################################################
+%.o: %.c
+	$(CC) -c $< $(CFLAGS) -o $@
+
+%.ps: %.lyx
+	$(LYX) -e ps $<
+
+%.tex: %.lyx
+	$(LYX) -e latex $<
+
+%.html: %.tex
+	latex2html -split +0 -toc_depth 8 -info 0 -address "" -no_navigation $<
 
 %.moc.cpp: %.h
-	moc -o $@ $<
+	$(MOC) -o $@ $<
 
 %.o: %.cpp
-	$(CPP) -c $< -DMAJOR_VERSION=$(MAJOR_VERSION) -DMINOR_VERSION=$(MINOR_VERSION) $(QT_INCLUDE_PATH)
+	$(CPP) -c $< $(QT_INCLUDE_PATH)
 
 %.c: %.def
 	$(AUTOGEN_PROGRAM) $(AUTOGEN_FLAGS) $^ 
 	
-OBJECTS = songplayer.o\
+%.cpp: %.ui
+	$(UIC) -i `basename $< .ui`.h -o $@ $<
+
+%.h: %.ui
+	$(UIC) -o `basename $< .ui`.h $<
+
+#############################################################################
+# Cleanup section
+#############################################################################
+clean:
+	$(RM) a.out core *.o *.log *.tex.dep *.toc *.dvi *.aux *.raw 
+	$(RM) plot.ps gmon.out toplot.dat build sum.tmp fetchfiles.sh
+	$(RM) -rf beatmixing beatmixing.ps
+	$(RM) -f cbpm-count cbpm-play kbpm-play kbpm-dj
+	$(RM) -rf kbpmdj-$(VERSION)
+	$(RM) -f *.moc.cpp *.ui.cpp *.ui.h
+	$(RM) -f songplayer.h songplayer.cpp
+	$(RM) -f songedit.h songedit.cpp
+	$(RM) -f songselector.h songselector.cpp
+	$(RM) -f about.h about.cpp
+	$(RM) -f askinput.h askinput.cpp
+	$(RM) -f preferences.h preferences.cpp
+	
+mrproper: clean
+	$(RM) *~ playlist.xmms played.log
+	$(RM) debian/*~
+
+#############################################################################
+# Documentation
+#############################################################################
+beatmixing.html: beatmixing.tex
+
+allhtml: beatmixing.html
+	$(RM) beatmixing/index.html
+	$(CP) index.html beatmixing/index.html
+	$(CP) mixingdesk.jpg beatmixing/
+
+website: allhtml
+	$(SCP) beatmixing/* krubbens@bpmdj.sourceforge.net:/home/groups/b/bp/bpmdj/htdocs
+
+#############################################################################
+# Command line version
+#############################################################################
+
+cbpm-index.c: cbpm-index.h
+cbpm-play.c: cbpm-index.h
+cbpm-count.c: cbpm-index.h
+
+cbpm-count: cbpm-index.o cbpm-count.o
+	$(CC) $^ -o $@
+	
+cbpm-play: cbpm-play.o cbpm-index.o player-core.o
+	$(CC) $(LDFLAGS) $^ -o $@
+
+#############################################################################
+# Kde version
+#############################################################################
+KPLAY_OBJECTS = songplayer.o\
 	songplayer.moc.o\
+	player-core.o\
 	cbpm-index.o\
-	kbpm-playeropts.o\
 	kbpm-play.o\
 	songplayerlogic.o\
 	songplayerlogic.moc.o
-#	about.ui.moc.o\
-#	songedit.ui.o\
-#	songedit.ui.moc.o\
-#	songselector.ui.o\
-#	songselector.ui.moc.o\
-#	songselector.logic.moc.o\
-#	songselector.logic.o\
-#	preferences.ui.o\
-#	preferences.ui.moc.o\
-#	preferences.logic.o\
-#	preferences.logic.moc.o\
-#	qsongviewitem.o\
-#	kbpm-index.o\
-#	kbpm-played.o\
-#	kbpm-dj.o\
-#	kbpm-md5.o
+	
+KSEL_OBJECTS = about.o\
+	about.moc.o\
+	askinput.o\
+	askinput.moc.o\
+	songedit.o\
+	songedit.moc.o\
+	songselector.o\
+	songselector.moc.o\
+	songselector.logic.moc.o\
+	songselector.logic.o\
+	preferences.o\
+	preferences.moc.o\
+	preferences.logic.o\
+	preferences.logic.moc.o\
+	qsongviewitem.o\
+	kbpm-index.o\
+	cbpm-index.o\
+	kbpm-played.o\
+	kbpm-dj.o\
+	kbpm-md5.o
 
-all: kbpm-play
+songselector.cpp: songselector.h
+
+songselector.logic.h: songselector.h
+
+songselector.logic.cpp: songselector.logic.h about.h songedit.h askinput.h\
+	preferences.h
+
+preferences.logic.h: preferences.h
+
+preferences.logic.cpp: preferences.logic.h
+
+about.cpp: about.h
+
+askinput.cpp: askinput.h
+
+songedit.cpp: songedit.h
 
 songplayer.cpp songplayer.h: songplayer.ui
-	uic -o songplayer.h songplayer.ui
-	uic -i songplayer.h -o songplayer.cpp songplayer.ui
+	$(UIC) -o songplayer.h songplayer.ui
+	$(UIC) -i songplayer.h -o songplayer.cpp songplayer.ui
 
-kbpm-play: $(OBJECTS)
-	$(CPP) $(OBJECTS) -o kbpm-play\
-	  -DMAJOR_VERSION=$(MAJOR_VERSION) -DMINOR_VERSION=$(MINOR_VERSION)\
+kbpm-play: $(KPLAY_OBJECTS)
+	$(CPP) $(KPLAY_OBJECTS) -o kbpm-play\
 	  $(LDFLAGS) $(QT_INCLUDE_PATH) $(QT_LIBRARY_PATH) $(QT_LIBS)
 
-songselector.logic.h: songselector.ui.h about.ui.h songedit.ui.h preferences.ui.h
+kbpm-dj: $(KSEL_OBJECTS)
+	$(CPP) $(KSEL_OBJECTS) -o kbpm-dj\
+	  $(LDFLAGS) $(QT_INCLUDE_PATH) $(QT_LIBRARY_PATH) $(QT_LIBS)
 
-indextest: cbpm-index.o
-	 $(CC) kbpm-indextest.c cbpm-index.o \
-	  -DMAJOR_VERSION=$(MAJOR_VERSION) -DMINOR_VERSION=$(MINOR_VERSION)
+#############################################################################
+# Distributions
+#############################################################################
+DOC = authors changelog copyright todo beatmixing.ps readme
+BIN  = cbpm-count cbpm-play kbpm-play kbpm-dj glue-bpmraw glue-mp3raw\
+	rbpm-play xmms-play
+GOALS = $(DOC) $(BIN)
+	
+.PHONY: directories
 
-cbpm-index.o: 
-	 $(CC) -I../cBpmDj/ -DMAJOR_VERSION=$(MAJOR_VERSION) -DMINOR_VERSION=$(MINOR_VERSION) -c ../cBpmDj/cbpm-index.c -o cbpm-index.o
-
-clean:
-	rm -f *.o
-	rm -f *.moc.cpp
-	rm -f *.ui.cpp
-	rm -f *.ui.h
-	rm -f a.out build kbpm-play
-	rm -rf kbpmdj-$(VERSION)
-	rm -f gmon.out played.log fetchfiles.sh
-	rm -f kbpm-playeropts.h songplayer.h songplayer.cpp
-
-deb-install: all
-	cp kbpm-play $(DESTDIR)/usr/bin/
-
-deb-dist:
-	fakeroot debian/rules binary
-
-
-directories: clean
-	$(RM) -r $(PROJECT)-$(VERSION); exit 0
-	$(MKDIR) $(PROJECT)-$(VERSION)
-	$(MKDIR) $(PROJECT)-$(VERSION)/music
-	$(MKDIR) $(PROJECT)-$(VERSION)/index
+directories: mrproper
+	$(RM) -r bpmdj-$(VERSION); exit 0
+	$(MKDIR) bpmdj-$(VERSION)
+	$(MKDIR) bpmdj-$(VERSION)/music
+	$(MKDIR) bpmdj-$(VERSION)/index
 
 source.tgz-dist: directories
-	$(CP) -f * $(PROJECT)-$(VERSION); exit 0
-	$(TAR) -cvzf $(PROJECT)-$(VERSION).source.tgz $(PROJECT)-$(VERSION)
+	$(CP) -f * bpmdj-$(VERSION); exit 0
+	$(CP) -fR debian bpmdj-$(VERSION); exit 0
+	$(TAR) -cvzf bpmdj-$(VERSION).source.tgz bpmdj-$(VERSION)
 	$(MV) *.tgz ..
-	$(RM) -r $(PROJECT)-$(VERSION); exit 0
+	$(RM) -r bpmdj-$(VERSION); exit 0
 
-shared.bin.tgz-dist: directories
+bin.tgz-dist: directories
 	$(MAKE) all
-	$(CP) -f $(GOALS) $(PROJECT)-$(VERSION); exit 0
-	$(TAR) -cvzf $(PROJECT)-$(VERSION).shared.bin.tgz $(PROJECT)-$(VERSION)
+	$(STRIP) $(BIN); exit 0
+	$(CP) -f $(GOALS) bpmdj-$(VERSION); exit 0
+	$(TAR) -cvzf bpmdj-$(VERSION).bin.tgz bpmdj-$(VERSION)
 	$(MV) *.tgz ..
-	$(RM) -r $(PROJECT)-$(VERSION); exit 0
+	$(RM) -r bpmdj-$(VERSION); exit 0
 
 tgz-dist: 
 	$(MAKE) source.tgz-dist 
-	$(MAKE) shared.bin.tgz-dist 
+	$(MAKE) bin.tgz-dist
+	
+deb-dist: 
+	fakeroot debian/rules binary
 
+deb-install: all
+	$(CP) $(BIN) $(DESTDIR)/usr/bin/
+	$(CP) $(DOC) $(DESTDIR)/usr/share/doc/bpmdj/
+
+
+
+######################################### TO CLEAN UP !!! #############################################################################
+# Setup for make redhat-dist 
+#############################################################################
+
+RPM_BASE = /usr/src/redhat
+
+#############################################################################
+# Phony targets
+#############################################################################
+.PHONY: wvb website  redhat-dist allhtml all clean clean-bin tags install uninstall 
+
+wvb: clobber 
+	cd ..; $(TAR) cvzf bpmdj-$(VERSION).tgz bpmdj 
+	$(SCP) ../bpmdj-$(VERSION).tgz  werner@asus:
+
+install: install_bin install_doc
+
+install_bin:
+	for  bin in $(TARGETS) $(INST_TARGETS); do \
+	   $(INSTALL) -D -m 755 $$bin ${ROOT}$(BINDIR)/$$bin; \
+	done
+
+install_doc: 
+	for doc in $(DOC); do \
+	   $(INSTALL) -D -m 755 $$doc ${ROOT}$(DOCDIR)/$$doc; \
+	done
+
+uninstall: 
+	for bin in $(TARGETS) $(INST_TARGETS); do \
+	   $(RM) ${ROOT}$(BINDIR)/$$bin; \
+	done \
+	for doc in $(DOC); do \
+	   $(RM) ${ROOT}$(DOCDIR)/$$doc; \
+	done
+
+#############################################################################
+# redhat distribution alpha and x86
+#############################################################################
+
+redhat-dist:
+	@for dir in RPMS SRPMS BUILD SOURCES SPECS; do \
+		if [ ! -w $(RPM_BASE)/$$dir ]; then \
+			$(ECHO) "$(RPM_BASE)/$$dir is not writable for you. Maybe try as root."; \
+			exit; \
+		fi; \
+	done ; \
+	$(MAKE) clean; \
+	$(MKDIR) bpmdj-$(VERSION); \
+	[ -f $(TAR_ARCH) ] && $(RM) $(TAR_ARCH); \
+	$(CP) `find . -maxdepth 1 -type f -print` bpmdj-$(VERSION) ; \
+	$(CAT) bpmdj.spec | \
+		$(SED) "s/_VERSION_/$(VERSION)/g" > bpmdj-$(VERSION)/bpmdj.spec; \
+	$(TAR) --exclude "CVS" -cvzf $(TAR_ARCH) bpmdj-$(VERSION) ; \
+	$(RM) -r bpmdj-$(VERSION); \
+	$(RPM) --clean -ta  $(TAR_ARCH); \
+	[ -f $(TAR_ARCH) ] && $(RM) $(TAR_ARCH)

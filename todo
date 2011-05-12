@@ -1,0 +1,46 @@
+overall: 
+  L- eens bekijken hoe we klankkleur kunnen herkennen.. Momenteel ben ik aan
+    het denken aan de wave te normaliseren, elke boog eruit te plukken en ze
+    allemaal netjes over elkaar leggen ? Iets gemiddeld in die trend is
+    natuurlijk niet goed genoed, dus hier zullen we nog wat moeten over piekeren
+  L- sourceforge logo is er precies ergens afgevallen ??
+
+cbpm-play:
+  L- sometimes the mp3 file is not written completely... -- hu hu ?
+
+cbpm-count:
+  L- eens testen of een kwadratische fout nog betere resultaten geeft of niet.
+
+kbpm-play:
+  B- als tempo = inf deftige errormelding geven
+  B- shifting beyond zero should lock down to zero (or produce somthing 'okay')
+  F- tempo changer in player
+  F- tempo measuren in player
+  F- tempo down en upscalen
+  F- metronome is still missing
+  F- should show remaining time instead of total time
+  F- checking of de cue points persistent blijven over tempo verschillen heen
+     (en eventueel fixen als dat fout is)
+  F- when quitting the program with the quitapp button it should quit in a sane way.
+  F- quitting while still writing the file, should result in killing the writing process.
+  F- loop support in player
+  
+documentation:
+  F- logfile doc schrijven
+  F- documentation for the browser
+  F- text schrijven over het begin van de 8 maten...
+  F- aanpassen van de lyx file met automatische insertie correct versienummer
+
+kbpm-dj:
+  F- andere filenames toelaten
+  F- selector should show the filesize
+  F- resizability !
+  F- multiple players (asus, cubical, tnm etc ...) & automatically setup player on other machine
+  F- multi selection del tags (gelijk de add)
+  F- automatic sorting of tags in tagline / song
+  F- automatic removal of duplicate tags in taglines / song
+  F- add all button; del all button (to select tags eaisly)
+  F- focus houden binnen bepaalde directory
+  F- marking similar songs as 'played'
+  F- keep focus on certain songs after reorganizing the thing
+  F- automatic scanning of new CD

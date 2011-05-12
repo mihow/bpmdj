@@ -18,9 +18,25 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-typedef signed   long long  int signed8;
-typedef unsigned long long  int unsigned8;
-typedef signed        long  int signed4;
-typedef unsigned      long  int unsigned4;
-typedef signed        short int signed2;
-typedef unsigned      short int unsigned2;
+#define LIST_DIR 0
+#define LIST_VERSION 4
+#define LIST_TITLE 1
+#define LIST_AUTHOR 2
+#define LIST_TEMPO 3
+#define LIST_TAGS 5
+#define LIST_FILE 6
+#define LIST_INDEX 7
+#define LIST_ONDISK 8
+#define LIST_MD5SUM 9
+
+class QSongViewItem: public QListViewItem
+{
+ private:
+   Song* song;
+ public:
+   QSongViewItem(QListViewItem* parent, Song* content);
+   QSongViewItem(QListView* parent, Song* content);
+   Song* getSong() {return song;};
+   virtual void paintCell(QPainter *p,const QColorGroup &cg, int col, int wid, int align);
+   virtual QString text(int i) const;
+};

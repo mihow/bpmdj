@@ -18,9 +18,22 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-typedef signed   long long  int signed8;
-typedef unsigned long long  int unsigned8;
-typedef signed        long  int signed4;
-typedef unsigned      long  int unsigned4;
-typedef signed        short int signed2;
-typedef unsigned      short int unsigned2;
+#include <stdlib.h>
+#include <stdio.h>
+/**
+ * An (obsolote) class to represent the song already played
+ */
+
+class Sums
+{
+ private:
+   static char** names;
+   static char** sums;
+   static int size;
+   static int next;
+   static FILE* f;
+   static void Add(const char* indexname);
+ public:
+   Sums(const char* filename);
+   static char* Md5(const char* indexname);
+};

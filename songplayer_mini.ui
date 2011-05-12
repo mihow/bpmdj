@@ -1,5 +1,5 @@
 <!DOCTYPE UI><UI>
-<class>SongPlayer</class>
+<class>MiniSongPlayer</class>
 <widget>
     <class>QDialog</class>
     <property stdset="1">
@@ -11,14 +11,175 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>749</width>
-            <height>375</height>
+            <width>688</width>
+            <height>203</height>
         </rect>
     </property>
     <property stdset="1">
         <name>caption</name>
-        <string>kBpmPlayer</string>
+        <string>BpmPlayer</string>
     </property>
+    <widget>
+        <class>QGroupBox</class>
+        <property stdset="1">
+            <name>name</name>
+            <cstring>Position</cstring>
+        </property>
+        <property stdset="1">
+            <name>geometry</name>
+            <rect>
+                <x>10</x>
+                <y>0</y>
+                <width>290</width>
+                <height>120</height>
+            </rect>
+        </property>
+        <property stdset="1">
+            <name>title</name>
+            <string>Position/Size</string>
+        </property>
+        <widget>
+            <class>QLCDNumber</class>
+            <property stdset="1">
+                <name>name</name>
+                <cstring>LcdLeft</cstring>
+            </property>
+            <property stdset="1">
+                <name>geometry</name>
+                <rect>
+                    <x>10</x>
+                    <y>20</y>
+                    <width>130</width>
+                    <height>40</height>
+                </rect>
+            </property>
+            <property stdset="1">
+                <name>numDigits</name>
+                <number>6</number>
+            </property>
+            <property>
+                <name>toolTip</name>
+                <string></string>
+            </property>
+        </widget>
+        <widget>
+            <class>QLCDNumber</class>
+            <property stdset="1">
+                <name>name</name>
+                <cstring>CurrentTimeLCD</cstring>
+            </property>
+            <property stdset="1">
+                <name>geometry</name>
+                <rect>
+                    <x>10</x>
+                    <y>70</y>
+                    <width>130</width>
+                    <height>40</height>
+                </rect>
+            </property>
+            <property stdset="1">
+                <name>numDigits</name>
+                <number>6</number>
+            </property>
+            <property>
+                <name>toolTip</name>
+                <string></string>
+            </property>
+        </widget>
+        <widget>
+            <class>QLCDNumber</class>
+            <property stdset="1">
+                <name>name</name>
+                <cstring>TotalTimeLCD</cstring>
+            </property>
+            <property stdset="1">
+                <name>geometry</name>
+                <rect>
+                    <x>150</x>
+                    <y>70</y>
+                    <width>120</width>
+                    <height>40</height>
+                </rect>
+            </property>
+            <property stdset="1">
+                <name>numDigits</name>
+                <number>6</number>
+            </property>
+            <property>
+                <name>toolTip</name>
+                <string></string>
+            </property>
+        </widget>
+        <widget>
+            <class>QLCDNumber</class>
+            <property stdset="1">
+                <name>name</name>
+                <cstring>LcdRight</cstring>
+            </property>
+            <property stdset="1">
+                <name>geometry</name>
+                <rect>
+                    <x>150</x>
+                    <y>20</y>
+                    <width>120</width>
+                    <height>40</height>
+                </rect>
+            </property>
+            <property stdset="1">
+                <name>numDigits</name>
+                <number>6</number>
+            </property>
+            <property>
+                <name>toolTip</name>
+                <string></string>
+            </property>
+        </widget>
+    </widget>
+    <widget>
+        <class>QLabel</class>
+        <property stdset="1">
+            <name>name</name>
+            <cstring>PlayingText</cstring>
+        </property>
+        <property stdset="1">
+            <name>geometry</name>
+            <rect>
+                <x>10</x>
+                <y>130</y>
+                <width>620</width>
+                <height>30</height>
+            </rect>
+        </property>
+        <property stdset="1">
+            <name>font</name>
+            <font>
+                <pointsize>18</pointsize>
+            </font>
+        </property>
+        <property stdset="1">
+            <name>frameShape</name>
+            <enum>NoFrame</enum>
+        </property>
+        <property stdset="1">
+            <name>margin</name>
+            <number>0</number>
+        </property>
+        <property stdset="1">
+            <name>text</name>
+            <string>SongName</string>
+        </property>
+        <property stdset="1">
+            <name>scaledContents</name>
+            <bool>false</bool>
+        </property>
+        <property stdset="1">
+            <name>alignment</name>
+            <set>AlignCenter</set>
+        </property>
+        <property>
+            <name>hAlign</name>
+        </property>
+    </widget>
     <widget>
         <class>QButtonGroup</class>
         <property stdset="1">
@@ -29,7 +190,7 @@
             <name>geometry</name>
             <rect>
                 <x>20</x>
-                <y>460</y>
+                <y>560</y>
                 <width>240</width>
                 <height>160</height>
             </rect>
@@ -168,8 +329,8 @@
         <property stdset="1">
             <name>geometry</name>
             <rect>
-                <x>10</x>
-                <y>170</y>
+                <x>280</x>
+                <y>550</y>
                 <width>260</width>
                 <height>200</height>
             </rect>
@@ -224,30 +385,6 @@
             <property stdset="1">
                 <name>accel</name>
                 <number>268435509</number>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton25</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>130</x>
-                    <y>60</y>
-                    <width>120</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>Stop</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435488</number>
             </property>
         </widget>
         <widget>
@@ -498,120 +635,28 @@
                 <string></string>
             </property>
         </widget>
-    </widget>
-    <widget>
-        <class>QGroupBox</class>
-        <property stdset="1">
-            <name>name</name>
-            <cstring>Position</cstring>
-        </property>
-        <property stdset="1">
-            <name>geometry</name>
-            <rect>
-                <x>10</x>
-                <y>0</y>
-                <width>290</width>
-                <height>120</height>
-            </rect>
-        </property>
-        <property stdset="1">
-            <name>title</name>
-            <string>Position/Size</string>
-        </property>
         <widget>
-            <class>QLCDNumber</class>
+            <class>QPushButton</class>
             <property stdset="1">
                 <name>name</name>
-                <cstring>LcdRight</cstring>
+                <cstring>PushButton25</cstring>
             </property>
             <property stdset="1">
                 <name>geometry</name>
                 <rect>
-                    <x>150</x>
-                    <y>20</y>
+                    <x>130</x>
+                    <y>60</y>
                     <width>120</width>
-                    <height>40</height>
+                    <height>38</height>
                 </rect>
             </property>
             <property stdset="1">
-                <name>numDigits</name>
-                <number>6</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string></string>
-            </property>
-        </widget>
-        <widget>
-            <class>QLCDNumber</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>LcdLeft</cstring>
+                <name>text</name>
+                <string>Stop</string>
             </property>
             <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>10</x>
-                    <y>20</y>
-                    <width>130</width>
-                    <height>40</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>numDigits</name>
-                <number>6</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string></string>
-            </property>
-        </widget>
-        <widget>
-            <class>QLCDNumber</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>CurrentTimeLCD</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>10</x>
-                    <y>70</y>
-                    <width>130</width>
-                    <height>40</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>numDigits</name>
-                <number>6</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string></string>
-            </property>
-        </widget>
-        <widget>
-            <class>QLCDNumber</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>TotalTimeLCD</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>150</x>
-                    <y>70</y>
-                    <width>120</width>
-                    <height>40</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>numDigits</name>
-                <number>6</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string></string>
+                <name>accel</name>
+                <number>268435488</number>
             </property>
         </widget>
     </widget>
@@ -662,54 +707,6 @@
             <class>QPushButton</class>
             <property stdset="1">
                 <name>name</name>
-                <cstring>PushButton22</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>80</x>
-                    <y>20</y>
-                    <width>60</width>
-                    <height>40</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>&gt;&gt;&gt;</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>0</number>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton36_2</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>140</x>
-                    <y>20</y>
-                    <width>50</width>
-                    <height>40</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>&gt;&gt;</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435504</number>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
                 <cstring>PushButton37</cstring>
             </property>
             <property stdset="1">
@@ -754,16 +751,20 @@
             <class>QLCDNumber</class>
             <property stdset="1">
                 <name>name</name>
-                <cstring>CurrentTempoLCD</cstring>
+                <cstring>TempoLd</cstring>
             </property>
             <property stdset="1">
                 <name>geometry</name>
                 <rect>
-                    <x>10</x>
+                    <x>210</x>
                     <y>70</y>
                     <width>90</width>
                     <height>40</height>
                 </rect>
+            </property>
+            <property stdset="1">
+                <name>numDigits</name>
+                <number>5</number>
             </property>
         </widget>
         <widget>
@@ -786,162 +787,487 @@
             <class>QLCDNumber</class>
             <property stdset="1">
                 <name>name</name>
-                <cstring>TempoLd</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>210</x>
-                    <y>70</y>
-                    <width>90</width>
-                    <height>40</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>numDigits</name>
-                <number>5</number>
-            </property>
-        </widget>
-    </widget>
-    <widget>
-        <class>QGroupBox</class>
-        <property stdset="1">
-            <name>name</name>
-            <cstring>GroupBox1</cstring>
-        </property>
-        <property stdset="1">
-            <name>geometry</name>
-            <rect>
-                <x>640</x>
-                <y>0</y>
-                <width>100</width>
-                <height>370</height>
-            </rect>
-        </property>
-        <property stdset="1">
-            <name>title</name>
-            <string>Volumes</string>
-        </property>
-        <widget>
-            <class>QLayoutWidget</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>Layout1</cstring>
+                <cstring>CurrentTempoLCD</cstring>
             </property>
             <property stdset="1">
                 <name>geometry</name>
                 <rect>
                     <x>10</x>
-                    <y>20</y>
-                    <width>30</width>
-                    <height>340</height>
+                    <y>70</y>
+                    <width>90</width>
+                    <height>40</height>
                 </rect>
             </property>
-            <vbox>
-                <property stdset="1">
-                    <name>margin</name>
-                    <number>0</number>
-                </property>
-                <property stdset="1">
-                    <name>spacing</name>
-                    <number>6</number>
-                </property>
-                <widget>
-                    <class>QLabel</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>TextLabel1</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>text</name>
-                        <string>Main</string>
-                    </property>
-                </widget>
-                <widget>
-                    <class>QSlider</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>Slider3</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>maxValue</name>
-                        <number>100</number>
-                    </property>
-                    <property stdset="1">
-                        <name>lineStep</name>
-                        <number>1</number>
-                    </property>
-                    <property stdset="1">
-                        <name>orientation</name>
-                        <enum>Vertical</enum>
-                    </property>
-                    <property stdset="1">
-                        <name>tickmarks</name>
-                        <enum>Both</enum>
-                    </property>
-                    <property stdset="1">
-                        <name>tickInterval</name>
-                        <number>5</number>
-                    </property>
-                </widget>
-            </vbox>
         </widget>
         <widget>
-            <class>QLayoutWidget</class>
+            <class>QPushButton</class>
             <property stdset="1">
                 <name>name</name>
-                <cstring>Layout2</cstring>
+                <cstring>PushButton22</cstring>
             </property>
             <property stdset="1">
                 <name>geometry</name>
                 <rect>
-                    <x>60</x>
+                    <x>80</x>
                     <y>20</y>
-                    <width>30</width>
-                    <height>340</height>
+                    <width>60</width>
+                    <height>40</height>
                 </rect>
             </property>
-            <vbox>
-                <property stdset="1">
-                    <name>margin</name>
-                    <number>0</number>
-                </property>
-                <property stdset="1">
-                    <name>spacing</name>
-                    <number>6</number>
-                </property>
-                <widget>
-                    <class>QLabel</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>TextLabel2</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>text</name>
-                        <string>PCM</string>
-                    </property>
-                </widget>
-                <widget>
-                    <class>QSlider</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>Slider4</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>orientation</name>
-                        <enum>Vertical</enum>
-                    </property>
-                    <property stdset="1">
-                        <name>tickmarks</name>
-                        <enum>Both</enum>
-                    </property>
-                    <property stdset="1">
-                        <name>tickInterval</name>
-                        <number>5</number>
-                    </property>
-                </widget>
-            </vbox>
+            <property stdset="1">
+                <name>text</name>
+                <string>&gt;&gt;&gt;</string>
+            </property>
+            <property stdset="1">
+                <name>accel</name>
+                <number>0</number>
+            </property>
         </widget>
+        <widget>
+            <class>QPushButton</class>
+            <property stdset="1">
+                <name>name</name>
+                <cstring>PushButton36_2</cstring>
+            </property>
+            <property stdset="1">
+                <name>geometry</name>
+                <rect>
+                    <x>140</x>
+                    <y>20</y>
+                    <width>50</width>
+                    <height>40</height>
+                </rect>
+            </property>
+            <property stdset="1">
+                <name>text</name>
+                <string>&gt;&gt;</string>
+            </property>
+            <property stdset="1">
+                <name>accel</name>
+                <number>268435504</number>
+            </property>
+        </widget>
+    </widget>
+    <widget>
+        <class>QLabel</class>
+        <property stdset="1">
+            <name>name</name>
+            <cstring>TextLabel1_2</cstring>
+        </property>
+        <property stdset="1">
+            <name>geometry</name>
+            <rect>
+                <x>10</x>
+                <y>170</y>
+                <width>40</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property stdset="1">
+            <name>text</name>
+            <string>Main</string>
+        </property>
+    </widget>
+    <widget>
+        <class>QLabel</class>
+        <property stdset="1">
+            <name>name</name>
+            <cstring>TextLabel2_3</cstring>
+        </property>
+        <property stdset="1">
+            <name>geometry</name>
+            <rect>
+                <x>350</x>
+                <y>170</y>
+                <width>50</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property stdset="1">
+            <name>text</name>
+            <string>PCM</string>
+        </property>
+    </widget>
+    <widget>
+        <class>QSlider</class>
+        <property stdset="1">
+            <name>name</name>
+            <cstring>Slider3</cstring>
+        </property>
+        <property stdset="1">
+            <name>geometry</name>
+            <rect>
+                <x>60</x>
+                <y>170</y>
+                <width>280</width>
+                <height>24</height>
+            </rect>
+        </property>
+        <property stdset="1">
+            <name>maxValue</name>
+            <number>99</number>
+        </property>
+        <property stdset="1">
+            <name>lineStep</name>
+            <number>1</number>
+        </property>
+        <property stdset="1">
+            <name>orientation</name>
+            <enum>Horizontal</enum>
+        </property>
+        <property stdset="1">
+            <name>tickmarks</name>
+            <enum>NoMarks</enum>
+        </property>
+        <property stdset="1">
+            <name>tickInterval</name>
+            <number>5</number>
+        </property>
+    </widget>
+    <widget>
+        <class>QSlider</class>
+        <property stdset="1">
+            <name>name</name>
+            <cstring>Slider4</cstring>
+        </property>
+        <property stdset="1">
+            <name>geometry</name>
+            <rect>
+                <x>400</x>
+                <y>170</y>
+                <width>280</width>
+                <height>24</height>
+            </rect>
+        </property>
+        <property stdset="1">
+            <name>orientation</name>
+            <enum>Horizontal</enum>
+        </property>
+        <property stdset="1">
+            <name>tickmarks</name>
+            <enum>NoMarks</enum>
+        </property>
+        <property stdset="1">
+            <name>tickInterval</name>
+            <number>5</number>
+        </property>
+    </widget>
+    <widget>
+        <class>QPushButton</class>
+        <property stdset="1">
+            <name>name</name>
+            <cstring>PushButton11</cstring>
+        </property>
+        <property stdset="1">
+            <name>geometry</name>
+            <rect>
+                <x>640</x>
+                <y>10</y>
+                <width>40</width>
+                <height>30</height>
+            </rect>
+        </property>
+        <property stdset="1">
+            <name>palette</name>
+            <palette>
+                <active>
+                    <color>
+                        <red>0</red>
+                        <green>0</green>
+                        <blue>0</blue>
+                    </color>
+                    <color>
+                        <red>255</red>
+                        <green>0</green>
+                        <blue>127</blue>
+                    </color>
+                    <color>
+                        <red>255</red>
+                        <green>127</green>
+                        <blue>191</blue>
+                    </color>
+                    <color>
+                        <red>255</red>
+                        <green>63</green>
+                        <blue>159</blue>
+                    </color>
+                    <color>
+                        <red>127</red>
+                        <green>0</green>
+                        <blue>64</blue>
+                    </color>
+                    <color>
+                        <red>170</red>
+                        <green>0</green>
+                        <blue>85</blue>
+                    </color>
+                    <color>
+                        <red>0</red>
+                        <green>0</green>
+                        <blue>0</blue>
+                    </color>
+                    <color>
+                        <red>255</red>
+                        <green>255</green>
+                        <blue>255</blue>
+                    </color>
+                    <color>
+                        <red>0</red>
+                        <green>0</green>
+                        <blue>0</blue>
+                    </color>
+                    <color>
+                        <red>255</red>
+                        <green>255</green>
+                        <blue>255</blue>
+                    </color>
+                    <color>
+                        <red>192</red>
+                        <green>192</green>
+                        <blue>192</blue>
+                    </color>
+                    <color>
+                        <red>0</red>
+                        <green>0</green>
+                        <blue>0</blue>
+                    </color>
+                    <color>
+                        <red>0</red>
+                        <green>0</green>
+                        <blue>128</blue>
+                    </color>
+                    <color>
+                        <red>255</red>
+                        <green>255</green>
+                        <blue>255</blue>
+                    </color>
+                </active>
+                <disabled>
+                    <color>
+                        <red>128</red>
+                        <green>128</green>
+                        <blue>128</blue>
+                    </color>
+                    <color>
+                        <red>255</red>
+                        <green>0</green>
+                        <blue>127</blue>
+                    </color>
+                    <color>
+                        <red>255</red>
+                        <green>127</green>
+                        <blue>191</blue>
+                    </color>
+                    <color>
+                        <red>255</red>
+                        <green>38</green>
+                        <blue>147</blue>
+                    </color>
+                    <color>
+                        <red>127</red>
+                        <green>0</green>
+                        <blue>64</blue>
+                    </color>
+                    <color>
+                        <red>170</red>
+                        <green>0</green>
+                        <blue>85</blue>
+                    </color>
+                    <color>
+                        <red>0</red>
+                        <green>0</green>
+                        <blue>0</blue>
+                    </color>
+                    <color>
+                        <red>255</red>
+                        <green>255</green>
+                        <blue>255</blue>
+                    </color>
+                    <color>
+                        <red>128</red>
+                        <green>128</green>
+                        <blue>128</blue>
+                    </color>
+                    <color>
+                        <red>255</red>
+                        <green>255</green>
+                        <blue>255</blue>
+                    </color>
+                    <color>
+                        <red>192</red>
+                        <green>192</green>
+                        <blue>192</blue>
+                    </color>
+                    <color>
+                        <red>0</red>
+                        <green>0</green>
+                        <blue>0</blue>
+                    </color>
+                    <color>
+                        <red>0</red>
+                        <green>0</green>
+                        <blue>128</blue>
+                    </color>
+                    <color>
+                        <red>255</red>
+                        <green>255</green>
+                        <blue>255</blue>
+                    </color>
+                </disabled>
+                <inactive>
+                    <color>
+                        <red>0</red>
+                        <green>0</green>
+                        <blue>0</blue>
+                    </color>
+                    <color>
+                        <red>255</red>
+                        <green>0</green>
+                        <blue>127</blue>
+                    </color>
+                    <color>
+                        <red>255</red>
+                        <green>127</green>
+                        <blue>191</blue>
+                    </color>
+                    <color>
+                        <red>255</red>
+                        <green>38</green>
+                        <blue>147</blue>
+                    </color>
+                    <color>
+                        <red>127</red>
+                        <green>0</green>
+                        <blue>64</blue>
+                    </color>
+                    <color>
+                        <red>170</red>
+                        <green>0</green>
+                        <blue>85</blue>
+                    </color>
+                    <color>
+                        <red>0</red>
+                        <green>0</green>
+                        <blue>0</blue>
+                    </color>
+                    <color>
+                        <red>255</red>
+                        <green>255</green>
+                        <blue>255</blue>
+                    </color>
+                    <color>
+                        <red>0</red>
+                        <green>0</green>
+                        <blue>0</blue>
+                    </color>
+                    <color>
+                        <red>255</red>
+                        <green>255</green>
+                        <blue>255</blue>
+                    </color>
+                    <color>
+                        <red>192</red>
+                        <green>192</green>
+                        <blue>192</blue>
+                    </color>
+                    <color>
+                        <red>0</red>
+                        <green>0</green>
+                        <blue>0</blue>
+                    </color>
+                    <color>
+                        <red>0</red>
+                        <green>0</green>
+                        <blue>128</blue>
+                    </color>
+                    <color>
+                        <red>255</red>
+                        <green>255</green>
+                        <blue>255</blue>
+                    </color>
+                </inactive>
+            </palette>
+        </property>
+        <property stdset="1">
+            <name>text</name>
+            <string>Z</string>
+        </property>
+        <property stdset="1">
+            <name>accel</name>
+            <number>0</number>
+        </property>
+    </widget>
+    <widget>
+        <class>QPushButton</class>
+        <property stdset="1">
+            <name>name</name>
+            <cstring>PushButton12</cstring>
+        </property>
+        <property stdset="1">
+            <name>geometry</name>
+            <rect>
+                <x>640</x>
+                <y>40</y>
+                <width>40</width>
+                <height>30</height>
+            </rect>
+        </property>
+        <property stdset="1">
+            <name>text</name>
+            <string>X</string>
+        </property>
+        <property stdset="1">
+            <name>accel</name>
+            <number>0</number>
+        </property>
+    </widget>
+    <widget>
+        <class>QPushButton</class>
+        <property stdset="1">
+            <name>name</name>
+            <cstring>PushButton13</cstring>
+        </property>
+        <property stdset="1">
+            <name>geometry</name>
+            <rect>
+                <x>640</x>
+                <y>70</y>
+                <width>40</width>
+                <height>30</height>
+            </rect>
+        </property>
+        <property stdset="1">
+            <name>text</name>
+            <string>C</string>
+        </property>
+        <property stdset="1">
+            <name>accel</name>
+            <number>0</number>
+        </property>
+    </widget>
+    <widget>
+        <class>QPushButton</class>
+        <property stdset="1">
+            <name>name</name>
+            <cstring>PushButton14</cstring>
+        </property>
+        <property stdset="1">
+            <name>geometry</name>
+            <rect>
+                <x>640</x>
+                <y>100</y>
+                <width>40</width>
+                <height>30</height>
+            </rect>
+        </property>
+        <property stdset="1">
+            <name>text</name>
+            <string>V</string>
+        </property>
+        <property stdset="1">
+            <name>accel</name>
+            <number>0</number>
+        </property>
     </widget>
     <widget>
         <class>QButtonGroup</class>
@@ -952,10 +1278,10 @@
         <property stdset="1">
             <name>geometry</name>
             <rect>
-                <x>290</x>
-                <y>170</y>
-                <width>340</width>
-                <height>200</height>
+                <x>170</x>
+                <y>310</y>
+                <width>520</width>
+                <height>250</height>
             </rect>
         </property>
         <property stdset="1">
@@ -971,8 +1297,8 @@
             <property stdset="1">
                 <name>geometry</name>
                 <rect>
-                    <x>190</x>
-                    <y>60</y>
+                    <x>370</x>
+                    <y>140</y>
                     <width>70</width>
                     <height>38</height>
                 </rect>
@@ -995,8 +1321,8 @@
             <property stdset="1">
                 <name>geometry</name>
                 <rect>
-                    <x>260</x>
-                    <y>60</y>
+                    <x>10</x>
+                    <y>140</y>
                     <width>70</width>
                     <height>38</height>
                 </rect>
@@ -1019,8 +1345,8 @@
             <property stdset="1">
                 <name>geometry</name>
                 <rect>
-                    <x>190</x>
-                    <y>100</y>
+                    <x>80</x>
+                    <y>140</y>
                     <width>70</width>
                     <height>38</height>
                 </rect>
@@ -1043,8 +1369,8 @@
             <property stdset="1">
                 <name>geometry</name>
                 <rect>
-                    <x>260</x>
-                    <y>100</y>
+                    <x>290</x>
+                    <y>140</y>
                     <width>70</width>
                     <height>38</height>
                 </rect>
@@ -1062,13 +1388,37 @@
             <class>QPushButton</class>
             <property stdset="1">
                 <name>name</name>
+                <cstring>PushButton15</cstring>
+            </property>
+            <property stdset="1">
+                <name>geometry</name>
+                <rect>
+                    <x>10</x>
+                    <y>100</y>
+                    <width>90</width>
+                    <height>38</height>
+                </rect>
+            </property>
+            <property stdset="1">
+                <name>text</name>
+                <string>Store Z</string>
+            </property>
+            <property stdset="1">
+                <name>accel</name>
+                <number>268435546</number>
+            </property>
+        </widget>
+        <widget>
+            <class>QPushButton</class>
+            <property stdset="1">
+                <name>name</name>
                 <cstring>PushButton16</cstring>
             </property>
             <property stdset="1">
                 <name>geometry</name>
                 <rect>
                     <x>110</x>
-                    <y>60</y>
+                    <y>100</y>
                     <width>80</width>
                     <height>38</height>
                 </rect>
@@ -1091,7 +1441,7 @@
             <property stdset="1">
                 <name>geometry</name>
                 <rect>
-                    <x>110</x>
+                    <x>200</x>
                     <y>100</y>
                     <width>80</width>
                     <height>38</height>
@@ -1115,8 +1465,8 @@
             <property stdset="1">
                 <name>geometry</name>
                 <rect>
-                    <x>110</x>
-                    <y>140</y>
+                    <x>280</x>
+                    <y>100</y>
                     <width>80</width>
                     <height>38</height>
                 </rect>
@@ -1134,109 +1484,13 @@
             <class>QPushButton</class>
             <property stdset="1">
                 <name>name</name>
-                <cstring>PushButton14</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>10</x>
-                    <y>140</y>
-                    <width>100</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>Retrieve V</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435574</number>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton13</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>10</x>
-                    <y>100</y>
-                    <width>100</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>Retrieve C</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435555</number>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton12</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>10</x>
-                    <y>60</y>
-                    <width>100</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>Retrieve X</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435576</number>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton15</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>110</x>
-                    <y>20</y>
-                    <width>80</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>Store Z</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435546</number>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
                 <cstring>PushButton10</cstring>
             </property>
             <property stdset="1">
                 <name>geometry</name>
                 <rect>
-                    <x>190</x>
-                    <y>20</y>
+                    <x>150</x>
+                    <y>140</y>
                     <width>140</width>
                     <height>38</height>
                 </rect>
@@ -1250,296 +1504,6 @@
                 <number>268435503</number>
             </property>
         </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton11</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>10</x>
-                    <y>20</y>
-                    <width>100</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>palette</name>
-                <palette>
-                    <active>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>0</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>0</green>
-                            <blue>127</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>127</green>
-                            <blue>191</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>63</green>
-                            <blue>159</blue>
-                        </color>
-                        <color>
-                            <red>127</red>
-                            <green>0</green>
-                            <blue>64</blue>
-                        </color>
-                        <color>
-                            <red>170</red>
-                            <green>0</green>
-                            <blue>85</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>0</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>255</green>
-                            <blue>255</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>0</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>255</green>
-                            <blue>255</blue>
-                        </color>
-                        <color>
-                            <red>192</red>
-                            <green>192</green>
-                            <blue>192</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>0</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>128</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>255</green>
-                            <blue>255</blue>
-                        </color>
-                    </active>
-                    <disabled>
-                        <color>
-                            <red>128</red>
-                            <green>128</green>
-                            <blue>128</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>0</green>
-                            <blue>127</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>127</green>
-                            <blue>191</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>38</green>
-                            <blue>147</blue>
-                        </color>
-                        <color>
-                            <red>127</red>
-                            <green>0</green>
-                            <blue>64</blue>
-                        </color>
-                        <color>
-                            <red>170</red>
-                            <green>0</green>
-                            <blue>85</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>0</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>255</green>
-                            <blue>255</blue>
-                        </color>
-                        <color>
-                            <red>128</red>
-                            <green>128</green>
-                            <blue>128</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>255</green>
-                            <blue>255</blue>
-                        </color>
-                        <color>
-                            <red>192</red>
-                            <green>192</green>
-                            <blue>192</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>0</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>128</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>255</green>
-                            <blue>255</blue>
-                        </color>
-                    </disabled>
-                    <inactive>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>0</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>0</green>
-                            <blue>127</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>127</green>
-                            <blue>191</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>38</green>
-                            <blue>147</blue>
-                        </color>
-                        <color>
-                            <red>127</red>
-                            <green>0</green>
-                            <blue>64</blue>
-                        </color>
-                        <color>
-                            <red>170</red>
-                            <green>0</green>
-                            <blue>85</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>0</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>255</green>
-                            <blue>255</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>0</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>255</green>
-                            <blue>255</blue>
-                        </color>
-                        <color>
-                            <red>192</red>
-                            <green>192</green>
-                            <blue>192</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>0</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>128</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>255</green>
-                            <blue>255</blue>
-                        </color>
-                    </inactive>
-                </palette>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>Retrieve Z</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435578</number>
-            </property>
-        </widget>
-    </widget>
-    <widget>
-        <class>QLabel</class>
-        <property stdset="1">
-            <name>name</name>
-            <cstring>PlayingText</cstring>
-        </property>
-        <property stdset="1">
-            <name>geometry</name>
-            <rect>
-                <x>10</x>
-                <y>130</y>
-                <width>630</width>
-                <height>30</height>
-            </rect>
-        </property>
-        <property stdset="1">
-            <name>font</name>
-            <font>
-                <pointsize>18</pointsize>
-            </font>
-        </property>
-        <property stdset="1">
-            <name>frameShape</name>
-            <enum>NoFrame</enum>
-        </property>
-        <property stdset="1">
-            <name>margin</name>
-            <number>0</number>
-        </property>
-        <property stdset="1">
-            <name>text</name>
-            <string>SongName</string>
-        </property>
-        <property stdset="1">
-            <name>scaledContents</name>
-            <bool>false</bool>
-        </property>
-        <property stdset="1">
-            <name>alignment</name>
-            <set>AlignCenter</set>
-        </property>
-        <property>
-            <name>hAlign</name>
-        </property>
     </widget>
 </widget>
 <connections>

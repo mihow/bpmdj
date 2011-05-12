@@ -18,9 +18,31 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-typedef signed   long long  int signed8;
-typedef unsigned long long  int unsigned8;
-typedef signed        long  int signed4;
-typedef unsigned      long  int unsigned4;
-typedef signed        short int signed2;
-typedef unsigned      short int unsigned2;
+#include <qapplication.h>
+#include <qlistview.h>
+#include <qlcdnumber.h>
+#include <qheader.h>
+#include <qgroupbox.h>
+#include <stdlib.h>
+#include "songselector.logic.h"
+#include "kbpm-played.h"
+#include "kbpm-md5.h"
+
+int main(int argc, char* argv[])
+{
+   SongIndex *songIndex;
+   QApplication app(argc,argv);
+   SongSelectorLogic test;
+   app.setMainWidget(&test);
+   // read already played indices
+   new Played("played.log");
+   // read md5sums
+//   new Sums("001-040");
+   // create the index in memory
+   songIndex=new SongIndex("/","./index","./music");
+   // put it in the dataview
+   test.injectDataSet(songIndex);
+   // start the test app
+   test.show();
+   return app.exec();
+}

@@ -21,49 +21,18 @@
 /*-------------------------------------------
  *         Headers
  *-------------------------------------------*/
-#include "config.h"
-
-#ifdef HAVE_STDLIB_H
 #include <stdlib.h>
-#endif /* HAVE_STDLIB_H */
-
-#ifdef HAVE_STRING_H
 #include <string.h>
-#endif /* HAVE_STRING_H */
-
-#ifdef HAVE_STDIO_H
 #include <stdio.h>
-#endif /* HAVE_STDIO_H */
-
-#ifdef HAVE_TERMIOS_H
 #include <termios.h>
-#endif /* HAVE_TERMIOS_H */
-
-#ifdef HAVE_FCNTL_H
 #include <fcntl.h>
-#endif /* HAVE_FCNTL_H */
-
-#ifdef HAVE_LIBGEN_H
 #include <libgen.h>
-#endif /* HAVE_LIBGEN_H */
-
-#ifdef HAVE_LINUX_SOUNDCARD_H
 #include <linux/soundcard.h>
-#endif /* HAVE_LINUX_SOUNDCARD_H */
-
-#ifdef HAVE_SIGNAL_H
 #include <signal.h>
-#endif /* HAVE_SIGNAL_H */
-
-#ifdef HAVE_TIME_H
 #include <time.h>
-#endif /* HAVE_TIME_H */
-
-#ifdef HAVE_ASSERT_H
 #include <assert.h>
-#endif /* HAVE_ASSERT_H */
-
 #include "common.h"
+#include "version.h"
 
 /*-------------------------------------------
  *         Index fields
@@ -155,7 +124,11 @@ void index_write()
    if (index_bpmcount_to>=0) fprintf(f,"bpmcount-to   : %d\n",index_bpmcount_to);
    if (index_md5sum) fprintf(f,"md5sum : %s\n",index_md5sum);
    if (index_remark) fprintf(f,"remark   : %s\n",index_remark);
-   for(i=0;i<index_nextcomment;i++) fprintf(f,"%s\n",index_comments[i]);
+   // we don't write out comments anymore. They take up lots of space, are useless
+   // and above all take a long time to read in if there are a lot of .idx files !
+   // nevertheless, we cannot thorw them away since older formats should be 
+   // converted to the new format
+   // for(i=0;i<index_nextcomment;i++) fprintf(f,"%s\n",index_comments[i]);
    fclose(f);
 }
 
@@ -298,7 +271,7 @@ void index_read(char* indexn)
    if (!index_version)
      {
 	char version[500];
-	sprintf(version,"BpmDj v%d.%d",MAJOR_VERSION,MINOR_VERSION);
+	sprintf(version,"BpmDj v%s",VERSION);
 	index_changed=1;
 	index_version=strdup(version);
      }
