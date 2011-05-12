@@ -1,4 +1,4 @@
-VERSION = 1.1
+VERSION = 1.2
 include defines
 
 all: cbpm-count cbpm-play kbpm-play kbpm-dj beatmixing.ps
@@ -9,8 +9,11 @@ all: cbpm-count cbpm-play kbpm-play kbpm-dj beatmixing.ps
 %.o: %.c
 	$(CC) -c $< $(CFLAGS) -o $@
 
-%.ps: %.lyx
-	$(LYX) -e ps $<
+%.dvi: %.tex
+	$(LATEX) $<
+
+%.ps: %.dvi
+	$(DVIPS) -o $@ $< 
 
 %.tex: %.lyx
 	$(LYX) -e latex $<
@@ -39,16 +42,20 @@ all: cbpm-count cbpm-play kbpm-play kbpm-dj beatmixing.ps
 clean:
 	$(RM) a.out core *.o *.log *.tex.dep *.toc *.dvi *.aux *.raw 
 	$(RM) plot.ps gmon.out toplot.dat build sum.tmp fetchfiles.sh
-	$(RM) -rf beatmixing beatmixing.ps
-	$(RM) -f cbpm-count cbpm-play kbpm-play kbpm-dj
-	$(RM) -rf kbpmdj-$(VERSION)
-	$(RM) -f *.moc.cpp *.ui.cpp *.ui.h
-	$(RM) -f songplayer.h songplayer.cpp
-	$(RM) -f songedit.h songedit.cpp
-	$(RM) -f songselector.h songselector.cpp
-	$(RM) -f about.h about.cpp
-	$(RM) -f askinput.h askinput.cpp
-	$(RM) -f preferences.h preferences.cpp
+	$(RM) cbpm-count cbpm-play kbpm-play kbpm-dj kbpm-count
+	$(RM) *.moc.cpp *.ui.cpp *.ui.h
+	$(RM) tagbox.h tagbox.cpp songplayer.h songplayer.cpp
+	$(RM) bpmcounter.h bpmcounter.cpp
+	$(RM) setupwizard.h setupwizard.cpp
+	$(RM) scanningprogress.h scanningprogress.cpp
+	$(RM) songselector.h songselector.cpp
+	$(RM) about.h about.cpp
+	$(RM) bpmbounds.h bpmbounds.cpp
+	$(RM) askinput.h askinput.cpp
+	$(RM) preferences.h preferences.cpp
+	$(RM) profile-clock process_bpm.sh
+	$(RM) -r kbpmdj-$(VERSION)
+	$(RM) -r beatmixing beatmixing.ps version.h
 	
 mrproper: clean
 	$(RM) *~ playlist.xmms played.log
@@ -64,16 +71,20 @@ allhtml: beatmixing.html
 	$(CP) index.html beatmixing/index.html
 	$(CP) mixingdesk.jpg beatmixing/
 
+.PHONY: website allhtml all clean 
 website: allhtml
-	$(SCP) beatmixing/* krubbens@bpmdj.sourceforge.net:/home/groups/b/bp/bpmdj/htdocs
+	scp beatmixing/* krubbens@bpmdj.sourceforge.net:/home/groups/b/bp/bpmdj/htdocs
 
 #############################################################################
 # Command line version
 #############################################################################
-
-cbpm-index.c: cbpm-index.h
-cbpm-play.c: cbpm-index.h
-cbpm-count.c: cbpm-index.h
+version.h: profile-clock
+	echo "#define VERSION \""$(VERSION)"\"" >version.h
+	./profile-clock >>version.h
+		
+cbpm-index.c: cbpm-index.h version.h
+cbpm-play.c: cbpm-index.h version.h
+cbpm-count.c: cbpm-index.h version.h
 
 cbpm-count: cbpm-index.o cbpm-count.o
 	$(CC) $^ -o $@
@@ -84,53 +95,65 @@ cbpm-play: cbpm-play.o cbpm-index.o player-core.o
 #############################################################################
 # Kde version
 #############################################################################
-KPLAY_OBJECTS = songplayer.o\
+KPLAY_OBJECTS = about.o\
+	about.moc.o\
+	songplayer.o\
 	songplayer.moc.o\
 	player-core.o\
 	cbpm-index.o\
 	kbpm-play.o\
 	songplayerlogic.o\
-	songplayerlogic.moc.o
+	songplayerlogic.moc.o\
+	bpmcounter.o\
+	bpmcounter.moc.o\
+	kbpm-counter.o\
+	kbpm-counter.moc.o
+
+KCOUNT_OBJECTS = bpmcounter.o\
+	bpmcounter.moc.o\
+	cbpm-index.o\
+	kbpm-count.o\
+	kbpm-count.moc.o
 	
 KSEL_OBJECTS = about.o\
 	about.moc.o\
 	askinput.o\
 	askinput.moc.o\
-	songedit.o\
-	songedit.moc.o\
+	tagbox.o\
+	tagbox.moc.o\
+	scanningprogress.moc.o\
+	scanningprogress.o\
+	bpmbounds.moc.o\
+	bpmbounds.o\
 	songselector.o\
 	songselector.moc.o\
 	songselector.logic.moc.o\
 	songselector.logic.o\
 	preferences.o\
 	preferences.moc.o\
-	preferences.logic.o\
-	preferences.logic.moc.o\
 	qsongviewitem.o\
 	kbpm-index.o\
 	cbpm-index.o\
 	kbpm-played.o\
+	setupwizard.moc.o\
+	setupwizard.o\
 	kbpm-dj.o\
-	kbpm-md5.o
+	kbpm-md5.o\
+	edit-distance.o
 
-songselector.cpp: songselector.h
-
-songselector.logic.h: songselector.h
-
-songselector.logic.cpp: songselector.logic.h about.h songedit.h askinput.h\
-	preferences.h
-
-preferences.logic.h: preferences.h
-
-preferences.logic.cpp: preferences.logic.h
-
-about.cpp: about.h
-
-askinput.cpp: askinput.h
-
-songedit.cpp: songedit.h
-
-songplayer.cpp songplayer.h: songplayer.ui
+kbpm-play.cpp: bpmcounter.h version.h
+bpmcounter.cpp: bpmcounter.h version.h
+songselector.cpp: songselector.h version.h
+tagbox.cpp: tagbox.h
+songselector.logic.h: songselector.h version.h
+songselector.logic.cpp: songselector.logic.h about.h tagbox.h askinput.h\
+	preferences.h version.h scanningprogress.h bpmbounds.h
+preferences.logic.h: preferences.h version.h
+preferences.logic.cpp: preferences.logic.h version.h
+about.cpp: about.h version.h
+askinput.cpp: askinput.h version.h
+kbpm-dj.cpp: setupwizard.h
+songplayer.cpp songplayer.h: songplayer.ui version.h
 	$(UIC) -o songplayer.h songplayer.ui
 	$(UIC) -i songplayer.h -o songplayer.cpp songplayer.ui
 
@@ -138,7 +161,7 @@ kbpm-play: $(KPLAY_OBJECTS)
 	$(CPP) $(KPLAY_OBJECTS) -o kbpm-play\
 	  $(LDFLAGS) $(QT_INCLUDE_PATH) $(QT_LIBRARY_PATH) $(QT_LIBS)
 
-kbpm-dj: $(KSEL_OBJECTS)
+kbpm-dj: $(KSEL_OBJECTS) songselector.cpp songselector.h
 	$(CPP) $(KSEL_OBJECTS) -o kbpm-dj\
 	  $(LDFLAGS) $(QT_INCLUDE_PATH) $(QT_LIBRARY_PATH) $(QT_LIBS)
 
@@ -181,12 +204,17 @@ deb-dist:
 	fakeroot debian/rules binary
 
 deb-install: all
+	$(MKDIR) $(DESTDIR)/usr/; exit 0
+	$(MKDIR) $(DESTDIR)/usr/bin/; exit 0
+	$(MKDIR) $(DESTDIR)/usr/share; exit 0
+	$(MKDIR) $(DESTDIR)/usr/share/doc; exit 0
+	$(MKDIR) $(DESTDIR)/usr/share/doc/bpmdj; exit 0
 	$(CP) $(BIN) $(DESTDIR)/usr/bin/
 	$(CP) $(DOC) $(DESTDIR)/usr/share/doc/bpmdj/
 
 
 
-######################################### TO CLEAN UP !!! #############################################################################
+### CODE BELOW WRITTEN BY tsteudten@users.sourceforge.net #################################################################
 # Setup for make redhat-dist 
 #############################################################################
 
@@ -195,11 +223,6 @@ RPM_BASE = /usr/src/redhat
 #############################################################################
 # Phony targets
 #############################################################################
-.PHONY: wvb website  redhat-dist allhtml all clean clean-bin tags install uninstall 
-
-wvb: clobber 
-	cd ..; $(TAR) cvzf bpmdj-$(VERSION).tgz bpmdj 
-	$(SCP) ../bpmdj-$(VERSION).tgz  werner@asus:
 
 install: install_bin install_doc
 

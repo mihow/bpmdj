@@ -21,6 +21,8 @@
 #include <qtimer.h>
 #include "songplayer.h"
 
+class BpmCountDialog;
+
 class SongPlayerLogic : public SongPlayer
 {
    Q_OBJECT
@@ -31,10 +33,14 @@ class SongPlayerLogic : public SongPlayer
    void setColor(QButton *button, bool enabled);
    void redrawCues();
    void normalReached(bool yes);
+   BpmCountDialog * bpmcounter;
+   bool visiblebpmcounter;
  public:
    SongPlayerLogic::SongPlayerLogic(QWidget*parent=0,const char*name=0, bool modal=FALSE,WFlags f=0);
  public slots:
+   // screen update and tempo slides
    virtual void timerTick();
+   // phase shifts
    virtual void nudgePlus();
    virtual void nudgeMinus();
    virtual void nudgePlus1M();
@@ -43,11 +49,10 @@ class SongPlayerLogic : public SongPlayer
    virtual void nudgeMinus4M();
    virtual void nudgePlus8M();
    virtual void nudgeMinus8M();
-   virtual void accept();
    virtual void nudgePlusB();
-   virtual void setCue();
    virtual void shiftBack();
-   virtual void stop();
+   // cues
+   virtual void setCue();
    virtual void retrieveZ();
    virtual void retrieveX();
    virtual void retrieveC();
@@ -56,16 +61,34 @@ class SongPlayerLogic : public SongPlayer
    virtual void storeX();
    virtual void storeC();
    virtual void storeV();
+   // cue shifting
+   virtual void nudgeCueBack();
+   virtual void nudgeCueForward();
+   virtual void nudgeCueBack8M();
+   virtual void nudgeCueForward8M();
+   // starting and stopping
+   virtual void stop();
+   // frequency shifts
    virtual void targetTempo();
    virtual void normalTempo();
    virtual void fastSwitch();
    virtual void mediumSwitch();
    virtual void slowSwitch();
    virtual void targetStep();
-   virtual void nudgeCueBack();
-   virtual void nudgeCueForward();
-   virtual void nudgeCueBack8M();
-   virtual void nudgeCueForward8M();
+   // finish window
+   virtual void accept();
+   // volumes
    virtual void pcmVolume(int volume);
    virtual void mainVolume(int volume);
+   // LFO functions
+   virtual void fastSaw();
+   virtual void slowSaw();
+   virtual void fastPan();
+   virtual void slowPan();
+   virtual void metronome();
+   virtual void normalLfo();
+   virtual void breakLfo();
+   virtual void slowRevSaw();
+   virtual void fastRevSaw();
+   virtual void openBpmCounter();
 };

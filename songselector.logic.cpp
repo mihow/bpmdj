@@ -20,12 +20,16 @@
 
 #include <unistd.h>
 #include <dirent.h>
+#include <qinputdialog.h>
 #include <qmessagebox.h>
 #include <qlcdnumber.h>
 #include <ctype.h>
 #include <qlabel.h>
 #include <qlistview.h>
 #include <qgroupbox.h>
+#include <qdir.h>
+#include <qfiledialog.h>
+#include <qmultilinedit.h>
 #include <qlineedit.h>
 #include <qcheckbox.h>
 #include <assert.h>
@@ -35,18 +39,24 @@
 #include <unistd.h>
 #include <errno.h>
 #include <sys/mount.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <libgen.h>
 #include "songselector.logic.h"
-#include "preferences.logic.h"
+#include "preferences.h"
 #include "about.h"
-#include "songedit.h"
+#include "tagbox.h"
 #include "qsongviewitem.h"
 #include "kbpm-played.h"
 #include "askinput.h"
 #include "version.h"
+#include "kbpm-dj.h"
+#include "bpmbounds.h"
+
 extern "C"
 {
 #include "cbpm-index.h"
+#include "edit-distance.h"
 }
 
 double SongSelectorLogic::mainTempo=0;
@@ -55,17 +65,18 @@ bool SongSelectorLogic::color_range=false;
 bool SongSelectorLogic::color_notondisk=false;
 int  SongSelectorLogic::itemcount=0;
 SongSelectorLogic *mainWindow;
-  
+
 void ToSwitchOrNotToSwitchSignal(int sig,siginfo_t *info, void* hu)
 {
+   // uiteindelijk moeten we de monitor switchen
    if (info->si_pid!=mainWindow->monitorpid)
      mainWindow->switchMonitorToMain();
    else
-     mainWindow->monitorpid=0;
+     mainWindow->clearMonitor();
 }
 
-SongSelectorLogic::SongSelectorLogic(QWidget*parent=0,const char*name=0, bool modal=FALSE,WFlags f=0) :
-  SongSelector(parent,name,modal,f)
+SongSelectorLogic::SongSelectorLogic(QWidget*parent=0,const char*name=0) :
+  SongSelector(parent,name)
 {
    mainTicks=0;
    timer=new QTimer(this);
@@ -83,7 +94,6 @@ SongSelectorLogic::SongSelectorLogic(QWidget*parent=0,const char*name=0, bool mo
    mainTempo=0;
    nextTagLine=0;
    itemcount=0;
-   targetIndex->setText("");
    mainWindow=this;
    // catch signals
    struct sigaction *act;
@@ -95,7 +105,103 @@ SongSelectorLogic::SongSelectorLogic(QWidget*parent=0,const char*name=0, bool mo
    monitorpid=0;
    // ignore sigchlds
    signal(SIGCHLD,SIG_IGN);
+   
+   // create menu structure
+   QMenuBar *main = new QMenuBar(this);
+   QPopupMenu *help = new QPopupMenu(this);
+   QPopupMenu *tools = new QPopupMenu(this);
+   QPopupMenu *file = new QPopupMenu(this);
+   QPopupMenu *selection = new QPopupMenu(this);
+               view = new QPopupMenu(this);
+   file->insertItem("&Quit",this,SLOT(quitButton()));
+   help->insertItem("&About",this,SLOT(doAbout()));
+   help->insertItem("&Read Manual",this,SLOT(doHelp()));
+   // retrieves from ./music all mp3's and creates index files for them
+   tools->insertItem("&Import mp3's",this,SLOT(importMp3s()));
+   // checks wether the songs on a disk can be found somewhere in the indices
+   tools->insertItem("&Check cdrom content",this,SLOT(checkDisc()));
+   // searches the current list and marks all MD5sum duplicates
+   tools->insertItem("Mark duplicates (experimental)",this,SLOT(doMarkDups()));
+   tools->insertItem("Find similar song names... (experimental)",this,SLOT(findsimilarnames()));
+   tools->insertItem("Find all similar song names... (experimental)",this,SLOT(findallsimilarnames()));
+   tools->insertSeparator();
+   tools->insertItem("&Preferences",this,SLOT(doPreferences()));
+   neglectdirstruct_item = view->insertItem("&Neglect index directory structure",this,SLOT(toggle_neglectdirstruct()));
+   view->insertSeparator();
+   notyetplayed_item = view->insertItem("&Show only not yet played songs",this,SLOT(toggle_notyetplayed()));
+   coloralreadyplayed_item = view->insertItem("&Color already played songs",this,SLOT(toggle_coloralreadyplayed()));
+   view->insertSeparator();
+   onlytemporange_item = view->insertItem("&Only show songs within tempo range (-0.06 < BPM < 0.06)",this,SLOT(toggle_onlytemporange()));
+   colorinrange_item = view->insertItem("Color songs in range",this,SLOT(toggle_colorinrange()));
+   view->insertSeparator();
+   onlyondisk_item = view->insertItem("Show only files on disk",this,SLOT(toggle_onlyondisk()));
+   colornotondisk_item = view->insertItem("Color files not on disk",this,SLOT(toggle_colornotondisk()));
+   view->setCheckable(true);
+   view->setItemChecked(neglectdirstruct_item,true);
+   view->setItemChecked(coloralreadyplayed_item,true);
+   view->setItemChecked(colorinrange_item,true);
+   view->setItemChecked(onlyondisk_item,true);
+   selection->insertItem("&Add tag...",this,SLOT(selectionAddTags()));
+   selection->insertItem("&Measure Bpm ...",this,SLOT(measureBpms()));
+   selection->insertSeparator();
+   selection->insertItem("&Fetch selection from cdrom...",this,SLOT(fetchSelection()));
+   selection->insertItem("E&xport xmms playlist",this,SLOT(exportPlayList()));
+   main->insertItem("&File",file);
+   main->insertItem("&View",view);
+   main->insertItem("&Selection",selection);
+   main->insertItem("&Tools",tools);
+   main->insertItem("&Help",help);
 };
+
+void SongSelectorLogic::toggle_neglectdirstruct()
+{
+   toggleItem(neglectdirstruct_item);
+}
+
+void SongSelectorLogic::toggle_notyetplayed()
+{
+   toggleItem(notyetplayed_item);
+}
+
+void SongSelectorLogic::toggle_coloralreadyplayed()
+{
+   toggleItem(coloralreadyplayed_item);
+}
+
+void SongSelectorLogic::toggle_onlytemporange()
+{
+   toggleItem(onlytemporange_item);
+}
+
+void SongSelectorLogic::toggle_colorinrange()
+{
+   toggleItem(colorinrange_item);
+}
+
+void SongSelectorLogic::toggle_onlyondisk()
+{
+   toggleItem(onlyondisk_item);
+}
+
+void SongSelectorLogic::toggle_colornotondisk()
+{
+   toggleItem(colornotondisk_item);
+}
+
+void SongSelectorLogic::toggleItem(int which)
+{
+   view->setItemChecked(which,!view->isItemChecked(which));
+   doFilterChanged();
+}
+
+void SongSelectorLogic::doHelp()
+{
+   if (!fork())
+     {
+	system("gv /usr/share/doc/bpmdj/beatmixing.ps");
+	exit(0);
+     }
+}
 
 void SongSelectorLogic::injectDataSet(SongIndex *data)
 {
@@ -103,18 +209,36 @@ void SongSelectorLogic::injectDataSet(SongIndex *data)
    // add all tags
    addTag("");
    findTags(data);
+   // enable the first everything tag
+   tagInclude[0] -> setChecked(true);
    // update the item list
    updateItemList();
 }
 
-void SongSelectorLogic::findTags(Song* song)
+void SongSelectorLogic::clearMonitor()
+{
+   if (playingInMonitor)
+     {
+	// printf("Clearing monitor %s\n",playingInMonitor->song_index);
+	playingInMonitor->reread();
+	parseTags(playingInMonitor->song_tags);
+	mainWindow->monitorpid=0;
+	playingInMonitor=NULL;
+     }
+}
+
+void SongSelectorLogic::findTags(Song* song)     
 {
    if (!song) return;
    if (song->isIndex())
      findTags(((SongIndex*)song)->list);
    findTags(song->next);
    // parsing of the tags
-   char* tags=song->song_tags;
+   parseTags(song->song_tags);
+}
+
+void SongSelectorLogic::parseTags(char* tags)
+{
    char* runner=tags;
    if (!tags) return;
    while(*runner)
@@ -193,7 +317,7 @@ void SongSelectorLogic::updateItemList()
 {
    itemcount=0;
    songList->clear();
-   if (flatStructure->isChecked())
+   if (view->isItemChecked(neglectdirstruct_item))
      flattenFilter(dataRoot,songList);
    else 
      deepFilter(dataRoot,songList);
@@ -217,16 +341,16 @@ bool SongSelectorLogic::filter(Song *item)
    // structure
    if (item->isIndex())
      {
-	if (flatStructure->isChecked()) return false;
+	if (view->isItemChecked(neglectdirstruct_item)) return false;
 	return true;
      }
    // song on disk ?
-   if (onDiskFilter->isChecked() && !item->song_ondisk)
+   if (view->isItemChecked(onlyondisk_item) && !item->song_ondisk)
      return false;
    // song played ?
    if (strcmp(item->song_index,mainMix->text())==0)
      item->song_played=true;
-   if (notYetPlayedFilter->isChecked() && item->song_played)
+   if (view->isItemChecked(notyetplayed_item) && item->song_played)
      return false;
    // check tag matching
    bool matched=false;
@@ -249,7 +373,7 @@ bool SongSelectorLogic::filter(Song *item)
      }
    if (!matched) return false;
    // tempo 
-   if (item->song_tempo && tempoFilter->isChecked())
+   if (item->song_tempo && view->isItemChecked(onlytemporange_item))
      {
 	double t=atof(item->song_tempo);
 	if (t<mainTempo*0.94) return false;
@@ -290,43 +414,6 @@ void SongSelectorLogic::setColor(QColor color)
 {
    countLcd->setBackgroundColor(color);
    mainLCD->setBackgroundColor(color);
-
-/*   TextLabel1->setBackgroundColor(color);
-   GroupBox2->setBackgroundColor(color);
-   Line1->setBackgroundColor(color);
-   TextLabel2_3->setBackgroundColor(color);
-   flatStructure->setBackgroundColor(color);
-   notYetPlayedFilter->setBackgroundColor(color);
-   colorPlayed->setBackgroundColor(color);
-   tempoFilter->setBackgroundColor(color);
-   colorRange->setBackgroundColor(color);
-   onDiskFilter->setBackgroundColor(color);
-   colorNotOnDisk->setBackgroundColor(color);
-   GroupBox3->setBackgroundColor(color);
-   TextLabel2_2->setBackgroundColor(color);
-   TextLabel1_3->setBackgroundColor(color);
-   TextLabel3_2->setBackgroundColor(color);
-   monitorTitle->setBackgroundColor(color);
-   monitorAuthor->setBackgroundColor(color);
-   monitorMix->setBackgroundColor(color);
-   PushButton4->setBackgroundColor(color);
-   PushButton2->setBackgroundColor(color);
-   GroupBox1->setBackgroundColor(color);
-   mainTitle->setBackgroundColor(color);
-   mainAuthor->setBackgroundColor(color);
-   mainMix->setBackgroundColor(color);
-   TextLabel2->setBackgroundColor(color);
-   TextLabel3->setBackgroundColor(color);
-   TextLabel4->setBackgroundColor(color);
-   TextLabel1_2->setBackgroundColor(color);
-   TextLabel1_4->setBackgroundColor(color);
-   mainTempoText->setBackgroundColor(color);
-   targetIndex->setBackgroundColor(color);
-   PushButton6->setBackgroundColor(color);
-   PushButton1->setBackgroundColor(color);
-   PushButton3->setBackgroundColor(color);
-   PushButton5->setBackgroundColor(color);
-*/
 }
 
 void SongSelectorLogic::switchMonitorToMain()
@@ -339,8 +426,7 @@ void SongSelectorLogic::switchMonitorToMain()
    mainTitle->setText(monitorTitle->text());
    mainAuthor->setText(monitorAuthor->text());
    mainMix->setText(monitorMix->text());
-   if(strcmp(targetIndex->text(),"")==0)
-     mainTempo=monitorTempo;
+   mainTempo=monitorTempo;
    sprintf(tmp,"%g",mainTempo);
    mainTempoText->setText(strdup(tmp));
    /* clear the monitor */
@@ -349,6 +435,13 @@ void SongSelectorLogic::switchMonitorToMain()
    monitorMix->setText("");
    monitorTempo=0;
    monitorpid=0;
+   /* clear the main */
+   if (playingInMain)
+     {
+	playingInMain->reread();
+	parseTags(playingInMain->song_tags);
+     }
+   //printf("Clearing main %s\n",playingInMain->song_index);
    /* ok, the song is already playing, now use the next command next time */
    monitorPlayCommand=(monitorPlayCommand == 1 ? 2 : 1);
    playingInMain=playingInMonitor;
@@ -356,7 +449,7 @@ void SongSelectorLogic::switchMonitorToMain()
    /* write playing sucker to disk */
    Played::Play(mainMix->text());
    /* update view */
-   if (flatStructure->isChecked())
+   if (view->isItemChecked(neglectdirstruct_item))
      updateItemList();
 }
 
@@ -369,22 +462,7 @@ int songFileCompare(const void * a, const void* b)
    return strcmp(A->song_file,B->song_file);
 }
 
-void SongSelectorLogic::doLock()
-{
-   // if main equals target clear the sucker
-   if (strcmp(targetIndex->text(),mainMix->text())==0)
-     {
-	targetIndex->setText("");
-     }
-   // otherwise, set target to current main
-   else
-     {
-	targetIndex->setText(mainMix->text());
-     }
-}
-
-
-bool SongSelectorLogic::lookfor(char* filename,Song* cur)
+bool SongSelectorLogic::lookfor(const char* filename,Song* cur)
 {
    if (!cur) return false;
    else if (cur->isIndex())
@@ -400,41 +478,94 @@ bool SongSelectorLogic::lookfor(char* filename,Song* cur)
      }
 }
 
-void SongSelectorLogic::checkfile(char* filename)
+bool exists(char* fn)
 {
-   // file should end on .mp3
-   // or .MP3
+   FILE * f = fopen(fn,"rb");
+   if (f)
+     {
+	fclose(f);
+	return true;
+     }
+   return false;
+}
+
+void SongSelectorLogic::checkfile(const char* filename, ScanningProgress * progress)
+{
+   // file should end on .mp3 or .MP3
    if (strlen(filename)<4) return;
    if (stricmp(filename+strlen(filename)-4,".mp3")==0)
      {
-	printf("Looking for %s\n",filename);
+	// printf("Looking for %s\n",filename);
 	if (!lookfor(filename,dataRoot))
-	  {
-	     char temp[500];
-	     printf("==> NOT FOUND !!!\n",filename);
-	     sprintf(temp,"%s not found",filename);
-	     QMessageBox::information(this,"Not found",temp);
+	  {	     
+	     char *temp;
+	     // replace last 3 chars with .idx
+	     char indexname[500];
+	     char halfindexname[500];
+	     temp=strdup(basename(strdup(filename)));
+	     temp[strlen(temp)-4]=0;
+	     sprintf(halfindexname,"%s.idx",temp);
+	     sprintf(indexname,"./index/%s.idx",temp);
+	     int nr=2;
+	     while(exists(indexname))
+	       {
+		  sprintf(halfindexname,"%s%d.idx",temp,nr);
+		  sprintf(indexname,"./index/%s%d.idx",temp,nr++);
+	       }
+	     // good create necessary data
+	     index_init();
+	     index_readfrom=strdup(indexname);
+	     
+	     char log[500];
+	     sprintf(log,"Writing %s",index_readfrom);
+	     progress->Created->insertLine(log);
+	     progress->Created->setCursorPosition(progress->Created->numLines(),1);
+	     app->processEvents();
+	     
+	     index_setversion();
+	     index_file=strdup(filename);
+	     index_changed=true;
+	     index_tags=strdup("New");
+	     index_period=20000;
+	     index_write();
+	     index_free();
+	     // inform dataroot of new file
+	     Song * ns = new Song(halfindexname,INDEX_DIR);
+	     assert(ns);
+	     assert(dataRoot);
+	     dataRoot->add(ns);
+	     parseTags(ns->song_tags);
+	     updateItemList();
 	  }
      }
 }
 
-void SongSelectorLogic::scandir(char* dirname, char*checkname)
+void SongSelectorLogic::scandir(const char* dirname, const char* checkname, ScanningProgress * progress)
 {
    DIR *dir;
    struct dirent*entry;
    dir=opendir(dirname);
    if (!dir) return;
-   printf("Recursing into %s\n",dirname);
+   
+   char tmp[500];
+   sprintf(tmp,"Recursing into %s",dirname);
+   progress->Log->insertLine(tmp);
+   progress->Log->setCursorPosition(progress->Log->numLines(),1);
+   app->processEvents();
+			     
    while (entry=readdir(dir))
      {
 	if (strcmp(entry->d_name,".")==0 ||
 	    strcmp(entry->d_name,"..")==0) continue;
 	char txt[500];
 	char txt2[500];
-	sprintf(txt,"%s/%s",checkname,entry->d_name);
+	if (checkname)
+	  sprintf(txt,"%s/%s",checkname,entry->d_name);
+	else
+	  sprintf(txt,"%s",entry->d_name);
 	sprintf(txt2,"%s/%s",dirname,entry->d_name);
-	scandir(txt2,txt);
-	checkfile(txt);
+	scandir(txt2,txt,progress);
+	checkfile(txt,progress);
      }
    closedir(dir);
 }
@@ -446,8 +577,11 @@ void SongSelectorLogic::checkDisc()
    if (whichCd.exec()==whichCd.Rejected) return;
    // 1 - mount cdrom
    system("mount /cdrom");
-   // 2 - Scan directory 
-   scandir("/cdrom",strdup(whichCd.LineEdit->text()));
+   // 2 - Scan directory
+   ScanningProgress * progress = new ScanningProgress();
+   progress->show();
+   scandir("/cdrom",strdup(whichCd.LineEdit->text()),progress);
+   progress->Okay->setEnabled(true);
    // 3 - umount cdrom
    system("umount /cdrom");
    system("eject /cdrom");
@@ -629,18 +763,56 @@ void SongSelectorLogic::exportPlayList()
      {
 	Song* song=toFetch[i++];
 	char* filename=song->song_file;
-	fprintf(script,"../cBpmDj/music/%s\n",filename);
+	fprintf(script,"./music/%s\n",filename);
      }
    fclose(script);
+}
+
+void SongSelectorLogic::measureBpms()
+{
+   /* ask user the given bpm's */
+   BpmBounds *bounds = new BpmBounds(this,0,true);
+   int res = bounds->exec();
+   if (res==QDialog::Rejected)
+     return;
+   char frombound[500];
+   char tobound[500];
+   if (bounds->From->text().isEmpty())
+     sprintf(frombound,"");
+   else 
+     sprintf(frombound,"--low %s",(const char*)(bounds->From->text()));
+   if (bounds->To->text().isEmpty())
+     sprintf(tobound,"");
+   else
+     sprintf(tobound,"--high %s",(const char*)(bounds->To->text()));
+   /* write out executable batch processing for every line */
+   FILE* script=fopen("process_bpm.sh","wb");
+   fprintf(script,"#!/bin/sh\n");
+   assert(script);
+   QListViewItemIterator it1(songList);
+   for(;it1.current();++it1)
+     {
+	QSongViewItem *svi=(QSongViewItem*)it1.current();
+	if (svi->isSelected()) 
+	  fprintf(script,"kbpm-play --batch %s %s \"%s\"\n",frombound,tobound,svi->getSong()->song_index);
+     }
+   fclose(script);
+   chmod("process_bpm.sh",S_IRUSR | S_IWUSR | S_IXUSR);
+   /* now start the sucker */
+   if (!fork())
+     {
+	if (system("./process_bpm.sh")<=256) exit(100);
+	printf("Error: couldn't execute process_bpm.sh\n");
+	exit(100);
+     }
 }
 
 void SongSelectorLogic::selectSong(QListViewItem *song)
 {
    int result;
    char *player;
-   char *matchWith;
+   Song *matchWith;
    char playercommand[500];
-   char tmp[500];
    /* if there is still a song playing in the monitor, don't do it */
    if (monitorpid!=0)
      {
@@ -659,17 +831,11 @@ void SongSelectorLogic::selectSong(QListViewItem *song)
    monitorMix->setText(song->text(LIST_INDEX));
    monitorTempo=atof(song->text(LIST_TEMPO));
    /* create suitable command */
-   playingInMonitor=strdup(song->text(LIST_INDEX));
-   sprintf(tmp,"\"%s\"",playingInMonitor);
-   playingInMonitor=strdup(tmp);
-   /* if there is a target locked index, use it */
-   if (strcmp(targetIndex->text(),"")==0)
-     matchWith=playingInMain;
-   else
-     matchWith=strdup(targetIndex->text());
+   playingInMonitor=((QSongViewItem*)song)->getSong();
+   matchWith=playingInMain;
    if (!matchWith) matchWith=playingInMonitor;
-   player=monitorPlayCommand == 1 ? playCommand1 : playCommand2;
-   sprintf(playercommand, player, matchWith, playingInMonitor);
+   player = monitorPlayCommand == 1 ? playCommand1 : playCommand2;
+   sprintf(playercommand, player, matchWith->song_index, playingInMonitor->song_index);
    /* fork and execute the command */
    if (!(monitorpid=fork()))
      {
@@ -682,7 +848,7 @@ void SongSelectorLogic::selectSong(QListViewItem *song)
 void SongSelectorLogic::doPreferences()
 {
    char tmp[50];
-   PreferencesDialogLogic preferences(NULL,NULL,TRUE);
+   PreferencesDialog preferences(NULL,NULL,TRUE);
    preferences.playerCommand1->setText(playCommand1);
    preferences.playerCommand2->setText(playCommand2);
    sprintf(tmp,"%d",yellowTime);
@@ -691,7 +857,7 @@ void SongSelectorLogic::doPreferences()
    preferences.orangeTime->setText(tmp);
    sprintf(tmp,"%d",redTime);
    preferences.redTime->setText(tmp);
-   if (preferences.exec()==Accepted)
+   if (preferences.exec()==QDialog::Accepted)
      {
 	playCommand1=strdup(preferences.playerCommand1->text());
 	playCommand2=strdup(preferences.playerCommand2->text());
@@ -701,36 +867,28 @@ void SongSelectorLogic::doPreferences()
      }
 }
 
-void SongSelectorLogic::doSongEdit(QListViewItem *song)
+void SongSelectorLogic::measureBpm(QListViewItem *song)
 {
-   if (!song) return;
-   char* index=strdup(song->text(LIST_INDEX));
-   SongData songdata(NULL,NULL,TRUE);
-   songdata.index->setText(index);
-   songdata.title->setText(song->text(LIST_TITLE));
-   songdata.author->setText(song->text(LIST_AUTHOR));
-   songdata.newTempo->setText(song->text(LIST_TEMPO));
-   songdata.newTags->setText(song->text(LIST_TAGS));
-   if (songdata.exec()==Accepted)
+   // time to fork and wait for return ....
+   if (!fork())
      {
-	double tempo=atof(songdata.newTempo->text());
-	// read the index file
-	index_read(index);
-	// modify tempo & period
-	index_period = (int) ((double)11025 * (double)60 * (double) 4 / tempo);
-	index_tempo = strdup(songdata.newTempo->text());
-	// modify taglines
-	index_tags = strdup(songdata.newTags->text());
-	// write the indfex file
-	index_write();
-	// free the bastard
-	index_free();
-	// now update the local songdata
-	Song *s=((QSongViewItem*)song)->getSong();
-	s->song_tempo=strdup(songdata.newTempo->text());
-	s->song_tags=strdup(songdata.newTags->text());
+	char  toexecute[1024];
+	// -s makes sure the bpm-counter starts immediatelly
+	// -S makes sure the bpm-counter stops afterwards
+	// -w specifies the index file to use
+	// and the argument is the .mp3 in question
+	// WVB -- this should move to the preference dialog
+	sprintf(toexecute,"./kbpm-count -s -S -w \"%s\" \"music/%s\"",( const char*)(song->text(LIST_INDEX)),(const char*)(song->text(LIST_FILE)));
+	if (system(toexecute)==-1)
+	  {
+	     sprintf(toexecute,"kbpm-count -s -S -w \"%s\" \"music/%s\"",( const char*)(song->text(LIST_INDEX)),(const char*)(song->text(LIST_FILE)));
+	     if (system(toexecute)==-1)
+	       {
+		  printf("Failed executing kbpm-count\n");
+	       }
+	  }
+	exit(0);
      }
-   free(index);
 }
 
 void SongSelectorLogic::songAddTag(QListViewItem *song, const char* tag)
@@ -755,13 +913,9 @@ void SongSelectorLogic::songAddTag(QListViewItem *song, const char* tag)
 void SongSelectorLogic::selectionAddTags()
 {
    // ask user the tag to add
-   SongData songdata(NULL,NULL,TRUE);
-   songdata.index->setText("*");
-   songdata.title->setText("*");
-   songdata.author->setText("*");
-   songdata.newTempo->setText("---");
+   TagBox songdata(NULL,NULL,TRUE);
    songdata.newTags->setText("");
-   if (songdata.exec()==Accepted)
+   if (songdata.exec()==QDialog::Accepted)
      {
 	QListViewItemIterator it1(songList);
 	for(;it1.current();++it1)
@@ -770,6 +924,7 @@ void SongSelectorLogic::selectionAddTags()
 	     if (svi->isSelected()) 
 	       songAddTag(svi,songdata.newTags->text());
 	  }
+	parseTags(strdup(songdata.newTags->text()));
      }
 }
 
@@ -818,9 +973,9 @@ void SongSelectorLogic::doFilterChanged()
 {
    const char * txt1;
    char * txt2;
-   color_range=colorRange->isChecked();
-   color_notondisk=colorNotOnDisk->isChecked();
-   color_played=colorPlayed->isChecked();
+   color_range=view->isItemChecked(colorinrange_item);
+   color_notondisk=view->isItemChecked(colornotondisk_item);
+   color_played=view->isItemChecked(coloralreadyplayed_item);
    txt1=searchLine->text();
    txt2=strupper(txt1);
    searchLine->setText(txt2);
@@ -828,9 +983,14 @@ void SongSelectorLogic::doFilterChanged()
    updateItemList();
 }
 
+void SongSelectorLogic::quitButton()
+{
+   close();
+}
+				    
 void SongSelectorLogic::addTag(const char* tag)
 {
-   int baseline=260;
+   int baseline=40;
    int col=0, row=0;
    int xbox=120;
    int i=0;
@@ -845,12 +1005,15 @@ void SongSelectorLogic::addTag(const char* tag)
    tagLines[nextTagLine]   =  new QLabel( GroupBox2, "" );
    tagLines[nextTagLine]   -> setGeometry( QRect( 50+col*xbox, baseline+30*row, 110, 30 ) );
    tagLines[nextTagLine]   -> setText( tag );
+   tagLines[nextTagLine]   -> show();
    tagInclude[nextTagLine] =  new QCheckBox( GroupBox2, "" );
    tagInclude[nextTagLine] -> setGeometry( QRect( 10+col*xbox, baseline+30*row, 20, 30 ) );
    tagInclude[nextTagLine] -> setText( tr( "" ) );
+   tagInclude[nextTagLine] -> show();
    tagExclude[nextTagLine] =  new QCheckBox( GroupBox2, "" );
    tagExclude[nextTagLine] -> setGeometry( QRect( 30+col*xbox, baseline+30*row, 20, 30 ) );
    tagExclude[nextTagLine] -> setText( tr( "" ) );
+   tagExclude[nextTagLine] -> show();
    connect( tagInclude[nextTagLine], SIGNAL( stateChanged(int) ), this, SLOT( doFilterChanged() ) );
    connect( tagExclude[nextTagLine], SIGNAL( stateChanged(int) ), this, SLOT( doFilterChanged() ) );
    nextTagLine++;
@@ -868,4 +1031,131 @@ void SongSelectorLogic::addTag(const char* tag)
 	else
 	  i++;
      }
+}
+
+void SongSelectorLogic::findallsimilarnames()
+{
+   bool ok;
+   // ask the name to start with
+   QString text = QInputDialog::getText("Input name to compare with","label","insert name",&ok);
+   if (ok && !text.isEmpty())
+     {
+	dist_init();
+	findallsimilarnamesindir(text);
+	dist_done();
+     }
+}
+
+void SongSelectorLogic::findallsimilarnamesindir(const char* dirname)
+{
+   DIR *dir;
+   struct dirent*entry;
+   printf("scanning directory %s\n",dirname);
+   dir=opendir(dirname);
+   assert(dir);
+   while (entry=readdir(dir))
+     {
+	char txt[500];
+	sprintf(txt,"%s/%s",dirname,entry->d_name);
+	if (entry->d_type==DT_DIR)
+	  {
+	     if (strcmp(entry->d_name,".")==0 ||
+		 strcmp(entry->d_name,"..")==0) continue;
+	     findallsimilarnamesindir(txt);
+	  }
+	else if (entry->d_type==DT_REG)
+	  {
+	     int l;
+	     char txt2[500];
+	     strcpy(txt2,entry->d_name);
+	     l=strlen(txt2);
+	     if (l>4)
+	       {
+		  if (strcasecmp(txt2+l-4,".mp3")==0)
+		    {
+		       txt2[l-4]=0;
+		       findsimilarnames(txt2,txt);
+		    }
+	       }
+	  }
+     }
+   closedir(dir);
+}
+
+void SongSelectorLogic::findsimilarnames(const char* text, const char* fullname)
+{
+//   printf("going in with %s...\n",text);
+   QListViewItemIterator it1(songList);
+   for(;it1.current();++it1)
+     {
+	QSongViewItem *svi=(QSongViewItem*)it1.current();
+	if (svi)
+	  {
+	     Song *song = svi->getSong();
+	     if (song)
+	       {
+		  if (!song->isIndex())
+		    {
+		       const char* t = song->song_title;
+		       const char* a = song->song_author;
+		       assert(t && a);
+		       int val=ndist(t,a,text);
+		       if (val<(strlen(text)/10)+3)
+			 {
+			    printf("%s <-> %s[%s] %d\n",text,t,a,val);
+			    if (fullname)
+			      {
+				 char d[1024];
+				 sprintf(d,"mpg123 -0 -4 -t \"%s\" 2>/tmp/p; grep kbit /tmp/p; tail -n 1 /tmp/p",fullname);
+				 system(d);
+				 sprintf(d,"mpg123 -0 -4 -t \"./music/%s\" 2>/tmp/p; grep kbit /tmp/p; tail -n 1 /tmp/p",song->song_file);
+				 system(d);
+				 printf("\n");
+			      }
+			 }
+		    }
+	       }
+	  }
+     }
+//   printf("coming out...\n");
+}
+
+void SongSelectorLogic::findsimilarnames()
+{
+   bool ok;
+   // ask the name to start with
+   QString text = QInputDialog::getText("Input name to compare with","label","insert name",&ok);
+   if (ok && !text.isEmpty())
+     {
+	dist_init();
+	findsimilarnames(text,NULL);
+	dist_done();
+     }
+}
+
+const char* SongSelectorLogic::askDir()
+{
+   //   QFileDialog *filedialog = new QFileDialog(0,0,true);
+   //   filedialog->exec()
+   QString path = QFileDialog::getExistingDirectory(NULL,this,NULL,"Specify directory");
+   if (path.isEmpty()) return NULL;
+   return strdup((const char*)path);
+}
+
+void SongSelectorLogic::importMp3s()
+{
+//   const char * dir = askDir();
+//   if (dir==NULL) return;
+   // scandir requires two arguments. The first is the absolute position to scan
+   // the second is how the entries should be named relatively to the music dir
+   // therefore dirname should point to a location relatively to music
+//   printf("Direcotry to scan = %s\n",dir);
+   
+   // gdvdmme..
+   // het probleem hier is onmiddelijk dat we niet weten hoe de gegeven directory zich verhoud tot de
+   // music directory.
+   ScanningProgress * progress = new ScanningProgress();
+   progress->show();
+   scandir(MUSIC_DIR,NULL,progress);
+   progress->Okay->setEnabled(true);
 }

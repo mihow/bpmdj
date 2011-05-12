@@ -301,8 +301,6 @@ int main(int argc, char *argv[])
 	fclose(raw);
 	if (opt_verbose)
 	  printf("Finding best autocorrelation\n");
-	sprintf(d," ");
-	index_addcomment(d);
 	stopshift=audiorate*60*4/startbpm;
 	startshift=audiorate*60*4/stopbpm;
 	  {
@@ -343,18 +341,6 @@ int main(int argc, char *argv[])
 	       }
 	     // fill in period
 	     index_period=minimumfoutat;
-	     //	printf("# %d: %ld - %ld\n",minimumfoutat,minimumfout,maximumfout);
-	     for(i=startshift;i<stopshift;i++)
-	       {
-		  fout=foutat[i-startshift];
-		  if (fout)
-		    {
-		       fout-=minimumfout;
-		       // fout=(fout*100)/(maximumfout-minimumfout);
-		       sprintf(d,"%g  %ld",4.0*(double)audiorate*60.0/(double)i,fout);
-		       index_addcomment(d);
-		    }
-	       }
 	     sprintf(d,"%g",4.0*(double)audiorate*60.0/(double)minimumfoutat);
 	     index_tempo=strdup(d);
 	     printf("%s: %s\n",index_file,d);

@@ -11,41 +11,235 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>511</width>
+            <width>503</width>
             <height>436</height>
         </rect>
+    </property>
+    <property stdset="1">
+        <name>palette</name>
+        <palette>
+            <active>
+                <color>
+                    <red>255</red>
+                    <green>0</green>
+                    <blue>127</blue>
+                </color>
+                <color>
+                    <red>192</red>
+                    <green>192</green>
+                    <blue>192</blue>
+                </color>
+                <color>
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>223</red>
+                    <green>223</green>
+                    <blue>223</blue>
+                </color>
+                <color>
+                    <red>96</red>
+                    <green>96</green>
+                    <blue>96</blue>
+                </color>
+                <color>
+                    <red>128</red>
+                    <green>128</green>
+                    <blue>128</blue>
+                </color>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+                <color>
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+                <color>
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>212</red>
+                    <green>255</green>
+                    <blue>252</blue>
+                </color>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+                <color>
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+            </active>
+            <disabled>
+                <color>
+                    <red>128</red>
+                    <green>128</green>
+                    <blue>128</blue>
+                </color>
+                <color>
+                    <red>192</red>
+                    <green>192</green>
+                    <blue>192</blue>
+                </color>
+                <color>
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>220</red>
+                    <green>220</green>
+                    <blue>220</blue>
+                </color>
+                <color>
+                    <red>96</red>
+                    <green>96</green>
+                    <blue>96</blue>
+                </color>
+                <color>
+                    <red>128</red>
+                    <green>128</green>
+                    <blue>128</blue>
+                </color>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+                <color>
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>128</red>
+                    <green>128</green>
+                    <blue>128</blue>
+                </color>
+                <color>
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>212</red>
+                    <green>255</green>
+                    <blue>252</blue>
+                </color>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+                <color>
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+            </disabled>
+            <inactive>
+                <color>
+                    <red>255</red>
+                    <green>0</green>
+                    <blue>127</blue>
+                </color>
+                <color>
+                    <red>192</red>
+                    <green>192</green>
+                    <blue>192</blue>
+                </color>
+                <color>
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>220</red>
+                    <green>220</green>
+                    <blue>220</blue>
+                </color>
+                <color>
+                    <red>96</red>
+                    <green>96</green>
+                    <blue>96</blue>
+                </color>
+                <color>
+                    <red>128</red>
+                    <green>128</green>
+                    <blue>128</blue>
+                </color>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+                <color>
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+                <color>
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>212</red>
+                    <green>255</green>
+                    <blue>252</blue>
+                </color>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+                <color>
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+            </inactive>
+        </palette>
     </property>
     <property stdset="1">
         <name>caption</name>
         <string>About</string>
     </property>
-    <widget>
-        <class>QLabel</class>
-        <property stdset="1">
-            <name>name</name>
-            <cstring>versionLabel</cstring>
-        </property>
-        <property stdset="1">
-            <name>geometry</name>
-            <rect>
-                <x>30</x>
-                <y>20</y>
-                <width>290</width>
-                <height>60</height>
-            </rect>
-        </property>
-        <property stdset="1">
-            <name>font</name>
-            <font>
-                <pointsize>36</pointsize>
-                <italic>1</italic>
-            </font>
-        </property>
-        <property stdset="1">
-            <name>text</name>
-            <string>BpmDj vX.Y</string>
-        </property>
-    </widget>
     <widget>
         <class>QPushButton</class>
         <property stdset="1">
@@ -75,8 +269,8 @@
         <property stdset="1">
             <name>geometry</name>
             <rect>
-                <x>40</x>
-                <y>160</y>
+                <x>30</x>
+                <y>170</y>
                 <width>460</width>
                 <height>200</height>
             </rect>
@@ -91,7 +285,16 @@
             <name>text</name>
             <string>(c) Werner Van Belle   Dec 2001
 e-mail: werner.van.belle@vub.ac.be
-Tel: 0486 68 84 48</string>
+Tel: +32 486 68 84 48
+
+http://bpmdj.sourceforge.net/</string>
+        </property>
+        <property stdset="1">
+            <name>alignment</name>
+            <set>AlignVCenter|AlignRight</set>
+        </property>
+        <property>
+            <name>hAlign</name>
         </property>
     </widget>
     <widget>
@@ -103,8 +306,8 @@ Tel: 0486 68 84 48</string>
         <property stdset="1">
             <name>geometry</name>
             <rect>
-                <x>260</x>
-                <y>90</y>
+                <x>200</x>
+                <y>110</y>
                 <width>230</width>
                 <height>50</height>
             </rect>
@@ -118,6 +321,34 @@ Tel: 0486 68 84 48</string>
         <property stdset="1">
             <name>text</name>
             <string>Free Dj Tools</string>
+        </property>
+    </widget>
+    <widget>
+        <class>QLabel</class>
+        <property stdset="1">
+            <name>name</name>
+            <cstring>versionLabel</cstring>
+        </property>
+        <property stdset="1">
+            <name>geometry</name>
+            <rect>
+                <x>30</x>
+                <y>20</y>
+                <width>320</width>
+                <height>90</height>
+            </rect>
+        </property>
+        <property stdset="1">
+            <name>font</name>
+            <font>
+                <pointsize>36</pointsize>
+                <bold>1</bold>
+                <underline>1</underline>
+            </font>
+        </property>
+        <property stdset="1">
+            <name>text</name>
+            <string>BpmDj vX.Y</string>
         </property>
     </widget>
 </widget>

@@ -19,12 +19,14 @@
 ****/
 
 
+#define MUSIC_DIR "./music"
+#define INDEX_DIR "./index"
+
 #include <qlistview.h>
 class Song
 {
  public:
    Song* next;
-   char *song_id;
    char *song_title;
    char *song_author;
    char *song_version;
@@ -37,7 +39,9 @@ class Song
    bool song_ondisk;
  public:
    Song();
-   Song(char*filename,char* currentpath,char* musicdir);
+   Song(char*filename,char* currentpath);
+   bool obtainTitleAuthor(char * fulltitle);
+   virtual void reread();
    virtual bool isIndex() {return false;};
    bool containsTag(const char* which);
 };
@@ -45,8 +49,12 @@ class Song
 class SongIndex: public Song
 {
  public:
+   char *song_id;
    Song *list;
    void add(Song*t);
-   SongIndex(char* filename, char*dirname, char* musicdir);
+   SongIndex() : Song() { scanDir("/", INDEX_DIR); };
+   SongIndex(char * filename, char * dirname) : Song() {scanDir(filename, dirname);};
+   void scanDir(char * filename, char * dirname);
+   virtual void reread() {return;};
    virtual bool isIndex() {return true;};
 };

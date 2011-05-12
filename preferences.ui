@@ -11,114 +11,14 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>592</width>
-            <height>402</height>
+            <width>588</width>
+            <height>372</height>
         </rect>
     </property>
     <property stdset="1">
         <name>caption</name>
         <string>Preferences</string>
     </property>
-    <widget>
-        <class>Line</class>
-        <property stdset="1">
-            <name>name</name>
-            <cstring>Line1</cstring>
-        </property>
-        <property stdset="1">
-            <name>geometry</name>
-            <rect>
-                <x>0</x>
-                <y>220</y>
-                <width>590</width>
-                <height>20</height>
-            </rect>
-        </property>
-        <property stdset="1">
-            <name>orientation</name>
-            <enum>Horizontal</enum>
-        </property>
-    </widget>
-    <widget>
-        <class>QLabel</class>
-        <property stdset="1">
-            <name>name</name>
-            <cstring>TextLabel8</cstring>
-        </property>
-        <property stdset="1">
-            <name>geometry</name>
-            <rect>
-                <x>20</x>
-                <y>250</y>
-                <width>280</width>
-                <height>20</height>
-            </rect>
-        </property>
-        <property stdset="1">
-            <name>text</name>
-            <string>Time to become: (in seconds)</string>
-        </property>
-    </widget>
-    <widget>
-        <class>QLabel</class>
-        <property stdset="1">
-            <name>name</name>
-            <cstring>TextLabel5</cstring>
-        </property>
-        <property stdset="1">
-            <name>geometry</name>
-            <rect>
-                <x>60</x>
-                <y>290</y>
-                <width>80</width>
-                <height>20</height>
-            </rect>
-        </property>
-        <property stdset="1">
-            <name>text</name>
-            <string>Yellow</string>
-        </property>
-    </widget>
-    <widget>
-        <class>QLabel</class>
-        <property stdset="1">
-            <name>name</name>
-            <cstring>TextLabel7</cstring>
-        </property>
-        <property stdset="1">
-            <name>geometry</name>
-            <rect>
-                <x>60</x>
-                <y>370</y>
-                <width>80</width>
-                <height>20</height>
-            </rect>
-        </property>
-        <property stdset="1">
-            <name>text</name>
-            <string>Red</string>
-        </property>
-    </widget>
-    <widget>
-        <class>QLabel</class>
-        <property stdset="1">
-            <name>name</name>
-            <cstring>TextLabel6</cstring>
-        </property>
-        <property stdset="1">
-            <name>geometry</name>
-            <rect>
-                <x>60</x>
-                <y>330</y>
-                <width>110</width>
-                <height>20</height>
-            </rect>
-        </property>
-        <property stdset="1">
-            <name>text</name>
-            <string>Orange</string>
-        </property>
-    </widget>
     <widget>
         <class>QLineEdit</class>
         <property stdset="1">
@@ -131,54 +31,6 @@
                 <x>140</x>
                 <y>30</y>
                 <width>440</width>
-                <height>28</height>
-            </rect>
-        </property>
-    </widget>
-    <widget>
-        <class>QLineEdit</class>
-        <property stdset="1">
-            <name>name</name>
-            <cstring>yellowTime</cstring>
-        </property>
-        <property stdset="1">
-            <name>geometry</name>
-            <rect>
-                <x>160</x>
-                <y>280</y>
-                <width>144</width>
-                <height>28</height>
-            </rect>
-        </property>
-    </widget>
-    <widget>
-        <class>QLineEdit</class>
-        <property stdset="1">
-            <name>name</name>
-            <cstring>orangeTime</cstring>
-        </property>
-        <property stdset="1">
-            <name>geometry</name>
-            <rect>
-                <x>160</x>
-                <y>320</y>
-                <width>144</width>
-                <height>28</height>
-            </rect>
-        </property>
-    </widget>
-    <widget>
-        <class>QLineEdit</class>
-        <property stdset="1">
-            <name>name</name>
-            <cstring>redTime</cstring>
-        </property>
-        <property stdset="1">
-            <name>geometry</name>
-            <rect>
-                <x>160</x>
-                <y>360</y>
-                <width>144</width>
                 <height>28</height>
             </rect>
         </property>
@@ -204,26 +56,6 @@
         </property>
     </widget>
     <widget>
-        <class>QPushButton</class>
-        <property stdset="1">
-            <name>name</name>
-            <cstring>PushButton13</cstring>
-        </property>
-        <property stdset="1">
-            <name>geometry</name>
-            <rect>
-                <x>430</x>
-                <y>350</y>
-                <width>145</width>
-                <height>38</height>
-            </rect>
-        </property>
-        <property stdset="1">
-            <name>text</name>
-            <string>&amp;Cancel</string>
-        </property>
-    </widget>
-    <widget>
         <class>QLabel</class>
         <property stdset="1">
             <name>name</name>
@@ -244,26 +76,6 @@
         </property>
     </widget>
     <widget>
-        <class>QLabel</class>
-        <property stdset="1">
-            <name>name</name>
-            <cstring>TextLabel2_2</cstring>
-        </property>
-        <property stdset="1">
-            <name>geometry</name>
-            <rect>
-                <x>20</x>
-                <y>90</y>
-                <width>110</width>
-                <height>20</height>
-            </rect>
-        </property>
-        <property stdset="1">
-            <name>text</name>
-            <string>Third Player</string>
-        </property>
-    </widget>
-    <widget>
         <class>QLineEdit</class>
         <property stdset="1">
             <name>name</name>
@@ -280,22 +92,6 @@
         </property>
     </widget>
     <widget>
-        <class>QLineEdit</class>
-        <property stdset="1">
-            <name>name</name>
-            <cstring>playerCommand3</cstring>
-        </property>
-        <property stdset="1">
-            <name>geometry</name>
-            <rect>
-                <x>140</x>
-                <y>90</y>
-                <width>440</width>
-                <height>28</height>
-            </rect>
-        </property>
-    </widget>
-    <widget>
         <class>QLabel</class>
         <property stdset="1">
             <name>name</name>
@@ -304,8 +100,8 @@
         <property stdset="1">
             <name>geometry</name>
             <rect>
-                <x>30</x>
-                <y>130</y>
+                <x>20</x>
+                <y>100</y>
                 <width>530</width>
                 <height>90</height>
             </rect>
@@ -323,6 +119,154 @@
         </property>
     </widget>
     <widget>
+        <class>Line</class>
+        <property stdset="1">
+            <name>name</name>
+            <cstring>Line1</cstring>
+        </property>
+        <property stdset="1">
+            <name>geometry</name>
+            <rect>
+                <x>0</x>
+                <y>190</y>
+                <width>590</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property stdset="1">
+            <name>orientation</name>
+            <enum>Horizontal</enum>
+        </property>
+    </widget>
+    <widget>
+        <class>QLabel</class>
+        <property stdset="1">
+            <name>name</name>
+            <cstring>TextLabel8</cstring>
+        </property>
+        <property stdset="1">
+            <name>geometry</name>
+            <rect>
+                <x>20</x>
+                <y>210</y>
+                <width>280</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property stdset="1">
+            <name>text</name>
+            <string>Time to become: (in seconds)</string>
+        </property>
+    </widget>
+    <widget>
+        <class>QLineEdit</class>
+        <property stdset="1">
+            <name>name</name>
+            <cstring>yellowTime</cstring>
+        </property>
+        <property stdset="1">
+            <name>geometry</name>
+            <rect>
+                <x>160</x>
+                <y>250</y>
+                <width>144</width>
+                <height>28</height>
+            </rect>
+        </property>
+    </widget>
+    <widget>
+        <class>QLineEdit</class>
+        <property stdset="1">
+            <name>name</name>
+            <cstring>orangeTime</cstring>
+        </property>
+        <property stdset="1">
+            <name>geometry</name>
+            <rect>
+                <x>160</x>
+                <y>290</y>
+                <width>144</width>
+                <height>28</height>
+            </rect>
+        </property>
+    </widget>
+    <widget>
+        <class>QLineEdit</class>
+        <property stdset="1">
+            <name>name</name>
+            <cstring>redTime</cstring>
+        </property>
+        <property stdset="1">
+            <name>geometry</name>
+            <rect>
+                <x>160</x>
+                <y>330</y>
+                <width>144</width>
+                <height>28</height>
+            </rect>
+        </property>
+    </widget>
+    <widget>
+        <class>QLabel</class>
+        <property stdset="1">
+            <name>name</name>
+            <cstring>TextLabel5</cstring>
+        </property>
+        <property stdset="1">
+            <name>geometry</name>
+            <rect>
+                <x>60</x>
+                <y>250</y>
+                <width>80</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property stdset="1">
+            <name>text</name>
+            <string>Yellow</string>
+        </property>
+    </widget>
+    <widget>
+        <class>QLabel</class>
+        <property stdset="1">
+            <name>name</name>
+            <cstring>TextLabel6</cstring>
+        </property>
+        <property stdset="1">
+            <name>geometry</name>
+            <rect>
+                <x>60</x>
+                <y>290</y>
+                <width>80</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property stdset="1">
+            <name>text</name>
+            <string>Orange</string>
+        </property>
+    </widget>
+    <widget>
+        <class>QLabel</class>
+        <property stdset="1">
+            <name>name</name>
+            <cstring>TextLabel7</cstring>
+        </property>
+        <property stdset="1">
+            <name>geometry</name>
+            <rect>
+                <x>60</x>
+                <y>330</y>
+                <width>80</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property stdset="1">
+            <name>text</name>
+            <string>Red</string>
+        </property>
+    </widget>
+    <widget>
         <class>QPushButton</class>
         <property stdset="1">
             <name>name</name>
@@ -331,8 +275,8 @@
         <property stdset="1">
             <name>geometry</name>
             <rect>
-                <x>430</x>
-                <y>310</y>
+                <x>350</x>
+                <y>250</y>
                 <width>145</width>
                 <height>38</height>
             </rect>
@@ -340,6 +284,26 @@
         <property stdset="1">
             <name>text</name>
             <string>&amp;Ok</string>
+        </property>
+    </widget>
+    <widget>
+        <class>QPushButton</class>
+        <property stdset="1">
+            <name>name</name>
+            <cstring>PushButton13</cstring>
+        </property>
+        <property stdset="1">
+            <name>geometry</name>
+            <rect>
+                <x>350</x>
+                <y>300</y>
+                <width>145</width>
+                <height>38</height>
+            </rect>
+        </property>
+        <property stdset="1">
+            <name>text</name>
+            <string>&amp;Cancel</string>
         </property>
     </widget>
 </widget>

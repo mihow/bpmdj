@@ -37,12 +37,11 @@ extern "C"
 Song::Song()
 {
    next=NULL;
-   song_id=NULL;
    song_title=NULL;
    song_author=NULL;
-   song_version=NULL;
    song_tempo=NULL;
    song_index=NULL;
+   song_version=NULL;
    song_tags=NULL;
    song_file=NULL;
    song_md5sum=NULL;
@@ -50,31 +49,74 @@ Song::Song()
    song_ondisk=false;
 }
 
-Song::Song(char*filename, char* currentpath, char* musicdir)
+void Song::reread()
 {
-   static int songid=0;
-   char * author, *fulltitle,*version,id[200],*tmp,pf[500];
-   int len=strlen(filename);
-   Song();
+   index_read(song_index);
+   /* when the index changes immediately (new version and so on)
+    * write it out again
+    */
+   if (index_changed)
+     index_write();
+   /* copy everything to object */
+   song_tempo = strdup(index_tempo);
+   song_file = strdup(index_file);
+   if (index_tags)
+     song_tags = strdup(index_tags);
+   else 
+     song_tags=strdup("");
+   if (index_md5sum) 
+     song_md5sum = strdup(index_md5sum);
+   else
+     song_md5sum=strdup("");
+   /* free all */
+   index_free();
+   /* try to open the song ! */
+   char mp3filename[1024];
+   int fd;
+   sprintf(mp3filename,"%s/%s",MUSIC_DIR,song_file);
+   fd=open(mp3filename,O_RDONLY);
+   song_ondisk = fd != -1;
+   if (song_ondisk)
+     close(fd);
+}
+
+Song::Song(char*filename, char* currentpath) 
+{
+   char *fulltitle, pf[500];
+   next=NULL;
    /* NULL */
    assert(filename);
-   /* too short */
-   if (len<4) return;
+   int len=strlen(filename);
    /* check for .idx at the end */
    assert(strcmp(filename+len-4,".idx")==0);
+   /* full index file */
+   sprintf(pf,"%s/%s",currentpath,filename);
+   song_index = strdup(pf);
    /* retrieve fullname without .idx */
    fulltitle=strdup(filename);
    assert(fulltitle);
    fulltitle[len-4]=0;
+   /* get all data */
+   if (!obtainTitleAuthor(fulltitle))
+     {
+	song_title = fulltitle;
+	song_author = "";
+	song_version = "";
+     }
+   /* read the index file */
+   reread();
+   /* set played flag */
+   song_played=Played::IsPlayed(song_index);
+}
+
+bool Song::obtainTitleAuthor(char * fulltitle)
+{
+   char * author, * version;
    /* find '[' */
    author=fulltitle;
    while(*author && (*author!='[')) author++;
    if (!*author)
-     {
-	printf("filename: %s copy: %s\n",filename, fulltitle);
-	fflush(stdout);
-     }
-   assert(*author);
+     return false;
    *author=0;
    author++;
    /* version is everything after the last ] */
@@ -84,51 +126,11 @@ Song::Song(char*filename, char* currentpath, char* musicdir)
    *version=0;
    version++;
    if (!*version) version=strdup("1");
-   /* create id */
-   sprintf(id,"%5d",songid++);
-   /* full index file */
-   sprintf(pf,"%s/%s",currentpath,filename);
-   /* read the index file */
-//   printf("Reading \"%s\"\n",pf);
-   index_read(pf);
-   if (index_changed)
-     index_write();
-   /* copy everything to object */
-   song_id=strdup(id);
-   song_title=fulltitle;
-   song_author=author;
-   song_tempo=strdup(index_tempo);
-   song_version=version;
-   song_index=strdup(pf);
-   song_file=strdup(index_file);
-   if (index_tags) song_tags=strdup(index_tags);
-   else song_tags=strdup("");
-   if (index_md5sum) song_md5sum=strdup(index_md5sum);
-   else 
-     {
-//	index_md5sum=strdup(song_md5sum=strdup(Sums::Md5(song_file)));
-//	index_write();
-		song_md5sum=strdup("");
-     }
-   /* set played flag */
-   song_played=Played::IsPlayed(song_index);
-   next=NULL;
-   /* free all */
-   index_free();
-   /* try to open the song ! */
-   char mp3filename[1024];
-   int fd;
-   sprintf(mp3filename,"%s/%s",musicdir,song_file);
-   fd=open(mp3filename,O_RDONLY);
-   if (fd!=-1)
-     {
-	close(fd);
-	song_ondisk=true;
-     }
-   else
-     {
-	song_ondisk=false;
-     }
+   /* succeeded, assign and return */
+   song_title = fulltitle;
+   song_author = author;
+   song_version = version;
+   return true;
 }
 
 void SongIndex::add(Song*t)
@@ -159,7 +161,7 @@ int inode_sorter(const void*a, const void*b)
      return 0;
 }
 
-SongIndex::SongIndex(char* filename, char*dirname, char* musicdir) : Song()
+void SongIndex::scanDir(char* filename, char*dirname)
 {
    struct toReadEntry **entriesToRead;
    int arraySize=1;
@@ -181,7 +183,7 @@ SongIndex::SongIndex(char* filename, char*dirname, char* musicdir) : Song()
 		 strcmp(entry->d_name,"..")==0) continue;
 	     char txt[500];
 	     sprintf(txt,"%s/%s",dirname,entry->d_name);
-	     add(new SongIndex(entry->d_name,txt,musicdir));
+	     add(new SongIndex(entry->d_name,txt));
 	  }
 	else if (entry->d_type==DT_REG)
 	  {
@@ -205,7 +207,12 @@ SongIndex::SongIndex(char* filename, char*dirname, char* musicdir) : Song()
    /* Read all files */
    for(int i=0;i<toRead;i++)
      {
-	add(new Song(entriesToRead[i]->filename,dirname,musicdir));
+	char * filename = entriesToRead[i]->filename;
+	int len = strlen(filename);
+	if (len >= 4 && strcmp(filename+len-4,".idx")==0)
+	  add(new Song(filename,dirname));
+	else
+	  printf("Ignoring %s\n",filename);
      }
    /* Clear data */
    for(int i=0;i<toRead;i++)

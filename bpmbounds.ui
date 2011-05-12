@@ -1,0 +1,218 @@
+<!DOCTYPE UI><UI>
+<class>BpmBounds</class>
+<widget>
+    <class>QDialog</class>
+    <property stdset="1">
+        <name>name</name>
+        <cstring>BpmBounds</cstring>
+    </property>
+    <property stdset="1">
+        <name>geometry</name>
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>418</width>
+            <height>344</height>
+        </rect>
+    </property>
+    <property stdset="1">
+        <name>caption</name>
+        <string>Batch BPM processing</string>
+    </property>
+    <widget>
+        <class>QPushButton</class>
+        <property stdset="1">
+            <name>name</name>
+            <cstring>PushButton8</cstring>
+        </property>
+        <property stdset="1">
+            <name>geometry</name>
+            <rect>
+                <x>10</x>
+                <y>250</y>
+                <width>100</width>
+                <height>38</height>
+            </rect>
+        </property>
+        <property stdset="1">
+            <name>text</name>
+            <string>Go</string>
+        </property>
+    </widget>
+    <widget>
+        <class>QLabel</class>
+        <property stdset="1">
+            <name>name</name>
+            <cstring>TextLabel1</cstring>
+        </property>
+        <property stdset="1">
+            <name>geometry</name>
+            <rect>
+                <x>120</x>
+                <y>250</y>
+                <width>80</width>
+                <height>30</height>
+            </rect>
+        </property>
+        <property stdset="1">
+            <name>text</name>
+            <string>From :</string>
+        </property>
+        <property stdset="1">
+            <name>alignment</name>
+            <set>AlignVCenter|AlignRight</set>
+        </property>
+        <property>
+            <name>hAlign</name>
+        </property>
+    </widget>
+    <widget>
+        <class>QLabel</class>
+        <property stdset="1">
+            <name>name</name>
+            <cstring>TextLabel2</cstring>
+        </property>
+        <property stdset="1">
+            <name>geometry</name>
+            <rect>
+                <x>120</x>
+                <y>300</y>
+                <width>80</width>
+                <height>30</height>
+            </rect>
+        </property>
+        <property stdset="1">
+            <name>text</name>
+            <string>To :</string>
+        </property>
+        <property stdset="1">
+            <name>alignment</name>
+            <set>AlignVCenter|AlignRight</set>
+        </property>
+        <property>
+            <name>hAlign</name>
+        </property>
+    </widget>
+    <widget>
+        <class>QPushButton</class>
+        <property stdset="1">
+            <name>name</name>
+            <cstring>PushButton9</cstring>
+        </property>
+        <property stdset="1">
+            <name>geometry</name>
+            <rect>
+                <x>10</x>
+                <y>290</y>
+                <width>100</width>
+                <height>38</height>
+            </rect>
+        </property>
+        <property stdset="1">
+            <name>text</name>
+            <string>Cancel</string>
+        </property>
+    </widget>
+    <widget>
+        <class>Line</class>
+        <property stdset="1">
+            <name>name</name>
+            <cstring>Line7</cstring>
+        </property>
+        <property stdset="1">
+            <name>geometry</name>
+            <rect>
+                <x>10</x>
+                <y>220</y>
+                <width>400</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property stdset="1">
+            <name>orientation</name>
+            <enum>Horizontal</enum>
+        </property>
+    </widget>
+    <widget>
+        <class>QLabel</class>
+        <property stdset="1">
+            <name>name</name>
+            <cstring>TextLabel4</cstring>
+        </property>
+        <property stdset="1">
+            <name>geometry</name>
+            <rect>
+                <x>10</x>
+                <y>10</y>
+                <width>400</width>
+                <height>210</height>
+            </rect>
+        </property>
+        <property stdset="1">
+            <name>text</name>
+            <string>Enter the bounds of the BPM search algorithm. If no bounds are specified the bounds currently specified in the .idx will be used.
+
+Determining the BPM of a song takes a while, therefore a background process will be spawned. When that process has finished you should restart kbpm-dj, otherwise the selector will still work with old (wrong) tempos. This also means that you can close kbpm-dj any time you want.</string>
+        </property>
+        <property stdset="1">
+            <name>alignment</name>
+            <set>WordBreak|AlignTop|AlignLeft</set>
+        </property>
+        <property>
+            <name>hAlign</name>
+        </property>
+        <property>
+            <name>vAlign</name>
+        </property>
+        <property>
+            <name>wordwrap</name>
+        </property>
+    </widget>
+    <widget>
+        <class>QLineEdit</class>
+        <property stdset="1">
+            <name>name</name>
+            <cstring>From</cstring>
+        </property>
+        <property stdset="1">
+            <name>geometry</name>
+            <rect>
+                <x>210</x>
+                <y>250</y>
+                <width>190</width>
+                <height>30</height>
+            </rect>
+        </property>
+    </widget>
+    <widget>
+        <class>QLineEdit</class>
+        <property stdset="1">
+            <name>name</name>
+            <cstring>To</cstring>
+        </property>
+        <property stdset="1">
+            <name>geometry</name>
+            <rect>
+                <x>210</x>
+                <y>300</y>
+                <width>190</width>
+                <height>30</height>
+            </rect>
+        </property>
+    </widget>
+</widget>
+<connections>
+    <connection>
+        <sender>PushButton8</sender>
+        <signal>clicked()</signal>
+        <receiver>BpmBounds</receiver>
+        <slot>accept()</slot>
+    </connection>
+    <connection>
+        <sender>PushButton9</sender>
+        <signal>clicked()</signal>
+        <receiver>BpmBounds</receiver>
+        <slot>reject()</slot>
+    </connection>
+</connections>
+</UI>

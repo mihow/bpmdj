@@ -15,8 +15,7 @@
 
  You should have received a copy of the GNU General Public License
  along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-****/
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  U****/
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
@@ -49,13 +48,12 @@ signed8 currentperiod;
 signed8 normalperiod;
 signed8 latency;
 signed8 y,x=0;
-int     opt_debuglatency = 0;
 int     opt_quiet = 0;
 char*   arg_dsp = "/dev/dsp";
 int     opt_match = 0;
 char*   arg_match = 0;
 int     opt_latency = 0;
-char*   arg_latency = "744";
+char*   arg_latency = "777";
 char*   arg_mixer = "/dev/mixer";
 char*   argument;
 
@@ -72,7 +70,7 @@ signed8 clock_ticks()
 {
    // clock ticks are expressed in WAVRATE resolution
    signed8 ticks=(signed8)times(NULL)-(signed8)starttick;
-   signed8 answer=ticks*(signed8)WAVRATE/(signed8)CLK_TCK;
+   signed8 answer=ticks*(signed8)WAVRATE/(signed8)CLOCK_FREQ;
    assert(answer>=0);
    return answer;
 }
@@ -146,18 +144,22 @@ void dsp_open()
    p=WAVRATE;
    ioctl(dsp,SOUND_PCM_WRITE_RATE,&p);
    ioctl(dsp,SNDCTL_DSP_GETOSPACE,&ab);
-   // check latency iuf necessary
-   if (opt_debuglatency)
+   // check latency if necessary
+   latency=(double)ab.bytes;
+   latency/=4.0;
+   latency/=(double)WAVRATE;
+   latency*=1000.0;
+   dsp_start();
+   clock_start();
+   sleep(1);
      {
-	latency=(double)ab.bytes;
-	latency/=4.0;
-	latency/=(double)WAVRATE;
-	latency*=1000.0;
-	printf("Dsp device has %d bytes: latency = %g ms\n",ab.bytes,latency);
-	dsp_start();
-	clock_start();
-	sleep(1);
-	printf("Clock gives %d ticks (should be around %d)\n",(long)clock_ticks(),WAVRATE);
+	signed8 l = clock_ticks();
+	if (l-WAVRATE>100) 
+	  {
+	     printf("Dsp device has %d bytes: latency = %g ms\n",ab.bytes,latency);
+	     printf("CLOCK_FREQ is wrong (again!) please inform the author !!!\n(werner.van.belle@vub.ac.be)\n");
+	     printf("Clock gives %d ticks (should be around %d)\n",(long)l,WAVRATE);
+	  }
      }
 }
 
@@ -243,22 +245,33 @@ static unsigned4 fsize(FILE* wtf)
    return res;
 }
 
-void wave_open(char* fname)
+void wave_open(char* fname, int synchronous)
 {
    char fn[500];
    // start decoding the file; this means: fork mp3 process
    // wait 1 second and start reading the file
-   if (!fork())
+   if (synchronous)
      {
 	char execute[500];
 	sprintf(execute,"glue-mp3raw \"%s\"\n",fname);
-	if (system(execute)<=256) exit(100);
-	sprintf(execute,"./glue-mp3raw \"%s\"\n",fname);
-	if (system(execute)<=256) exit(100);
-	printf("Error: couldn't execute glue-mp3raw or ./glue-mp3raw\n");
-	exit(100);
+	if (!(system(execute)<=256))
+	  {
+	     printf("Error: couldn't execute glue-mp3raw\n");
+	     exit(100);
+	  }
      }
-   sleep(1);
+   else 
+     {
+	if (!fork())
+	  {
+	     char execute[500];
+	     sprintf(execute,"glue-mp3raw \"%s\"\n",fname);
+	     if (system(execute)<=256) exit(100);
+	     printf("Error: couldn't execute glue-mp3raw\n");
+	     exit(100);
+	  }
+	sleep(1);
+     }
    sprintf(fn,"%s.raw",fname);
    wave_name=strdup(basename(fn));
    wave_file=fopen(wave_name,"rb");
@@ -297,10 +310,9 @@ int wave_read(unsigned4 pos, unsigned4 *val)
 /*-------------------------------------------
  *         Synth operations
  *-------------------------------------------*/
-typedef unsigned4 (*_lfo_)(unsigned4 x);
-        unsigned8   lfo_phase=0;
-        signed8   lfo_period=0;
-         _lfo_   lfo_do;
+unsigned8   lfo_phase=0;
+signed8   lfo_period=0;
+_lfo_   lfo_do;
 
 void jumpto(signed8, int);
 
@@ -621,11 +633,9 @@ void changetempo(signed8 period)
     */
    int change=(long)(currentperiod*1000/period)-(long)1000;
    if (period>currentperiod)
-     printf("slow down (%d)\n",change);
-   else 
-     printf("speed up (%d)\n",change);
-   
-   
+     msg_slowdown(change);
+   else
+     msg_speedup(change);
    currentperiod = period;
    y = x * currentperiod / normalperiod;
    
@@ -715,12 +725,9 @@ void read_write_loop()
 	// write value
 	dsp_write(value);
      }
-   if (opt_debuglatency)
-     {
-	latencycheck=dsp_playcount();
-	dsp_flush();
-	printf("Actual playing latency = %d ms\n",(long)((clock_ticks()-latencycheck)*(signed8)1000/(signed8)WAVRATE));
-     }
+   latencycheck=dsp_playcount();
+   dsp_flush();
+   printf("Actual playing latency = %d ms\n",(long)((clock_ticks()-latencycheck)*(signed8)1000/(signed8)WAVRATE));
 }
 
 /*-------------------------------------------
@@ -734,21 +741,19 @@ void line()
 void copyright()
 {
    printf("BpmDj Player v%s, Copyright (c) 2001 Werner Van Belle\n",VERSION);
-   printf("This software is distributed under the GPL2 license. See copyright.txt for\n");
-   printf("details. Press 'h' for Help. See beatmixing.ps for details\n");
+   printf("This software is distributed under the GPL2 license. See copyright.txt\n");
+   printf("Press 'h' for Help. See beatmixing.ps for details\n");
    line();
 }
 
-int main(int argc, char *argv[])
+void core_init(int sync)
 {
-   app_init(argc,argv);
    copyright();
    assert(sizeof(signed2)==2);
    assert(sizeof(int)==4);
    assert(sizeof(signed4)==4);
    assert(sizeof(signed8)==8);
    // Parsing the arguments
-   process_options(argc,argv);
    if (opt_match)
      {
 	index_read(arg_match);
@@ -759,6 +764,7 @@ int main(int argc, char *argv[])
      if (strcmp(strstr(argument,".mp3"),".mp3")==0)
        {
 	  printf("Error: please enter the index file, not the mp3 file\n");
+	  printf("       an index file can be made with cbpm-count\n");
 	  exit(30);
        }
    index_read(argument);
@@ -785,16 +791,30 @@ int main(int argc, char *argv[])
 	printf(" speed(%g)\n",(double)normalperiod/(double)currentperiod);
      }
    cue_read();
+   wave_open(index_file,sync);
+}
+
+void core_open()
+{
    mixer_open();
    dsp_open();
-   wave_open(index_file);
-   terminal_start();
+}
+
+void core_play()
+{
    read_write_loop();
+}
+
+void core_close()
+{
    dsp_close();
    mixer_close();
+}
+
+void core_done()
+{
    wave_close();
    cue_write();
-   terminal_stop();
    if (index_changed)
      {
 	if (!opt_quiet)

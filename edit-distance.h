@@ -18,6 +18,8 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#include <qtimer.h>
-#include <qlistview.h>
-#include "preferences.logic.h"
+#include <assert.h>
+
+int ndist(const char* title, const char* author, const char* other);
+void dist_init();
+void dist_done();

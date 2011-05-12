@@ -32,18 +32,21 @@
 
 #include <qtimer.h>
 #include <qlistview.h>
+#include <dirent.h>
 #include <qpushbutton.h>
+#include <qcheckbox.h>
 #include <qlineedit.h>
 #include <qmenubar.h>
 #include "songselector.h"
+#include "scanningprogress.h"
 #include "kbpm-index.h"
 
-#define PLAYCOMMAND1 "./kbpm-play -d /dev/dsp2 -x /dev/mixer1 -p 840 0   -m %s %s"
-#define PLAYCOMMAND2 "./kbpm-play -d /dev/dsp1 -x /dev/mixer  -p 840 400 -m %s %s"
-#define TIME_YELLOW 120
-#define TIME_ORANGE 150
-#define TIME_RED 180
-#define MAXTAGSPERCOL 23
+#define PLAYCOMMAND1  "kbpm-play -d /dev/dsp2 -x /dev/mixer1 -p 640 0   -m \"%s\" \"%s\""
+#define PLAYCOMMAND2  "kbpm-play -d /dev/dsp1 -x /dev/mixer  -p 640 400 -m \"%s\" \"%s\""
+#define TIME_YELLOW   120
+#define TIME_ORANGE   150
+#define TIME_RED      180
+#define MAXTAGSPERCOL 29
 #define MAXTAGS (MAXTAGSPERCOL*2)
 
 class SongSelectorLogic: public SongSelector
@@ -60,8 +63,8 @@ class SongSelectorLogic: public SongSelector
    int monitorPlayCommand;
    char* playCommand1;
    char* playCommand2;
-   char* playingInMain;
-   char* playingInMonitor;
+   Song* playingInMain;
+   Song* playingInMonitor;
    SongIndex *dataRoot;
    int filterBpm;
    double monitorTempo;
@@ -69,6 +72,15 @@ class SongSelectorLogic: public SongSelector
    QLabel *tagLines[MAXTAGS];
    QCheckBox *tagInclude[MAXTAGS];
    QCheckBox *tagExclude[MAXTAGS];
+   QPopupMenu *view;
+   QPopupMenu *songedit;
+   int neglectdirstruct_item;
+   int notyetplayed_item;
+   int coloralreadyplayed_item;
+   int onlytemporange_item;
+   int colorinrange_item;
+   int onlyondisk_item;
+   int colornotondisk_item;
  public:
    static int    itemcount;
    static double mainTempo;
@@ -76,12 +88,13 @@ class SongSelectorLogic: public SongSelector
    static bool   color_played;
    static bool   color_notondisk;
  public:
-   SongSelectorLogic(QWidget*parent=0,const char*name=0, bool modal=FALSE,WFlags f=0);
+   SongSelectorLogic(QWidget*parent=0,const char*name=0);
    void injectDataSet(SongIndex *data);
    void addTag(const char* tag);
    void findTags(Song* song);
  private:
    void updateItemList();
+   void toggleItem(int which);
    void flattenFilter(Song* list, QListViewItem* parent);
    void deepFilter(Song* list, QListViewItem* parent);
    void flattenFilter(Song* list, QListView* parent);
@@ -90,23 +103,41 @@ class SongSelectorLogic: public SongSelector
    bool doFilter(Song * item);
    void setColor(QColor color);
    void songAddTag(QListViewItem * song, const char* tag);
-   bool lookfor(char*filename, Song*cur);
-   void checkfile(char*filename);
-   void scandir(char*filename,char*checkname);
+   bool lookfor(const char*filename, Song*cur);
+   void checkfile(const char* filename, ScanningProgress * progress);
+   void scandir(const char* filename,const char* checkname, ScanningProgress * progress);
+   void songEdit(QListViewItem* song);
+   void measureBpm(QListViewItem* song);
+   const char * askDir();
+   void parseTags(char* tags);
  protected:
    bool filter(Song * item);
  public slots:
+   virtual void clearMonitor();
    virtual void switchMonitorToMain();
    virtual void timerTick();
    virtual void selectSong(QListViewItem* song);
    virtual void doPreferences();
    virtual void doAbout();
    virtual void doFilterChanged();
-   virtual void doSongEdit(QListViewItem* song);
    virtual void fetchSelection();
    virtual void checkDisc();
-   virtual void doLock();
    virtual void exportPlayList();
    virtual void selectionAddTags();
    virtual void doMarkDups();
+   virtual void quitButton();
+   virtual void toggle_neglectdirstruct();
+   virtual void toggle_notyetplayed();
+   virtual void toggle_coloralreadyplayed();
+   virtual void toggle_onlytemporange();
+   virtual void toggle_colorinrange();
+   virtual void toggle_onlyondisk();
+   virtual void toggle_colornotondisk();
+   virtual void findsimilarnames();
+   virtual void findsimilarnames(const char* name, const char* fullname);
+   virtual void findallsimilarnames();
+   virtual void findallsimilarnamesindir(const char*dirname);
+   virtual void importMp3s();
+   virtual void measureBpms();
+   virtual void doHelp();
 };

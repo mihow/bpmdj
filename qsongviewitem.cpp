@@ -84,7 +84,13 @@ void QSongViewItem::paintCell(QPainter *p,const QColorGroup &cg, int col, int wi
 
 QString QSongViewItem::text(int i) const
 {
-   if (i==LIST_DIR) return song->song_id;
+   if (i==LIST_DIR) 
+     {
+	if (song->isIndex())
+	  return ((SongIndex*)song)->song_id;
+	else 
+	  return "";
+     }
    if (i==LIST_VERSION) return song->song_version;
    if (i==LIST_TITLE) return song->song_title;
    if (i==LIST_AUTHOR) return song->song_author;

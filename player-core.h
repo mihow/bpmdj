@@ -51,6 +51,18 @@ int       mixer_get_pcm();
 void      doubleperiod();
 void      halveperiod();
 
+// initializes the index fields
+// and start reading the audio
+void      core_init(int synchronous);
+// opens the playing device
+void      core_open();
+// plays until asked to stop
+void      core_play();
+// closes the playing device
+void      core_close();
+// closes the wave and writes any changes to the index 
+void      core_done();
+
 unsigned4 lfo_no(unsigned4 x);
 unsigned4 lfo_saw(unsigned4 x);
 unsigned4 lfo_pan(unsigned4 x);
@@ -58,6 +70,8 @@ unsigned4 lfo_break(unsigned4 x);
 unsigned4 lfo_difference(unsigned4 x);
 unsigned4 lfo_revsaw(unsigned4 x);
 unsigned4 lfo_metronome(unsigned4 x);
+typedef unsigned4 (*_lfo_)(unsigned4 x);
+void lfo_set(char* name, _lfo_ l, unsigned8 freq, unsigned8 phase);
 
 extern int   opt_debuglatency;
 extern int   opt_quiet;
@@ -74,6 +88,8 @@ void line();
 extern int app_init(int argc, char *argv[]);
 extern void process_options(int argc,char *argv[]);
 extern void show_error(char*msg);
-extern void terminal_start();
-extern void terminal_stop();
+//extern void terminal_start();
+//extern void terminal_stop();
 extern void show_error(char*msg);
+extern void msg_slowdown(int c);
+extern void msg_speedup(int c);

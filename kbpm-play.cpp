@@ -43,6 +43,7 @@
 #include <math.h>
 #include <pthread.h>
 #include "songplayerlogic.h"
+#include "kbpm-counter.h"
 
 extern "C"
 {
@@ -55,9 +56,11 @@ extern "C"
 /*-------------------------------------------
  *         Constants & Variables
  *-------------------------------------------*/
-static int   opt_miniplayer = 0;
+static int   opt_batch = 0;
 static char* arg_posx = NULL;
 static char* arg_posy = NULL;
+static int   arg_low=120;
+static int   arg_high=160;
 
 /*-------------------------------------------
  *         Parsing arguments 
@@ -67,6 +70,14 @@ void * go(void* neglect)
   {
      app->exec();
   }
+
+void msg_slowdown(int change)
+{
+}
+
+void msg_speedup(int change)
+{
+}
 
 void terminal_start()
 {
@@ -94,10 +105,12 @@ void options_failure(char* err)
 	  "   -d arg      --dsp arg           dsp device to use (default = /dev/dsp)\n"
 	  "   -x arg      --mixer arg         mixer device to use (default = /dev/mixer)\n"
 	  "   -m arg      --match arg         song to match tempo with\n"
-	  "   -l nbr      --latency nbr       required latency in ms (default = 744)\n"
+	  "   -L nbr      --latency nbr       required latency in ms (default = 744)\n"
 	  "   -p nbr nbr  --position nbr nbr  position to place the window\n"
-	  "   -s          --small             use the mini player\n"
-	  "   argument                  the index file of the song to play\n\n%s\n\n",err);
+	  "   -b          --batch             start immediatelly, no sound, quit immidiatelly\n"
+	  "   -l nbr      --low nbr           lowest bpm to look for (default = 120)\n"
+	  "   -h nbr      --high nbr          highest bpm to look for (default = 160)\n"
+	  "   argument                        the index file of the song to handle\n\n%s\n\n",err);
    exit(1);
 }
 
@@ -117,21 +130,32 @@ void process_options(int argc, char* argv[])
 	       options_failure("option neither short or long");
 	     else arg=argv[i]+1;
 	     // check value
-	     if (strcmp(arg,"debuglatency")==0 ||
-		 strcmp(arg,"w")==0)
-	       opt_debuglatency=1;
-	     else if (strcmp(arg,"quiet")==0 ||
-		      strcmp(arg,"q")==0)
+	     if (strcmp(arg,"quiet")==0 ||
+		 strcmp(arg,"q")==0)
 	       opt_quiet=1;
-	     else if (strcmp(arg,"small")==0 ||
-		      strcmp(arg,"s")==0)
-	       opt_miniplayer=1;
+	     else if (strcmp(arg,"batch")==0 ||
+		      strcmp(arg,"b")==0)
+	       opt_batch=1;
 	     else if (strcmp(arg,"dsp")==0 ||
 		      strcmp(arg,"d")==0)
 	       {
 		  if (++i>=argc) 
 		    options_failure("dsp argument scanning error");
 		  arg_dsp=argv[i];
+	       }
+	     else if (strcmp(arg,"low")==0 ||
+		      strcmp(arg,"l")==0)
+	       {
+		  if (++i>=argc) 
+		    options_failure("low argument scanning error");
+		  arg_low=atoi(argv[i]);
+	       }
+	     else if (strcmp(arg,"high")==0 ||
+		      strcmp(arg,"h")==0)
+	       {
+		  if (++i>=argc)
+		    options_failure("high argument scanning error");
+		  arg_high=atoi(argv[i]);
 	       }
 	     else if (strcmp(arg,"match")==0 ||
 		      strcmp(arg,"m")==0)
@@ -142,7 +166,7 @@ void process_options(int argc, char* argv[])
 		  arg_match=argv[i];
 	       }
 	     else if (strcmp(arg,"latency")==0 ||
-		      strcmp(arg,"l")==0)
+		      strcmp(arg,"L")==0)
 	       {
 		  opt_latency=1;
 		  if (++i>=argc)
@@ -184,7 +208,35 @@ void show_error(char*text)
    QMessageBox::critical(NULL,a,b,QMessageBox::Ok,0,0);
 }
 
-int app_init(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
-   app=new QApplication(argc,argv);
+   process_options(argc,argv);
+   if (opt_batch)
+     {
+	// create an application
+	app = new QApplication(argc,argv);
+	// init the core, we do not open it because
+	// we don't want any dsp access
+	core_init(1);
+	printf("Wave written\n");
+	// initialize the count dialog
+	BpmCountDialog *counter = new BpmCountDialog();
+	counter->setBpmBounds(arg_low,arg_high);
+	counter->doit();
+	counter->finish();
+	printf("Counting done\n");
+	// finish the core -> remove the raw file
+	core_done();
+     }
+   else
+     {
+	app=new QApplication(argc,argv);
+	core_init(0);
+	core_open();
+	terminal_start();
+	core_play();
+	terminal_stop();
+	core_close();
+	core_done();
+     }
 }

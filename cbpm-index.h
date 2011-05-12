@@ -22,8 +22,6 @@
  *         Index operations
  *-------------------------------------------*/
 extern           char   * index_readfrom;
-extern           char * * index_comments;
-extern           int      index_nextcomment;
 extern           char   * index_version;
 extern           int      index_period;
 extern           char   * index_tempo;
@@ -41,8 +39,8 @@ extern unsigned long      index_cue_c;
 extern unsigned long      index_cue_v;
 
        void     index_init       ();
+       void     index_setversion ();
        void     index_write      ();
        void     index_read       (char*);
-       void     index_addcomment (char*);
        void     index_free       ();
 

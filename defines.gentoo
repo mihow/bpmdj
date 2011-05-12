@@ -1,5 +1,7 @@
 CC=gcc -O9
+# -pg
 CPP=g++ -O9
+# -pg
 
 CFLAGS+=
 LDFLAGS+= -lpthread -lm
@@ -8,6 +10,8 @@ CP = cp
 MV = mv
 TAR = tar
 LYX = lyx
+LATEX = latex
+DVIPS = dvips
 MKDIR = mkdir
 UIC = /usr/qt/2/bin/uic
 MOC = /usr/qt/2/bin/moc

@@ -27,12 +27,22 @@
 #include <qlabel.h>
 #include <math.h>
 #include <qslider.h>
+#include <sys/times.h>
 #include "songplayerlogic.h"
 #include "kbpm-play.h"
+#include "version.h"
+#include "kbpm-counter.h"
+
+extern "C" 
+{
+#include "cbpm-index.h"
+}
 
 SongPlayerLogic::SongPlayerLogic(QWidget*parent=0,const char*name=0, bool modal=FALSE,WFlags f=0) :
   SongPlayer(parent,name,modal,f)
 {
+   bpmcounter  = new BpmCountDialog(this);
+   visiblebpmcounter = false;
    timer = new QTimer(this);
    connect(timer,SIGNAL(timeout()), SLOT(timerTick()));
    timer->start(1000);
@@ -209,6 +219,8 @@ void SongPlayerLogic::nudgeMinus8M()
 
 void SongPlayerLogic::accept()
 {
+   // signal any active counter to stop working
+   bpmcounter->finish();
    // if the song has been stopped, simply start and stop again.
    ::stop=1;
    ::paused=0;
@@ -240,6 +252,10 @@ void SongPlayerLogic::timerTick()
    // change tempo when necesarry
    if (fade_time>0)
      targetStep();
+   // if visible...
+   if (visiblebpmcounter)
+     bpmcounter->timerTick();
+
 }
 
 void SongPlayerLogic::setCue()
@@ -400,4 +416,58 @@ void SongPlayerLogic::mainVolume(int v)
 void SongPlayerLogic::pcmVolume(int v)
 {
    mixer_set_pcm(100-v);
+}
+
+void SongPlayerLogic::fastSaw()
+{
+   lfo_set("Saw",lfo_saw,16,::y-dsp_latency());
+}
+
+void SongPlayerLogic::slowSaw()
+{
+   lfo_set("Saw",lfo_saw,8,::y-dsp_latency());
+}
+
+void SongPlayerLogic::fastPan()
+{
+   lfo_set("Pan",lfo_pan,16,::y-dsp_latency());
+}
+
+void SongPlayerLogic::slowPan()
+{
+   lfo_set("Pan",lfo_pan,8,::y-dsp_latency()); 
+}
+
+void SongPlayerLogic::normalLfo()
+{
+   lfo_set("No",lfo_no,4,::y-dsp_latency()); 
+}
+
+void SongPlayerLogic::fastRevSaw()
+{
+ lfo_set("Reverse saw",lfo_revsaw,16,::y-dsp_latency());
+}
+
+void SongPlayerLogic::slowRevSaw()
+{
+   lfo_set("Reverse saw",lfo_revsaw,8,::y-dsp_latency()); 
+}
+
+void SongPlayerLogic::metronome()
+{
+   lfo_set("Metronome",lfo_metronome,16,::y-dsp_latency()); 
+}
+
+void SongPlayerLogic::breakLfo()
+{
+   lfo_set("Break",lfo_break,1,::y-dsp_latency());
+}
+
+void SongPlayerLogic::openBpmCounter()
+{
+   if (visiblebpmcounter)
+     bpmcounter->hide();
+   else
+     bpmcounter->show();
+   visiblebpmcounter=!visiblebpmcounter;   
 }

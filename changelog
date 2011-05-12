@@ -1,3 +1,21 @@
+1.2:
+  kbpm  - starting batch process bpm-counting
+  kbpm  - importing of .mp3's
+  kbpm  - startup 'wizard'
+  kbpm  - tags are updated as player changes them
+  kbpm  - added tempo shifter, reset tapping button, skip box
+  kbpm  - merging player and counter, is easier to handle
+  kplay - added tooltips for keyshortcuts to kplay
+  all   - much faster index access.
+  all   - added clock_freq measure thing in makefile
+  kplay - added tapping tempo counter.
+  kbpm  - automatic start and stop options
+  kbpm  - index file is read if exists. -> tags & cues are kept
+  kbpm  - counter shows autocorrelation plot
+  kplay - added lfo's (metronome, saw, break, pan, revsaw)
+  all   - version.h is now generated, version number in documentation has
+          been removed.
+  kbpm  - started with a QT based BPM counter.
 1.1:
   kplay - fixed latency bug due to release time of keys.
   kplay - fixed button color bug when presseing normal/target or when
@@ -25,11 +43,11 @@
   ksel  - loading of files of disk
   ksel  - now it is impossible to play two songs in the same monitor.
   ksel  - mark duplicates
-  ksel  - new handy tool: can scan .mp3 duisks and say which songs are 
+  ksel  - new handy tool: can scan .mp3 disks and say which songs are 
           not indexed yet.	  
 1.0:
-  ksel  -  initial release of the Qt song selector
-  kplay -  initial releasse of the Kde(Qt)-player
+  ksel  - initial release of the Qt song selector
+  kplay - initial releasse of the Kde(Qt)-player
   cbpm  - added md5sum's in the index format
   cbpm  - you can now change the upper and lower limit of the 
           BPM-search algorithm

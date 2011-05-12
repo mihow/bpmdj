@@ -150,6 +150,16 @@ void (*oldio)(int);
 void (*oldhup)(int);
 void (*oldurg)(int);
 
+void msg_slowdown(int change)
+{
+   printf("slow down (%d)\n",change);
+}
+
+void msg_speedup(int change)
+{
+   printf("speed up (%d)\n",change);
+}
+
 void terminal_blurb(int Reset)
 {
    static struct termios old;
@@ -260,10 +270,7 @@ void process_options(int argc, char* argv[])
 	       options_failure("option neither short or long");
 	     else arg=argv[i]+1;
 	     // check value
-	     if (strcmp(arg,"debuglatency")==0 ||
-		 strcmp(arg,"w")==0)
-	       opt_debuglatency=1;
-	     else if (strcmp(arg,"quiet")==0 ||
+	     if (strcmp(arg,"quiet")==0 ||
 		      strcmp(arg,"q")==0)
 	       opt_quiet=1;
 	     else if (strcmp(arg,"dsp")==0 ||
@@ -300,7 +307,14 @@ void process_options(int argc, char* argv[])
    
 }
 
-
-int app_init(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
+   process_options(argc,argv);
+   core_init(0);
+   core_open();
+   terminal_start();
+   core_play();
+   terminal_stop();
+   core_close();
+   core_done();
 }

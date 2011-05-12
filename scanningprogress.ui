@@ -1,0 +1,231 @@
+<!DOCTYPE UI><UI>
+<class>ScanningProgress</class>
+<widget>
+    <class>QDialog</class>
+    <property stdset="1">
+        <name>name</name>
+        <cstring>ScanningProgress</cstring>
+    </property>
+    <property stdset="1">
+        <name>geometry</name>
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>592</width>
+            <height>804</height>
+        </rect>
+    </property>
+    <property stdset="1">
+        <name>caption</name>
+        <string>Importing Mp3's</string>
+    </property>
+    <widget>
+        <class>Line</class>
+        <property stdset="1">
+            <name>name</name>
+            <cstring>Line1</cstring>
+        </property>
+        <property stdset="1">
+            <name>geometry</name>
+            <rect>
+                <x>10</x>
+                <y>80</y>
+                <width>580</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property stdset="1">
+            <name>orientation</name>
+            <enum>Horizontal</enum>
+        </property>
+    </widget>
+    <widget>
+        <class>QLabel</class>
+        <property stdset="1">
+            <name>name</name>
+            <cstring>TextLabel1</cstring>
+        </property>
+        <property stdset="1">
+            <name>geometry</name>
+            <rect>
+                <x>20</x>
+                <y>310</y>
+                <width>120</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property stdset="1">
+            <name>text</name>
+            <string>Scanning :</string>
+        </property>
+    </widget>
+    <widget>
+        <class>QMultiLineEdit</class>
+        <property stdset="1">
+            <name>name</name>
+            <cstring>Created</cstring>
+        </property>
+        <property stdset="1">
+            <name>geometry</name>
+            <rect>
+                <x>20</x>
+                <y>570</y>
+                <width>560</width>
+                <height>180</height>
+            </rect>
+        </property>
+    </widget>
+    <widget>
+        <class>QPushButton</class>
+        <property stdset="1">
+            <name>name</name>
+            <cstring>Okay</cstring>
+        </property>
+        <property stdset="1">
+            <name>enabled</name>
+            <bool>false</bool>
+        </property>
+        <property stdset="1">
+            <name>geometry</name>
+            <rect>
+                <x>440</x>
+                <y>760</y>
+                <width>138</width>
+                <height>38</height>
+            </rect>
+        </property>
+        <property stdset="1">
+            <name>text</name>
+            <string>Okay</string>
+        </property>
+    </widget>
+    <widget>
+        <class>QLabel</class>
+        <property stdset="1">
+            <name>name</name>
+            <cstring>TextLabel2</cstring>
+        </property>
+        <property stdset="1">
+            <name>geometry</name>
+            <rect>
+                <x>20</x>
+                <y>540</y>
+                <width>170</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property stdset="1">
+            <name>text</name>
+            <string>Created index files :</string>
+        </property>
+    </widget>
+    <widget>
+        <class>QLabel</class>
+        <property stdset="1">
+            <name>name</name>
+            <cstring>TextLabel5</cstring>
+        </property>
+        <property stdset="1">
+            <name>geometry</name>
+            <rect>
+                <x>10</x>
+                <y>10</y>
+                <width>580</width>
+                <height>70</height>
+            </rect>
+        </property>
+        <property stdset="1">
+            <name>text</name>
+            <string>After importing mp3's, a set of empty index files is created. Before they are usefull, you should select them in the selector and choose Selection|MeasureBpm...</string>
+        </property>
+        <property stdset="1">
+            <name>alignment</name>
+            <set>WordBreak|AlignTop|AlignLeft</set>
+        </property>
+        <property>
+            <name>vAlign</name>
+        </property>
+        <property>
+            <name>wordwrap</name>
+        </property>
+    </widget>
+    <widget>
+        <class>QMultiLineEdit</class>
+        <property stdset="1">
+            <name>name</name>
+            <cstring>Log</cstring>
+        </property>
+        <property stdset="1">
+            <name>geometry</name>
+            <rect>
+                <x>20</x>
+                <y>340</y>
+                <width>560</width>
+                <height>180</height>
+            </rect>
+        </property>
+    </widget>
+    <widget>
+        <class>QLabel</class>
+        <property stdset="1">
+            <name>name</name>
+            <cstring>TextLabel6</cstring>
+        </property>
+        <property stdset="1">
+            <name>geometry</name>
+            <rect>
+                <x>10</x>
+                <y>100</y>
+                <width>580</width>
+                <height>190</height>
+            </rect>
+        </property>
+        <property stdset="1">
+            <name>text</name>
+            <string>Index files can be renamed and moved around within the ./index directory. When using a special index-filename convention, the program will be able to retrieve title, author, remix and version of the song. The file format used by the author (and as such, understood by the program) is:
+
+    &lt;title&gt;{&lt;remix&gt;}[&lt;author&gt;]&lt;version&gt;.idx
+
+Eg: LandOfFreedom{HappyPeopleRemix}[Transwave]3.idx</string>
+        </property>
+        <property stdset="1">
+            <name>alignment</name>
+            <set>WordBreak|AlignTop|AlignLeft</set>
+        </property>
+        <property>
+            <name>vAlign</name>
+        </property>
+        <property>
+            <name>wordwrap</name>
+        </property>
+    </widget>
+    <widget>
+        <class>Line</class>
+        <property stdset="1">
+            <name>name</name>
+            <cstring>Line1_2</cstring>
+        </property>
+        <property stdset="1">
+            <name>geometry</name>
+            <rect>
+                <x>10</x>
+                <y>290</y>
+                <width>580</width>
+                <height>20</height>
+            </rect>
+        </property>
+        <property stdset="1">
+            <name>orientation</name>
+            <enum>Horizontal</enum>
+        </property>
+    </widget>
+</widget>
+<connections>
+    <connection>
+        <sender>Okay</sender>
+        <signal>clicked()</signal>
+        <receiver>ScanningProgress</receiver>
+        <slot>accept()</slot>
+    </connection>
+</connections>
+</UI>

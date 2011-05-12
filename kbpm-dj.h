@@ -18,16 +18,6 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#include <qtimer.h>
-#include <qlistview.h>
-#include "preferences.h"
+#include <qapplication.h>
 
-class PreferencesDialogLogic: public PreferencesDialog
-{
-   Q_OBJECT
- private:
- public:
-   PreferencesDialogLogic(QWidget*parent=0,const char*name=0, bool modal=FALSE,WFlags f=0) :
-     PreferencesDialog(parent,name,modal,f) {};
- public slots:
-};
+extern QApplication *app;

@@ -7,6 +7,8 @@ TAR = tar
 UIC = uic
 MOC = moc
 LYX = lyx
+LATEX = latex
+DVIPS = dvips
 MKDIR = mkdir
 STRIP = strip
 

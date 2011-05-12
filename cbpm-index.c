@@ -35,11 +35,74 @@
 #include "version.h"
 
 /*-------------------------------------------
+ *         Performance operations
+ *-------------------------------------------*/
+static char* buffer = NULL;
+static long int buffer_size;
+static long int buffer_ptr;
+static FILE* buffer_file;
+
+static void buffer_init(FILE * stream)
+{
+   // read new buffer
+   fseek(stream,0,SEEK_END);
+   buffer_size=ftell(stream);
+   buffer=malloc(buffer_size+1);
+   assert(buffer);
+   // read file
+   fseek(stream,0,SEEK_SET);
+   fread(buffer,buffer_size,1,stream);
+   // sentinel.. so nextchar can work faster
+   buffer[buffer_size]='\n';
+   buffer_ptr=0;
+   buffer_file=stream;
+}
+
+static int nextchar()
+{
+   // no end-of-file check because 
+   // this is done in the beginning in getline
+   return buffer[buffer_ptr++];
+}
+
+static void buffer_done()
+  {
+     free(buffer);
+     buffer=NULL;
+     buffer_size=0;
+     buffer_file=NULL;
+  }
+
+ssize_t fast_getline(char **lineptr)
+  // warning !!!! -- semantics differ seriously from getline.
+{
+   int c;
+   int l=0;
+   char * result;
+   // check end of line !
+   if (buffer_ptr>=buffer_size)
+     return -1;
+   // now, we are sure we can read till the end of this line !
+   result = buffer+buffer_ptr;
+   while((c=nextchar())!='\n') l++;
+   // give a pointer back
+   *lineptr = result;
+   // zero terminate the thing
+   result[l]=0;
+   return l;
+}
+
+char* strldup(char* str, int l)
+{
+   char * result = malloc(l+1);
+   strncpy(result,str,l+1);
+   return result;
+}
+	      
+/*-------------------------------------------
  *         Index fields
  *-------------------------------------------*/
 char   * index_readfrom = NULL;
-char * * index_comments;
- int     index_nextcomment;
 char   * index_version;
  int     index_period;
 char   * index_tempo;
@@ -55,15 +118,12 @@ unsigned long index_cue_z;
 unsigned long index_cue_x;
 unsigned long index_cue_c;
 unsigned long index_cue_v;
-#define  maxcomments (5000)
 /*-------------------------------------------
  *         Index operations
  *-------------------------------------------*/
 void index_init()
 {
    index_version=NULL;
-   index_comments=calloc(maxcomments,sizeof(char*));
-   index_nextcomment=0;
    index_period=-1;
    index_file=0;
    index_tags=NULL;
@@ -79,6 +139,13 @@ void index_init()
    index_cue_v=0;
 }
 
+void index_setversion()
+{
+   char temp[500];
+   sprintf(temp,"BpmDj v%s",VERSION);
+   index_version=strdup(temp);
+}
+
 void index_free()
 {
    int i;
@@ -89,9 +156,6 @@ void index_free()
    if (index_file) free(index_file);
    if (index_tempo) free(index_tempo);
    if (index_tags) free(index_tags);
-   for(i=0;i<index_nextcomment;i++)
-     if (index_comments[i]) free(index_comments[i]);
-   if (index_comments) free(index_comments);
    if (index_md5sum) free(index_md5sum);
 }
 
@@ -124,11 +188,6 @@ void index_write()
    if (index_bpmcount_to>=0) fprintf(f,"bpmcount-to   : %d\n",index_bpmcount_to);
    if (index_md5sum) fprintf(f,"md5sum : %s\n",index_md5sum);
    if (index_remark) fprintf(f,"remark   : %s\n",index_remark);
-   // we don't write out comments anymore. They take up lots of space, are useless
-   // and above all take a long time to read in if there are a lot of .idx files !
-   // nevertheless, we cannot thorw them away since older formats should be 
-   // converted to the new format
-   // for(i=0;i<index_nextcomment;i++) fprintf(f,"%s\n",index_comments[i]);
    fclose(f);
 }
 
@@ -146,30 +205,15 @@ char* strip_end(char*tostrip,char*theend)
    return tostrip;
 }
 
-char* strip(char*tostrip)
+char* strip(char*tostrip, char* theend)
 {
    tostrip=strip_begin(tostrip);
-   return strip_end(tostrip,tostrip+strlen(tostrip)-1);
-}
-
-void index_addcomment(char* line)
-{
-   index_comments[index_nextcomment++]=strdup(line);
-   assert(index_nextcomment<maxcomments);
-}
-
-void index_delete(int idx)
-{
-   int t;
-   --index_nextcomment;
-   for(t=idx;t<index_nextcomment;t++)
-     index_comments[t]=index_comments[t+1];
+   return strip_end(tostrip,theend);
 }
 
 void index_read(char* indexn)
 {
    char *line=NULL;
-   int linesiz=0;
    int read;
    // open file
    FILE* index;
@@ -182,45 +226,39 @@ void index_read(char* indexn)
      }
    // clear all fields
    index_init();
+   // inititalize buffer
+   buffer_init(index);
    // read fields
-   while((read=getline(&line,&linesiz,index))!=-1)
+   while((read=fast_getline(&line))!=-1)
      {
-	char *field, *c=strip(line), *value;
-	if (*c=='#') 
-	  {  // ignore and store comments
-	     index_addcomment(line);
-	     free(line);
-	     line=NULL;
-	     continue;  
-	  }
-	while(*c!=':' && *c!=0) c++;
-	if (!*c) 
+	char * field;
+	char * end = line + read;
+	char * c = strip(line, end - 1), *value;
+	while(*c!=':' && *c!=0)
 	  {
-	     // ignore non-field lines
-	     index_addcomment(line);
-	     free(line);
-	     line=NULL;
-	     continue;
+	     *c=tolower(*c);
+	     c++;
 	  }
+	if (!*c) continue;
 	*c=0;
 	field=strip_end(line,c-1);
 	value=strip_begin(c+1);
-	if (strcasecmp(field,"version")==0) index_version=strdup(value);
-	else if(strcasecmp(field,"period")==0) index_period=atoi(value);
-	else if(strcasecmp(field,"file")==0) index_file=strdup(value);
-	else if(strcasecmp(field,"tempo")==0) index_tempo=strdup(value);
-	else if(strcasecmp(field,"bpmcount-to")==0) index_bpmcount_to=atoi(value);
-	else if(strcasecmp(field,"bpmcount-from")==0) index_bpmcount_from=atoi(value);
-	else if(strcasecmp(field,"comment")==0) index_remark=strdup(value);
-	else if(strcasecmp(field,"cue")==0) index_cue=atol(value);
-	else if(strcasecmp(field,"cue-z")==0) index_cue_z=atol(value);
-	else if(strcasecmp(field,"cue-x")==0) index_cue_x=atol(value);
-	else if(strcasecmp(field,"cue-c")==0) index_cue_c=atol(value);
-	else if(strcasecmp(field,"cue-v")==0) index_cue_v=atol(value);
-	else if(strcasecmp(field,"md5sum")==0) index_md5sum=strdup(value);
-	else if(strcasecmp(field,"tag")==0) 
+	if (strcmp(field,"version")==0) index_version=strldup(value,end-value);
+	else if(strcmp(field,"period")==0) index_period=atoi(value);
+	else if(strcmp(field,"file")==0) index_file=strldup(value,end-value);
+	else if(strcmp(field,"tempo")==0) index_tempo=strldup(value,end-value);
+	else if(strcmp(field,"bpmcount-to")==0) index_bpmcount_to=atoi(value);
+	else if(strcmp(field,"bpmcount-from")==0) index_bpmcount_from=atoi(value);
+	else if(strcmp(field,"comment")==0) index_remark=strldup(value,end-value);
+	else if(strcmp(field,"cue")==0) index_cue=atol(value);
+	else if(strcmp(field,"cue-z")==0) index_cue_z=atol(value);
+	else if(strcmp(field,"cue-x")==0) index_cue_x=atol(value);
+	else if(strcmp(field,"cue-c")==0) index_cue_c=atol(value);
+	else if(strcmp(field,"cue-v")==0) index_cue_v=atol(value);
+	else if(strcmp(field,"md5sum")==0) index_md5sum=strldup(value,end-value);
+	else if(strcmp(field,"tag")==0) 
 	  {
-	     if (!index_tags) index_tags=strdup(value);
+	     if (!index_tags) index_tags=strldup(value,end-value);
 	     else 
 	       {
 		  char tmp[1000];
@@ -232,48 +270,19 @@ void index_read(char* indexn)
 	else 
 	  {
 	     printf("Warning: Unknown field %s\n",field);
-	     index_addcomment(line);
 	     continue;
 	  }
-	free(line);
-	line=NULL;
      }
-   if (line) 
-     free(line);
+   // finish file access
+   buffer_done();
    fclose(index);
    // check for old non-versioned files
    if (!index_version)
      {
 	char * y;
 	int idx;
-	printf("Warning: old index file %s\n",basename(index_readfrom));
-	// search for "# .* - ";
-	for(idx=0;idx<index_nextcomment;idx++)
-	  {
-	     line=index_comments[idx];
-	     if (strstr(line," - "))
-	       {
-		  index_period=atoi(line+2);
-		  index_comments[idx]=strdup("");
-		  continue;
-	       }
-	     if (line[0]=='#')
-	       index_delete(idx--);
-	  }
-	// fix some other fields
-	index_file=strdup(basename(index_readfrom));
-	y=strstr(index_file,".idx");
-	assert(y);
-	strcpy(y,".mp3");
-	index_changed=1;
-     }
-   // fix fields
-   if (!index_version)
-     {
-	char version[500];
-	sprintf(version,"BpmDj v%s",VERSION);
-	index_changed=1;
-	index_version=strdup(version);
+	printf("Error: too old index file %s\n",basename(index_readfrom));
+	exit(40);
      }
    if (index_period==-1)
      {
