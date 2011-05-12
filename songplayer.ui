@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>953</width>
-            <height>311</height>
+            <width>983</width>
+            <height>328</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -36,34 +36,7 @@
         <property name="spacing">
             <number>6</number>
         </property>
-        <widget class="QLabel" row="1" column="0" rowspan="1" colspan="3">
-            <property name="name">
-                <cstring>PlayingText</cstring>
-            </property>
-            <property name="font">
-                <font>
-                    <pointsize>18</pointsize>
-                </font>
-            </property>
-            <property name="frameShape">
-                <enum>NoFrame</enum>
-            </property>
-            <property name="margin">
-                <number>0</number>
-            </property>
-            <property name="text">
-                <string>SongName</string>
-            </property>
-            <property name="scaledContents">
-                <bool>false</bool>
-            </property>
-            <property name="alignment">
-                <set>AlignCenter</set>
-            </property>
-            <property name="hAlign" stdset="0">
-            </property>
-        </widget>
-        <widget class="QButtonGroup" row="2" column="0">
+        <widget class="QButtonGroup" row="1" column="0" rowspan="2" colspan="2">
             <property name="name">
                 <cstring>ButtonGroup4</cstring>
             </property>
@@ -88,6 +61,14 @@
                     <property name="name">
                         <cstring>PushButton8</cstring>
                     </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
                     <property name="text">
                         <string>-8M</string>
                     </property>
@@ -101,6 +82,14 @@
                 <widget class="QPushButton" row="3" column="1">
                     <property name="name">
                         <cstring>PushButton7</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
                     </property>
                     <property name="text">
                         <string>+8M</string>
@@ -116,6 +105,14 @@
                     <property name="name">
                         <cstring>PushButton5</cstring>
                     </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
                     <property name="text">
                         <string>+4M</string>
                     </property>
@@ -126,51 +123,17 @@
                         <string>Key: '5'</string>
                     </property>
                 </widget>
-                <widget class="QPushButton" row="2" column="0">
-                    <property name="name">
-                        <cstring>PushButton6</cstring>
-                    </property>
-                    <property name="text">
-                        <string>-4M</string>
-                    </property>
-                    <property name="accel">
-                        <string>4</string>
-                    </property>
-                    <property name="toolTip" stdset="0">
-                        <string>Key: '4'</string>
-                    </property>
-                </widget>
-                <widget class="QPushButton" row="1" column="0">
-                    <property name="name">
-                        <cstring>PushButton4</cstring>
-                    </property>
-                    <property name="text">
-                        <string>-1M</string>
-                    </property>
-                    <property name="accel">
-                        <string>1</string>
-                    </property>
-                    <property name="toolTip" stdset="0">
-                        <string>Key: '1'</string>
-                    </property>
-                </widget>
-                <widget class="QPushButton" row="0" column="0">
-                    <property name="name">
-                        <cstring>KeyMinus</cstring>
-                    </property>
-                    <property name="text">
-                        <string>-</string>
-                    </property>
-                    <property name="accel">
-                        <string>-</string>
-                    </property>
-                    <property name="toolTip" stdset="0">
-                        <string>Key: '-'</string>
-                    </property>
-                </widget>
                 <widget class="QPushButton" row="0" column="1">
                     <property name="name">
                         <cstring>KeyPlus</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
                     </property>
                     <property name="text">
                         <string>+</string>
@@ -186,6 +149,14 @@
                     <property name="name">
                         <cstring>PushButton3</cstring>
                     </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
                     <property name="text">
                         <string>+1M</string>
                     </property>
@@ -199,6 +170,14 @@
                 <widget class="QPushButton" row="2" column="2">
                     <property name="name">
                         <cstring>PushButton9</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
                     </property>
                     <property name="text">
                         <string>-1/2B</string>
@@ -214,6 +193,14 @@
                     <property name="name">
                         <cstring>PushButton25</cstring>
                     </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
                     <property name="text">
                         <string>Stop</string>
                     </property>
@@ -227,6 +214,14 @@
                 <widget class="QPushButton" row="3" column="2">
                     <property name="name">
                         <cstring>PushButton19</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
                     </property>
                     <property name="text">
                         <string>+1B</string>
@@ -242,6 +237,14 @@
                     <property name="name">
                         <cstring>PushButton24</cstring>
                     </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
                     <property name="text">
                         <string>Restart</string>
                     </property>
@@ -252,14 +255,433 @@
                         <string>Key: ']'</string>
                     </property>
                 </widget>
+                <widget class="QPushButton" row="2" column="0">
+                    <property name="name">
+                        <cstring>PushButton6</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>-4M</string>
+                    </property>
+                    <property name="accel">
+                        <string>4</string>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Key: '4'</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="1" column="0">
+                    <property name="name">
+                        <cstring>PushButton4</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>-1M</string>
+                    </property>
+                    <property name="accel">
+                        <string>1</string>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Key: '1'</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="0" column="0">
+                    <property name="name">
+                        <cstring>KeyMinus</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>-</string>
+                    </property>
+                    <property name="accel">
+                        <string>-</string>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Key: '-'</string>
+                    </property>
+                </widget>
             </grid>
         </widget>
-        <widget class="QButtonGroup" row="2" column="1">
+        <widget class="QGroupBox" row="0" column="4" rowspan="2" colspan="1">
             <property name="name">
-                <cstring>ButtonGroup1</cstring>
+                <cstring>GroupBox1</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>5</hsizetype>
+                    <vsizetype>5</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
             </property>
             <property name="title">
-                <string>LFO</string>
+                <string>Volumes</string>
+            </property>
+            <property name="layoutMargin" stdset="0">
+            </property>
+            <property name="layoutSpacing" stdset="0">
+            </property>
+            <widget class="QSlider">
+                <property name="name">
+                    <cstring>Slider4</cstring>
+                </property>
+                <property name="geometry">
+                    <rect>
+                        <x>46</x>
+                        <y>40</y>
+                        <width>26</width>
+                        <height>211</height>
+                    </rect>
+                </property>
+                <property name="pageStep">
+                    <number>1</number>
+                </property>
+                <property name="orientation">
+                    <enum>Vertical</enum>
+                </property>
+                <property name="tickmarks">
+                    <enum>Both</enum>
+                </property>
+                <property name="tickInterval">
+                    <number>5</number>
+                </property>
+            </widget>
+            <widget class="QLabel">
+                <property name="name">
+                    <cstring>TextLabel1</cstring>
+                </property>
+                <property name="geometry">
+                    <rect>
+                        <x>5</x>
+                        <y>20</y>
+                        <width>39</width>
+                        <height>18</height>
+                    </rect>
+                </property>
+                <property name="text">
+                    <string>Main</string>
+                </property>
+            </widget>
+            <widget class="QSlider">
+                <property name="name">
+                    <cstring>Slider3</cstring>
+                </property>
+                <property name="geometry">
+                    <rect>
+                        <x>5</x>
+                        <y>40</y>
+                        <width>26</width>
+                        <height>211</height>
+                    </rect>
+                </property>
+                <property name="maxValue">
+                    <number>100</number>
+                </property>
+                <property name="lineStep">
+                    <number>1</number>
+                </property>
+                <property name="pageStep">
+                    <number>1</number>
+                </property>
+                <property name="orientation">
+                    <enum>Vertical</enum>
+                </property>
+                <property name="tickmarks">
+                    <enum>Both</enum>
+                </property>
+                <property name="tickInterval">
+                    <number>5</number>
+                </property>
+            </widget>
+            <widget class="QLabel">
+                <property name="name">
+                    <cstring>TextLabel2</cstring>
+                </property>
+                <property name="geometry">
+                    <rect>
+                        <x>46</x>
+                        <y>20</y>
+                        <width>41</width>
+                        <height>18</height>
+                    </rect>
+                </property>
+                <property name="text">
+                    <string>Pcm</string>
+                </property>
+            </widget>
+        </widget>
+        <widget class="QButtonGroup" row="0" column="2" rowspan="1" colspan="2">
+            <property name="name">
+                <cstring>ButtonGroup3</cstring>
+            </property>
+            <property name="title">
+                <string>Tempo</string>
+            </property>
+            <grid>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <property name="margin">
+                    <number>11</number>
+                </property>
+                <property name="spacing">
+                    <number>6</number>
+                </property>
+                <widget class="QLayoutWidget" row="1" column="0" rowspan="1" colspan="5">
+                    <property name="name">
+                        <cstring>layout8</cstring>
+                    </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QLCDNumber">
+                            <property name="name">
+                                <cstring>CurrentTempoLCD</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>1</hsizetype>
+                                    <vsizetype>7</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="numDigits">
+                                <number>6</number>
+                            </property>
+                        </widget>
+                        <widget class="QLCDNumber">
+                            <property name="name">
+                                <cstring>NormalTempoLCD</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>1</hsizetype>
+                                    <vsizetype>7</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="numDigits">
+                                <number>6</number>
+                            </property>
+                        </widget>
+                        <widget class="QLCDNumber">
+                            <property name="name">
+                                <cstring>TempoLd</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>1</hsizetype>
+                                    <vsizetype>7</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                        </widget>
+                    </hbox>
+                </widget>
+                <widget class="QLayoutWidget" row="0" column="0">
+                    <property name="name">
+                        <cstring>layout9</cstring>
+                    </property>
+                    <vbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>BpmCounter2</cstring>
+                            </property>
+                            <property name="enabled">
+                                <bool>false</bool>
+                            </property>
+                            <property name="text">
+                                <string>.</string>
+                            </property>
+                            <property name="accel">
+                                <string></string>
+                            </property>
+                        </widget>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>PushButton36_2</cstring>
+                            </property>
+                            <property name="text">
+                                <string>Normal Switch</string>
+                            </property>
+                            <property name="accel">
+                                <string>0</string>
+                            </property>
+                            <property name="toolTip" stdset="0">
+                                <string>Key: '0'</string>
+                            </property>
+                        </widget>
+                    </vbox>
+                </widget>
+                <widget class="QLayoutWidget" row="0" column="1">
+                    <property name="name">
+                        <cstring>layout10</cstring>
+                    </property>
+                    <vbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>PushButton37</cstring>
+                            </property>
+                            <property name="text">
+                                <string>Slow Switch</string>
+                            </property>
+                        </widget>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>PushButton22</cstring>
+                            </property>
+                            <property name="text">
+                                <string>Fast Switch</string>
+                            </property>
+                            <property name="accel">
+                                <string></string>
+                            </property>
+                        </widget>
+                    </vbox>
+                </widget>
+                <widget class="QLayoutWidget" row="0" column="2">
+                    <property name="name">
+                        <cstring>layout11</cstring>
+                    </property>
+                    <vbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>PushButton21</cstring>
+                            </property>
+                            <property name="text">
+                                <string>Normal</string>
+                            </property>
+                            <property name="accel">
+                                <string>.</string>
+                            </property>
+                        </widget>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>PushButton20</cstring>
+                            </property>
+                            <property name="text">
+                                <string>Target</string>
+                            </property>
+                            <property name="accel">
+                                <string></string>
+                            </property>
+                        </widget>
+                    </vbox>
+                </widget>
+                <widget class="QLayoutWidget" row="0" column="3">
+                    <property name="name">
+                        <cstring>layout12</cstring>
+                    </property>
+                    <vbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>pushButton42</cstring>
+                            </property>
+                            <property name="enabled">
+                                <bool>false</bool>
+                            </property>
+                            <property name="text">
+                                <string>.</string>
+                            </property>
+                        </widget>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>SpectrumButton</cstring>
+                            </property>
+                            <property name="enabled">
+                                <bool>true</bool>
+                            </property>
+                            <property name="text">
+                                <string>Spectrum</string>
+                            </property>
+                        </widget>
+                    </vbox>
+                </widget>
+                <widget class="QLayoutWidget" row="0" column="4">
+                    <property name="name">
+                        <cstring>layout13</cstring>
+                    </property>
+                    <vbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>BpmCounter</cstring>
+                            </property>
+                            <property name="enabled">
+                                <bool>true</bool>
+                            </property>
+                            <property name="text">
+                                <string>&amp;Bpm Counter</string>
+                            </property>
+                        </widget>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>AboutButton</cstring>
+                            </property>
+                            <property name="enabled">
+                                <bool>true</bool>
+                            </property>
+                            <property name="text">
+                                <string>About</string>
+                            </property>
+                        </widget>
+                    </vbox>
+                </widget>
+            </grid>
+        </widget>
+        <widget class="QGroupBox" row="0" column="0">
+            <property name="name">
+                <cstring>Position</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>5</hsizetype>
+                    <vsizetype>5</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="title">
+                <string>Position/Size</string>
             </property>
             <property name="layoutMargin" stdset="0">
             </property>
@@ -270,126 +692,177 @@
                     <cstring>unnamed</cstring>
                 </property>
                 <property name="margin">
-                    <number>5</number>
+                    <number>11</number>
                 </property>
                 <property name="spacing">
-                    <number>1</number>
+                    <number>5</number>
                 </property>
-                <widget class="QPushButton" row="1" column="0">
+                <widget class="QLCDNumber" row="1" column="0">
                     <property name="name">
-                        <cstring>PushButton28</cstring>
+                        <cstring>TotalTimeLCD</cstring>
                     </property>
-                    <property name="text">
-                        <string>Slow Saw</string>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>7</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
                     </property>
-                    <property name="accel">
-                        <string>S</string>
+                    <property name="minimumSize">
+                        <size>
+                            <width>0</width>
+                            <height>0</height>
+                        </size>
+                    </property>
+                    <property name="numDigits">
+                        <number>6</number>
                     </property>
                     <property name="toolTip" stdset="0">
-                        <string>Key:'S'</string>
+                        <string></string>
                     </property>
                 </widget>
-                <widget class="QPushButton" row="1" column="1">
+                <widget class="QLCDNumber" row="0" column="0">
                     <property name="name">
-                        <cstring>PushButton29</cstring>
+                        <cstring>CurrentTimeLCD</cstring>
                     </property>
-                    <property name="text">
-                        <string>Fast Saw</string>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>7</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
                     </property>
-                    <property name="accel">
-                        <string>Alt+S</string>
+                    <property name="minimumSize">
+                        <size>
+                            <width>0</width>
+                            <height>0</height>
+                        </size>
+                    </property>
+                    <property name="numDigits">
+                        <number>6</number>
                     </property>
                     <property name="toolTip" stdset="0">
-                        <string>Key: 'ALT-S'</string>
-                    </property>
-                </widget>
-                <widget class="QPushButton" row="2" column="0">
-                    <property name="name">
-                        <cstring>PushButton30</cstring>
-                    </property>
-                    <property name="text">
-                        <string>Slow rSaw</string>
-                    </property>
-                    <property name="accel">
-                        <string>R</string>
-                    </property>
-                    <property name="toolTip" stdset="0">
-                        <string>Key: 'R'</string>
-                    </property>
-                </widget>
-                <widget class="QPushButton" row="2" column="1">
-                    <property name="name">
-                        <cstring>PushButton31</cstring>
-                    </property>
-                    <property name="text">
-                        <string>Fast rSaw</string>
-                    </property>
-                    <property name="accel">
-                        <string>Alt+R</string>
-                    </property>
-                    <property name="toolTip" stdset="0">
-                        <string>Key: 'ALT-R'</string>
-                    </property>
-                </widget>
-                <widget class="QPushButton" row="3" column="1">
-                    <property name="name">
-                        <cstring>PushButton39</cstring>
-                    </property>
-                    <property name="text">
-                        <string>Normal</string>
-                    </property>
-                    <property name="accel">
-                        <string>N</string>
-                    </property>
-                    <property name="toolTip" stdset="0">
-                        <string>Key: 'N'</string>
-                    </property>
-                </widget>
-                <widget class="QPushButton" row="3" column="0">
-                    <property name="name">
-                        <cstring>PushButton42</cstring>
-                    </property>
-                    <property name="text">
-                        <string>Break</string>
-                    </property>
-                    <property name="accel">
-                        <string>B</string>
-                    </property>
-                    <property name="toolTip" stdset="0">
-                        <string>Key: 'B'</string>
-                    </property>
-                </widget>
-                <widget class="QPushButton" row="0" column="1">
-                    <property name="name">
-                        <cstring>PushButton27</cstring>
-                    </property>
-                    <property name="text">
-                        <string>Fast Pan</string>
-                    </property>
-                    <property name="accel">
-                        <string>Alt+P</string>
-                    </property>
-                    <property name="toolTip" stdset="0">
-                        <string>Key: 'ALT-P'</string>
-                    </property>
-                </widget>
-                <widget class="QPushButton" row="0" column="0">
-                    <property name="name">
-                        <cstring>PushButton26</cstring>
-                    </property>
-                    <property name="text">
-                        <string>Slow Pan</string>
-                    </property>
-                    <property name="accel">
-                        <string>P</string>
-                    </property>
-                    <property name="toolTip" stdset="0">
-                        <string>Key: 'P'</string>
+                        <string></string>
                     </property>
                 </widget>
             </grid>
         </widget>
-        <widget class="QButtonGroup" row="2" column="2">
+        <widget class="QPushButton" row="2" column="4">
+            <property name="name">
+                <cstring>PushButton32</cstring>
+            </property>
+            <property name="text">
+                <string>Quit</string>
+            </property>
+            <property name="accel">
+                <string>Q</string>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>Key: 'q'</string>
+            </property>
+            <property name="whatsThis" stdset="0">
+                <string></string>
+            </property>
+        </widget>
+        <widget class="QButtonGroup" row="0" column="1">
+            <property name="name">
+                <cstring>buttonGroup6</cstring>
+            </property>
+            <property name="title">
+                <string>Loops</string>
+            </property>
+            <property name="exclusive">
+                <bool>false</bool>
+            </property>
+            <grid>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <property name="spacing">
+                    <number>0</number>
+                </property>
+                <widget class="QPushButton" row="0" column="0">
+                    <property name="name">
+                        <cstring>NoLoopButton</cstring>
+                    </property>
+                    <property name="enabled">
+                        <bool>true</bool>
+                    </property>
+                    <property name="text">
+                        <string>No</string>
+                    </property>
+                    <property name="toggleButton">
+                        <bool>false</bool>
+                    </property>
+                    <property name="on">
+                        <bool>false</bool>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="1" column="0">
+                    <property name="name">
+                        <cstring>pushButton46</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>1B</string>
+                    </property>
+                    <property name="toggleButton">
+                        <bool>false</bool>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="2" column="0">
+                    <property name="name">
+                        <cstring>pushButton44</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>1M</string>
+                    </property>
+                    <property name="toggleButton">
+                        <bool>false</bool>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="3" column="0">
+                    <property name="name">
+                        <cstring>pushButton45</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>4M</string>
+                    </property>
+                    <property name="toggleButton">
+                        <bool>false</bool>
+                    </property>
+                    <property name="on">
+                        <bool>false</bool>
+                    </property>
+                </widget>
+            </grid>
+        </widget>
+        <widget class="QButtonGroup" row="1" column="3" rowspan="2" colspan="1">
             <property name="name">
                 <cstring>cueGroup</cstring>
             </property>
@@ -861,291 +1334,15 @@
                 </widget>
             </grid>
         </widget>
-        <widget class="QButtonGroup" row="0" column="1" rowspan="1" colspan="2">
+        <widget class="QButtonGroup" row="1" column="2" rowspan="2" colspan="1">
             <property name="name">
-                <cstring>ButtonGroup3</cstring>
+                <cstring>ButtonGroup1</cstring>
             </property>
             <property name="title">
-                <string>Tempo</string>
+                <string>LFO</string>
             </property>
-            <grid>
-                <property name="name">
-                    <cstring>unnamed</cstring>
-                </property>
-                <property name="margin">
-                    <number>11</number>
-                </property>
-                <property name="spacing">
-                    <number>6</number>
-                </property>
-                <widget class="QLayoutWidget" row="0" column="0">
-                    <property name="name">
-                        <cstring>Layout8</cstring>
-                    </property>
-                    <property name="layoutSpacing" stdset="0">
-                    </property>
-                    <grid>
-                        <property name="name">
-                            <cstring>unnamed</cstring>
-                        </property>
-                        <property name="margin">
-                            <number>0</number>
-                        </property>
-                        <property name="spacing">
-                            <number>5</number>
-                        </property>
-                        <widget class="QLCDNumber" row="1" column="2" rowspan="1" colspan="3">
-                            <property name="name">
-                                <cstring>NormalTempoLCD</cstring>
-                            </property>
-                            <property name="numDigits">
-                                <number>6</number>
-                            </property>
-                        </widget>
-                        <widget class="QPushButton" row="0" column="4" rowspan="1" colspan="2">
-                            <property name="name">
-                                <cstring>PushButton37</cstring>
-                            </property>
-                            <property name="text">
-                                <string>&gt;</string>
-                            </property>
-                        </widget>
-                        <widget class="QPushButton" row="0" column="3">
-                            <property name="name">
-                                <cstring>PushButton36_2</cstring>
-                            </property>
-                            <property name="text">
-                                <string>&gt;&gt;</string>
-                            </property>
-                            <property name="accel">
-                                <string>0</string>
-                            </property>
-                            <property name="toolTip" stdset="0">
-                                <string>Key: '0'</string>
-                            </property>
-                        </widget>
-                        <widget class="QPushButton" row="0" column="1" rowspan="1" colspan="2">
-                            <property name="name">
-                                <cstring>PushButton22</cstring>
-                            </property>
-                            <property name="text">
-                                <string>&gt;&gt;&gt;</string>
-                            </property>
-                            <property name="accel">
-                                <string></string>
-                            </property>
-                        </widget>
-                        <widget class="QLCDNumber" row="1" column="0" rowspan="1" colspan="2">
-                            <property name="name">
-                                <cstring>CurrentTempoLCD</cstring>
-                            </property>
-                            <property name="numDigits">
-                                <number>6</number>
-                            </property>
-                        </widget>
-                        <widget class="QLCDNumber" row="1" column="5" rowspan="1" colspan="2">
-                            <property name="name">
-                                <cstring>TempoLd</cstring>
-                            </property>
-                            <property name="numDigits">
-                                <number>6</number>
-                            </property>
-                        </widget>
-                        <widget class="QPushButton" row="0" column="0">
-                            <property name="name">
-                                <cstring>PushButton20</cstring>
-                            </property>
-                            <property name="text">
-                                <string>Target</string>
-                            </property>
-                            <property name="accel">
-                                <string></string>
-                            </property>
-                        </widget>
-                        <widget class="QPushButton" row="0" column="6">
-                            <property name="name">
-                                <cstring>PushButton21</cstring>
-                            </property>
-                            <property name="text">
-                                <string>Normal</string>
-                            </property>
-                            <property name="accel">
-                                <string>.</string>
-                            </property>
-                        </widget>
-                    </grid>
-                </widget>
-                <widget class="QLayoutWidget" row="0" column="2">
-                    <property name="name">
-                        <cstring>Layout9</cstring>
-                    </property>
-                    <property name="layoutSpacing" stdset="0">
-                    </property>
-                    <grid>
-                        <property name="name">
-                            <cstring>unnamed</cstring>
-                        </property>
-                        <property name="margin">
-                            <number>0</number>
-                        </property>
-                        <property name="spacing">
-                            <number>1</number>
-                        </property>
-                        <widget class="QPushButton" row="1" column="0">
-                            <property name="name">
-                                <cstring>PushButton32</cstring>
-                            </property>
-                            <property name="text">
-                                <string>Quit</string>
-                            </property>
-                            <property name="accel">
-                                <string>Q</string>
-                            </property>
-                            <property name="toolTip" stdset="0">
-                                <string>Key: 'q'</string>
-                            </property>
-                            <property name="whatsThis" stdset="0">
-                                <string></string>
-                            </property>
-                        </widget>
-                        <widget class="QPushButton" row="0" column="0">
-                            <property name="name">
-                                <cstring>BpmCounter</cstring>
-                            </property>
-                            <property name="text">
-                                <string>&amp;Bpm Counter</string>
-                            </property>
-                            <property name="accel">
-                                <string>Alt+B</string>
-                            </property>
-                        </widget>
-                    </grid>
-                </widget>
-                <widget class="Line" row="0" column="1">
-                    <property name="name">
-                        <cstring>Line1</cstring>
-                    </property>
-                    <property name="frameShape">
-                        <enum>VLine</enum>
-                    </property>
-                    <property name="frameShadow">
-                        <enum>Sunken</enum>
-                    </property>
-                    <property name="orientation">
-                        <enum>Vertical</enum>
-                    </property>
-                </widget>
-            </grid>
-        </widget>
-        <widget class="QGroupBox" row="0" column="0">
-            <property name="name">
-                <cstring>Position</cstring>
-            </property>
-            <property name="title">
-                <string>Position/Size</string>
-            </property>
-            <property name="layoutMargin" stdset="0">
-            </property>
-            <property name="layoutSpacing" stdset="0">
-            </property>
-            <grid>
-                <property name="name">
-                    <cstring>unnamed</cstring>
-                </property>
-                <property name="margin">
-                    <number>11</number>
-                </property>
-                <property name="spacing">
-                    <number>5</number>
-                </property>
-                <widget class="QLCDNumber" row="1" column="1">
-                    <property name="name">
-                        <cstring>TotalTimeLCD</cstring>
-                    </property>
-                    <property name="sizePolicy">
-                        <sizepolicy>
-                            <hsizetype>1</hsizetype>
-                            <vsizetype>5</vsizetype>
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                        </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                        <size>
-                            <width>0</width>
-                            <height>40</height>
-                        </size>
-                    </property>
-                    <property name="numDigits">
-                        <number>6</number>
-                    </property>
-                    <property name="toolTip" stdset="0">
-                        <string></string>
-                    </property>
-                </widget>
-                <widget class="QLCDNumber" row="1" column="0">
-                    <property name="name">
-                        <cstring>CurrentTimeLCD</cstring>
-                    </property>
-                    <property name="numDigits">
-                        <number>6</number>
-                    </property>
-                    <property name="toolTip" stdset="0">
-                        <string></string>
-                    </property>
-                </widget>
-                <widget class="QLCDNumber" row="0" column="0">
-                    <property name="name">
-                        <cstring>LcdLeft</cstring>
-                    </property>
-                    <property name="numDigits">
-                        <number>6</number>
-                    </property>
-                    <property name="toolTip" stdset="0">
-                        <string></string>
-                    </property>
-                </widget>
-                <widget class="QLCDNumber" row="0" column="1">
-                    <property name="name">
-                        <cstring>LcdRight</cstring>
-                    </property>
-                    <property name="sizePolicy">
-                        <sizepolicy>
-                            <hsizetype>1</hsizetype>
-                            <vsizetype>1</vsizetype>
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                        </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                        <size>
-                            <width>0</width>
-                            <height>40</height>
-                        </size>
-                    </property>
-                    <property name="numDigits">
-                        <number>6</number>
-                    </property>
-                    <property name="toolTip" stdset="0">
-                        <string></string>
-                    </property>
-                </widget>
-            </grid>
-        </widget>
-        <widget class="QGroupBox" row="0" column="3" rowspan="3" colspan="1">
-            <property name="name">
-                <cstring>GroupBox1</cstring>
-            </property>
-            <property name="sizePolicy">
-                <sizepolicy>
-                    <hsizetype>5</hsizetype>
-                    <vsizetype>5</vsizetype>
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                </sizepolicy>
-            </property>
-            <property name="title">
-                <string>Volumes</string>
+            <property name="exclusive">
+                <bool>true</bool>
             </property>
             <property name="layoutMargin" stdset="0">
             </property>
@@ -1159,56 +1356,145 @@
                     <number>5</number>
                 </property>
                 <property name="spacing">
-                    <number>2</number>
+                    <number>1</number>
                 </property>
-                <widget class="QLabel" row="0" column="1">
+                <widget class="QPushButton" row="1" column="0">
                     <property name="name">
-                        <cstring>TextLabel2</cstring>
+                        <cstring>PushButton28</cstring>
                     </property>
                     <property name="text">
-                        <string>PCM</string>
+                        <string>Slow Saw</string>
+                    </property>
+                    <property name="accel">
+                        <string>S</string>
+                    </property>
+                    <property name="toggleButton">
+                        <bool>true</bool>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Key:'S'</string>
                     </property>
                 </widget>
-                <widget class="QSlider" row="1" column="1">
+                <widget class="QPushButton" row="1" column="1">
                     <property name="name">
-                        <cstring>Slider4</cstring>
-                    </property>
-                    <property name="orientation">
-                        <enum>Vertical</enum>
-                    </property>
-                    <property name="tickmarks">
-                        <enum>Both</enum>
-                    </property>
-                    <property name="tickInterval">
-                        <number>5</number>
-                    </property>
-                </widget>
-                <widget class="QLabel" row="0" column="0">
-                    <property name="name">
-                        <cstring>TextLabel1</cstring>
+                        <cstring>PushButton29</cstring>
                     </property>
                     <property name="text">
-                        <string>Main</string>
+                        <string>Fast Saw</string>
+                    </property>
+                    <property name="accel">
+                        <string>Alt+S</string>
+                    </property>
+                    <property name="toggleButton">
+                        <bool>true</bool>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Key: 'ALT-S'</string>
                     </property>
                 </widget>
-                <widget class="QSlider" row="1" column="0">
+                <widget class="QPushButton" row="2" column="0">
                     <property name="name">
-                        <cstring>Slider3</cstring>
+                        <cstring>PushButton30</cstring>
                     </property>
-                    <property name="maxValue">
-                        <number>100</number>
+                    <property name="text">
+                        <string>Slow rSaw</string>
                     </property>
-                    <property name="lineStep">
-                        <number>1</number>
+                    <property name="accel">
+                        <string>R</string>
                     </property>
-                    <property name="orientation">
-                        <enum>Vertical</enum>
+                    <property name="toggleButton">
+                        <bool>true</bool>
                     </property>
-                    <property name="tickmarks">
-                        <enum>Both</enum>
+                    <property name="toolTip" stdset="0">
+                        <string>Key: 'R'</string>
                     </property>
-                    <property name="tickInterval">
-                        <number>5</number>
+                </widget>
+                <widget class="QPushButton" row="2" column="1">
+                    <property name="name">
+                        <cstring>PushButton31</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Fast rSaw</string>
+                    </property>
+                    <property name="accel">
+                        <string>Alt+R</string>
+                    </property>
+                    <property name="toggleButton">
+                        <bool>true</bool>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Key: 'ALT-R'</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="3" column="1">
+                    <property name="name">
+                        <cstring>PushButton39</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Normal</string>
+                    </property>
+                    <property name="accel">
+                        <string>N</string>
+                    </property>
+                    <property name="toggleButton">
+                        <bool>true</bool>
+                    </property>
+                    <property name="on">
+                        <bool>true</bool>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Key: 'N'</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="3" column="0">
+                    <property name="name">
+                        <cstring>PushButton42</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Break</string>
+                    </property>
+                    <property name="accel">
+                        <string>B</string>
+                    </property>
+                    <property name="toggleButton">
+                        <bool>true</bool>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Key: 'B'</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="0" column="1">
+                    <property name="name">
+                        <cstring>PushButton27</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Fast Pan</string>
+                    </property>
+                    <property name="accel">
+                        <string>Alt+P</string>
+                    </property>
+                    <property name="toggleButton">
+                        <bool>true</bool>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Key: 'ALT-P'</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="0" column="0">
+                    <property name="name">
+                        <cstring>PushButton26</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Slow Pan</string>
+                    </property>
+                    <property name="accel">
+                        <string>P</string>
+                    </property>
+                    <property name="toggleButton">
+                        <bool>true</bool>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Key: 'P'</string>
                     </property>
                 </widget>
             </grid>
@@ -1427,12 +1713,6 @@
         <slot>metronome()</slot>
     </connection>
     <connection>
-        <sender>PushButton42</sender>
-        <signal>pressed()</signal>
-        <receiver>SongPlayer</receiver>
-        <slot>breakLfo()</slot>
-    </connection>
-    <connection>
         <sender>PushButton5</sender>
         <signal>clicked()</signal>
         <receiver>SongPlayer</receiver>
@@ -1467,6 +1747,42 @@
         <signal>valueChanged(int)</signal>
         <receiver>SongPlayer</receiver>
         <slot>pcmVolume(int)</slot>
+    </connection>
+    <connection>
+        <sender>pushButton46</sender>
+        <signal>clicked()</signal>
+        <receiver>SongPlayer</receiver>
+        <slot>toggleBeatLoop()</slot>
+    </connection>
+    <connection>
+        <sender>pushButton44</sender>
+        <signal>clicked()</signal>
+        <receiver>SongPlayer</receiver>
+        <slot>toggleMeasureLoop()</slot>
+    </connection>
+    <connection>
+        <sender>pushButton45</sender>
+        <signal>clicked()</signal>
+        <receiver>SongPlayer</receiver>
+        <slot>toggle4MeasureLoop()</slot>
+    </connection>
+    <connection>
+        <sender>NoLoopButton</sender>
+        <signal>clicked()</signal>
+        <receiver>SongPlayer</receiver>
+        <slot>toggleNoLoop()</slot>
+    </connection>
+    <connection>
+        <sender>SpectrumButton</sender>
+        <signal>clicked()</signal>
+        <receiver>SongPlayer</receiver>
+        <slot>openSpectrumAnalyzer()</slot>
+    </connection>
+    <connection>
+        <sender>AboutButton</sender>
+        <signal>clicked()</signal>
+        <receiver>SongPlayer</receiver>
+        <slot>openAbout()</slot>
     </connection>
 </connections>
 <tabstops>
@@ -1510,12 +1826,12 @@
     <tabstop>PushButton20</tabstop>
     <tabstop>PushButton21</tabstop>
     <tabstop>PushButton32</tabstop>
-    <tabstop>BpmCounter</tabstop>
+    <tabstop>BpmCounter2</tabstop>
     <tabstop>Slider4</tabstop>
     <tabstop>Slider3</tabstop>
 </tabstops>
 <slots>
-    <slot>breakLfo()</slot>
+    <slot>openAbout()</slot>
     <slot>fastPan()</slot>
     <slot>fastRevSaw()</slot>
     <slot>fastSaw()</slot>
@@ -1558,6 +1874,11 @@
     <slot>tap()</slot>
     <slot>targetStep()</slot>
     <slot>targetTempo()</slot>
+    <slot>toggleBeatLoop()</slot>
+    <slot>toggleMeasureLoop()</slot>
+    <slot>toggle4MeasureLoop()</slot>
+    <slot>toggleNoLoop()</slot>
+    <slot>openSpectrumAnalyzer()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

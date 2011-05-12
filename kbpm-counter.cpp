@@ -51,7 +51,6 @@
 #include <pthread.h>
 #include "kbpm-counter.h"
 #include "sys/times.h"
-#include "about.h"
 #include "fourier.h"
 
 extern "C"
@@ -61,15 +60,6 @@ extern "C"
 #include "common.h"
 #include "player-core.h"
 }
-
-/*
-static   int  arg_from=0;
-static   int  arg_to=100;
-static   int  opt_write=0;
-static   int  opt_start=0;
-static   int  opt_stop=0;
-static char * arg_write;
-*/
 
 BpmCountDialog::BpmCountDialog(SongPlayer*parent, const char*name, bool modal, WFlags f) :
   CountDialog(0,name,modal,f)
@@ -130,111 +120,20 @@ unsigned long BpmCountDialog::phasefit(long i)
 	d=abs((long)audio[c]-(long)audio[c-i]);
 	prev=mismatch;
 	mismatch+=d;
-	assert(mismatch>=prev);
+	// WVB -- removed wegens waarschijnlijk vertragende factor
+	// assert(mismatch>=prev);
      }
    return mismatch;
 }
 
 long fsize(FILE * f)
 {
-   long answer;
-   fseek(f,0,SEEK_END);
+  long answer;
+  fseek(f,0,SEEK_END);
    answer=ftell(f);
    fseek(f,0,SEEK_SET);
    return answer;
 }
-
-/*void copyright()
-{
-   printf("BpmDj BPM Counter v%s, Copyright (c) 2001 Werner Van Belle\n",VERSION);
-   printf("This software is distributed under the GPL2 license. See copyright.txt for details\n");
-   printf("See beatmixing.ps for details how to use the program.\n");
-   printf("--------------------------------------------------------------------\n");
-}
-
-void options_failure(char* err)
-{
-   // print options
-   printf("Usage:  kbpm-count <options> argument\n\n"
-	  "   -t nbr   --to nbr         read to % (default = 100)\n"
-	  "   -f nbr   --from nbr       read from % (default = 0)\n"
-	  "   -w arg   --write arg      write .idx file to ...\n"
-	  "   argument                  the .mp3 file to find tempo for\n\n%s\n\n",err);
-   exit(1);
-}
-
-/*void process_options(int argc, char* argv[])
-{
-   // run trough all the arguments
-   int i = 1 ;
-   for(i = 1 ; i < argc ; i ++)
-     {
-	if (argv[i][0]=='-')
-	  {
-	     char* arg;
-	     // check long opt ?
-	     if (argv[i][1]=='-')
-	       arg=argv[i]+2;
-	     else if (argv[i][1]==0 || argv[i][2]!=0)
-	       options_failure("option neither short or long");
-	     else arg=argv[i]+1;
-	     // check value
-	     if (strcmp(arg,"create")==0 ||
-		 strcmp(arg,"c")==0)
-	       opt_create=1;
-	     else if (strcmp(arg,"from")==0 ||
-		      strcmp(arg,"f")==0)
-	       {
-		  if (++i>=argc) 
-		    options_failure("from argument scanning error");
-		  arg_from=atoi(argv[i]);
-	       }
-	     else if (strcmp(arg,"to")==0 ||
-		      strcmp(arg,"t")==0)
-	       {
-		  if (++i>=argc) 
-		    options_failure("to argument scanning error");
-		  arg_to=atoi(argv[i]);
-	       }
-	     else if (strcmp(arg,"low")==0 ||
-		      strcmp(arg,"l")==0)
-	       {
-		  if (++i>=argc) 
-		    options_failure("low argument scanning error");
-		  arg_low=atoi(argv[i]);
-	       }
-	     else if (strcmp(arg,"high")==0 ||
-		      strcmp(arg,"h")==0)
-	       {
-		  if (++i>=argc)
-		    options_failure("high argument scanning error");
-		  arg_high=atoi(argv[i]);
-	       }
-	     else if (strcmp(arg,"write")==0 ||
-		      strcmp(arg,"w")==0)
-	       {
-		  opt_write=1;
-		  if (++i>=argc)
-		    options_failure("write argument scanning error");
-		  arg_write=argv[i];
-	       }
-	     else if (strcmp(arg,"s")==0 ||
-		      strcmp(arg,"start")==0)
-	       opt_start=1;
-	     else if (strcmp(arg,"S")==0 ||
-		      strcmp(arg,"stop")==0)
-	       opt_stop=1;
-	  }
-	else
-	  argument = argv[i];
-     }
-   if (argument==NULL)
-     {
-	options_failure("requires at least one argument");
-     }
-   
-}
-*/
 
 void BpmCountDialog::setBpmBounds(long start, long stop)
 {
@@ -551,151 +450,6 @@ static double barkbounds[barksize+1] =
     15500	
   };
 
-void BpmCountDialog::fetchSpectrum()
-{
-  long int slidesize = WAVRATE*10;
-  long int slide;
-  long int blocksize = 65536;
-  double *fftdata;
-  double *fftfreq;
-  double *fftfreqi;
-  double *fftwindowfreq;
-  signed short *data;
-  double *barkscale;
-  int bark;
-  barkscale=(double*)malloc(sizeof(double)*barksize);
-  fftdata=(double*)malloc(sizeof(double)*(blocksize+slidesize));
-  fftwindowfreq=(double*)malloc(sizeof(double)*blocksize);
-  fftfreq=(double*)malloc(sizeof(double)*(blocksize/2));
-  fftfreqi=(double*)malloc(sizeof(double)*blocksize);
-  // hieronder x 2 omdat we zowel links als rechts binnen krijgen
-  data=(signed short*)malloc(sizeof(signed short)*(blocksize+slidesize)*2);
-  assert(data);
-
-  FILE * raw;
-  char d[500];
-  // the filename of the file to read is the basename 
-  // suffixed with .raw
-  sprintf(d,"%s.raw",basename(index_file));
-  raw=fopen(d,"rb");
-  if (!raw)
-    {
-      printf("Error: Unable to open %s\n",argument);
-      exit(3);
-    }
-
-  // reset the fftfreq
-  long pos;
-  for(pos=0;pos<blocksize/2;pos++)
-    fftwindowfreq[pos]=0.0;
-  // position file
-  unsigned long long int audiosize=fsize(raw)/4;
-  long startpos = cue*4;
-  printf("Fetching spectrum at position = %ld\n",startpos);
-  fseek(raw,startpos,SEEK_SET);
-  // read in memory
-  pos=0;
-  while(pos<blocksize+slidesize)
-    {
-      long count=fread(data+pos*2,2*sizeof(signed short),blocksize+slidesize-pos,raw);
-      assert(count>0);
-      pos+=count;
-    }
-  // shrink down
-  for(pos=0;pos<blocksize+slidesize;pos++)
-    fftdata[pos]=(double)data[pos*2];
-  // cummulate different windows
-  for(slide=0;slide<slidesize;slide+=slidesize/100)
-    {
-      printf("slide = %d\n",(int)slide);
-      // do an fft on that position and normalize the result
-      fft_double(blocksize,0,fftdata+slide,NULL,fftwindowfreq,fftfreqi);
-      for(pos=0;pos<blocksize/2;pos++)
-	fftfreq[pos]+=fftwindowfreq[pos];
-    }
-  fclose(raw);
-  // normalize the result
-  double max = 0;
-  for(pos=0;pos<blocksize/2;pos++)
-    // fftfreq[pos]=fabsl(fftfreq[pos]*(double)pos/((double)blocksize*10.0));
-    fftfreq[pos]=fabsl(fftfreq[pos]);
-  for(pos=0;pos<blocksize/2;pos++)
-    if (fftfreq[pos]>max) 
-      max=fftfreq[pos];
-  for(pos=0;pos<blocksize/2;pos++)
-    fftfreq[pos]=fftfreq[pos]*100.0/max;
-  
-  // bring all frequency relatively to the bark-scales
-  for(bark=0;bark<barksize;bark++)
-    barkscale[bark]=0;
-  for(pos=0;pos<blocksize/2;pos++)
-    {
-      double freq = Index_to_frequency(blocksize,pos)*(double)WAVRATE;
-      for(bark=0;bark<barksize;bark++)
-	if (freq>barkbounds[bark] &&
-	    freq<barkbounds[bark+1])
-	  {
-	    double length = barkbounds[bark+1]-barkbounds[bark];
-	    double barkcentre = barkbounds[bark]+length/2.0;
-	    double dist = fabsl(freq-barkcentre)*2.0/length;
-	    double scale = 1.0 - dist;
-	    assert(scale>=0.0);
-	    barkscale[bark]+=fftfreq[pos]*scale;
-	    assert(barkscale[bark]>=0.0);
-	  }
-    }
-  // rescale bark information..
-  // the first entry in the scale is always halved because this is the bass level
-  barkscale[0]/=2.0;
-  max=0;
-  for(bark=0;bark<barksize;bark++)
-    if (barkscale[bark]>max)
-      max=barkscale[bark];
-  for(bark=0;bark<barksize;bark++)
-    {
-      barkscale[bark]=barkscale[bark]*99.0/max;
-      assert(barkscale[bark]>=0.0);
-    }
-  
-  // show it...
-  QPixmap *pm = new QPixmap(barksize,100);
-  QPainter p;
-  p.begin(pm);
-  QRect r(QRect(0,0,pm->width(),pm->height()));
-  p.fillRect(r,Qt::white);
-  int X,Y;
-  p.setPen(Qt::black);
-  for(pos=0;pos<barksize;pos++)
-    {
-      X=pos;
-      Y=(int)barkscale[pos];
-      p.drawPoint(X,Y);
-    }
-  /*
-    for(pos=0;pos<blocksize/2;pos++)
-    {
-    X=(int)(r.width()*2.0*(double)pos/(double)blocksize);
-    Y=(int)fftfreq[pos];
-    p.drawPoint(X,Y);
-    }
-  */
-  p.end();
-  BpmPix->setPixmap(*pm);
-  // write out values...
-  char spectrum[barksize+1];
-  for(pos=0;pos<barksize;pos++)
-    spectrum[pos]='a'+(char)(barkscale[pos]/4);
-  spectrum[barksize]=0;
-  index_spectrum=strdup(spectrum);
-  index_changed=1;
-  // free everything involved
-  free(fftwindowfreq);
-  free(fftfreq);
-  free(fftfreqi);
-  free(fftdata);
-  free(data);
-}
-
 void BpmCountDialog::doitwrapper()
 {
    doit();
@@ -865,13 +619,4 @@ void BpmCountDialog::decBpm()
 	currentperiod/=2;
 	normalperiod/=2;
      }
-}
-
-void BpmCountDialog::about()
-{
-   char tmp[500];
-   AboutDialog about(NULL,NULL,1);
-   sprintf(tmp,"BpmDj v%s",VERSION);
-   about.versionLabel->setText(tmp);
-   about.exec();
 }

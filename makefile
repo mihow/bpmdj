@@ -1,7 +1,7 @@
-VERSION = 1.7
+VERSION = 1.8
 include defines
 
-all: cbpm-count cbpm-play kbpm-play kbpm-dj beatmixing.ps
+all: cbpm-count cbpm-play kbpm-play kbpm-dj
 
 #############################################################################
 # Rulesets
@@ -71,8 +71,8 @@ allhtml: beatmixing.html
 	$(CP) mixingdesk.jpg beatmixing/
 
 .PHONY: website allhtml all clean 
-website: allhtml
-	scp beatmixing/* krubbens@bpmdj.sourceforge.net:/home/groups/b/bp/bpmdj/htdocs/
+website: 
+	scp *.html *.png krubbens@bpmdj.sourceforge.net:/home/groups/b/bp/bpmdj/htdocs/
 
 #############################################################################
 # Command line version
@@ -101,11 +101,15 @@ KPLAY_OBJECTS = about.o\
 	player-core.o\
 	cbpm-index.o\
 	kbpm-play.o\
-	songplayerlogic.o\
-	songplayerlogic.moc.o\
+	songplayer.logic.o\
+	songplayer.logic.moc.o\
 	bpmcounter.o\
 	bpmcounter.moc.o\
 	kbpm-counter.o\
+	spectrumanalyzer.o\
+	spectrumanalyzer.moc.o\
+	spectrumanalyzer.logic.o\
+	spectrumanalyzer.logic.moc.o\
 	kbpm-counter.moc.o\
 	fourierd.o\
 	fftmisc.o
@@ -118,6 +122,8 @@ KCOUNT_OBJECTS = bpmcounter.o\
 
 KSEL_OBJECTS = qstring-factory.o\
 	spectrum.o\
+	cluster.o\
+	pca.o\
 	about.o\
 	about.moc.o\
 	loader.o\
@@ -136,7 +142,7 @@ KSEL_OBJECTS = qstring-factory.o\
 	importscanner.o\
 	songselector.logic.moc.o\
 	songselector.logic.o\
-	process-manager.cpp\
+	process-manager.o\
 	preferences.o\
 	preferences.moc.o\
 	qsong.o\
@@ -157,6 +163,7 @@ KSEL_OBJECTS = qstring-factory.o\
 	similarscanner.moc.o\
 	config.o
 
+spectrumanalyzer.logic.h: spectrumanalyzer.h
 process-manager.cpp: process-manager.h
 importscanner.h: dirscanner.h
 dirscanner.o: dirscanner.h dirscanner.cpp
@@ -179,7 +186,7 @@ about.cpp: about.h version.h
 loader.cpp: loader.h
 askinput.cpp: askinput.h version.h
 kbpm-dj.cpp: setupwizard.h
-songplayer.cpp songplayer.h: songplayer.ui version.h
+songplayer.cpp songplayer.h: songplayer.ui version.h spectrumanalyzer.logic.h
 	$(UIC) -o songplayer.h songplayer.ui
 	$(UIC) -i songplayer.h -o songplayer.cpp songplayer.ui
 

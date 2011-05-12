@@ -99,8 +99,6 @@ void QSong::init(const QString filename, const QString currentpath)
   /* set played flag */
   song_played=Played::IsPlayed(song_index);
   played_author_at_time = -100;
-  hue=-2; // -2 = no initialised, -1 = no spectrum
-  sat=-1;
   color_distance = 0;
   spectrum_string = "";
   distance_string = "";
@@ -149,63 +147,29 @@ QSong::QSong(QString a, QString b, QListView* parent) :
   newSpectrum(song_spectrum);
 }
 
-void QSong::getColors()
+QString tonumber(const int b)
 {
-  int ih, is;
-  if (song_spectrum.isNull())
-    {
-      hue=-1;
-      sat=-1;
-      return;
-    }
-  QColor transfer;
-  float red = 0, green = 0, blue = 0;
-  int val;
-  for (int i = 0; i<24;i++)
-    {
-      char letter = song_spectrum.at(i).latin1() - 'a';
-      float mismatch=letter;
-      mismatch=mismatch*scales[i];
-      mismatch*=mismatch;
-      mismatch/=625.0;
-      transfer.setHsv(i*240/24,255,255);
-      red+=transfer.red()*mismatch;
-      green+=transfer.green()*mismatch;
-      blue+=transfer.blue()*mismatch;
-    }
-  if (red >= green && red >= blue)
-    {
-      green *= 255.0/red;
-      blue  *= 255.0/red;
-      red    = 255.0;
-    }
-  if (green >= red && green >= blue)
-    {
-      red   *= 255.0/green;
-      blue  *= 255.0/green;
-      green  = 255.0;
-    }
-  if (blue >= red && blue >= green)
-    {
-      red   *= 255.0/blue;
-      green *= 255.0/blue;
-      blue   = 255.0;
-    }
-  transfer.setRgb((int)red,(int)green,(int)blue);
-  transfer.getHsv(ih,is,val);
-  hue=ih;
-  sat=is;
+  return ( b < 10 ?
+	   QString("00")+QString::number(b) :
+	   ( b < 100 ?
+	     QString("0")+QString::number(b) :
+	     QString::number(b)));
+}
 
-  spectrum_string = 
-    ( hue==-2 ? 
-      QString::null :
-      ( hue==-1 ? 
-	QString::null :
-	( hue < 10 ?
-	  QString("00")+QString::number(hue) :
-	  ( hue < 100 ?
-	    QString("0")+QString::number(hue) :
-	    QString::number(hue) ) ) ) );
+void QSong::invertColor(bool r, bool g, bool b)
+{
+  QColor c;
+  c.setRgb(r ? 255-color.red(): color.red(),
+	   g ? 255-color.green() : color.green(),
+	   b ? 255-color.blue() : color.blue());
+  setColor(c);
+}
+
+void QSong::setColor(QColor transfer)
+{
+  color = transfer;
+  spectrum_string = ( !color.isValid() ? QString::null :
+		      color.name());
 }
 
 static float max(float a, float b)
@@ -224,30 +188,50 @@ static float min(float a, float b)
     return b;
 }
 
+void QSong::simpledump(int d)
+{
+}
+
+void QSong::determine_color(float hue, float dummy, int dummy2, int dummy3)
+{
+  color.setHsv((int)hue,255,255);
+  spectrum_string = tonumber((int)hue);
+}
+
+
+float QSong::distance(Point* point)
+{
+  QSong *song = (QSong*)point;
+  QString main = song->song_spectrum;
+  if (!main.isNull())
+    {
+      float distance=0;
+      for (int i = 0; i<24;i++)
+	{
+	  char letter1 = song_spectrum.at(i).latin1();
+	  char letter2 = main.at(i).latin1();
+	  float mismatch=letter1-letter2;
+	  mismatch*=scales[i];
+	  mismatch*=mismatch;
+	  distance+=mismatch;
+	}
+      // maximum is 14 * 25 * 25
+      // distance /= (34.3/16.0);
+      return distance /= 2;
+    }
+  return 100000;
+}
+
+
 bool QSong::getDistance()
 {
   color_distance=255;
   if (!song_spectrum.isNull())
-    if (ProcessManager::playingInMain)
+    if (ProcessManager::playingInMain())
       {
-	QString main = ProcessManager::playingInMain->song_spectrum;
-	if (!main.isNull())
-	  {
-	    float distance=0;
-	    for (int i = 0; i<24;i++)
-	      {
-		char letter1 = song_spectrum.at(i).latin1();
-		char letter2 = main.at(i).latin1();
-		float mismatch=letter1-letter2;
-		mismatch*=scales[i];
-		mismatch*=mismatch;
-		distance+=mismatch;
-	      }
-	    // maximum is 14 * 25 * 25
-	    // distance /= (34.3/16.0);
-	    if (distance>255) distance=255;
-	    color_distance = (int)distance;
-	  }
+	float d = distance(ProcessManager::playingInMain());
+	if (d<255) 
+	  color_distance = (int)d;
       }
   distance_string = 
     ( ( color_distance<0 || color_distance == 255 ) ?
@@ -291,7 +275,7 @@ void QSong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid, int a
 	  return;
 	}
       break;
-
+      
     case LIST_TITLE:
       if (Config::color_played && song_played)
 	{
@@ -329,6 +313,7 @@ void QSong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid, int a
 	    QListViewItem::paintCell(p,ncg,col,wid,align);
 	    return;
 	  }
+	break;
       }
       
     case LIST_SPECTRUM:
@@ -336,22 +321,7 @@ void QSong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid, int a
 	if (!song_spectrum.isNull())
 	  {
 	    QColorGroup ncg(cg);
-	    float distance = 1.0;
-	    if (ProcessManager::playingInMain && !ProcessManager::playingInMain->song_spectrum.isNull())
-	      {
-		QSong *main= ProcessManager::playingInMain;
-		distance  = fabs(main->hue-hue);
-		distance  = min(distance,360-distance);
-		if (distance<45)
-		  distance = 1.0;
-		else if (distance<60)
-		  distance = 1.0-(distance-45)/15.0;
-		else
-		  distance = 0.0;
-	      }
-	    QColor transfer;
-	    transfer.setHsv(hue,sat,(int)(255.0*distance));
-	    ncg.setColor(QColorGroup::Base,transfer);
+	    ncg.setColor(QColorGroup::Base,color);
 	    QListViewItem::paintCell(p,ncg,col,wid,align);
 	    return;
 	  }

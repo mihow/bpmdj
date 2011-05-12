@@ -21,10 +21,13 @@
 #include "common.h"
 #define  WAVRATE  (44100)
 #define  wave_bufsize (32L*1024L)
+// one period is the length of 1 measure
 extern  signed8 targetperiod;
 extern  signed8 currentperiod;
 extern  signed8 normalperiod;
 extern  signed8 latency;
+// x is the data position in the raw file (thus at normal tempo)
+// y is the position in the playing file (thus at target tempo)
 extern  signed8 y,x;
 volatile extern  int stop;
 volatile extern  int finished;
@@ -72,6 +75,8 @@ unsigned4 lfo_revsaw(unsigned4 x);
 unsigned4 lfo_metronome(unsigned4 x);
 typedef unsigned4 (*_lfo_)(unsigned4 x);
 void lfo_set(char* name, _lfo_ l, unsigned8 freq, unsigned8 phase);
+// the jumpback is expressed at the normal speed of playing
+int  loop_set(unsigned8 jumpback);
 
 extern int   opt_debuglatency;
 extern int   opt_quiet;

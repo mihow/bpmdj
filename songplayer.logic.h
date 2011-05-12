@@ -36,7 +36,8 @@ class SongPlayerLogic :
    void redrawCues();
    void normalReached(bool yes);
    BpmCountDialog * bpmcounter;
-   bool visiblebpmcounter;
+ protected:
+   virtual void done(int r);
  public:
    SongPlayerLogic::SongPlayerLogic(QWidget*parent=0,const char*name=0, bool modal=FALSE,WFlags f=0);
  public slots:
@@ -94,4 +95,11 @@ class SongPlayerLogic :
    virtual void slowRevSaw();
    virtual void fastRevSaw();
    virtual void openBpmCounter();
+   virtual void openSpectrumAnalyzer();
+   virtual void openAbout();
+   // loop functionality
+   virtual void toggleNoLoop();
+   virtual void toggleBeatLoop();
+   virtual void toggleMeasureLoop();
+   virtual void toggle4MeasureLoop();
 };

@@ -81,7 +81,7 @@
                             </sizepolicy>
                         </property>
                         <property name="title">
-                            <string>Player 1</string>
+                            <string>Main</string>
                         </property>
                         <grid>
                             <property name="name">
@@ -93,7 +93,7 @@
                             <property name="spacing">
                                 <number>6</number>
                             </property>
-                            <widget class="QLayoutWidget" row="0" column="1" rowspan="1" colspan="2">
+                            <widget class="QLayoutWidget" row="0" column="0">
                                 <property name="name">
                                     <cstring>layout5</cstring>
                                 </property>
@@ -144,95 +144,6 @@
                                     </widget>
                                 </vbox>
                             </widget>
-                            <widget class="QLayoutWidget" row="0" column="0">
-                                <property name="name">
-                                    <cstring>layout4</cstring>
-                                </property>
-                                <vbox>
-                                    <property name="name">
-                                        <cstring>unnamed</cstring>
-                                    </property>
-                                    <widget class="QLabel">
-                                        <property name="name">
-                                            <cstring>TextLabel1_2</cstring>
-                                        </property>
-                                        <property name="sizePolicy">
-                                            <sizepolicy>
-                                                <hsizetype>1</hsizetype>
-                                                <vsizetype>5</vsizetype>
-                                                <horstretch>0</horstretch>
-                                                <verstretch>0</verstretch>
-                                            </sizepolicy>
-                                        </property>
-                                        <property name="backgroundOrigin">
-                                            <enum>ParentOrigin</enum>
-                                        </property>
-                                        <property name="text">
-                                            <string>Tempo</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QLabel">
-                                        <property name="name">
-                                            <cstring>TextLabel2</cstring>
-                                        </property>
-                                        <property name="sizePolicy">
-                                            <sizepolicy>
-                                                <hsizetype>1</hsizetype>
-                                                <vsizetype>5</vsizetype>
-                                                <horstretch>0</horstretch>
-                                                <verstretch>0</verstretch>
-                                            </sizepolicy>
-                                        </property>
-                                        <property name="backgroundOrigin">
-                                            <enum>ParentOrigin</enum>
-                                        </property>
-                                        <property name="text">
-                                            <string>Title</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QLabel">
-                                        <property name="name">
-                                            <cstring>TextLabel3</cstring>
-                                        </property>
-                                        <property name="sizePolicy">
-                                            <sizepolicy>
-                                                <hsizetype>1</hsizetype>
-                                                <vsizetype>5</vsizetype>
-                                                <horstretch>0</horstretch>
-                                                <verstretch>0</verstretch>
-                                            </sizepolicy>
-                                        </property>
-                                        <property name="backgroundOrigin">
-                                            <enum>ParentOrigin</enum>
-                                        </property>
-                                        <property name="text">
-                                            <string>Author</string>
-                                        </property>
-                                    </widget>
-                                </vbox>
-                            </widget>
-                            <widget class="QCheckBox" row="1" column="0" rowspan="1" colspan="2">
-                                <property name="name">
-                                    <cstring>ismain1</cstring>
-                                </property>
-                                <property name="backgroundOrigin">
-                                    <enum>ParentOrigin</enum>
-                                </property>
-                                <property name="text">
-                                    <string>Main</string>
-                                </property>
-                            </widget>
-                            <widget class="QCheckBox" row="1" column="2">
-                                <property name="name">
-                                    <cstring>onoff1</cstring>
-                                </property>
-                                <property name="backgroundOrigin">
-                                    <enum>ParentOrigin</enum>
-                                </property>
-                                <property name="text">
-                                    <string>On/Off</string>
-                                </property>
-                            </widget>
                         </grid>
                     </widget>
                     <widget class="QGroupBox" row="0" column="3">
@@ -248,7 +159,7 @@
                             </sizepolicy>
                         </property>
                         <property name="title">
-                            <string>Player 4</string>
+                            <string>Extra Player 2</string>
                         </property>
                         <grid>
                             <property name="name">
@@ -261,73 +172,6 @@
                                 <number>6</number>
                             </property>
                             <widget class="QLayoutWidget" row="0" column="0">
-                                <property name="name">
-                                    <cstring>layout8</cstring>
-                                </property>
-                                <vbox>
-                                    <property name="name">
-                                        <cstring>unnamed</cstring>
-                                    </property>
-                                    <widget class="QLabel">
-                                        <property name="name">
-                                            <cstring>TextLabel1_2_2_2</cstring>
-                                        </property>
-                                        <property name="sizePolicy">
-                                            <sizepolicy>
-                                                <hsizetype>1</hsizetype>
-                                                <vsizetype>5</vsizetype>
-                                                <horstretch>0</horstretch>
-                                                <verstretch>0</verstretch>
-                                            </sizepolicy>
-                                        </property>
-                                        <property name="backgroundOrigin">
-                                            <enum>ParentOrigin</enum>
-                                        </property>
-                                        <property name="text">
-                                            <string>Tempo</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QLabel">
-                                        <property name="name">
-                                            <cstring>TextLabel2_2_2</cstring>
-                                        </property>
-                                        <property name="sizePolicy">
-                                            <sizepolicy>
-                                                <hsizetype>1</hsizetype>
-                                                <vsizetype>5</vsizetype>
-                                                <horstretch>0</horstretch>
-                                                <verstretch>0</verstretch>
-                                            </sizepolicy>
-                                        </property>
-                                        <property name="backgroundOrigin">
-                                            <enum>ParentOrigin</enum>
-                                        </property>
-                                        <property name="text">
-                                            <string>Title</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QLabel">
-                                        <property name="name">
-                                            <cstring>TextLabel1_3_2</cstring>
-                                        </property>
-                                        <property name="sizePolicy">
-                                            <sizepolicy>
-                                                <hsizetype>1</hsizetype>
-                                                <vsizetype>5</vsizetype>
-                                                <horstretch>0</horstretch>
-                                                <verstretch>0</verstretch>
-                                            </sizepolicy>
-                                        </property>
-                                        <property name="backgroundOrigin">
-                                            <enum>ParentOrigin</enum>
-                                        </property>
-                                        <property name="text">
-                                            <string>Author</string>
-                                        </property>
-                                    </widget>
-                                </vbox>
-                            </widget>
-                            <widget class="QLayoutWidget" row="0" column="1" rowspan="1" colspan="2">
                                 <property name="name">
                                     <cstring>layout9</cstring>
                                 </property>
@@ -394,28 +238,6 @@
                                     </widget>
                                 </vbox>
                             </widget>
-                            <widget class="QCheckBox" row="1" column="0" rowspan="1" colspan="2">
-                                <property name="name">
-                                    <cstring>ismain4</cstring>
-                                </property>
-                                <property name="backgroundOrigin">
-                                    <enum>ParentOrigin</enum>
-                                </property>
-                                <property name="text">
-                                    <string>Main</string>
-                                </property>
-                            </widget>
-                            <widget class="QCheckBox" row="1" column="2">
-                                <property name="name">
-                                    <cstring>onoff4</cstring>
-                                </property>
-                                <property name="backgroundOrigin">
-                                    <enum>ParentOrigin</enum>
-                                </property>
-                                <property name="text">
-                                    <string>On/Off</string>
-                                </property>
-                            </widget>
                         </grid>
                     </widget>
                     <widget class="QGroupBox" row="0" column="2">
@@ -431,7 +253,7 @@
                             </sizepolicy>
                         </property>
                         <property name="title">
-                            <string>Player 3</string>
+                            <string>Extra Player 1</string>
                         </property>
                         <grid>
                             <property name="name">
@@ -444,73 +266,6 @@
                                 <number>6</number>
                             </property>
                             <widget class="QLayoutWidget" row="0" column="0">
-                                <property name="name">
-                                    <cstring>layout7</cstring>
-                                </property>
-                                <property name="backgroundOrigin">
-                                    <enum>ParentOrigin</enum>
-                                </property>
-                                <vbox>
-                                    <property name="name">
-                                        <cstring>unnamed</cstring>
-                                    </property>
-                                    <widget class="QLabel">
-                                        <property name="name">
-                                            <cstring>TextLabel1_2_3</cstring>
-                                        </property>
-                                        <property name="sizePolicy">
-                                            <sizepolicy>
-                                                <hsizetype>1</hsizetype>
-                                                <vsizetype>5</vsizetype>
-                                                <horstretch>0</horstretch>
-                                                <verstretch>0</verstretch>
-                                            </sizepolicy>
-                                        </property>
-                                        <property name="text">
-                                            <string>Tempo</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QLabel">
-                                        <property name="name">
-                                            <cstring>TextLabel2_3</cstring>
-                                        </property>
-                                        <property name="sizePolicy">
-                                            <sizepolicy>
-                                                <hsizetype>1</hsizetype>
-                                                <vsizetype>5</vsizetype>
-                                                <horstretch>0</horstretch>
-                                                <verstretch>0</verstretch>
-                                            </sizepolicy>
-                                        </property>
-                                        <property name="backgroundOrigin">
-                                            <enum>ParentOrigin</enum>
-                                        </property>
-                                        <property name="text">
-                                            <string>Title</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QLabel">
-                                        <property name="name">
-                                            <cstring>TextLabel3_2</cstring>
-                                        </property>
-                                        <property name="sizePolicy">
-                                            <sizepolicy>
-                                                <hsizetype>1</hsizetype>
-                                                <vsizetype>5</vsizetype>
-                                                <horstretch>0</horstretch>
-                                                <verstretch>0</verstretch>
-                                            </sizepolicy>
-                                        </property>
-                                        <property name="backgroundOrigin">
-                                            <enum>ParentOrigin</enum>
-                                        </property>
-                                        <property name="text">
-                                            <string>Author</string>
-                                        </property>
-                                    </widget>
-                                </vbox>
-                            </widget>
-                            <widget class="QLayoutWidget" row="0" column="1" rowspan="1" colspan="2">
                                 <property name="name">
                                     <cstring>layout10</cstring>
                                 </property>
@@ -577,28 +332,6 @@
                                     </widget>
                                 </vbox>
                             </widget>
-                            <widget class="QCheckBox" row="1" column="0" rowspan="1" colspan="2">
-                                <property name="name">
-                                    <cstring>ismain3</cstring>
-                                </property>
-                                <property name="backgroundOrigin">
-                                    <enum>ParentOrigin</enum>
-                                </property>
-                                <property name="text">
-                                    <string>Main</string>
-                                </property>
-                            </widget>
-                            <widget class="QCheckBox" row="1" column="2">
-                                <property name="name">
-                                    <cstring>onoff3</cstring>
-                                </property>
-                                <property name="backgroundOrigin">
-                                    <enum>ParentOrigin</enum>
-                                </property>
-                                <property name="text">
-                                    <string>On/Off</string>
-                                </property>
-                            </widget>
                         </grid>
                     </widget>
                     <widget class="QGroupBox" row="0" column="1">
@@ -614,7 +347,7 @@
                             </sizepolicy>
                         </property>
                         <property name="title">
-                            <string>Player 2</string>
+                            <string>Monitor</string>
                         </property>
                         <grid>
                             <property name="name">
@@ -627,73 +360,6 @@
                                 <number>6</number>
                             </property>
                             <widget class="QLayoutWidget" row="0" column="0">
-                                <property name="name">
-                                    <cstring>layout6</cstring>
-                                </property>
-                                <vbox>
-                                    <property name="name">
-                                        <cstring>unnamed</cstring>
-                                    </property>
-                                    <widget class="QLabel">
-                                        <property name="name">
-                                            <cstring>TextLabel1_2_2</cstring>
-                                        </property>
-                                        <property name="sizePolicy">
-                                            <sizepolicy>
-                                                <hsizetype>1</hsizetype>
-                                                <vsizetype>5</vsizetype>
-                                                <horstretch>0</horstretch>
-                                                <verstretch>0</verstretch>
-                                            </sizepolicy>
-                                        </property>
-                                        <property name="backgroundOrigin">
-                                            <enum>ParentOrigin</enum>
-                                        </property>
-                                        <property name="text">
-                                            <string>Tempo</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QLabel">
-                                        <property name="name">
-                                            <cstring>TextLabel2_2</cstring>
-                                        </property>
-                                        <property name="sizePolicy">
-                                            <sizepolicy>
-                                                <hsizetype>1</hsizetype>
-                                                <vsizetype>5</vsizetype>
-                                                <horstretch>0</horstretch>
-                                                <verstretch>0</verstretch>
-                                            </sizepolicy>
-                                        </property>
-                                        <property name="backgroundOrigin">
-                                            <enum>ParentOrigin</enum>
-                                        </property>
-                                        <property name="text">
-                                            <string>Title</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QLabel">
-                                        <property name="name">
-                                            <cstring>TextLabel1_3</cstring>
-                                        </property>
-                                        <property name="sizePolicy">
-                                            <sizepolicy>
-                                                <hsizetype>1</hsizetype>
-                                                <vsizetype>5</vsizetype>
-                                                <horstretch>0</horstretch>
-                                                <verstretch>0</verstretch>
-                                            </sizepolicy>
-                                        </property>
-                                        <property name="backgroundOrigin">
-                                            <enum>ParentOrigin</enum>
-                                        </property>
-                                        <property name="text">
-                                            <string>Author</string>
-                                        </property>
-                                    </widget>
-                                </vbox>
-                            </widget>
-                            <widget class="QLayoutWidget" row="0" column="1" rowspan="1" colspan="2">
                                 <property name="name">
                                     <cstring>layout11</cstring>
                                 </property>
@@ -760,101 +426,7 @@
                                     </widget>
                                 </vbox>
                             </widget>
-                            <widget class="QCheckBox" row="1" column="0" rowspan="1" colspan="2">
-                                <property name="name">
-                                    <cstring>ismain2</cstring>
-                                </property>
-                                <property name="backgroundOrigin">
-                                    <enum>ParentOrigin</enum>
-                                </property>
-                                <property name="text">
-                                    <string>Main</string>
-                                </property>
-                            </widget>
-                            <widget class="QCheckBox" row="1" column="2">
-                                <property name="name">
-                                    <cstring>onoff2</cstring>
-                                </property>
-                                <property name="backgroundOrigin">
-                                    <enum>AncestorOrigin</enum>
-                                </property>
-                                <property name="text">
-                                    <string>On/Off</string>
-                                </property>
-                            </widget>
                         </grid>
-                    </widget>
-                    <widget class="QLayoutWidget" row="2" column="0" rowspan="1" colspan="4">
-                        <property name="name">
-                            <cstring>Layout5</cstring>
-                        </property>
-                        <hbox>
-                            <property name="name">
-                                <cstring>unnamed</cstring>
-                            </property>
-                            <property name="margin">
-                                <number>0</number>
-                            </property>
-                            <property name="spacing">
-                                <number>6</number>
-                            </property>
-                            <widget class="QLineEdit">
-                                <property name="name">
-                                    <cstring>searchLine</cstring>
-                                </property>
-                            </widget>
-                            <widget class="QPushButton">
-                                <property name="name">
-                                    <cstring>PushButton2</cstring>
-                                </property>
-                                <property name="text">
-                                    <string>Search</string>
-                                </property>
-                            </widget>
-                            <widget class="QLCDNumber">
-                                <property name="name">
-                                    <cstring>countLcd</cstring>
-                                </property>
-                            </widget>
-                            <widget class="QLCDNumber">
-                                <property name="name">
-                                    <cstring>mainLCD</cstring>
-                                </property>
-                                <property name="sizePolicy">
-                                    <sizepolicy>
-                                        <hsizetype>1</hsizetype>
-                                        <vsizetype>1</vsizetype>
-                                        <horstretch>0</horstretch>
-                                        <verstretch>0</verstretch>
-                                    </sizepolicy>
-                                </property>
-                            </widget>
-                            <spacer>
-                                <property name="name">
-                                    <cstring>Spacer3</cstring>
-                                </property>
-                                <property name="orientation">
-                                    <enum>Horizontal</enum>
-                                </property>
-                                <property name="sizeType">
-                                    <enum>Expanding</enum>
-                                </property>
-                                <property name="sizeHint">
-                                    <size>
-                                        <width>20</width>
-                                        <height>20</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                            <widget class="QPushButton">
-                                <property name="name">
-                                    <cstring>PushButton3</cstring>
-                                </property>
-                                <property name="text">
-                                    <string>&amp;Switch</string>
-                                </property>
-                            </widget>
-                        </hbox>
                     </widget>
                     <widget class="QListView" row="1" column="0" rowspan="1" colspan="4">
                         <column>
@@ -1024,6 +596,64 @@
                             <bool>true</bool>
                         </property>
                     </widget>
+                    <widget class="QLayoutWidget" row="2" column="0" rowspan="1" colspan="4">
+                        <property name="name">
+                            <cstring>layout6</cstring>
+                        </property>
+                        <hbox>
+                            <property name="name">
+                                <cstring>unnamed</cstring>
+                            </property>
+                            <widget class="QLineEdit">
+                                <property name="name">
+                                    <cstring>searchLine</cstring>
+                                </property>
+                            </widget>
+                            <widget class="QPushButton">
+                                <property name="name">
+                                    <cstring>PushButton2</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Search</string>
+                                </property>
+                            </widget>
+                            <widget class="QLCDNumber">
+                                <property name="name">
+                                    <cstring>countLcd</cstring>
+                                </property>
+                            </widget>
+                            <widget class="QLCDNumber">
+                                <property name="name">
+                                    <cstring>mainLCD</cstring>
+                                </property>
+                                <property name="sizePolicy">
+                                    <sizepolicy>
+                                        <hsizetype>1</hsizetype>
+                                        <vsizetype>1</vsizetype>
+                                        <horstretch>0</horstretch>
+                                        <verstretch>0</verstretch>
+                                    </sizepolicy>
+                                </property>
+                            </widget>
+                            <spacer>
+                                <property name="name">
+                                    <cstring>Spacer3</cstring>
+                                </property>
+                                <property name="orientation">
+                                    <enum>Horizontal</enum>
+                                </property>
+                                <property name="sizeType">
+                                    <enum>Expanding</enum>
+                                </property>
+                                <property name="sizeHint">
+                                    <size>
+                                        <width>230</width>
+                                        <height>20</height>
+                                    </size>
+                                </property>
+                            </spacer>
+                        </hbox>
+                    </widget>
                 </grid>
             </widget>
             <widget class="QWidget">
@@ -1058,12 +688,6 @@
         <slot>doFilterChanged()</slot>
     </connection>
     <connection>
-        <sender>PushButton3</sender>
-        <signal>clicked()</signal>
-        <receiver>SongSelector</receiver>
-        <slot>switchMonitorToMain()</slot>
-    </connection>
-    <connection>
         <sender>songList</sender>
         <signal>rightButtonPressed(QListViewItem*,const QPoint&amp;,int)</signal>
         <receiver>SongSelector</receiver>
@@ -1081,60 +705,11 @@
         <receiver>SongSelector</receiver>
         <slot>doFilterChanged()</slot>
     </connection>
-    <connection>
-        <sender>onoff1</sender>
-        <signal>stateChanged(int)</signal>
-        <receiver>SongSelector</receiver>
-        <slot>playersChanged()</slot>
-    </connection>
-    <connection>
-        <sender>ismain1</sender>
-        <signal>stateChanged(int)</signal>
-        <receiver>SongSelector</receiver>
-        <slot>playersChanged()</slot>
-    </connection>
-    <connection>
-        <sender>onoff2</sender>
-        <signal>stateChanged(int)</signal>
-        <receiver>SongSelector</receiver>
-        <slot>playersChanged()</slot>
-    </connection>
-    <connection>
-        <sender>onoff3</sender>
-        <signal>stateChanged(int)</signal>
-        <receiver>SongSelector</receiver>
-        <slot>playersChanged()</slot>
-    </connection>
-    <connection>
-        <sender>onoff4</sender>
-        <signal>stateChanged(int)</signal>
-        <receiver>SongSelector</receiver>
-        <slot>playersChanged()</slot>
-    </connection>
-    <connection>
-        <sender>ismain2</sender>
-        <signal>stateChanged(int)</signal>
-        <receiver>SongSelector</receiver>
-        <slot>playersChanged()</slot>
-    </connection>
-    <connection>
-        <sender>ismain3</sender>
-        <signal>stateChanged(int)</signal>
-        <receiver>SongSelector</receiver>
-        <slot>playersChanged()</slot>
-    </connection>
-    <connection>
-        <sender>ismain4</sender>
-        <signal>stateChanged(int)</signal>
-        <receiver>SongSelector</receiver>
-        <slot>playersChanged()</slot>
-    </connection>
 </connections>
 <tabstops>
     <tabstop>songList</tabstop>
     <tabstop>searchLine</tabstop>
     <tabstop>PushButton2</tabstop>
-    <tabstop>PushButton3</tabstop>
 </tabstops>
 <slots>
     <slot>checkDisc()</slot>
@@ -1152,6 +727,7 @@
     <slot>selectionAddTags()</slot>
     <slot>switchMonitorToMain()</slot>
     <slot>playersChanged()</slot>
+    <slot>selectionIsTargetColor()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

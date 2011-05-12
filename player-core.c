@@ -38,6 +38,9 @@
 #include "cbpm-index.h"
 #include "version.h"
 
+// WVB -- testing variable for the impulse characeteristic
+//#define IMPULSE_PANNING
+
 /*-------------------------------------------
  *         Constants & Variables
  *-------------------------------------------*/
@@ -494,28 +497,70 @@ unsigned4 lfo_difference(unsigned4 x)
 }
 
 
+#ifdef IMPULSE_PANNING
+#undef DIFF
+static int DIFF = 19190*4;
+static float *prevl;
+static float *prevr;
+void pan_init()
+{
+  int i;
+  DIFF = normalperiod;
+  prevl=(float*)malloc(DIFF*sizeof(float));
+  prevr=(float*)malloc(DIFF*sizeof(float));
+  
+  for(i = 0 ; i < DIFF ; i ++)
+    {
+      prevl[i]=0.0;
+      prevr[i]=0.0;
+    }
+}
+
+static float maxsig=0.0;
 unsigned4 lfo_pan(unsigned4 x)
 {
    signed8 diff;
-   signed4 quart;
-   diff=(signed8)y-(signed8)lfo_phase;
-   diff=diff%lfo_period;
-   quart=lfo_period/4;
-   /* at position 0, centre */
-   if (diff<quart)
-     return lfo_volume(x,quart-diff,quart,1,1);
-   /* at position 0.25, right */
-   diff-=quart;
-   if (diff<quart)
-     return lfo_volume(x,diff,quart,1,1);
-   /* at position 0.5 centre */
-   diff-=quart;
-   if (diff<quart)
-     return lfo_volume(x,1,1,quart-diff,quart);
-   /* at position 0.75 left */
-   diff-=quart;
-   return lfo_volume(x,1,1,diff,quart);
+   longtrick lt;
+   signed4 left;
+   signed4 right;
+   lt.value=x;
+   int pos = y %DIFF;
+   prevl[pos]+=(float)lt.leftright.left/100.0;
+   prevr[pos]+=(float)lt.leftright.right/100.0;
+   if (fabs(prevl[pos])>maxsig)
+     maxsig=fabs(prevl[pos]);
+   if (fabs(prevr[pos])>maxsig)
+     maxsig=fabs(prevr[pos]);
+   lt.leftright.left = prevl[pos]*32767.0/maxsig;
+   lt.leftright.right = prevr[pos]*32767.0/maxsig;
+   return lt.value;
 }
+#endif
+
+#ifndef IMPULSE_PANNING
+unsigned4 lfo_pan(unsigned4 x)
+{
+  signed8 diff;
+  signed4 quart;
+  diff=(signed8)y-(signed8)lfo_phase;
+  diff=diff%lfo_period;
+  quart=lfo_period/4;
+  // at position 0, centre 
+  if (diff<quart)
+    return lfo_volume(x,quart-diff,quart,1,1);
+  // at position 0.25, right 
+  diff-=quart;
+  if (diff<quart)
+    return lfo_volume(x,diff,quart,1,1);
+  // at position 0.5 centre 
+  diff-=quart;
+  if (diff<quart)
+    return lfo_volume(x,1,1,quart-diff,quart);
+  // at position 0.75 left
+  diff-=quart;
+  return lfo_volume(x,1,1,diff,quart);
+}
+#endif
 
 unsigned4 lfo_saw(unsigned4 x)
 {
@@ -651,6 +696,44 @@ void cue_read()
 }
 
 /*-------------------------------------------
+ *         Loop operations
+ *-------------------------------------------*/
+#define   loop_off  ((unsigned8)-1)
+unsigned8 loop_at = loop_off;
+unsigned8 loop_restart = 0;
+
+int loop_set(unsigned8 jumpback)
+{
+  //  printf("---\nloop_at = %d, loop_restart = %d, cue = %d, jumpback=%d, paused = %d\n",(int)loop_at,(int)loop_restart,(int)cue,(int)jumpback,(int)paused);
+  if (paused)
+    {
+      loop_at = cue;
+      if (loop_at<0) 
+	loop_at = loop_off;
+      paused = 0;
+    }
+  if (loop_at==loop_off)
+    {
+      loop_at=x;
+    }
+  if (jumpback==0)
+    loop_at=loop_off;
+  else
+    if (jumpback<=loop_at)
+      loop_restart=loop_at-jumpback;
+    else
+      loop_at=loop_off;
+  //  printf("loop_at = %d, loop_restart = %d, cue = %d, jumpback=%d, paused = %d\n",(int)loop_at,(int)loop_restart,(int)cue,(int)jumpback,(int)paused);
+  return loop_at!=loop_off;
+}
+
+void loop_jump()
+{
+  x=loop_restart;
+  y=y_normalise(x);
+}
+
+/*-------------------------------------------
  *         Program logic
  *-------------------------------------------*/
 void help();
@@ -744,11 +827,13 @@ void read_write_loop()
 	  }
 	// calculate value
 	x=y*normalperiod/currentperiod;
+	if (x>loop_at)
+	  loop_jump();
 	if (wave_read(x,value)<0)
 	  {
-	     printf("End of song, pausing\n");
-	     paused = 1;
-	     value[0] = 0L;
+	    printf("End of song, pausing\n");
+	    paused = 1;
+	    value[0] = 0L;
 	  };
 	value[0]=lfo_do(value[0]);
 	y=y+1;
@@ -810,7 +895,7 @@ void core_init(int sync)
      if (strcmp(strstr(argument,".mp3"),".mp3")==0)
        {
 	  printf("Error: please enter the index file, not the mp3 file\n");
-	  printf("       an index file can be made with cbpm-count\n");
+	  printf("       an index file can be made with 'kbpm-play -c'\n");
 	  exit(30);
        }
    index_read(argument);
@@ -832,11 +917,20 @@ void core_init(int sync)
 	double targettempo;
 	normaltempo=4.0*(double)WAVRATE*60.0/(double)normalperiod;
 	targettempo=4.0*(double)WAVRATE*60.0/(double)targetperiod;
-	printf("Normal tempo = %g BPM\n",normaltempo);
-	printf("Target tempo = %g BPM",targettempo);
+	if (normaltempo>0)
+	  printf("Normal tempo = %g BPM\n",normaltempo);
+	else
+	  printf("No normal tempo known\n");
+	if (targettempo>0)
+	  printf("Target tempo = %g BPM",targettempo);
+	else
+	  printf("No Target tempo known\n");
 	printf(" speed(%g)\n",(double)normalperiod/(double)currentperiod);
      }
    cue_read();
+#ifdef IMPULSE_PANNING
+   pan_init();
+#endif
    wave_open(index_file,sync);
 }
 

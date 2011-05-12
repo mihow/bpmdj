@@ -1,14 +1,64 @@
+============================
+1.9:
+  - SELECTOR: als de .raw file al bestaat voordat we hem gaan creeeren moet hier ook iets mee aangevangen worden
+  - kbpm-counter.cpp kbpm-counter.h CountDialog en BpmCountDialog beter consistentere namen geven..
+  - merge index_file creation into cbpm-index (kbpm-play.c bevat dergelijke code en import-scanner.cpp)
+  - PLAYER: dsp parameters die niet gezet kunnen worden moeten gemeld worden vanuit een QT-box
+  - na een tofetch list opgesteld te hebben moeten we de songs afhalen.
+    - tar appenden is geen goed systeem
+    - we zouden ook beter direct zorgen dat de namen correct zijn
+CLUSTER SELECTIE
+  - when disposing the object, all the subobjects meenemen...
+  - dialog creeeren om de cluster selectie beter te kunnen controleren...
+  - qsong uitbreiden met een extra kolom die de cluster beschrijft..
+    CPS kan worden gebruikt als navigatiemiddel om van A naar B te geraken zonder al
+    te messy overgangen te moeten nemen... De CPS
+  - performantie nog eens verder bekijken... Volgens mij wordt er nog iets te veel geheugen gebruikt...
+  - verschillende distance methoden erin steken
+  - Path tag toevoegen. This box should contain 
+    ' a number of entries. Every entry is either 
+    het volledig automatisch laten gebeuren is nog niet voor vandaag... 
+    daarentegen kunnen we toch al een 'target' color ergens opgeven, zodat we weten naar welke
+    waarde we streven. Eens we dit weten, kunnen we ook de spectrum analyse limiteren to de zaken 
+    die in de correcte richting gaan...
+- folding derin steken... en op disk schrijven waar gepast...
+  eens zien hoe de cluster detetctie daarmee overweeg kan..
+  normaal gesproken zou dit wel eens een serieus tijdje kunnen duren, daar de afstandsmaat
+  toch wat rekenwerk vraagt..
+  in elk geval we moeten er wat mee experimenteren
+- Locked mode derbij proppen zodat we een song op een vast tempo kunnen spelen
+- AUTOMATIC inversion when main song too dark..
+- Impulse detection/impulse response meten
+- automatische mixer der in steken
+- visualisatie box van stijl/positie der in stoppen...
+- color path finder derin steken
+- mix export erin steken
+- ogg support
+- color buttons dark as long as they cannot be used..
+- impulse response meten... volgens mij kan dat gebruikt worden om het 'soort muziek te meten', net zoals het gebruikt moet kunnen worden om in 
+  hogere frequenties de rest te meten... 
+WEBSITE:
+  - flashier maken (donker en meer uitleg...)
+  - overview maken van de vorige layouts... ik ben eigenlijk benieuwd naar de evolutie...
+SIMILAR NAME SCANNER: 
+- checkbox om ongekende onmiddelijk te markeren
+- checkbox om exacte matches onmiddelijk te deleten
+- start-button
+- in de similar find box moeten we natuurlijk nog aankruisen dat we diegene die we zeker niet kennen behouden als .mp3 of onmiddelijk willen markeren als 'gofetch'
+- ogg support erin steken voor zover dat dat mogelijk is natuurlijk :)
 - automatisch opstellen van playlist aan de hand van een aantal maten:
   - tempo, spectrum, dcolor
   - ook toelaten van een overgang van het ene nummer naar het andere te berekenen
-- zien wat er mis is met de .inf nummers
-- this is the mainsong in orde brengen...
-- dsp parameters die niet gezet kunnen worden moeten gemeld worden
-- fix de kleuren legende in about box
-- add pictures hier en daar
-- als de .raw file niet geschreven kan worden moet dit eveneens gemeld worden
-- als de .raw file al bestaat voordat we hem gaan creeeren moet hier ook iets mee aangevangen worden
-
+RENAMER BOX:
+  - isMix in orde brengen
+  - fast wizards laten werken
+KBPM PLAYER:
+  - loop support debuggen (of der uit gooien)
+  - manual tempo changing
+  - changelog: kplay + reorganized layout/added loop support and manual tempo changing
+  - visible counter vlag weghalen
+- populaire halen van cd16--60
+=====================================
 kbpm-play:
   - als de file al bestaat en we moeten correleren onmiddelijk binnen 10BPM bounds zoeken
   - eerst een volledige high energy scan doen over gans het tempo bereik
@@ -19,42 +69,34 @@ kbpm-play:
   - should show remaining time instead of total time
   - checking of de cue points persistent blijven over tempo verschillen heen
     (en eventueel fixen als dat fout is)
-  - when quitting the program with the quitapp window-button it should quit in a sane way
   - loop support in player
   - when changing an lfo the current phase should remain the same.
   - reverse playing of certain measures
+  - tempo changer
 
 documentation:
   - logfile doc schrijven
   - documentation for the browser
 
 kbpm-dj:
-  - nieuw tempo zou geen 132.4 moeten zijn maar iets gelijk unk
-  - in de renamer box kunnen we normaal een aantal routines buiten haakskes brengen
   - nog eens een memorycheck erop los laten...
-  - een player moet geindiceerd worden in een kleur
-    - green: free
   - setup on a remote machine should be possible.
   - downloaden van mp3's automatically
   - nfs-mounten ? Copying the same data ??
   - multiple players (asus, cubical, tnm etc ...) & automatically setup player on other machine
   - play songs at fixed given tempo instead of the tempo of the next song
   - renamer: de zaken voor de - beschouwen als author and naar achter moven 
-
-  - startup of program:
-    - loading box:
-       - informatie laten geven over the played files
-       - informatie laten geven over de configuratiefile die gelezen wordt
-       - indien er .raw files achtergebleven zijn deze laten zien met de mogelijkheid tot deletion
-    - wizard
+  - setup - wizard
        - DSP-parameters verzamelen wanneer gestart wordt
        - Directories maken als het enigzins mogelijk is
        - Laten selecteren van de directory waar de interesante file steken
   - Memory stuff:
     - remove duplicate strings (see qstring-factory.h/.cpp
-    - version count should be a number instead of a QString
-    - tempo should be a float instead of a QString
     - automatic removal of duplicate tags in taglines / song
     - automatic sorting of tags in tagline / song
     - importing mp3's can faster by copying the list and removing every item we found to match
- 
+  - we should slowly migrate to a better data-structure. However i absoilutely refuse to use a database, these things tends to be completely 
+    unmanagebale and useless. I also don't want a binary format. Do we want everyhting to be loaded in memory ? Evenenens compressed in memory
+    houden ? Dus tempos als double, strings met wat extra tekens kwijt ? Willen we bij elke change aan de playlist opnieuw een Songlist genereren ? 
+    Dit zal het ons beter mogelijk malken om rap te sorteren en eens we binnen dezelfde selectierange werken kunnen we op die manier bijzonder 
+    snel te werk gaan, zal nog wel wat hackwerk vragen denk ik..

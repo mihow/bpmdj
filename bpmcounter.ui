@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>749</width>
-            <height>921</height>
+            <width>557</width>
+            <height>715</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -225,17 +225,6 @@
                                     </property>
                                     <property name="text">
                                         <string>&amp;Start</string>
-                                    </property>
-                                </widget>
-                                <widget class="QPushButton">
-                                    <property name="name">
-                                        <cstring>AboutButton</cstring>
-                                    </property>
-                                    <property name="enabled">
-                                        <bool>true</bool>
-                                    </property>
-                                    <property name="text">
-                                        <string>&amp;About</string>
                                     </property>
                                 </widget>
                             </vbox>
@@ -780,14 +769,6 @@
                                 <bool>false</bool>
                             </property>
                         </widget>
-                        <widget class="QPushButton">
-                            <property name="name">
-                                <cstring>pushButton8</cstring>
-                            </property>
-                            <property name="text">
-                                <string>Fetch Spectrum</string>
-                            </property>
-                        </widget>
                     </hbox>
                 </widget>
             </vbox>
@@ -813,12 +794,6 @@
     </image>
 </images>
 <connections>
-    <connection>
-        <sender>AboutButton</sender>
-        <signal>clicked()</signal>
-        <receiver>CountDialog</receiver>
-        <slot>about()</slot>
-    </connection>
     <connection>
         <sender>StartButton</sender>
         <signal>clicked()</signal>
@@ -897,12 +872,6 @@
         <receiver>PushButton7_2</receiver>
         <slot>setDisabled(bool)</slot>
     </connection>
-    <connection>
-        <sender>pushButton8</sender>
-        <signal>clicked()</signal>
-        <receiver>CountDialog</receiver>
-        <slot>fetchSpectrum()</slot>
-    </connection>
 </connections>
 <tabstops>
     <tabstop>TagEdit</tabstop>
@@ -917,7 +886,6 @@
     <tabstop>PushButton6</tabstop>
     <tabstop>PushButton7_2</tabstop>
     <tabstop>StartButton</tabstop>
-    <tabstop>AboutButton</tabstop>
     <tabstop>BusyToggle</tabstop>
 </tabstops>
 <slots>

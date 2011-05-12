@@ -44,7 +44,6 @@ bool Config::limit_nonplayed = false;
 bool Config::limit_uprange = false;
 bool Config::limit_downrange = false;
 bool Config::limit_indistance = false;
-bool Config::limit_inspectrum = false;
 
 QString Config::playCommand1 = "kbpm-play -d /dev/dsp2 -x /dev/mixer1 -p 0 0   -m \"%s\" \"%s\"";
 QString Config::playCommand2 = "kbpm-play -d /dev/dsp1 -x /dev/mixer  -p 0 400 -m \"%s\" \"%s\"";
@@ -56,7 +55,7 @@ void Config::save()
   QFile f(".kbpmdj");
   f.open(IO_WriteOnly);
   QDataStream s(&f);
-  s << (Q_UINT16)0xBDE1;
+  s << (Q_UINT16)0xBDE2;
   s << (Q_UINT16)file_count;
   s << (Q_UINT16)yellowTime;
   s << (Q_UINT16)orangeTime;
@@ -75,7 +74,6 @@ void Config::save()
   s << (Q_INT8)limit_uprange;
   s << (Q_INT8)limit_downrange;
   s << (Q_INT8)limit_indistance;
-  s << (Q_INT8)limit_inspectrum;
   s << playCommand1;
   s << playCommand2;
   s << playCommand3;
@@ -128,7 +126,33 @@ void Config::load()
 	  s >> b; limit_uprange = b;
 	  s >> b; limit_downrange = b;
 	  s >> b; limit_indistance = b;
-	  s >> b; limit_inspectrum = b;
+	  s >> b; // limit_inspectrum
+	  s >> playCommand1;
+	  s >> playCommand2;
+	  s >> playCommand3;
+	  s >> playCommand4;
+	}
+      if (w == 0xBDE2)
+	{
+	  printf("Loading config v1.8\n");
+	  s >> w; file_count = w;
+	  s >> w; yellowTime = w;
+	  s >> w; orangeTime = w;
+	  s >> w; redTime = w;
+	  s >> w; filterBpm = w;
+	  s >> b; color_range = b;
+	  s >> b; color_played = b;
+	  s >> b; color_authorplayed = b;
+	  s >> b; color_ondisk = b;
+	  s >> b; color_cues = b;
+	  s >> b; color_dcolor = b;
+	  s >> b; color_spectrum = b;
+	  s >> b; authorDecay = b;
+	  s >> b; limit_ondisk = b;
+	  s >> b; limit_nonplayed = b;
+	  s >> b; limit_uprange = b;
+	  s >> b; limit_downrange = b;
+	  s >> b; limit_indistance = b;
 	  s >> playCommand1;
 	  s >> playCommand2;
 	  s >> playCommand3;

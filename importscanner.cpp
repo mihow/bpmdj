@@ -57,8 +57,6 @@ void ImportScanner::checkfile(const QString pathname, const QString filen)
     filename = pathname + "/" + filen;
   else
     filename = filen;
-  // printf("checking file %s\n",filename);
-  fflush(stdout);
   if (!selector->lookfor(filename))
     {	     
       char *temp;
@@ -89,7 +87,8 @@ void ImportScanner::checkfile(const QString pathname, const QString filen)
       index_file=strdup(filename);
       index_changed=true;
       index_tags=strdup("New");
-      index_period=20000;
+      index_period=-1;
+      index_tempo=strdup("/");
       index_write();
       index_free();
       

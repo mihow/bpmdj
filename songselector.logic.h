@@ -63,7 +63,6 @@ class SongSelectorLogic:
     int temporange_item;
     int onlyondisk_item;
     int onlyindistance_item;
-    int onlyinspectrum_item;
     static int itemcount;
   public:
     SongSelectorLogic(QWidget*parent=0, const QString name=0);
@@ -105,8 +104,11 @@ class SongSelectorLogic:
     virtual void fetchSelection();
     virtual void checkDisc();
     virtual void exportPlayList();
+    virtual void doSpectrumPca();
+    virtual void doSpectrumClustering();
     virtual void selectionAddTags();
     virtual void selectionPlayIn3th();
+    virtual void selectionPlayIn4th();
     virtual void selectionSetMainSong();
     virtual void selectionDelTags();
     virtual void doMarkDups();
@@ -128,8 +130,8 @@ class SongSelectorLogic:
     virtual void toggle_temporange();
     virtual void toggle_onlyondisk();
     virtual void toggle_onlyindistance();
-    virtual void toggle_onlyspectrum();
-    
+
+    virtual void invertSpectrum();
     virtual void findsimilarnames();
     virtual void findallsimilarnames();
     virtual void importMp3s();

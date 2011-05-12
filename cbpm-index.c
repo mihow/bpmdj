@@ -60,43 +60,43 @@ static void buffer_init(FILE * stream)
 
 static int nextchar()
 {
-   // no end-of-file check because 
-   // this is done in the beginning in getline
-   return buffer[buffer_ptr++];
+  // no end-of-file check because 
+  // this is done in the beginning in getline
+  return buffer[buffer_ptr++];
 }
 
 static void buffer_done()
-  {
-     free(buffer);
-     buffer=NULL;
-     buffer_size=0;
-     buffer_file=NULL;
-  }
+{
+  free(buffer);
+  buffer=NULL;
+  buffer_size=0;
+  buffer_file=NULL;
+}
 
 ssize_t fast_getline(char **lineptr)
-  // warning !!!! -- semantics differ seriously from getline.
+     // warning !!!! -- semantics differ seriously from getline.
 {
-   int c;
-   int l=0;
-   char * result;
-   // check end of line !
-   if (buffer_ptr>=buffer_size)
-     return -1;
-   // now, we are sure we can read till the end of this line !
-   result = buffer+buffer_ptr;
-   while((c=nextchar())!='\n') l++;
-   // give a pointer back
-   *lineptr = result;
-   // zero terminate the thing
-   result[l]=0;
-   return l;
+  int c;
+  int l=0;
+  char * result;
+  // check end of line !
+  if (buffer_ptr>=buffer_size)
+    return -1;
+  // now, we are sure we can read till the end of this line !
+  result = buffer+buffer_ptr;
+  while((c=nextchar())!='\n') l++;
+  // give a pointer back
+  *lineptr = result;
+  // zero terminate the thing
+  result[l]=0;
+  return l;
 }
 
 char* strldup(char* str, int l)
 {
-   char * result = malloc(l+1);
-   strncpy(result,str,l+1);
-   return result;
+  char * result = malloc(l+1);
+  strncpy(result,str,l+1);
+  return result;
 }
 	      
 /*-------------------------------------------
@@ -221,121 +221,200 @@ char* strip(char*tostrip, char* theend)
    return strip_end(tostrip,theend);
 }
 
+int strcompare(const void *a, const void * b)
+{
+  return strcmp(*(const char**)a,*(const char**)b);
+}
+
+int fix_tagline()
+{
+  // hoe kunnen we de tagline fixed ?
+  // we creeeren een array die refereert naar de gevraagde words,
+  int length;
+  int nextword = 0;
+  char* lastword;
+  char* words[100];
+  char* runner;
+  char* temp;
+  char * new_tags;
+  int i = 0;
+  if (index_tags==NULL)
+    return 0;
+  // find all tags
+  temp=strdup(index_tags);
+  runner=temp;
+  length = strlen(runner);
+  while(1)
+    {
+      words[nextword++]=runner;
+      while(*runner!=' ' && *runner!=0) runner++;
+      if (!*runner) 
+	break;
+      *runner=0;
+      runner++;
+    }
+  // now sort them 
+  qsort(words,nextword,sizeof(char*),strcompare);
+  // remove duplicates and create result
+  new_tags = malloc(length+1);
+  runner = new_tags;
+  lastword = "";
+  for(i = 0 ; i <nextword ; i ++)
+    {
+      if (strcmp(words[i],lastword)!=0)
+	{
+	  strcpy(runner,lastword=words[i]);
+	  runner+=strlen(words[i]);
+	  *runner=' ';
+	  runner++;
+	}
+    }
+  if (runner>new_tags)
+    *(runner-1)=0;
+  else
+    *(runner)=0;
+  if (strcmp(index_tags,new_tags)==0)
+    {
+      free(new_tags);
+      free(temp);
+      return 0;
+    }
+  else
+    {
+      printf("Tag: '%s' to '%s'\n",index_tags,new_tags);
+      free(index_tags);
+      free(temp);
+      index_tags=new_tags;
+      return 1;
+    }
+}
+
 void index_read(const char* indexn)
 {
-   char *line=NULL;
-   int read;
-   // open file
-   FILE* index;
-   index_readfrom=strdup(indexn);
-   index=fopen(index_readfrom,"rb");
-   if (!index) 
-     {
-	printf("Couldn't read %s\n",indexn);
-	exit(5);
-     }
-   // clear all fields
-   index_init();
-   // inititalize buffer
-   buffer_init(index);
-   // read fields
-   while((read=fast_getline(&line))!=-1)
-     {
-	char * field;
-	char * end = line + read;
-	char * c = strip(line, end - 1), *value;
-	while(*c!=':' && *c!=0)
-	  {
-	     *c=tolower(*c);
-	     c++;
-	  }
-	if (!*c) continue;
-	*c=0;
-	field=strip_end(line,c-1);
-	value=strip_begin(c+1);
-	if (strcmp(field,"version")==0) index_version=strldup(value,end-value);
-	else if(strcmp(field,"period")==0) index_period=atoi(value);
-	else if(strcmp(field,"file")==0) index_file=strldup(value,end-value);
-	else if(strcmp(field,"tempo")==0) index_tempo=strldup(value,end-value);
-	else if(strcmp(field,"bpmcount-to")==0) index_bpmcount_to=atoi(value);
-	else if(strcmp(field,"bpmcount-from")==0) index_bpmcount_from=atoi(value);
-	else if(strcmp(field,"comment")==0) index_remark=strldup(value,end-value);
-	else if(strcmp(field,"time")==0) index_time=strldup(value,end-value);
-	else if(strcmp(field,"cue")==0) index_cue=atol(value);
-	else if(strcmp(field,"cue-z")==0) index_cue_z=atol(value);
-	else if(strcmp(field,"cue-x")==0) index_cue_x=atol(value);
-	else if(strcmp(field,"cue-c")==0) index_cue_c=atol(value);
-	else if(strcmp(field,"cue-v")==0) index_cue_v=atol(value);
-	else if(strcmp(field,"md5sum")==0) index_md5sum=strldup(value,end-value);
-	else if(strcmp(field,"spectrum")==0) index_spectrum=strldup(value,end-value);
-	else if(strcmp(field,"tag")==0) 
-	  {
-	    if (!index_tags) index_tags=strldup(value,end-value);
-	    else 
-	      {
-		char tmp[1000];
-		sprintf(tmp,"%s %s",index_tags,value);
-		free(index_tags);
-		index_tags=strdup(tmp);
-	      }
-	  }
-	else 
-	  {
-	    printf("Warning: Unknown field %s\n",field);
-	    continue;
-	  }
-     }
-   // finish file access
-   buffer_done();
-   fclose(index);
-   // check for old non-versioned files
-   if (!index_version)
-     {
-       char * y;
-       int idx;
-       printf("Error: too old index file %s\n",basename(index_readfrom));
-       exit(40);
-     }
-   if (index_period==-1)
-     {
-       printf("Error: no valid period given\n");
-       exit(40);
-     }
-
-   // check for old versions running 22050 samplerate
-   if ((strcmp(index_version,"BpmDj v1.5")==0)
-       ||(strcmp(index_version,"BpmDj v1.4")==0)
-       ||(strcmp(index_version,"BpmDj v1.3")==0)
-       ||(strcmp(index_version,"BpmDj v1.2")==0)
-       ||(strcmp(index_version,"BpmDj v1.1")==0)
-       ||(strcmp(index_version,"BpmDj v1.0")==0)
-       ||(strcmp(index_version,"BpmDj v0.9")==0)
-       ||(strcmp(index_version,"BpmDj v0.8")==0)
-       ||(strcmp(index_version,"BpmDj v0.7")==0)
-       ||(strcmp(index_version,"BpmDj v0.6")==0)
-       ||(strcmp(index_version,"BpmDj v0.5")==0))
-     {
-       index_cue_z *= 2;
-       index_cue_x *= 2;
-       index_cue_c *= 2;
-       index_cue_v *= 2;
-       index_cue   *= 2; 
-       index_changed = 1;
-       index_setversion();
-     }
-   
-   // update tempo
-   {
-     char tempo[500];
-     double T=4.0*(double)11025*60.0/(double)index_period;
-     if (T>=100.0)
-       sprintf(tempo,"%g",T);
-     else 
-       sprintf(tempo,"0%g",T);
-     if (!index_tempo || strcmp(index_tempo,tempo)!=0)
-       {
-	 index_tempo=strdup(tempo);
-	 index_changed=1;
-       }
-   }
+  char *line=NULL;
+  int read;
+  // open file
+  FILE* index;
+  index_readfrom=strdup(indexn);
+  index=fopen(index_readfrom,"rb");
+  if (!index) 
+    {
+      printf("Couldn't read %s\n",indexn);
+      exit(5);
+    }
+  // clear all fields
+  index_init();
+  // inititalize buffer
+  buffer_init(index);
+  // read fields
+  while((read=fast_getline(&line))!=-1)
+    {
+      char * field;
+      char * end = line + read;
+      char * c = strip(line, end - 1), *value;
+      while(*c!=':' && *c!=0)
+	{
+	  *c=tolower(*c);
+	  c++;
+	}
+      if (!*c) continue;
+      *c=0;
+      field=strip_end(line,c-1);
+      value=strip_begin(c+1);
+      if (strcmp(field,"version")==0) index_version=strldup(value,end-value);
+      else if(strcmp(field,"period")==0) index_period=atoi(value);
+      else if(strcmp(field,"file")==0) index_file=strldup(value,end-value);
+      else if(strcmp(field,"tempo")==0) index_tempo=strldup(value,end-value);
+      else if(strcmp(field,"bpmcount-to")==0) index_bpmcount_to=atoi(value);
+      else if(strcmp(field,"bpmcount-from")==0) index_bpmcount_from=atoi(value);
+      else if(strcmp(field,"comment")==0) index_remark=strldup(value,end-value);
+      else if(strcmp(field,"time")==0) index_time=strldup(value,end-value);
+      else if(strcmp(field,"cue")==0) index_cue=atol(value);
+      else if(strcmp(field,"cue-z")==0) index_cue_z=atol(value);
+      else if(strcmp(field,"cue-x")==0) index_cue_x=atol(value);
+      else if(strcmp(field,"cue-c")==0) index_cue_c=atol(value);
+      else if(strcmp(field,"cue-v")==0) index_cue_v=atol(value);
+      else if(strcmp(field,"md5sum")==0) index_md5sum=strldup(value,end-value);
+      else if(strcmp(field,"spectrum")==0) index_spectrum=strldup(value,end-value);
+      else if(strcmp(field,"tag")==0) 
+	{
+	  if (!index_tags) index_tags=strldup(value,end-value);
+	  else 
+	    {
+	      char tmp[1000];
+	      sprintf(tmp,"%s %s",index_tags,value);
+	      free(index_tags);
+	      index_tags=strdup(tmp);
+	    }
+	}
+      else 
+	{
+	  printf("Warning: Unknown field %s\n",field);
+	  continue;
+	}
+    }
+  // finish file access
+  buffer_done();
+  fclose(index);
+  // check for old non-versioned files
+  if (!index_version)
+    {
+      char * y;
+      int idx;
+      printf("Error: too old index file %s\n",basename(index_readfrom));
+      exit(40);
+    }
+  
+  // check for old versions running 22050 samplerate
+  if ((strcmp(index_version,"BpmDj v1.5")==0)
+      ||(strcmp(index_version,"BpmDj v1.4")==0)
+      ||(strcmp(index_version,"BpmDj v1.3")==0)
+      ||(strcmp(index_version,"BpmDj v1.2")==0)
+      ||(strcmp(index_version,"BpmDj v1.1")==0)
+      ||(strcmp(index_version,"BpmDj v1.0")==0)
+      ||(strcmp(index_version,"BpmDj v0.9")==0)
+      ||(strcmp(index_version,"BpmDj v0.8")==0)
+      ||(strcmp(index_version,"BpmDj v0.7")==0)
+      ||(strcmp(index_version,"BpmDj v0.6")==0)
+      ||(strcmp(index_version,"BpmDj v0.5")==0))
+    {
+      index_cue_z *= 2;
+      index_cue_x *= 2;
+      index_cue_c *= 2;
+      index_cue_v *= 2;
+      index_cue   *= 2; 
+      index_changed = 1;
+      index_setversion();
+    }
+  
+  // update tempo
+  if (index_period>0)
+    {
+      double T=4.0*(double)11025*60.0/(double)index_period;
+      if (T>20.0 && T < 400.0)
+	{
+	  char tempo[500];
+	  if (T>=100.0)
+	    sprintf(tempo,"%g",T);
+	  else 
+	    sprintf(tempo,"0%g",T);
+	  if (!index_tempo || strcmp(index_tempo,tempo)!=0)
+	    {
+	      index_tempo=strdup(tempo);
+	      index_changed=1;
+	    }
+	}
+      else
+	index_period = -1;
+    }
+  if (index_period <=0)
+    {
+      index_period = -1;
+      index_tempo = strdup("/");
+      index_changed = 1;
+    }
+  
+  // the problem of duplicate tags..
+  if (fix_tagline())
+    index_changed=1;
 }

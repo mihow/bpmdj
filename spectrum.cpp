@@ -40,16 +40,18 @@ void newSpectrum(QString spectrum)
 
 void lastSpectrum()
 {
-  printf("Spectrum Scale\n");
-  for(int i =0 ;i<24;i++)
+  for(int i=0;i<24;i++)
     {
       scales[i]=(float)spectra/(float)sums[i];
-      // deze dip in de curve is noodzakelijk om de 
-      // middenfrequenties anders te kwoteren...
-      float factor = ((i-12.0)/12.0);
-      factor*=factor;
-      factor+=5;
-      scales[i]*=factor;
+      scales[i]*=5;
+      /*
+	float factor = ((i-12.0)/12.0);
+	factor= s
+	factor*=factor;
+	factor+=5;
+	scales[i]*=factor;
+      */
+      
       //      printf("%d  %g\n",i,scales[i]);
     }
 }

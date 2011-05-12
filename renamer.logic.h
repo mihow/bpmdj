@@ -20,9 +20,16 @@ class RenamerLogic:
    QString capitalizeAfterSpace(QString in);
    QString removeSpaces(QString in);
    QString removeSpecials(QString in);
+   QString removeFirstSpecials(QString in);
    QString removeFirstChar(QString in);
    QString subStringIsAuthor(QString in);
    QString replaceSubString(QString in);
+   QString replaceUnderscores(QString in);
+   QString beforeMinusIsAuthor(QString in);
+   QString fixExtention(QString in);
+   QString betweenBracesIsTrash(QString in);
+   QString subStringIsMix(QString in);
+   QString deleteSubString(QString in);
  public slots:
    virtual void capitalizeAfterSpace();
    virtual void smallCapsInWords();
@@ -35,4 +42,12 @@ class RenamerLogic:
    virtual void replaceSubString();
    virtual void realizeSelection();
    virtual void ignoreSelection();
+   virtual void beforeMinusIsAuthor();
+   virtual void betweenBracesIsTrash();
+   virtual void substringIsMix();
+   virtual void removeFirstSpecials();
+   virtual void keySelectionIsAuthor();
+   virtual void replaceUnderscores();
+   virtual void fixExtention();
+   virtual void betweenBracesIsMix();
 };

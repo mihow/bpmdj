@@ -19,9 +19,11 @@
 ****/
 
 #include "config.h"
+#include "cluster.h"
 
 class QSong: 
-    public QListViewItem
+  public QListViewItem,
+  public Point
 {
   public:
     QString song_title;
@@ -34,8 +36,7 @@ class QSong:
     QString song_time;
     QString song_md5sum;
     QString song_spectrum;
-    short int hue;
-    short int sat;
+    QColor  color;
     QString spectrum_string;
     QString distance_string;
     int     color_distance;
@@ -51,9 +52,13 @@ class QSong:
     QSong(QString filename, QString currentpath, QListView* parent);
     bool obtainTitleAuthor(char * fulltitle);
     void reread();
-    void getColors();
+    void setColor(QColor c);
+    void invertColor(bool r, bool g, bool b);
     bool getDistance();
     bool containsTag(const QString which);
     virtual void paintCell(QPainter *p, const QColorGroup &cg, int col, int wid, int align);
     virtual QString text(int i) const;
+    virtual float distance(Point* point);
+    virtual void simpledump(int d);
+    virtual void determine_color(float hue, float, int, int);
 };

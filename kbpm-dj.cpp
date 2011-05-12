@@ -52,6 +52,7 @@ protected:
   virtual void checkfile(const QString  fullname, const QString  filename)
   {
       result+=QString::number(number)+". "+filename+"\n";
+      number++;
   }
 public:
   QString result;
@@ -113,7 +114,18 @@ int main(int argc, char* argv[])
 			     "There are some left over .raw files. These are:\n"+raw.result,
 			     "Remove", "Ignore", 0, 0, 1)==0)
       system("rm -- *.raw");
-  
+  // 1.d find out where the documentation is located
+/*  while (! DirectoryScanner::exists("/usr/share/doc/bpmdj/beatmixing.ps")
+	 && ! DirectoryScanner::exists("/usr/share/doc/bpmdj/beatmixing.ps.gz")
+	 && ! DirectoryScanner::exists("./beatmixing.ps")
+	 && ! DirectoryScanner::exists("./beatmixing.ps.gz"))
+    {
+      QMessageBox::warning(NULL,"I cannot find the documentation,\n",
+			   "please place the documentation in the current directory\n"
+			   "or in /usr/shar/doc/bpmdj/");
+    }
+*/
+   
   // 2. read the configuration
   loader->config->setEnabled(true);
   app->processEvents();

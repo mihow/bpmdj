@@ -1,3 +1,26 @@
+1.8:
+  kplay + added ui for spectrum analyzer
+  ksel  - can handle songs with 'inf' tempo or songs with no tempo	
+  kplay - can now also create empty index files
+  ksel  + tags are sorted and duplicates are removed
+  ksel  - fixed a bug in 'this is the mainsong'	 
+  ksel  + renamer box: added feature: 'between '(' and ')' is trash
+  ksel  + renamer box: added feature: '_' to ' '
+  ksel  + renamer box: added feature: remove Initial Special Characters
+  ksel  + renamer box: added feature: fix bad extention problem
+  ksel  + renamer box: aantal functies buiten haakjes gebracht	
+  ksel  + fixed authors and color legend in about box
+  ksel  + added pca spectrum detector, much better, yoda says
+  ksel  + automatic ignoring of limitations when no main song
+  ksel  - moved 'switch' button to menu bar because it was not essentially
+  kplay - when pressing 'normal' or 'target' button, correct ratio is shown
+  ksel  + adding principal analysis tool
+  kplay + added loop support in kplay (usefull to mix very short songs)
+  kplay + reorganized kplay layout
+  ksel  + renamer box added all kinds of interesting features
+  ksel  - renamer box bug in good-filename detection solved
+  ksel  + when starting, a check to see whether the documentation is available
+  kplay - click on close-button finishes the player
 1.7:
   ksel  ~ my machine was stolen, i had to move back to sourceforge	  
   ksel  + added similar name scanner	 

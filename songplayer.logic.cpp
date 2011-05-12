@@ -28,43 +28,46 @@
 #include <math.h>
 #include <qslider.h>
 #include <sys/times.h>
-#include "songplayerlogic.h"
-#include "kbpm-play.h"
 #include "version.h"
+#include "kbpm-play.h"
+#include "songplayer.logic.h"
 #include "kbpm-counter.h"
+#include "spectrumanalyzer.logic.h"
+#include "about.h"
 
 extern "C" 
 {
 #include "cbpm-index.h"
 }
 
+void SongPlayerLogic::done(int r)
+{
+  accept();
+}
+
 SongPlayerLogic::SongPlayerLogic(QWidget*parent,const char*name, bool modal,WFlags f) :
   SongPlayer(parent,name,modal,f)
 {
    bpmcounter  = new BpmCountDialog(this);
-   visiblebpmcounter = false;
    timer = new QTimer(this);
    connect(timer,SIGNAL(timeout()), SLOT(timerTick()));
    timer->start(1000);
    tempo_fade=-1;
    fade_time=0;
    redrawCues();
-   // remove last 8 charactesr...
-   int l=strlen(wave_name);
-   char* blah=(char*)malloc(sizeof(l));
-   blah=strdup(wave_name);
-   if (l>8) blah[l-8]=0;
-   PlayingText->setText(blah);
+
+   // set caption
+   if (index_readfrom)
+     {
+       QString blah = index_readfrom;
+       blah.replace("./index/","");
+       setCaption(blah);
+     }
    
    TempoLd->display(100.0*(double)normalperiod/(double)currentperiod);
    // set colors of tempo change buttons
    normalReached(currentperiod==normalperiod);
-   /* 
-    setColor(PushButton22,false);
-    setColor(PushButton36_2,false);
-    setColor(PushButton37,false);
-    */
-   
+
    // set volume sliders
    Slider3->setValue(100-mixer_get_main());
    Slider4->setValue(100-mixer_get_pcm());
@@ -84,6 +87,7 @@ void SongPlayerLogic::setColor(QButton *button, bool enabled)
    QColor a, ad, am, aml, al;
    QPalette pal;
    QColorGroup cg;
+
    if (enabled)
      {
 	a=QColor(0,255,127);
@@ -100,6 +104,7 @@ void SongPlayerLogic::setColor(QButton *button, bool enabled)
 	aml=QColor( 255, 63, 159);
 	al=QColor( 255, 127, 191) ;
      }
+
    cg.setColor( QColorGroup::Foreground, black );
    cg.setColor( QColorGroup::Button, a );
    cg.setColor( QColorGroup::Light, al);
@@ -154,27 +159,27 @@ void SongPlayerLogic::setColor(QButton *button, bool enabled)
 
 void SongPlayerLogic::nudgePlus()
 {
-   ::y-=::currentperiod/(4*32);
-   if (::y<0)
-     {
-	printf("y underflow, setting to zero\n");
-	::y=0;
-     }
+  ::y-=::currentperiod/(4*32);
+  if (::y<0)
+    {
+      printf("y underflow, setting to zero\n");
+      ::y=0;
+    }
 }
 
 void SongPlayerLogic::nudgeMinus()
 {
-   ::y+=currentperiod/(4*32);
+  ::y+=currentperiod/(4*32);
 }
 
 void SongPlayerLogic::nudgePlusB()
 {
-   ::y+=currentperiod/4;
+  ::y+=currentperiod/4;
 }
 
 void SongPlayerLogic::nudgePlus1M()
 {
-   ::y+=currentperiod;
+  ::y+=currentperiod;
 }
 
 void SongPlayerLogic::nudgeMinus1M()
@@ -234,8 +239,8 @@ void SongPlayerLogic::timerTick()
 {
    unsigned4 m=wave_max();
    // the position if kB
-   LcdLeft->display((double)((int)(x_normalise(::y)*1000/m))/(double)10);
-   LcdRight->display((int)(m/1024));
+   // LcdLeft->display((double)((int)(x_normalise(::y)*1000/m))/(double)10);
+   // LcdRight->display((int)(m/1024));
    // times are displayed with respect to the current tempo
    unsigned4 totaltime=y_normalise(m)/WAVRATE;
    unsigned4 currenttime=::y/WAVRATE;
@@ -247,15 +252,16 @@ void SongPlayerLogic::timerTick()
    // show current tempo
    double  T0=4.0*(double)WAVRATE*60.0/(double)currentperiod;
    double  T1=4.0*(double)WAVRATE*60.0/(double)normalperiod;
+   if (currentperiod<-1) T0=0;
+   if (normalperiod<-1) T1=0;
    CurrentTempoLCD -> display(T0);
    NormalTempoLCD -> display(T1);
    // change tempo when necesarry
    if (fade_time>0)
      targetStep();
    // if visible...
-   if (visiblebpmcounter)
+   if (bpmcounter->isVisible())
      bpmcounter->timerTick();
-
 }
 
 void SongPlayerLogic::setCue()
@@ -336,14 +342,16 @@ void SongPlayerLogic::storeV()
 
 void SongPlayerLogic::targetTempo()
 {
-   changetempo(targetperiod);
-   normalReached(false);
+  changetempo(targetperiod);
+  TempoLd->display(100.0*(double)normalperiod/(double)currentperiod);
+  normalReached(false);
 }
 
 void SongPlayerLogic::normalTempo()
 {
-   changetempo(normalperiod);
-   normalReached(true);
+  changetempo(normalperiod);
+  TempoLd->display(100.0*(double)normalperiod/(double)currentperiod);
+  normalReached(true);
 }
 
 void SongPlayerLogic::fastSwitch()
@@ -365,34 +373,34 @@ void SongPlayerLogic::slowSwitch()
 }
 
 void SongPlayerLogic::normalReached(bool t)
-  {
-     setColor(PushButton22,t);	
-     setColor(PushButton36_2,t);
-     setColor(PushButton37,t);
-  }
+{
+  setColor(PushButton22,t);	
+  setColor(PushButton36_2,t);
+  setColor(PushButton37,t);
+}
 
 void SongPlayerLogic::targetStep()
 {
-   tempo_fade++;
-   if (tempo_fade>fade_time)
-     {
-	tempo_fade=0;
-	fade_time=0;
-	normalReached(true);
-	return;
-     }
-   if (tempo_fade==1)
-     {
-	normalReached(false);
-     }
-   
-   /**
-    * Another enhancement is that we dont change the period lineary !
-    */
-   double result;
-   result = (double)targetperiod*pow((double)normalperiod/(double)targetperiod,(double)tempo_fade/(double)fade_time);
-   changetempo((int)result);
-   TempoLd->display(100.0*(double)normalperiod/(double)currentperiod);
+  tempo_fade++;
+  if (tempo_fade>fade_time)
+    {
+      tempo_fade=0;
+      fade_time=0;
+      normalReached(true);
+      return;
+    }
+  if (tempo_fade==1)
+    {
+      normalReached(false);
+    }
+  
+  /**
+   * Another enhancement is that we dont change the period lineary !
+   */
+  double result;
+  result = (double)targetperiod*pow((double)normalperiod/(double)targetperiod,(double)tempo_fade/(double)fade_time);
+  changetempo((int)result);
+  TempoLd->display(100.0*(double)normalperiod/(double)currentperiod);
 }
 
 void SongPlayerLogic::nudgeCueBack()
@@ -474,9 +482,43 @@ void SongPlayerLogic::breakLfo()
 
 void SongPlayerLogic::openBpmCounter()
 {
-   if (visiblebpmcounter)
-     bpmcounter->hide();
+  if (bpmcounter->isVisible())
+    bpmcounter->hide();
    else
      bpmcounter->show();
-   visiblebpmcounter=!visiblebpmcounter;   
+}
+
+void SongPlayerLogic::openSpectrumAnalyzer()
+{
+  SpectrumDialogLogic analyzer;
+  analyzer.exec();
+}
+
+void SongPlayerLogic::openAbout()
+{
+  char tmp[500];
+  AboutDialog about(NULL,NULL,1);
+  sprintf(tmp,"BpmDj v%s",VERSION);
+  about.versionLabel->setText(tmp);
+  about.exec();
+}
+
+void SongPlayerLogic::toggleNoLoop()
+{
+  loop_set(0);
+}
+
+void SongPlayerLogic::toggleBeatLoop()
+{
+  loop_set(normalperiod/4);
+}
+
+void SongPlayerLogic::toggleMeasureLoop()
+{
+  loop_set(normalperiod);
+}
+
+void SongPlayerLogic::toggle4MeasureLoop()
+{
+  loop_set(normalperiod*4);
 }

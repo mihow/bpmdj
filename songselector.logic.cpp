@@ -56,11 +56,13 @@
 #include "bpmbounds.h"
 #include "process-manager.h"
 #include "similarscanner.h"
+#include "cluster.h"
 
 extern "C"
 {
 #include "cbpm-index.h"
 #include "edit-distance.h"
+#include "pca.h"
 }
 
 int  SongSelectorLogic::itemcount=0;
@@ -86,11 +88,13 @@ SongSelectorLogic::SongSelectorLogic(QWidget * parent, const QString name) :
   QPopupMenu *after = new QPopupMenu(this);
   QPopupMenu *tools = new QPopupMenu(this);
   QPopupMenu *file = new QPopupMenu(this);
+  QPopupMenu *players = new QPopupMenu(this);
   selection = new QPopupMenu(this);
   view = new QPopupMenu(this);
 
   // file menu
   file->insertItem("&Quit",this,SLOT(quitButton()));
+  
   // help menu
   help->insertItem("&About",this,SLOT(doAbout()));
   help->insertItem("&Read Manual",this,SLOT(doHelp()));
@@ -118,9 +122,11 @@ SongSelectorLogic::SongSelectorLogic(QWidget * parent, const QString name) :
   colorauthorplayed_item  = view->insertItem("Color already played authors",this,SLOT(toggle_colorauthorplayed()));
   colorinrange_item       = view->insertItem("Color songs within tempo range",this,SLOT(toggle_colorinrange()));
   colorsongondisk_item    = view->insertItem("Color songs not on disk",this,SLOT(toggle_colorsongsnotondisk()));
-  colorcues_item          = view ->insertItem("color songs without cues",this,SLOT(toggle_colorsongswithoutcues()));
-  colordcolor_item        = view -> insertItem("color spectrum distance",this, SLOT(toggle_colordcolor()));
-  colorspectrum_item      = view -> insertItem("color spectrum",this,SLOT(toggle_colorspectrum()));
+  colorcues_item          = view ->insertItem("Color songs without cues",this,SLOT(toggle_colorsongswithoutcues()));
+  colordcolor_item        = view -> insertItem("Color spectrum distance",this, SLOT(toggle_colordcolor()));
+  colorspectrum_item      = view -> insertItem("Color PCA of spectrum",this,SLOT(toggle_colorspectrum()));
+  view->insertItem("Invert Color of PCA",this,SLOT(invertSpectrum()));
+    
   view->setItemChecked(coloralreadyplayed_item, Config::color_played);
   view->setItemChecked(colorinrange_item      , Config::color_range);
   view->setItemChecked(colorauthorplayed_item , Config::color_authorplayed);
@@ -137,38 +143,43 @@ SongSelectorLogic::SongSelectorLogic(QWidget * parent, const QString name) :
   notyetplayed_item       = view->insertItem("Limit selection to &Non-played songs",this,SLOT(toggle_notyetplayed()));
   onlyondisk_item         = view->insertItem("Limit selection to &Files on disk",this,SLOT(toggle_onlyondisk()));
   onlyindistance_item     = view->insertItem("Limit selection to &dColor range",this,SLOT(toggle_onlyindistance()));
-  onlyinspectrum_item     = view->insertItem("Limit selection to &Spectrum range",this,SLOT(toggle_onlyspectrum()));
   view->setCheckable(true);
   view->setItemChecked(onlyondisk_item,         Config::limit_ondisk);
   view->setItemChecked(notyetplayed_item,       Config::limit_nonplayed);
   view->setItemChecked(onlyuptemporange_item,   Config::limit_uprange);
   view->setItemChecked(onlydowntemporange_item, Config::limit_downrange);
   view->setItemChecked(onlyindistance_item,     Config::limit_indistance);
-  view->setItemChecked(onlyinspectrum_item,     Config::limit_inspectrum);
 
   // selection menu
   selection->insertItem("&Add tag...",this,SLOT(selectionAddTags()));
   selection->insertItem("&Delete tag...",this,SLOT(selectionDelTags()));
   selection->insertItem("&Measure Bpm ...",this,SLOT(measureBpms()));
   selection->insertItem("Measure Sound Color ...",this,SLOT(measureSpectra()));
+  selection->insertItem("Pca Analysis Sound Color",this,SLOT(doSpectrumPca()));
+  selection->insertItem("Cluster Analysis Sound Color",this,SLOT(doSpectrumClustering()));
   selection->insertSeparator();
-  selection->insertItem("Play in 3th player",this,SLOT(selectionPlayIn3th()));
-  selection->insertItem("This _is_ the main song",this,SLOT(selectionSetMainSong()));
+  selection->insertItem("This is the main song, but don't play it",this,SLOT(selectionSetMainSong()));
+  selection->insertItem("Play in 1st Extra Player",this,SLOT(selectionPlayIn3th()));
+  selection->insertItem("Play in 2nd Extra Player",this,SLOT(selectionPlayIn4th()));
   selection->insertSeparator();
   selection->insertItem("&Fetch selection from cdrom...",this,SLOT(fetchSelection()));
   selection->insertItem("E&xport xmms playlist",this,SLOT(exportPlayList()));
   selection->insertSeparator();
   selection->insertItem("Select all b&ut tagged",this,SLOT(selectAllButTagged()));
   
+  // players menu
+  players->insertItem("&Switch Monitor To Main",this,SLOT(switchMonitorToMain()));
+  
   // main menu
   main->insertItem("&File",file);
   main->insertItem("&View",view);
   main->insertItem("&Selection",selection);
+  main->insertItem("&Players",players);
   main->insertItem("&Before",before);
   main->insertItem("&After",after);
   main->insertItem("&Tools",tools);
   main->insertItem("&Help",help);
-
+  
   // nog een aantal items toevoegen
   //   create remote/local script pair
   //   R- copy index files to other side
@@ -246,11 +257,6 @@ void SongSelectorLogic::toggle_onlyindistance()
   toggleItem(onlyindistance_item);
 }
 
-void SongSelectorLogic::toggle_onlyspectrum()
-{
-  toggleItem(onlyinspectrum_item);
-}
-
 void SongSelectorLogic::toggleItem(int which)
 {
   view->setItemChecked(which,!view->isItemChecked(which));
@@ -262,6 +268,21 @@ void SongSelectorLogic::doHelp()
   if (!fork())
     {
       system("gv /usr/share/doc/bpmdj/beatmixing.ps");
+      exit(0);
+    }
+  if (!fork())
+    {
+      system("gv /usr/share/doc/bpmdj/beatmixing.ps.gz");
+      exit(0);
+    }
+  if (!fork())
+    {
+      system("gv ./beatmixing.ps");
+      exit(0);
+    }
+  if (!fork())
+    {
+      system("gv ./beatmixing.ps.gz");
       exit(0);
     }
 }
@@ -279,13 +300,16 @@ void SongSelectorLogic::findAllTags()
   for(;it.current();++it)
     {
       QSong * song = (QSong*)it.current();
-      song->getColors();
       parseTags(song->song_tags);
     }
   // enable the first everything tag
   tagInclude[0] -> setChecked(true);
   // update the item list
   updateItemList();
+  // do a pca on all the data
+  songList->selectAll(true);
+  doSpectrumPca();
+  songList->selectAll(false);
 }
 
 void SongSelectorLogic::parseTags(QString tagz)
@@ -326,6 +350,19 @@ static bool alreadygavefilterwarning = false;
 
 void SongSelectorLogic::updateItemList()
 {
+  // if no song is playing...
+  // backup & untoggle certain properties..
+  bool backup_uprange = Config::limit_uprange;
+  bool backup_downrange = Config::limit_downrange;
+  bool backup_distancerange = Config::limit_indistance;
+  if (!processManager->playing_songs[0] &&
+      !processManager->playing_songs[1])
+    {
+      view->setItemChecked(onlyuptemporange_item,Config::limit_uprange = false);
+      view->setItemChecked(onlydowntemporange_item,Config::limit_downrange = false);
+      view->setItemChecked(onlyindistance_item,Config::limit_indistance = false);
+    }
+  // update selection
   itemcount=0;
   QListViewItemIterator it(songList);
   for(;it.current();++it)
@@ -338,6 +375,7 @@ void SongSelectorLogic::updateItemList()
     }
   songList->repaint();
   countLcd->display(itemcount);
+  // nothing selected ?
   if (itemcount==0 && !alreadygavefilterwarning)
     {
       QMessageBox::warning(this,"Empty Selection","With the current selection of filters,\n"
@@ -345,6 +383,36 @@ void SongSelectorLogic::updateItemList()
 			   "If you want to modify this, go to the View menu.");
       alreadygavefilterwarning = true;
     }
+  // restore
+  if (!processManager->playing_songs[0] &&
+      !processManager->playing_songs[1])
+    {
+      view->setItemChecked(onlyuptemporange_item,Config::limit_uprange = backup_uprange);
+      view->setItemChecked(onlydowntemporange_item,Config::limit_downrange = backup_downrange);
+      view->setItemChecked(onlyindistance_item,Config::limit_indistance = backup_distancerange);
+    }
+}
+
+void SongSelectorLogic::invertSpectrum()
+{
+  // if there is a main song playing...
+  bool sr = true;
+  bool sg = true;
+  bool sb = true;
+  if (ProcessManager::playingInMain())
+    {
+      QColor c = ProcessManager::playingInMain()->color;
+      sr = c.red()<128;
+      sg = c.green()<128;
+      sb = c.blue()<128;
+    }
+  QListViewItemIterator it(songList);
+  for(;it.current();++it)
+    {
+      QSong *song = (QSong*)it.current();
+      song->invertColor(sr,sg,sb);
+    }
+  updateProcessView();
 }
 
 bool SongSelectorLogic::lookfor(const QString w) 
@@ -361,7 +429,7 @@ bool SongSelectorLogic::lookfor(const QString w)
 
 bool SongSelectorLogic::filter(QSong *item)
 {
-  if (ProcessManager::playingInMain!=NULL && ProcessManager::playingInMain->song_author==item->song_author)
+  if (ProcessManager::playingInMain()!=NULL && ProcessManager::playingInMain()->song_author==item->song_author)
     {
       item->played_author_at_time = Played::songs_played;
     }
@@ -372,19 +440,6 @@ bool SongSelectorLogic::filter(QSong *item)
   // song on disk ?
   if (view->isItemChecked(onlyondisk_item) && !item->song_ondisk)
     return false;
-  // in spectrum range ?
-  if (view->isItemChecked(onlyinspectrum_item))
-    {
-      if (ProcessManager::playingInMain && !ProcessManager::playingInMain->song_spectrum.isNull())
-	{
-	  QSong *main= ProcessManager::playingInMain;
-	  float distance  = fabs(main->hue-item->hue);
-	  if (360-distance < distance)
-	    distance = 360-distance;
-	  if (distance>=60)
-	    return false;
-	}
-    }
   // song played ?
   if (view->isItemChecked(notyetplayed_item) && item->song_played)
     return false;
@@ -440,8 +495,8 @@ void SongSelectorLogic::timerTick()
 
 void SongSelectorLogic::setColor(QColor color)
 {
-   countLcd->setBackgroundColor(color);
-   mainLCD->setBackgroundColor(color);
+  countLcd->setBackgroundColor(color);
+  mainLCD->setBackgroundColor(color);
 }
 
 void SongSelectorLogic::setPlayerColor(QGroupBox *player ,QColor color)
@@ -493,14 +548,14 @@ void SongSelectorLogic::switchMonitorToMain()
 void SongSelectorLogic::updateProcessView()
 {
   // set main song
-  QSong * song = processManager->playingInMain;
+  QSong * song = processManager->playing_songs[0];
   QColor color;
   color.setHsv(0,0,128);
   if (song)
     {
       title1->setText(song->song_title);
       author1->setText(song->song_author);
-      color.setHsv(song->hue,song->sat,255);
+      color=song->color;
     }
   else
     {
@@ -508,14 +563,15 @@ void SongSelectorLogic::updateProcessView()
       author1->setText(QString::null);
     }
   setPlayerColor(player1,color);
+  
   // set monitor song
-  song = processManager->playingInMonitor;
+  song = processManager->playing_songs[1];
   color.setHsv(0,0,128);
   if (song)
     {
       title2->setText(song->song_title);
       author2->setText(song->song_author);
-      color.setHsv(song->hue,song->sat,255);
+      color = song->color;
     }
   else
     {
@@ -523,6 +579,39 @@ void SongSelectorLogic::updateProcessView()
       author2->setText("");
     }
   setPlayerColor(player2,color);
+
+  // set monitor song
+  song = processManager->playing_songs[2];
+  color.setHsv(0,0,128);
+  if (song)
+    {
+      title3->setText(song->song_title);
+      author3->setText(song->song_author);
+      color = song->color;
+    }
+  else
+    {
+      title3->setText("");
+      author3->setText("");
+    }
+  setPlayerColor(player3,color);
+
+  // set monitor song
+  song = processManager->playing_songs[3];
+  color.setHsv(0,0,128);
+  if (song)
+    {
+      title4->setText(song->song_title);
+      author4->setText(song->song_author);
+      color = song->color;
+    }
+  else
+    {
+      title4->setText("");
+      author4->setText("");
+    }
+  setPlayerColor(player4,color);
+  
   // set main tempo 
   char tmp[500];
   sprintf(tmp,"%g",processManager->mainTempo);
@@ -554,6 +643,120 @@ void SongSelectorLogic::checkDisc()
   // 3 - umount cdrom
   system("umount /cdrom");
   system("eject /cdrom");
+}
+
+void SongSelectorLogic::doSpectrumPca()
+{
+  // instead of exporting the frequency bands, we will 
+  // determine a suitable color.
+  // therefore we will do a principal component 
+  
+  // .. data = matrix
+  // 0. first count 
+  QListViewItemIterator it1(songList);
+  int count=0;
+  for(;it1.current();++it1)
+    {
+      QSong *svi=(QSong*)it1.current();
+      if (svi->isSelected() && svi->isVisible())
+	if (svi->song_spectrum!=QString::null)
+	  count++;
+    }
+  // 1. fill matrix
+  float **data = matrix(count,24);
+  QListViewItemIterator it2(songList);
+  int written=0;
+  for(;it2.current();++it2)
+    {
+      QSong *svi=(QSong*)it2.current();
+      if (svi->isSelected() && svi->isVisible())
+	{
+	  if (svi->song_spectrum!=QString::null)
+	    {
+	      for (int i = 0 ; i < 24 ; i++)
+		{
+		  char letter = svi->song_spectrum.at(i).latin1()-'a';
+		  data[written+1][i+1]=(float)letter;
+		}
+	      written++;
+	    }
+	}
+    }
+  // 2. do principal component analysis
+  do_pca(count,24,data);
+  float minx=0,miny=0,minz=0;
+  float maxx=0,maxy=0,maxz=0;
+  float dx,dy,dz;
+  for(int i = 1 ; i <= count; i ++)
+    {
+      #define MIN(A,B) if (B<A) A=B;
+      #define MAX(A,B) if (B>A) A=B;
+      MIN(minx,data[i][1]);
+      MIN(miny,data[i][2]);
+      MIN(minz,data[i][3]);
+      MAX(maxx,data[i][1]);
+      MAX(maxy,data[i][2]);
+      MAX(maxz,data[i][3]);
+    }
+  dx=maxx-minx;
+  dy=maxy-miny;
+  dz=maxz-minz;
+  if (dx==0) dx=1;
+  if (dy==0) dy=1;
+  if (dz==0) dz=1;
+  dx/=255.0;
+  dy/=255.0;
+  dz/=255.0;
+  // 3. modify colors of the selected items
+  QListViewItemIterator it3(songList);
+  written=0;
+  for(;it3.current();++it3)
+    {
+      QSong *svi=(QSong*)it3.current();
+      if (svi->isSelected() && svi->isVisible())
+	{
+	  if (svi->song_spectrum!=QString::null)
+	    {
+	      written++;
+	      float x = data[written][1];
+	      float y = data[written][2];
+	      float z = data[written][3];
+	      x-=minx;
+	      y-=miny;
+	      z-=minz;
+	      x/=dx;
+	      y/=dy;
+	      z/=dz;
+	      QColor transfer;
+	      transfer.setRgb((int)x,(int)y,(int)z);
+	      svi->setColor(transfer);
+	    }
+	}
+    }
+  // 4. clean up
+  free_matrix(data, count, 24);
+  updateProcessView();
+}
+
+void SongSelectorLogic::doSpectrumClustering()
+{
+  // 0. add all information in 1 cluster
+  Cluster cluster;
+  Cluster::reset();
+  QListViewItemIterator it1(songList);
+  for(;it1.current();++it1)
+    {
+      QSong *svi=(QSong*)it1.current();
+      if (svi->isSelected() && svi->isVisible())
+	if (svi->song_spectrum!=QString::null)
+	  cluster.addPoint(svi);
+    }
+  // 1. Do the Analysis
+  Couple * result = cluster.agglomerate();
+  // 2. Assign Colors
+  result->determine_color((float)0,(float)360,0,5);
+  // 3. Clean Up
+  updateProcessView();
 }
 
 void SongSelectorLogic::exportPlayList()
@@ -867,20 +1070,20 @@ void SongSelectorLogic::songDelTag(QListViewItem *S, const QString & tag)
 
 void SongSelectorLogic::selectionAddTags()
 {
-   // ask user the tag to add
-   TagBox songdata(NULL,NULL,TRUE);
-   songdata.newTags->setText("");
-   if (songdata.exec()==QDialog::Accepted)
-     {
-	QListViewItemIterator it1(songList);
-	for(;it1.current();++it1)
-	  {
-	    QSong *svi=(QSong*)it1.current();
-	     if (svi->isSelected() && svi->isVisible()) 
-	       songAddTag(svi,songdata.newTags->text());
-	  }
-	parseTags(songdata.newTags->text());
-     }
+  // ask user the tag to add
+  TagBox songdata(NULL,NULL,TRUE);
+  songdata.newTags->setText("");
+  if (songdata.exec()==QDialog::Accepted)
+    {
+      QListViewItemIterator it1(songList);
+      for(;it1.current();++it1)
+	{
+	  QSong *svi=(QSong*)it1.current();
+	  if (svi->isSelected() && svi->isVisible()) 
+	    songAddTag(svi,songdata.newTags->text());
+	}
+      parseTags(songdata.newTags->text());
+    }
 }
 
 void SongSelectorLogic::selectionPlayIn3th()
@@ -891,7 +1094,21 @@ void SongSelectorLogic::selectionPlayIn3th()
       QSong *svi=(QSong*)it1.current();
       if (svi->isSelected() && svi->isVisible()) 
 	{
-	  processManager->startSongPlayer3(svi);
+	  processManager->startExtraSong(2,svi);
+	  return;
+	}
+    }
+}
+
+void SongSelectorLogic::selectionPlayIn4th()
+{
+  QListViewItemIterator it1(songList);
+  for(;it1.current();++it1)
+    {
+      QSong *svi=(QSong*)it1.current();
+      if (svi->isSelected() && svi->isVisible()) 
+	{
+	  processManager->startExtraSong(3,svi);
 	  return;
 	}
     }
@@ -998,7 +1215,6 @@ void SongSelectorLogic::doFilterChanged()
   Config::limit_uprange = view->isItemChecked(onlyuptemporange_item);
   Config::limit_downrange = view->isItemChecked(onlydowntemporange_item);
   Config::limit_indistance = view->isItemChecked(onlyindistance_item);
-  Config::limit_inspectrum = view->isItemChecked(onlyinspectrum_item);     
   searchLine -> setText(searchLine->text().upper());
   updateItemList();
 }

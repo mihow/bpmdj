@@ -1,493 +1,566 @@
-<!DOCTYPE UI><UI>
+<!DOCTYPE UI><UI version="3.1" stdsetdef="1">
 <class>Renamer</class>
-<widget>
-    <class>QDialog</class>
-    <property stdset="1">
-        <name>name</name>
+<widget class="QDialog">
+    <property name="name">
         <cstring>Renamer</cstring>
     </property>
-    <property stdset="1">
-        <name>geometry</name>
+    <property name="geometry">
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>1041</width>
-            <height>534</height>
+            <width>951</width>
+            <height>487</height>
         </rect>
     </property>
-    <property stdset="1">
-        <name>caption</name>
+    <property name="caption">
         <string>RenameBox</string>
     </property>
     <grid>
-        <property stdset="1">
-            <name>margin</name>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <property name="margin">
             <number>11</number>
         </property>
-        <property stdset="1">
-            <name>spacing</name>
+        <property name="spacing">
             <number>6</number>
         </property>
-        <widget row="1"  column="0" >
-            <class>QLabel</class>
-            <property stdset="1">
-                <name>name</name>
+        <widget class="QLabel" row="1" column="0">
+            <property name="name">
                 <cstring>TextLabel2</cstring>
             </property>
-            <property stdset="1">
-                <name>sizePolicy</name>
+            <property name="sizePolicy">
                 <sizepolicy>
                     <hsizetype>5</hsizetype>
                     <vsizetype>1</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
                 </sizepolicy>
             </property>
-            <property stdset="1">
-                <name>text</name>
+            <property name="text">
                 <string>Key:</string>
             </property>
         </widget>
-        <widget row="2"  column="0" >
-            <class>QLabel</class>
-            <property stdset="1">
-                <name>name</name>
+        <widget class="QLabel" row="2" column="0">
+            <property name="name">
                 <cstring>TextLabel1</cstring>
             </property>
-            <property stdset="1">
-                <name>sizePolicy</name>
+            <property name="sizePolicy">
                 <sizepolicy>
                     <hsizetype>5</hsizetype>
                     <vsizetype>1</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
                 </sizepolicy>
             </property>
-            <property stdset="1">
-                <name>text</name>
+            <property name="text">
                 <string>Replace:</string>
             </property>
         </widget>
-        <widget row="3"  column="0"  rowspan="1"  colspan="2" >
-            <class>QGroupBox</class>
-            <property stdset="1">
-                <name>name</name>
+        <widget class="QGroupBox" row="3" column="0" rowspan="1" colspan="2">
+            <property name="name">
                 <cstring>GroupBox1</cstring>
             </property>
-            <property stdset="1">
-                <name>sizePolicy</name>
+            <property name="sizePolicy">
                 <sizepolicy>
                     <hsizetype>1</hsizetype>
                     <vsizetype>5</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
                 </sizepolicy>
             </property>
-            <property stdset="1">
-                <name>title</name>
+            <property name="title">
                 <string>Fix</string>
             </property>
             <grid>
-                <property stdset="1">
-                    <name>margin</name>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <property name="margin">
                     <number>11</number>
                 </property>
-                <property stdset="1">
-                    <name>spacing</name>
+                <property name="spacing">
                     <number>6</number>
                 </property>
-                <widget row="0"  column="0" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QPushButton" row="0" column="0">
+                    <property name="name">
                         <cstring>PushButton5</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
                         <string>SmallCapsIn&amp;Words</string>
                     </property>
-                    <property>
-                        <name>toolTip</name>
+                    <property name="toolTip" stdset="0">
                         <string>Decapitalizes all letters in words</string>
                     </property>
                 </widget>
-                <widget row="1"  column="0" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QPushButton" row="0" column="1">
+                    <property name="name">
                         <cstring>PushButton3</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
                         <string>&amp;CapitalizeAfterSpace</string>
                     </property>
-                    <property>
-                        <name>toolTip</name>
+                    <property name="toolTip" stdset="0">
                         <string>Capitalizes all letters after spaces</string>
                     </property>
                 </widget>
-                <widget row="2"  column="0" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QPushButton" row="1" column="0">
+                    <property name="name">
                         <cstring>PushButton101</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>enabled</name>
-                        <bool>false</bool>
-                    </property>
-                    <property stdset="1">
-                        <name>text</name>
-                        <string>Extention</string>
-                    </property>
-                </widget>
-            </grid>
-        </widget>
-        <widget row="3"  column="2" >
-            <class>QGroupBox</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>GroupBox2</cstring>
-            </property>
-            <property stdset="1">
-                <name>sizePolicy</name>
-                <sizepolicy>
-                    <hsizetype>1</hsizetype>
-                    <vsizetype>5</vsizetype>
-                </sizepolicy>
-            </property>
-            <property stdset="1">
-                <name>title</name>
-                <string>Remove</string>
-            </property>
-            <grid>
-                <property stdset="1">
-                    <name>margin</name>
-                    <number>11</number>
-                </property>
-                <property stdset="1">
-                    <name>spacing</name>
-                    <number>6</number>
-                </property>
-                <widget row="1"  column="0" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>PushButton6</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>text</name>
-                        <string>S&amp;pecials</string>
-                    </property>
-                </widget>
-                <widget row="0"  column="0" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>PushButton2</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>text</name>
-                        <string>&amp;Space</string>
-                    </property>
-                    <property>
-                        <name>toolTip</name>
-                        <string>Removes All Spaces</string>
-                    </property>
-                </widget>
-                <widget row="2"  column="0" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>PushButton13</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>text</name>
-                        <string>^C&amp;har</string>
-                    </property>
-                </widget>
-                <widget row="0"  column="1" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>PushButton11</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>enabled</name>
-                        <bool>false</bool>
-                    </property>
-                    <property stdset="1">
-                        <name>text</name>
-                        <string>^Number</string>
-                    </property>
-                </widget>
-                <widget row="1"  column="1" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>PushButton38</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>enabled</name>
+                    <property name="enabled">
                         <bool>true</bool>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
-                        <string>$Number</string>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>Extention (.MP3, .IDX)</string>
                     </property>
                 </widget>
-                <widget row="2"  column="1" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>PushButton37</cstring>
+                <widget class="QPushButton" row="1" column="1">
+                    <property name="name">
+                        <cstring>pushButton19</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>enabled</name>
+                    <property name="enabled">
+                        <bool>true</bool>
+                    </property>
+                    <property name="text">
+                        <string>'(..)' is Mix</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="2" column="1">
+                    <property name="name">
+                        <cstring>pushButton22</cstring>
+                    </property>
+                    <property name="enabled">
                         <bool>false</bool>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
-                        <string>Version</string>
+                    <property name="text">
+                        <string>author - title.Mp3</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="2" column="0">
+                    <property name="name">
+                        <cstring>pushButton21</cstring>
+                    </property>
+                    <property name="enabled">
+                        <bool>false</bool>
+                    </property>
+                    <property name="text">
+                        <string>author, some_weird.MP3</string>
                     </property>
                 </widget>
             </grid>
         </widget>
-        <widget row="3"  column="3" >
-            <class>QGroupBox</class>
-            <property stdset="1">
-                <name>name</name>
+        <widget class="QGroupBox" row="3" column="3">
+            <property name="name">
                 <cstring>GroupBox3</cstring>
             </property>
-            <property stdset="1">
-                <name>sizePolicy</name>
+            <property name="sizePolicy">
                 <sizepolicy>
                     <hsizetype>1</hsizetype>
                     <vsizetype>5</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
                 </sizepolicy>
             </property>
-            <property stdset="1">
-                <name>title</name>
+            <property name="title">
                 <string>Substrings</string>
             </property>
             <grid>
-                <property stdset="1">
-                    <name>margin</name>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <property name="margin">
                     <number>11</number>
                 </property>
-                <property stdset="1">
-                    <name>spacing</name>
+                <property name="spacing">
                     <number>6</number>
                 </property>
-                <widget row="1"  column="0" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QPushButton" row="0" column="0">
+                    <property name="name">
+                        <cstring>PushButton7</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>&amp;Delete </string>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="1" column="0">
+                    <property name="name">
                         <cstring>PushButton12</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
                         <string>Is&amp;Author</string>
                     </property>
                 </widget>
-                <widget row="2"  column="0" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QPushButton" row="0" column="1" rowspan="1" colspan="2">
+                    <property name="name">
                         <cstring>PushButton10</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>enabled</name>
-                        <bool>false</bool>
+                    <property name="enabled">
+                        <bool>true</bool>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
                         <string>Is&amp;Mix</string>
                     </property>
                 </widget>
-                <widget row="0"  column="0" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>PushButton7</cstring>
+                <widget class="QPushButton" row="1" column="1" rowspan="1" colspan="2">
+                    <property name="name">
+                        <cstring>pushButton17</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
-                        <string>&amp;Delete </string>
+                    <property name="enabled">
+                        <bool>true</bool>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>Before '-' is author</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="2" column="0" rowspan="1" colspan="2">
+                    <property name="name">
+                        <cstring>pushButton18</cstring>
+                    </property>
+                    <property name="enabled">
+                        <bool>true</bool>
+                    </property>
+                    <property name="text">
+                        <string>Key sel is auth</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="2" column="2">
+                    <property name="name">
+                        <cstring>pushButton23</cstring>
+                    </property>
+                    <property name="text">
+                        <string>'_' -&gt; ' '</string>
                     </property>
                 </widget>
             </grid>
         </widget>
-        <widget row="3"  column="4" >
-            <class>QGroupBox</class>
-            <property stdset="1">
-                <name>name</name>
+        <widget class="QGroupBox" row="3" column="4">
+            <property name="name">
                 <cstring>GroupBox19</cstring>
             </property>
-            <property stdset="1">
-                <name>sizePolicy</name>
+            <property name="sizePolicy">
                 <sizepolicy>
                     <hsizetype>1</hsizetype>
                     <vsizetype>5</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
                 </sizepolicy>
             </property>
-            <property stdset="1">
-                <name>title</name>
+            <property name="title">
                 <string>Finishing</string>
             </property>
-            <property stdset="1">
-                <name>orientation</name>
+            <property name="orientation">
                 <enum>Vertical</enum>
             </property>
             <grid>
-                <property stdset="1">
-                    <name>margin</name>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <property name="margin">
                     <number>11</number>
                 </property>
-                <property stdset="1">
-                    <name>spacing</name>
+                <property name="spacing">
                     <number>6</number>
                 </property>
-                <widget row="0"  column="0" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QPushButton" row="0" column="0">
+                    <property name="name">
                         <cstring>PushButton34</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
                         <string>&amp;Realize</string>
                     </property>
                 </widget>
-                <widget row="1"  column="0" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QPushButton" row="1" column="0">
+                    <property name="name">
                         <cstring>PushButton35</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
                         <string>D&amp;one</string>
                     </property>
                 </widget>
-                <widget row="2"  column="0" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QPushButton" row="2" column="0">
+                    <property name="name">
                         <cstring>PushButton16</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
                         <string>&amp;Ignore</string>
                     </property>
                 </widget>
             </grid>
         </widget>
-        <widget row="2"  column="4" >
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
+        <widget class="QPushButton" row="2" column="4">
+            <property name="name">
                 <cstring>PushButton58</cstring>
             </property>
-            <property stdset="1">
-                <name>enabled</name>
+            <property name="enabled">
                 <bool>true</bool>
             </property>
-            <property stdset="1">
-                <name>text</name>
+            <property name="text">
                 <string>Change</string>
             </property>
         </widget>
-        <widget row="2"  column="1"  rowspan="1"  colspan="3" >
-            <class>QLineEdit</class>
-            <property stdset="1">
-                <name>name</name>
+        <widget class="QLineEdit" row="2" column="1" rowspan="1" colspan="3">
+            <property name="name">
                 <cstring>ReplaceString</cstring>
             </property>
-            <property stdset="1">
-                <name>font</name>
+            <property name="font">
                 <font>
                     <family>adobe-courier</family>
                 </font>
             </property>
         </widget>
-        <widget row="1"  column="1"  rowspan="1"  colspan="4" >
-            <class>QLineEdit</class>
-            <property stdset="1">
-                <name>name</name>
+        <widget class="QLineEdit" row="1" column="1" rowspan="1" colspan="4">
+            <property name="name">
                 <cstring>SubString</cstring>
             </property>
-            <property stdset="1">
-                <name>font</name>
+            <property name="font">
                 <font>
                     <family>adobe-courier</family>
                 </font>
             </property>
-            <property stdset="1">
-                <name>text</name>
+            <property name="text">
                 <string></string>
             </property>
         </widget>
-        <widget row="0"  column="0"  rowspan="1"  colspan="5" >
-            <class>QListView</class>
+        <widget class="QListView" row="0" column="0" rowspan="1" colspan="5">
             <column>
-                <property>
-                    <name>text</name>
+                <property name="text">
                     <string>New</string>
                 </property>
-                <property>
-                    <name>clickable</name>
+                <property name="clickable">
                     <bool>true</bool>
                 </property>
-                <property>
-                    <name>resizeable</name>
+                <property name="resizable">
                     <bool>true</bool>
                 </property>
             </column>
             <column>
-                <property>
-                    <name>text</name>
+                <property name="text">
                     <string>Original </string>
                 </property>
-                <property>
-                    <name>clickable</name>
+                <property name="clickable">
                     <bool>true</bool>
                 </property>
-                <property>
-                    <name>resizeable</name>
+                <property name="resizable">
                     <bool>true</bool>
                 </property>
             </column>
             <column>
-                <property>
-                    <name>text</name>
+                <property name="text">
                     <string>Full Name</string>
                 </property>
-                <property>
-                    <name>clickable</name>
+                <property name="clickable">
                     <bool>true</bool>
                 </property>
-                <property>
-                    <name>resizeable</name>
+                <property name="resizable">
                     <bool>true</bool>
                 </property>
             </column>
-            <property stdset="1">
-                <name>name</name>
+            <property name="name">
                 <cstring>NameList</cstring>
             </property>
-            <property stdset="1">
-                <name>font</name>
+            <property name="font">
                 <font>
                     <family>adobe-courier</family>
                 </font>
             </property>
-            <property stdset="1">
-                <name>frameShape</name>
+            <property name="frameShape">
                 <enum>NoFrame</enum>
             </property>
-            <property stdset="1">
-                <name>selectionMode</name>
+            <property name="selectionMode">
                 <enum>Extended</enum>
             </property>
-            <property stdset="1">
-                <name>allColumnsShowFocus</name>
+            <property name="allColumnsShowFocus">
                 <bool>true</bool>
             </property>
+        </widget>
+        <widget class="QGroupBox" row="3" column="2">
+            <property name="name">
+                <cstring>GroupBox2</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>1</hsizetype>
+                    <vsizetype>5</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="title">
+                <string>Remove</string>
+            </property>
+            <grid>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <property name="margin">
+                    <number>11</number>
+                </property>
+                <property name="spacing">
+                    <number>6</number>
+                </property>
+                <widget class="QPushButton" row="1" column="0">
+                    <property name="name">
+                        <cstring>PushButton6</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>S&amp;pecials</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="0" column="0">
+                    <property name="name">
+                        <cstring>PushButton2</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>&amp;Space</string>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Removes All Spaces</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="1" column="1">
+                    <property name="name">
+                        <cstring>PushButton13</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>^C&amp;har</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="0" column="1">
+                    <property name="name">
+                        <cstring>PushButton37</cstring>
+                    </property>
+                    <property name="enabled">
+                        <bool>true</bool>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>^Specials</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="2" column="0" rowspan="1" colspan="2">
+                    <property name="name">
+                        <cstring>pushButton20</cstring>
+                    </property>
+                    <property name="enabled">
+                        <bool>true</bool>
+                    </property>
+                    <property name="text">
+                        <string>'(...)' </string>
+                    </property>
+                </widget>
+            </grid>
         </widget>
     </grid>
 </widget>
@@ -538,7 +611,7 @@
         <sender>PushButton10</sender>
         <signal>clicked()</signal>
         <receiver>Renamer</receiver>
-        <slot>subStringIsAuthor()</slot>
+        <slot>substringIsMix()</slot>
     </connection>
     <connection>
         <sender>PushButton12</sender>
@@ -570,16 +643,75 @@
         <receiver>Renamer</receiver>
         <slot>ignoreSelection()</slot>
     </connection>
-    <slot access="public">capitalizeAfterSpace()</slot>
-    <slot access="public">changeSelection()</slot>
-    <slot access="public">deleteSubString()</slot>
-    <slot access="public">ignoreSelection()</slot>
-    <slot access="public">realizeSelection()</slot>
-    <slot access="public">removeFirstChar()</slot>
-    <slot access="public">removeSpaces()</slot>
-    <slot access="public">removeSpecials()</slot>
-    <slot access="public">replaceSubString()</slot>
-    <slot access="public">smallCapsInWords()</slot>
-    <slot access="public">subStringIsAuthor()</slot>
+    <connection>
+        <sender>pushButton17</sender>
+        <signal>clicked()</signal>
+        <receiver>Renamer</receiver>
+        <slot>beforeMinusIsAuthor()</slot>
+    </connection>
+    <connection>
+        <sender>PushButton10</sender>
+        <signal>clicked()</signal>
+        <receiver>Renamer</receiver>
+        <slot>substringIsMix()</slot>
+    </connection>
+    <connection>
+        <sender>pushButton18</sender>
+        <signal>clicked()</signal>
+        <receiver>Renamer</receiver>
+        <slot>keySelectionIsAuthor()</slot>
+    </connection>
+    <connection>
+        <sender>pushButton20</sender>
+        <signal>clicked()</signal>
+        <receiver>Renamer</receiver>
+        <slot>betweenBracesIsTrash()</slot>
+    </connection>
+    <connection>
+        <sender>PushButton37</sender>
+        <signal>clicked()</signal>
+        <receiver>Renamer</receiver>
+        <slot>removeFirstSpecials()</slot>
+    </connection>
+    <connection>
+        <sender>pushButton23</sender>
+        <signal>clicked()</signal>
+        <receiver>Renamer</receiver>
+        <slot>replaceUnderscores()</slot>
+    </connection>
+    <connection>
+        <sender>PushButton101</sender>
+        <signal>clicked()</signal>
+        <receiver>Renamer</receiver>
+        <slot>fixExtention()</slot>
+    </connection>
+    <connection>
+        <sender>pushButton19</sender>
+        <signal>clicked()</signal>
+        <receiver>Renamer</receiver>
+        <slot>betweenBraceseIsMix()</slot>
+    </connection>
 </connections>
+<slots>
+    <slot>capitalizeAfterSpace()</slot>
+    <slot>changeSelection()</slot>
+    <slot>deleteSubString()</slot>
+    <slot>ignoreSelection()</slot>
+    <slot>realizeSelection()</slot>
+    <slot>removeFirstChar()</slot>
+    <slot>removeSpaces()</slot>
+    <slot>removeSpecials()</slot>
+    <slot>replaceSubString()</slot>
+    <slot>smallCapsInWords()</slot>
+    <slot>subStringIsAuthor()</slot>
+    <slot>beforeMinusIsAuthor()</slot>
+    <slot>substringIsMix()</slot>
+    <slot>keySelectionIsAuthor()</slot>
+    <slot>betweenBracesIsTrash()</slot>
+    <slot>removeFirstSpecials()</slot>
+    <slot>replaceUnderscores()</slot>
+    <slot>fixExtention()</slot>
+    <slot>betweenBraceseIsMix()</slot>
+</slots>
+<layoutdefaults spacing="6" margin="11"/>
 </UI>

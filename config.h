@@ -49,7 +49,6 @@ class Config
     static bool limit_uprange;
     static bool limit_downrange;
     static bool limit_indistance;
-    static bool limit_inspectrum;
     static QString playCommand1;
     static QString playCommand2;
     static QString playCommand3;

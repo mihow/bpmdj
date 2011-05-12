@@ -42,8 +42,9 @@
 #include <assert.h>
 #include <math.h>
 #include <pthread.h>
-#include "songplayerlogic.h"
+#include "songplayer.logic.h"
 #include "kbpm-counter.h"
+#include "spectrumanalyzer.logic.h"
 
 extern "C"
 {
@@ -52,11 +53,11 @@ extern "C"
 #include "player-core.h"
 }
 
-
 /*-------------------------------------------
  *         Constants & Variables
  *-------------------------------------------*/
 static int   opt_batch = 0;
+static int   opt_create = 0;
 static int   opt_color = 0;
 static char* arg_posx = NULL;
 static char* arg_posy = NULL;
@@ -102,8 +103,9 @@ void options_failure(char* err)
    // print options
    printf("Usage:  kbpm-play <options> argument\n\n"
 //	  "   -w          --debuglatency      debugs latency of the player\n"
+          "   -c          --create            create an index file if none exists\n"
 	  "   -q          --quiet             be quiet\n"
-	  "   -d arg      --dsp arg           dsp device to use (default = /dev/dsp)\n"
+	  "   -d arg      --dsp arg           dsp device to use (default = /dev/dsp)\n" 
 	  "   -x arg      --mixer arg         mixer device to use (default = /dev/mixer)\n"
 	  "   -m arg      --match arg         song to match tempo with\n"
 	  "   -L nbr      --latency nbr       required latency in ms (default = 744)\n"
@@ -118,92 +120,94 @@ void options_failure(char* err)
 
 void process_options(int argc, char* argv[])
 {
-   // run trough all the arguments
-   int i=1;
-   for(i = 1 ; i < argc ; i ++)
-     {
-	if (argv[i][0]=='-')
-	  {
-	     char* arg;
-	     // check long opt ?
-	     if (argv[i][1]=='-')
-	       arg=argv[i]+2;
-	     else if (argv[i][1]==0 || argv[i][2]!=0)
-	       options_failure("option neither short or long");
-	     else arg=argv[i]+1;
-	     // check value
-	     if (strcmp(arg,"quiet")==0 ||
-		 strcmp(arg,"q")==0)
+  int i=1;
+  for(i = 1 ; i < argc ; i ++)
+    {
+      if (argv[i][0]=='-')
+	{
+	  char* arg;
+	  // check long opt ?
+	  if (argv[i][1]=='-')
+	    arg=argv[i]+2;
+	  else if (argv[i][1]==0 || argv[i][2]!=0)
+	    options_failure("option neither short or long");
+	  else arg=argv[i]+1;
+	  // check value
+	  if (strcmp(arg,"quiet")==0 ||
+	      strcmp(arg,"q")==0)
 	       opt_quiet=1;
-	     else if (strcmp(arg,"batch")==0 ||
-		      strcmp(arg,"b")==0)
-	       opt_batch=1;
-	     else if (strcmp(arg,"spectrum")==0 ||
-		      strcmp(arg,"s")==0)
-	       opt_color=1;
-	     else if (strcmp(arg,"dsp")==0 ||
-		      strcmp(arg,"d")==0)
-	       {
-		  if (++i>=argc) 
-		    options_failure("dsp argument scanning error");
-		  arg_dsp=argv[i];
-	       }
-	     else if (strcmp(arg,"low")==0 ||
-		      strcmp(arg,"l")==0)
-	       {
-		  if (++i>=argc) 
-		    options_failure("low argument scanning error");
-		  arg_low=atoi(argv[i]);
-	       }
-	     else if (strcmp(arg,"high")==0 ||
-		      strcmp(arg,"h")==0)
-	       {
-		  if (++i>=argc)
-		    options_failure("high argument scanning error");
-		  arg_high=atoi(argv[i]);
-	       }
-	     else if (strcmp(arg,"match")==0 ||
-		      strcmp(arg,"m")==0)
-	       {
-		  opt_match=1;
-		  if (++i>=argc) 
-		    options_failure("match argument scanning error");
-		  arg_match=argv[i];
-	       }
-	     else if (strcmp(arg,"latency")==0 ||
-		      strcmp(arg,"L")==0)
-	       {
-		  opt_latency=1;
-		  if (++i>=argc)
-		    options_failure("latency argument scanning error");
-		  arg_latency=argv[i];
-	       }
-	     else if (strcmp(arg,"mixer")==0 ||
-		      strcmp(arg,"x")==0)
-	       {
-		  if (++i>=argc)
-		    options_failure("mixer argument scanning error");
-		  arg_mixer=argv[i];
-	       }
-	     else if (strcmp(arg,"position")==0 ||
-		      strcmp(arg,"p")==0)
-	       {
-		  if (++i>=argc)
-		    options_failure("position x argument scanning error");
-		  arg_posx=argv[i];
-		  if (++i>=argc)
-		    options_failure("position y argument scanning error");
-		  arg_posy=argv[i];
-	       }
-	  }
-	else
-	  argument = argv[i];
-     }
-   if (argument==NULL)
-     {
-	options_failure("requires at least one argument");
-     }
-   
+	  else if (strcmp(arg,"batch")==0 ||
+		   strcmp(arg,"b")==0)
+	    opt_batch=1;
+	  else if (strcmp(arg,"create")==0 ||
+		   strcmp(arg,"c")==0)
+	    opt_create=1;
+	  else if (strcmp(arg,"spectrum")==0 ||
+		   strcmp(arg,"s")==0)
+	    opt_color=1;
+	  else if (strcmp(arg,"dsp")==0 ||
+		   strcmp(arg,"d")==0)
+	    {
+	      if (++i>=argc) 
+		options_failure("dsp argument scanning error");
+	      arg_dsp=argv[i];
+	    }
+	  else if (strcmp(arg,"low")==0 ||
+		   strcmp(arg,"l")==0)
+	    {
+	      if (++i>=argc) 
+		options_failure("low argument scanning error");
+	      arg_low=atoi(argv[i]);
+	    }
+	  else if (strcmp(arg,"high")==0 ||
+		   strcmp(arg,"h")==0)
+	    {
+	      if (++i>=argc)
+		options_failure("high argument scanning error");
+	      arg_high=atoi(argv[i]);
+	    }
+	  else if (strcmp(arg,"match")==0 ||
+		   strcmp(arg,"m")==0)
+	    {
+	      opt_match=1;
+	      if (++i>=argc) 
+		options_failure("match argument scanning error");
+	      arg_match=argv[i];
+	    }
+	  else if (strcmp(arg,"latency")==0 ||
+		   strcmp(arg,"L")==0)
+	    {
+	      opt_latency=1;
+	      if (++i>=argc)
+		options_failure("latency argument scanning error");
+	      arg_latency=argv[i];
+	    }
+	  else if (strcmp(arg,"mixer")==0 ||
+		   strcmp(arg,"x")==0)
+	    {
+	      if (++i>=argc)
+		options_failure("mixer argument scanning error");
+	      arg_mixer=argv[i];
+	    }
+	  else if (strcmp(arg,"position")==0 ||
+		   strcmp(arg,"p")==0)
+	    {
+	      if (++i>=argc)
+		options_failure("position x argument scanning error");
+	      arg_posx=argv[i];
+	      if (++i>=argc)
+		options_failure("position y argument scanning error");
+	      arg_posy=argv[i];
+	    }
+	}
+      else
+	argument = argv[i];
+    }
+  if (argument==NULL)
+    {
+      options_failure("requires at least one argument");
+    }
+  
 }
 
 void show_error(char*text)
@@ -213,45 +217,78 @@ void show_error(char*text)
    QMessageBox::critical(NULL,a,b,QMessageBox::Ok,0,0);
 }
 
+bool checkRaw()
+  {
+    FILE * raw;
+    char d[500];
+    // the filename of the file to read is the basename 
+    // suffixed with .raw
+    sprintf(d,"%s.raw",basename(index_file));
+  }
+
 int main(int argc, char *argv[])
 {
-   process_options(argc,argv);
-   // create an application
-   app = new QApplication(argc,argv);
-   if (opt_batch)
-     {
-       // init the core, we do not open it because
-       // we don't want any dsp access
-       core_init(1);
-       printf("Wave written\n");
-       // initialize the count dialog
-       BpmCountDialog *counter = new BpmCountDialog();
-       counter->setBpmBounds(arg_low,arg_high);
-       counter->doit();
-       counter->finish();
-       printf("Counting done\n");
-       // finish the core -> remove the raw file
-       core_done();
-     }
-   else if (opt_color)
-     {
-       core_init(1);
-       printf("Wave written\n");
-       // initialize the count dialog
-       BpmCountDialog *counter = new BpmCountDialog();
-       counter->fetchSpectrum();
-       counter->finish();
-       printf("Fetching Color done\n");
-       core_done();
-     }
-   else
-     {
-       core_init(0);
-       core_open();
-       terminal_start();
-       core_play();
-       terminal_stop();
-       core_close();
-       core_done();
-     }
+  process_options(argc,argv);
+  // create an application
+  app = new QApplication(argc,argv);
+  // if we need to create an index file we'll make it.
+  if (opt_create)
+    {
+      // argument aindigt normaal op .mp3 of iets in dien trend...
+      char newname[500];
+      strcpy(newname,argument);
+      int len = strlen(newname);
+      if (len>=4 && newname[len-4]=='.')
+	strcpy(newname+len-3,"idx");
+      else
+	options_failure("Sorry, mp3 must end on .mp3");
+      // create index and write it..
+      index_init();
+      index_setversion();
+      index_readfrom = strdup(newname);
+      index_file = strdup(argument);
+      index_changed = 1;
+      index_tags=strdup("New");
+      index_period = -1;
+      index_tempo = strdup("/");
+      index_write();
+      index_free();
+      argument = strdup(newname);
+    }
+  if (opt_batch)
+    {
+      // init the core, we do not open it because
+      // we don't want any dsp access
+      core_init(1);
+      printf("Wave written\n");
+      // initialize the count dialog
+      BpmCountDialog *counter = new BpmCountDialog();
+      counter->setBpmBounds(arg_low,arg_high);
+      counter->doit();
+      counter->finish();
+      printf("Counting done\n");
+      // finish the core -> remove the raw file
+      core_done();
+    }
+  else if (opt_color)
+    {
+      core_init(1);
+      printf("Wave written\n");
+      // initialize the count dialog
+      SpectrumDialogLogic *counter = new SpectrumDialogLogic();
+      counter->fetchSpectrum();
+      counter->finish();
+      printf("Fetching Color done\n");
+      core_done();
+    }
+  else
+    {
+      core_init(0);
+      core_open();
+      terminal_start();
+      core_play();
+      terminal_stop();
+      core_close();
+      core_done();
+    }
 }

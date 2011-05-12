@@ -21,7 +21,7 @@
 /*-------------------------------------------
  *         Index operations
  *-------------------------------------------*/
-extern           char   * index_readfrom;
+extern           char   * index_readfrom;   
 extern           char   * index_version;
 extern           int      index_period;
 extern           char   * index_tempo;

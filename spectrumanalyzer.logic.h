@@ -18,10 +18,18 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#include <qapplication.h>
+#include "songplayer.h"
+#include "spectrumanalyzer.h"
 
-extern "C" {
-#include "player-core.h"
-}
+#define barksize 24
 
-extern QApplication *app;
+class SpectrumDialogLogic : public SpectrumDialog
+{
+   Q_OBJECT
+ private:
+   QSlider * meters[barksize];
+ public:
+   SpectrumDialogLogic(SongPlayer*parent=0, const char * name=0, bool modal=FALSE, WFlags f=0);
+ public slots:
+   virtual void fetchSpectrum();
+};
