@@ -1,0 +1,14 @@
+$Id: INSTALL,v 1.1 2002/02/03 16:43:50 krubbens Exp $
+
+Thomas Steudten <thomas@steudten.com>
+
+To build from the sources run the following commands:
+
+1.    [autoheader]
+2.    [autoconf]
+3.    ./configure
+4.    make all
+5.    make install
+
+Run ./configure --help to see the options.
+ 

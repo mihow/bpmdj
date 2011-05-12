@@ -1,3 +1,8 @@
+0.9:
+  - fixed bug in '{' (backward movement)
+  - fixed .MP3 bug
+  - added Thomas configure things
+  - added tag support in index module
 0.8:
   - removed some duplicate messages
   - made pause/unpause more logic

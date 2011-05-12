@@ -17,7 +17,38 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
+#include "config.h"
 
+#ifdef HAVE_STDLIB_H
+#include <stdlib.h>
+#endif /* HAVE_STDLIB_H */
+
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif /* HAVE_STRING_H */
+
+#ifdef HAVE_STDIO_H
+#include <stdio.h>
+#endif /* HAVE_STDIO_H */
+
+#ifdef HAVE_LIBGEN_H
+#include <libgen.h>
+#endif /* HAVE_LIBGEN_H */
+
+#ifdef HAVE_ASSERT_H
+#include <assert.h>
+#endif /* HAVE_ASSERT_H */
+
+#ifdef HAVE_MATH_H
+#include <math.h>
+#endif /* HAVE_MATH_H */
+
+#include "cbpm-index.h"
+#include "cbpm-coloropts.h"
+
+#include "common.h"
+
+/*
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -26,215 +57,68 @@
 #include <assert.h>
 #include "cbpm-index.h"
 #include "cbpm-coloropts.h"
+#include "fourier.h"
+*/
 
-  signed char *audio;
-unsigned long audiosize;
-unsigned long audiorate=22050;  // perfect measure, 5512 is too lossy, 22050 takes too much time
-unsigned long colorfreq=110;    // good ?
-unsigned long colorperiod;
-signed   long long *color;
-signed  long long colorsadded=0;
-long     int  bufsiz=32*1024;
-
-signed char sign(signed char a, signed char b)
-{
-   if (a==b) return 0;
-   if (a<b) return 1;
-   return -1;
-}
-
-unsigned long findturn(unsigned long idx)
-{
-   signed long startsign;
-   if (idx==audiosize) return idx;
-   assert(idx<audiosize);
-   startsign=sign(audio[idx],audio[idx+1]);
-   if (startsign==0)
-     while(idx<audiosize-1 && 
-	   sign(audio[idx],audio[idx+1])==0) idx++;
-   else
-     while(idx<audiosize-1 &&
-	   sign(audio[idx],audio[idx+1])!=-startsign) idx++;
-   return idx;
-}
-
-void obtain_color_old()
-{
-   signed int times=0;
-   signed long long i,t0,t1;
-   colorperiod=audiorate/colorfreq;
-   color=calloc(colorperiod,sizeof(signed long long));
-   assert(color);
-   /* the technique is simpel. We go voer the wave 
-    * until we find a switch from going up to gfoing down. 
-    * This point is marked T0. From then on we keep going 
-    * until we find a switch from going down to going up.
-    * We neglect this point completely, but call it T1.
-    * We continue till we find the next turning point. 
-    * Again we neglect it and call it T2. Now we start 
-    * looking for our final opint T3. If we found it 
-    * we rewrite the wave linearry between T0 and T3. 
-    * The wave itself is maximized and supperposed 
-    * over the colrowave. The wave is not normalised.
-    * Normalisation is done by the number of same waves
-    * encounterd.
-    * 
-    * This is done over the complete wave until we find
-    * no more waves.
-    */
-   while (times<10 && (t0=findturn(0))!=audiosize)
-     {
-	signed long long v0,v1,si,cv0,cv1,c0,c;
-	printf("colorsadded = %ld \n",colorsadded);
-	while(1)
-	  {
-	     if ((t0+times*5)>=audiosize) 
-	       t1=audiosize;
-	     else
-	       t1=findturn(t0+times*3)+1;
-	     /* we store this piece of wave
-	      * in the color-table stretched
-	      * appropriately and subtracted with [t0]
-	      */
-	     if (t1>=audiosize) break;
-	     assert(t0!=t1);
-	     v0=audio[t0];
-	     v1=audio[t1];
-	     //  printf("%ld\n",(long)t1-(long)t0);
-	     si=1;
-	     c0=0;
-	     cv0=0;
-	     if (v1<v0) si=-1;
-/*	     if (t1-t0<)
-	       for(i=t0;i<=t1;i++)
-		 {
-		    signed long v=audio[i];
-		    audio[i]=v0+(v1-v0)*(i-t0)/(t1-t0);
-		 }
-	     else
- */	       
-	       {
-		  for(c=0;c<colorperiod;c++)
-		    {
-		       signed long long v=(signed long long)audio[t0+c*(t1-t0)/(colorperiod-1)];
-		       v=si*(v-(v0+c*(v1-v0)/(colorperiod-1)));
-		       if (c==0) 
-			 assert(v==0);
-		       if (c==colorperiod-1) 
-			 assert(v==0);
-		       color[c]+=v;
-		    }
-/*		  for(i=t0;i<=t1;i++)
-		    {
-		       signed long long v=audio[i];
-		       audio[i]=(signed char)(v0+(v1-v0)*(i-t0)/(t1-t0));
-		    }
-*/		  colorsadded++;
-	       }
-	     t0=t1;
-	  };
-	for(i=0;i<colorperiod;i++)
-	  {
-	     char d[500];
-	     sprintf(d, "%d      %d",(int)i,(int)(((signed long long)256L)*color[i]/(signed long long)colorsadded));
-	     index_addcomment(d);
-	  }
-	times++;
-     };
-   // dump result
-}
+  signed short int *audio;
+unsigned long  int audiosize;
+unsigned long  int audiorate=22050;  // perfect measure, 5512 is too lossy, 22050 takes too much time
+unsigned       int fftsiz=2048;      // size of the fft
+          long int bufsiz=32*1024;
 
 void obtain_color()
 {
-   signed int times=0;
-   signed long long i,t0,t1;
-   colorperiod=audiorate/colorfreq;
-   color=calloc(colorperiod,sizeof(signed long long));
-   assert(color);
-   /* since the previous techniques doesn't work
-    * i'm trying this one. Instead of looking for ups
-    * and downs we now start looking.
-    * We take a number of random waves of a specific 
-    * period and supperpose them on the colorwave for
-    * the given period.
-    * We take a piece of wave and find the best position
-    * to place it over the color... This is maybe the best. 
-    */
-   while (times<10 && (t0=findturn(0))!=audiosize)
+   /* - het probleem met deze techniek is dat het een 
+    *   gemiddelde neemt en de conpositie
+    *   dus invloed heeft op de frequentieverdeling...
+    * - een extra probleem is dat we een gemiddelde nodig 
+    *   hebben om te weten wat denormale aard van het nummer
+    *   is..
+    */ 
+   float inbuffer[fftsiz];
+   float outbuffer[fftsiz];
+   float outbuffer_i[fftsiz];
+   float color[fftsiz];
+   signed long long i=0,j;
+   signed long long colorsadded=0;
+   // empty color
+   for(j=0;j<fftsiz;j++)
+     color[j]=0;
+   // scan data
+   while (i<audiosize-fftsiz)
      {
-	signed long long v0,v1,si,cv0,cv1,c0,c;
-	printf("colorsadded = %ld \n",colorsadded);
-	while(1)
-	  {
-	     if ((t0+times*5)>=audiosize) 
-	       t1=audiosize;
-	     else
-	       t1=findturn(t0+times*3)+1;
-	     /* we store this piece of wave
-	      * in the color-table stretched
-	      * appropriately and subtracted with [t0]
-	      */
-	     if (t1>=audiosize) break;
-	     assert(t0!=t1);
-	     v0=audio[t0];
-	     v1=audio[t1];
-	     //  printf("%ld\n",(long)t1-(long)t0);
-	     si=1;
-	     c0=0;
-	     cv0=0;
-	     if (v1<v0) si=-1;
-/*	     if (t1-t0<)
-	       for(i=t0;i<=t1;i++)
-		 {
-		    signed long v=audio[i];
-		    audio[i]=v0+(v1-v0)*(i-t0)/(t1-t0);
-		 }
-	     else
- */	       
-	       {
-		  for(c=0;c<colorperiod;c++)
-		    {
-		       signed long long v=(signed long long)audio[t0+c*(t1-t0)/(colorperiod-1)];
-		       v=si*(v-(v0+c*(v1-v0)/(colorperiod-1)));
-		       if (c==0) 
-			 assert(v==0);
-		       if (c==colorperiod-1) 
-			 assert(v==0);
-		       color[c]+=v;
-		    }
-/*		  for(i=t0;i<=t1;i++)
-		    {
-		       signed long long v=audio[i];
-		       audio[i]=(signed char)(v0+(v1-v0)*(i-t0)/(t1-t0));
-		    }
-*/		  colorsadded++;
-	       }
-	     t0=t1;
-	  };
-	for(i=0;i<colorperiod;i++)
-	  {
-	     char d[500];
-	     sprintf(d, "%d      %d",(int)i,(int)(((signed long long)256L)*color[i]/(signed long long)colorsadded));
-	     index_addcomment(d);
-	  }
-	times++;
+	// fill buffer
+	for(j=0;j<fftsiz;j++)
+//	  {
+//	     char d[500];
+	     inbuffer[j]=(float)audio[i+j];
+//	     sprintf(d, "%d      %g",(int)i,(int)(((signed long long)256L)*color[i]/(signed long long)colorsadded));
+//	     index_addcomment(d);
+//	  }
+	// fft buffer
+	fft_float(fftsiz,0,inbuffer,NULL,outbuffer,outbuffer_i);
+	// read outbuffer
+	for(j=0;j<fftsiz;j++)
+	  color[j]+=
+	  sqrt(
+	       (double)((outbuffer[j]+outbuffer_i[j]))*
+	       (double)((outbuffer[j]+outbuffer_i[j]))
+	       );
+	i+=fftsiz;
+	colorsadded++;
+//	break;
      };
-   // dump result
-}
-
-unsigned long phasefit(long i)
-{
-   long c,d;
-   unsigned long mismatch=0;
-   unsigned long prev=mismatch;
-   for(c=i;c<audiosize;c++)
+   printf("colorsadded = %d\n",colorsadded);
+   for(j=0;j<fftsiz/2;j++)
+     color[j]+=color[fftsiz-j];
+   for(j=0;j<fftsiz/2;j++)
+     color[j]/=(float)colorsadded;
+   for(i=0;i<fftsiz/2;i++)
      {
-	d=abs((long)audio[c]-(long)audio[c-i]);
-	prev=mismatch;
-	mismatch+=d;
-	assert(mismatch>=prev);
+	char d[500];
+	sprintf(d, "%d      %g",(int)i,log(fabsf(color[i])));
+	index_addcomment(d);
      }
-   return mismatch;
 }
 
 long fsize(FILE * f)
@@ -315,7 +199,7 @@ int main(int argc, char *argv[])
 	printf("Reading from %ldk to %ldk ",startpercent/1024,stoppercent/1024);
 	printf("(audiosize = %dk)\n",audiosize/1024);
      }
-   audio=malloc(audiosize+1);
+   audio=calloc(audiosize+1,sizeof(signed short int));
    if (!audio)
      {
 	printf("Error: unable to allocate audio buffer\n");
@@ -328,15 +212,11 @@ int main(int argc, char *argv[])
 	count=fread(buffer,1,bufsiz,raw);
 	for (i=0;i<count/2;i+=2*(44100/audiorate))
 	  {
-	     signed long int left, right,mean;
-	     signed char reduw;
-	     left=buffer[i];
-	     right=buffer[i+1];
-	     mean=left/256;
-	     assert(abs(mean)<129);
+	     signed long int mean;
+	     mean=buffer[i];
 	     if (pos+i/(2*(44100/audiorate))>=audiosize) break;
 	     assert(pos+i/(2*(44100/audiorate))<audiosize);
-	     audio[pos+i/(2*(44100/audiorate))]=(signed char)mean;
+	     audio[pos+i/(2*(44100/audiorate))]=mean;
 	  }
 	pos+=count/(4*(44100/audiorate));
      }

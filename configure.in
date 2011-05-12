@@ -1,0 +1,113 @@
+dnl Process this file with autoconf to produce a configure script.
+dnl 
+dnl $Id: configure.in,v 1.2 2002/02/03 19:38:25 krubbens Exp $
+dnl 
+dnl Written by Thomas Steudten <thomas@steudten.com>
+dnl January 20, 2002 
+dnl
+dnl This program is free software; you can redistribute it 
+dnl and/or modify it under the terms of the GNU General
+dnl Public License as published by the Free Software
+dnl Foundation; either version 2 of the License, or (at
+dnl your option) any later version.
+dnl 
+dnl This program is distributed in the hope that it will
+dnl be useful, but WITHOUT ANY WARRANTY; without even the
+dnl implied warranty of MERCHANTABILITY or FITNESS FOR A
+dnl PARTICULAR PURPOSE.  See the GNU General Public
+dnl License for more details.
+dnl 
+dnl The GNU General Public License should be included with
+dnl this file.  If not, you can view it at
+dnl http://www.gnu.org/copyleft/gpl.html
+dnl or write to the Free Software Foundation, Inc., 59
+dnl Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+dnl 
+dnl $Log: configure.in,v $
+dnl Revision 1.2  2002/02/03 19:38:25  krubbens
+dnl - cbpm-period moved to cbpm-count
+dnl - cbpm-player moved to cbpm-play
+dnl - GNUmakefile.in containted some wrong dependencies
+dnl - GNUmakefile.in was msising the tgz-packaging stuff
+dnl
+dnl Revision 1.1  2002/02/03 16:59:37  krubbens
+dnl - added Thomas configure things
+dnl
+dnl 
+
+
+dnl AutoConf Initialization
+
+AC_PREREQ(2.50)
+AC_REVISION($Revision: 1.2 $)
+AC_INIT(cbpm-play.c)
+AC_CONFIG_SRCDIR(cbpm-play.c)
+AC_CONFIG_HEADER(config.h)
+AC_CANONICAL_HOST
+
+dnl
+dnl Checks for programs needed to build.
+dnl
+
+AC_PROG_CC
+AC_PROG_CPP
+AC_PROG_INSTALL
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
+
+dnl
+dnl compiler stuff
+dnl 
+
+AC_C_CONST
+AC_TYPE_SIZE_T
+AC_CHECK_SIZEOF(int)
+AC_CHECK_SIZEOF(char *)
+AC_CHECK_SIZEOF(long)
+AC_CHECK_SIZEOF(long long)
+AC_CHECK_SIZEOF(size_t)
+
+dnl
+dnl Checks for header files.
+dnl
+
+AC_HEADER_STDC
+AC_CHECK_HEADERS(fcntl.h math.h time.h signal.h libgen.h)
+AC_CHECK_HEADERS(linux/soundcard.h time.h stdio.h assert.h termios.h)
+
+dnl
+dnl Checks for library functions.
+dnl
+
+AC_CHECK_FUNCS(calloc)
+
+dnl
+dnl substitute values for output
+dnl
+
+AC_SUBST(MYLIBS)
+AC_SUBST(MYCFLAGS)
+
+dnl
+dnl generate GNUmakefile
+dnl
+AC_OUTPUT(GNUmakefile)
+
+dnl
+dnl echo configuration 
+dnl
+
+echo \
+"------------------------------------------------------------------------
+Configuration:
+
+  Source code location:   ${srcdir}
+  Compiler:               ${CC}
+  Compiler flags:         ${CFLAGS}
+  Host System Type:       ${host}
+  Install path:           ${prefix}
+
+  See config.h for further configuration information.
+------------------------------------------------------------------------"
+
+dnl configure.in ends here

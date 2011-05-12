@@ -18,14 +18,37 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#include <math.h>
+
+#include "config.h"
+
+#ifdef HAVE_STDLIB_H
 #include <stdlib.h>
-#include <stdio.h>
+#endif /* HAVE_STDLIB_H */
+
+#ifdef HAVE_STRING_H
 #include <string.h>
+#endif /* HAVE_STRING_H */
+
+#ifdef HAVE_STDIO_H
+#include <stdio.h>
+#endif /* HAVE_STDIO_H */
+
+#ifdef HAVE_LIBGEN_H
 #include <libgen.h>
+#endif /* HAVE_LIBGEN_H */
+
+#ifdef HAVE_ASSERT_H
 #include <assert.h>
+#endif /* HAVE_ASSERT_H */
+
+#ifdef HAVE_MATH_H
+#include <math.h>
+#endif /* HAVE_MATH_H */
+
 #include "cbpm-index.h"
 #include "cbpm-periodopts.h"
+
+#include "common.h"
 
 unsigned char *audio;
 unsigned long audiosize;
@@ -73,7 +96,7 @@ int main(int argc, char *argv[])
 {
    FILE * raw;
    char * tmp,d[500];
-   int optct, res1, res2;
+   int optct, res2;
    signed short buffer[bufsiz];
    long count,pos,i,redux,startpercent=0,stoppercent=100;
    index_init();
@@ -99,6 +122,7 @@ int main(int argc, char *argv[])
      {
 	index_readfrom=strdup(basename(index_file));
 	tmp=strstr(index_readfrom,".mp3");
+	if (!tmp) tmp=strstr(index_readfrom,".MP3");
 	strcpy(tmp,".idx");
      }
    // de bpmcount_from en bpm_count_to fields moeten 
@@ -119,7 +143,6 @@ int main(int argc, char *argv[])
 	     exit(100);
 	  }
      }
-   printf("%d\n",res1);
    // the filename of the file to read is the basename 
    // suffixed with .raw
    sprintf(d,"%s.raw",basename(index_file));

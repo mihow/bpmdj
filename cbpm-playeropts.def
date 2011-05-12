@@ -10,9 +10,9 @@ flag = {
 };
 
 flag = {
-  name = verbose;
-  descrip = "Verbose";
-  value = v;
+  name = quiet;
+  descrip = "Be quiet";
+  value = q;
 };
 
 flag = {

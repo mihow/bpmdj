@@ -29,6 +29,7 @@ extern           int      index_period;
 extern           char   * index_tempo;
 extern           char   * index_file;
 extern           char   * index_remark;
+extern           char   * index_tags;
 extern           int      index_changed;
 extern           int      index_bpmcount_from;
 extern           int      index_bpmcount_to;
@@ -42,3 +43,5 @@ extern unsigned long      index_cue_v;
        void     index_write      ();
        void     index_read       (char*);
        void     index_addcomment (char*);
+       void     index_free       ();
+

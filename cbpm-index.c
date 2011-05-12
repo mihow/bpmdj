@@ -21,16 +21,49 @@
 /*-------------------------------------------
  *         Headers
  *-------------------------------------------*/
+#include "config.h"
+
+#ifdef HAVE_STDLIB_H
 #include <stdlib.h>
+#endif /* HAVE_STDLIB_H */
+
+#ifdef HAVE_STRING_H
 #include <string.h>
+#endif /* HAVE_STRING_H */
+
+#ifdef HAVE_STDIO_H
 #include <stdio.h>
+#endif /* HAVE_STDIO_H */
+
+#ifdef HAVE_TERMIOS_H
 #include <termios.h>
+#endif /* HAVE_TERMIOS_H */
+
+#ifdef HAVE_FCNTL_H
 #include <fcntl.h>
+#endif /* HAVE_FCNTL_H */
+
+#ifdef HAVE_LIBGEN_H
 #include <libgen.h>
+#endif /* HAVE_LIBGEN_H */
+
+#ifdef HAVE_LINUX_SOUNDCARD_H
 #include <linux/soundcard.h>
+#endif /* HAVE_LINUX_SOUNDCARD_H */
+
+#ifdef HAVE_SIGNAL_H
 #include <signal.h>
+#endif /* HAVE_SIGNAL_H */
+
+#ifdef HAVE_TIME_H
 #include <time.h>
+#endif /* HAVE_TIME_H */
+
+#ifdef HAVE_ASSERT_H
 #include <assert.h>
+#endif /* HAVE_ASSERT_H */
+
+#include "common.h"
 
 /*-------------------------------------------
  *         Index fields
@@ -43,9 +76,10 @@ char   * index_version;
 char   * index_tempo;
 char   * index_file;
 char   * index_remark;
-int      index_changed;
-int      index_bpmcount_from;
-int      index_bpmcount_to;
+char   * index_tags;
+ int     index_changed;
+ int     index_bpmcount_from;
+ int     index_bpmcount_to;
 unsigned long index_cue;
 unsigned long index_cue_z;
 unsigned long index_cue_x;
@@ -60,8 +94,9 @@ void index_init()
    index_version=NULL;
    index_comments=calloc(maxcomments,sizeof(char*));
    index_nextcomment=0;
-   index_period=0;
+   index_period=-1;
    index_file=0;
+   index_tags=NULL;
    index_tempo=0;
    index_remark=0;
    index_changed=0;
@@ -71,6 +106,21 @@ void index_init()
    index_cue_x=0;
    index_cue_c=0;
    index_cue_v=0;
+}
+
+void index_free()
+{
+   int i;
+   if (index_readfrom) free(index_readfrom);
+   index_readfrom=NULL;
+   if (index_version) free(index_version);
+   if (index_remark) free(index_remark);
+   if (index_file) free(index_file);
+   if (index_tempo) free(index_tempo);
+   if (index_tags) free(index_tags);
+   for(i=0;i<index_nextcomment;i++)
+     if (index_comments[i]) free(index_comments[i]);
+   if (index_comments) free(index_comments);
 }
 
 void index_write()
@@ -92,6 +142,7 @@ void index_write()
    fprintf(f,"file     : %s\n",index_file);
    fprintf(f,"period   : %d\n",index_period);
    fprintf(f,"tempo    : %s\n",index_tempo);
+   if (index_tags) fprintf(f,"tag      : %s\n",index_tags);
    if (index_cue>0) fprintf(f,"cue      : %ld\n",index_cue);
    if (index_cue_z>0) fprintf(f,"cue-z    : %ld\n",index_cue_z);
    if (index_cue_x>0) fprintf(f,"cue-x    : %ld\n",index_cue_x);
@@ -104,20 +155,24 @@ void index_write()
    fclose(f);
 }
 
+char* strip_begin(char*tostrip)
+{
+   while(*tostrip && (*tostrip==' ' || *tostrip=='\t' || *tostrip=='\n')) tostrip++;
+   return tostrip;
+}
+
+char* strip_end(char*tostrip,char*theend)
+{
+   int c;
+   while(theend>=tostrip && (c=*theend) && (c==' ' || c=='\t' || c=='\n')) theend--;
+   *(theend+1)=0;
+   return tostrip;
+}
+
 char* strip(char*tostrip)
 {
-   char *theend;
-   // strip beginning
-   while(*tostrip && (*tostrip==' ' || *tostrip=='\t' || *tostrip=='\n')) tostrip++;
-   // find ending
-   theend=tostrip;
-   while(*theend) theend++;
-   theend--;
-   // strip end
-   while(*theend && (*theend==' ' || *theend=='\t' || *theend=='\n')) theend--;
-   *(theend+1)=0;
-   // return stripped
-   return tostrip;
+   tostrip=strip_begin(tostrip);
+   return strip_end(tostrip,tostrip+strlen(tostrip)-1);
 }
 
 void index_addcomment(char* line)
@@ -141,7 +196,7 @@ void index_read(char* indexn)
    int read;
    // open file
    FILE* index;
-   index_readfrom=indexn;
+   index_readfrom=strdup(indexn);
    index=fopen(index_readfrom,"rb");
    if (!index) 
      {
@@ -156,7 +211,9 @@ void index_read(char* indexn)
 	char *field, *c=strip(line), *value;
 	if (*c=='#') 
 	  {  // ignore and store comments
-	     index_addcomment(line);	     
+	     index_addcomment(line);
+	     free(line);
+	     line=NULL;
 	     continue;  
 	  }
 	while(*c!=':' && *c!=0) c++;
@@ -164,11 +221,13 @@ void index_read(char* indexn)
 	  {
 	     // ignore non-field lines
 	     index_addcomment(line);
+	     free(line);
+	     line=NULL;
 	     continue;
 	  }
 	*c=0;
-	field=strip(line);
-	value=strip(c+1);
+	field=strip_end(line,c-1);
+	value=strip_begin(c+1);
 	if (strcasecmp(field,"version")==0) index_version=strdup(value);
 	else if(strcasecmp(field,"period")==0) index_period=atoi(value);
 	else if(strcasecmp(field,"file")==0) index_file=strdup(value);
@@ -181,12 +240,25 @@ void index_read(char* indexn)
 	else if(strcasecmp(field,"cue-x")==0) index_cue_x=atol(value);
 	else if(strcasecmp(field,"cue-c")==0) index_cue_c=atol(value);
 	else if(strcasecmp(field,"cue-v")==0) index_cue_v=atol(value);
+	else if(strcasecmp(field,"tag")==0) 
+	  {
+	     if (!index_tags) index_tags=strdup(value);
+	     else 
+	       {
+		  char tmp[1000];
+		  sprintf(tmp,"%s %s",index_tags,value);
+		  free(index_tags);
+		  index_tags=strdup(tmp);
+	       }
+	  }
 	else 
 	  {
 	     printf("Warning: Unknown field %s\n",field);
 	     index_addcomment(line);
 	     continue;
 	  }
+	free(line);
+	line=NULL;
      }
    if (line) 
      free(line);
@@ -225,16 +297,23 @@ void index_read(char* indexn)
 	index_changed=1;
 	index_version=strdup(version);
      }
-   if (!index_period)
+   if (index_period==-1)
      {
 	printf("Error: no valid period given\n");
 	exit(40);
      }
-   if (!index_tempo)
+   // update tempo
      {
 	char tempo[500];
-	sprintf(tempo,"%g",4.0*(double)11025*60.0/(double)index_period);
-	index_tempo=strdup(tempo);
-	index_changed=1;
+	double T=4.0*(double)11025*60.0/(double)index_period;
+	if (T>=100.0)
+	  sprintf(tempo,"%g",T);
+	else 
+	  sprintf(tempo,"0%g",T);
+	if (!index_tempo || strcmp(index_tempo,tempo)!=0)
+	  {
+	     index_tempo=strdup(tempo);
+	     index_changed=1;
+	  }
      }
 }

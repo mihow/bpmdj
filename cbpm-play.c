@@ -21,39 +21,76 @@
 /*-------------------------------------------
  *         Headers
  *-------------------------------------------*/
+#include "config.h"
+
+#ifdef HAVE_STDLIB_H
 #include <stdlib.h>
+#endif /* HAVE_STDLIB_H */
+
+#ifdef HAVE_STRING_H
 #include <string.h>
+#endif /* HAVE_STRING_H */
+
+#ifdef HAVE_STDIO_H
 #include <stdio.h>
+#endif /* HAVE_STDIO_H */
+
+#ifdef HAVE_TERMIOS_H
 #include <termios.h>
+#endif /* HAVE_TERMIOS_H */
+
+#ifdef HAVE_FCNTL_H
 #include <fcntl.h>
+#endif /* HAVE_FCNTL_H */
+
+#ifdef HAVE_LIBGEN_H
 #include <libgen.h>
+#endif /* HAVE_LIBGEN_H */
+
+#ifdef HAVE_LINUX_SOUNDCARD_H
 #include <linux/soundcard.h>
+#endif /* HAVE_LINUX_SOUNDCARD_H */
+
+#ifdef HAVE_SIGNAL_H
 #include <signal.h>
+#endif /* HAVE_SIGNAL_H */
+
+#ifdef HAVE_TIME_H
 #include <time.h>
+#endif /* HAVE_TIME_H */
+
+#ifdef HAVE_ASSERT_H
 #include <assert.h>
+#endif /* HAVE_ASSERT_H */
+
+#ifdef HAVE_MATH_H
 #include <math.h>
+#endif /* HAVE_MATH_H */
+
 #include "cbpm-index.h"
 #include "cbpm-playeropts.h"
+
+#include "common.h"
 
 /*-------------------------------------------
  *         Constants & Variables
  *-------------------------------------------*/
-#define            WAVRATE  (22050)
-#define            wave_bufsize (32*1024)
-  signed long long targetperiod;
-  signed long long currentperiod;
-  signed long long normalperiod;
-  signed long long latency;
-  signed long long y,x=0;
-               int stop=0;
-               int paused=0;
+#define  WAVRATE  (22050)
+#define  wave_bufsize (32*1024)
+  signed8 targetperiod;
+  signed8 currentperiod;
+  signed8 normalperiod;
+  signed8 latency;
+  signed8 y,x=0;
+     int stop=0;
+     int paused=0;
 
-unsigned long long x_normalise(unsigned long long y)
+unsigned8 x_normalise(unsigned8 y)
 {
    return y*normalperiod/currentperiod;
 }
 
-unsigned long long y_normalise(unsigned long long x)
+unsigned8 y_normalise(unsigned8 x)
 {
    return x*currentperiod/normalperiod;
 }
@@ -67,10 +104,10 @@ void clock_start()
    starttick=times(NULL);
 }
 
-signed long long clock_ticks()
+signed8 clock_ticks()
 {
-   long long ticks=(long long)times(NULL)-(long long)starttick;
-   long long answer=ticks*(long long)WAVRATE/(long long)CLK_TCK;
+   signed8 ticks=(signed8)times(NULL)-(signed8)starttick;
+   signed8 answer=ticks*(signed8)WAVRATE/(signed8)CLK_TCK;
    assert(answer>=0);
    return answer;
 }
@@ -78,15 +115,15 @@ signed long long clock_ticks()
 /*-------------------------------------------
  *         Dsp operations
  *-------------------------------------------*/ 
-static              int dsp;
-static signed long long dsp_writecount=0;
+static    int dsp;
+static signed8 dsp_writecount=0;
 
 void dsp_start()
 {
    dsp_writecount=0;
 }
 
-signed long long dsp_playcount()
+signed8 dsp_playcount()
 {
    count_info cnt;
    ioctl(dsp,SNDCTL_DSP_GETOPTR,&cnt);
@@ -100,13 +137,13 @@ void dsp_pause()
    dsp_writecount=0;
 }
 
-void dsp_write(unsigned long *value)
+void dsp_write(unsigned4 *value)
 {
    dsp_writecount++;
    write(dsp,value,4);
 }
 
-signed long long dsp_latency()
+signed8 dsp_latency()
 { 
    return dsp_writecount-dsp_playcount();
 }
@@ -157,14 +194,14 @@ void dsp_close()
 /*-------------------------------------------
  *         File input oprations
  *-------------------------------------------*/
-         char * wave_name=NULL;
-unsigned long   wave_buffer[wave_bufsize];
-         FILE * wave_file;
-unsigned long   wave_bufferpos=-wave_bufsize;
+char * wave_name=NULL;
+unsigned4 wave_buffer[wave_bufsize];
+FILE * wave_file;
+unsigned4 wave_bufferpos=-wave_bufsize;
 
-static unsigned long fsize(FILE* wtf)
+static unsigned4 fsize(FILE* wtf)
 {
-   unsigned long res;
+   unsigned4 res;
    fseek(wtf,0,SEEK_END);
    res=ftell(wtf);
    fseek(wtf,0,SEEK_SET);
@@ -203,12 +240,12 @@ void wave_close()
    remove(wave_name);
 }
 
-unsigned long wave_max()
+unsigned4 wave_max()
 {
    return fsize(wave_file)/4;
 }
 
-int wave_read(unsigned long pos, unsigned long *val)
+int wave_read(unsigned4 pos, unsigned4 *val)
 {
    if (pos-wave_bufferpos>=wave_bufsize)
      {
@@ -225,14 +262,14 @@ int wave_read(unsigned long pos, unsigned long *val)
 /*-------------------------------------------
  *         Synth operations
  *-------------------------------------------*/
-        unsigned long long  lfo_phase=0;
-          signed long long  lfo_period=0;
-typedef unsigned long       (*_lfo_)(unsigned long x);
-                     _lfo_  lfo_do;
+typedef unsigned4 (*_lfo_)(unsigned4 x);
+        unsigned8   lfo_phase=0;
+        signed8   lfo_period=0;
+         _lfo_   lfo_do;
 
-void jumpto(signed long long int, int);
+void jumpto(signed8, int);
 
-void lfo_set(char* name, _lfo_ l, unsigned long long freq, unsigned long long phase)
+void lfo_set(char* name, _lfo_ l, unsigned8 freq, unsigned8 phase)
 {
    /* if paused, unpause and choose own phase */
    lfo_period=4*currentperiod/freq;
@@ -251,14 +288,14 @@ void lfo_set(char* name, _lfo_ l, unsigned long long freq, unsigned long long ph
      }
 }
 
-unsigned long lfo_no(unsigned long x)
+unsigned4 lfo_no(unsigned4 x)
 {
    return x;
 }
 
 typedef union
 {
-   unsigned long int value;
+   unsigned4 value;
    struct 
      {
 	signed short int left;
@@ -266,11 +303,11 @@ typedef union
      } leftright;
 } longtrick;
 
-unsigned long lfo_volume(unsigned long x, signed long multiplierleft, signed long divisorleft, signed long multiplierright,signed long divisorright)
+unsigned4 lfo_volume(unsigned4 x, signed4 multiplierleft, signed4 divisorleft, signed4 multiplierright,signed4 divisorright)
 {
    longtrick lt;
-   signed long int left;
-   signed long int right;
+   signed4 left;
+   signed4 right;
    lt.value=x;
    left=lt.leftright.left;
    right=lt.leftright.right;
@@ -283,14 +320,14 @@ unsigned long lfo_volume(unsigned long x, signed long multiplierleft, signed lon
    return lt.value;
 }
 
-unsigned long lfo_metronome(unsigned long x)
+unsigned4 lfo_metronome(unsigned4 x)
 {
    double val;
-   signed long long diff;
+   signed8 diff;
    longtrick lt;
-   signed long int left;
-   signed long int right;
-   diff=(signed long long)y-(signed long long)lfo_phase;
+   signed4 left;
+   signed4 right;
+   diff=(signed8)y-(signed8)lfo_phase;
    diff=diff%lfo_period;
    /* say ping */
    val=sin(6.28*diff*(double)(WAVRATE)/440.0)*4096.0*(1.0-(double)diff/(double)lfo_period);
@@ -302,15 +339,15 @@ unsigned long lfo_metronome(unsigned long x)
 }
 
 
-unsigned long lfo_difference(unsigned long x)
+unsigned4 lfo_difference(unsigned4 x)
 {
    static signed short prevl;
    static signed short prevr;
    double val;
-   signed long long diff;
+   signed8 diff;
    longtrick lt;
-   signed long int left;
-   signed long int right;
+   signed4 left;
+   signed4 right;
    lt.value=x;
    left=lt.leftright.left-prevl;
    right=lt.leftright.right-prevr;
@@ -322,11 +359,11 @@ unsigned long lfo_difference(unsigned long x)
 }
 
 
-unsigned long lfo_pan(unsigned long x)
+unsigned4 lfo_pan(unsigned4 x)
 {
-   signed long long diff;
-   signed long quart;
-   diff=(signed long long)y-(signed long long)lfo_phase;
+   signed8 diff;
+   signed4 quart;
+   diff=(signed8)y-(signed8)lfo_phase;
    diff=diff%lfo_period;
    quart=lfo_period/4;
    /* at position 0, centre */
@@ -345,18 +382,18 @@ unsigned long lfo_pan(unsigned long x)
    return lfo_volume(x,1,1,diff,quart);
 }
 
-unsigned long lfo_saw(unsigned long x)
+unsigned4 lfo_saw(unsigned4 x)
 {
-   signed long long diff;
-   diff=(signed long long)y-(signed long long)lfo_phase;
+   signed8 diff;
+   diff=(signed8)y-(signed8)lfo_phase;
    diff=diff%lfo_period;
    return lfo_volume(x,diff,lfo_period,diff,lfo_period);
 }
 
-unsigned long lfo_break(unsigned long x)
+unsigned4 lfo_break(unsigned4 x)
 {
-   signed long long diff;
-   diff=(signed long long)y-(signed long long)lfo_phase;
+   signed8 diff;
+   diff=(signed8)y-(signed8)lfo_phase;
    diff=diff%lfo_period;
    if (diff>lfo_period*95/100) 
      return 0;
@@ -364,10 +401,10 @@ unsigned long lfo_break(unsigned long x)
      return x;
 }
 
-unsigned long lfo_revsaw(unsigned long x)
+unsigned4 lfo_revsaw(unsigned4 x)
 {
-   signed long long diff;
-   diff=(signed long long)y-(signed long long)lfo_phase;
+   signed8 diff;
+   diff=(signed8)y-(signed8)lfo_phase;
    diff=diff%lfo_period;
    diff=lfo_period-diff;
    return lfo_volume(x,diff,lfo_period,diff,lfo_period);
@@ -385,7 +422,7 @@ void lfo_init()
  * real (non-stretched) song
  */
 
-typedef unsigned long long cue_info;
+typedef unsigned8 cue_info;
 static cue_info cue_before = 0;
 static cue_info cue = 0;
 static cue_info cues[4] = {0,0,0,0};
@@ -396,7 +433,7 @@ void cue_set()
    printf("Setting cue\n");
 }
 
-void cue_shift(char* txt, signed long long whence)
+void cue_shift(char* txt, signed8 whence)
 {
    printf("%s\n",txt);
    cue+=whence;
@@ -424,25 +461,25 @@ void cue_write()
 	index_changed=1;
 	printf("Index has been changed\n");
      }
-   if (index_cue_z!=(unsigned long)cues[0])
+   if (index_cue_z!=(unsigned4)cues[0])
      {
 	printf("Z cue has been changed\n");
 	index_changed=1;
 	index_cue_z=cues[0];
      }
-   if (index_cue_x!=(unsigned long)cues[1])
+   if (index_cue_x!=(unsigned4)cues[1])
      {
 	printf("X cue has been changed\n");
 	index_changed=1;
 	index_cue_x=cues[1];
      }
-   if (index_cue_c!=(unsigned long)cues[2])
+   if (index_cue_c!=(unsigned4)cues[2])
      {
 	printf("C cue has been changed\n");
 	index_changed=1;
 	index_cue_c=cues[2];
      }
-   if (index_cue_v!=(unsigned long)cues[3])
+   if (index_cue_v!=(unsigned4)cues[3])
      {
 	printf("V cue has been changed\n");
 	index_changed=1;
@@ -457,7 +494,7 @@ void cue_read()
    cues[1]=index_cue_x;
    cues[2]=index_cue_c;
    cues[3]=index_cue_v;
-   if (HAVE_OPT(VERBOSE))
+   if (!HAVE_OPT(QUIET))
      {
 	printf("Available cue's: ");
 	if (cues[0]) printf("Z ");
@@ -474,27 +511,35 @@ void cue_read()
  *-------------------------------------------*/
 void help();
 
-void changetempo(signed long long period)
+void changetempo(signed8 period)
 {
    /* change tempo to period
     * - the current x should remain the same
     * x = y * normalperiod / currentperiod
     * y = x * currentperiod / normalperiod
     */
+   int change=(long)(currentperiod*1000/period)-(long)1000;
+   if (period>currentperiod)
+     printf("slow down (%d)\n",change);
+   else 
+     printf("speed up (%d)\n",change);
+   
+   
    currentperiod = period;
    y = x * currentperiod / normalperiod;
+   
 }
 
 void printpos(char* text)
 {
-   unsigned long m=wave_max();
+   unsigned4 m=wave_max();
    printf("%s: %d % (%d/%d)\n",text,
 	  (long)(x_normalise(y)*100/m),
 	  (long)x_normalise(y)/1024,
 	  (long)m/1024);
 }
 
-void jumpto(signed long long mes, int txt)
+void jumpto(signed8 mes, int txt)
 {
    if (paused)
      {
@@ -511,9 +556,9 @@ void jumpto(signed long long mes, int txt)
 	// - if we subtract what should be playing with what is playing, we have a difference
 	// - we can fixed this difference to fit a measure
 	// - this fixed difference is added to gotopos.
-	signed long long gotopos=y_normalise(cue)-currentperiod*mes;
-	signed long long difference=gotopos-y+dsp_latency();
-	signed long long fixeddiff=(difference/currentperiod)*currentperiod;
+	signed8 gotopos=y_normalise(cue)-currentperiod*mes;
+	signed8 difference=gotopos-y+dsp_latency();
+	signed8 fixeddiff=(difference/currentperiod)*currentperiod;
 	y+=fixeddiff;
 	if (txt) printf("S");
      }
@@ -528,8 +573,8 @@ void jumpto(signed long long mes, int txt)
 
 void useraction(int neglect)
 {
-   static unsigned long      time_mark=0;        // the clock time mark
-   static   signed long long tempo_fade=0;       // 0 = targetperiod; 10 = normalperiod
+   static unsigned4      time_mark=0;        // the clock time mark
+   static   signed8 tempo_fade=0;       // 0 = targetperiod; 10 = normalperiod
    int c=0,nr=read(0,&c,1);
    switch (c)
      {
@@ -554,15 +599,20 @@ void useraction(int neglect)
       case 'b' :  lfo_set("Break",lfo_break,1,y-dsp_latency());  break;
       case 'r' :  lfo_set("Reverse saw",lfo_revsaw,8,y-dsp_latency());  break;
       case 'R' :  lfo_set("Reverse saw",lfo_revsaw,16,y-dsp_latency());  break;
+      case 'D' :  lfo_set("Differentiator",lfo_difference,16,0); break;
+	/* placing cues */
       case 'm' :  lfo_set("Metronome",lfo_metronome,16,y-dsp_latency()); break;
-      case 'd' :  lfo_set("Differentiator",lfo_difference,16,0); break;
+      case 'd' :  index_period*=2; index_changed=1; 
+	          printf("Doubled the current period\n"); break;
+      case 'u' :  index_period/=2; index_changed=1;
+	          printf("Halved the current period\n"); break;
         /* tempo changes */
       case '>' :
       case '0' :  if (tempo_fade<10) tempo_fade=tempo_fade+1;
-	          printf("Tempo fade %d\n",tempo_fade);
+	          printf("Tempo fade %d ",tempo_fade);
   	          changetempo(targetperiod+(normalperiod - targetperiod)*tempo_fade/10); break;
       case '<' :  if (tempo_fade>0) tempo_fade=tempo_fade-1;
- 	          printf("Tempo fade %d\n",tempo_fade);
+ 	          printf("Tempo fade %d ",tempo_fade);
 	          changetempo(targetperiod+(normalperiod - targetperiod)*tempo_fade/10); break;
       case '.' :  changetempo(normalperiod);  printf("Tempo normal\n");  break;
       case ',' :  changetempo(targetperiod);  printf("Tempo target\n");  break;
@@ -601,7 +651,7 @@ void useraction(int neglect)
 		       time_mark=time(NULL);
 		    }
        	          break;
-      case '{' :  cue_shift("Shifting cue 8 measure backward",8*normalperiod); break;
+      case '{' :  cue_shift("Shifting cue 8 measure backward",-8*normalperiod); break;
       case '}' :  cue_shift("Shifting cue 8 measure forward",8*normalperiod); break;
       case '(' :  cue_shift("Shifting cue 1/32 note backward",-normalperiod/128); break;
       case ')' :  cue_shift("Shifting cue 1/32 note forward",+normalperiod/128); break;
@@ -622,9 +672,9 @@ void useraction(int neglect)
 
 void read_write_loop()
 {
-   signed   long long selfplaycount=-latency;
-   signed   long long latencycheck;
-   unsigned long      value[1];
+   signed8   selfplaycount=-latency;
+   signed8   latencycheck;
+   unsigned4 value[1];
    lfo_init();
    dsp_start();
    clock_start();
@@ -657,7 +707,7 @@ void read_write_loop()
      {
 	latencycheck=dsp_playcount();
 	dsp_flush();
-	printf("Actual playing latency = %d ms\n",(long)((clock_ticks()-latencycheck)*(long long)1000/(long long)WAVRATE));
+	printf("Actual playing latency = %d ms\n",(long)((clock_ticks()-latencycheck)*(signed8)1000/(signed8)WAVRATE));
      }
 }
 
@@ -665,6 +715,7 @@ void read_write_loop()
  *         Terminal routines  
  *-------------------------------------------*/
 void (*oldio)(int);
+void (*oldhup)(int);
 void (*oldurg)(int);
 
 void terminal_blurb(int Reset)
@@ -680,6 +731,11 @@ void terminal_blurb(int Reset)
    else (void) tcsetattr (0, TCSANOW, &old);
 }
 
+void stopsignal(int n)
+{
+   stop=1;
+}
+
 void terminal_start()
 {
    long i;
@@ -689,6 +745,7 @@ void terminal_start()
    fcntl(0,F_SETOWN,i);
    oldio=signal(SIGIO, useraction);
    oldurg=signal(SIGURG, useraction);
+   oldhup=signal(SIGHUP, stopsignal);
 }
 
 void terminal_stop()
@@ -696,6 +753,7 @@ void terminal_stop()
    terminal_blurb(1);
    signal(SIGIO, oldio);
    signal(SIGURG, oldurg);
+   signal(SIGHUP, oldhup);
 }
 
 /*-------------------------------------------
@@ -758,10 +816,10 @@ int main(int argc, char *argv[])
 {
    int optct;
    copyright();
-   assert(sizeof(signed short int)==2);
+   assert(sizeof(signed2)==2);
    assert(sizeof(int)==4);
-   assert(sizeof(long)==4);
-   assert(sizeof(long long)==8);
+   assert(sizeof(signed4)==4);
+   assert(sizeof(signed8)==8);
    // Parsing the arguments
    optct=optionProcess(&cbpmplayerOptions,argc,argv);
    if (argc-optct!=1) USAGE(EXIT_FAILURE);
@@ -769,6 +827,7 @@ int main(int argc, char *argv[])
      {
 	index_read(OPT_ARG(MATCH));
 	targetperiod=index_period*4;
+	index_free();
      }
    if (strstr(argv[optct],".mp3"))
      if (strcmp(strstr(argv[optct],".mp3"),".mp3")==0)
@@ -789,7 +848,7 @@ int main(int argc, char *argv[])
 	normalperiod/=2;
 	targetperiod/=2;
      }
-   if (HAVE_OPT(VERBOSE))
+   if (!HAVE_OPT(QUIET))
      {
 	double normaltempo;
 	double targettempo;
@@ -810,8 +869,9 @@ int main(int argc, char *argv[])
    terminal_stop();
    if (index_changed)
      {
-	if (HAVE_OPT(VERBOSE))
+	if (!HAVE_OPT(QUIET))
 	  printf("Updating index file\n");
 	index_write();
      }
+   index_free();
 }
