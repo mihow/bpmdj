@@ -21,7 +21,7 @@
 using namespace std;
 #line 1 "midi-bindings.c++"
 #ifdef MIDI
-
+#include <cstdio>
 #include "midi-bindings.h"
 #include "bpmplay.h"
 #include <alsa/asoundlib.h>

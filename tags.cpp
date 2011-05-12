@@ -20,6 +20,7 @@
 #define __loaded__tags_cpp__
 using namespace std;
 #line 1 "tags.c++"
+#include <cstdio>
 #include <assert.h>
 #include "constants.h"
 #include "tags.h"

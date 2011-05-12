@@ -41,6 +41,7 @@ using namespace std;
  * WVB - added better error handling...
  */
 
+#include <cstdio>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>

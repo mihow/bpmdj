@@ -20,6 +20,7 @@
 #define __loaded__bpm_analyzer_h__
 using namespace std;
 #line 1 "bpm-analyzer.h++"
+#include <cstdio>
 #include <qstring.h>
 #include "bpmplay.h"
 #include "analyzer.h"

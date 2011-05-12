@@ -20,6 +20,7 @@
 #define __loaded__capacity_cpp__
 using namespace std;
 #line 1 "capacity.c++"
+#include <cstdio>
 #include <qcheckbox.h>
 #include <qstring.h>
 #include "capacity-widget.h"

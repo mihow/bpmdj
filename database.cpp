@@ -22,6 +22,7 @@ using namespace std;
 #line 1 "database.c++"
 #include <qtreewidget.h>
 #include <qlabel.h>
+#include <cstdio>
 #include "history.h"
 #include "database.h"
 #include "song-metric.h"

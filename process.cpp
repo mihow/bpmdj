@@ -20,6 +20,7 @@
 #define __loaded__process_cpp__
 using namespace std;
 #line 1 "process.c++"
+#include <cstdio>
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>

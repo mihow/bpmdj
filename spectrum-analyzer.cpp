@@ -20,6 +20,7 @@
 #define __loaded__spectrum_analyzer_cpp__
 using namespace std;
 #line 1 "spectrum-analyzer.c++"
+#include <cstdio>
 #include <qapplication.h>
 #include <qlineedit.h>
 #include <qpixmap.h>

@@ -20,6 +20,7 @@
 #define __loaded__signals_cpp__
 using namespace std;
 #line 1 "signals.c++"
+#include <cstdio>
 #include <assert.h>
 #include <stdlib.h>
 #include <math.h>

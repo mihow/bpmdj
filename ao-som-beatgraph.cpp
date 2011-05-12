@@ -20,6 +20,7 @@
 #define __loaded__ao_som_beatgraph_cpp__
 using namespace std;
 #line 1 "ao-som-beatgraph.c++"
+#include <cstdio>
 #include "memory.h"
 #include "player-core.h"
 #include "ao-som-beatgraph.h"

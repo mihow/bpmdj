@@ -26,7 +26,7 @@ using namespace std;
 #include <Qt/qlcdnumber.h>
 #include <Qt/qgroupbox.h>
 #include <stdlib.h>
-#include <stdlib.h>
+#include <cstdio>
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>

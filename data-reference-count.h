@@ -22,6 +22,7 @@
 #define __loaded__data_reference_count_h__
 using namespace std;
 #line 1 "data-reference-count.h++"
+#include <cstdio>
 #include <set>
 #include <stdio.h>
 #include <typeinfo>

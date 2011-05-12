@@ -20,6 +20,7 @@
 #define __loaded__player_cpp__
 using namespace std;
 #line 1 "player.c++"
+#include <cstdio>
 #include <Qt/qlcdnumber.h>
 #include <stdio.h>
 #include <unistd.h>

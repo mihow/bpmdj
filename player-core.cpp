@@ -20,6 +20,7 @@
 #define __loaded__player_core_cpp__
 using namespace std;
 #line 1 "player-core.c++"
+#include <cstdio>
 #include <signal.h>
 #include <errno.h>
 #include <stdlib.h>

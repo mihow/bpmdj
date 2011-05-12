@@ -22,6 +22,7 @@ using namespace std;
 #line 1 "capacity-checker.c++"
 #include <Qt/qfile.h>
 #include <Qt/qtextstream.h>
+#include <cstdio>
 #include "capacity-checker.h"
 #include "embedded-files.h"
 #include "common.h"

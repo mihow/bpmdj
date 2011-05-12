@@ -20,7 +20,7 @@
 #define __loaded__bpmclock_cpp__
 using namespace std;
 #line 1 "bpmclock.c++"
-#include "bpmclock.h"
+#include <cstdio>
 #include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
@@ -30,6 +30,7 @@ using namespace std;
 #include <stdlib.h>
 #include <sched.h>
 #include "version.h"
+#include "bpmclock.h"
 #include "info.h"
 
 int main(int argc, char *argv[])

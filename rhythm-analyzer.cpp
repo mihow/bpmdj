@@ -20,6 +20,7 @@
 #define __loaded__rhythm_analyzer_cpp__
 using namespace std;
 #line 1 "rhythm-analyzer.c++"
+#include <cstdio>
 #include <qapplication.h>
 #include <qlineedit.h>
 #include <qpixmap.h>

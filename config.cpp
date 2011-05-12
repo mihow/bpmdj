@@ -30,6 +30,7 @@ using namespace std;
 #include <qpushbutton.h>
 #include <qbuttongroup.h>
 #include <qmessagebox.h>
+#include <cstdio>
 #include "bpmdj-pref.h"
 #include "config.h"
 #include "song.h"

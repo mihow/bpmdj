@@ -22,6 +22,7 @@
 #define __loaded__array_meta_h__
 using namespace std;
 #line 1 "array-meta.h++"
+#include <cstdio>
 #include "array-storage.h"
 #include "coordinates.h"
 

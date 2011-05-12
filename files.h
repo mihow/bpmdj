@@ -20,6 +20,7 @@
 #define __loaded__files_h__
 using namespace std;
 #line 1 "files.h++"
+#include <cstdio>
 #include <stdio.h>
 #include "array.h"
 #include "stereo-sample2.h"

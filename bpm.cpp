@@ -20,6 +20,7 @@
 #define __loaded__bpm_cpp__
 using namespace std;
 #line 1 "bpm.c++"
+#include <cstdio>
 #include <stdio.h>
 #include <stdlib.h>
 #include <fftw3.h>

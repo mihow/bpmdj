@@ -20,6 +20,7 @@
 #define __loaded__md5_analyzer_cpp__
 using namespace std;
 #line 1 "md5-analyzer.c++"
+#include <cstdio>
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>

@@ -20,6 +20,7 @@
 #define __loaded__spectrum_pca_cpp__
 using namespace std;
 #line 1 "spectrum-pca.c++"
+#include <cstdio>
 #include "vector-iterator.h"
 #include "pca.h"
 #include "spectrum-pca.h"

@@ -20,6 +20,7 @@
 #define __loaded__history_cpp__
 using namespace std;
 #line 1 "history.c++"
+#include <cstdio>
 #include <stdio.h>
 #include <string.h>
 #include <fcntl.h>

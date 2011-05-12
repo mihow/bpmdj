@@ -22,6 +22,7 @@
 #define __loaded__coordinates_h__
 using namespace std;
 #line 1 "coordinates.h++"
+#include <cstdio>
 //---------------------------------------------------------------
 //                          Forwards
 //---------------------------------------------------------------

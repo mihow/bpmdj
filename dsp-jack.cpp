@@ -22,6 +22,7 @@ using namespace std;
 #line 1 "dsp-jack.c++"
 #ifdef COMPILE_JACK
 #include <stdlib.h>
+#include <cstdio>
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>

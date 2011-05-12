@@ -20,6 +20,7 @@
 #define __loaded__index_demo_cpp__
 using namespace std;
 #line 1 "index-demo.c++"
+#include <cstdio>
 #include "index.h"
 #include "types.h"
 

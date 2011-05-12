@@ -21,6 +21,7 @@
 using namespace std;
 #line 1 "renamer.c++"
 #include <assert.h>
+#include <cstdio>
 #include <ctype.h>
 #include <qlineedit.h>
 #include <qlistview.h>

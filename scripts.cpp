@@ -20,6 +20,7 @@
 #define __loaded__scripts_cpp__
 using namespace std;
 #line 1 "scripts.c++"
+#include <cstdio>
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>

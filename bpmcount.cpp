@@ -21,7 +21,7 @@
 using namespace std;
 #line 1 "bpmcount.c++"
 #include <stdlib.h>
-#include <stdlib.h>
+#include <cstdio>
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>

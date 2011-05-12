@@ -20,6 +20,7 @@
 #define __loaded__files_cpp__
 using namespace std;
 #line 1 "files.c++"
+#include <cstdio>
 #include <string.h>
 #include <errno.h>
 #include <assert.h>

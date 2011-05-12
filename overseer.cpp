@@ -20,6 +20,7 @@
 #define __loaded__overseer_cpp__
 using namespace std;
 #line 1 "overseer.c++"
+#include <cstdio>
 #include <fcntl.h>
 #include <stdlib.h>
 #include <sys/types.h>

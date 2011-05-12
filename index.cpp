@@ -20,6 +20,7 @@
 #define __loaded__index_cpp__
 using namespace std;
 #line 1 "index.c++"
+#include <cstdio>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>

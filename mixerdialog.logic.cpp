@@ -20,6 +20,7 @@
 #define __loaded__mixerdialog_logic_cpp__
 using namespace std;
 #line 1 "mixerdialog.logic.c++"
+#include <cstdio>
 #include <qlcdnumber.h>
 #include <stdio.h>
 #include <unistd.h>

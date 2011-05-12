@@ -21,6 +21,7 @@
 using namespace std;
 #line 1 "bpmmerge.c++"
 #include <stdlib.h>
+#include <cstdio>
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>

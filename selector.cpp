@@ -20,6 +20,7 @@
 #define __loaded__selector_cpp__
 using namespace std;
 #line 1 "selector.c++"
+#include <cstdio>
 #include <unistd.h>
 #include <qinputdialog.h>
 #include <math.h>

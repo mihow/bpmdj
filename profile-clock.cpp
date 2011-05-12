@@ -20,6 +20,7 @@
 #define __loaded__profile_clock_cpp__
 using namespace std;
 #line 1 "profile-clock.c++"
+#include <cstdio>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/times.h>

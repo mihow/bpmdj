@@ -20,6 +20,7 @@
 #define __loaded__song_information_cpp__
 using namespace std;
 #line 1 "song-information.c++"
+#include <cstdio>
 #include "index.h"
 #include "song-information.h"
 

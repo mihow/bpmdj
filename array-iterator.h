@@ -22,6 +22,7 @@
 #define __loaded__array_iterator_h__
 using namespace std;
 #line 1 "array-iterator.h++"
+#include <cstdio>
 /**
  * @ingroup data
  * @brief backend multidimensional iterator

@@ -20,6 +20,7 @@
 #define __loaded__efence_print_cpp__
 using namespace std;
 #line 1 "efence-print.c++"
+#ifdef EFENCE
 /*
  * Electric Fence - Red-Zone memory allocator.
  * Bruce Perens, 1988, 1993
@@ -57,8 +58,7 @@ using namespace std;
  * functions
  */
 
-#ifdef EFENCE
-
+#include <cstdio>
 #include "efence.h"
 #include <stdlib.h>
 #include <unistd.h>

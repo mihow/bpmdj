@@ -20,6 +20,7 @@
 #define __loaded__beatgraph_analyzer_cpp__
 using namespace std;
 #line 1 "beatgraph-analyzer.c++"
+#include <cstdio>
 #include <Qt/qapplication.h>
 #include <Qt/qlineedit.h>
 #include <Qt/qpixmap.h>

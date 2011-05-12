@@ -20,6 +20,7 @@
 #define __loaded__song_slot_cpp__
 using namespace std;
 #line 1 "song-slot.c++"
+#include <cstdio>
 #include <iostream>
 #include <qlabel.h>
 #include <qsizepolicy.h>

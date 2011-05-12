@@ -20,6 +20,7 @@
 #define __loaded__statistics_cpp__
 using namespace std;
 #line 1 "statistics.c++"
+#include <cstdio>
 #include <assert.h>
 #include <qstring.h>
 #include <stdio.h>

@@ -20,6 +20,7 @@
 #define __loaded__resampler_cpp__
 using namespace std;
 #line 1 "resampler.c++"
+#include <cstdio>
 #include <stdlib.h>
 #include <math.h>
 #include <assert.h>

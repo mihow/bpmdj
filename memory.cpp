@@ -20,6 +20,7 @@
 #define __loaded__memory_cpp__
 using namespace std;
 #line 1 "memory.c++"
+#include <cstdio>
 #include <stdlib.h> // # 1033
 #include <stdio.h>
 #include <assert.h>
