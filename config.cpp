@@ -23,18 +23,17 @@ using namespace std;
 #include <qdatastream.h>
 #include <qspinbox.h>
 #include <qcombobox.h>
-#include <qlistbox.h>
 #include <qcheckbox.h>
 #include <stdlib.h>
 #include <qpushbutton.h>
 #include <qbuttongroup.h>
 #include <qmessagebox.h>
-#include "preferences.logic.h"
+#include "bpmdj-pref.h"
 #include "config.h"
 #include "song.h"
 #include "song-metric.h"
 #include "metric-widget.h"
-#include "kbpm-dj.h"
+#include "bpmdj.h"
 #include "scripts.h"
 #include "magic.h"
 
@@ -53,7 +52,7 @@ bool ConfigState::isOn() const
   return state;
 }
 
-void ConfigState::addTo(QPopupMenu * m)
+void ConfigState::addTo(Q3PopupMenu * m)
 {
   menu = m;
   item = m->insertItem(menu_text,this,SLOT(toggle()));
@@ -110,7 +109,7 @@ init_singleton_var(Config,distance_spectrumweight,float,0.11);
 ConfigState Config::ask_mix(true);
 ConfigState Config::auto_popqueue(false);
 SongProcess Config::players[4];
-init_singleton_var(Config,mixer_command,QString,"");
+//init_singleton_var(Config,mixer_command,QString,"");
 init_singleton_var(Config,color_tempo44,QColor,QColor(0,255,0));
 init_singleton_var(Config,color_tempo54,QColor,QColor(255,0,0));
 init_singleton_var(Config,color_tempo64,QColor,QColor(255,0,0));
@@ -132,10 +131,10 @@ init_singleton_var(Config,color_played_author,QColor,QColor(255,170,0));
 init_singleton_var(Config,color_unavailable,QColor,QColor(127,127,127));
 init_singleton_var(Config,color_dcolor_col,QColor,QColor(255,255,0));
 init_singleton_var(Config,color_cluster_depth,int,3);
-init_singleton_var(Config,taglist,QListView*,NULL);
-init_singleton_var(Config,header,QHeader*,NULL);
-init_singleton_var(Config,bpm_mixer_command,QString,"kbpm-mix --alsa");
-ConfigState Config::open_bpmmixer(false);
+//init_singleton_var(Config,taglist,Q3ListView*,NULL);
+init_singleton_var(Config,header,Q3Header*,NULL);
+//init_singleton_var(Config,bpm_mixer_command,QString,"kbpm-mix --alsa");
+// ConfigState Config::open_bpmmixer(false);
 init_singleton_var(Config,distance_tempoweight,float,0.02);
 init_singleton_var(Config,distance_echoweight,float,0.62);
 init_singleton_var(Config,distance_rythmweight,float,0.26);
@@ -148,13 +147,16 @@ init_singleton_var(Config,anal_bpm_to,float,160);
 init_singleton_var(Config,anal_bpm_technique,int,1);
 init_singleton_var(Config,color_alltime,QColor,QColor(0,0,255));
 ConfigState Config::play_fragments(false);
+init_singleton_var(Config,tag_include,QString,"");
+init_singleton_var(Config,tag_mustbe,QString,"");
+init_singleton_var(Config,tag_exclude,QString,"");
 
 /**
  * we don't open the mixer command because the program its normal 
  * mode of operation should be two soundcards. The mixer is a fix and
  * even almost experimental feature.
  */
-void dump_header(QHeader * h)
+void dump_header(Q3Header * h)
 {
   // export the header;
   int nr = h->count();
@@ -162,14 +164,14 @@ void dump_header(QHeader * h)
     printf("%d -> %d [%d]\t",i,h->mapToSection(i),h->sectionSize(i));
 }
 
-void realize_mapping(QHeader * h, int i, int j, int s)
+void realize_mapping(Q3Header * h, int i, int j, int s)
 {
   h->moveSection(j,i);
   //  dump_header(h);
   h->resizeSection(j,s);
 }
 
-void copy_header(QHeader * in, QHeader * out)
+void copy_header(Q3Header * in, Q3Header * out)
 {
   for(int i = 0 ; i < in->count() ; i ++)
     {
@@ -180,11 +182,11 @@ void copy_header(QHeader * in, QHeader * out)
 
 void Config::save()
 {
-  QFile f(".kbpmdj");
+  QFile f(".bpmdj");
   f.open(IO_WriteOnly);
   if (!f.isOpen() || !f.isWritable())
     {
-      Error(true,"Configuration file \".kbpmdj\" cannot be opened for writing");
+      Error(true,"Configuration file \".bpmdj\" cannot be opened for writing");
       return;
     }
   QDataStream s(&f);
@@ -217,7 +219,7 @@ void Config::save()
   s << get_distance_spectrumweight();
   s << (Q_INT8)limit_authornonplayed;
   s << (Q_INT8)get_shown_aboutbox();
-  s << get_mixer_command();
+  s << QString(""); // get_mixer_command();
   s << (Q_INT8)0; // the obsolte open_mixer flag
   s << (Q_INT8)ask_mix;
   s << (Q_INT8)auto_popqueue;
@@ -245,26 +247,11 @@ void Config::save()
   s << get_color_unavailable();
   s << get_color_dcolor_col();
   s << (Q_UINT16)get_color_cluster_depth();
-  s << get_bpm_mixer_command();
-  s << (Q_INT8)open_bpmmixer;
-  // export the taglist... tricky thing (tm)
-  Q_UINT16 nr = get_taglist()->childCount();
+  s << QString(""); // get_bpm_mixer_command();
+  s << (Q_INT8)0 ; // open_bpmmixer;
+  Q_UINT16 nr = 0;
   s << nr;
-  QListViewItemIterator it(get_taglist());
-  while(it.current())
-    {
-      QListViewItem * i = it.current();
-      s << (i->text(0)); 
-      bool b = i->text(1) == TAG_TRUE;
-      s << (Q_INT8)b;
-      b = i->text(2) == TAG_TRUE;
-      s << (Q_INT8)b;
-      b = i->text(3) == TAG_TRUE;
-      s << (Q_INT8)b;
-      it++;
-    }
-  // export the header;
-  //  dump_header(get_header());
+  // export the header (tricky thing (tm)
   nr = get_header()->count();
   s << nr;
   for(int i = 0 ; i < nr ; i ++)
@@ -292,6 +279,9 @@ void Config::save()
   s << (Q_INT8) color_songs_based_on_history;
   s << get_color_alltime();
   s << (Q_INT8)play_fragments;
+  s << get_tag_include();
+  s << get_tag_mustbe();
+  s << get_tag_exclude();
 }
 
 bool Config::load()
@@ -304,9 +294,9 @@ bool Config::load()
     }
   for(int i = 0 ; i < 4 ; i++)
     players[i].setNameId("player"+QString::number(i),i);
-  set_taglist(new QListView());
-  set_header(new QHeader());
-  if (QFile::exists(".kbpmdj"))
+  Q3ListView * taglist = new Q3ListView();
+  set_header(new Q3Header());
+  if (QFile::exists(".bpmdj"))
     {
       Q_INT8 b;
       Q_UINT16 magic;
@@ -314,228 +304,13 @@ bool Config::load()
       QString str;
       QColor clr;
       float fl;
-      QFile f(".kbpmdj");
+      QFile f(".bpmdj");
       f.open(IO_ReadOnly);
       QDataStream s(&f);
       s >> magic;
-      if ( (magic == MAGIC_1_6)
-	   || (magic == MAGIC_1_7)
-	   || (magic == MAGIC_1_8)
-	   || (magic == MAGIC_1_9)
-	   || (magic == MAGIC_2_1)
-	   || (magic == MAGIC_2_2)
-	   || (magic == MAGIC_2_4)
-	   || (magic == MAGIC_2_5)
-	   || (magic == MAGIC_2_6)
-	   || (magic == MAGIC_2_7)
-	   || (magic == MAGIC_2_8)
-	   || (magic == MAGIC_2_9))
+      if ( magic < MAGIC_3_4 )
 	{
 	  return false;
-	}
-      else if (magic == MAGIC_3_0)
-	{
-	  s >> w; set_file_count (w);
-	  s >> w; set_yellowTime (w);
-	  s >> w; set_orangeTime (w);
-	  s >> w; set_redTime (w);
-	  s >> w; set_filterBpm (w);
-	  s >> b; color_range.state=b;
-	  s >> b; color_played.state=b;
-	  s >> b; color_authorplayed.state=b;
-	  s >> b; color_ondisk.state=b;
-	  s >> b; color_cues.state=b;
-	  s >> b; color_dcolor.state=b;
-	  s >> b; color_spectrum.state=b;
-	  s >> b; set_authorDecay(b);
-	  s >> b; limit_ondisk.state=b;
-	  s >> b; limit_nonplayed.state=b;
-	  s >> b; limit_uprange.state=b;
-	  s >> b; limit_downrange.state=b;
-	  s >> b; limit_indistance.state=b;
-	  for(int i = 0 ; i < 4 ; i ++)
-	    {
-	      s >> w;   players[i].setCommand((SongProcess::command_type)w);
-	      s >> str; players[i].setName(str);
-	      s >> str; players[i].setRemote(str);
-	    }
-	  s >> fl; set_distance_temposcale(fl);
-	  s >> fl; set_distance_spectrumweight(fl);
-	  s >> b; limit_authornonplayed.state=b;
-	  s >> b; set_shown_aboutbox(b);
-	  s >> str; set_mixer_command(str);
-	  s >> b; // open_mixer.set(b);
-	  s >> b; ask_mix.set(b);
-	  s >> b; auto_popqueue.set(b);
-	  s >> str; // set_record_command(str);
-	  s >> str; // set_replay_command(str);
-	  s >> str; // set_record_mixer_command(str);
-	  s >> clr; set_color_tempo44(clr);
-	  s >> clr; set_color_tempo54(clr);
-	  s >> clr; set_color_tempo64(clr);
-	  s >> clr; set_color_tempo74(clr);
-	  s >> clr; set_color_tempo84(clr);
-	  s >> b; set_show_tempo54(b);
-	  s >> b; set_show_tempo64(b);
-	  s >> b; set_show_tempo74(b);
-	  s >> b; set_show_tempo84(b);
-	  s >> b; set_show_unknown_tempo(b);
-	  s >> clr; set_color_green_time(clr);
-	  s >> clr; set_color_yellow_time(clr);
-	  s >> clr; set_color_orange_time(clr);
-	  s >> clr; set_color_red_time(clr);
-	  s >> b; set_color_main_window(b);
-	  s >> b; set_log_spectrum_distance(b);
-	  s >> clr; set_color_played_song(clr);
-	  s >> clr; set_color_played_author(clr);
-	  s >> clr; set_color_unavailable(clr);
-	  s >> clr; set_color_dcolor_col(clr);
-	  s >> w; set_color_cluster_depth (w);
-	  s >> str; set_bpm_mixer_command(str);
-	  s >> b; open_bpmmixer.set(b);
-	  // read tag data
-	  s >> w; 
-	  while(w-->0)
-	    {
-	      QString t;
-	      Q_INT8 i,m,e;
-	      s >> t;
-	      s >> i; 
-	      s >> m; 
-	      s >> e; 
-	      new QListViewItem(get_taglist(), t, i ? TAG_TRUE : TAG_FALSE,
-				m ? TAG_TRUE : TAG_FALSE,
-				e ? TAG_TRUE : TAG_FALSE);
-	    }
-	  // read header
-	  s >> w; 
-	  for(int i = 0 ; i < w ; i++)
-	    get_header()->addLabel("");
-	  for(int i = 0 ; i < w ; i++)
-	    {
-	      Q_UINT16 m1,m2; s >> m1; s >> m2;
-	      realize_mapping(get_header(),i,m1,m2);
-	    }
-	  float F;
-	  s >> F; set_distance_tempoweight(F);
-	  s >> F; set_distance_echoweight(F);
-	  s >> F; set_distance_rythmweight(F);
-	  s >> F; set_distance_compositionweight(F);
-	  s >> w; set_max_songs(w);
-	  s >> clr; set_color_unchecked(clr);
-	  for(int i = 0 ; i < 8 ; i ++)
-	    {
-	      s >> w;   analyzers[i].setCommand((SongProcess::command_type)w);
-	      s >> str; analyzers[i].setName(str);
-	      s >> str; analyzers[i].setRemote(str);
-	    }
-	  s >> fl;  set_anal_bpm_from(fl);
-	  s >> fl;  set_anal_bpm_to(fl);
-	  s >> w;   set_anal_bpm_technique(w);
-	  s >> b;   color_songs_based_on_history.set(b);
-	  s >> clr; set_color_alltime(clr);
-	}
-      else if (magic == MAGIC_3_3)
-	{
-	  s >> w; set_file_count (w);
-	  s >> w; set_yellowTime (w);
-	  s >> w; set_orangeTime (w);
-	  s >> w; set_redTime (w);
-	  s >> w; set_filterBpm (w);
-	  s >> b; color_range.state=b;
-	  s >> b; color_played.state=b;
-	  s >> b; color_authorplayed.state=b;
-	  s >> b; color_ondisk.state=b;
-	  s >> b; color_cues.state=b;
-	  s >> b; color_dcolor.state=b;
-	  s >> b; color_spectrum.state=b;
-	  s >> b; set_authorDecay(b);
-	  s >> b; limit_ondisk.state=b;
-	  s >> b; limit_nonplayed.state=b;
-	  s >> b; limit_uprange.state=b;
-	  s >> b; limit_downrange.state=b;
-	  s >> b; limit_indistance.state=b;
-	  for(int i = 0 ; i < 4 ; i ++)
-	    {
-	      s >> w;   players[i].setCommand((SongProcess::command_type)w);
-	      s >> str; players[i].setName(str);
-	      s >> str; players[i].setRemote(str);
-	    }
-	  s >> fl; set_distance_temposcale(fl);
-	  s >> fl; set_distance_spectrumweight(fl);
-	  s >> b; limit_authornonplayed.state=b;
-	  s >> b; set_shown_aboutbox(b);
-	  s >> str; set_mixer_command(str);
-	  s >> b; // open_mixer.set(b);
-	  s >> b; ask_mix.set(b);
-	  s >> b; auto_popqueue.set(b);
-	  s >> str; // set_record_command(str);
-	  s >> str; // set_replay_command(str);
-	  s >> str; // set_record_mixer_command(str);
-	  s >> clr; set_color_tempo44(clr);
-	  s >> clr; set_color_tempo54(clr);
-	  s >> clr; set_color_tempo64(clr);
-	  s >> clr; set_color_tempo74(clr);
-	  s >> clr; set_color_tempo84(clr);
-	  s >> b; set_show_tempo54(b);
-	  s >> b; set_show_tempo64(b);
-	  s >> b; set_show_tempo74(b);
-	  s >> b; set_show_tempo84(b);
-	  s >> b; set_show_unknown_tempo(b);
-	  s >> clr; set_color_green_time(clr);
-	  s >> clr; set_color_yellow_time(clr);
-	  s >> clr; set_color_orange_time(clr);
-	  s >> clr; set_color_red_time(clr);
-	  s >> b; set_color_main_window(b);
-	  s >> b; set_log_spectrum_distance(b);
-	  s >> clr; set_color_played_song(clr);
-	  s >> clr; set_color_played_author(clr);
-	  s >> clr; set_color_unavailable(clr);
-	  s >> clr; set_color_dcolor_col(clr);
-	  s >> w; set_color_cluster_depth (w);
-	  s >> str; set_bpm_mixer_command(str);
-	  s >> b; open_bpmmixer.set(b);
-	  // read tag data
-	  s >> w; 
-	  while(w-->0)
-	    {
-	      QString t;
-	      Q_INT8 i,m,e;
-	      s >> t;
-	      s >> i; 
-	      s >> m; 
-	      s >> e; 
-	      new QListViewItem(get_taglist(), t, i ? TAG_TRUE : TAG_FALSE,
-				m ? TAG_TRUE : TAG_FALSE,
-				e ? TAG_TRUE : TAG_FALSE);
-	    }
-	  // read header
-	  s >> w; 
-	  for(int i = 0 ; i < w ; i++)
-	    get_header()->addLabel("");
-	  for(int i = 0 ; i < w ; i++)
-	    {
-	      Q_UINT16 m1,m2; s >> m1; s >> m2;
-	      realize_mapping(get_header(),i,m1,m2);
-	    }
-	  float F;
-	  s >> F; set_distance_tempoweight(F);
-	  s >> F; set_distance_echoweight(F);
-	  s >> F; set_distance_rythmweight(F);
-	  s >> F; set_distance_compositionweight(F);
-	  s >> w; set_max_songs(w);
-	  s >> clr; set_color_unchecked(clr);
-	  for(int i = 0 ; i < 8 ; i ++)
-	    {
-	      s >> w;   analyzers[i].setCommand((SongProcess::command_type)w);
-	      s >> str; analyzers[i].setName(str);
-	      s >> str; analyzers[i].setRemote(str);
-	    }
-	  s >> fl;  set_anal_bpm_from(fl);
-	  s >> fl;  set_anal_bpm_to(fl);
-	  s >> w;   set_anal_bpm_technique(w);
-	  s >> b;   color_songs_based_on_history.set(b);
-	  s >> clr; set_color_alltime(clr);
 	}
       else if (magic == MAGIC_3_4)
 	{
@@ -567,7 +342,7 @@ bool Config::load()
 	  s >> fl; set_distance_spectrumweight(fl);
 	  s >> b; limit_authornonplayed.state=b;
 	  s >> b; set_shown_aboutbox(b);
-	  s >> str; set_mixer_command(str);
+	  s >> str; //set_mixer_command(str);
 	  s >> b; // open_mixer.set(b);
 	  s >> b; ask_mix.set(b);
 	  s >> b; auto_popqueue.set(b);
@@ -595,8 +370,8 @@ bool Config::load()
 	  s >> clr; set_color_unavailable(clr);
 	  s >> clr; set_color_dcolor_col(clr);
 	  s >> w; set_color_cluster_depth (w);
-	  s >> str; set_bpm_mixer_command(str);
-	  s >> b; open_bpmmixer.set(b);
+	  s >> str; // set_bpm_mixer_command(str);
+	  s >> b; // open_bpmmixer.set(b);
 	  // read tag data
 	  s >> w; 
 	  while(w-->0)
@@ -607,7 +382,7 @@ bool Config::load()
 	      s >> i; 
 	      s >> m; 
 	      s >> e; 
-	      new QListViewItem(get_taglist(), t, i ? TAG_TRUE : TAG_FALSE,
+	      new Q3ListViewItem(taglist, t, i ? TAG_TRUE : TAG_FALSE,
 				m ? TAG_TRUE : TAG_FALSE,
 				e ? TAG_TRUE : TAG_FALSE);
 	    }
@@ -640,17 +415,151 @@ bool Config::load()
 	  s >> clr; set_color_alltime(clr);
 	  s >> b;   play_fragments.set(b);
 	}
+      else if (magic == MAGIC_3_5)
+	{
+	  s >> w; set_file_count (w);
+	  s >> w; set_yellowTime (w);
+	  s >> w; set_orangeTime (w);
+	  s >> w; set_redTime (w);
+	  s >> w; set_filterBpm (w);
+	  s >> b; color_range.state=b;
+	  s >> b; color_played.state=b;
+	  s >> b; color_authorplayed.state=b;
+	  s >> b; color_ondisk.state=b;
+	  s >> b; color_cues.state=b;
+	  s >> b; color_dcolor.state=b;
+	  s >> b; color_spectrum.state=b;
+	  s >> b; set_authorDecay(b);
+	  s >> b; limit_ondisk.state=b;
+	  s >> b; limit_nonplayed.state=b;
+	  s >> b; limit_uprange.state=b;
+	  s >> b; limit_downrange.state=b;
+	  s >> b; limit_indistance.state=b;
+	  for(int i = 0 ; i < 4 ; i ++)
+	    {
+	      s >> w;   players[i].setCommand((SongProcess::command_type)w);
+	      s >> str; players[i].setName(str);
+	      s >> str; players[i].setRemote(str);
+	    }
+	  s >> fl; set_distance_temposcale(fl);
+	  s >> fl; set_distance_spectrumweight(fl);
+	  s >> b; limit_authornonplayed.state=b;
+	  s >> b; set_shown_aboutbox(b);
+	  s >> str; //set_mixer_command(str);
+	  s >> b; // open_mixer.set(b);
+	  s >> b; ask_mix.set(b);
+	  s >> b; auto_popqueue.set(b);
+	  s >> str; // set_record_command(str);
+	  s >> str; // set_replay_command(str);
+	  s >> str; // set_record_mixer_command(str);
+	  s >> clr; set_color_tempo44(clr);
+	  s >> clr; set_color_tempo54(clr);
+	  s >> clr; set_color_tempo64(clr);
+	  s >> clr; set_color_tempo74(clr);
+	  s >> clr; set_color_tempo84(clr);
+	  s >> b; set_show_tempo54(b);
+	  s >> b; set_show_tempo64(b);
+	  s >> b; set_show_tempo74(b);
+	  s >> b; set_show_tempo84(b);
+	  s >> b; set_show_unknown_tempo(b);
+	  s >> clr; set_color_green_time(clr);
+	  s >> clr; set_color_yellow_time(clr);
+	  s >> clr; set_color_orange_time(clr);
+	  s >> clr; set_color_red_time(clr);
+	  s >> b; set_color_main_window(b);
+	  s >> b; set_log_spectrum_distance(b);
+	  s >> clr; set_color_played_song(clr);
+	  s >> clr; set_color_played_author(clr);
+	  s >> clr; set_color_unavailable(clr);
+	  s >> clr; set_color_dcolor_col(clr);
+	  s >> w; set_color_cluster_depth (w);
+	  s >> str; // set_bpm_mixer_command(str);
+	  s >> b; // open_bpmmixer.set(b);
+	  // read tag data
+	  s >> w; assert (w==0);
+	  /*	  while(w-->0)
+	    {
+	      QString t;
+	      Q_INT8 i,m,e;
+	      s >> t;
+	      s >> i; 
+	      s >> m; 
+	      s >> e; 
+	      new Q3ListViewItem(taglist, t, i ? TAG_TRUE : TAG_FALSE,
+				m ? TAG_TRUE : TAG_FALSE,
+				e ? TAG_TRUE : TAG_FALSE);
+				}
+	  */
+	  // read header
+	  s >> w; 
+	  for(int i = 0 ; i < w ; i++)
+	    get_header()->addLabel("");
+	  for(int i = 0 ; i < w ; i++)
+	    {
+	      Q_UINT16 m1,m2; s >> m1; s >> m2;
+	      realize_mapping(get_header(),i,m1,m2);
+	    }
+	  float F;
+	  s >> F; set_distance_tempoweight(F);
+	  s >> F; set_distance_echoweight(F);
+	  s >> F; set_distance_rythmweight(F);
+	  s >> F; set_distance_compositionweight(F);
+	  s >> w; set_max_songs(w);
+	  s >> clr; set_color_unchecked(clr);
+	  for(int i = 0 ; i < 8 ; i ++)
+	    {
+	      s >> w;   analyzers[i].setCommand((SongProcess::command_type)w);
+	      s >> str; analyzers[i].setName(str);
+	      s >> str; analyzers[i].setRemote(str);
+	    }
+	  s >> fl;  set_anal_bpm_from(fl);
+	  s >> fl;  set_anal_bpm_to(fl);
+	  s >> w;   set_anal_bpm_technique(w);
+	  s >> b;   color_songs_based_on_history.set(b);
+	  s >> clr; set_color_alltime(clr);
+	  s >> b;   play_fragments.set(b);
+	  s >> str; set_tag_include(str);
+	  s >> str; set_tag_mustbe(str);
+	  s >> str; set_tag_exclude(str);
+	}
       else
 	printf("Wrong config file format\n");
       calc_and_cache();
+      if (magic < MAGIC_3_5)
+	taglist2config(taglist);
     }
+  // if the magic was csmaller than 3_5 WE CONVER THTE TAGLIST
   return true;
+}
+
+void taglist2strings(Q3ListView * tagList, QString &in, QString& must, QString&out)
+{
+  Q3ListViewItemIterator t(tagList);
+  while(t.current())
+    {
+      Q3ListViewItem * i = t.current();
+      QString tag = i->text(0);
+      if (i->text(1)==TAG_TRUE) in+=OneSpace+tag+OneSpace;
+      if (i->text(2)==TAG_TRUE) must+=OneSpace+tag+OneSpace;
+      if (i->text(3)==TAG_TRUE) out+=OneSpace+tag+OneSpace;
+      t++;
+    } 
+}
+
+void taglist2config(Q3ListView*taglist)
+{
+  QString in,must,out;
+  in=must=out="";
+  taglist2strings(taglist,in,must,out);
+  Config::set_tag_include(in);
+  Config::set_tag_exclude(out);
+  Config::set_tag_mustbe(must);
 }
 
 bool Config::open_ui(int pane)
 {
   char tmp[50];
-  PreferencesLogic preferences(NULL,NULL,TRUE);
+  BpmDjPreferences preferences(NULL,NULL,TRUE);
 
   sprintf(tmp,"%d",get_yellowTime());
   preferences.yellowTime->setText(tmp);
@@ -666,7 +575,7 @@ bool Config::open_ui(int pane)
   
   preferences.authorDecay  -> setValue ( get_authorDecay() ) ;
   preferences.tempoSpin    -> setValue ( lround(get_distance_temposcale()*100.0) ) ;
-  preferences.mixerCommand -> setText  ( get_mixer_command() ) ;
+  // preferences.mixerCommand -> setText  ( get_mixer_command() ) ;
 
   preferences.colorTempo44 -> setPaletteBackgroundColor( get_color_tempo44 ());
   preferences.colorTempo54 -> setPaletteBackgroundColor( get_color_tempo54 ());
@@ -696,8 +605,8 @@ bool Config::open_ui(int pane)
 
   preferences.clusterDepth -> setValue (get_color_cluster_depth ());
 
-  preferences.bpmmixcmd -> setText( get_bpm_mixer_command () );
-  preferences.subtabs -> setCurrentItem( pane );
+  // preferences.bpmmixcmd -> setText( get_bpm_mixer_command () );
+  preferences.subtabs -> setCurrentIndex( pane );
 
   preferences.From -> setText(get_anal_bpm_from() ? QString::number(get_anal_bpm_from()) : "");
   preferences.To   -> setText(get_anal_bpm_to() ? QString::number(get_anal_bpm_to()): "");
@@ -710,7 +619,7 @@ bool Config::open_ui(int pane)
       set_redTime(atoi(preferences.redTime->text()));
       set_authorDecay ( preferences.authorDecay->value());
       set_distance_temposcale ( (float)(preferences.tempoSpin->value())/100.0);
-      set_mixer_command ( preferences.mixerCommand->text());
+      // set_mixer_command ( preferences.mixerCommand->text());
       
       set_color_tempo44(preferences.colorTempo44->paletteBackgroundColor());
       set_color_tempo54(preferences.colorTempo54->paletteBackgroundColor());
@@ -737,7 +646,7 @@ bool Config::open_ui(int pane)
       set_color_unchecked(preferences.colorUncheckedSong -> paletteBackgroundColor( ));
       set_color_dcolor_col(preferences.colordColorCol -> paletteBackgroundColor( ));
       set_color_cluster_depth(preferences.clusterDepth -> value());
-      set_bpm_mixer_command(preferences.bpmmixcmd -> text());
+      // set_bpm_mixer_command(preferences.bpmmixcmd -> text());
       
       set_distance_tempoweight       ( (float)(preferences.dColorMetric->tempoDistanceSpin->value())/100.0);
       set_distance_spectrumweight    ( (float)(preferences.dColorMetric->spectrumSpin->value())/100.0);

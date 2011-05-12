@@ -56,6 +56,7 @@ public:
   bool sigs_installed;
   void init(BasicProcessManager * l);
   void check();
+  void setup_signals();
   DiedProcesses() : sigs_installed(false) {};
   ~DiedProcesses() {};
 };
@@ -78,33 +79,57 @@ void DiedProcesses::check()
     }
   }
 }
- 
+
+/**
+ * The signaling stuff rmeains a mess. How many times I have to had
+ * to revise this code is unbeieveable. In any case. With Qt4, it seems that
+ * the QtCore support grabs the signal and then calls us thereby 
+ * completely ignoring our info parameter. As such, I throw the 
+ * fucker out, and install it myself by manually initialising it 
+ * after the application is allocated
+ */ 
 void ToSwitchOrNotToSwitchSignal(int sig, siginfo_t *info, void* hu)
 {
   Synchronized(dead_processes);
   int blah;
-  waitpid(info->si_pid,&blah,0);
-  dead_processes.died_pids.insert(info->si_pid);
+  if (!info) 
+    printf("No info available for signal %d\n",sig);
+  else
+    {
+      waitpid(info->si_pid,&blah,0);
+      dead_processes.died_pids.insert(info->si_pid);
+    }
 }
 
 void DiedProcesses::init(BasicProcessManager * l)
 {
-  if (!sigs_installed)
+  if (!listeners)
     {
-      sigs_installed = true;
       listeners = new vector<BasicProcessManager*>();
       listeners->reserve(10);
-      // catch signals
-      struct sigaction *act;
-      act=bpmdj_allocate(1,struct sigaction);
-      act->sa_sigaction=ToSwitchOrNotToSwitchSignal;
-      act->sa_flags=SA_SIGINFO;
-      // sigaction(SIGUSR1,act,NULL);
-      sigaction(SIGCHLD,act,NULL);
-      // ignore sigchlds
-      // signal(SIGCHLD,SIG_IGN);
-    };
+    }
   listeners->push_back(l);
+}
+
+void DiedProcesses::setup_signals()
+{
+  assert(!sigs_installed);
+  sigs_installed = true;
+  // catch signals
+  struct sigaction *act;
+  act=bpmdj_allocate(1,struct sigaction);
+  act->sa_sigaction=ToSwitchOrNotToSwitchSignal;
+  act->sa_flags=SA_SIGINFO;
+  // WVB -- this could be useful | SA_NOCLDWAIT;
+  // sigaction(SIGUSR1,act,NULL);
+  sigaction(SIGCHLD,act,NULL);
+  // ignore sigchlds
+  // signal(SIGCHLD,SIG_IGN);
+}
+
+void setup_signals()
+{
+  dead_processes.setup_signals();
 }
 
 BasicProcessManager::BasicProcessManager(int count)
@@ -145,7 +170,7 @@ void BasicProcessManager::start(int id,const char* command, QString logname, boo
   QString final_command(command);
   if (!logname.isEmpty())
     {
-      QString fulllog = "/tmp/"+logname+".kbpmdj.log";
+      QString fulllog = "/tmp/"+logname+".bpmdj.log";
       final_command+=QString(" >>")+fulllog+" 2>&1";
       FILE * flog = fopen(fulllog,append ? "ab" : "wb");
       assert(flog);

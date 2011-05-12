@@ -30,15 +30,14 @@ using namespace std;
 #include "dsp-none.h"
 #include "dsp-alsa.h"
 #include "dsp-oss.h"
-#include "dsp-mixed.h"
 #include "magic.h"
-#include "songplayer.logic.h"
+#include "player.h"
 #include "capacity.h"
 #include "scripts.h"
 
 PlayerConfig::PlayerConfig()
 {
-  set_meta_name(QString(".kbpm-play"));
+  set_meta_name(QString(".bpmplay"));
   init();
   load();
   save();
@@ -46,7 +45,7 @@ PlayerConfig::PlayerConfig()
 
 PlayerConfig::PlayerConfig(QString configname)
 {
-  set_meta_name(QString(".")+QString(configname)+QString(".kbpm-play"));
+  set_meta_name(QString(".")+QString(configname)+QString(".bpmplay"));
   init();
   load();
 }
@@ -240,6 +239,29 @@ void PlayerConfig::load()
 	s >> w;  set_jack_latency(w);
 	s >> b; set_jack_verbose(b);
      }
+   else if (magic == MAGIC_3_5)
+     {
+	s >> str; set_core_rawpath(str);
+	s >> w; set_player_dsp(w);
+	s >> w; set_alsa_latency(w);
+	s >> b; set_alsa_verbose(b);
+	s >> str; set_alsa_dev(str);
+	s >> str; set_oss_dsp(str);
+	s >> b; set_oss_init_fragments(b);
+	s >> w; set_oss_fragments(w);
+	s >> b; set_oss_verbose(b);
+	s >> b; set_oss_nolatencyaccounting(b);
+	s >> w; set_oss_latency(w);
+	s >> w; set_bpm_channel(w);
+	s >> b; set_player_rms(b);
+	s >> fl; set_player_rms_target(fl);
+	s >> w; set_disabled_capacities(w);
+	s >> w; set_ui_posx(w);
+	s >> w; set_ui_posy(w);
+	s >> str; set_jack_dev(str);
+	s >> w;  set_jack_latency(w);
+	s >> b; set_jack_verbose(b);
+     }
   else
-    Error(true,"Kbpm-play wrong config file format\n");
+    Error(true,"bpmplay wrong config file format\n");
 }

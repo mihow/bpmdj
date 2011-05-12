@@ -30,31 +30,13 @@ struct QStringLesser
   bool operator()(QString *s1, QString *s2) const {return (*s1)<(*s2);};
 };
 
-static set<QString*, QStringLesser> symbol_table;
+static set<QString> symbol_table;
 
-bool Symbol::operator < (const Symbol & other)
+void Symbol::init(const QString& s)
 {
-  return text < other.text;
-}
-
-bool Symbol::operator == (const Symbol & other)
-{
-  return text == other.text;
-}
-
-Symbol::Symbol(QString s)
-{
-  init(s);
-}
-
-void Symbol::init(QString s)
-{
-  set<QString*,QStringLesser>::iterator pos = symbol_table.find(&s);
+  set<QString>::iterator pos = symbol_table.find(s);
   if (pos==symbol_table.end())
-    {
-      text = new QString(s);
-      symbol_table.insert(text);
-    }
+    symbol_table.insert(text=s);
   else 
     text = *pos;
 }

@@ -22,20 +22,20 @@ using namespace std;
 #include <assert.h>
 #include <math.h>
 #include <stdlib.h>
-#include <qlistview.h>
-#include "songselector.logic.h"
+#include "albumitem.h"
+//#include "songselector.logic.h"
 #include "qsong.h"
 #include "process-manager.h"
 #include "dirscanner.h"
 
-AlbumItem::AlbumItem(const char* name, QListView* parent) :
-  QListViewItem(parent,name)
+AlbumItem::AlbumItem(const char* name, Q3ListView* parent) :
+  Q3ListViewItem(parent,name)
 {
   init_song();
 }
 
-AlbumItem::AlbumItem(int nr, Song * s, QListViewItem* parent) :
-  QListViewItem(parent,QString::number(nr),s->get_title(),s->get_author(),s->get_time(),s->get_storedin(),s->get_file())
+AlbumItem::AlbumItem(int nr, Song * s, Q3ListViewItem* parent) :
+  Q3ListViewItem(parent,QString::number(nr),s->get_title(),s->get_author(),s->get_time(),s->get_storedin(),s->get_file())
 {
   set_song(s);
   setRenameEnabled(0,true);

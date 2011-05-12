@@ -1,0 +1,7 @@
+RCS = ${shell ls rc-*.qrc 2>/dev/null}
+include defines
+.rc-files: $(RCS:%.qrc=%.cpp)
+
+%.cpp: %.qrc
+	@echo "  [rcc] "$@
+	@$(RCC) -o $@ $<

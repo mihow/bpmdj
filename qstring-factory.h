@@ -23,35 +23,16 @@ using namespace std;
 #include <qstring.h>
 #include <set>
 
-extern const QString TRUE_TEXT;
-extern const QString FALSE_TEXT;
-extern const QString TAG_TRUE; 
-extern const QString TAG_FALSE;
-extern const QString zero;
-extern const QString zeroo;
-extern const QString slash;
-extern const QString EMPTY;
-extern const QString ANAL_NOTNEC;
-extern const QString ANAL_NEC;
-
 QString tonumber(const int b);
 QString tonumber(const float f);
 
-struct PtrQStringLesser
-{
-  bool operator()(QString *s1, QString *s2) const 
-  {
-    return (*s1)<(*s2);
-  };
-};
-
 class QStringFactory
 {
- private:
-    static bool killed;
-    static set<QString*,PtrQStringLesser> tree;
- public:
-    static QString create(QString str);
-    static void kill();
+private:
+  static bool killed;
+  static set<QString> tree;
+public:
+  static QString create(QString str);
+  static void kill();
 };
 #endif

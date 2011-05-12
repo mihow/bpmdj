@@ -37,12 +37,5 @@ using namespace std;
   public: static inline type get_##var() { return _##var; }; \
   void static inline set_##var(type a) { _##var = a; };
 
-#define singleton_array_accessors(type,type2,var)  \
-  private: static type _##var; \
-  public: static inline type get_##var() { return _##var; }; \
-  void static inline set_##var(type a) { _##var = a; }; \
-  static inline type2 get_##var(int idx) { return _##var[idx];}; \
-  static inline void set_##var(int idx, type2 v) {_##var[idx]=v;};
-
 #define init_singleton_var(klasse, var, type, init) type klasse::_##var = init
 #endif

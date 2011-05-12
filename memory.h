@@ -28,5 +28,5 @@ using namespace std;
 void * myalloc(int size, char* file, int line);
 void * myrealloc(void* thing, int size);
 void   myfree(void*);
-char*  zeroable(char* in);  // returns NULL if in or *in == 0
+ 
 #endif

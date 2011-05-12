@@ -1,6 +1,0 @@
-- add a screenshot of kbpm-play to webpage
-- add changes to webpage and changelog
-To release the software
-- make check [-bin,-doc]
-  the check-doc will dump the output in bpmdj-doc-errors.txt
-- make tgz

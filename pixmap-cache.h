@@ -20,11 +20,11 @@
 #define __BPMDJ___PIXMAP_CACHE_H__
 using namespace std;
 #line 1 "pixmap-cache.h++"
-#include <qintcache.h>
+#include <qcache.h>
 #include <qpixmap.h>
 #include "song.h"
 
-class PixmapCache: private QIntCache<QPixmap>
+class PixmapCache: private QCache<intptr_t,QPixmap>
 {
   private:
     int width;

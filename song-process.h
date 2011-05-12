@@ -20,13 +20,13 @@
 #define __BPMDJ___SONG_PROCESS_H__
 using namespace std;
 #line 1 "song-process.h++"
-#include <qcolor.h>
-#include <qstring.h>
-#include <qcheckbox.h>
-#include <qcombobox.h>
-#include <qlineedit.h>
-#include <qpushbutton.h>
-#include <qhbox.h>
+#include <Qt/qcolor.h>
+#include <Qt/qstring.h>
+#include <Qt/qcheckbox.h>
+#include <Qt/qcombobox.h>
+#include <Qt/qlineedit.h>
+#include <Qt/qpushbutton.h>
+#include <Qt/q3hbox.h>
 #include "index.h"
 #include "basic-process-manager.h"
 
@@ -192,7 +192,7 @@ class SongSelectorPlayView: public QCheckBox
    void processChange();
 };
 
-class SongProcPrefView: public QHBox
+class SongProcPrefView: public Q3HBox
 {
    Q_OBJECT;
  protected:

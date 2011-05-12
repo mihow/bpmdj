@@ -18,10 +18,8 @@
 ****/
 using namespace std;
 #line 1 "index-reader.c++"
-#include <fcntl.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <dirent.h>
 #include <assert.h>
 #include <stdio.h>
 #include <qlistview.h>
@@ -29,51 +27,110 @@ using namespace std;
 #include <qprogressbar.h>
 #include <qfile.h>
 #include <qdatastream.h>
+#include "bpmdj-event.h"
 #include "index-reader.h"
-#include "kbpm-dj.h"
+#include "bpmdj.h"
 #include "song.h"
 #include "spectrum-type.h"
 #include "database.h"
+#include "qstring-factory.h"
+#include "constants.h"
+#include "dirscanner.h"
+#include "vector-iterator.h"
 
-IndexReader::IndexReader(QProgressBar * b, QLabel *l, BasicDataBase * db, int expected) : 
-  DirectoryScanner(".idx")
+class SongSelectorLogic;
+class Song;
+
+IndexReader indexReader;
+bool reading_index = false;
+
+class IndexScanner: public DirectoryScanner
 {
-  database = db;
-  progress = b;
-  reading = l;
+protected:
+  virtual void checkfile(const QString prefix, const QString filename);
+public:
+  vector<Song*> *songs_this_turn;
+  IndexScanner() : DirectoryScanner(IndexDir,IdxExt)
+  {
+  };
+};
+
+void IndexScanner::checkfile(const QString prefix, const QString  filename)
+{
+  Index index(prefix + slash + filename);
+  songs_this_turn->push_back(new Song(&index,true,false));
+}
+
+elementResult ActiveIndexReader::start(int expected)
+{
+  if (reader) delete reader;
+  reading_index=true;
+  // the chunk size is determined by  a maximum of 100 files per thunk and
+  // and a minimum of 1 percent of the bar
+  int chunk_size = expected / 100;
+  expected_files = expected;
+  if (chunk_size < 100) chunk_size = 100;
+  reader = new IndexScanner();
+  reader->set_file_per_turn(chunk_size);
   total_files = 0;
-  idx_files = 0;
-  step_size = expected / 100;
-  if (step_size<=0) step_size = 10;
-  if (progress) progress->setTotalSteps(expected);
-  scan(IndexDir,IndexDir);
-  if (progress) progress -> setProgress(total_files);
-  QStringFactory::kill();
+  queue_thunk();
+  return Done;
 }
 
-void IndexReader::recursing(const QString dirname)
+elementResult ActiveIndexReader::terminate()
 {
-  if (reading) reading -> setText(dirname);
+  reading_index=false;
+  deactivate();
+  return Done;
 }
 
-void IndexReader::add(Song * song)
+class CollectionOfSongs: public BpmDjEvent
 {
-  database->add(song);
-  if ( progress && ++ total_files % step_size == 0)
-    {
-      progress -> setProgress(total_files);
-      app -> processEvents();
-    }
-}
+private:
+  vector<Song*> *collection;
+  int total_files;
+  int expected_files;
+public:
+  CollectionOfSongs(vector<Song*> *sc, int t, int e):
+    collection(sc),
+    total_files(t),
+    expected_files(e)
+  {
+    if (app) app->postEvent(song_selector_window,this);
+  }
+  virtual void run(SongSelectorLogic * selector)
+  {
+    int progress= total_files*100/(expected_files ? expected_files : 1);
+    ::status->message("Reading index: "+QString::number(progress)+"%",5000);
+    // printf("Passing along %x\n",(unsigned4)collection); fflush(stdout);
+    if (collection->size())
+      selector->step_reading_indices(collection);
+    else
+      selector->stop_reading_indices(total_files);
+  }
+  
+  virtual ~CollectionOfSongs()
+  {
+    // printf("Deleting  %x\n",(unsigned4)collection); fflush(stdout);
+    delete collection;
+  }
+};
 
-void IndexReader::checkfile(const QString prefix, const QString  filename)
+elementResult ActiveIndexReader::thunk()
 {
-  QString fullname = prefix + "/" + filename;
-  idx_files++;
-  Index index(fullname);
-  Song * song = database->find(index.get_filename());
-  if (song)
-    song->refill(index,true);
+  assert(reader);
+  reader->songs_this_turn=new vector<Song*>();
+  int read = reader->scan();
+  total_files+=read;
+  if (total_files > expected_files) 
+    expected_files = total_files*100/90;
+  new CollectionOfSongs(reader->songs_this_turn,total_files,expected_files);
+  if (read)
+    return RevisitAfterIncoming;
   else
-    add(new Song(&index,true,false));
+    {
+      reading_index=false;
+      delete reader;
+      return Done;
+    }
 }

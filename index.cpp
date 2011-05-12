@@ -34,14 +34,15 @@ using namespace std;
 #include <qlineedit.h>
 #include <time.h>
 #include <string.h>
-#include <qstring.h>
+#include <Qt/qstring.h>
+#include "qstring-factory.h"
 #include "common.h"
 #include "index.h"
 #include "version.h"
 #include "song-information.h"
 #include "memory.h"
 #include "spectrum-type.h"
-#include "kbpm-dj.h"
+#include "bpmdj.h"
 #include "smallhistogram-type.h"
 #include "histogram-property.h"
 
@@ -205,61 +206,61 @@ void AlbumField::set_data(Data &data)
 
 void Index::write_idx()
 {
-   if (!meta_filename)
-     {
-       printf("Error: no name given to write index file to\n");
-       return;
-     }
-
-   Token token;
-   token[key_bpmdj_version]=VersionString;
-   token[key_file]=String(index_file);
-   token[key_title]=String(title);
-   token[key_author]=String(author);
-   token[key_remix]=String(remix);
-   token[key_version]=String(version);
-   token[key_period]=get_data(index_period);
-   token[key_tags]=String(index_tags);
-   token[key_cuez]=(Signed8)index_cue_z;
-   token[key_cuex]=(Signed8)index_cue_x;
-   token[key_cuec]=(Signed8)index_cue_c;
-   token[key_cuev]=(Signed8)index_cue_v;
-   token[key_cue]=(Signed8)index_cue;
-   token[key_md5sum]=String(index_md5sum);
-   token[key_time]=String(index_time);
-   if (index_spectrum!=no_spectrum)
-     token[key_spectrum]=index_spectrum->get_data();
-   token[key_disabled_capacities]=Unsigned2(index_disabled_capacities);
-   token[key_prev]=get_data(prev);
-   token[key_next]=get_data(next);
-   
-   const int versionnr = -1;
-   token[key_echo]=index_histogram.get_data(versionnr);
-   token[key_rythm]=index_rythm.get_data(versionnr);
-   token[key_composition]=index_composition.get_data(versionnr);
-   token[key_min]=index_min.get_data(versionnr);
-   token[key_max]=index_max.get_data(versionnr);
-   token[key_mean]=index_mean.get_data(versionnr);
-   token[key_power]=index_power.get_data(versionnr);
-
-   // count the albums
-   AlbumField **amp = albums;
-   int c = 0;
-   while (*amp)
-     {
-       c++;
-       amp++;
-     }
-   Array<1,Data> album_data(c);
-   amp = albums;
-   c=0;
-   while (*amp)
-     {
-       album_data[c++]=(*amp)->get_data(versionnr);
-       amp++;
-     }
-   token[key_albums]=album_data;
-   DataBinner::write(token,(const char*)meta_filename);
+  if (meta_filename.isEmpty())
+    {
+      printf("Error: no name given to write index file to\n");
+      return;
+    }
+  
+  Token token;
+  token[key_bpmdj_version]=VersionString;
+  token[key_file]=String(index_file);
+  token[key_title]=String(title);
+  token[key_author]=String(author);
+  token[key_remix]=String(remix);
+  token[key_version]=String(version);
+  token[key_period]=get_data(index_period);
+  token[key_tags]=String(index_tags);
+  token[key_cuez]=(Signed8)index_cue_z;
+  token[key_cuex]=(Signed8)index_cue_x;
+  token[key_cuec]=(Signed8)index_cue_c;
+  token[key_cuev]=(Signed8)index_cue_v;
+  token[key_cue]=(Signed8)index_cue;
+  token[key_md5sum]=String(index_md5sum);
+  token[key_time]=String(index_time);
+  if (index_spectrum!=no_spectrum)
+    token[key_spectrum]=index_spectrum->get_data();
+  token[key_disabled_capacities]=Unsigned2(index_disabled_capacities);
+  token[key_prev]=get_data(prev);
+  token[key_next]=get_data(next);
+  
+  const int versionnr = -1;
+  token[key_echo]=index_histogram.get_data(versionnr);
+  token[key_rythm]=index_rythm.get_data(versionnr);
+  token[key_composition]=index_composition.get_data(versionnr);
+  token[key_min]=index_min.get_data(versionnr);
+  token[key_max]=index_max.get_data(versionnr);
+  token[key_mean]=index_mean.get_data(versionnr);
+  token[key_power]=index_power.get_data(versionnr);
+  
+  // count the albums
+  AlbumField **amp = albums;
+  int c = 0;
+  while (*amp)
+    {
+      c++;
+      amp++;
+    }
+  Array<1,Data> album_data(c);
+  amp = albums;
+  c=0;
+  while (*amp)
+    {
+      album_data[c++]=(*amp)->get_data(versionnr);
+      amp++;
+    }
+  token[key_albums]=album_data;
+  DataBinner::write(token,meta_filename);
 }
 
 AlbumField::AlbumField(int r, QString n)
@@ -285,7 +286,7 @@ bool Index::fix_tagline()
   char* temp;
   char * new_tags;
   int i = 0;
-  if (index_tags==NULL)
+  if (index_tags.isNull())
     return false;
   // find all tags
   temp=strdup(index_tags);
@@ -529,32 +530,27 @@ void Index::set_period(period_type t, bool update_on_disk)
     write_idx();
 }; 
 
+class SongInfoDialog:
+  public QDialog
+{
+public:
+  SongInformation * info;
+  SongInfoDialog(): QDialog(NULL)
+  {
+    info = new SongInformation(this);
+    info->save->setDefault(true);
+  }
+};
+
 // dialog boxes to update the state of an index file
 #define field2this(namea,nameb) if (info.namea##Edit->text()!=nameb) \
   { nameb = info.namea##Edit->text(); \
     meta_changed = true; }
 void Index::executeInfoDialog()
 {
-  SongInformation info(NULL,NULL,TRUE);
-  info.idxLabel->setText(meta_filename);
-  info.md5Label->setText(index_md5sum);
-  info.titleEdit->setText(title);
-  info.authorEdit->setText(author);
-  info.versionEdit->setText(version);
-  info.remixEdit->setText(remix);
-  info.tagEdit->setText(index_tags);
-  capacity_type old_disabled_capacity = index_disabled_capacities;
-  init_capacity_widget(info.capacity,old_disabled_capacity);
-  if (info.exec()==QDialog::Accepted)
-    {
-      field2this(title, title);
-      field2this(author, author);
-      field2this(remix, remix);
-      field2this(version, version);
-      field2this(tag, index_tags);
-      index_disabled_capacities = get_capacity(info.capacity);
-      meta_changed |= old_disabled_capacity!=index_disabled_capacities;
-    }
+  SongInfoDialog info;
+  info.info->updateDataFrom(this);
+  info.exec();
 }
 
 HistoryField *Index::add_prev_song(QString mp3)
@@ -752,29 +748,22 @@ bool Index::set_title_author_remix(QString meta_filename)
   return busy==4;
 }
 
-char* findUniqueName(const char * directory, const char* filename)
+QString findUniqueName(QString directory, QString filename)
 {
-  char indexname[500];
-  char *temp;
-  char halfindexname[500];
-  temp=strdup(basename(strdup(filename)));
-  temp[strlen(temp)-4]=0;
-  sprintf(halfindexname,"%s.idx",temp);
-  sprintf(indexname,"%s%s.idx",(const char*)directory,temp);
+  QString temp=filename.mid(filename.lastIndexOf(slash)+1);
+  temp=temp.left(temp.length()-4);
+  QString indexname= directory + temp + IdxExt;
   int nr=2;
   while(exists(indexname))
-    {
-      sprintf(halfindexname,"%s%d.idx",temp,nr);
-      sprintf(indexname,"%s%s%d.idx",(const char*)directory,temp,nr++);
-    }
-  return strdup(indexname);
+    indexname=directory+temp+QString::number(nr++)+IdxExt;
+  return indexname;
 }
 
 Index* createNewIndexFor(QString filename, QString directory)
 {
   // find a unique index filename
-  char * indexname = findUniqueName(directory,filename);
-  printf("Creating index file %s\n",indexname);
+  QString indexname = findUniqueName(directory,filename);
+  // printf("Creating index file %s\n",indexname.ascii());
   // create an index and set the file in which it is stored
   Index *index = new Index();
   index->set_storedin(indexname);
@@ -784,9 +773,6 @@ Index* createNewIndexFor(QString filename, QString directory)
   index->set_title_author_remix(indexname);
   // we set the period to unknown, which will also 
   // immediatelly write the index to disk
-  index->set_period(-1);
-  index->set_changed();
-  index->write_idx();
-  bpmdj_deallocate(indexname);
+  index->set_period(-1,true);
   return index;
 }

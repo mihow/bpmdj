@@ -1,6 +1,7 @@
-VERSION = 3.4
+VERSION = 3.5
+BIN = bpmplay bpmdj bpmmerge bpmcount 
 .EXPORT_ALL_VARIABLES:
-all: .link-targets .ui-forms .source .depend .compile 
+all: .link-targets .ui-forms .rc-files .source-creator .depend .compile 
 
 # We don't use autotools, automake, autoproject and so on since these are
 # too complicated. Instead we expect that the one who wants to compile the
@@ -22,14 +23,19 @@ LINK =  $(CPP) $(LDFLAGS) $(QT_INCLUDE_PATH) $(QT_LIBRARY_PATH) $(QT_LIBS)
 .ui-forms: ui-forms
 	@echo "User Interface Forms:"
 	@make -s --no-print-directory -f ui-forms $@
+.rc-files: rc-files
+	@echo "Resource files:"
+	@make -s --no-print-directory -f rc-files $@
 
 # Precompile all the source files
-.PHONY: .source
-.source: sources
+# The output file is the .source file.
+.PHONY: .source-creator
+.source-creator: sources
 	@echo "Source Files:"
 	@make -s --no-print-directory -f sources .sources
 
 # Create the dependency file if necessary
+# only necessary if the .sources was modified
 .depend: .sources
 	@echo "Dependencies:"
 	@$(CPP) $(CFLAGS) $(QT_INCLUDE_PATH) $(QT_LIBRARY_PATH) -MM *.cpp >.depend
@@ -37,7 +43,7 @@ LINK =  $(CPP) $(LDFLAGS) $(QT_INCLUDE_PATH) $(QT_LIBRARY_PATH) $(QT_LIBS)
 # Compilation of all source files
 .compile: compile .depend
 	@echo "Compiling:"
-	@make -j 3 -s --no-print-directory -f compile
+	@make -j 3 -s --no-print-directory -f compile 
 
 # Packaging of the distribution
 packages: packager all
@@ -85,5 +91,5 @@ tuuster:
 	@scp kbpm-dj   bpmdj@tuuster:bpmdj/
 
 website:
-	rsync -e ssh -xavz documentation/* krubbens@bpmdj.sourceforge.net:/home/groups/b/bp/bpmdj/htdocs/
+	rsync -e ssh -xavz redirect_documentation/* krubbens@bpmdj.sourceforge.net:/home/groups/b/bp/bpmdj/htdocs/
 	ssh krubbens@bpmdj.sourceforge.net chmod +rX -R /home/groups/b/bp/bpmdj/htdocs/*

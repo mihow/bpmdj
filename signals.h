@@ -79,7 +79,7 @@ template <class Type, int Channels> class BasicSignal
     void multiply(Type m);
     void divide(Sample<Type,Channels> d);
     virtual void absolute();
-    virtual void smooth(int nr);
+    virtual void smooth(unsigned int nr);
     Sample<Type,Channels> find_abs_max();
     Sample<Type,Channels> normalize_abs_max();
 };
@@ -371,7 +371,7 @@ DECLARE SAMPLE SAMPLE::zero_to_one() const
 DECLARE void BASIC::operator =(const BasicSignal<Type,Channels> &val)
 {
   assert(val.length==length);
-  for(int i = 0 ; i < length ; i ++)
+  for(unsigned int i = 0 ; i < length ; i ++)
     set(i,val[i]);
 }
 
@@ -418,15 +418,15 @@ DECLARE BASIC& BASIC::operator >=(const Type &val)
   return *this;
 }
 
-DECLARE void BASIC::smooth(int nr)
+DECLARE void BASIC::smooth(unsigned int nr)
 {
   for(unsigned1 C = 0 ; C < Channels ; C++)
     {
       Type added[nr*2];
       Type sum = 0;
-      for(int i = 0 ; i < nr*2 ; i++)
+      for(unsigned int i = 0 ; i < nr*2 ; i++)
 	sum+=added[i]=get(i,C);
-      for(int i = nr ; i < length - nr ; i++)
+      for(unsigned int i = nr ; (int)i < (int)length - (int)nr ; i++)
 	{
 	  int ni = i + nr;
 	  int nj = ni % (nr * 2);
@@ -766,18 +766,18 @@ DECLHAAR void HAAR::backward(BasicSignal<Output,Channels> &a, int n)
 
 DECLHAAR void HAAR::execute()
 {
-  int n=in.length;
+  unsigned int n=in.length;
   if (n<4) return;
-  int i;
+  unsigned int i;
   for(i = 0 ;i < n ; i ++)
     out.set(i,in.get(i));
   while(i<out.length)
     out.set(i++,0);
   if (fwd)
-    for(int nn=n;nn>=4;nn>>=1)
+    for(unsigned int nn=n;nn>=4;nn>>=1)
       forward(out,nn);
   else
-    for(int nn=4;nn<=n;nn<<=1)
+    for(unsigned int nn=4;nn<=n;nn<<=1)
       backward(out,nn);
 }
 

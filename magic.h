@@ -35,5 +35,6 @@ using namespace std;
 #define MAGIC_3_0 0xBDEC
 #define MAGIC_3_3 0xBDED
 #define MAGIC_3_4 0xBDEE
-#define MAGIC_NOW MAGIC_3_4
+#define MAGIC_3_5 0xBDEF
+#define MAGIC_NOW MAGIC_3_5
 #endif

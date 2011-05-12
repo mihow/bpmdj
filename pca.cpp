@@ -46,7 +46,7 @@ using namespace std;
 #include <stdlib.h>
 #include <unistd.h>
 #include <assert.h>
-#include "kbpm-dj.h"
+#include "bpmdj.h"
 #include "pca.h"
 #include "memory.h"
 #include "common.h"

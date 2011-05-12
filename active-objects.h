@@ -34,7 +34,85 @@ using namespace std;
 #include "ao-pool.h"
 using namespace std;
 typedef enum{RevisitLater, Revisit, RevisitAfterIncoming, Done, Interrupt} elementResult;
+
 /**
+ * @defgroup ao Active Objects
+ * 
+ * These pages document the active objects as used in Borg4. The active objects are supported by a compact
+ * runtime that allows messages to be queued into objects, which will then in turn be activated as soon as
+ * new messages are available. The runtime is mainly accessed through the @ref ActiveObject class.
+ * 
+ * There is also a compiler available that will automatically create code for active objects. 
+ * The aoc compiler generates a wrapper for an active object. The inside of that object
+ * will be the active object that is shielded from the rest of the world. The 
+ * outside (the meta-object) will accept all the incoming calls and forward them 
+ * to the active object. The following header file, demo1.ao declares two active objects, Sender and Receiver. 
+ * The sender will accept startSending. The receiver will accept printNumber. The aoc compiler will automatically
+ * generate an appropriate header that will declare two seperate object. In the case of the sender 
+ * active object, these will be called Sender and ActiveSender. The ActiveSender will contain 
+ * all the methods we declared (except for the meta method). The Sender class will be a proxy 
+ * and can be accessed concurrently. All the arguments to each call will be wrapped into a 
+ * message and passed to the underlying activeObject. If access to the object fields is necessary
+ * then a meta method must be declared.
+ *
+ * File: demo1.ao; compile with aoc demo1.ao >demo1.h
+ *
+ *
+ *  <code><pre>
+ *   active DemoSender
+ *     {
+ *     int tosend = 20;
+ *     DemoReceiver * recv;
+ *     message startSending(DemoReceiver* recv, int nr);
+ *     meta void donothing();
+ *     };
+ *
+ *   active DemoReceiver
+ *     {
+ *     message printNumber(int nr);
+ *     };
+ *  </pre></code>
+ *
+ * The implementation side of these two active objects looks as follows. File: @ref demo1.cpp
+ *
+ *  <code><pre>
+ *   \#include "demo1.h"
+ *   elementResult ActiveDemoSender::startSending(DemoReceiver* recv, int a)
+ *     {
+ *     tosend = a;
+ *     for(int i = 0 ; i < tosend ;  i++)
+ *     recv->printNumber(i);
+ *     return Done;
+ *     }
+ *
+ *   elementResult ActiveDemoReceiver::printNumber(int nr)
+ *     {
+ *     printf("%d  ",nr);
+ *     fflush(stdout);
+ *     return RevisitAfterIncoming;
+ *     }
+ * 
+ *   int main(int, char* [])
+ *     {
+ *     DemoSender * sender = new DemoSender();
+ *     DemoReceiver * recv = new DemoReceiver();
+ *     sender->startSending(recv,100);
+ *     sleep(100);
+ *     }
+ *  </pre></code>
+ *
+ * @todo with respect to the compiler we should allow any block outside the active section.
+ * 
+ * @todo the compiler should export first all the global vars and then each active object one
+ *       by one.
+ * 
+ * @todo active objects should be able to inherit from each other. If I is an interface and A
+ * the active object that must inherit from it, then we get
+ * BA: BI and MA: MI
+ */
+
+/**
+ * @ingroup ao
  * @brief Active Objects perform their task 
  * seperated in time (control flow) and space (data) from the rest of the program.
  *

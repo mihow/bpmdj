@@ -36,11 +36,11 @@ using namespace std;
 #include <qfiledialog.h>
 #include <qpainter.h>
 #include <qcombobox.h>
-#include "kbpm-play.h"
+#include "bpmplay.h"
 #include "mixerdialog.logic.h"
 #include "memory.h"
 
-MixerDialogLogic::MixerDialogLogic(QWidget*parent,const char*name, bool modal,WFlags f) :
+MixerDialogLogic::MixerDialogLogic(QWidget*parent,const char*name, bool modal,Qt::WindowFlags f) :
   MixerDialog(parent,name,modal,f)
 {
   volumesChanged();

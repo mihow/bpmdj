@@ -48,34 +48,37 @@ using namespace std;
 #define LIST_RYTHM 18
 #define LIST_COMPOSITION 19
 
+#define singleton_array_accessors(type,type2,var)  \
+  private: static type _##var; \
+  private: static inline type get_##var() { return _##var; }; \
+  void static inline set_##var(type a) { _##var = a; }; \
+  public: static inline type2 get_##var(int idx) { return _##var[idx];}; \
+  public: static inline void set_##var(int idx, type2 v) {_##var[idx]=v;};
+
 class QSong: public QVectorViewData
 {
-    // accessors
-    singleton_array_accessors(bool*, bool, selected);
-    singleton_array_accessors(Song **, Song *, songs);
-    singleton_accessors(int,compare_col);
-    singleton_accessors(bool,compare_asc);
-    singleton_accessors(int,song_count);
-
-   public:
-    static void setVector(Song** arr, int cnt);
-    // functions required by the vectorview
-    virtual int vectorSize() const;
-    virtual bool isSelected(int i) const { assert(i>=0); return get_selected(i); };
-    virtual void setSelected(int i, bool val=true) {get_selected()[i]=val;};
-    virtual void sort(int col, bool ascending);
-    virtual void preparePaint(QVectorView* vv, int i);
-    virtual void paintCell(QVectorView* vv, int i, QPainter *p, const QColorGroup &cg, int col, int wid, int align);
-    virtual QString text(int j, int i) const { return Text(get_songs(j),i); };
-    
-    static  void Sort();
-    QSong();
-    static Song * songEssence(int i);
-    static QColor * colorOfTempoCol(const Song* main, Song* song);
-    static QColor * colorOfAuthorCol(Song * song);
-    static QColor * colorOfPlaycount(Song * song);
-    static QColor * colorOfdColorCol(Song* song);
-    static void playedAuthorAtTime(int i, int t) {get_songs(i)->set_played_author_at_time(t);};
-    static QString Text(Song * j, int i);
+  singleton_array_accessors(bool*, bool, selected);
+  singleton_array_accessors(Song **, Song *, songs);
+  singleton_accessors(int,compare_col);
+  singleton_accessors(bool,compare_asc);
+  singleton_accessors(int,song_count);
+public:
+  static void setVector(Song** arr, int cnt);
+  static void addVector(Song** arr, int cnt);
+  virtual int vectorSize() const;
+  virtual bool isSelected(int i) const { assert(i>=0); return get_selected(i); };
+  virtual void setSelected(int i, bool val=true) {get_selected()[i]=val;};
+  virtual void sort(int col, bool ascending);
+  virtual void paintCell(QVectorView* vv, int i, QPainter *p, const QColorGroup &cg, int col, int wid, int align);
+  virtual QString text(int j, int i) const { return Text(get_songs(j),i); };
+  static  void Sort();
+  QSong();
+  static Song * songEssence(int i);
+  static QColor * colorOfTempoCol(const Song* main, Song* song);
+  static QColor * colorOfAuthorCol(Song * song);
+  static QColor * colorOfPlaycount(Song * song);
+  static QColor * colorOfdColorCol(Song* song);
+  static void playedAuthorAtTime(int i, int t) {get_songs(i)->set_played_author_at_time(t);};
+  static QString Text(Song * j, int i);
 };
 #endif

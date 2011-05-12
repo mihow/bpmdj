@@ -31,8 +31,8 @@ class Tags
  private:
   static map<QString,int> tree;
   static QString   find_tag(tag_type tag);
-  static tag_type  add_tag(QString tag);
  public:
+  static tag_type  add_tag(QString tag);
   static vector<QString> tag_names;
   static bool      new_tags;
   static void      init();

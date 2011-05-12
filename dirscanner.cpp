@@ -25,17 +25,18 @@ using namespace std;
 #include "dirscanner.h"
 #include "common.h"
 #include "capacity.h"
+#include "constants.h"
 
 bool DirectoryScanner::goodName(QString name)
 {
   // must end on .idx or a song extension
-  if (!goodExtension(name) && name.right(4)!=".idx")
+  if (!goodExtension(name) && !name.endsWith(IdxExt))
     return false;
   // no spaces or any special characters
   // should occur anywhere in the filename
-  if (name.contains(" ")) return false;
-  if (name.contains("_")>1) return false;
-  if (name.contains("_")==1)
+  if (name.contains(OneSpace)) return false;
+  if (name.count("_")>1) return false;
+  if (name.contains("_"))
     {
       int pos = name.findRev("_");
       int pos2 = name.find("[");
@@ -57,56 +58,89 @@ bool DirectoryScanner::goodName(QString name)
   return true;
 }
 
-
-DirectoryScanner::DirectoryScanner(QString  extension)
+DirectoryScanner::DirectoryScanner(QString extension):
+  recurse(true),
+  required_extension(extension)
 { 
-  required_extension=extension; 
 };
+
+DirectoryScanner::DirectoryScanner(QString dir, QString extension, bool rec):
+  recurse(rec),
+  required_extension(extension)
+{
+  reset(dir);
+}
 
 void DirectoryScanner::recursing(const QString dirname)
 {
   printf("Recursing into %s\n",(const char*)dirname);
 }
 
-bool DirectoryScanner::scandir(const QString dirname, const QString prefix)
+void DirectoryScanner::reset(const QString dirname, unsigned4 fpt)
 {
-  struct dirent * entry;
-  DIR * dir=opendir(dirname);
-  if (!dir) return false;
-  recursing(dirname);
-  /**
-   * Todo: sort the directory according to the inode numbers and then read them 
-   * in one by one
-   */
-  while ( (entry=readdir(dir)) )
+  DirPos pos;
+  pos.dir = opendir(dirname);
+  pos.path = dirname;
+  prefix_length=dirname.length();
+  dir_stack.push(pos);
+  files_per_turn=fpt;
+}
+
+unsigned4 DirectoryScanner::scan()
+{
+  unsigned4 real_files=0;
+  while(real_files < files_per_turn)
     {
-      if (strcmp(entry->d_name,".")==0 ||
-	  strcmp(entry->d_name,"..")==0) continue;
-      QString newprefix;
-      if (prefix == QString::null)
-	newprefix=entry->d_name;
+      if (dir_stack.size()==0) 
+	return real_files;
+      DirPos dirpos = dir_stack.top();
+      if (!dirpos.dir) dir_stack.pop();
       else
-	newprefix=prefix+"/"+entry->d_name;
-      QString newdir = dirname +"/"+entry->d_name;
-      if (!scandir(newdir,newprefix))
-	scanfile(prefix,entry->d_name);
+	{
+	  struct dirent * entry=NULL;
+	  while ( real_files<files_per_turn && (entry=readdir(dirpos.dir)))
+	    {
+	      if (strcmp(entry->d_name,".")==0 ||
+		  strcmp(entry->d_name,"..")==0) continue;
+	      QString d_name(entry->d_name);
+	      QString newdir = dirpos.path+slash+d_name;
+	      // is it a directory
+	      DIR * nd = opendir(newdir);
+	      if (nd)
+		{
+		  if (!recurse) continue;
+		  DirPos pos;
+		  pos.dir = nd;
+		  pos.path = newdir;
+		  dir_stack.push(pos);
+		  recursing(newdir);
+		  break;
+		}
+	      else
+		{
+		  real_files++;
+		  scanfile(dirpos.path,d_name);
+		}
+	    }
+	  if (!entry)
+	    {
+	      closedir(dirpos.dir);
+	      dir_stack.pop();
+	    }
+	}
     }
-  closedir(dir);
-  return true;
+  return real_files;
 }
 
 bool DirectoryScanner::matchextension(const QString filename)
 {
-  if (!required_extension)
-    return true;
-  if (strlen(filename)<strlen(required_extension))
-    return false;
+  if (required_extension.isEmpty()) return true;
+  if (strlen(filename)<strlen(required_extension)) return false;
   return filename.right(required_extension.length()).contains(required_extension,0);
 }
 
-void DirectoryScanner::scanfile(const QString  fullname, const QString  filename)
+void DirectoryScanner::scanfile(const QString dir, const QString filename)
 {
   if (matchextension(filename))
-    checkfile(fullname,filename);
+    checkfile(dir,filename);
 }
-

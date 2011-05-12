@@ -19,6 +19,7 @@
 using namespace std;
 #line 1 "song-process.c++"
 #include <iostream>
+#include <q3button.h>
 #include <qlabel.h>
 #include <qsizepolicy.h>
 #include <qmessagebox.h>
@@ -28,7 +29,7 @@ using namespace std;
 #include "embedded-files.h"
 #include "version.h"
 #include "analyzers-manager.h"
-#include "log-viewer.logic.h"
+#include "log-viewer.h"
 
 void SongProcess::init()
 {
@@ -85,7 +86,7 @@ void SongProcess::setEnabled(bool val)
 	      emit stateChanged();
 	      emit viewChanged();
 	      if (kind==analyzer)
-		Config::open_ui(2);
+		Config::open_ui(1);
 	      else
 		Config::open_ui(0);
 	    }
@@ -138,7 +139,7 @@ void SongProcess::setOldCommand(QString s)
   // what the command prefix is 
   cmd=empty;
   if (command.find("xmms")>=0) cmd=xmms;
-  if (command.find("kbpm-play")>=0) cmd=standard;
+  if (command.find("bpmplay")>=0) cmd=standard;
   if (cmd==empty) return;
   // what the remote host is
   idx = command.find("--remote ");
@@ -174,7 +175,7 @@ void SongProcess::setOldCommand(QString s)
 QString SongProcess::getBasicCommand() const
 {
   assert(cmd==standard);
-  QString result("kbpm-play ");
+  QString result("bpmplay ");
   if (!remote.isEmpty())
     result +="--remote "+remote+" ";
   if (!name.isEmpty())
@@ -187,7 +188,7 @@ QString SongProcess::getPlayCommand(Index& match_with_index, Index & to_play_son
 {
   if (cmd==xmms)
     {
-      return QString("xmms -e music/")+escape(to_play_song.get_filename()) + " &";
+      return QString("xmms -e music/")+QString(escape(to_play_song.get_filename())) + QString(" &");
     }
   else if (cmd==standard)
     {
@@ -216,7 +217,7 @@ QString SongProcess::getAnalCommand(bool tempo, int technique, double from, doub
 	sprintf(frombound,"--low %g",from);
       if (to)
 	sprintf(tobound,"--high %g",to);
-      tempoLine=QString("--bpm ")+QString::number(technique)+" "+frombound+" "+tobound;
+      tempoLine=QString("--bpm ")+QString::number(technique)+OneSpace+QString(frombound)+OneSpace+QString(tobound);
     }
   
   QString spectrumLine = spectrum ? "--spectrum" : "";
@@ -386,8 +387,7 @@ void SongProcess::checkerDied()
     if (index.get_time().isEmpty())
       {
 	setUselessState();
-	// dump into the error log
-	LogViewerLogic log;
+	LogViewer log;
 	log.goTo(getLogName());
 	log.exec();
       }
@@ -452,6 +452,7 @@ SongSelectorAnalView::SongSelectorAnalView(QWidget * parent, AnalyzersManager * 
   QCheckBox(parent,""), song_process(&proc)
 {
   setTristate(true);
+  setAutoFillBackground(true);
   QSizePolicy policy = sizePolicy();
   policy.setHorData(QSizePolicy::Expanding);
   setSizePolicy(policy);
@@ -480,9 +481,9 @@ void SongSelectorAnalView::processChange()
 {
   switch(song_process->enabledState())
     {
-    case SongProcess::disabled: QCheckBox::setState(QButton::Off); break;
-    case SongProcess::enabling: QCheckBox::setState(QButton::NoChange); break;
-    case SongProcess::ok: QCheckBox::setState(QButton::On); break;
+    case SongProcess::disabled: QCheckBox::setState(QCheckBox::Off); break;
+    case SongProcess::enabling: QCheckBox::setState(QCheckBox::NoChange); break;
+    case SongProcess::ok: QCheckBox::setState(QCheckBox::On); break;
     default: assert(0);
     }
   QString text = song_process->getText();
@@ -523,6 +524,7 @@ SongSelectorPlayView::SongSelectorPlayView(QWidget * parent, SongProcess & proc)
   QCheckBox(parent,""), song_process(&proc)
 {
   setTristate(true);
+  setAutoFillBackground(true);
   QSizePolicy policy = sizePolicy();
   policy.setHorData(QSizePolicy::Expanding);
   setSizePolicy(policy);
@@ -543,9 +545,9 @@ void SongSelectorPlayView::processChange()
 {
   switch(song_process->enabledState())
     {
-    case SongProcess::disabled: QCheckBox::setState(QButton::Off);      break;
-    case SongProcess::enabling: QCheckBox::setState(QButton::NoChange); break;
-    case SongProcess::ok:       QCheckBox::setState(QButton::On);       break;
+    case SongProcess::disabled: QCheckBox::setState(QCheckBox::Off);      break;
+    case SongProcess::enabling: QCheckBox::setState(QCheckBox::NoChange); break;
+    case SongProcess::ok:       QCheckBox::setState(QCheckBox::On);       break;
     default:
       assert(0);
     }
@@ -557,16 +559,17 @@ void SongSelectorPlayView::processChange()
   QColor color;
   if (song) color = song->get_color();
   else color.setHsv(0,0,128);
+  if (!color.isValid() || color.value()<127) color=QColor(255,255,255);
   QCheckBox::setBackgroundColor(color);
 }
 
 //----------------------------------------------------------
 // The widgets in the preference box
 //----------------------------------------------------------
-SongProcPrefView::SongProcPrefView(QWidget * parent, SongProcess & proc) : QHBox(parent)
+SongProcPrefView::SongProcPrefView(QWidget * parent, SongProcess & proc): 
+  Q3HBox(parent)
 {
   song_process = & proc;
-
   cmd_box = new QComboBox(this);
   cmd_box->insertItem("empty",SongProcess::empty);
   cmd_box->insertItem("standard",SongProcess::standard);

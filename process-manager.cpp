@@ -18,11 +18,11 @@
 ****/
 using namespace std;
 #line 1 "process-manager.c++"
-#include "songselector.logic.h"
+#include "selector.h"
 #include "process-manager.h"
 #include "scripts.h"
 #include "history.h"
-#include "kbpm-dj.h"
+#include "bpmdj.h"
 
 Song* main_song = NULL;
 Song* monitor_song = NULL;

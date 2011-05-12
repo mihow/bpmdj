@@ -38,7 +38,8 @@ DataIo::DataIo(QString qfn, const char * mode)
 {
   const char *fn;
 #if QT_VERSION > 0x040000
-  fn=qfn.toAscii();
+  QByteArray F = qfn.toAscii();
+  fn=F.data();
 #else
   fn=qfn.ascii();
 #endif
@@ -47,6 +48,7 @@ DataIo::DataIo(QString qfn, const char * mode)
   if (!text)
     {
       printf("Could not open file \"%s\"\n",fn);
+      assert(0);
       exit(1);
     }
   version = DATA_VERSION_NR;
@@ -492,12 +494,14 @@ int  DataTexter::read_fileformat_versionnr()
 //===============================================================
 DataBinner::DataBinner(QString fn, const char* mode) : DataIo(fn,mode) 
 {
+  file_in_use=fn;
   mapped_region = NULL;
   mapped_size = 0;
 };
 
 DataBinner::DataBinner(FILE *f) : DataIo(f) 
 {
+  file_in_use="<unknown>";
   mapped_region = NULL;
   mapped_size = 0;
 };
@@ -539,8 +543,9 @@ int DataBinner::read_fileformat_versionnr()
 {
   if (cur_ptr+4>mapped_region+file_size)
     {
-      printf("Could not read fileformat version");
-      assert(0);
+      QByteArray ba=file_in_use.ascii();
+      printf("Could not read fileformat version from file %s\n",(const char*)ba);
+      exit(150);
     }
   int version=*(int*)cur_ptr;
   cur_ptr+=4;
@@ -626,6 +631,12 @@ void DataBinner::write_internal(const char * ptre, int size)
 
 void DataBinner::read_internal(char * ptre, int size)
 {
+  if (cur_ptr+size>mapped_region+file_size)
+    {
+      QByteArray ba=file_in_use.ascii();
+      printf("Could not read full data from file %s\n",(const char*)ba);
+      exit(150);
+    }
   memcpy(ptre,cur_ptr,size);
   cur_ptr+=size;
 };

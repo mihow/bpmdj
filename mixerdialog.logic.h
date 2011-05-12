@@ -21,7 +21,7 @@
 using namespace std;
 #line 1 "mixerdialog.logic.h++"
 #include <qtimer.h>
-#include <qbutton.h>
+#include <q3button.h>
 #include "mixerdialog.h"
 
 #define dspmixmaxmult 128
@@ -40,7 +40,7 @@ class MixerDialogLogic :
    int sync;
    bool stop;
    bool stopped;
-   MixerDialogLogic(QWidget*parent=0,const char*name=0, bool modal=FALSE,WFlags f=0);
+   MixerDialogLogic(QWidget*parent=0,const char*name=0, bool modal=FALSE, Qt::WindowFlags f=0);
  public slots:
    virtual void volumesChanged();
    virtual void accept();

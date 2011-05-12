@@ -43,7 +43,7 @@ class RenamerLogic:
    RenamerLogic(QWidget* parent, RenamerChangesFilename * rcf);
    virtual ~RenamerLogic();
    void add(const QString name, const QString pos);
-   virtual void scan(const QString dirname);
+   void scan(const QString dirname);
  protected:
    virtual void checkfile(const QString fullname, const QString filename);
    virtual bool matchextension(const QString filename);

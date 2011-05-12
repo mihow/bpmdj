@@ -26,7 +26,7 @@ void SongHeap::add(Song *s)
 {
   // is there space ?
   assert(s);
-  if (size<maxsize)   
+  if (size<maxsize)
     {
       insert(s);
       size++;

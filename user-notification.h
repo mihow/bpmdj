@@ -22,7 +22,7 @@ using namespace std;
 #line 1 "user-notification.h++"
 #include <qstring.h>
 #include "bpmdj-event.h"
-#include "songselector.logic.h"
+#include "selector.h"
 
 /**
  * A user notification can contain information for dialog boxes

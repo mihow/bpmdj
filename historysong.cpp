@@ -23,7 +23,7 @@ using namespace std;
 #include <math.h>
 #include <stdlib.h>
 #include <qlistview.h>
-#include "songselector.logic.h"
+#include "selector.h"
 #include "qsong.h"
 #include "process-manager.h"
 #include "history.h"
@@ -53,8 +53,8 @@ void HistorySong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid,
       if (Config::color_cues && !song->get_has_cues())
 	{
 	  QColorGroup ncg(cg);
-	  ncg.setColor(QColorGroup::Base,QColor(0,0,255));
-	  QListViewItem::paintCell(p,ncg,col,wid,align);
+	  ncg.setColor(QColorGroup::Window,QColor(0,0,255));
+	  Q3ListViewItem::paintCell(p,ncg,col,wid,align);
 	  return;
 	}
       break;
@@ -65,8 +65,8 @@ void HistorySong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid,
 	if ( (color=QSong::colorOfTempoCol(main,song)) )
 	  {
 	    QColorGroup ncg(cg);
-	    ncg.setColor(QColorGroup::Base,*color);
-	    QListViewItem::paintCell(p,ncg,col,wid,align);
+	    ncg.setColor(QColorGroup::Window,*color);
+	    Q3ListViewItem::paintCell(p,ncg,col,wid,align);
 	    delete(color);
 	    return;
 	  }
@@ -77,8 +77,8 @@ void HistorySong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid,
       if (Config::color_played && song->get_played())
 	{
 	  QColorGroup ncg(cg);
-	  ncg.setColor(QColorGroup::Base,Config::get_color_played_song());
-	  QListViewItem::paintCell(p,ncg,col,wid,align);
+	  ncg.setColor(QColorGroup::Window,Config::get_color_played_song());
+	  Q3ListViewItem::paintCell(p,ncg,col,wid,align);
 	  return;
 	}
       break;
@@ -87,8 +87,8 @@ void HistorySong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid,
       if ( (color=QSong::colorOfAuthorCol(song)) )
 	{
 	  QColorGroup ncg(cg);
-	  ncg.setColor(QColorGroup::Base,*color);
-	  QListViewItem::paintCell(p,ncg,col,wid,align);
+	  ncg.setColor(QColorGroup::Window,*color);
+	  Q3ListViewItem::paintCell(p,ncg,col,wid,align);
 	  delete(color);
 	  return;
 	}
@@ -98,8 +98,8 @@ void HistorySong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid,
       if ( (color=QSong::colorOfdColorCol(song)) )
 	{
 	  QColorGroup ncg(cg);
-	  ncg.setColor(QColorGroup::Base,*color);
-	  QListViewItem::paintCell(p,ncg,col,wid,align);
+	  ncg.setColor(QColorGroup::Window,*color);
+	  Q3ListViewItem::paintCell(p,ncg,col,wid,align);
 	  delete(color);
 	  return;
 	}
@@ -110,21 +110,20 @@ void HistorySong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid,
 	if (song->get_spectrum()!=no_spectrum)
 	  {
 	    QColorGroup ncg(cg);
-	    ncg.setColor(QColorGroup::Base,song->get_color());
-	    QListViewItem::paintCell(p,ncg,col,wid,align);
+	    ncg.setColor(QColorGroup::Window,song->get_color());
+	    Q3ListViewItem::paintCell(p,ncg,col,wid,align);
 	    return;
 	  }
       break;
     }
-  
   if (Config::color_ondisk && !song->get_ondisk())
     {
       QColorGroup ncg(cg);
-      ncg.setColor(QColorGroup::Base,Config::get_color_unavailable());
-      QListViewItem::paintCell(p,ncg,col,wid,align);
+      ncg.setColor(QColorGroup::Window,Config::get_color_unavailable());
+      Q3ListViewItem::paintCell(p,ncg,col,wid,align);
     }
   else
-    QListViewItem::paintCell(p,cg,col,wid,align);
+    Q3ListViewItem::paintCell(p,cg,col,wid,align);
 }
 
 QString HistorySong::text(int i) const
@@ -151,8 +150,8 @@ QString HistorySong::text(int i) const
   return QString::null;
 }
 
-HistorySong::HistorySong(Song * s, QString r, QString c, QListView* parent) :
-  QListViewItem(parent,"","","","","","","")
+HistorySong::HistorySong(Song * s, QString r, QString c, Q3ListView* parent) :
+  Q3ListViewItem(parent,"","","","","","","")
 {
   song =  s;
   relation = r;

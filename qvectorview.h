@@ -21,26 +21,23 @@
 using namespace std;
 #line 1 "qvectorview.h++"
 // A QVectorView suitable for BpmDj.
-// This is a stripdown from trolltechs QListView class. 
-
-#ifndef QT_H
-#include <qptrvector.h>
-#include "qscrollview.h"
-#endif
+// This is a stripdown from trolltechs Qt3 QListView class. 
+#include <Qt3Support/q3ptrvector.h>
+#include <Qt3Support/q3scrollview.h>
 #include <vector>
 
-#ifndef QT_NO_VECTORVIEW
-
 class QFont;
-class QHeader;
-class QIconSet;
+class Q3Header;
 class QVectorView;
 
-class Q_EXPORT QVectorViewData : public Qt
+class QVectorViewData
 {
  public:
   int ownHeight;
-  int height() const;
+  int height() const
+  {
+    return ownHeight;
+  }
   QVectorViewData( );
   virtual void setup(QVectorView *v);
   virtual ~QVectorViewData();
@@ -49,18 +46,15 @@ class Q_EXPORT QVectorViewData : public Qt
   virtual int  vectorSize() const = 0;
   virtual QString text( int row, int col) const = 0;
   virtual void sort(int col, bool ascending) = 0;
-  virtual void preparePaint( QVectorView* , int number) = 0;
   virtual void paintCell( QVectorView*, int number, QPainter *, const QColorGroup & cg, int column, int width, int alignment );
  private:
-  void init();
-  uint configured: 1;
   friend class QVectorView;
 };
 
 class ViewColumnInfo;
 class ItemColumnInfo;
 
-class Q_EXPORT QVectorView: public QScrollView
+class QVectorView: public Q3ScrollView
 {
   friend class QVectorViewData;
   Q_OBJECT ;
@@ -74,7 +68,7 @@ class Q_EXPORT QVectorView: public QScrollView
   int totalHeight;
  public:
   // Constructor
-  QVectorView( QWidget* parent, QVectorViewData * container, WFlags f = 0 );
+  QVectorView( QWidget* parent, QVectorViewData * container, Qt::WindowFlags f = 0 );
   void setupItemContainer();
   void vectorChanged();
  signals:
@@ -84,10 +78,10 @@ class Q_EXPORT QVectorView: public QScrollView
   void rightButtonPressed( int, const QPoint&, int );
  public:
   ~QVectorView();
-  QHeader * header() const;
+  Q3Header * header() const;
   virtual int addColumn( const QString &label, int size = -1);
   virtual void setColumnText( int column, const QString &label );
-  virtual void setColumnText( int column, const QIconSet& iconset, const QString &label );
+  //  virtual void setColumnText( int column, const QIconSet& iconset, const QString &label );
   QString columnText( int column ) const;
   virtual void setColumnWidth( int column, int width );
   int columnWidth( int column ) const;
@@ -95,9 +89,7 @@ class Q_EXPORT QVectorView: public QScrollView
   virtual void setColumnWidthMode( int column, WidthMode );
   WidthMode columnWidthMode( int column ) const;
   int columns() const;
-  virtual void setColumnAlignment( int, int );
   void setSectionPos( int column, int index );
-  int columnAlignment( int ) const;
   void show();
   int itemAt( const QPoint & screenPos );
   QRect itemRect( int i ) const;
@@ -118,7 +110,7 @@ class Q_EXPORT QVectorView: public QScrollView
   bool rootIsDecorated() const;
   virtual void setSorting( int column, bool ascending = TRUE );
   void setSortColumn( int column );
-  void setSortOrder( SortOrder order );
+  void setSortOrder( Qt::SortOrder order );
   virtual void setFont( const QFont & );
   virtual void setPalette( const QPalette & );
   bool eventFilter( QObject * o, QEvent * );
@@ -196,7 +188,7 @@ class Q_EXPORT QVectorView: public QScrollView
   void get_visible_range(int &lo, int &hi) {lo=top_line_number; hi=bottom_line_number;};
  private:
   ViewColumnInfo * d_vci;
-  QHeader * d_h;
+  Q3Header * d_h;
   int d_margin;
   int d_focusItem, d_highlighted, d_oldFocusItem;
   QTimer * d_timer;
@@ -206,7 +198,7 @@ class Q_EXPORT QVectorView: public QScrollView
   int d_bottomPixel;
   struct Column 
     { QVectorView::WidthMode wmode; };
-  QPtrVector<Column> d_column;
+  Q3PtrVector<Column> d_column;
   int d_fontMetricsHeight;
   int d_minLeftBearing, d_minRightBearing;
   int d_ellipsisWidth;
@@ -228,6 +220,4 @@ class Q_EXPORT QVectorView: public QScrollView
   int  d_pressedColumn;
   ResizeMode d_resizeMode;
 };
-
-#endif // QT_NO_VECTORVIEW
 #endif

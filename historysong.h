@@ -24,15 +24,15 @@ using namespace std;
 #include "cluster.h"
 
 class HistorySong: 
-  public QListViewItem
+  public Q3ListViewItem
 {
  private:
   Song * song;
   QString relation;
   QString comment;
  public:
-  HistorySong(Song *song, QString relation, QString comment, QListView* parent);
-  HistorySong(QListView* parent, QListViewItem* after);
+  HistorySong(Song *song, QString relation, QString comment, Q3ListView* parent);
+  HistorySong(Q3ListView* parent, Q3ListViewItem* after);
   Song * getSong() {return song;};
   virtual void paintCell(QPainter *p, const QColorGroup &cg, int col, int wid, int align);
   virtual QString text(int i) const;

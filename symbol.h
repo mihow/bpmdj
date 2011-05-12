@@ -19,7 +19,7 @@
 
 #ifndef OM_SYMBOL_H
 #define OM_SYMBOL_H
-#include <qstring.h>
+#include <Qt/qstring.h>
 #include "data.h"
 
 //---------------------------------------------------------------
@@ -34,15 +34,12 @@ class symbolLesser;
 class Symbol: public DataClass
 {
  private:
-  QString *text;
-  Symbol(QString * s) : text(s)
-    {
-    }
-  void init(QString s);
+  QString text;
+  void init(const QString& s);
  protected:
   virtual DataClass* shallow_copy() const
     {
-      return new Symbol(text);
+      return new Symbol(*this);
     };
   virtual QString type_name() const 
     {
@@ -57,7 +54,10 @@ class Symbol: public DataClass
   Symbol() :  text(NULL) 
     {
     }; 
-  Symbol(QString s);
+  Symbol(const QString &s)
+    {
+      init(s);
+    }
   Symbol(const Symbol& s) : DataClass(), text(s.text)
     {
     }; 
@@ -66,20 +66,30 @@ class Symbol: public DataClass
       text=s.text;
       return *this;
     };
-  QString& operator ()() const 
+  const QString& operator ()() const 
     {
-      return *text; 
+      return text; 
     };
-  operator QString&() const
+  operator const QString&() const
     {
-      return *text;
+      return text;
+    }
+  operator QString() const
+    {
+      return text;
     }
   int length() const 
     {
-      return text->length();
+      return text.length();
     };
-  bool operator <   (const Symbol & other);
-  bool operator ==  (const Symbol & other);
+  bool operator <   (const Symbol & other)
+    {
+      return text < other.text;
+    }
+  bool operator ==  (const Symbol & other)
+    {
+      return text < other.text;
+    }
 };
 
 struct symbolLesser

@@ -20,38 +20,34 @@ using namespace std;
 #line 1 "pixmap-cache.c++"
 #include "pixmap-cache.h"
 
-PixmapCache::PixmapCache() : QIntCache<QPixmap>()
+PixmapCache::PixmapCache() : QCache<intptr_t,QPixmap>()
 {
   main = NULL;
   width = -1;
   height = -1;
-  setAutoDelete(true);
 }
 
 QPixmap * PixmapCache::insert(Song* a, QPixmap * pm)
 {
-  QIntCache<QPixmap>::insert((intptr_t)(void*)a,pm);
+  QCache<intptr_t,QPixmap>::insert((intptr_t)(void*)a,pm);
   return pm;
 }
 
 void PixmapCache::remove(Song * a)
 {
-  QIntCache<QPixmap>::remove((intptr_t)a);
+  QCache<intptr_t,QPixmap>::remove((intptr_t)a);
 }
 
 QPixmap *PixmapCache::find(Song* a, Song* m, int w, int h)
 {
   if (w!=width || h!=height || m!=main)
     {
-      QIntCache<QPixmap>::clear();
-      //      QIntCacheIterator<QPixmap> it(*this);
-      //      while (!it.isEmpty())
-      //      	QIntCache<QPixmap>::remove(it.currentKey());
+      QCache<intptr_t,QPixmap>::clear();
       main = m;
       width = w;
       height = h;
     }
-  QPixmap * answer = QIntCache<QPixmap>::find((intptr_t)a);
+  QPixmap * answer = (*this)[((intptr_t)a)];
   if (answer) return answer;
   return insert(a,new QPixmap());
 }

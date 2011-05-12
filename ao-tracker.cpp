@@ -24,12 +24,12 @@ using namespace std;
 
 elementResult ActiveAoTracker::sunset(string s)
 {
-  cerr << "The sun is setting for " << s << "\n";
+  // cerr << "The sun is setting for " << s << "\n";
   assert(alive.find(s)!=alive.end());
   alive.erase(s);
   if (alive.empty())
     {
-      cerr << "No active objects left, deactivating pool\n";
+      // cerr << "No active objects left, deactivating pool\n";
       deactivate();
     }
   return Done;
@@ -37,7 +37,7 @@ elementResult ActiveAoTracker::sunset(string s)
 
 elementResult ActiveAoTracker::sunrise(string s)
 {
-  cerr << "The sun is rising for " << s << "\n";
+  // cerr << "The sun is rising for " << s << "\n";
   assert(alive.find(s)==alive.end());
   alive.insert(s);
   return Done;

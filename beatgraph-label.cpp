@@ -18,69 +18,84 @@
 ****/
 using namespace std;
 #line 1 "beatgraph-label.c++"
-#include <qpixmap.h>
+#include <Qt/qpixmap.h>
+#include <QtGui/QPaintEvent>
 #include "beatgraph-label.h"
 #include "player-core.h"
 
-static QPen ruler_pen(QColor(255,255,0), 3);
-void BeatGraphLabel::drawCursor()
+void BeatGraphLabel::xorLine(int ox, int &x1, int &x2)
 {
-  QPixmap *pm = pixmap();
-  if (!pm) return;
-  int window_xsize = pm->width();
-  if (window_xsize>1)
+  int osx = original.width();
+  if (ox>=osx) return;
+  int sx = resized.width();
+  static QRgb mask=QColor(255,255,0).rgb();
+  x1 = -1, x2 = -1;
+  if (osx<=1) return; // div by zero 
+  x1 = ox*sx/osx; 
+  x2 = ((ox+1)*sx/osx);
+  if (x2>=sx) 
+    x2=sx;
+  assert(x1<x2);
+  for(int y = 0 ; y < resized.height(); y++)
     {
-      int pos = ::x/samples_per_column;
-      pos=pos*(width()-1)/(window_xsize-1);
-      if (oldpos==pos)
-	return;
-      QPainter paint(this);
-      paint.setPen(ruler_pen);
-      paint.setRasterOp( Qt::XorROP);
-      if (oldpos>-1)
-	paint.drawLine(oldpos,0,oldpos,height());
-      paint.drawLine(pos,0,pos,height());
-      oldpos=pos;
-      paint.end();
-    }
-  else
-    {
-      QPainter paint(this);
-      paint.setPen(ruler_pen);
-      paint.setRasterOp( Qt::XorROP);
-      if (oldpos>-1)
-	paint.drawLine(oldpos,0,oldpos,height());
-      oldpos=-1;
-      paint.end();
+      QRgb* l = ((QRgb*)resized.scanLine(y));
+      for(int x = x1; x < x2 ; x++)
+	l[x]^=mask;
     }
 }
 
-void BeatGraphLabel::drawRuler()
+void BeatGraphLabel::moveRuler(int &x1, int&x2,int &x3, int &x4)
 {
-  if (oldpos>-1)
+  if (resized.isNull()) return; 
+  int pos = ::x/samples_per_column;
+  x1=x2=x3=x4=-1;
+  if (ruler_x==pos) return;
+  if (ruler_x>-1)
+    xorLine(ruler_x,x1,x2);
+  ruler_x=pos;
+  xorLine(ruler_x,x3,x4);
+}
+
+void BeatGraphLabel::drawCursor()
+{
+  int x1,x2,x3,x4;
+  moveRuler(x1,x2,x3,x4);
+  if (x1==-1)
     {
-      QPainter paint(this);
-      paint.setPen(ruler_pen);
-      paint.setRasterOp(Qt::XorROP);
-      if (oldpos>-1)
-	paint.drawLine(oldpos,0,oldpos,height());
-      paint.end();
+      if (x3==-1) return;
+      repaint(QRect(x3,0,x4-x3+1,resized.height()));
+    }
+  else
+    {
+      if (x3==-1)
+	repaint(QRect(x1,0,x2-x1+1,resized.height()));
+      else
+	{
+	  int a = ::min(x1,x3);
+	  int b = ::max(x2,x4);
+	  if (b-a<2*(x2-x1+x4-x3))
+	    repaint(QRect(a,0,b-a+1,resized.height()));
+	  else
+	    {
+	      repaint(QRect(x3,0,x4-x3+1,resized.height()));
+	      repaint(QRect(x1,0,x2-x1+1,resized.height()));
+	    }
+	}
     }
 }
 
 void BeatGraphLabel::drawCueText()
 {
-  QPixmap *pm = pixmap();
-  if (!pm) return;
-  int window_xsize = pm->width();
-  QPainter paint(this);
+  if (!(resized.width()>1 && samples_per_column>1)) return;
+  QPainter paint;
+  paint.begin(&resized);
   QColor cue_to_color[5];
   cue_to_color[0]=QColor(255,255,255);
   cue_to_color[1]=QColor(255,0,0);
   cue_to_color[2]=QColor(0,255,0);
   cue_to_color[3]=QColor(0,0,255);
   cue_to_color[4]=QColor(255,255,0);
-  const int size = 10;
+  int tx=resized.width();
   for(int i = -1 ; i < 4 ; i ++)
     {
       cue_info c = i==-1 ? ::cue : ::cues[i];
@@ -89,32 +104,63 @@ void BeatGraphLabel::drawCueText()
       paint.setPen(cue_pen);
       int x = c/samples_per_column;
       int y = c-x*samples_per_column;
-      x=x*(width()-1)/(window_xsize-1);
-      y=y*(height()-1)/samples_per_column;
-      paint.drawLine(x-size,y,x+size,y);
-      paint.drawLine(x,y-size,x,y+size);
+      x=x*tx/original.width();
+      y=y*resized.height()/samples_per_column;
+      paint.drawLine(x-10,y,x+10,y);
+      paint.drawLine(x,y-10,x,y+10);
     }
   paint.end();
+  update();
 }
 
 void BeatGraphLabel::paintEvent(QPaintEvent *e)
 {
-  QLabel::paintEvent(e);
-  drawCueText();
-  drawRuler();
+  if (resized.isNull())
+    {
+      QPainter p;
+      p.begin(this);
+      p.fillRect(e->rect(),Qt::black);
+      p.end();
+      return;
+    }
+  if (cues_changed)
+    {
+      cues_changed=false;
+      if (!original.isNull())
+	{
+	  setImage(original,samples_per_column);
+	  int a,b,c,d;
+	  moveRuler(a,b,c,d);
+	}
+    }
+  QPainter p;
+  p.begin(this);
+  p.drawImage(e->rect(),resized,e->rect());
+  p.end();
+}
+
+void BeatGraphLabel::resizeEvent(QResizeEvent * event)
+{
+  cues_changed=true;
+  update();
 }
 
 BeatGraphLabel::BeatGraphLabel(QWidget * parent, const char * name) : 
-  QLabel(parent,name)
+  QWidget(parent,name), original(), resized()
 {
-  oldpos=-1;
-  setScaledContents(true);
+  setAttribute(Qt::WA_OpaquePaintEvent);
+  ruler_x=-1;
+  cues_changed=false;
+  samples_per_column=1;
   connect(&timer,SIGNAL(timeout()),SLOT(drawCursor()));
 };
 
-void BeatGraphLabel::setPixmap (const QPixmap &pm, unsigned8 samplespercol)
+void BeatGraphLabel::setImage(QImage image, unsigned8 samplespercol)
 {
-  QLabel::setPixmap(pm);
+  original=image;
+  resized=original.scaled(size());
+  drawCueText();
+  ruler_x = -1;
   samples_per_column=samplespercol;
   timer.start(333);
 }

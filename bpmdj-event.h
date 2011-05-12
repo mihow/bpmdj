@@ -24,15 +24,19 @@ using namespace std;
 
 class SongSelectorLogic;
 
-class BpmDjEvent: public BpmEvent
+/**
+ * A bpm dj event used to signal various things to the song selector.
+ * The selectorwindow will accept each bpmdjevent by executing the 
+ * run method. This double dispatching makes it possible
+ * to be thread safe while at the same time have the flexibility
+ * to wrtie things outside the user interface itself.
+ */
+class BpmDjEvent: public QEvent
 {
  public:
-  BpmDjEvent() : BpmEvent(BpmDjCustom)
+  BpmDjEvent() : QEvent((QEvent::Type)BpmDjCustom)
   {
   }
-  virtual void run(SongSelectorLogic * song_selector_window) = 0;
-  virtual ~BpmDjEvent()
-  {
-  }
+  virtual void run(SongSelectorLogic * song_selector) = 0;
 };
 #endif

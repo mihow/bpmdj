@@ -63,6 +63,6 @@ void set_used_decoder(int x);
 
 class PlayerConfig;
 class Index;
-// Set the environment before calling bpmdj-raw
+// Set the environment before calling bpmdjraw
 int set_decoder_environment(PlayerConfig * config, Index * idx);
 #endif

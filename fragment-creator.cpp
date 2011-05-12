@@ -18,15 +18,15 @@
 ****/
 using namespace std;
 #line 1 "fragment-creator.c++"
-#include "kbpm-dj.h"
+#include "bpmdj.h"
 #include "scripts.h"
-#include "songselector.logic.h"
+#include "selector.h"
 #include "fragment-creator.h"
 
 elementResult ActiveFragmentCreator::createOneFor(Song* song)
 {
   QString music_filename = song->get_file();
-  QString fragment_filename = FragmentsDir+"/nr"+QString::number((int)(void*)song)+".wav";
+  QString fragment_filename = FragmentsDir+"/nr"+QString::number((intptr_t)(void*)song)+".wav";
   Index index(song->get_storedin());
   unsigned8 pos = index.get_cue();
   int startsec=pos/44100;
@@ -39,9 +39,17 @@ elementResult ActiveFragmentCreator::createOneFor(Song* song)
     {
       // this is a bit experimental and relies hevaily onmplayer its
       // excellent capabilities to seek to the right position.
-      QString toexecute = "mplayer -vc null -vo null -ss "+QString::number(startsec)
-	+ " -endpos "+QString::number(stopsec-startsec)+" -ao pcm:fast:file="+escape(fragment_filename)
-	+ " "+MusicDir+"/"+escape(music_filename);
+      QString toexecute = 
+	QString("mplayer -vc null -vo null -ss ")
+	+ QString::number(startsec)
+	+ QString(" -endpos ")
+	+ QString::number(stopsec-startsec)
+	+ QString(" -ao pcm:fast:file=")
+	+ QString(escape(fragment_filename))
+	+ OneSpace
+	+ QString(MusicDir)
+	+ slash
+	+ QString(escape(music_filename));
       execute(toexecute.ascii());
     }
   if (exists(fragment_filename.ascii()))

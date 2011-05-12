@@ -25,11 +25,11 @@ using namespace std;
 #include <qpainter.h>
 #include <qtextedit.h>
 #include <qlabel.h>
-#include "kbpm-dj.h"
+#include "bpmdj.h"
 #include "song.h"
 #include "histogram-type.h"
 #include "echo-property.h"
-#include "songselector.logic.h"
+#include "selector.h"
 #include "spectrum-type.h"
 #include "signals.h"
 #include "files.h"

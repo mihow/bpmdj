@@ -18,30 +18,21 @@
 ****/
 using namespace std;
 #line 1 "qvectorview.c++"
-// A QVectorView suitable for BpmDj.
-// This is a huge stripdown from trolltechs QListView class.
-// TODO: move totalheight from QVectorViewData to QVectorView
 #include <iostream>
 #include <qtimer.h>
-#include <qheader.h>
-#include <qscrollview.h>
+#include <q3header.h>
+#include <q3scrollview.h>
 #include <qpainter.h>
 #include <qcursor.h>
-#include <qptrstack.h>
-#include <qptrlist.h>
 #include <qapplication.h>
 #include <qbitmap.h>
 #include <qdatetime.h>
-#include <qptrdict.h>
-#include <qptrvector.h>
 #include <qiconset.h>
 #include <qpixmapcache.h>
-#include <qpopupmenu.h>
-#include <qtl.h>
-#include <qdragobject.h>
 #include <qlineedit.h>
-#include <qvbox.h>
-#include <qstyle.h>
+#include <QtGui/qstyle.h>
+#include <QtGui/QStyleOptionQ3ListView>
+#include <QtGui/QMouseEvent>
 #include <assert.h>
 #include <stdlib.h>
 #include "qvectorview.h"
@@ -70,13 +61,7 @@ public:
 
 QVectorViewData::QVectorViewData( )
 {
-    init();
-}
-
-void QVectorViewData::init()
-{
-    ownHeight = 0;
-    configured = FALSE;
+  ownHeight = 0;
 }
 
 QVectorViewData::~QVectorViewData()
@@ -85,7 +70,6 @@ QVectorViewData::~QVectorViewData()
 
 void QVectorViewData::setup(QVectorView * v)
 {
-  configured = true;
   int ph = 0;
   int h;
   h = QMAX( v->d_fontMetricsHeight, ph ) + 2 * v->itemMargin();
@@ -100,8 +84,7 @@ void QVectorViewData::paintCell(QVectorView* lv, int number, QPainter * p, const
   QFontMetrics fm( p->fontMetrics() );
   QString t = text( number, column );
   int marg = lv->itemMargin();
-  const BackgroundMode bgmode = lv->viewport()->backgroundMode();
-  const QColorGroup::ColorRole crole = QPalette::backgroundRoleFromMode( bgmode );
+  const QColorGroup::ColorRole crole = lv->viewport()->backgroundRole();
   if ( cg.brush( crole ) != lv->colorGroup().brush( crole ) )
     p->fillRect( 0, 0, width, height(), cg.brush( crole ) );
   else
@@ -113,15 +96,12 @@ void QVectorViewData::paintCell(QVectorView* lv, int number, QPainter * p, const
     } 
   else 
     p->setPen( cg.text() );
-  if ( !t.isEmpty() ) {
-    if ( !(align & AlignTop || align & AlignBottom) )
-      align |= AlignVCenter;
-    p->drawText(marg , 0, width, height(), align, t );
-  }  
+  if ( !t.isEmpty() ) 
+    p->drawText(marg , 0, width, height(), Qt::AlignVCenter, t );
 }
 
-QVectorView::QVectorView( QWidget * parent, QVectorViewData * container, WFlags f)
-    : QScrollView( parent, "VectorView", f | WStaticContents | WNoAutoErase )
+QVectorView::QVectorView(QWidget * parent, QVectorViewData * container, Qt::WindowFlags f):
+  Q3ScrollView( parent, "VectorView", f | Qt::WStaticContents | Qt::WNoAutoErase )
 {
   item_container = container;
   init();
@@ -145,7 +125,7 @@ void QVectorView::init()
 {
     d_vci = 0;
     d_timer = new QTimer( this );
-    d_h = new QHeader( this, "list view header" );
+    d_h = new Q3Header( this, "list view header" );
     d_h->installEventFilter( this );
     d_focusItem = -1;
     d_oldFocusItem = -1;
@@ -185,9 +165,9 @@ void QVectorView::init()
     connect( horizontalScrollBar(), SIGNAL(sliderMoved(int)), d_h, SLOT(setOffset(int)) );
     connect( horizontalScrollBar(), SIGNAL(valueChanged(int)), d_h, SLOT(setOffset(int)) );
     viewport()->setFocusProxy( this );
-    viewport()->setFocusPolicy( WheelFocus );
-    viewport()->setBackgroundMode( PaletteBase );
-    setBackgroundMode( PaletteBackground, PaletteBase );
+    viewport()->setFocusPolicy( Qt::WheelFocus );
+    viewport()->setBackgroundRole( QPalette::Base );
+    setBackgroundRole( QPalette::Base );
 }
 
 void QVectorView::setShowSortIndicator( bool show )
@@ -283,7 +263,6 @@ void QVectorView::drawContentsOffset( QPainter * p, int ox, int oy,
 	int y = itemPos(current);
 	if ( y < cy+ch && y+ih >= cy )  // need to paint current?
 	  {
-	    item_container->preparePaint(this, current);
 	    if ( fx < 0 ) 
 	      {
 		// find first interesting column, once
@@ -312,8 +291,7 @@ void QVectorView::drawContentsOffset( QPainter * p, int ox, int oy,
 	    x = fx;
 	    c = fc;
 	    // draw to last interesting column
-	    bool drawActiveSelection = hasFocus() || d_inMenuMode ||
-	      !style().styleHint( QStyle::SH_ItemView_ChangeHighlightOnFocus, this );
+	    bool drawActiveSelection = hasFocus() || d_inMenuMode; // !style().styleHint( QStyle::SH_ItemView_ChangeHighlightOnFocus, this );
 	    const QColorGroup &cg = ( drawActiveSelection ? colorGroup() : palette().inactive() );
       
 	    while ( c < lc )
@@ -327,10 +305,7 @@ void QVectorView::drawContentsOffset( QPainter * p, int ox, int oy,
 		  {
 		    p->translate( r.left(), r.top() );
 		    int ac = d_h->mapToLogical( c );
-		    // map to Left currently. This should change once we can really reverse the listview.
-		    int align = columnAlignment( ac );
-		    if ( align == AlignAuto ) align = AlignLeft;
-		    item_container->paintCell(this, current, p, cg, ac, r.width(), align);
+		    item_container->paintCell(this, current, p, cg, ac, r.width(), Qt::AlignLeft);
 		  }
 		p->restore();
 		x += cs;
@@ -355,15 +330,17 @@ void QVectorView::drawContentsOffset( QPainter * p, int ox, int oy,
 
 void QVectorView::paintEmptyArea( QPainter * p, const QRect & rect )
 {
-  QStyleOption opt( 0, 0 ); // ### hack; in 3.1, add a property in QVectorView and QHeader
-  QStyle::SFlags how = QStyle::Style_Default;
-  if ( isEnabled() )
-    how |= QStyle::Style_Enabled;
+  //  QStyleOption opt( 0, 0 ); // ### hack; in 3.1, add a property in QVectorView and Q3Header
+  //  QStyle::SFlags how = QStyle::Style_Default;
+  //  if ( isEnabled() )
+  //    how |= QStyle::Style_Enabled;
   
-  style().drawComplexControl( QStyle::CC_ListView,
-			      p, this, rect, colorGroup(),
-			      how, QStyle::SC_ListView, QStyle::SC_None,
-			      opt );
+  QStyleOptionQ3ListView options;
+  options.rect=rect;
+  options.palette=palette();
+  if (isEnabled())
+    options.state|=QStyle::State_Enabled ;
+  style()->drawComplexControl(QStyle::CC_Q3ListView, &options, p, this);
 }
 
 void QVectorView::buildDrawableList()
@@ -386,7 +363,7 @@ void QVectorView::buildDrawableList()
 void QVectorView::setContentsPos( int x, int y )
 {
     updateGeometries();
-    QScrollView::setContentsPos( x, y );
+    Q3ScrollView::setContentsPos( x, y );
 }
 
 int QVectorView::addColumn( const QString &label, int width )
@@ -415,7 +392,7 @@ void QVectorView::setColumnText( int column, const QString &label )
     }
 }
 
-void QVectorView::setColumnText( int column, const QIconSet& iconset, const QString &label )
+/*void QVectorView::setColumnText( int column, const QIconSet& iconset, const QString &label )
 {
   if ( column < d_h->count() ) 
     {
@@ -423,6 +400,7 @@ void QVectorView::setColumnText( int column, const QIconSet& iconset, const QStr
       updateGeometries();
     }
 }
+*/
 
 void QVectorView::setColumnWidth( int column, int w )
 {
@@ -464,40 +442,6 @@ QVectorView::WidthMode QVectorView::columnWidthMode( int c ) const
 	return Manual;
 }
 
-void QVectorView::setColumnAlignment( int column, int align )
-{
-  if ( column < 0 )
-    return;
-  if ( !d_vci )
-    d_vci = new ViewColumnInfo;
-  ViewColumnInfo * l = d_vci;
-  while( column ) 
-    {
-      if ( !l->next )
-	l->next = new ViewColumnInfo;
-      l = l->next;
-      column--;
-    }
-  if ( l->align == align )
-    return;
-  l->align = align;
-  triggerUpdate();
-}
-
-int QVectorView::columnAlignment( int column ) const
-{
-  if ( column < 0 || !d_vci )
-    return AlignAuto;
-  ViewColumnInfo * l = d_vci;
-  while( column ) {
-    if ( !l->next )
-      l->next = new ViewColumnInfo;
-    l = l->next;
-    column--;
-  }
-  return l ? l->align : AlignAuto;
-}
-
 void QVectorView::show()
 {
   // Reimplemented to setx the correct background mode and viewed
@@ -507,7 +451,7 @@ void QVectorView::show()
       reconfigureItems();
       updateGeometries();
     }
-  QScrollView::show();
+  Q3ScrollView::show();
 }
 
 void QVectorView::updateContents()
@@ -577,11 +521,10 @@ void QVectorView::handleSizeChange( int section, int os, int ns )
 
     // map auto to left for now. Need to fix this once we support
     // reverse layout on the listview.
-    int align = columnAlignment( section );
-    if ( align == AlignAuto ) align = AlignLeft;
-    if ( align != AlignAuto && align != AlignLeft )
-	viewport()->repaint( d_h->cellPos( actual ) - contentsX(), 0,
-			     d_h->cellSize( actual ), visibleHeight() );
+    // int align = Qt::AlignLeft;
+    //    if ( align != AlignAuto && align != AlignLeft )
+    //      viewport()->repaint( d_h->cellPos( actual ) - contentsX(), 0,
+    //			   d_h->cellSize( actual ), visibleHeight() );
 }
 
 void QVectorView::updateDirtyItems()
@@ -608,14 +551,14 @@ void QVectorView::makeVisible()
 
 void QVectorView::resizeEvent( QResizeEvent *e )
 {
-  QScrollView::resizeEvent( e );
+  Q3ScrollView::resizeEvent( e );
   d_fullRepaintOnComlumnChange = TRUE;
   d_h->resize( visibleWidth(), d_h->height() );
 }
 
 void QVectorView::viewportResizeEvent( QResizeEvent *e )
 {
-  QScrollView::viewportResizeEvent( e );
+  Q3ScrollView::viewportResizeEvent( e );
   d_h->resize( visibleWidth(), d_h->height() );
 }
 
@@ -639,11 +582,11 @@ bool QVectorView::eventFilter( QObject * o, QEvent * e )
       switch( me2.type() )
 	{
 	case QEvent::MouseButtonDblClick:
-	  if ( me2.button() == RightButton )
+	  if ( me2.button() == Qt::RightButton )
 	    return TRUE;
 	  break;
 	case QEvent::MouseMove:
-	  if ( me2.state() & RightButton ) 
+	  if ( me2.state() & Qt::RightButton ) 
 	    {
 	      viewportMouseMoveEvent( &me2 );
 	      return TRUE;
@@ -669,18 +612,12 @@ bool QVectorView::eventFilter( QObject * o, QEvent * e )
 	  break;
 	}
     } 
-  return QScrollView::eventFilter( o, e );
-}
-
-int QVectorViewData::height() const
-{
-    assert ( configured );
-    return ownHeight;
+  return Q3ScrollView::eventFilter( o, e );
 }
 
 void QVectorView::contentsMousePressEvent( QMouseEvent * e )
 {
-    contentsMousePressEventEx( e );
+  contentsMousePressEventEx( e );
 }
 
 void QVectorView::contentsMousePressEventEx( QMouseEvent * e )
@@ -695,7 +632,7 @@ void QVectorView::contentsMousePressEventEx( QMouseEvent * e )
   d_pressedEmptyArea = e->y() > contentsHeight();
   int oldCurrent = currentItem();
   
-  if ( e->button() == RightButton)
+  if ( e->button() == Qt::RightButton)
     {
       // if the element is not selected, then select it
       if (i>=0 && !isSelected(i))
@@ -705,14 +642,14 @@ void QVectorView::contentsMousePressEventEx( QMouseEvent * e )
   
   if ( i<0 ) 
     {
-      if ( !( e->state() & ControlButton ) )
+      if ( !( e->state() & Qt::ControlButton ) )
 	clearSelection();
       goto emit_signals;
     } 
   else 
     {
       // No new anchor when using shift
-      if ( !(e->state() & ShiftButton) )
+      if ( !(e->state() & Qt::ShiftButton) )
 	d_selectAnchor = i;
     }
   
@@ -727,7 +664,7 @@ void QVectorView::contentsMousePressEventEx( QMouseEvent * e )
   
   {
     bool changed = FALSE;
-    if ( !(e->state() & (ControlButton | ShiftButton)) ) 
+    if ( !(e->state() & (Qt::ControlButton | Qt::ShiftButton)) ) 
       {
 	if ( !isSelected(i) ) 
 	  {
@@ -741,9 +678,9 @@ void QVectorView::contentsMousePressEventEx( QMouseEvent * e )
       } 
     else 
       {
-	if ( e->state() & ShiftButton )
+	if ( e->state() & Qt::ShiftButton )
 	  d_pressedSelected = FALSE;
-	if ( (e->state() & ControlButton) && !(e->state() & ShiftButton) && i>=0 ) 
+	if ( (e->state() & Qt::ControlButton) && !(e->state() & Qt::ShiftButton) && i>=0 ) 
 	  {
 	    setSelected(i,!isSelected(i) );
 	    changed = TRUE;
@@ -778,7 +715,7 @@ void QVectorView::contentsMousePressEventEx( QMouseEvent * e )
   emit pressed( i );
   emit pressed( i, viewport()->mapToGlobal( vp ), c );
   emit mouseButtonPressed( e->button(), i, viewport()->mapToGlobal( vp ), c );
-  if ( e->button() == RightButton && i == d_pressedItem ) 
+  if ( e->button() == Qt::RightButton && i == d_pressedItem ) 
     emit rightButtonPressed( i, viewport()->mapToGlobal( vp ), c );
 }
 
@@ -805,7 +742,7 @@ void QVectorView::contentsMouseReleaseEventEx( QMouseEvent * e )
 
   if ( d_focusItem == d_pressedItem &&
        d_pressedSelected && d_focusItem &&
-       e->button() == LeftButton) 
+       e->button() == Qt::LeftButton) 
     {
       bool block = signalsBlocked();
       blockSignals( TRUE );
@@ -828,10 +765,10 @@ void QVectorView::contentsMouseReleaseEventEx( QMouseEvent * e )
       emit clicked( i );
       emit clicked( i, viewport()->mapToGlobal( vp ), d_h->mapToLogical( d_h->cellAt( vp.x() ) ) );
       emit mouseButtonClicked( e->button(), i, viewport()->mapToGlobal( vp ), i ? d_h->mapToLogical( d_h->cellAt( vp.x() ) ) : -1 );
-      if ( e->button() == RightButton ) {
+      if ( e->button() == Qt::RightButton ) {
 	if ( i<0 ) 
 	  {
-	    if ( !(e->state() & ControlButton) )
+	    if ( !(e->state() & Qt::ControlButton) )
 	      clearSelection();
 	    emit rightButtonClicked( 0, viewport()->mapToGlobal( vp ), -1 );
 	    return;
@@ -845,7 +782,7 @@ void QVectorView::contentsMouseReleaseEventEx( QMouseEvent * e )
 
 void QVectorView::contentsMouseDoubleClickEvent( QMouseEvent * e )
 {
-  if ( !e || e->button() != LeftButton )
+  if ( !e || e->button() != Qt::LeftButton )
     return;
   
   // ensure that the following mouse moves and eventual release is
@@ -887,9 +824,9 @@ void QVectorView::contentsMouseMoveEvent( QMouseEvent * e )
     }
   
   if ( !d_buttonDown ||
-       ( ( e->state() & LeftButton ) != LeftButton &&
-	 ( e->state() & MidButton ) != MidButton &&
-	 ( e->state() & RightButton ) != RightButton ) )
+       ( ( e->state() & Qt::LeftButton ) != Qt::LeftButton &&
+	 ( e->state() & Qt::MidButton ) != Qt::MidButton &&
+	 ( e->state() & Qt::RightButton ) != Qt::RightButton ) )
     return;
   
   // check, if we need to scroll
@@ -997,47 +934,47 @@ void QVectorView::doAutoScroll( const QPoint &cursorPos )
     d_visibleTimer->start( 1, TRUE );
 }
 
-void QVectorView::focusInEvent( QFocusEvent* )
+void QVectorView::focusInEvent( QFocusEvent* e)
 {
   d_inMenuMode = FALSE;
   if ( d_focusItem >=0 ) 
     {
       repaintItem( d_focusItem );
     } 
-  else if (QFocusEvent::reason() != QFocusEvent::Mouse ) 
+  else if (e->reason() != Qt::MouseFocusReason ) 
     {
       d_focusItem = -1;
       emit currentChanged( d_focusItem );
       repaintItem( d_focusItem );
     }
-  if ( style().styleHint( QStyle::SH_ItemView_ChangeHighlightOnFocus, this ) ) 
-    {
-      viewport()->repaint( FALSE );
-    }
-  QRect mfrect = itemRect( d_focusItem );
-  if ( mfrect.isValid() ) 
-    {
-      if ( header() && header()->isVisible() )
-	setMicroFocusHint( mfrect.x(), mfrect.y()+header()->height(), mfrect.width(), mfrect.height(), FALSE );
-      else
-	setMicroFocusHint( mfrect.x(), mfrect.y(), mfrect.width(), mfrect.height(), FALSE );
-    }
+  //if ( style().styleHint( QStyle::SH_ItemView_ChangeHighlightOnFocus, this ) ) 
+  //{
+  //viewport()->repaint( FALSE );
+  //}
+  //  QRect mfrect = itemRect( d_focusItem );
+  //  if ( mfrect.isValid() ) 
+  //    {
+  //      if ( header() && header()->isVisible() )
+  //	setMicroFocusHint( mfrect.x(), mfrect.y()+header()->height(), mfrect.width(), mfrect.height(), FALSE );
+  //      else
+  //	setMicroFocusHint( mfrect.x(), mfrect.y(), mfrect.width(), mfrect.height(), FALSE );
+  //    }
 }
 
-void QVectorView::focusOutEvent( QFocusEvent* )
+void QVectorView::focusOutEvent( QFocusEvent*e )
 {
-  if ( QFocusEvent::reason() == QFocusEvent::Popup && d_buttonDown )
+  if ( e->reason() == Qt::PopupFocusReason && d_buttonDown )
     d_buttonDown = FALSE;
-  if ( style().styleHint( QStyle::SH_ItemView_ChangeHighlightOnFocus, this ) ) 
-    {
-      d_inMenuMode =
-	QFocusEvent::reason() == QFocusEvent::Popup
-	|| (qApp->focusWidget() && qApp->focusWidget()->inherits("QMenuBar"));
-      if ( !d_inMenuMode ) 
-	{
-	  viewport()->repaint( FALSE );
-	}
-    }
+  //  if ( style().styleHint( QStyle::SH_ItemView_ChangeHighlightOnFocus, this ) ) 
+  //    {
+  //      d_inMenuMode =
+  //	QFocusEvent::reason() == QFocusEvent::Popup
+  //	|| (qApp->focusWidget() && qApp->focusWidget()->inherits("QMenuBar"));
+  //      if ( !d_inMenuMode ) 
+  //	{
+  //	  viewport()->repaint( FALSE );
+  //	}
+  //    }
   
   if ( d_focusItem>=0 )
     repaintItem( d_focusItem );
@@ -1071,12 +1008,12 @@ void QVectorView::keyPressEvent( QKeyEvent * e )
   bool selectCurrent = TRUE;
   switch( e->key() ) 
     {
-    case Key_Backspace:
-    case Key_Delete:
+    case Qt::Key_Backspace:
+    case Qt::Key_Delete:
       break;
-    case Key_Enter:
-    case Key_Return:
-      if ( e->state() & ControlButton ) 
+    case Qt::Key_Enter:
+    case Qt::Key_Return:
+      if ( e->state() & Qt::ControlButton ) 
 	{
 	  e->ignore();
 	  emit ctrlReturnPressed( currentItem() );
@@ -1088,25 +1025,25 @@ void QVectorView::keyPressEvent( QKeyEvent * e )
 	}
       // do NOT accept.  QDialog.
       return;
-    case Key_Down:
+    case Qt::Key_Down:
       selectCurrent = FALSE;
       i++;
       singleStep = TRUE;
       break;
-    case Key_Up:
+    case Qt::Key_Up:
       selectCurrent = FALSE;
       i--;
       singleStep = TRUE;
       break;
-    case Key_Home:
+    case Qt::Key_Home:
       selectCurrent = FALSE;
       i = 0;
       break;
-    case Key_End:
+    case Qt::Key_End:
       selectCurrent = FALSE;
       i = item_container->vectorSize()-1;
       break;
-    case Key_Next:
+    case Qt::Key_Next:
       selectCurrent = FALSE;
       i2 = itemAt( QPoint( 0, visibleHeight()-1 ) );
       if ( i2 == i || !r.isValid() ||
@@ -1134,7 +1071,7 @@ void QVectorView::keyPressEvent( QKeyEvent * e )
 	  }
       }
       break;
-    case Key_Prior:
+    case Qt::Key_Prior:
       selectCurrent = FALSE;
       i2 = itemAt( QPoint( 0, 0 ) );
       if ( i == i2 || !r.isValid() || r.top() <= 0 ) 
@@ -1153,30 +1090,30 @@ void QVectorView::keyPressEvent( QKeyEvent * e )
 	  i = i2;
 	}
       break;
-    case Key_Plus: return;
-    case Key_Right:
+    case Qt::Key_Plus: return;
+    case Qt::Key_Right:
       if ( contentsX() + visibleWidth() < contentsWidth() ) 
 	horizontalScrollBar()->addLine();
       return;
-    case Key_Minus: return;
-    case Key_Left:
+    case Qt::Key_Minus: return;
+    case Qt::Key_Left:
       if ( contentsX() ) 
 	horizontalScrollBar()->subtractLine();
       return;
-    case Key_Space:
+    case Qt::Key_Space:
       emit spacePressed( currentItem() );
       break;
-    case Key_Escape:
+    case Qt::Key_Escape:
       e->ignore(); // For QDialog
       return;
-    case Key_F2:
+    case Qt::Key_F2:
     default:
       {
-	if ( e->state() & ControlButton ) 
+	if ( e->state() & Qt::ControlButton ) 
 	  {
 	    switch ( e->key() ) 
 	      {
-	      case Key_A:
+	      case Qt::Key_A:
 		selectAll( TRUE );
 		break;
 	      }
@@ -1188,11 +1125,11 @@ void QVectorView::keyPressEvent( QKeyEvent * e )
   
   if ( i<0 || i>=item_container->vectorSize() ) return;
   
-  if ( !( e->state() & ShiftButton ) || d_selectAnchor<0 )
+  if ( !( e->state() & Qt::ShiftButton ) || d_selectAnchor<0 )
     d_selectAnchor = i;
   
   setCurrentItem( i );
-  handleItemChange( old, e->state() & ShiftButton, e->state() & ControlButton );
+  handleItemChange( old, e->state() & Qt::ShiftButton, e->state() & Qt::ControlButton );
   
   if ( singleStep )
     {
@@ -1300,13 +1237,13 @@ void QVectorView::setCurrentItem( int i )
   int prev = d_focusItem;
   d_focusItem = i;
   
-  QRect mfrect = itemRect( i );
-  if ( mfrect.isValid() ) {
-    if ( header() && header()->isVisible() )
-      setMicroFocusHint( mfrect.x(), mfrect.y()+header()->height(), mfrect.width(), mfrect.height(), FALSE );
-    else
-      setMicroFocusHint( mfrect.x(), mfrect.y(), mfrect.width(), mfrect.height(), FALSE );
-  }
+  //  QRect mfrect = itemRect( i );
+  //  if ( mfrect.isValid() ) {
+  //    if ( header() && header()->isVisible() )
+  //      setMicroFocusHint( mfrect.x(), mfrect.y()+header()->height(), mfrect.width(), mfrect.height(), FALSE );
+  //    else
+  //      setMicroFocusHint( mfrect.x(), mfrect.y(), mfrect.width(), mfrect.height(), FALSE );
+  //  }
   
   if ( i != prev ) 
     {
@@ -1361,19 +1298,19 @@ int QVectorView::itemMargin() const
 
 void QVectorView::styleChange( QStyle& old )
 {
-    QScrollView::styleChange( old );
+    Q3ScrollView::styleChange( old );
     reconfigureItems();
 }
 
 void QVectorView::setFont( const QFont & f )
 {
-    QScrollView::setFont( f );
+    Q3ScrollView::setFont( f );
     reconfigureItems();
 }
 
 void QVectorView::setPalette( const QPalette & p )
 {
-    QScrollView::setPalette( p );
+    Q3ScrollView::setPalette( p );
     reconfigureItems();
 }
 
@@ -1416,7 +1353,7 @@ QSize QVectorView::sizeHint() const
   constPolish();
   // buildDrawableList();
   QSize s( d_h->sizeHint() );
-  s.setWidth( s.width() + style().pixelMetric(QStyle::PM_ScrollBarExtent) );
+  s.setWidth( s.width() + style()->pixelMetric(QStyle::PM_ScrollBarExtent) );
   s += QSize(frameWidth()*2,frameWidth()*2);
   s.setHeight( s.height() + 10 * item_container->height() );
   if ( s.width() > s.height() * 3 )
@@ -1430,7 +1367,7 @@ QSize QVectorView::sizeHint() const
 
 QSize QVectorView::minimumSizeHint() const
 {
-    return QScrollView::minimumSizeHint();
+    return Q3ScrollView::minimumSizeHint();
 }
 
 void QVectorView::setRootIsDecorated( bool enable )
@@ -1453,7 +1390,7 @@ void QVectorView::ensureItemVisible( int i )
     setContentsPos( contentsX(), y );
 }
 
-QHeader * QVectorView::header() const
+Q3Header* QVectorView::header() const
 {
   return d_h;
 }
@@ -1619,7 +1556,7 @@ void QVectorView::windowActivationChange( bool oldActive )
     d_scrollTimer->stop();
   if ( palette().active() != palette().inactive() )
     viewport()->update();
-  QScrollView::windowActivationChange( oldActive );
+  Q3ScrollView::windowActivationChange( oldActive );
 }
 
 void QVectorView::hideColumn( int column )

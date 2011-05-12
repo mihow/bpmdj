@@ -19,7 +19,7 @@
 using namespace std;
 #line 1 "user-notification.c++"
 #include <qmessagebox.h>
-#include "kbpm-dj.h"
+#include "bpmdj.h"
 #include "user-notification.h"
 
 UserNotification::UserNotification(): update_view(false), main_changed(false), 

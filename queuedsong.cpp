@@ -23,7 +23,6 @@ using namespace std;
 #include <math.h>
 #include <stdlib.h>
 #include <qlistview.h>
-#include "songselector.logic.h"
 #include "qsong.h"
 #include "process-manager.h"
 #include "history.h"
@@ -62,17 +61,14 @@ QString QueuedAnalSong::text(int i) const
     case ANAL_RYTHM : return needs_rythm() ? ANAL_NEC : ANAL_NOTNEC;
     case ANAL_COMPOSITION : return needs_composition() ? ANAL_NEC : ANAL_NOTNEC;
     }
-  return QListViewItem::text(i);
+  return Q3ListViewItem::text(i);
 }
 
-/**
- * this is a mess... (TM)
- */
 void QueuedSong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid, int align)
 {
   if (col!=QUEUED_ANKER && !song)
     {
-      QListViewItem::paintCell(p,cg,col,wid,align);
+      Q3ListViewItem::paintCell(p,cg,col,wid,align);
       return;
     }
   switch(col)
@@ -81,15 +77,15 @@ void QueuedSong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid, 
       if (anker)
 	{
 	  QColorGroup ncg(cg);
-	  ncg.setColor(QColorGroup::Base,QColor(255,0,0));
-	  QListViewItem::paintCell(p,ncg,col,wid,align);
+	  ncg.setColor(QColorGroup::Window,QColor(255,0,0));
+	  Q3ListViewItem::paintCell(p,ncg,col,wid,align);
 	  return;
 	}
       else
 	{
 	  QColorGroup ncg(cg);
-	  ncg.setColor(QColorGroup::Base,QColor(255,255,0));
-	  QListViewItem::paintCell(p,ncg,col,wid,align);
+	  ncg.setColor(QColorGroup::Window,QColor(255,255,0));
+	  Q3ListViewItem::paintCell(p,ncg,col,wid,align);
 	  return;
 	}
       break;
@@ -97,8 +93,8 @@ void QueuedSong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid, 
       if (Config::color_cues && !song->get_has_cues())
 	{
 	  QColorGroup ncg(cg);
-	  ncg.setColor(QColorGroup::Base,QColor(0,0,255));
-	  QListViewItem::paintCell(p,ncg,col,wid,align);
+	  ncg.setColor(QColorGroup::Window,QColor(0,0,255));
+	  Q3ListViewItem::paintCell(p,ncg,col,wid,align);
 	  return;
 	}
       break;
@@ -110,8 +106,8 @@ void QueuedSong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid, 
       if (Config::color_played && song->get_played())
 	{
 	  QColorGroup ncg(cg);
-	  ncg.setColor(QColorGroup::Base,Config::get_color_played_song());
-	  QListViewItem::paintCell(p,ncg,col,wid,align);
+	  ncg.setColor(QColorGroup::Window,Config::get_color_played_song());
+	  Q3ListViewItem::paintCell(p,ncg,col,wid,align);
 	  return;
 	}
       break;
@@ -122,8 +118,8 @@ void QueuedSong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid, 
 	if ( (color=QSong::colorOfAuthorCol(song)) )
 	  {
 	    QColorGroup ncg(cg);
-	    ncg.setColor(QColorGroup::Base,*color);
-	    QListViewItem::paintCell(p,ncg,col,wid,align);
+	    ncg.setColor(QColorGroup::Window,*color);
+	    Q3ListViewItem::paintCell(p,ncg,col,wid,align);
 	    delete(color);
 	    return;
 	  }
@@ -136,8 +132,8 @@ void QueuedSong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid, 
 	QColorGroup ncg(cg);
 	if (distance<=1)
 	  yellow = (int)(distance*255.0);
-	ncg.setColor(QColorGroup::Base,QColor(yellow,255-yellow,0));
-	QListViewItem::paintCell(p,ncg,col,wid,align);
+	ncg.setColor(QColorGroup::Window,QColor(yellow,255-yellow,0));
+	Q3ListViewItem::paintCell(p,ncg,col,wid,align);
 	return;
       }
       
@@ -146,8 +142,8 @@ void QueuedSong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid, 
 	if (song->get_spectrum()!=no_spectrum)
 	  {
 	    QColorGroup ncg(cg);
-	    ncg.setColor(QColorGroup::Base,song->get_color());
-	    QListViewItem::paintCell(p,ncg,col,wid,align);
+	    ncg.setColor(QColorGroup::Window,song->get_color());
+	    Q3ListViewItem::paintCell(p,ncg,col,wid,align);
 	    return;
 	  }
       break;
@@ -155,11 +151,11 @@ void QueuedSong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid, 
   if (Config::color_ondisk && !song->get_ondisk())
     {
       QColorGroup ncg(cg);
-      ncg.setColor(QColorGroup::Base,Config::get_color_unavailable());
-      QListViewItem::paintCell(p,ncg,col,wid,align);
+      ncg.setColor(QColorGroup::Window,Config::get_color_unavailable());
+      Q3ListViewItem::paintCell(p,ncg,col,wid,align);
     }
   else
-    QListViewItem::paintCell(p,cg,col,wid,align);
+    Q3ListViewItem::paintCell(p,cg,col,wid,align);
 }
 
 QString QueuedSong::text(int i) const
@@ -187,11 +183,11 @@ QString QueuedSong::text(int i) const
     case QUEUED_ANKER : 
       return tonumber(pos);
     }
-  return QListViewItem::text(i);
+  return Q3ListViewItem::text(i);
 }
 
-QueuedSong::QueuedSong(Song * s, QListView* parent) :
-  QListViewItem(parent,"","","","","","","")
+QueuedSong::QueuedSong(Song * s, Q3ListView* parent) :
+  Q3ListViewItem(parent,"","","","","","","")
 {
   song = s;
   setText(QUEUED_TEMPO,song->tempo_str());
@@ -199,10 +195,11 @@ QueuedSong::QueuedSong(Song * s, QListView* parent) :
   distance = 0; 
   mark = false;
   pos = parent->childCount();
+  // setAutoFillBackground(true);
 }
 
-QueuedSong::QueuedSong(QListView* parent, QListViewItem *after) :
-  QListViewItem(parent,after)
+QueuedSong::QueuedSong(Q3ListView* parent, Q3ListViewItem *after) :
+  Q3ListViewItem(parent,after)
 {
   song = NULL;
   anker = false;
@@ -211,8 +208,10 @@ QueuedSong::QueuedSong(QListView* parent, QListViewItem *after) :
   pos = parent->childCount();
 }
 
-QueuedAnalSong::QueuedAnalSong(QListView* parent, Song * s) :
-  QListViewItem(parent), song(s) {};
+QueuedAnalSong::QueuedAnalSong(Q3ListView* parent, Song * s) :
+  Q3ListViewItem(parent), song(s) 
+{
+};
 
 void QueuedSong::setSong(Song* s, double d)
 {

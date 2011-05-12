@@ -21,7 +21,7 @@
 using namespace std;
 #line 1 "tempo-type.h++"
 #include <qstring.h>
-#include "qstring-factory.h"
+#include "constants.h"
 
 class tempo_type
 {

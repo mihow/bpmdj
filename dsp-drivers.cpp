@@ -25,7 +25,6 @@ using namespace std;
 #include "dsp-oss.h"
 #include "dsp-alsa.h"
 #include "dsp-none.h"
-#include "dsp-mixed.h"
 #include "dsp-jack.h"
 
 #ifndef COMPILE_OSS
@@ -47,7 +46,7 @@ dsp_driver * dsp_driver::get_driver(PlayerConfig * cfg)
     case 0 : return new dsp_none ( * cfg ) ;
     case 1 : return new dsp_oss  ( * cfg ) ;
     case 2 : return new dsp_alsa ( * cfg ) ;
-    case 3 : return new dsp_mixed( * cfg ) ;
+    case 3 : assert(0); 
 #ifdef INCOMPLETE_FEATURES
 #ifdef COMPILE_JACK
     case 4 : return new dsp_jack ( * cfg ) ;

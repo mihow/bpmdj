@@ -75,7 +75,9 @@ static void used(QCheckBox * b)
 
 static void unavailable(QCheckBox * b)
 {
-  b->setPaletteBackgroundColor(QColor(255,0,0));
+  QPalette palette;
+  palette.setColor(b->backgroundRole(), QColor(255,0,0,255));
+  b->setPalette(palette);
 }
 
 Capacity unavailable_capacities = no_disabled_capacities;

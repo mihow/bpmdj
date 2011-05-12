@@ -1,3 +1,0 @@
-#!/bin/bash
-/usr/bin/alsamixergui -c 0 &
-/usr/bin/alsamixergui -c 1 &

@@ -150,6 +150,7 @@ class DataBinner: public DataIo
   static const int type_float4 = 13;
   static const int type_float8 = 14;
   // read/write operations
+  QString file_in_use;
   char * mapped_region;
   char * cur_ptr;
   unsigned4 mapped_size;

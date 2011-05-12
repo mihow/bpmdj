@@ -25,7 +25,6 @@ using namespace std;
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <qpainter.h>
-#include "songselector.logic.h"
 #include "process-manager.h"
 #include "history.h"
 #include "dirscanner.h"
@@ -36,6 +35,7 @@ using namespace std;
 #include "song-statistics.h"
 #include "song-metric.h"
 #include "song.h"
+#include "qstring-factory.h"
 
 init_singleton_var(Song,max_alltime_total,int,1);
 

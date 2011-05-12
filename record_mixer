@@ -1,6 +1,0 @@
-#!/bin/bash
-# This is an example-script that can be used to trigger
-# the setting of the record mixer levels
-# If necessary, add an xhost +asus (or wherever your 
-# record sound card is located
-# ssh root@asus DISPLAY=cubical:0 aumix &

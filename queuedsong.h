@@ -20,11 +20,12 @@
 #define __BPMDJ___QUEUEDSONG_H__
 using namespace std;
 #line 1 "queuedsong.h++"
+#include <q3listview.h>
 #include "config.h"
 #include "cluster.h"
 
 class QueuedSong: 
-  public QListViewItem
+  public Q3ListViewItem
 {
   private:
     Song * song;
@@ -38,8 +39,8 @@ class QueuedSong:
     Song* getSong() {return song;};
     void setPos(int p) {pos=p;};
     int getPos() {return pos;};
-    QueuedSong(Song *song, QListView* parent);
-    QueuedSong(QListView* parent, QListViewItem* after);
+    QueuedSong(Song *song, Q3ListView* parent);
+    QueuedSong(Q3ListView* parent, Q3ListViewItem* after);
     bool ankered() {return anker;};
     void setAnkered(bool b) {anker = b; if (anker) distance=0;};
     virtual void paintCell(QPainter *p, const QColorGroup &cg, int col, int wid, int align);
@@ -59,7 +60,7 @@ class QueuedSong:
 
 class SongProcess;
 class QueuedAnalSong: 
-  public QListViewItem
+  public Q3ListViewItem
 {
   private:
     Song * song;
@@ -73,7 +74,7 @@ class QueuedAnalSong:
     //    void setSong(Song* s, double d);
     Song* getSong() { return song; };
     QString getDisplayTitle() {return song->getDisplayTitle();};
-    QueuedAnalSong(QListView* parent,Song *song);
+    QueuedAnalSong(Q3ListView* parent,Song *song);
     virtual QString text(int i) const;
     QString getCommand(SongProcess& p);
 };

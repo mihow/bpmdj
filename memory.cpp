@@ -67,15 +67,3 @@ void* myrealloc(void* thing, int size)
   assert(result);
   return result;
 }
-
-char* zeroable(char* in)
-{
-  if (!in) return NULL;
-  if (!*in) 
-    {
-      bpmdj_deallocate(in);
-      return NULL;
-    }
-  return in;
-}
-

@@ -19,6 +19,7 @@
 using namespace std;
 #line 1 "tags.c++"
 #include <assert.h>
+#include "constants.h"
 #include "tags.h"
 #include "memory.h"
 #include "qstring-factory.h"

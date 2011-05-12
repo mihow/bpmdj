@@ -1,0 +1,3783 @@
+<ui version="4.0" >
+ <class>SongPlayer</class>
+ <widget class="QDialog" name="SongPlayer" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>500</width>
+    <height>354</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>BpmPlayer</string>
+  </property>
+  <property name="sizeGripEnabled" >
+   <bool>true</bool>
+  </property>
+  <layout class="QGridLayout" >
+   <property name="leftMargin" >
+    <number>1</number>
+   </property>
+   <property name="topMargin" >
+    <number>1</number>
+   </property>
+   <property name="rightMargin" >
+    <number>1</number>
+   </property>
+   <property name="bottomMargin" >
+    <number>1</number>
+   </property>
+   <property name="horizontalSpacing" >
+    <number>6</number>
+   </property>
+   <property name="verticalSpacing" >
+    <number>6</number>
+   </property>
+   <item row="0" column="0" >
+    <widget class="QTabWidget" name="tab" >
+     <property name="currentIndex" >
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="playerTab" >
+      <attribute name="title" >
+       <string>Pla&amp;yer</string>
+      </attribute>
+      <layout class="QGridLayout" >
+       <property name="leftMargin" >
+        <number>9</number>
+       </property>
+       <property name="topMargin" >
+        <number>9</number>
+       </property>
+       <property name="rightMargin" >
+        <number>9</number>
+       </property>
+       <property name="bottomMargin" >
+        <number>9</number>
+       </property>
+       <property name="horizontalSpacing" >
+        <number>6</number>
+       </property>
+       <property name="verticalSpacing" >
+        <number>6</number>
+       </property>
+       <item row="1" column="0" colspan="2" >
+        <layout class="QHBoxLayout" >
+         <property name="spacing" >
+          <number>2</number>
+         </property>
+         <property name="leftMargin" >
+          <number>0</number>
+         </property>
+         <property name="topMargin" >
+          <number>0</number>
+         </property>
+         <property name="rightMargin" >
+          <number>0</number>
+         </property>
+         <property name="bottomMargin" >
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QGroupBox" name="groupBox" >
+           <property name="title" >
+            <string>GroupBox</string>
+           </property>
+           <layout class="QGridLayout" >
+            <property name="leftMargin" >
+             <number>2</number>
+            </property>
+            <property name="topMargin" >
+             <number>2</number>
+            </property>
+            <property name="rightMargin" >
+             <number>2</number>
+            </property>
+            <property name="bottomMargin" >
+             <number>2</number>
+            </property>
+            <property name="horizontalSpacing" >
+             <number>2</number>
+            </property>
+            <property name="verticalSpacing" >
+             <number>2</number>
+            </property>
+            <item row="3" column="0" >
+             <widget class="QPushButton" name="ButtonMinus8M" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip" >
+               <string>Key: '6'</string>
+              </property>
+              <property name="text" >
+               <string>-8M</string>
+              </property>
+              <property name="shortcut" >
+               <string>7</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1" >
+             <widget class="QPushButton" name="ButtonPlus4M" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip" >
+               <string>Key: '5'</string>
+              </property>
+              <property name="text" >
+               <string>+4M</string>
+              </property>
+              <property name="shortcut" >
+               <string>5</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2" >
+             <widget class="QPushButton" name="PushButton24" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip" >
+               <string>Key: ']'</string>
+              </property>
+              <property name="text" >
+               <string>Restart</string>
+              </property>
+              <property name="shortcut" >
+               <string>]</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="2" >
+             <widget class="QPushButton" name="PushButton19" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip" >
+               <string>Key: '9'</string>
+              </property>
+              <property name="text" >
+               <string>+1B</string>
+              </property>
+              <property name="shortcut" >
+               <string>9</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="2" >
+             <widget class="QPushButton" name="ButtonMinusHalfB" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip" >
+               <string>Key: '*'</string>
+              </property>
+              <property name="text" >
+               <string>-1/2B</string>
+              </property>
+              <property name="shortcut" >
+               <string>*</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0" >
+             <widget class="QPushButton" name="ButtonMinus4M" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip" >
+               <string>Key: '4'</string>
+              </property>
+              <property name="text" >
+               <string>-4M</string>
+              </property>
+              <property name="shortcut" >
+               <string>4</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1" >
+             <widget class="QPushButton" name="ButtonPlus1M" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip" >
+               <string>Key: '2'</string>
+              </property>
+              <property name="text" >
+               <string>+1M</string>
+              </property>
+              <property name="shortcut" >
+               <string>2</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0" >
+             <widget class="QPushButton" name="ButtonMinus1M" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip" >
+               <string>Key: '1'</string>
+              </property>
+              <property name="text" >
+               <string>-1M</string>
+              </property>
+              <property name="shortcut" >
+               <string>1</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1" >
+             <widget class="QPushButton" name="ButtonPlus8M" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip" >
+               <string>Key: '8'</string>
+              </property>
+              <property name="text" >
+               <string>+8M</string>
+              </property>
+              <property name="shortcut" >
+               <string>8</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="2" >
+             <widget class="QPushButton" name="startStopButton" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip" >
+               <string>Key: ' '</string>
+              </property>
+              <property name="text" >
+               <string>Stop</string>
+              </property>
+              <property name="shortcut" >
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0" >
+             <widget class="QPushButton" name="KeyMinus" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip" >
+               <string>Key: '-'</string>
+              </property>
+              <property name="text" >
+               <string>-</string>
+              </property>
+              <property name="shortcut" >
+               <string>-</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1" >
+             <widget class="QPushButton" name="KeyPlus" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip" >
+               <string>Key: '+' </string>
+              </property>
+              <property name="text" >
+               <string>+</string>
+              </property>
+              <property name="shortcut" >
+               <string>+</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="groupBox_2" >
+           <property name="title" >
+            <string>Cue</string>
+           </property>
+           <layout class="QGridLayout" >
+            <property name="leftMargin" >
+             <number>2</number>
+            </property>
+            <property name="topMargin" >
+             <number>2</number>
+            </property>
+            <property name="rightMargin" >
+             <number>2</number>
+            </property>
+            <property name="bottomMargin" >
+             <number>2</number>
+            </property>
+            <property name="horizontalSpacing" >
+             <number>2</number>
+            </property>
+            <property name="verticalSpacing" >
+             <number>2</number>
+            </property>
+            <item row="2" column="0" >
+             <widget class="QPushButton" name="PushButton13" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip" >
+               <string>Key: 'C'</string>
+              </property>
+              <property name="text" >
+               <string>Jump to C</string>
+              </property>
+              <property name="shortcut" >
+               <string>C</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="2" >
+             <widget class="QPushButton" name="PushButton34" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip" >
+               <string>Key: '('</string>
+              </property>
+              <property name="text" >
+               <string>- 1/32</string>
+              </property>
+              <property name="shortcut" >
+               <string>(</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1" >
+             <widget class="QPushButton" name="PushButton16" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip" >
+               <string>Key: 'ALT-X'</string>
+              </property>
+              <property name="text" >
+               <string>Store X</string>
+              </property>
+              <property name="shortcut" >
+               <string>Alt+X</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="3" >
+             <widget class="QPushButton" name="PushButton36" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip" >
+               <string>Key: '}'</string>
+              </property>
+              <property name="text" >
+               <string>+8M</string>
+              </property>
+              <property name="shortcut" >
+               <string>}</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="3" >
+             <widget class="QPushButton" name="PushButton33" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip" >
+               <string>Key: ')'</string>
+              </property>
+              <property name="text" >
+               <string>+1/32</string>
+              </property>
+              <property name="shortcut" >
+               <string>)</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0" >
+             <widget class="QPushButton" name="PushButton12" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip" >
+               <string>Key: 'X'</string>
+              </property>
+              <property name="text" >
+               <string>Jump to X</string>
+              </property>
+              <property name="shortcut" >
+               <string>X</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1" >
+             <widget class="QPushButton" name="PushButton18" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip" >
+               <string>Key: 'ALT-V'</string>
+              </property>
+              <property name="text" >
+               <string>Store V</string>
+              </property>
+              <property name="shortcut" >
+               <string>Alt+V</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="3" >
+             <widget class="QPushButton" name="AboutButton" >
+              <property name="enabled" >
+               <bool>true</bool>
+              </property>
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text" >
+               <string>About</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2" colspan="2" >
+             <widget class="QPushButton" name="PushButton10" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip" >
+               <string>Key: '/'</string>
+              </property>
+              <property name="text" >
+               <string>Set Cue</string>
+              </property>
+              <property name="shortcut" >
+               <string>/</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1" >
+             <widget class="QPushButton" name="PushButton17" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip" >
+               <string>Key: 'ALT-C'</string>
+              </property>
+              <property name="text" >
+               <string>Store C</string>
+              </property>
+              <property name="shortcut" >
+               <string>Alt+C</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="2" >
+             <widget class="QPushButton" name="PushButton35" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip" >
+               <string>Key: '{'</string>
+              </property>
+              <property name="text" >
+               <string>-8M</string>
+              </property>
+              <property name="shortcut" >
+               <string>{</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="2" >
+             <widget class="QPushButton" name="PushButton41" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip" >
+               <string>Key: 'm'</string>
+              </property>
+              <property name="text" >
+               <string>Metronome</string>
+              </property>
+              <property name="shortcut" >
+               <string>M</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0" >
+             <widget class="QPushButton" name="PushButton14" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip" >
+               <string>Key: 'V'</string>
+              </property>
+              <property name="text" >
+               <string>Jump to V</string>
+              </property>
+              <property name="shortcut" >
+               <string>V</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1" >
+             <widget class="QPushButton" name="PushButton15" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip" >
+               <string>Key: 'ALT+Z'</string>
+              </property>
+              <property name="text" >
+               <string>Store Z</string>
+              </property>
+              <property name="shortcut" >
+               <string>Alt+Z</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0" >
+             <widget class="QPushButton" name="PushButton11" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="toolTip" >
+               <string>Key 'z'</string>
+              </property>
+              <property name="text" >
+               <string>Jump to Z</string>
+              </property>
+              <property name="shortcut" >
+               <string>Z</string>
+              </property>
+              <property name="flat" >
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="0" column="0" >
+        <widget class="QGroupBox" name="groupBox_3" >
+         <property name="title" >
+          <string>Tempo</string>
+         </property>
+         <layout class="QGridLayout" >
+          <property name="leftMargin" >
+           <number>0</number>
+          </property>
+          <property name="topMargin" >
+           <number>0</number>
+          </property>
+          <property name="rightMargin" >
+           <number>0</number>
+          </property>
+          <property name="bottomMargin" >
+           <number>0</number>
+          </property>
+          <property name="horizontalSpacing" >
+           <number>2</number>
+          </property>
+          <property name="verticalSpacing" >
+           <number>2</number>
+          </property>
+          <item row="0" column="0" colspan="2" >
+           <widget class="QSlider" name="tempoSlider" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize" >
+             <size>
+              <width>0</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="minimum" >
+             <number>-100</number>
+            </property>
+            <property name="maximum" >
+             <number>100</number>
+            </property>
+            <property name="value" >
+             <number>0</number>
+            </property>
+            <property name="orientation" >
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="tickInterval" >
+             <number>50</number>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2" >
+           <widget class="QPushButton" name="PushButton21" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text" >
+             <string>Normal</string>
+            </property>
+            <property name="shortcut" >
+             <string>.</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0" colspan="3" >
+           <layout class="QHBoxLayout" >
+            <property name="spacing" >
+             <number>6</number>
+            </property>
+            <property name="leftMargin" >
+             <number>0</number>
+            </property>
+            <property name="topMargin" >
+             <number>0</number>
+            </property>
+            <property name="rightMargin" >
+             <number>0</number>
+            </property>
+            <property name="bottomMargin" >
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLCDNumber" name="CurrentTimeLCD" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Minimum" hsizetype="Preferred" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize" >
+               <size>
+                <width>0</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="palette" >
+               <palette>
+                <active>
+                 <colorrole role="WindowText" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>0</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                 <colorrole role="Base" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                 <colorrole role="Window" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                </active>
+                <inactive>
+                 <colorrole role="WindowText" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>0</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                 <colorrole role="Base" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                 <colorrole role="Window" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                </inactive>
+                <disabled>
+                 <colorrole role="WindowText" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>121</red>
+                    <green>125</green>
+                    <blue>121</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                 <colorrole role="Base" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                 <colorrole role="Window" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                </disabled>
+               </palette>
+              </property>
+              <property name="toolTip" >
+               <string/>
+              </property>
+              <property name="autoFillBackground" >
+               <bool>true</bool>
+              </property>
+              <property name="numDigits" >
+               <number>6</number>
+              </property>
+              <property name="segmentStyle" >
+               <enum>QLCDNumber::Flat</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLCDNumber" name="TotalTimeLCD" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Minimum" hsizetype="Preferred" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize" >
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="palette" >
+               <palette>
+                <active>
+                 <colorrole role="WindowText" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>0</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                 <colorrole role="Base" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                 <colorrole role="Window" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                </active>
+                <inactive>
+                 <colorrole role="WindowText" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>0</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                 <colorrole role="Base" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                 <colorrole role="Window" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                </inactive>
+                <disabled>
+                 <colorrole role="WindowText" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>121</red>
+                    <green>125</green>
+                    <blue>121</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                 <colorrole role="Base" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                 <colorrole role="Window" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                </disabled>
+               </palette>
+              </property>
+              <property name="toolTip" >
+               <string/>
+              </property>
+              <property name="autoFillBackground" >
+               <bool>true</bool>
+              </property>
+              <property name="numDigits" >
+               <number>6</number>
+              </property>
+              <property name="segmentStyle" >
+               <enum>QLCDNumber::Flat</enum>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="3" column="0" colspan="3" >
+           <layout class="QHBoxLayout" >
+            <property name="spacing" >
+             <number>6</number>
+            </property>
+            <property name="leftMargin" >
+             <number>0</number>
+            </property>
+            <property name="topMargin" >
+             <number>0</number>
+            </property>
+            <property name="rightMargin" >
+             <number>0</number>
+            </property>
+            <property name="bottomMargin" >
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLCDNumber" name="CurrentTempoLCD" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Maximum" hsizetype="Minimum" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize" >
+               <size>
+                <width>0</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="palette" >
+               <palette>
+                <active>
+                 <colorrole role="WindowText" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>0</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                 <colorrole role="Base" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                 <colorrole role="Window" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                </active>
+                <inactive>
+                 <colorrole role="WindowText" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>0</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                 <colorrole role="Base" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                 <colorrole role="Window" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                </inactive>
+                <disabled>
+                 <colorrole role="WindowText" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>121</red>
+                    <green>125</green>
+                    <blue>121</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                 <colorrole role="Base" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                 <colorrole role="Window" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                </disabled>
+               </palette>
+              </property>
+              <property name="autoFillBackground" >
+               <bool>true</bool>
+              </property>
+              <property name="numDigits" >
+               <number>6</number>
+              </property>
+              <property name="segmentStyle" >
+               <enum>QLCDNumber::Flat</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLCDNumber" name="NormalTempoLCD" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Minimum" hsizetype="Minimum" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="palette" >
+               <palette>
+                <active>
+                 <colorrole role="WindowText" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>0</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                 <colorrole role="Base" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                 <colorrole role="Window" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                </active>
+                <inactive>
+                 <colorrole role="WindowText" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>0</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                 <colorrole role="Base" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                 <colorrole role="Window" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                </inactive>
+                <disabled>
+                 <colorrole role="WindowText" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>121</red>
+                    <green>125</green>
+                    <blue>121</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                 <colorrole role="Base" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                 <colorrole role="Window" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                </disabled>
+               </palette>
+              </property>
+              <property name="autoFillBackground" >
+               <bool>true</bool>
+              </property>
+              <property name="numDigits" >
+               <number>6</number>
+              </property>
+              <property name="segmentStyle" >
+               <enum>QLCDNumber::Flat</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLCDNumber" name="TempoLd" >
+              <property name="sizePolicy" >
+               <sizepolicy vsizetype="Minimum" hsizetype="Minimum" >
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="palette" >
+               <palette>
+                <active>
+                 <colorrole role="WindowText" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>0</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                 <colorrole role="Base" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                 <colorrole role="Window" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                </active>
+                <inactive>
+                 <colorrole role="WindowText" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>0</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                 <colorrole role="Base" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                 <colorrole role="Window" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                </inactive>
+                <disabled>
+                 <colorrole role="WindowText" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>121</red>
+                    <green>125</green>
+                    <blue>121</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                 <colorrole role="Base" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                 <colorrole role="Window" >
+                  <brush brushstyle="SolidPattern" >
+                   <color alpha="255" >
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                </disabled>
+               </palette>
+              </property>
+              <property name="autoFillBackground" >
+               <bool>true</bool>
+              </property>
+              <property name="segmentStyle" >
+               <enum>QLCDNumber::Flat</enum>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="1" column="0" >
+           <widget class="QSpinBox" name="tempoSwitchTime" >
+            <property name="minimum" >
+             <number>1</number>
+            </property>
+            <property name="maximum" >
+             <number>180</number>
+            </property>
+            <property name="singleStep" >
+             <number>10</number>
+            </property>
+            <property name="value" >
+             <number>10</number>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2" >
+           <widget class="QPushButton" name="PushButton20" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text" >
+             <string>Target</string>
+            </property>
+            <property name="shortcut" >
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1" >
+           <widget class="QPushButton" name="switcherButton" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="toolTip" >
+             <string>Key: '0'</string>
+            </property>
+            <property name="text" >
+             <string>Fade</string>
+            </property>
+            <property name="shortcut" >
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="0" column="1" >
+        <widget class="QGroupBox" name="groupBox_4" >
+         <property name="title" >
+          <string>LFO</string>
+         </property>
+         <layout class="QGridLayout" >
+          <property name="leftMargin" >
+           <number>0</number>
+          </property>
+          <property name="topMargin" >
+           <number>0</number>
+          </property>
+          <property name="rightMargin" >
+           <number>0</number>
+          </property>
+          <property name="bottomMargin" >
+           <number>0</number>
+          </property>
+          <property name="horizontalSpacing" >
+           <number>2</number>
+          </property>
+          <property name="verticalSpacing" >
+           <number>2</number>
+          </property>
+          <item row="3" column="0" >
+           <widget class="QPushButton" name="PushButton42" >
+            <property name="toolTip" >
+             <string>Key: 'B': break</string>
+            </property>
+            <property name="text" >
+             <string/>
+            </property>
+            <property name="icon" >
+             <iconset resource="rc-player.qrc" >:/Icons/break.xpm</iconset>
+            </property>
+            <property name="shortcut" >
+             <string>B</string>
+            </property>
+            <property name="checkable" >
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0" >
+           <widget class="QPushButton" name="PushButton26" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="toolTip" >
+             <string>Key: 'P': pan</string>
+            </property>
+            <property name="text" >
+             <string/>
+            </property>
+            <property name="icon" >
+             <iconset resource="rc-player.qrc" >:/Icons/slow-pan.xpm</iconset>
+            </property>
+            <property name="shortcut" >
+             <string>P</string>
+            </property>
+            <property name="checkable" >
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0" >
+           <widget class="QPushButton" name="PushButton30" >
+            <property name="toolTip" >
+             <string>Key: 'R': reverse saw</string>
+            </property>
+            <property name="text" >
+             <string/>
+            </property>
+            <property name="icon" >
+             <iconset resource="rc-player.qrc" >:/Icons/slow-down-saw.xpm</iconset>
+            </property>
+            <property name="shortcut" >
+             <string>R</string>
+            </property>
+            <property name="checkable" >
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1" >
+           <widget class="QPushButton" name="PushButton27" >
+            <property name="toolTip" >
+             <string>Key: 'ALT-P': pan</string>
+            </property>
+            <property name="text" >
+             <string/>
+            </property>
+            <property name="icon" >
+             <iconset resource="rc-player.qrc" >:/Icons/fast-pan.xpm</iconset>
+            </property>
+            <property name="shortcut" >
+             <string>Alt+P</string>
+            </property>
+            <property name="checkable" >
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1" >
+           <widget class="QPushButton" name="PushButton29" >
+            <property name="toolTip" >
+             <string>Key: 'ALT-S': saw</string>
+            </property>
+            <property name="text" >
+             <string/>
+            </property>
+            <property name="icon" >
+             <iconset resource="rc-player.qrc" >:/Icons/fast-up-saw.xpm</iconset>
+            </property>
+            <property name="shortcut" >
+             <string>Alt+S</string>
+            </property>
+            <property name="checkable" >
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1" >
+           <widget class="QPushButton" name="PushButton39" >
+            <property name="toolTip" >
+             <string>Key: 'N', no LFO</string>
+            </property>
+            <property name="text" >
+             <string/>
+            </property>
+            <property name="icon" >
+             <iconset resource="rc-player.qrc" >:/Icons/normal.xpm</iconset>
+            </property>
+            <property name="shortcut" >
+             <string>N</string>
+            </property>
+            <property name="checkable" >
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" >
+           <widget class="QPushButton" name="PushButton28" >
+            <property name="toolTip" >
+             <string>Key:'S': saw</string>
+            </property>
+            <property name="text" >
+             <string/>
+            </property>
+            <property name="icon" >
+             <iconset resource="rc-player.qrc" >:/Icons/slow-up-saw.xpm</iconset>
+            </property>
+            <property name="shortcut" >
+             <string>S</string>
+            </property>
+            <property name="checkable" >
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1" >
+           <widget class="QPushButton" name="PushButton31" >
+            <property name="toolTip" >
+             <string>Key: 'ALT-R': reverse saw</string>
+            </property>
+            <property name="text" >
+             <string/>
+            </property>
+            <property name="icon" >
+             <iconset resource="rc-player.qrc" >:/Icons/fast-down-saw.xpm</iconset>
+            </property>
+            <property name="shortcut" >
+             <string>Alt+R</string>
+            </property>
+            <property name="checkable" >
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="scramblerTab" >
+      <attribute name="title" >
+       <string>Scra&amp;mbler</string>
+      </attribute>
+      <layout class="QGridLayout" >
+       <property name="leftMargin" >
+        <number>0</number>
+       </property>
+       <property name="topMargin" >
+        <number>0</number>
+       </property>
+       <property name="rightMargin" >
+        <number>0</number>
+       </property>
+       <property name="bottomMargin" >
+        <number>0</number>
+       </property>
+       <property name="horizontalSpacing" >
+        <number>6</number>
+       </property>
+       <property name="verticalSpacing" >
+        <number>6</number>
+       </property>
+       <item row="0" column="0" colspan="6" >
+        <layout class="QVBoxLayout" >
+         <property name="spacing" >
+          <number>3</number>
+         </property>
+         <property name="leftMargin" >
+          <number>0</number>
+         </property>
+         <property name="topMargin" >
+          <number>0</number>
+         </property>
+         <property name="rightMargin" >
+          <number>0</number>
+         </property>
+         <property name="bottomMargin" >
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="mapin" >
+           <property name="sizePolicy" >
+            <sizepolicy vsizetype="Expanding" hsizetype="Preferred" >
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize" >
+            <size>
+             <width>0</width>
+             <height>28</height>
+            </size>
+           </property>
+           <property name="toolTip" >
+            <string>This is the input map. Every color represents a segment of the audio stream. The length of one segment is determined by the notelength.</string>
+           </property>
+           <property name="scaledContents" >
+            <bool>true</bool>
+           </property>
+           <property name="wordWrap" >
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="mapout" >
+           <property name="sizePolicy" >
+            <sizepolicy vsizetype="Expanding" hsizetype="Preferred" >
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize" >
+            <size>
+             <width>0</width>
+             <height>28</height>
+            </size>
+           </property>
+           <property name="toolTip" >
+            <string>The is the ouput sequency. The colors are the same as in the input track above. The order can be modified by selecting sgements in the input track and then placing them here.</string>
+           </property>
+           <property name="scaledContents" >
+            <bool>true</bool>
+           </property>
+           <property name="wordWrap" >
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="mapspeed" >
+           <property name="sizePolicy" >
+            <sizepolicy vsizetype="Expanding" hsizetype="Preferred" >
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize" >
+            <size>
+             <width>0</width>
+             <height>28</height>
+            </size>
+           </property>
+           <property name="scaledContents" >
+            <bool>true</bool>
+           </property>
+           <property name="wordWrap" >
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="mapvolume" >
+           <property name="sizePolicy" >
+            <sizepolicy vsizetype="Expanding" hsizetype="Preferred" >
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize" >
+            <size>
+             <width>0</width>
+             <height>28</height>
+            </size>
+           </property>
+           <property name="scaledContents" >
+            <bool>true</bool>
+           </property>
+           <property name="wordWrap" >
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item rowspan="2" row="2" column="3" colspan="2" >
+        <widget class="Q3ButtonGroup" name="buttonGroup10" >
+         <property name="title" >
+          <string/>
+         </property>
+         <property name="flat" >
+          <bool>false</bool>
+         </property>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <layout class="QGridLayout" >
+          <property name="leftMargin" >
+           <number>0</number>
+          </property>
+          <property name="topMargin" >
+           <number>0</number>
+          </property>
+          <property name="rightMargin" >
+           <number>0</number>
+          </property>
+          <property name="bottomMargin" >
+           <number>0</number>
+          </property>
+          <property name="horizontalSpacing" >
+           <number>6</number>
+          </property>
+          <property name="verticalSpacing" >
+           <number>6</number>
+          </property>
+          <item row="0" column="0" colspan="2" >
+           <widget class="QRadioButton" name="atend_continue" >
+            <property name="text" >
+             <string>continue</string>
+            </property>
+            <property name="checked" >
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" >
+           <widget class="QRadioButton" name="atend_z" >
+            <property name="text" >
+             <string>Z</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1" >
+           <widget class="QRadioButton" name="atend_x" >
+            <property name="text" >
+             <string>X</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="4" >
+           <widget class="QCheckBox" name="atend_loop" >
+            <property name="text" >
+             <string>loop</string>
+            </property>
+            <property name="shortcut" >
+             <string>Space</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2" >
+           <widget class="QRadioButton" name="atend_c" >
+            <property name="text" >
+             <string>C</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3" >
+           <widget class="QRadioButton" name="atend_v" >
+            <property name="text" >
+             <string>V</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2" colspan="2" >
+           <widget class="QRadioButton" name="atend_restart" >
+            <property name="text" >
+             <string>restart</string>
+            </property>
+            <property name="checked" >
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="4" >
+           <widget class="QRadioButton" name="atend_stop" >
+            <property name="text" >
+             <string>stop</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="3" column="5" >
+        <widget class="QPushButton" name="pushButton47" >
+         <property name="text" >
+          <string>Save</string>
+         </property>
+         <property name="shortcut" >
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1" colspan="2" >
+        <widget class="QComboBox" name="mapping_scale" >
+         <property name="sizePolicy" >
+          <sizepolicy vsizetype="Fixed" hsizetype="Maximum" >
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="focusPolicy" >
+          <enum>Qt::WheelFocus</enum>
+         </property>
+         <property name="editable" >
+          <bool>false</bool>
+         </property>
+         <property name="currentIndex" >
+          <number>2</number>
+         </property>
+         <property name="duplicatesEnabled" >
+          <bool>false</bool>
+         </property>
+         <item>
+          <property name="text" >
+           <string>1/64th</string>
+          </property>
+         </item>
+         <item>
+          <property name="text" >
+           <string>1/32th</string>
+          </property>
+         </item>
+         <item>
+          <property name="text" >
+           <string>1/16th</string>
+          </property>
+         </item>
+         <item>
+          <property name="text" >
+           <string>1/8th</string>
+          </property>
+         </item>
+         <item>
+          <property name="text" >
+           <string>1/4th</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="2" column="1" colspan="2" >
+        <widget class="QSpinBox" name="mapout_length" >
+         <property name="sizePolicy" >
+          <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="focusPolicy" >
+          <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="toolTip" >
+          <string>The number of output segments in the output track</string>
+         </property>
+         <property name="minimum" >
+          <number>1</number>
+         </property>
+         <property name="maximum" >
+          <number>256</number>
+         </property>
+         <property name="singleStep" >
+          <number>1</number>
+         </property>
+         <property name="value" >
+          <number>64</number>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0" >
+        <widget class="QPushButton" name="pushButton77" >
+         <property name="text" >
+          <string>Stop seq</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" >
+        <widget class="QPushButton" name="pushButton50" >
+         <property name="sizePolicy" >
+          <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text" >
+          <string>&amp;Go seq</string>
+         </property>
+         <property name="shortcut" >
+          <string>G</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="2" >
+        <widget class="QPushButton" name="pushButton49" >
+         <property name="text" >
+          <string>-</string>
+         </property>
+         <property name="shortcut" >
+          <string>-</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2" colspan="2" >
+        <widget class="QPushButton" name="pushButton50_2" >
+         <property name="text" >
+          <string>+</string>
+         </property>
+         <property name="shortcut" >
+          <string>+</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="5" >
+        <widget class="QPushButton" name="pushButton48" >
+         <property name="text" >
+          <string>&amp;Load</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="4" colspan="2" >
+        <widget class="QPushButton" name="pushButton51" >
+         <property name="text" >
+          <string>Fade</string>
+         </property>
+         <property name="shortcut" >
+          <string>0</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="beatgraphTab" >
+      <attribute name="title" >
+       <string>Be&amp;atgraph</string>
+      </attribute>
+      <layout class="QGridLayout" >
+       <property name="leftMargin" >
+        <number>0</number>
+       </property>
+       <property name="topMargin" >
+        <number>0</number>
+       </property>
+       <property name="rightMargin" >
+        <number>0</number>
+       </property>
+       <property name="bottomMargin" >
+        <number>0</number>
+       </property>
+       <property name="horizontalSpacing" >
+        <number>6</number>
+       </property>
+       <property name="verticalSpacing" >
+        <number>6</number>
+       </property>
+       <item row="0" column="0" >
+        <widget class="BeatGraphAnalyzer" native="1" name="beatGraphAnalyzer" />
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="bpmTab" >
+      <attribute name="title" >
+       <string>&amp;Bpm</string>
+      </attribute>
+      <layout class="QGridLayout" >
+       <property name="leftMargin" >
+        <number>9</number>
+       </property>
+       <property name="topMargin" >
+        <number>9</number>
+       </property>
+       <property name="rightMargin" >
+        <number>9</number>
+       </property>
+       <property name="bottomMargin" >
+        <number>9</number>
+       </property>
+       <property name="horizontalSpacing" >
+        <number>6</number>
+       </property>
+       <property name="verticalSpacing" >
+        <number>6</number>
+       </property>
+       <item row="0" column="0" >
+        <widget class="BpmAnalyzerDialog" native="1" name="bpmCounter" />
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="spectrumTab" >
+      <attribute name="title" >
+       <string>Spectrum</string>
+      </attribute>
+      <layout class="QGridLayout" >
+       <property name="leftMargin" >
+        <number>9</number>
+       </property>
+       <property name="topMargin" >
+        <number>9</number>
+       </property>
+       <property name="rightMargin" >
+        <number>9</number>
+       </property>
+       <property name="bottomMargin" >
+        <number>9</number>
+       </property>
+       <property name="horizontalSpacing" >
+        <number>6</number>
+       </property>
+       <property name="verticalSpacing" >
+        <number>6</number>
+       </property>
+       <item row="0" column="0" >
+        <widget class="SpectrumAnalyzer" native="1" name="spectrum" />
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="rythmTab" >
+      <attribute name="title" >
+       <string>Rhytm</string>
+      </attribute>
+      <layout class="QGridLayout" >
+       <property name="leftMargin" >
+        <number>9</number>
+       </property>
+       <property name="topMargin" >
+        <number>9</number>
+       </property>
+       <property name="rightMargin" >
+        <number>9</number>
+       </property>
+       <property name="bottomMargin" >
+        <number>9</number>
+       </property>
+       <property name="horizontalSpacing" >
+        <number>6</number>
+       </property>
+       <property name="verticalSpacing" >
+        <number>6</number>
+       </property>
+       <item row="0" column="0" >
+        <widget class="RythmAnalyzer" native="1" name="widget" />
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="songTab" >
+      <attribute name="title" >
+       <string>Song &amp;Info</string>
+      </attribute>
+      <layout class="QGridLayout" >
+       <property name="leftMargin" >
+        <number>9</number>
+       </property>
+       <property name="topMargin" >
+        <number>9</number>
+       </property>
+       <property name="rightMargin" >
+        <number>9</number>
+       </property>
+       <property name="bottomMargin" >
+        <number>9</number>
+       </property>
+       <property name="horizontalSpacing" >
+        <number>6</number>
+       </property>
+       <property name="verticalSpacing" >
+        <number>6</number>
+       </property>
+       <item row="0" column="0" >
+        <widget class="SongInformation" native="1" name="songInfo" />
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="setupTab" >
+      <attribute name="title" >
+       <string>Setup</string>
+      </attribute>
+      <layout class="QGridLayout" >
+       <property name="leftMargin" >
+        <number>9</number>
+       </property>
+       <property name="topMargin" >
+        <number>9</number>
+       </property>
+       <property name="rightMargin" >
+        <number>9</number>
+       </property>
+       <property name="bottomMargin" >
+        <number>9</number>
+       </property>
+       <property name="horizontalSpacing" >
+        <number>6</number>
+       </property>
+       <property name="verticalSpacing" >
+        <number>6</number>
+       </property>
+       <item row="0" column="0" colspan="2" >
+        <widget class="QTabWidget" name="tabWidget" >
+         <property name="currentIndex" >
+          <number>0</number>
+         </property>
+         <widget class="QWidget" name="tab_2" >
+          <attribute name="title" >
+           <string>Decoding</string>
+          </attribute>
+          <layout class="QGridLayout" >
+           <property name="leftMargin" >
+            <number>9</number>
+           </property>
+           <property name="topMargin" >
+            <number>9</number>
+           </property>
+           <property name="rightMargin" >
+            <number>9</number>
+           </property>
+           <property name="bottomMargin" >
+            <number>9</number>
+           </property>
+           <property name="horizontalSpacing" >
+            <number>6</number>
+           </property>
+           <property name="verticalSpacing" >
+            <number>6</number>
+           </property>
+           <item row="3" column="0" colspan="3" >
+            <widget class="QCheckBox" name="rms_toggle" >
+             <property name="text" >
+              <string>normalize RMS power</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0" colspan="3" >
+            <widget class="QLabel" name="textLabel2_6" >
+             <property name="sizePolicy" >
+              <sizepolicy vsizetype="Maximum" hsizetype="Preferred" >
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text" >
+              <string>disable use of the following decoder programs on this configuration</string>
+             </property>
+             <property name="wordWrap" >
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1" colspan="2" >
+            <widget class="QLineEdit" name="rms" >
+             <property name="text" >
+              <string>0.12</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0" >
+            <widget class="QLabel" name="textLabel2" >
+             <property name="text" >
+              <string>Target RMS power</string>
+             </property>
+             <property name="wordWrap" >
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0" colspan="2" >
+            <widget class="QLabel" name="textLabel1_3" >
+             <property name="text" >
+              <string>Directory to store .raw files</string>
+             </property>
+             <property name="wordWrap" >
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0" colspan="3" >
+            <widget class="CapacityWidget" native="1" name="capacity" />
+           </item>
+           <item row="2" column="2" >
+            <widget class="QLineEdit" name="raw_directory" >
+             <property name="text" >
+              <string>./</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="tab_3" >
+          <attribute name="title" >
+           <string>Alsa</string>
+          </attribute>
+          <layout class="QGridLayout" >
+           <property name="leftMargin" >
+            <number>9</number>
+           </property>
+           <property name="topMargin" >
+            <number>9</number>
+           </property>
+           <property name="rightMargin" >
+            <number>9</number>
+           </property>
+           <property name="bottomMargin" >
+            <number>9</number>
+           </property>
+           <property name="horizontalSpacing" >
+            <number>6</number>
+           </property>
+           <property name="verticalSpacing" >
+            <number>6</number>
+           </property>
+           <item row="1" column="0" >
+            <widget class="QLabel" name="textLabel9" >
+             <property name="text" >
+              <string>ALSA device to use</string>
+             </property>
+             <property name="wordWrap" >
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1" colspan="2" >
+            <widget class="QSpinBox" name="alsa_latency" >
+             <property name="minimum" >
+              <number>50</number>
+             </property>
+             <property name="maximum" >
+              <number>1000</number>
+             </property>
+             <property name="singleStep" >
+              <number>10</number>
+             </property>
+             <property name="value" >
+              <number>150</number>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1" >
+            <spacer>
+             <property name="orientation" >
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeType" >
+              <enum>QSizePolicy::Expanding</enum>
+             </property>
+             <property name="sizeHint" >
+              <size>
+               <width>20</width>
+               <height>149</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="3" column="0" colspan="3" >
+            <widget class="QCheckBox" name="alsa_verbose" >
+             <property name="text" >
+              <string>verbose</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0" >
+            <widget class="QLabel" name="textLabel3" >
+             <property name="text" >
+              <string>Latency (ms)</string>
+             </property>
+             <property name="wordWrap" >
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0" colspan="3" >
+            <widget class="QCheckBox" name="alsa" >
+             <property name="font" >
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text" >
+              <string>use ALSA driver</string>
+             </property>
+             <property name="checked" >
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1" >
+            <widget class="QLineEdit" name="alsa_dev" >
+             <property name="text" >
+              <string>hw:0</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="2" >
+            <widget class="QComboBox" name="comboBox2" >
+             <item>
+              <property name="text" >
+               <string>hw:0,0</string>
+              </property>
+             </item>
+             <item>
+              <property name="text" >
+               <string>hw:1,0</string>
+              </property>
+             </item>
+             <item>
+              <property name="text" >
+               <string>plughw:0</string>
+              </property>
+             </item>
+             <item>
+              <property name="text" >
+               <string>plughw:1</string>
+              </property>
+             </item>
+             <item>
+              <property name="text" >
+               <string>default</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="tab_4" >
+          <attribute name="title" >
+           <string>Oss</string>
+          </attribute>
+          <layout class="QGridLayout" >
+           <property name="leftMargin" >
+            <number>9</number>
+           </property>
+           <property name="topMargin" >
+            <number>9</number>
+           </property>
+           <property name="rightMargin" >
+            <number>9</number>
+           </property>
+           <property name="bottomMargin" >
+            <number>9</number>
+           </property>
+           <property name="horizontalSpacing" >
+            <number>6</number>
+           </property>
+           <property name="verticalSpacing" >
+            <number>6</number>
+           </property>
+           <item row="7" column="0" colspan="2" >
+            <spacer>
+             <property name="orientation" >
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeType" >
+              <enum>QSizePolicy::Expanding</enum>
+             </property>
+             <property name="sizeHint" >
+              <size>
+               <width>20</width>
+               <height>51</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="3" column="0" >
+            <widget class="QLabel" name="textLabel7" >
+             <property name="text" >
+              <string>Fragment count</string>
+             </property>
+             <property name="wordWrap" >
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="0" colspan="3" >
+            <widget class="QCheckBox" name="oss_verbose" >
+             <property name="text" >
+              <string>verbose</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0" >
+            <widget class="QLabel" name="textLabel6" >
+             <property name="text" >
+              <string>DSP device to use</string>
+             </property>
+             <property name="wordWrap" >
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0" colspan="3" >
+            <widget class="QCheckBox" name="oss_init_fragments" >
+             <property name="text" >
+              <string>Set buffer properties</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0" colspan="3" >
+            <widget class="QCheckBox" name="oss" >
+             <property name="font" >
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text" >
+              <string>use OSS sound driver</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0" >
+            <widget class="QLabel" name="textLabel3_3" >
+             <property name="text" >
+              <string>Latency (ms)</string>
+             </property>
+             <property name="wordWrap" >
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1" colspan="2" >
+            <widget class="QSpinBox" name="oss_latency" >
+             <property name="minimum" >
+              <number>50</number>
+             </property>
+             <property name="maximum" >
+              <number>1000</number>
+             </property>
+             <property name="singleStep" >
+              <number>25</number>
+             </property>
+             <property name="value" >
+              <number>300</number>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1" >
+            <widget class="QLineEdit" name="oss_dsp" >
+             <property name="text" >
+              <string>/dev/dsp</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1" colspan="2" >
+            <widget class="QSpinBox" name="oss_fragments" >
+             <property name="minimum" >
+              <number>1</number>
+             </property>
+             <property name="maximum" >
+              <number>100</number>
+             </property>
+             <property name="value" >
+              <number>16</number>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="0" colspan="3" >
+            <widget class="QCheckBox" name="oss_nolatencyaccounting" >
+             <property name="text" >
+              <string>No latency accounting</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="2" >
+            <widget class="QComboBox" name="comboBox3" >
+             <item>
+              <property name="text" >
+               <string>/dev/dsp</string>
+              </property>
+             </item>
+             <item>
+              <property name="text" >
+               <string>/dev/dsp1</string>
+              </property>
+             </item>
+             <item>
+              <property name="text" >
+               <string>/dev/dsp2</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="tab_5" >
+          <attribute name="title" >
+           <string>Shared</string>
+          </attribute>
+          <layout class="QGridLayout" >
+           <property name="leftMargin" >
+            <number>9</number>
+           </property>
+           <property name="topMargin" >
+            <number>9</number>
+           </property>
+           <property name="rightMargin" >
+            <number>9</number>
+           </property>
+           <property name="bottomMargin" >
+            <number>9</number>
+           </property>
+           <property name="horizontalSpacing" >
+            <number>6</number>
+           </property>
+           <property name="verticalSpacing" >
+            <number>6</number>
+           </property>
+           <item row="1" column="0" >
+            <layout class="QHBoxLayout" >
+             <property name="spacing" >
+              <number>6</number>
+             </property>
+             <property name="leftMargin" >
+              <number>0</number>
+             </property>
+             <property name="topMargin" >
+              <number>0</number>
+             </property>
+             <property name="rightMargin" >
+              <number>0</number>
+             </property>
+             <property name="bottomMargin" >
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="textLabel1" >
+               <property name="text" >
+                <string>Channel</string>
+               </property>
+               <property name="wordWrap" >
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSpinBox" name="bpm_channel" >
+               <property name="minimum" >
+                <number>1</number>
+               </property>
+               <property name="maximum" >
+                <number>2</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="2" column="0" >
+            <widget class="QLabel" name="textLabel3_2" >
+             <property name="text" >
+              <string>This only works when the mixing desk (bpmmix) has been started. This still is an experimental feature.</string>
+             </property>
+             <property name="alignment" >
+              <set>Qt::AlignJustify|Qt::AlignVCenter</set>
+             </property>
+             <property name="wordWrap" >
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0" >
+            <widget class="QCheckBox" name="bpm" >
+             <property name="font" >
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text" >
+              <string>use BPM local mixing desk.</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0" >
+            <spacer>
+             <property name="orientation" >
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeType" >
+              <enum>QSizePolicy::Expanding</enum>
+             </property>
+             <property name="sizeHint" >
+              <size>
+               <width>20</width>
+               <height>164</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="tab_6" >
+          <attribute name="title" >
+           <string>Jack</string>
+          </attribute>
+          <layout class="QGridLayout" >
+           <property name="leftMargin" >
+            <number>9</number>
+           </property>
+           <property name="topMargin" >
+            <number>9</number>
+           </property>
+           <property name="rightMargin" >
+            <number>9</number>
+           </property>
+           <property name="bottomMargin" >
+            <number>9</number>
+           </property>
+           <property name="horizontalSpacing" >
+            <number>6</number>
+           </property>
+           <property name="verticalSpacing" >
+            <number>6</number>
+           </property>
+           <item row="3" column="0" colspan="2" >
+            <widget class="QCheckBox" name="jack_verbose" >
+             <property name="enabled" >
+              <bool>false</bool>
+             </property>
+             <property name="text" >
+              <string>verbose</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0" colspan="2" >
+            <widget class="QCheckBox" name="jack" >
+             <property name="enabled" >
+              <bool>false</bool>
+             </property>
+             <property name="font" >
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text" >
+              <string>use Jack device</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1" >
+            <spacer>
+             <property name="orientation" >
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeType" >
+              <enum>QSizePolicy::Expanding</enum>
+             </property>
+             <property name="sizeHint" >
+              <size>
+               <width>20</width>
+               <height>90</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="1" column="0" >
+            <widget class="QLabel" name="textLabel3_3_2_2" >
+             <property name="enabled" >
+              <bool>false</bool>
+             </property>
+             <property name="text" >
+              <string>Device</string>
+             </property>
+             <property name="wordWrap" >
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1" >
+            <widget class="QSpinBox" name="jack_latency" >
+             <property name="enabled" >
+              <bool>false</bool>
+             </property>
+             <property name="minimum" >
+              <number>50</number>
+             </property>
+             <property name="maximum" >
+              <number>1000</number>
+             </property>
+             <property name="singleStep" >
+              <number>25</number>
+             </property>
+             <property name="value" >
+              <number>300</number>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0" >
+            <widget class="QLabel" name="textLabel3_3_2" >
+             <property name="enabled" >
+              <bool>false</bool>
+             </property>
+             <property name="text" >
+              <string>Latency (ms)</string>
+             </property>
+             <property name="wordWrap" >
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1" >
+            <widget class="QLineEdit" name="jack_dev" >
+             <property name="enabled" >
+              <bool>false</bool>
+             </property>
+             <property name="text" >
+              <string/>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+       </item>
+       <item row="1" column="0" >
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType" >
+          <enum>QSizePolicy::Expanding</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>360</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="1" column="1" >
+        <widget class="QPushButton" name="pushButton90" >
+         <property name="text" >
+          <string>Apply</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11" />
+ <customwidgets>
+  <customwidget>
+   <class>Q3ButtonGroup</class>
+   <extends>Q3GroupBox</extends>
+   <header>Qt3Support/Q3ButtonGroup</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>BeatGraphAnalyzer</class>
+   <extends>QWidget</extends>
+   <header>beatgraph-analyzer.h</header>
+  </customwidget>
+  <customwidget>
+   <class>RythmAnalyzer</class>
+   <extends>QWidget</extends>
+   <header>rythm-analyzer.h</header>
+  </customwidget>
+  <customwidget>
+   <class>SongInformation</class>
+   <extends>QWidget</extends>
+   <header>song-information.h</header>
+  </customwidget>
+  <customwidget>
+   <class>SpectrumAnalyzer</class>
+   <extends>QWidget</extends>
+   <header>spectrum-analyzer.h</header>
+  </customwidget>
+  <customwidget>
+   <class>BpmAnalyzerDialog</class>
+   <extends>QWidget</extends>
+   <header>bpm-analyzer.h</header>
+  </customwidget>
+  <customwidget>
+   <class>CapacityWidget</class>
+   <extends>QWidget</extends>
+   <header>capacity-widget.h</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>startStopButton</tabstop>
+  <tabstop>PushButton42</tabstop>
+  <tabstop>PushButton30</tabstop>
+  <tabstop>PushButton28</tabstop>
+  <tabstop>ButtonMinusHalfB</tabstop>
+  <tabstop>PushButton19</tabstop>
+  <tabstop>ButtonPlus8M</tabstop>
+  <tabstop>ButtonMinus8M</tabstop>
+  <tabstop>ButtonMinus4M</tabstop>
+  <tabstop>ButtonMinus1M</tabstop>
+  <tabstop>KeyMinus</tabstop>
+  <tabstop>ButtonPlus4M</tabstop>
+  <tabstop>KeyPlus</tabstop>
+  <tabstop>ButtonPlus1M</tabstop>
+  <tabstop>PushButton24</tabstop>
+  <tabstop>PushButton29</tabstop>
+  <tabstop>PushButton31</tabstop>
+  <tabstop>PushButton39</tabstop>
+  <tabstop>PushButton27</tabstop>
+  <tabstop>PushButton26</tabstop>
+  <tabstop>PushButton10</tabstop>
+  <tabstop>PushButton34</tabstop>
+  <tabstop>PushButton33</tabstop>
+  <tabstop>PushButton35</tabstop>
+  <tabstop>PushButton36</tabstop>
+  <tabstop>PushButton41</tabstop>
+  <tabstop>PushButton12</tabstop>
+  <tabstop>PushButton13</tabstop>
+  <tabstop>PushButton14</tabstop>
+  <tabstop>PushButton11</tabstop>
+  <tabstop>PushButton18</tabstop>
+  <tabstop>PushButton17</tabstop>
+  <tabstop>PushButton16</tabstop>
+  <tabstop>PushButton15</tabstop>
+  <tabstop>switcherButton</tabstop>
+  <tabstop>PushButton20</tabstop>
+  <tabstop>PushButton21</tabstop>
+  <tabstop>tempoSlider</tabstop>
+  <tabstop>AboutButton</tabstop>
+  <tabstop>pushButton48</tabstop>
+  <tabstop>pushButton47</tabstop>
+  <tabstop>mapping_scale</tabstop>
+  <tabstop>atend_restart</tabstop>
+  <tabstop>pushButton50</tabstop>
+ </tabstops>
+ <includes>
+  <include location="local" >beatgraph-analyzer.h</include>
+  <include location="local" >capacity-widget.h</include>
+ </includes>
+ <resources>
+  <include location="rc-player.qrc" />
+ </resources>
+ <connections>
+  <connection>
+   <sender>AboutButton</sender>
+   <signal>clicked()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>openAbout()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ButtonMinus1M</sender>
+   <signal>pressed()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>nudgeMinus1M()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ButtonMinus4M</sender>
+   <signal>pressed()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>nudgeMinus4M()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ButtonMinus8M</sender>
+   <signal>pressed()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>nudgeMinus8M()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ButtonMinusHalfB</sender>
+   <signal>pressed()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>nudgeMinusHalfB()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ButtonPlus1M</sender>
+   <signal>pressed()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>nudgePlus1M()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ButtonPlus4M</sender>
+   <signal>pressed()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>nudgePlus4M()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ButtonPlus8M</sender>
+   <signal>pressed()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>nudgePlus8M()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>KeyMinus</sender>
+   <signal>clicked()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>nudgeMinus()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>KeyPlus</sender>
+   <signal>clicked()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>nudgePlus()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>PushButton10</sender>
+   <signal>pressed()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>setCue()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>PushButton11</sender>
+   <signal>pressed()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>retrieveZ()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>PushButton12</sender>
+   <signal>pressed()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>retrieveX()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>PushButton13</sender>
+   <signal>pressed()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>retrieveC()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>PushButton14</sender>
+   <signal>pressed()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>retrieveV()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>PushButton15</sender>
+   <signal>clicked()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>storeZ()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>PushButton16</sender>
+   <signal>clicked()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>storeX()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>PushButton17</sender>
+   <signal>clicked()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>storeC()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>PushButton18</sender>
+   <signal>clicked()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>storeV()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>PushButton19</sender>
+   <signal>clicked()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>nudgePlusB()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>PushButton20</sender>
+   <signal>clicked()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>targetTempo()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>PushButton21</sender>
+   <signal>clicked()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>normalTempo()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>PushButton24</sender>
+   <signal>clicked()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>restart()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>PushButton26</sender>
+   <signal>pressed()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>slowPan()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>PushButton27</sender>
+   <signal>pressed()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>fastPan()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>PushButton28</sender>
+   <signal>pressed()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>slowSaw()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>PushButton29</sender>
+   <signal>pressed()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>fastSaw()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>PushButton30</sender>
+   <signal>pressed()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>slowRevSaw()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>PushButton31</sender>
+   <signal>pressed()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>fastRevSaw()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>PushButton33</sender>
+   <signal>clicked()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>nudgeCueForward()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>PushButton34</sender>
+   <signal>clicked()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>nudgeCueBack()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>PushButton35</sender>
+   <signal>released()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>nudgeCueBack8M()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>PushButton36</sender>
+   <signal>clicked()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>nudgeCueForward8M()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>PushButton39</sender>
+   <signal>pressed()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>normalLfo()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>PushButton41</sender>
+   <signal>pressed()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>metronome()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>PushButton42</sender>
+   <signal>pressed()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>breakLfo()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>alsa</sender>
+   <signal>pressed()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>setAlsa()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>atend_loop</sender>
+   <signal>clicked()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>mapLoopChange()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>bpmTab</sender>
+   <signal>pressed()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>setBpmMixingDesk()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBox2</sender>
+   <signal>activated(QString)</signal>
+   <receiver>alsa_dev</receiver>
+   <slot>setText(QString)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBox3</sender>
+   <signal>activated(QString)</signal>
+   <receiver>oss_dsp</receiver>
+   <slot>setText(QString)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mapout_length</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>mapLengthChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mapping_scale</sender>
+   <signal>activated(int)</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>mapScaleChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>oss</sender>
+   <signal>pressed()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>setOss()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton47</sender>
+   <signal>clicked()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>saveMap()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton48</sender>
+   <signal>clicked()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>loadMap()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton49</sender>
+   <signal>clicked()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>nudgeMinus()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton50</sender>
+   <signal>pressed()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>mapStart()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton50_2</sender>
+   <signal>clicked()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>nudgePlus()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton51</sender>
+   <signal>clicked()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>mediumSwitch()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton77</sender>
+   <signal>pressed()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>mapStop()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton90</sender>
+   <signal>clicked()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>restartCore()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>startStopButton</sender>
+   <signal>pressed()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>start_stop()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>switcherButton</sender>
+   <signal>clicked()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>mediumSwitch()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tempoSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>tempoChanged()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>jack</sender>
+   <signal>clicked()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>setJack()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>beatGraphAnalyzer</sender>
+   <signal>normalTempo()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>normalTempo()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>beatGraphAnalyzer</sender>
+   <signal>targetTempo()</signal>
+   <receiver>SongPlayer</receiver>
+   <slot>targetTempo()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

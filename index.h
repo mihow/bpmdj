@@ -76,8 +76,10 @@ class HistoryField
 /*-------------------------------------------
  *            Indices
  *-------------------------------------------*/
+class SongInformation;
 class Index
 {
+  friend class SongInformation;
   // the meta fields cover information with repsect to the index file itself
   // all other fields are normally information about the mp3 described.
  private:
@@ -414,11 +416,11 @@ class Index
   // md5sum 
   //--------------------------
  public:
-  QString          get_md5sum()             
+  QString get_md5sum()             
     {
       return index_md5sum; 
     };
-  void set_md5sum(QString s)       
+  void set_md5sum(QString s)
     { 
       if (meta_changed || index_md5sum!=s)
 	{
@@ -510,5 +512,5 @@ class Index
  */ 
 Index * createNewIndexFor(QString song, QString directory);
 // will prefix the extention of filename with a number until a unique filename is found
-char * findUniqueName(const char* directory, const char* filename);
+QString findUniqueName(QString directory, QString filename);
 #endif

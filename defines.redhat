@@ -1,9 +1,0 @@
-CPP=g++ -O9
-CC=gcc -O9
-MOC = moc
-CFLAGS+= -D COMPILE_ALSA -D COMPILE_OSS -D QT_THREAD_SUPPORT
-LDFLAGS+= -lpthread -lm -lasound -lrt
-QT_INCLUDE_PATH=-I/usr/lib/qt3/include
-QT_LIBRARY_PATH=-L/usr/lib/qt
-QT_LIBS= -lqt
-UIC = /usr/bin/uic

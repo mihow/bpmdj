@@ -1,4 +1,0 @@
-#!/bin/bash
-ssh root@asus killall brec bplay 2>/dev/null
-terminal -T RECORD -e "ssh root@asus brec -s 44100 -S -b 16 /store/tracks/$1"
-ssh root@asus killall brec 2>/dev/null

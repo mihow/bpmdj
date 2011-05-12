@@ -121,7 +121,7 @@ int wave_open(Index * playing, bool synchronous)
   int decoder = set_decoder_environment(config,playing);
   if (!decoder) return err_noraw;
   
-  // start decoding the file; this means: fork bpmdj-raw process
+  // start decoding the file; this means: fork bpmdjraw process
   // wait 1 second and start reading the file
   if (synchronous)
     {

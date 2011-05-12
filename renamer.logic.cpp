@@ -29,7 +29,7 @@ using namespace std;
 #include <qmessagebox.h>
 #include "renamer.logic.h"
 #include "renamerstart.h"
-#include "songselector.logic.h"
+#include "selector.h"
 #include "scripts.h"
 #include "capacity.h"
 
@@ -46,10 +46,10 @@ RenamerLogic::~RenamerLogic()
 }
 
 #define FOREACH(operation) {\
-  QListViewItemIterator it(NameList);\
+  Q3ListViewItemIterator it(NameList);\
    for(;it.current();++it)\
      {\
-	QListViewItem * item = it.current();\
+	Q3ListViewItem * item = it.current();\
 	if (item->isSelected())\
 	  item->setText(0,operation(item->text(0)));\
      }\
@@ -74,7 +74,7 @@ void RenamerLogic::add(const QString name, const QString pos)
   // if it is an index it should have no correct information
   if (inform && inform->shouldFilenameBeExcluded(pos)) return;
   // so it is an incorrect filename which does not contain correct information
-  new QListViewItem(NameList,name,name,pos);
+  new Q3ListViewItem(NameList,name,name,pos);
 }
 
 QString RenamerLogic::smallCapsInWord(QString in)
@@ -338,10 +338,10 @@ void RenamerLogic::changeSelection()
    // the greatest common substring in
    QString key;
    int l = -1;
-   QListViewItemIterator it(NameList);
+   Q3ListViewItemIterator it(NameList);
    for(;it.current();++it)
      {
-       QListViewItem * item = it.current();
+       Q3ListViewItem * item = it.current();
        if (item->isSelected())
 	 {
 	   QString txt = item->text(0);
@@ -359,12 +359,12 @@ void RenamerLogic::changeSelection()
      {
        for(int pos = key.length()-3-size; pos>=0 && !found; pos--) // -3 is extenetion
 	 {
-	   QListViewItemIterator it(NameList);
+	   Q3ListViewItemIterator it(NameList);
 	   found = true;
 	   gcs = key.mid(pos,size);
 	   for(;it.current() && found;++it)
 	     {
-	       QListViewItem * item = it.current();
+	       Q3ListViewItem * item = it.current();
 	       if (item->isSelected())
 		 {
 		   if (!item->text(0).contains(gcs))
@@ -380,10 +380,10 @@ void RenamerLogic::changeSelection()
 
 void RenamerLogic::realizeSelection()
 {
-  QListViewItemIterator it(NameList);
+  Q3ListViewItemIterator it(NameList);
   for(;it.current();)
     {
-      QListViewItem * item = it.current();
+      Q3ListViewItem * item = it.current();
       if (item->isSelected())
 	{
 	  // position 0 is the new name
@@ -434,7 +434,8 @@ void RenamerLogic::realizeSelection()
 
 void RenamerLogic::scan(const QString dirname)
 {
-  DirectoryScanner::scan(dirname);
+  reset(dirname);
+  DirectoryScanner::scan();
   if (NameList->childCount())
     show();
   else
@@ -445,10 +446,10 @@ void RenamerLogic::scan(const QString dirname)
 
 void RenamerLogic::ignoreSelection()
 {
-  QListViewItemIterator it(NameList);
+  Q3ListViewItemIterator it(NameList);
   for(;it.current();)
     {
-      QListViewItem * item = it.current();
+      Q3ListViewItem * item = it.current();
       if (item->isSelected())
 	delete item;
       else ++it;

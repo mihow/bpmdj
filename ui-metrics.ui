@@ -1,0 +1,181 @@
+<ui version="4.0" >
+ <class>MetricWidget</class>
+ <widget class="QWidget" name="MetricWidget" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>266</width>
+    <height>281</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Form2</string>
+  </property>
+  <layout class="QGridLayout" >
+   <property name="leftMargin" >
+    <number>0</number>
+   </property>
+   <property name="topMargin" >
+    <number>0</number>
+   </property>
+   <property name="rightMargin" >
+    <number>0</number>
+   </property>
+   <property name="bottomMargin" >
+    <number>0</number>
+   </property>
+   <item row="5" column="0" >
+    <widget class="QLabel" name="textLabel2_2_2" >
+     <property name="text" >
+      <string>Echo weight (default = 62)</string>
+     </property>
+     <property name="wordWrap" >
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="0" >
+    <widget class="QLabel" name="textLabel5" >
+     <property name="text" >
+      <string>Composition weight (default = 33)</string>
+     </property>
+     <property name="wordWrap" >
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0" >
+    <widget class="QSpinBox" name="spectrumSpin" >
+     <property name="minimum" >
+      <number>0</number>
+     </property>
+     <property name="maximum" >
+      <number>1000</number>
+     </property>
+     <property name="singleStep" >
+      <number>10</number>
+     </property>
+     <property name="value" >
+      <number>100</number>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" >
+    <widget class="QSpinBox" name="tempoDistanceSpin" >
+     <property name="minimum" >
+      <number>0</number>
+     </property>
+     <property name="maximum" >
+      <number>1000</number>
+     </property>
+     <property name="singleStep" >
+      <number>10</number>
+     </property>
+     <property name="value" >
+      <number>100</number>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0" >
+    <widget class="QSpinBox" name="echoSpin" >
+     <property name="minimum" >
+      <number>0</number>
+     </property>
+     <property name="maximum" >
+      <number>1000</number>
+     </property>
+     <property name="singleStep" >
+      <number>10</number>
+     </property>
+     <property name="value" >
+      <number>100</number>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" >
+    <widget class="QLabel" name="textLabel1" >
+     <property name="text" >
+      <string>Specify the weights of the different metrics.</string>
+     </property>
+     <property name="wordWrap" >
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0" >
+    <widget class="QLabel" name="textLabel2_2_2_2" >
+     <property name="text" >
+      <string>Rythm weight (default = 26)</string>
+     </property>
+     <property name="wordWrap" >
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="0" >
+    <widget class="QSpinBox" name="compositionSpin" >
+     <property name="minimum" >
+      <number>0</number>
+     </property>
+     <property name="maximum" >
+      <number>1000</number>
+     </property>
+     <property name="singleStep" >
+      <number>10</number>
+     </property>
+     <property name="value" >
+      <number>0</number>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0" >
+    <widget class="QLabel" name="textLabel2_2" >
+     <property name="text" >
+      <string>Spectrum weight (default = 11)</string>
+     </property>
+     <property name="wordWrap" >
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="0" >
+    <widget class="QSpinBox" name="rythmSpin" >
+     <property name="minimum" >
+      <number>0</number>
+     </property>
+     <property name="maximum" >
+      <number>1000</number>
+     </property>
+     <property name="singleStep" >
+      <number>10</number>
+     </property>
+     <property name="value" >
+      <number>100</number>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" >
+    <widget class="QLabel" name="textLabel2_2_3" >
+     <property name="text" >
+      <string>Tempo weight (default = 2)</string>
+     </property>
+     <property name="wordWrap" >
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11" />
+ <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
+ <tabstops>
+  <tabstop>tempoDistanceSpin</tabstop>
+  <tabstop>spectrumSpin</tabstop>
+  <tabstop>echoSpin</tabstop>
+  <tabstop>rythmSpin</tabstop>
+  <tabstop>compositionSpin</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

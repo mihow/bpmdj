@@ -19,35 +19,53 @@
 using namespace std;
 #line 1 "database.c++"
 #include <qlabel.h>
-#include <pthread.h>
 #include "history.h"
 #include "database.h"
 #include "song-metric.h"
 #include "qsong.h"
-#include "songselector.logic.h"
+#include "selector.h"
 #include "process-manager.h"
 #include "vector-iterator.h"
 #include "tags.h"
 #include "heap.h"
 #include "song-statistics.h"
-#include "kbpm-dj.h"
+#include "bpmdj.h"
 #include "existence-scanner.h"
+#include "history.h"
+#include "database.h"
+#include "song-metric.h"
+#include "qsong.h"
+#include "scripts.h"
 
-/**
- * The database cache contains items that are visible when only considereing the taglist
- */
-DataBase::DataBase() 
+void DataBase::reset()
+{
+  clear();
+  init();
+}
+
+DataBase::DataBase() : all()
 {
   init();
 }
 
+Song * DataBase::find(QString song_filename)
+{
+  map<QString,Song*>::iterator ssbf;
+  ssbf = file2song.find(song_filename);
+  if (ssbf==file2song.end())
+    return NULL;
+  return ssbf->second;
+}
+
 DataBase::~DataBase()
 {
+  clear();
 }
 
 void DataBase::init()
 {
-  BasicDataBase::init();
+  all.clear();
+  file2song = map<QString,Song*>();
   cache.clear();
   and_include = NULL;
   or_include = NULL;
@@ -59,7 +77,9 @@ void DataBase::init()
 
 void DataBase::clear()
 {
-  BasicDataBase::clear();
+  vectorIterator<Song*> i(all); ITERATE_OVER(i) delete i.val(); }
+  all.clear();
+  file2song = map<QString,Song*>();
   cache.clear();
   bpmdj_deallocate(and_include);
   bpmdj_deallocate(or_include);
@@ -71,11 +91,11 @@ bool DataBase::cacheValid(SongSelectorLogic * selector)
 {
   if (rebuild_cache || selector->tagList->childCount() != tag_size)
     return false;
-  QListViewItemIterator it(selector->tagList);
+  Q3ListViewItemIterator it(selector->tagList);
   int i = 0;
   while(it.current())
     {
-      QListViewItem *t = it.current();
+      Q3ListViewItem *t = it.current();
       tag_type ta = Tags::find_tag(t->text(TAGS_TEXT));
       if ( (ta != tag[i]) ||
 	   (t->text(TAGS_AND) == TAG_TRUE) != and_include[i] ||
@@ -101,11 +121,11 @@ void DataBase::copyTags(SongSelectorLogic * selector)
   tag         = new tag_type[tag_size];
   and_includes_checked = false;
   excludes_checked = false;
-  QListViewItemIterator it(selector->tagList);
+  Q3ListViewItemIterator it(selector->tagList);
   int i = 0;
   while(it.current())
     {
-      QListViewItem * t = it.current();
+      Q3ListViewItem * t = it.current();
       tag[i] = Tags::find_tag(t->text(TAGS_TEXT));
       // printf("%s = %d\n",(const char*) t->text(TAGS_TEXT),tag[i]);
       or_include[i] = t->text(TAGS_OR) == TAG_TRUE;
@@ -180,7 +200,7 @@ bool DataBase::filter(SongSelectorLogic* selector, Song *item, Song* main, float
     {
       QString title=item->get_title().upper();
       QString author=item->get_author().upper();
-      if (title.contains(lookingfor)+author.contains(lookingfor)==0)
+      if (!title.contains(lookingfor) && !author.contains(lookingfor))
 	return false;
     }
   // obtain the distance
@@ -195,7 +215,7 @@ int DataBase::get_unheaped_selection(SongSelectorLogic* selector, Song* main, QV
   // to get an appropriate selection we allocate the nessary vector
   int itemcount=0;
   updateCache(selector);
-  Song * * show = bpmdj_allocate(cache.size(),Song*);
+  Song ** show = bpmdj_allocate(cache.size(),Song*);
   vectorIterator<Song*> song(cache); ITERATE_OVER(song)
     bool vis = filter(selector,song.val(),main,1.0);
     if (vis) show[itemcount++] = song.val();
@@ -213,17 +233,10 @@ int DataBase::set_answer(Song ** show, int itemcount, QVectorView* target)
       bpmdj_deallocate(show);
     }
   int ibefore = target->currentItem();
-  // store old current item if available
   Song * before = NULL;
   if(ibefore>=0 && ibefore < QSong::get_song_count())
     before = QSong::songEssence(ibefore);
-  // set the vector
   QSong::setVector(show,itemcount);
-  // find the old current item and make it the current again
-  //  if (before)
-  //    printf("Song before was %s\n",(const char*)before->getDisplayTitle());
-  //  else
-  //    printf("There was no song before\n");
   int item_to_select = 0;
   if (before && show)
     for(int i = 0 ; i < itemcount ; i ++)
@@ -232,48 +245,94 @@ int DataBase::set_answer(Song ** show, int itemcount, QVectorView* target)
 	  item_to_select = i;
 	  break;
 	}
-  // set the focus
-  //  printf("The new item to select is %d\n",item_to_select);
   target->setCurrentItem(item_to_select);
   if (item_to_select < itemcount && item_to_select >=0)
     QSong::set_selected(item_to_select,true);
   target->ensureItemVisible(item_to_select);
-  //  printf("The new first item is selected ? %d\n",QSong::get_selected(0));
-  // inform the target that the vector has changed
   target->vectorChanged();
-  //  printf("The new focus is at %d\n\n",target->currentItem());
-  //  printf("The vectorview thinks that first item isSelected: %d\n\n",target->isSelected(0));
   return itemcount;
 }
-
-static int itemUpdateingCount = 0;
-int DataBase::getSelection(SongSelectorLogic* selector, Song* main, QVectorView* target, int count)
+ 
+int DataBase::getSelection(SongSelectorLogic* selector, QVectorView* target, int count)
 {
+  Song* main=::main_song;
   // only when we have a dcolor limitation can we use the amount limitation
-  if (!Config::limit_indistance || count==0 || main==NULL) return get_unheaped_selection(selector, main, target);
+  if (!Config::limit_indistance || count==0 || main==NULL) 
+    return get_unheaped_selection(selector, main, target);
   assert(count>0);
   
-  // to get an appropriate selection we allocate the nessary vector
-  itemUpdateingCount++;
   updateCache(selector);
-  Song * * show = bpmdj_allocate(count,Song*);
   SongHeap heap(count);
   if (Config::limit_indistance) heap.maximum = 1.0;
   vectorIterator<Song*> song(cache); ITERATE_OVER(song)
     bool vis = filter(selector,song.val(),main, heap.maximum);
     if (vis) heap.add(song.val());
   }
+  Song ** show = bpmdj_allocate(count,Song*);
   int itemcount = heap.copy_to(show);
   assert(itemcount<=count);
-  itemUpdateingCount--;
   return set_answer(show,itemcount,target);
 }
+
+void DataBase::addNewSongs(SongSelectorLogic* selector, QVectorView* target, vector<Song*> *newsongs)
+{
+  // since these come from the indexreader we do not want to limit the selection to a heap
+  // since that would slow everything down. Instead we simply extende the current selection
+  // if the song satisfies all other criterias (in tempo, proper tag etc)
+  // we also do not check cache updates or the likes, this means that the filter must be
+  // applied in 2 steps. First to check the tag, then to check its distance to the mainsong
+  assert(newsongs);
+  if (!newsongs->size()) return;
+  Song* show[newsongs->size()];
+  unsigned int count=0;
+  vectorIterator<Song*> song(newsongs); ITERATE_OVER(song)
+    add(song.val());  // add it to the total list
+    bool vis = tagFilter(song.val());
+    if (vis) 
+    {
+      cache.push_back(song.val()); // put it in the cache if necessary
+      if (filter(selector,song.val(),::main_song,1.0))
+	show[count++]=song.val();  // put it in the current selection
+    }
+  }
+  assert(count<=newsongs->size());
+  QSong::addVector(show,count);
+  // printf("Acceping %x\n",(unsigned4)newsongs); fflush(stdout);
+  target->vectorChanged();
+}
+
+void DataBase::add(Song* song)
+{
+  all.push_back(song);
+  if (file2song.find(song->get_file())!=file2song.end())
+    {
+      Song *song2 = file2song[song->get_file()];
+      Fatal("The song \n    %s\n"
+	    "occurs at least two times in different index files\n"
+	    "The first index file is \n    %s\n"
+	    "The second index file is \n    %s",
+	    (const char*)song->get_file(),
+	    (const char*)song->get_storedin(),
+	    (const char*)song2->get_storedin());
+    }
+  file2song[song->get_file()]=song;
+  flush_cache();
+};
 
 Song * * DataBase::closestSongs(SongSelectorLogic * selector,
 				Song * target1, float weight1,
 				Song * target2, float weight2,
 				SongMetriek * metriek, int maximum, int &count)
 {
+  /*
+  cerr << "Looking for a song between " << target1->getDisplayTitle().toStdString()
+  << " and " << target2->getDisplayTitle().toStdString() 
+  << " weight1 = " << weight1 
+  << " weight2 = " << weight2
+  << " maximum weight = " << maximum 
+  << "\n";
+  */
+
   int i, j;
   float * minima = bpmdj_allocate(maximum,float);
   Song * * entries = bpmdj_allocate(maximum,Song*);

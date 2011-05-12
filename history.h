@@ -40,11 +40,11 @@ private:
   static FILE* f;
   static QString history_filename;
   singleton_accessors(int,songs_played);
-  static QListView * log_ui;
+  static Q3ListView * log_ui;
   static void mark_as_played(DataBase * db, QString s);
   static void mark_as_played(Song *song);
 public:
-  History(const QString filename, DataBase * db, QListView * putin);
+  History(const QString filename, DataBase * db, Q3ListView * putin);
   static void this_is_playing(Song * main_now);
   static void save_history();
   static void clear_history(DataBase * db);

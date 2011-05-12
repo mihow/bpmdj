@@ -21,7 +21,7 @@
 using namespace std;
 #line 1 "common.h++"
 #include <stdio.h>
-#include <qstring.h>
+#include <Qt/qstring.h>
 #include <string.h>
 #include "types.h"
 

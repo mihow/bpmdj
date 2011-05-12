@@ -23,7 +23,6 @@ using namespace std;
 #include <math.h>
 #include <qpainter.h>
 #include <stdlib.h>
-#include "songselector.logic.h"
 #include "song-metric.h"
 #include "qsong.h"
 #include "process-manager.h"
@@ -47,6 +46,10 @@ static PixmapCache echo_icon_cache;
 static PixmapCache rythm_icon_cache;
 static PixmapCache composition_icon_cache;
 
+// if we would add 1 by 1 then we need to reallocate these vectors once in a while
+// this cannot be done when somebody is accessing the vector. Therefor we need to 
+// install a couple of locks her to avoid concurrent access. The problem is of course
+// the 
 void QSong::setVector(Song**arr, int cnt)
 {
   if (get_songs()) bpmdj_deallocate(get_songs());
@@ -59,6 +62,20 @@ void QSong::setVector(Song**arr, int cnt)
   assert(cnt>=0 &&
 	 (cnt>0 ? arr!=NULL : arr==NULL));
   Sort();
+}
+
+void QSong::addVector(Song**arr, int cnt)
+{
+  assert(cnt>=0);
+  if (!cnt) return;
+  int oldcnt=get_song_count();
+  int newcnt=oldcnt+cnt;
+  set_songs(bpmdj_reallocate(get_songs(),newcnt,Song*));
+  set_selected(bpmdj_reallocate(get_selected(),newcnt,bool));
+  memset(get_selected()+oldcnt,0,cnt*sizeof(bool));
+  memcpy(get_songs()+oldcnt,arr,cnt*sizeof(Song*));
+  set_song_count(newcnt);
+  assert(cnt>=0 && (cnt>0 ? arr!=NULL : arr==NULL));
 }
 
 int QSong::vectorSize() const
@@ -625,10 +642,3 @@ Song * QSong::songEssence(int i)
   if (i<0 || i >=get_song_count()) return NULL; 
   else return get_songs(i);
 };
-
-void QSong::preparePaint(QVectorView * vv, int i)
-{
-//  Song * song = songEssence(i);
-//  if (!song) return;
-//  fragmentCache.get(song);
-}

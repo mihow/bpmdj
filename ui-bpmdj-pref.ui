@@ -1,0 +1,1214 @@
+<ui version="4.0" >
+ <class>BpmDjPreferences</class>
+ <widget class="QDialog" name="BpmDjPreferences" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>558</width>
+    <height>507</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Song Selector Preferences</string>
+  </property>
+  <layout class="QGridLayout" >
+   <property name="leftMargin" >
+    <number>9</number>
+   </property>
+   <property name="topMargin" >
+    <number>9</number>
+   </property>
+   <property name="rightMargin" >
+    <number>9</number>
+   </property>
+   <property name="bottomMargin" >
+    <number>9</number>
+   </property>
+   <property name="horizontalSpacing" >
+    <number>6</number>
+   </property>
+   <property name="verticalSpacing" >
+    <number>6</number>
+   </property>
+   <item row="0" column="0" >
+    <widget class="QTabWidget" name="subtabs" >
+     <property name="currentIndex" >
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="playerTab" >
+      <attribute name="title" >
+       <string>Players</string>
+      </attribute>
+      <layout class="QGridLayout" >
+       <property name="leftMargin" >
+        <number>9</number>
+       </property>
+       <property name="topMargin" >
+        <number>9</number>
+       </property>
+       <property name="rightMargin" >
+        <number>9</number>
+       </property>
+       <property name="bottomMargin" >
+        <number>9</number>
+       </property>
+       <property name="horizontalSpacing" >
+        <number>6</number>
+       </property>
+       <property name="verticalSpacing" >
+        <number>6</number>
+       </property>
+       <item row="0" column="0" >
+        <widget class="QLabel" name="TextLabel3" >
+         <property name="sizePolicy" >
+          <sizepolicy vsizetype="Maximum" hsizetype="Preferred" >
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text" >
+          <string>&lt;b>Player commands</string>
+         </property>
+         <property name="alignment" >
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         </property>
+         <property name="wordWrap" >
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="2" >
+        <widget class="QFrame" name="playerStack" >
+         <property name="frameShape" >
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow" >
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QVBoxLayout" >
+          <property name="spacing" >
+           <number>6</number>
+          </property>
+          <property name="leftMargin" >
+           <number>9</number>
+          </property>
+          <property name="topMargin" >
+           <number>9</number>
+          </property>
+          <property name="rightMargin" >
+           <number>9</number>
+          </property>
+          <property name="bottomMargin" >
+           <number>9</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="label_2" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Maximum" hsizetype="Preferred" >
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text" >
+             <string>Choose what kind of player you want (tip: use standard) and give it a name (that name is the file shere it will save the players configuration). If the player is on a remote host enter the yser@host in the third field.</string>
+            </property>
+            <property name="wordWrap" >
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" >
+            <property name="spacing" >
+             <number>6</number>
+            </property>
+            <property name="leftMargin" >
+             <number>0</number>
+            </property>
+            <property name="topMargin" >
+             <number>0</number>
+            </property>
+            <property name="rightMargin" >
+             <number>0</number>
+            </property>
+            <property name="bottomMargin" >
+             <number>0</number>
+            </property>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="2" column="0" >
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType" >
+          <enum>QSizePolicy::Expanding</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>437</width>
+           <height>27</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="2" column="1" >
+        <widget class="QPushButton" name="playerInstallButton" >
+         <property name="enabled" >
+          <bool>true</bool>
+         </property>
+         <property name="text" >
+          <string>Install</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="analyzerTab" >
+      <attribute name="title" >
+       <string>Analyzers</string>
+      </attribute>
+      <layout class="QGridLayout" >
+       <property name="leftMargin" >
+        <number>9</number>
+       </property>
+       <property name="topMargin" >
+        <number>9</number>
+       </property>
+       <property name="rightMargin" >
+        <number>9</number>
+       </property>
+       <property name="bottomMargin" >
+        <number>9</number>
+       </property>
+       <property name="horizontalSpacing" >
+        <number>6</number>
+       </property>
+       <property name="verticalSpacing" >
+        <number>6</number>
+       </property>
+       <item row="0" column="0" colspan="2" >
+        <widget class="QLabel" name="TextLabel3_2" >
+         <property name="sizePolicy" >
+          <sizepolicy vsizetype="Maximum" hsizetype="Preferred" >
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text" >
+          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-weight:600;">Analyzer commands&lt;/span>&lt;/p>&lt;/body>&lt;/html></string>
+         </property>
+         <property name="alignment" >
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         </property>
+         <property name="wordWrap" >
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="2" >
+        <widget class="QFrame" name="analyzerStack" >
+         <property name="frameShape" >
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow" >
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QVBoxLayout" >
+          <property name="spacing" >
+           <number>6</number>
+          </property>
+          <property name="leftMargin" >
+           <number>9</number>
+          </property>
+          <property name="topMargin" >
+           <number>9</number>
+          </property>
+          <property name="rightMargin" >
+           <number>9</number>
+          </property>
+          <property name="bottomMargin" >
+           <number>9</number>
+          </property>
+          <item>
+           <layout class="QVBoxLayout" >
+            <property name="spacing" >
+             <number>6</number>
+            </property>
+            <property name="leftMargin" >
+             <number>0</number>
+            </property>
+            <property name="topMargin" >
+             <number>0</number>
+            </property>
+            <property name="rightMargin" >
+             <number>0</number>
+            </property>
+            <property name="bottomMargin" >
+             <number>0</number>
+            </property>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="2" column="1" >
+        <widget class="QPushButton" name="analyzerInstallButton" >
+         <property name="text" >
+          <string>Install</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" >
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType" >
+          <enum>QSizePolicy::Expanding</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>261</width>
+           <height>27</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_4" >
+      <attribute name="title" >
+       <string>Tempo</string>
+      </attribute>
+      <layout class="QGridLayout" >
+       <property name="leftMargin" >
+        <number>9</number>
+       </property>
+       <property name="topMargin" >
+        <number>9</number>
+       </property>
+       <property name="rightMargin" >
+        <number>9</number>
+       </property>
+       <property name="bottomMargin" >
+        <number>9</number>
+       </property>
+       <property name="horizontalSpacing" >
+        <number>6</number>
+       </property>
+       <property name="verticalSpacing" >
+        <number>6</number>
+       </property>
+       <item row="0" column="0" >
+        <widget class="QLabel" name="textLabel1_2" >
+         <property name="sizePolicy" >
+          <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text" >
+          <string>Color matching tempo</string>
+         </property>
+         <property name="wordWrap" >
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1" >
+        <widget class="QPushButton" name="colorTempo44" >
+         <property name="autoFillBackground" >
+          <bool>true</bool>
+         </property>
+         <property name="text" >
+          <string/>
+         </property>
+         <property name="flat" >
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="0" colspan="2" >
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType" >
+          <enum>QSizePolicy::Expanding</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>256</width>
+           <height>108</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="5" column="1" >
+        <widget class="QSpinBox" name="tempoSpin" >
+         <property name="maximum" >
+          <number>100</number>
+         </property>
+         <property name="value" >
+          <number>6</number>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0" colspan="2" >
+        <widget class="QCheckBox" name="showUnknownTempo" >
+         <property name="text" >
+          <string>unknown tempo matches perfect</string>
+         </property>
+         <property name="checked" >
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" >
+        <widget class="QCheckBox" name="showTempo54" >
+         <property name="text" >
+          <string>show 5/4 harmonics</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" >
+        <widget class="QCheckBox" name="showTempo64" >
+         <property name="text" >
+          <string>show 6/4 harmonics</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1" >
+        <widget class="QPushButton" name="colorTempo74" >
+         <property name="autoFillBackground" >
+          <bool>true</bool>
+         </property>
+         <property name="text" >
+          <string/>
+         </property>
+         <property name="flat" >
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0" >
+        <widget class="QCheckBox" name="showTempo84" >
+         <property name="text" >
+          <string>show 8/4 harmonics</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0" >
+        <widget class="QLabel" name="textLabel2_3" >
+         <property name="text" >
+          <string>Tempo range</string>
+         </property>
+         <property name="wordWrap" >
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1" >
+        <widget class="QPushButton" name="colorTempo64" >
+         <property name="autoFillBackground" >
+          <bool>true</bool>
+         </property>
+         <property name="text" >
+          <string/>
+         </property>
+         <property name="flat" >
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1" >
+        <widget class="QPushButton" name="colorTempo84" >
+         <property name="autoFillBackground" >
+          <bool>true</bool>
+         </property>
+         <property name="text" >
+          <string/>
+         </property>
+         <property name="flat" >
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1" >
+        <widget class="QPushButton" name="colorTempo54" >
+         <property name="autoFillBackground" >
+          <bool>true</bool>
+         </property>
+         <property name="text" >
+          <string/>
+         </property>
+         <property name="flat" >
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0" >
+        <widget class="QCheckBox" name="showTempo74" >
+         <property name="text" >
+          <string>show 7/4 harmonics</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0" colspan="2" >
+        <widget class="Q3ButtonGroup" name="bpmalgo" >
+         <property name="enabled" >
+          <bool>true</bool>
+         </property>
+         <property name="title" >
+          <string>Analysis Algorithm</string>
+         </property>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="radioButtonExclusive" >
+          <bool>true</bool>
+         </property>
+         <layout class="QGridLayout" >
+          <property name="leftMargin" >
+           <number>0</number>
+          </property>
+          <property name="topMargin" >
+           <number>0</number>
+          </property>
+          <property name="rightMargin" >
+           <number>0</number>
+          </property>
+          <property name="bottomMargin" >
+           <number>0</number>
+          </property>
+          <property name="horizontalSpacing" >
+           <number>6</number>
+          </property>
+          <property name="verticalSpacing" >
+           <number>6</number>
+          </property>
+          <item row="0" column="0" colspan="2" >
+           <widget class="QRadioButton" name="resamplingScan" >
+            <property name="text" >
+             <string>Rayshoot, Resampling</string>
+            </property>
+            <property name="checked" >
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" colspan="2" >
+           <widget class="QRadioButton" name="enveloppeSpectrum" >
+            <property name="text" >
+             <string>Enveloppe Spectrum</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2" colspan="2" >
+           <widget class="QRadioButton" name="ultraLongFFT" >
+            <property name="text" >
+             <string>Rayshoot, FFT Guidance</string>
+            </property>
+            <property name="checked" >
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="2" >
+           <widget class="QLabel" name="TextLabel2_3" >
+            <property name="text" >
+             <string>To</string>
+            </property>
+            <property name="alignment" >
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="wordWrap" >
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1" >
+           <widget class="QLineEdit" name="From" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="3" >
+           <widget class="QLineEdit" name="To" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0" >
+           <widget class="QLabel" name="TextLabel1_3" >
+            <property name="text" >
+             <string>From</string>
+            </property>
+            <property name="alignment" >
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="wordWrap" >
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2" colspan="2" >
+           <widget class="QRadioButton" name="fullAutoCorrelation" >
+            <property name="text" >
+             <string>Full Autocorrelation</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0" colspan="4" >
+           <widget class="Line" name="line3" >
+            <property name="frameShape" >
+             <enum>QFrame::HLine</enum>
+            </property>
+            <property name="frameShadow" >
+             <enum>QFrame::Sunken</enum>
+            </property>
+            <property name="orientation" >
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1" >
+           <spacer>
+            <property name="orientation" >
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType" >
+             <enum>QSizePolicy::Expanding</enum>
+            </property>
+            <property name="sizeHint" >
+             <size>
+              <width>20</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="2" column="2" colspan="2" >
+           <widget class="QRadioButton" name="weightedEnvCor" >
+            <property name="text" >
+             <string>Weighted</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_5" >
+      <attribute name="title" >
+       <string>Colors</string>
+      </attribute>
+      <layout class="QGridLayout" >
+       <property name="leftMargin" >
+        <number>9</number>
+       </property>
+       <property name="topMargin" >
+        <number>9</number>
+       </property>
+       <property name="rightMargin" >
+        <number>9</number>
+       </property>
+       <property name="bottomMargin" >
+        <number>9</number>
+       </property>
+       <property name="horizontalSpacing" >
+        <number>6</number>
+       </property>
+       <property name="verticalSpacing" >
+        <number>6</number>
+       </property>
+       <item row="7" column="0" colspan="4" >
+        <widget class="QLabel" name="label" >
+         <property name="text" >
+          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-weight:600;">Timer colors&lt;/span>&lt;/p>&lt;/body>&lt;/html></string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0" colspan="3" >
+        <widget class="QLabel" name="textLabel1_5_3" >
+         <property name="enabled" >
+          <bool>true</bool>
+         </property>
+         <property name="text" >
+          <string>Color of unavailable songs</string>
+         </property>
+         <property name="wordWrap" >
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0" colspan="3" >
+        <widget class="QLabel" name="textLabel1_5_3_2" >
+         <property name="enabled" >
+          <bool>false</bool>
+         </property>
+         <property name="text" >
+          <string>Color of unchecked songs</string>
+         </property>
+         <property name="wordWrap" >
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="5" colspan="2" >
+        <widget class="QSpinBox" name="authorDecay" >
+         <property name="minimum" >
+          <number>1</number>
+         </property>
+         <property name="maximum" >
+          <number>100</number>
+         </property>
+         <property name="value" >
+          <number>6</number>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="3" colspan="4" >
+        <widget class="QPushButton" name="colorPlayedAuthor" >
+         <property name="enabled" >
+          <bool>true</bool>
+         </property>
+         <property name="autoFillBackground" >
+          <bool>true</bool>
+         </property>
+         <property name="text" >
+          <string/>
+         </property>
+         <property name="flat" >
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0" colspan="3" >
+        <widget class="QLabel" name="textLabel1_5_2" >
+         <property name="enabled" >
+          <bool>true</bool>
+         </property>
+         <property name="text" >
+          <string>Color of already played songs</string>
+         </property>
+         <property name="wordWrap" >
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="3" colspan="4" >
+        <widget class="QPushButton" name="colorUnavailableSong" >
+         <property name="enabled" >
+          <bool>true</bool>
+         </property>
+         <property name="autoFillBackground" >
+          <bool>true</bool>
+         </property>
+         <property name="text" >
+          <string/>
+         </property>
+         <property name="flat" >
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="3" colspan="4" >
+        <widget class="QPushButton" name="colorUncheckedSong" >
+         <property name="enabled" >
+          <bool>false</bool>
+         </property>
+         <property name="autoFillBackground" >
+          <bool>true</bool>
+         </property>
+         <property name="text" >
+          <string/>
+         </property>
+         <property name="flat" >
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="3" colspan="4" >
+        <widget class="QPushButton" name="colorPlayedSong" >
+         <property name="enabled" >
+          <bool>true</bool>
+         </property>
+         <property name="autoFillBackground" >
+          <bool>true</bool>
+         </property>
+         <property name="text" >
+          <string/>
+         </property>
+         <property name="flat" >
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="3" colspan="4" >
+        <widget class="QPushButton" name="colorAlltimePlaycount" >
+         <property name="enabled" >
+          <bool>true</bool>
+         </property>
+         <property name="autoFillBackground" >
+          <bool>true</bool>
+         </property>
+         <property name="text" >
+          <string/>
+         </property>
+         <property name="flat" >
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0" colspan="5" >
+        <widget class="QLabel" name="textLabel1" >
+         <property name="text" >
+          <string>Author Decay (#songs)</string>
+         </property>
+         <property name="wordWrap" >
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" colspan="3" >
+        <widget class="QLabel" name="textLabel1_5_4" >
+         <property name="enabled" >
+          <bool>true</bool>
+         </property>
+         <property name="text" >
+          <string>Alltime playcount color</string>
+         </property>
+         <property name="wordWrap" >
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="3" >
+        <widget class="QLabel" name="textLabel1_5" >
+         <property name="enabled" >
+          <bool>true</bool>
+         </property>
+         <property name="text" >
+          <string>Color of already played authors</string>
+         </property>
+         <property name="wordWrap" >
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0" colspan="2" >
+        <widget class="QLabel" name="textLabel2_4" >
+         <property name="enabled" >
+          <bool>true</bool>
+         </property>
+         <property name="text" >
+          <string>Color 'dColor' col</string>
+         </property>
+         <property name="wordWrap" >
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="4" colspan="2" >
+        <widget class="QLabel" name="TextLabel8_2_4" >
+         <property name="text" >
+          <string>Normal</string>
+         </property>
+         <property name="alignment" >
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+         <property name="wordWrap" >
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="5" >
+        <widget class="QLabel" name="TextLabel8_2" >
+         <property name="text" >
+          <string>seconds, become</string>
+         </property>
+         <property name="wordWrap" >
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="5" >
+        <widget class="QLabel" name="TextLabel8_2_2" >
+         <property name="text" >
+          <string>seconds, become</string>
+         </property>
+         <property name="wordWrap" >
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="6" >
+        <widget class="QPushButton" name="greenTimeColor" >
+         <property name="autoFillBackground" >
+          <bool>true</bool>
+         </property>
+         <property name="text" >
+          <string/>
+         </property>
+         <property name="flat" >
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="0" >
+        <widget class="QLabel" name="TextLabel8" >
+         <property name="text" >
+          <string>After</string>
+         </property>
+         <property name="wordWrap" >
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="1" colspan="4" >
+        <widget class="QLineEdit" name="yellowTime" >
+         <property name="text" >
+          <string>120</string>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="6" >
+        <widget class="QPushButton" name="redTimeColor" >
+         <property name="autoFillBackground" >
+          <bool>true</bool>
+         </property>
+         <property name="text" >
+          <string/>
+         </property>
+         <property name="flat" >
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="11" column="0" colspan="7" >
+        <widget class="QCheckBox" name="color_main_window" >
+         <property name="text" >
+          <string>color entire main window</string>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="5" >
+        <widget class="QLabel" name="TextLabel85" >
+         <property name="text" >
+          <string>seconds, become</string>
+         </property>
+         <property name="wordWrap" >
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="1" colspan="4" >
+        <widget class="QLineEdit" name="redTime" >
+         <property name="text" >
+          <string>180</string>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="0" >
+        <widget class="QLabel" name="TextLabel84" >
+         <property name="text" >
+          <string>After</string>
+         </property>
+         <property name="wordWrap" >
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="0" >
+        <widget class="QLabel" name="TextLabel83" >
+         <property name="text" >
+          <string>After</string>
+         </property>
+         <property name="wordWrap" >
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="6" >
+        <widget class="QPushButton" name="orangeTimeColor" >
+         <property name="autoFillBackground" >
+          <bool>true</bool>
+         </property>
+         <property name="text" >
+          <string/>
+         </property>
+         <property name="flat" >
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="1" colspan="4" >
+        <widget class="QLineEdit" name="orangeTime" >
+         <property name="text" >
+          <string>150</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="6" >
+        <widget class="QPushButton" name="yellowTimeColor" >
+         <property name="autoFillBackground" >
+          <bool>true</bool>
+         </property>
+         <property name="text" >
+          <string/>
+         </property>
+         <property name="flat" >
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="2" colspan="5" >
+        <widget class="QPushButton" name="colordColorCol" >
+         <property name="enabled" >
+          <bool>true</bool>
+         </property>
+         <property name="text" >
+          <string/>
+         </property>
+         <property name="flat" >
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="12" column="5" colspan="2" >
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType" >
+          <enum>QSizePolicy::Expanding</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>159</width>
+           <height>306</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_6" >
+      <attribute name="title" >
+       <string>Metrics</string>
+      </attribute>
+      <layout class="QGridLayout" >
+       <property name="leftMargin" >
+        <number>9</number>
+       </property>
+       <property name="topMargin" >
+        <number>9</number>
+       </property>
+       <property name="rightMargin" >
+        <number>9</number>
+       </property>
+       <property name="bottomMargin" >
+        <number>9</number>
+       </property>
+       <property name="horizontalSpacing" >
+        <number>6</number>
+       </property>
+       <property name="verticalSpacing" >
+        <number>6</number>
+       </property>
+       <item row="0" column="3" >
+        <widget class="QSpinBox" name="max_songs" >
+         <property name="enabled" >
+          <bool>true</bool>
+         </property>
+         <property name="toolTip" >
+          <string>Set to 0 to switch off</string>
+         </property>
+         <property name="specialValueText" >
+          <string>Unlimited</string>
+         </property>
+         <property name="maximum" >
+          <number>1000000</number>
+         </property>
+         <property name="value" >
+          <number>100</number>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="4" >
+        <widget class="MetricWidget" native="1" name="dColorMetric" >
+         <property name="sizePolicy" >
+          <sizepolicy vsizetype="MinimumExpanding" hsizetype="Preferred" >
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2" >
+        <widget class="QLabel" name="textLabel2_2" >
+         <property name="toolTip" >
+          <string>Set to zero for unlimited</string>
+         </property>
+         <property name="text" >
+          <string>Maximum # songs</string>
+         </property>
+         <property name="wordWrap" >
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_7" >
+      <attribute name="title" >
+       <string>Cluster</string>
+      </attribute>
+      <layout class="QGridLayout" >
+       <property name="leftMargin" >
+        <number>9</number>
+       </property>
+       <property name="topMargin" >
+        <number>9</number>
+       </property>
+       <property name="rightMargin" >
+        <number>9</number>
+       </property>
+       <property name="bottomMargin" >
+        <number>9</number>
+       </property>
+       <property name="horizontalSpacing" >
+        <number>6</number>
+       </property>
+       <property name="verticalSpacing" >
+        <number>6</number>
+       </property>
+       <item row="0" column="1" >
+        <widget class="QSpinBox" name="clusterDepth" >
+         <property name="value" >
+          <number>3</number>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" >
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType" >
+          <enum>QSizePolicy::Expanding</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>265</width>
+           <height>448</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="0" column="0" >
+        <widget class="QLabel" name="textLabel1_6" >
+         <property name="text" >
+          <string>After cluster analysis, color based on depth.</string>
+         </property>
+         <property name="wordWrap" >
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="2" >
+        <widget class="QLabel" name="textLabel2_5" >
+         <property name="text" >
+          <string>The number of different colors is 2^depth.</string>
+         </property>
+         <property name="wordWrap" >
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item row="1" column="0" >
+    <widget class="QDialogButtonBox" name="buttonBox" >
+     <property name="orientation" >
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons" >
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::NoButton|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>Q3ButtonGroup</class>
+   <extends>Q3GroupBox</extends>
+   <header>Qt3Support/Q3ButtonGroup</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>MetricWidget</class>
+   <extends>QWidget</extends>
+   <header>metric-widget.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>BpmDjPreferences</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>537</x>
+     <y>278</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>BpmDjPreferences</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>605</x>
+     <y>284</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

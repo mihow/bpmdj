@@ -1,9 +1,0 @@
-CPP=g++ -O9 -Wall
-CC=gcc -O9 -Wall
-CFLAGS+=-D COMPILE_OSS -D COMPILE_ALSA
-LDFLAGS+= -lpthread -lm -lasound -lrt
-UIC = uic
-MOC = moc
-QT_INCLUDE_PATH= -I ${QTDIR}/include/
-QT_LIBRARY_PATH= -L ${QTDIR}/lib/
-QT_LIBS= -D_REENTRANT -DQT_THREAD_SUPPORT -lqt-mt

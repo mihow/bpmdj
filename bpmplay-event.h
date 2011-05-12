@@ -22,26 +22,32 @@ using namespace std;
 #line 1 "bpmplay-event.h++"
 #include "custom-event.h"
 
-class SongPlayerLogic;
-
-class BpmPlayEvent: public BpmEvent
+class SongPlayer;
+/**
+ * A player event used to signal various things to the Qt songplayer.
+ * The playerwindow will accept each playevent by executing the 
+ * run method. This double dispatching makes it possible
+ * to be thread safe while at the same time have the flexibility
+ * to wrtie things outside the user interface itself.
+ */
+class BpmPlayEvent: public QEvent
 {
- public:
-  BpmPlayEvent() : BpmEvent(BpmPlayCustom)
-    {
-    }
-  virtual void run(SongPlayerLogic * player) = 0;
+public:
+  BpmPlayEvent() : QEvent((QEvent::Type)BpmPlayCustom)
+  {
+  }
+  virtual void run(SongPlayer * player) = 0;
 };
 
 class InitAndStart: public BpmPlayEvent
 {
- public:
-  virtual void run(SongPlayerLogic * player);
+public:
+  virtual void run(SongPlayer * player);
 };
 
 class PlayingStateChanged: public BpmPlayEvent
 {
- public:
-  virtual void run(SongPlayerLogic * player);
+public:
+  virtual void run(SongPlayer * player);
 };
 #endif

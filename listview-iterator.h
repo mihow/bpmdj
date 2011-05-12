@@ -28,7 +28,7 @@ using namespace std;
 template<class T>
 class listViewIterator
 {
-  QListViewItemIterator it;
+  Q3ListViewItemIterator it;
   bool once;
 public:
   inline void key()
@@ -59,10 +59,10 @@ public:
   inline void start()
   {
   }
-  listViewIterator(QListViewItem* C): it(C), once(false)
+  listViewIterator(Q3ListViewItem* C): it(C), once(false)
   {
   };
-  listViewIterator(QListView* C): it(C), once(false)
+  listViewIterator(Q3ListView* C): it(C), once(false)
   {
   };
 };

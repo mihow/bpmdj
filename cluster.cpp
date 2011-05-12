@@ -680,10 +680,13 @@ int Cluster::addcouple(Couple * c)
   return addcontent(c);
 }
 
-// ------------------------------
-// Does it work ?
-// TESTING CODE
-// -----------------------------
+/**
+ * A testing point to illustrate how points in the cluster should behave. See the old_main 
+ * routine to test the clustering algorithm. At the moment a run with 1000 random points
+ * takes 3.830 time to complete. 2000 points take 17.760 time. 3000 points take 44.060 time.
+ * This is of course highly dependent on the time the distance metric takes and the processor
+ * At the time of this measurement it was a pentium class machine.
+ */
 class TestPoint:
   public Point
 {
@@ -716,14 +719,10 @@ int old_main()
   Cluster::reset();
   printf("Cluster Created\n");
   fflush(stdout);
-  // create all data
   for(int i = 0; i<4000;i++)
     all->addPoint(new TestPoint(random()));
   printf("Data Created\n");
   fflush(stdout);
-  // Agglomerate
-  // WVB -- deze null is niet ok, maar kan me momenteel
-  // weinig schelen
   all->agglomerate(NULL);
   printf("Agglomeration Done\n");
   fflush(stdout);
@@ -732,7 +731,3 @@ int old_main()
   // all->determine_color(0,360,0,0);
   return 0;
 }
-
-// 1000 = 3.830
-// 2000 = 17.760
-// 3000 = 44.060

@@ -1,17 +1,35 @@
+3.5:
+	- removed bpmmix, which was a nice idea but in the end not the goal of bpmdj
+	- the history thisisplqying function had a small bug
+	- the data reader will check the boundaries before addressing improper memory due to short files
+        + added the location in the song information box
+        - removed the similar scanner, since it didn't work that well
+        + the statistics are calculated when calculate is pressed
+        + removed the k letter from most binaries and programs
+        + improved symbol/qstring singleton creation
+        + taglists are saved in the configuration as strings instead of the qlistviewitem lists 
+        + loading while the ui is already useable
+        - removed a segfault from the data-io writer constructor
+        + removed unnecessary features such as player mixer / recorder and kbpm-mix starter
+        + moved various analyzers into separate tabs
+        + improved updating process of the song cursor and removed a slight mismatch
+        + remove sign warnings in the signals module
+        - a 64 bit bug in fragment-creator.cpp
+        + first port to Qt4
 3.4:
-  ksel  + removed the recording options. This can normally be done by a surrounding script or so	
-  ksel  + improved the subprocess termination handling	
+  ksel  + removed the recording options. This can normally be done by a surrounding script or so
+  ksel  + improved the subprocess termination handling
   ksel  + when importing songs, the ondisk information is updated on the fly and strange songfilenames
 	  are reported
-  ksel  + the existence scanner is an active object as well	
-  ksel  + the pca analyzer runs as an active object	 
-  ksel  + the active objects pool now quits properly	
+  ksel  + the existence scanner is an active object as well
+  ksel  + the pca analyzer runs as an active object
+  ksel  + the active objects pool now quits properly
   kplay + support for mpg123 0.65 & mplayer 1.0rc1-4.1.2
   g++   - gcc suddenly no longe nows how to handle the vectors in pca.c++, so I renamed them
   slack - removed some bugs that prohibited proper slackware compilation
   alsa  - removed a small bug that would shift cues over at most period_size-1 and introduced
 	  garbage when restarting a cue.
-  kplay - kbpm-play --check would stop also if the playinstate included 'started to play'	 
+  kplay - kbpm-play --check would stop also if the playingstate included 'started to play'	 
   ksel  + added the possibility to decode small parts of the song as prelistening
   kplay + automatically switch to beatgraph if song is enterily loaded
   kplay + beatgraph analyzer shows a moving cursor

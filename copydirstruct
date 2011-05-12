@@ -1,5 +1,0 @@
-#!/bin/bash
-gawk '{print "./xtouch \""$0"\""}' $1 >tmplst
-chmod 755 tmplst
-
-  

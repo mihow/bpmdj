@@ -25,6 +25,8 @@ using namespace std;
 #include <unistd.h>
 #include <dirent.h>
 #include <qlabel.h>
+#include <q3listview.h>
+#include <qbytearray.h>
 #include <qlineedit.h>
 #include <assert.h>
 #include <stdio.h>
@@ -35,20 +37,22 @@ using namespace std;
 #include "common.h"
 #include "scripts.h"
 #include "vector-iterator.h"
+#include "qstring-factory.h"
 
 Song * History::t_2 = NULL;
 Song * History::t_1 = NULL;
 Song * History::t_0 = NULL;
 init_singleton_var(History,songs_played,int,0);
-QListView * History::log_ui = NULL;
+Q3ListView * History::log_ui = NULL;
 FILE *History::f = NULL;
 QString History::history_filename;
 
-History::History(const QString filename, DataBase *db, QListView * putin)
+History::History(const QString filename, DataBase *db, Q3ListView * putin)
 {
+  QByteArray fname=filename.toAscii();
   log_ui = putin;
   if (f) fclose(f);
-  f = fopen(filename,"rb");
+  f = fopen(fname,"rb");
   if (f!=NULL)
     {
       char  *line = NULL;
@@ -64,7 +68,7 @@ History::History(const QString filename, DataBase *db, QListView * putin)
 	bpmdj_deallocate(line);
     }
   history_filename = filename;
-  f=fopen(filename,"ab");
+  f=fopen(fname,"ab");
 }
 
 void History::mark_as_played(DataBase * db, QString s)
@@ -79,7 +83,7 @@ void History::mark_as_played(Song *song)
   song->set_played(true);
   set_songs_played(get_songs_played() + 1);
   if (log_ui)
-    new QListViewItem(log_ui,
+    new Q3ListViewItem(log_ui,
 		      tonumber(get_songs_played()),
 		      song->get_title(),
 		      song->get_author());
@@ -120,10 +124,9 @@ void History::clear_history(DataBase * db)
 
 void History::this_is_playing(Song * main_now)
 {
-  if (main_now)
+  if (main_now && f)
     {
-      // write to disk..
-      const QString name = main_now->get_file();
+      QByteArray name = main_now->get_file().toAscii();
       fprintf(f,"%s\n",(const char*)name);
       fflush(f);
       mark_as_played(main_now);

@@ -19,7 +19,7 @@
 
 #ifndef OM_DATA_H
 #define OM_DATA_H
-#include <qstring.h>
+#include <Qt/qstring.h>
 #include <assert.h>
 #include "data-version.h"
 #include "types.h"

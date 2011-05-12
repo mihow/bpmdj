@@ -26,7 +26,6 @@ using namespace std;
 #include <qspinbox.h>
 #include <sys/stat.h>
 #include <qpainter.h>
-#include "songselector.logic.h"
 #include "qsong.h"
 #include "process-manager.h"
 #include "history.h"

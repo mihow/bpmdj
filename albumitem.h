@@ -20,6 +20,7 @@
 #define __BPMDJ___ALBUMITEM_H__
 using namespace std;
 #line 1 "albumitem.h++"
+#include <Qt/q3listview.h>
 #include "config.h"
 #include "cluster.h"
 #include "data.h"
@@ -31,12 +32,12 @@ using namespace std;
 #define ALBUM_INDEX 4
 #define ALBUM_FILE 5
 
-class AlbumItem: public QListViewItem
+class AlbumItem: public Q3ListViewItem
 {
   accessors(Song*, song, NULL);
  public:
-  AlbumItem(const char* name, QListView * parent);
-  AlbumItem(int nr, Song *song, QListViewItem * parent);
+  AlbumItem(const char* name, Q3ListView * parent);
+  AlbumItem(int nr, Song *song, Q3ListViewItem * parent);
   void fixNr();
 };
 #endif

@@ -56,13 +56,22 @@ class SongHeap: set<Song*,SongDistComparator>
  public:
   float maximum;
   int size;
+  /**
+   * Initializes the heap to a maxmimum of nr songs.
+   */
   SongHeap(int nr)
     {
       maxsize = nr;
       maximum = 1000000;
       size = 0;
     }
+  /**
+   * adds the song. If full the largest one is removed.
+   */
   void add(Song * s);
+  /**
+   * Will copy all the songs in order to the target array.
+   */
   int copy_to(Song** target);
 };
 #endif

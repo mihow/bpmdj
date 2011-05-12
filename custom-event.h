@@ -20,15 +20,7 @@
 #define __BPMDJ___CUSTOM_EVENT_H__
 using namespace std;
 #line 1 "custom-event.h++"
-#include <qevent.h>
+#include <Qt/qevent.h>
 
 enum {BpmPlayCustom = QEvent::User, BpmDjCustom, CommonEvent};
-
-class BpmEvent: public QCustomEvent
-{
- public:
-  BpmEvent(int t) : QCustomEvent(t)
-    {
-    }
-};
 #endif

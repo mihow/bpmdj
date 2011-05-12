@@ -23,13 +23,13 @@ using namespace std;
 #include <vector>
 #include "map-iterator.h"
 #include "set-iterator.h"
-#include "kbpm-dj.h"
+#include "bpmdj.h"
 #include "fragment.h"
 #include "fragment-creator.h"
 #include "vector-iterator.h"
 #include "active-objects.h"
 #include "config.h"
-#include "songselector.logic.h"
+#include "selector.h"
 
 void FragmentCreated::run(SongSelectorLogic * song_selector_window)
 {

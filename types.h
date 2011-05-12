@@ -20,7 +20,7 @@
 #ifndef OM_TYPE_H
 #define OM_TYPE_H
 #include <typeinfo>
-#include <qstring.h>
+#include <Qt/qstring.h>
 
 // #define SHORT_ONE  // can be used to limit the maximum array size to 4 dimensions
 

@@ -19,8 +19,7 @@
 using namespace std;
 #line 1 "existence-scanner.c++"
 #include "existence-scanner.h"
-#include "songselector.logic.h"
-#include "kbpm-dj.h"
+#include "bpmdj.h"
 #include "vector-iterator.h"
 #include "user-notification.h"
               

@@ -36,4 +36,6 @@ class BasicProcessManager
     virtual void checkSignals();
     virtual void start(int id, const char* command, QString logname, bool append);
 };
+
+void setup_signals();
 #endif

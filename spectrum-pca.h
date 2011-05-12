@@ -23,7 +23,7 @@
 #include "reference-count.h"
 using namespace std;
 #include <vector>
-#include "songselector.logic.h"
+#include "selector.h"
 class SpectrumPca;
 class ActiveSpectrumPca;
 #ifdef TRACE_MESSAGES

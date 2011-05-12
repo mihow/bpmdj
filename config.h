@@ -22,8 +22,8 @@ using namespace std;
 #line 1 "config.h++"
 #include <qlistview.h>
 #include <qcolor.h>
-#include <qheader.h>
-#include <qpopupmenu.h>
+#include <Qt3Support/q3header.h>
+#include <Qt3Support/q3popupmenu.h>
 #include "data.h"
 #include "song-process.h"
 #include "accessors.h"
@@ -33,10 +33,11 @@ const QString MusicDir = "./music";
 const QString IndexDir = "./index";
 const QString FragmentsDir = "./fragments";
 
-void realize_mapping(QHeader * h, int column, int location, int size);
-void copy_header(QHeader * in, QHeader * out);
+void realize_mapping(Q3Header * h, int column, int location, int size);
+void copy_header(Q3Header * in, Q3Header * out);
+void taglist2config(Q3ListView*taglist);
 
-class QPopupMenu;
+class Q3PopupMenu;
 
 class ConfigState: public QObject
 {
@@ -45,14 +46,14 @@ class ConfigState: public QObject
     bool state;
     friend class Config;
     QString menu_text;
-    QPopupMenu * menu;
+    Q3PopupMenu * menu;
     int item;
     void update();
   public:
     ConfigState(bool init = false);
     virtual void setMenuText ( const QString & );
     bool isOn() const;
-    virtual void addTo ( QPopupMenu * w );
+    virtual void addTo ( Q3PopupMenu * w );
     operator bool() const {return state;};  
     // the set function bypasses the signal emit phase and does not update the UI
     void set(bool);
@@ -98,7 +99,7 @@ class Config
   singleton_accessors(bool,shown_aboutbox);
   // version 2.1
   // removed tmp_directory from version 2.9
-  singleton_accessors(QString,mixer_command);
+  // singleton_accessors(QString,mixer_command);
   // static ConfigState open_mixer;
   // version 2.2
   static ConfigState ask_mix;
@@ -131,11 +132,11 @@ class Config
   singleton_accessors(QColor,color_unavailable);
   singleton_accessors(QColor,color_dcolor_col);
   singleton_accessors(int,color_cluster_depth);
-  singleton_accessors(QListView*,taglist);
-  singleton_accessors(QHeader*,header);
+  // singleton_accessors(Q3ListView*,taglist);
+  singleton_accessors(Q3Header*,header);
   // 2.6
-  singleton_accessors(QString,bpm_mixer_command);
-  static ConfigState open_bpmmixer;
+  // singleton_accessors(QString,bpm_mixer_command);
+  // static ConfigState open_bpmmixer;
   // 2.7
   singleton_accessors(float,distance_tempoweight);
   singleton_accessors(float,distance_echoweight);
@@ -155,6 +156,10 @@ class Config
   singleton_accessors(QColor, color_alltime);
   // 3.4
   static ConfigState play_fragments;
+  // 3.5
+  singleton_accessors(QString, tag_include);
+  singleton_accessors(QString, tag_mustbe);
+  singleton_accessors(QString, tag_exclude);
  private:
   static void calc_and_cache();
   static void set_playCommand1(QString s) 

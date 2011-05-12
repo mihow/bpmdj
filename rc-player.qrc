@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/Icons" >
+        <file>break.xpm</file>
+        <file>fast-down-saw.xpm</file>
+        <file>fast-pan.xpm</file>
+        <file>fast-up-saw.xpm</file>
+        <file>normal.xpm</file>
+        <file>slow-down-saw.xpm</file>
+        <file>slow-pan.xpm</file>
+        <file>slow-up-saw.xpm</file>
+    </qresource>
+</RCC>

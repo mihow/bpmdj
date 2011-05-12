@@ -7,6 +7,7 @@ B4      = ${shell ls *.b4  2>/dev/null | grep -v .*\.L.c++ 2>/dev/null}
 	data-lexer.cpp data-syntax.h data-syntax.cpp
 	@grep "#include\ *\"" *.h *.cpp >/tmp/t
 	@if test ! -e .sources; then cp /tmp/t .sources; fi
+	@if ! [ -e .sources ]; then cp /tmp/t .sources; fi
 	@if ! cmp /tmp/t .sources >/dev/null; then mv /tmp/t .sources; fi
 
 %.h: %.b4 aoc

@@ -224,7 +224,7 @@ void Remote(const char* script, ...)
 // The escaping necessary for ssh to work is ridicoulous..
 // An ordinary containement within " ... " does not work, so we must
 // escape every character on its own. Especially the & is important
-// because this would otherwise spawns a background procses.
+// because this would otherwise spawn a background procses.
 char * escape(const char * in)
 {
   assert(in);
@@ -249,7 +249,7 @@ int start_bpmdj_raw(const char* where, const char* file)
 {
   char * w = escape(where);
   char * f = escape(file);
-  int  err = vexecute("bpmdj-raw %s %s",w,f);
+  int  err = vexecute("bpmdjraw %s %s",w,f);
   bpmdj_deallocate(w);
   bpmdj_deallocate(f);
   return err;
@@ -297,7 +297,7 @@ void removeAllRaw(const char* d)
 
 void removeAllLog()
 {
-  execute("rm -- /tmp/*.kbpmdj.log");
+  execute("rm -- /tmp/*.bpmdj.log");
 }
 
 int start_umount_cdrom(bool eject)

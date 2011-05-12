@@ -25,7 +25,7 @@ using namespace std;
 #include <assert.h>
 #include <fftw3.h>
 #include "memory.h"
-#include "kbpm-play.h"
+#include "bpmplay.h"
 #include "stereo-sample2.h"
 #include "period-type.h"
 #include "player-core.h"

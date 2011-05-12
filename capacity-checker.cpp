@@ -18,11 +18,12 @@
 ****/
 using namespace std;
 #line 1 "capacity-checker.c++"
-#include <qfile.h>
+#include <Qt/qfile.h>
+#include <Qt/qtextstream.h>
 #include "capacity-checker.h"
 #include "embedded-files.h"
 #include "common.h"
-#include "kbpm-play.h"
+#include "bpmplay.h"
 #include "scripts.h"
 
 bool DecoderChecker::works()
@@ -99,9 +100,9 @@ bool Mpg123Decoder::checkProgram(QString filename)
   while(!(line=stream.readLine()).isNull())
     {
       if (line.find("0.59r")>=0) check1=true;
-      if (line.find("0.60")>=0) check1=true;
-      if (line.find("0.61")>=0) check1=true;
-      if (line.find("0.65")>=0) check1=true;
+      if (line.find("0.6")>=0) check1=true;
+      if (line.find("0.6")>=0) check1=true;
+      if (line.find("0.6")>=0) check1=true;
       if (line.find("Michael Hipp")>=0) check2=true;
     }
   logfile.close();

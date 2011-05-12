@@ -21,18 +21,8 @@ using namespace std;
 #include <stdlib.h>
 #include <stdio.h>
 #include <set>
+#include "constants.h"
 #include "qstring-factory.h"
-
-const QString TRUE_TEXT("Yes");
-const QString FALSE_TEXT("No");
-const QString TAG_TRUE("Yes"); 
-const QString TAG_FALSE("___");
-const QString zero("0");
-const QString zeroo("00");
-const QString slash("/");
-const QString EMPTY("");
-const QString ANAL_NOTNEC("___");
-const QString ANAL_NEC("Missing");
 
 QString tonumber(const int b)
 {
@@ -48,9 +38,8 @@ QString tonumber(const float f)
   return QString::number(f);
 }
 
-set<QString*,PtrQStringLesser> QStringFactory::tree;
+set<QString> QStringFactory::tree;
 bool QStringFactory::killed = false;
-
 QString QStringFactory::create(QString newly_allocated)
 {
   if (killed) 
@@ -58,13 +47,11 @@ QString QStringFactory::create(QString newly_allocated)
   if (newly_allocated.isEmpty())
     return QString::null;
   
-  set<QString*,PtrQStringLesser>::iterator found;
-  found = tree.find(&newly_allocated);
-  if (found!=tree.end())
-    return **found;
-  QString * text = new QString(newly_allocated);
-  tree.insert(text);
-  return *text;
+  set<QString>::iterator found;
+  found = tree.find(newly_allocated);
+  if (found!=tree.end()) return *found;
+  tree.insert(newly_allocated);
+  return newly_allocated;
 }
 
 void QStringFactory::kill()
