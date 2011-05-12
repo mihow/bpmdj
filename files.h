@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -18,25 +18,7 @@
 ****/
 
 #include <stdio.h>
-#include "basic-types.h"
-// meta operations on files
-long   fsize(FILE * f);
 
-// sample operations on files
+long   fsize(FILE * f);
 long   readsamples(void* target, int count, FILE* file);
 long   writesamples(void* target, int count, FILE* file);
-
-// writing
-void file_signed4  (signed4     i, FILE * f);
-void file_float4   (float4      i, FILE * f);
-void file_float8   (float8      i, FILE * f);
-void file_unsigned1(unsigned1   i, FILE * f);
-void file_unsigned4(unsigned4   i, FILE * f);
-void file_sequence (unsigned1 * a, int length, FILE *f);
-
-// reading
-float4    buffer_float4();
-unsigned1 buffer_unsigned1();
-unsigned4 buffer_unsigned4();
-void      buffer_sequence(unsigned1 *a, int length);
-

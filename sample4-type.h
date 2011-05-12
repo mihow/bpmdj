@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,8 +16,10 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
+
 #include <stdlib.h>
-#include "basic-types.h"
+#include <stdio.h>
+#include "Data/om-data.h"
 
 class sample4_type
 {
@@ -36,8 +38,16 @@ class sample4_type
       left = l;
       right = r;
     }
-  bool fully_defined() {return left!=no_sample && right!=no_sample;};
-  void write(const char*prefix, FILE * output);
+  bool fully_defined() 
+    {
+      return left!=no_sample && right!=no_sample;
+    };
+  bool badly_defined()
+    {
+      return !fully_defined();
+    }
+  Data get_data(int versionnr) const; 
+  void set_data(Data & data);
   void read(char*);
 };
 

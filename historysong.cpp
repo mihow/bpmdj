@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -43,16 +43,13 @@
 #define HISTORY_TAGS 10
 #define HISTORY_ONDISK 11
 
-/**
- * this is a mess... (TM)
- */
 void HistorySong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid, int align)
 {
   QColor * color;
   switch(col)
     {
     case HISTORY_CUES:
-      if (Config::get_color_cues() && !song->get_has_cues())
+      if (Config::color_cues && !song->get_has_cues())
 	{
 	  QColorGroup ncg(cg);
 	  ncg.setColor(QColorGroup::Base,QColor(0,0,255));
@@ -63,7 +60,7 @@ void HistorySong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid,
       
     case HISTORY_TEMPO: 
       {
-	Song * main = ProcessManager::playingInMain();
+	Song * main = ::main_song;
 	if ( (color=QSong::colorOfTempoCol(main,song)) )
 	  {
 	    QColorGroup ncg(cg);
@@ -76,7 +73,7 @@ void HistorySong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid,
       }
 
     case HISTORY_TITLE:
-      if (Config::get_color_played() && song->get_played())
+      if (Config::color_played && song->get_played())
 	{
 	  QColorGroup ncg(cg);
 	  ncg.setColor(QColorGroup::Base,Config::get_color_played_song());
@@ -108,7 +105,7 @@ void HistorySong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid,
       break;
       
     case HISTORY_SPECTRUM:
-      if (Config::get_color_spectrum())
+      if (Config::color_spectrum)
 	if (song->get_spectrum()!=no_spectrum)
 	  {
 	    QColorGroup ncg(cg);
@@ -119,7 +116,7 @@ void HistorySong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid,
       break;
     }
   
-  if (Config::get_color_ondisk() && !song->get_ondisk())
+  if (Config::color_ondisk && !song->get_ondisk())
     {
       QColorGroup ncg(cg);
       ncg.setColor(QColorGroup::Base,Config::get_color_unavailable());

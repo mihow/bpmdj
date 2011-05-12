@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -477,7 +477,7 @@ void scpcol(float **data, int n, int m, float **symmat)
 /* Allocates a float vector with range [1..n]. */
 float *vector(int n)
 {
-  float * v = allocate(n,float);
+  float * v = bpmdj_allocate(n,float);
   return v-1;
 }
 
@@ -487,12 +487,12 @@ float **matrix(int n,int m)
   int i;
   float **mat;
   /* Allocate pointers to rows. */
-  mat = allocate(n, float*);
+  mat = bpmdj_allocate(n, float*);
   mat -= 1;
   /* Allocate rows and set pointers to them. */
   for (i = 1; i <= n; i++)
     {
-      mat[i] = allocate(m,float);
+      mat[i] = bpmdj_allocate(m,float);
       mat[i] -= 1;
     }
   /* Return pointer to array of pointers to rows. */
@@ -503,18 +503,17 @@ float **matrix(int n,int m)
 /* Free a float vector allocated by vector(). */
 static void free_vector(float *v, int n)
 {
-   deallocate((char*) (v+1));
+  bpmdj_deallocate((char*) (v+1));
 }
 
 /**  Deallocate float matrix storage  ***************************/
 /* Free a float matrix allocated by matrix(). */
 void free_matrix(float ** mat, int n, int m)
 {
-   int i;
-
-   for (i = n; i >= 1; i--)
-     deallocate ((char*) (mat[i]+1));
-   deallocate ((char*) (mat+1));
+  int i;
+  for (i = n; i >= 1; i--)
+    bpmdj_deallocate ((char*) (mat[i]+1));
+  bpmdj_deallocate ((char*) (mat+1));
 }
 
 /**  Reduce a real, symmetric matrix to a symmetric, tridiag. matrix. */

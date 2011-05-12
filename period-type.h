@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 ****/
 
 #include "files.h"
+#include "Data/types.h"
 
 class period_type
 {
@@ -47,14 +48,6 @@ class period_type
   const period_type halved()
     {
       return period_type(period/2);
-    }
-  const void write_idx(FILE * f)
-    {
-      fprintf(f,"period   : %d\n",period);
-    }
-  const void write_bib_v261(FILE * index)
-    {
-      file_signed4(period,index);
     }
   const period_type lower(int delta)
     {

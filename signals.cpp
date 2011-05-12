@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ signed8 higher_power_of_two(signed8 a)
 
 double find_max(double * data, long l)
 {
-  double m;
+  double m = 0;
   for(long i = 0 ; i < l ; i ++)
     if (data[i]>m)
       m=data[i];
@@ -136,8 +136,8 @@ void dump(const char* title, double * data, int size)
 void biased_circular_autocorrelation(double * in, int size)
 {
   // do the forward transform
-  double * fft_r = allocate(size,double);
-  double * fft_i = allocate(size,double);
+  double * fft_r = bpmdj_allocate(size,double);
+  double * fft_i = bpmdj_allocate(size,double);
   // dump("input forward fft",in,size);
   fft_double(size,false,in,NULL,fft_r,fft_i);
   // dump("output forward fft (real)",fft_r,size);
@@ -148,14 +148,14 @@ void biased_circular_autocorrelation(double * in, int size)
   fft_double(size,true,fft_r,NULL,in,fft_i);
   // dump("output backward fft (real)",in,size);
   // dump("output backward fft (img)",fft_i,size);
-  deallocate(fft_r);
-  deallocate(fft_i);
+  bpmdj_deallocate(fft_r);
+  bpmdj_deallocate(fft_i);
 }
 
 void biased_autocorrelation(double * in, int size)
 {
   // do the forward transform
-  double * fft_c = allocate(size*2,double);
+  double * fft_c = bpmdj_allocate(size*2,double);
   for(int i = 0 ; i<size ; i++)
     {
       fft_c[i]=in[i];
@@ -164,7 +164,7 @@ void biased_autocorrelation(double * in, int size)
   biased_circular_autocorrelation(fft_c,size*2);
   for(int i = 0 ; i < size ; i ++)
     in[i]=fft_c[i];
-  deallocate(fft_c);
+  bpmdj_deallocate(fft_c);
 }
 
 void unbiased_autocorrelation(double * data, int size)
@@ -249,7 +249,8 @@ void differentiate(double * arr, int s)
 
 void energize(double*data, double audiosize, unsigned4 fs)
 {
-  array(rr,fs,float);
+  assert(fs>0);
+  bpmdj_array(rr,fs,float);
   for(unsigned4 i = 0 ; i < fs ; i++)
     rr[i]=0;
   double M = 0;
@@ -274,7 +275,7 @@ void energize(double*data, double audiosize, unsigned4 fs)
       double R = sqrt(S/fs);
       data[x>=fs ? x - fs : 0 ] = R;
     }
-  deallocate(rr);
+  bpmdj_deallocate(rr);
 }
 
 void test_signals()
@@ -289,8 +290,8 @@ void test_signals()
     */
    // in this test we verify whether the subtraction of the ubiased autocorrelation relates
    // to the best L2 match
-   double *a = allocate(512,double);
-   double *b = allocate(512,double);
+   double *a = bpmdj_allocate(512,double);
+   double *b = bpmdj_allocate(512,double);
    for(int test = 0 ; test < 1000 ; test++)
      {
 	for(int i = 0 ; i < 512; i ++)

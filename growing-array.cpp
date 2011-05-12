@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2004-2005 Werner Van Belle
+ Copyright (C) 2004-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ template <class T> void GrowingArray<T>::init()
 template <class T> void GrowingArray<T>::reset()
 {
   if (allocated>0)
-    deallocate(elements);
+    bpmdj_deallocate(elements);
   allocated = 1;
   elements = new T[allocated]();
   count = 0;

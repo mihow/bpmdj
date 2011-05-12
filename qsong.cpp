@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -48,11 +48,11 @@ static PixmapCache composition_icon_cache;
 
 void QSong::setVector(Song**arr, int cnt)
 {
-  if (get_songs()) deallocate(get_songs());
-  if (get_selected()) deallocate(get_selected());
+  if (get_songs()) bpmdj_deallocate(get_songs());
+  if (get_selected()) bpmdj_deallocate(get_selected());
   set_songs(arr);
   set_song_count(cnt);
-  set_selected(allocate(get_song_count(),bool));
+  set_selected(bpmdj_allocate(get_song_count(),bool));
   for(int i = 0 ; i < cnt ; i ++)
     set_selected(i,false);
   assert(cnt>=0 &&
@@ -84,7 +84,7 @@ static QColor * mixColor(QColor a, double d, QColor b)
 
 QColor * QSong::colorOfTempoCol(const Song* main, Song* song)
 {
-  if (!Config::get_color_range()) return NULL;
+  if (!Config::color_range) return NULL;
   if (!main) return NULL;
   if (song->get_tempo().none()) return NULL;
   double d = SongMetriek::std.tempo_diff(*main,*song);
@@ -102,7 +102,7 @@ QColor * QSong::colorOfTempoCol(const Song* main, Song* song)
 
 QColor * QSong::colorOfAuthorCol(Song* song)
 {
-  if (!Config::get_color_authorplayed()) return NULL;
+  if (!Config::color_authorplayed) return NULL;
   int played_author_songs_ago = History::get_songs_played() - song->get_played_author_at_time();
   if (played_author_songs_ago < Config::get_authorDecay())
     return mixColor(Config::get_color_played_author(), (float)played_author_songs_ago/(float)Config::get_authorDecay() ,Qt::white);
@@ -114,26 +114,26 @@ QColor * QSong::colorOfPlaycount(Song* song)
   float count = song->get_alltime_playcount();
   float total = song->get_max_alltime_total();
   if (count)
-    return mixColor(Qt::white, count/total, QColor(0,0,255));
+    return mixColor(Qt::white, count/total, Config::get_color_alltime());
   return NULL;
 }
 
 QColor * QSong::colorOfdColorCol(Song* song)
 {
-  if (!Config::get_color_dcolor()) return NULL;
+  if (!Config::color_dcolor) return NULL;
   if (song->get_color_distance() > 1.0) return NULL;
   return mixColor(Config::get_color_dcolor_col(), song -> get_color_distance(), Qt::white);
 }
 
 void QSong::paintCell(QVectorView* vv, int i, QPainter *p,const QColorGroup &cg, int col, int wid, int align)
 {
-  Song * main = ProcessManager::playingInMain();
+  Song * main = ::main_song;
   Song * song = get_songs(i);
   QColor *color;
   switch(col)
     {
     case LIST_CUES:
-      if (Config::get_color_cues() && !song->get_has_cues())
+      if (Config::color_cues && !song->get_has_cues())
 	{
 	  QColorGroup ncg(cg);
 	  ncg.setColor(QColorGroup::Base,QColor(0,0,255));
@@ -154,7 +154,7 @@ void QSong::paintCell(QVectorView* vv, int i, QPainter *p,const QColorGroup &cg,
       break;
       
     case LIST_TITLE:
-      if (Config::get_color_played() && song->get_played())
+      if (Config::color_played && song->get_played())
 	{
 	  QColorGroup ncg(cg);
 	  ncg.setColor(QColorGroup::Base,Config::get_color_played_song());
@@ -186,7 +186,7 @@ void QSong::paintCell(QVectorView* vv, int i, QPainter *p,const QColorGroup &cg,
       break;
       
     case LIST_SPECTRUM:
-      if (Config::get_color_spectrum())
+      if (Config::color_spectrum)
 	if (song->get_spectrum()!=no_spectrum)
 	  {
 	    QColorGroup ncg(cg);
@@ -400,7 +400,7 @@ void QSong::paintCell(QVectorView* vv, int i, QPainter *p,const QColorGroup &cg,
     }
   
   // the normal color depends wether the song is on the disk or not
-  if (Config::get_color_ondisk())
+  if (Config::color_ondisk)
     {
       if (!song->get_ondisk_checked())
 	{
@@ -419,13 +419,11 @@ void QSong::paintCell(QVectorView* vv, int i, QPainter *p,const QColorGroup &cg,
     }
 
   // how many times did the song play ?
-
-
   if (col==LIST_TITLE || col==LIST_AUTHOR || col==LIST_TIME
       || col == LIST_VERSION || col==LIST_TAGS || col == LIST_INDEX 
       || col == LIST_MD5SUM || col==LIST_FILE || col == LIST_MIN
       || col == LIST_MAX || col==LIST_MEAN || col==LIST_POWER)
-    if (color=colorOfPlaycount(song))
+    if (Config::color_songs_based_on_history && (color=colorOfPlaycount(song)))
       {
 	QColorGroup ncg(cg);
 	ncg.setColor(QColorGroup::Base,*color);

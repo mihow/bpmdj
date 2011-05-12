@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -29,12 +29,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
-#include "memory.h"
 #include "cluster.h"
+#include "memory.h"
 
 float    ** Cluster::similarity = NULL;
-Position ** Cluster::next;
-Position ** Cluster::prev;
+ClusterPosition ** Cluster::next;
+ClusterPosition ** Cluster::prev;
 Point    ** Cluster::realcontent;
 int         Cluster::type_mark;
 int         Cluster::realcontentsize=0;
@@ -269,7 +269,7 @@ Cluster::Cluster()
 {
   totalsize=2;
   size=0;
-  pointstocluster=allocate(2,int);
+  pointstocluster=bpmdj_allocate(2,int);
 }
 
 void Cluster::add(int t)
@@ -278,7 +278,7 @@ void Cluster::add(int t)
   if(size>totalsize)
     {
       totalsize*=2;
-      pointstocluster=reallocate(pointstocluster,totalsize,int);
+      pointstocluster=bpmdj_reallocate(pointstocluster,totalsize,int);
     }
   pointstocluster[size-1]=t;
 }
@@ -363,16 +363,16 @@ inline bool Cluster::isPoint(int idx)
 
 void Cluster::dumpConnectionMatrix()
 {
-  int **matrix = allocate(realcontentsize,int*);
+  int **matrix = bpmdj_allocate(realcontentsize,int*);
   for(int i=0;i<realcontentsize;i++)
     {
-      matrix[i]=allocate(realcontentsize,int);
+      matrix[i]=bpmdj_allocate(realcontentsize,int);
       for (int j = 0 ; j < realcontentsize ; j++)
 	matrix[i][j]=0;
     }
   
-  Position c = next[0][0];
-  Position n;
+  ClusterPosition c = next[0][0];
+  ClusterPosition n;
   while(true)
     {
       matrix[c.x][c.y]++;
@@ -404,7 +404,7 @@ void Cluster::dumpConnectionMatrix()
 	  else 
 	    printf("*");
 	}
-      deallocate(matrix[i]);
+      bpmdj_deallocate(matrix[i]);
       printf("\n");
     }
   printf("====================================\n");
@@ -423,8 +423,8 @@ void Cluster::dumpConnectionMatrix()
 
 int compareposition(const void* a, const void *b)
 {
-  Position* A = (Position*)a;
-  Position* B = (Position*)b;
+  ClusterPosition* A = (ClusterPosition*)a;
+  ClusterPosition* B = (ClusterPosition*)b;
   if (A->distance<B->distance)
     return -1;
   else if (A->distance==B->distance)
@@ -440,7 +440,7 @@ Couple *Cluster::agglomerate(Metriek * metriek)
   // 1. create initial set of comparisons.
   int entriestosort = ((size-1)*(size))/2;
   int entry=0;
-  Position *entries = allocate(entriestosort,Position);
+  ClusterPosition *entries = bpmdj_allocate(entriestosort,ClusterPosition);
   assert(entries);
   printf("%d entries to create...\n",entriestosort);
   
@@ -455,13 +455,13 @@ Couple *Cluster::agglomerate(Metriek * metriek)
   
   printf("Similarity set created...(%d)\nBegin sorting\n",entry);
   // 2. sort the entries
-  qsort(entries,entriestosort,sizeof(struct Position),compareposition);
+  qsort(entries,entriestosort,sizeof(struct ClusterPosition),compareposition);
   printf("Entries sorted...\n");
   // 3. now we must link them all together... 
-   Position p;
+   ClusterPosition p;
    p.x=0;
    p.y=0;
-   Position c;
+   ClusterPosition c;
    for (int i = 0 ; i <entriestosort; i++)
      {
        c = entries[i];
@@ -475,7 +475,7 @@ Couple *Cluster::agglomerate(Metriek * metriek)
    prev[0][0]=c;
    next[c.x][c.y].x=0;
    next[c.x][c.y].y=0;
-   deallocate(entries);
+   bpmdj_deallocate(entries);
    printf("Prev/next filled with correct data...\n");
    //dumpConnectionMatrix();
    printf("Begin agglomerating elements...\n");
@@ -483,12 +483,12 @@ Couple *Cluster::agglomerate(Metriek * metriek)
    while(size>1)
     {
       // a. check stop condition
-      Position first;
+      ClusterPosition first;
       first = next[0][0];
       // first.x = next[0][0].x;
       // first.y = next[0][0].y;
       assert(first.x > 0 || first.y > 0);
-      Position second;
+      ClusterPosition second;
       second.x = next[first.x][first.y].x;
       second.y = next[first.x][first.y].y;
       //if (!first.distance<=second.distance)
@@ -536,8 +536,8 @@ Couple *Cluster::agglomerate(Metriek * metriek)
 	  float d = distance(z,i,metriek);
 	  // nu bepalen we welke posities deruit gaat uit de gesorteerde lijst. 
 	  // en welke verhuist naar een andere locatie (z,i)
-	  Position relocate;
-	  Position remove;
+	  ClusterPosition relocate;
+	  ClusterPosition remove;
 	  relocate.y=i;
 	  remove.y=i;
 	  // this is tricky, because x is not necessarily larger than i
@@ -570,8 +570,8 @@ Couple *Cluster::agglomerate(Metriek * metriek)
 	  
 	  // some quick checks
 	  // fix list to remove (remove.x,remove.y)
-	  Position p;
-	  Position n;
+	  ClusterPosition p;
+	  ClusterPosition n;
 	  p=prev[remove.x][remove.y];
 	  if (p.x==-1)
 	    printf("removal of %d,%d",remove.x,remove.y);
@@ -610,12 +610,12 @@ Couple *Cluster::agglomerate(Metriek * metriek)
 void Cluster::reset()
 {
   realcontenttotalsize = 1;
-  realcontent=allocate(realcontenttotalsize,Point*);
+  realcontent=bpmdj_allocate(realcontenttotalsize,Point*);
   realcontentsize=0;
-  similarity=allocate(realcontenttotalsize,float*);
+  similarity=bpmdj_allocate(realcontenttotalsize,float*);
   // the previous and next matrices
-  prev = allocate(realcontenttotalsize,Position*);
-  next = allocate(realcontenttotalsize,Position*);
+  prev = bpmdj_allocate(realcontenttotalsize,ClusterPosition*);
+  next = bpmdj_allocate(realcontenttotalsize,ClusterPosition*);
 }
 
 int Cluster::addcontent(Point* p)
@@ -624,10 +624,10 @@ int Cluster::addcontent(Point* p)
   if (realcontentsize>=realcontenttotalsize)
     {
       realcontenttotalsize*=2;
-      realcontent = reallocate(realcontent,realcontenttotalsize, Point*);
-      similarity  = reallocate(similarity, realcontenttotalsize, float*);
-      prev        = reallocate(prev,       realcontenttotalsize, Position *);
-      next        = reallocate(next,       realcontenttotalsize, Position *);
+      realcontent = bpmdj_reallocate(realcontent,realcontenttotalsize, Point*);
+      similarity  = bpmdj_reallocate(similarity, realcontenttotalsize, float*);
+      prev        = bpmdj_reallocate(prev,       realcontenttotalsize, ClusterPosition *);
+      next        = bpmdj_reallocate(next,       realcontenttotalsize, ClusterPosition *);
     }
   int id = realcontentsize++;
   realcontent[id] = p;
@@ -635,8 +635,8 @@ int Cluster::addcontent(Point* p)
   if (id==0)
     {
       similarity[id]=NULL;
-      prev[id]=allocate(1,Position);
-      next[id]=allocate(1,Position);
+      prev[id]=bpmdj_allocate(1,ClusterPosition);
+      next[id]=bpmdj_allocate(1,ClusterPosition);
       prev[id][0].x=-1;
       prev[id][0].y=-1;
       next[id][0].x=-1;
@@ -644,9 +644,9 @@ int Cluster::addcontent(Point* p)
     }
   else
     {
-      similarity[id]=allocate(id,float);
-      prev[id]=allocate(id,Position);
-      next[id]=allocate(id,Position);
+      similarity[id]=bpmdj_allocate(id,float);
+      prev[id]=bpmdj_allocate(id,ClusterPosition);
+      next[id]=bpmdj_allocate(id,ClusterPosition);
       for(int j = 0 ; j < id ; j++)
 	{
 	  similarity[id][j]=-1;

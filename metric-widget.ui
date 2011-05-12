@@ -27,7 +27,7 @@
                 <cstring>textLabel2_2_2</cstring>
             </property>
             <property name="text">
-                <string>Echo weight (default = 68)</string>
+                <string>Echo weight (default = 62)</string>
             </property>
         </widget>
         <widget class="QLabel" row="9" column="0">
@@ -35,7 +35,7 @@
                 <cstring>textLabel5</cstring>
             </property>
             <property name="text">
-                <string>Composition weight (default = 100)</string>
+                <string>Composition weight (default = 33)</string>
             </property>
         </widget>
         <widget class="QSpinBox" row="4" column="0">
@@ -102,7 +102,7 @@
                 <cstring>textLabel2_2_2_2</cstring>
             </property>
             <property name="text">
-                <string>Rythm weight (default = 250)</string>
+                <string>Rythm weight (default = 26)</string>
             </property>
         </widget>
         <widget class="QSpinBox" row="10" column="0">
@@ -127,7 +127,7 @@
                 <cstring>textLabel2_2</cstring>
             </property>
             <property name="text">
-                <string>Spectrum weight (default = 100)</string>
+                <string>Spectrum weight (default = 11)</string>
             </property>
         </widget>
         <widget class="QSpinBox" row="8" column="0">
@@ -152,7 +152,7 @@
                 <cstring>textLabel2_2_3</cstring>
             </property>
             <property name="text">
-                <string>Tempo weight (default = 0)</string>
+                <string>Tempo weight (default = 2)</string>
             </property>
         </widget>
     </grid>

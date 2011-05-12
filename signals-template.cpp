@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -268,7 +268,7 @@ DECLARE void SIGNL::init_channels()
   for(int i = 0 ; i < Channels ; i ++)
     {
       int l = BasicSignal<Type,Channels>::length;
-      channel[i] = allocate(l,Type);
+      channel[i] = bpmdj_allocate(l,Type);
     }
 }
 
@@ -281,7 +281,7 @@ DECLARE SIGNL::~Signal()
 {
   for(int i = 0 ; i < Channels ; i++)
     {
-      deallocate(channel[i]);
+      bpmdj_deallocate(channel[i]);
       channel[i]=NULL;
     }
 }
@@ -502,7 +502,6 @@ static const Output C1 = +0.8365163037378079;
 static const Output C2 = +0.2241438680420134;
 static const Output C3 = -0.1294095225512604;
 */
-
 
 DECLHAAR void HAAR::forward(BasicSignal<Output,Channels> &a, int n)
 {

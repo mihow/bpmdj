@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -58,6 +58,7 @@ class RenamerLogic:
    QString beforeMinusIsAuthor(QString in);
    QString fixExtention(QString in);
    QString betweenBracesIsTrash(QString in);
+   QString betweenBracesIsMix(QString in);
    QString subStringIsMix(QString in);
    QString deleteSubString(QString in);
  public slots:
@@ -74,10 +75,10 @@ class RenamerLogic:
    virtual void ignoreSelection();
    virtual void beforeMinusIsAuthor();
    virtual void betweenBracesIsTrash();
+   virtual void betweenBracesIsMix();
    virtual void substringIsMix();
    virtual void removeFirstSpecials();
    virtual void keySelectionIsAuthor();
    virtual void replaceUnderscores();
    virtual void fixExtention();
-   virtual void betweenBracesIsMix();
 };

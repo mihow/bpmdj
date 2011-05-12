@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -31,14 +31,15 @@
 #include "scripts.h"
 #include "version.h"
 #include "player-config.h"
-#include "histogram-property.cpp"
-#include "smallhistogram-type.cpp"
+#include "histogram-property.h"
+#include "smallhistogram-type.h"
 #include "signals-template.cpp"
 
 /*-------------------------------------------
  *         Templates we need
  *-------------------------------------------*/
 
+/*
 // types
 template class smallhistogram_type<32>;
 template class smallhistogram_type<96>;
@@ -48,6 +49,7 @@ template class histogram_property<96>;
 // signals
 template double normalize_abs_max<double>(double*, long);
 template double find_abs_max<double>(double*, long);
+*/
 
 /*-------------------------------------------
  *         Vars
@@ -59,7 +61,7 @@ PlayerConfig * config;      // will be the standard configuration
  *-------------------------------------------*/
 void options_failure(char* err)
 {
-  printf("BpmDj Merger v%s, Copyright (c) 2001-2005 Werner Van Belle\n",VERSION);
+  printf("BpmDj Merger v%s, Copyright (c) 2001-2006 Werner Van Belle\n",VERSION);
   printf("This software is distributed under the GPL2 license. See copyright.txt\n\n");
   printf("Usage:  kbpm-merge <options> [old-song] new-song\n\n"
 	 "  --mix         nbr  how many measures should be used to create the mix\n" 
@@ -405,8 +407,8 @@ bool createFiles(char* a, char* b)
   set_decoder_environment(config,&idx_b);
   
   printf("Decoding %s\n",b);
-  if (!vexecute(CREATERAW_CMD,"./",filename_b))
-    exit(100);
+  if (!start_bpmdj_raw("./",filename_b))
+    _exit(100);
   
   file_b=openRawFileForWriting(&idx_b, "./");
   
@@ -438,7 +440,7 @@ static stereo_sample2 *buffer_a; // the full data at the end of the old file
 void readTail(signed8 measures)
 {
   length_a = (unsigned4)(measures * period_a);
-  buffer_a = allocate(length_a,stereo_sample2);
+  buffer_a = bpmdj_allocate(length_a,stereo_sample2);
   filelength_a = fsize(file_a);
   if (length_a * 4 > filelength_a)
     {
@@ -466,7 +468,7 @@ static stereo_sample2 *buffer_b; // full new data at the beginning of the new fi
 void readHead(signed8 percent, signed8 measures)
 {
   length_b = (unsigned4)(measures * period_b);
-  buffer_b = allocate(length_b,stereo_sample2);
+  buffer_b = bpmdj_allocate(length_b,stereo_sample2);
   filelength_b = fsize(file_b);
   position_b = filelength_b*percent/100;
   position_b /= 4;
@@ -483,7 +485,7 @@ void readHead(signed8 percent, signed8 measures)
 void copySong(signed8 percent)
 {
   length_b = (unsigned4)64*1024;
-  buffer_b = allocate(length_b,stereo_sample2);
+  buffer_b = bpmdj_allocate(length_b,stereo_sample2);
   position_b = ftell(file_b);
   filelength_b = fsize(file_b);
   unsigned4 togo=(filelength_b*percent/100)-position_b;
@@ -508,7 +510,7 @@ void stretchHead(signed8 headmeasures)
 {
   printf("Stretching head to fit (period_a = %d, period_b = %d)\n",(int)period_a,(int)period_b);
   length_c = period_a*headmeasures;
-  buffer_c = allocate(length_c,stereo_sample2);
+  buffer_c = bpmdj_allocate(length_c,stereo_sample2);
   for(unsigned4 i = 0 ; i < length_c ; i ++)
     {
       buffer_c[i]=buffer_b[(unsigned8)i*(unsigned8)length_b/(unsigned8)length_c];
@@ -530,8 +532,8 @@ void collapseBuffers()
 {
   length_d = length_a / COLLAPSE;
   length_f = length_b / COLLAPSE;
-  buffer_d = allocate(length_d,compressed);
-  buffer_f = allocate(length_f,compressed);
+  buffer_d = bpmdj_allocate(length_d,compressed);
+  buffer_f = bpmdj_allocate(length_f,compressed);
   // calculate absolute value
   for(unsigned4 pos = 0 ; pos < length_d ; pos++)
     buffer_d[pos]=(((signed4)abs(((stereo_sample2*)buffer_a)[pos * COLLAPSE].left)+
@@ -544,7 +546,7 @@ void collapseBuffers()
 void collapseStretchedBuffer()
 {
   length_e = length_c / COLLAPSE;
-  buffer_e = allocate(length_e,compressed);
+  buffer_e = bpmdj_allocate(length_e,compressed);
   for(unsigned4 pos = 0 ; pos < length_e ; pos++)
     buffer_e[pos]=(((signed4)abs(((stereo_sample2*)buffer_c)[pos * COLLAPSE].left)+
 		    (signed4)abs(((stereo_sample2*)buffer_c)[pos * COLLAPSE].right))/2)>>8;
@@ -625,10 +627,10 @@ unsigned4 findMatchWithVolumeAccounting()
       compressed * buffer_dprime = (compressed*)(buffer_d+pos);
       for(unsigned4 y = 0 ; y < length_e && diff < mindiff; y ++)
 	{
-	  diff+= (unsigned4)abs(
-				(signed4)buffer_dprime[y]*(length_e-y)/length_e
-				-(signed4)buffer_e[y]
-				);
+	  diff+= (unsigned4)labs(
+				 (signed4)buffer_dprime[y]*(length_e-y)/length_e
+				 -(signed4)buffer_e[y]
+				 );
 	}
       
       if (diff<mindiff)
@@ -651,10 +653,10 @@ unsigned4 findMatchWithVolumeAccounting()
       compressed * buffer_dprime = (compressed*)(buffer_d+pos);
       for(unsigned4 y = 0 ; y < length_e && diff < mindiff; y ++)
 	{
-	  diff+= (unsigned4)abs(
-				(signed4)buffer_dprime[y]*(length_e-y)/length_e
-				-(signed4)buffer_e[y]
-				);
+	  diff+= (unsigned4)labs(
+				 (signed4)buffer_dprime[y]*(length_e-y)/length_e
+				 -(signed4)buffer_e[y]
+				 );
 	}
       if (diff<mindiff)
 	{
@@ -763,15 +765,15 @@ void volumefade(signed8 pos)
 
 void tempocopy(unsigned4 target_period)
 {
-  buffer_b=allocate(period_b,stereo_sample2);
-  buffer_c=allocate(target_period,stereo_sample2);
+  buffer_b=bpmdj_allocate(period_b,stereo_sample2);
+  buffer_c=bpmdj_allocate(target_period,stereo_sample2);
   readsamples(buffer_b,period_b,file_b);
   for(unsigned4 i = 0 ; i < target_period; i ++ )
     buffer_c[i]=buffer_b[(signed8)i*(signed8)period_b/(signed8)target_period];
   signed4 written = writesamples(buffer_c, target_period, file_a);
   assert(written == (signed)target_period);
-  deallocate(buffer_b);
-  deallocate(buffer_c);
+  bpmdj_deallocate(buffer_b);
+  bpmdj_deallocate(buffer_c);
 }
 
 void tempofade(int time)

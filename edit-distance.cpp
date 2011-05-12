@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -47,9 +47,9 @@ void dist_init()
   int m = 128;
   int n = 128;
   // create empty distance matrix
-  d = allocate (  m + 1 , int * ) ;
+  d = bpmdj_allocate (  m + 1 , int * ) ;
   for ( i = 0 ; i <= m ; i ++ )
-    d [ i ] = allocate( n + 1 , int ) ;
+    d [ i ] = bpmdj_allocate( n + 1 , int ) ;
   // set startrows
   for ( i = 0 ; i <= m ; i ++ )
     d [ i ] [ 0 ] = i ;
@@ -62,8 +62,8 @@ void dist_done()
   int i = 0;
   // free everything
   for ( i = 0 ; i <= 128 ; i ++ )
-    deallocate ( d [ i ] ) ;
-  deallocate ( d ) ;
+    bpmdj_deallocate ( d [ i ] ) ;
+  bpmdj_deallocate ( d ) ;
 }
 
 int edist(char* x, char* y)
@@ -87,7 +87,7 @@ int edist(char* x, char* y)
 char* strupperdup(const char* in)
 {
   int l = strlen(in);
-  char* out = allocate(l+1,char);
+  char* out = bpmdj_allocate(l+1,char);
   int r,w;
   for(r=0, w=0; r<l; r++)
     {
@@ -102,9 +102,9 @@ int ndist(const char* title, const char* author, const char* other)
 {
   int tl = strlen ( title ) ;
   int al = strlen ( author ) ;
-  char * x1 = allocate( tl + al + 1, char );
-  char * x2 = allocate( tl + al + 1, char );
-  char * x3 = allocate( tl + 1, char );
+  char * x1 = bpmdj_allocate( tl + al + 1, char );
+  char * x2 = bpmdj_allocate( tl + al + 1, char );
+  char * x3 = bpmdj_allocate( tl + 1, char );
   char * y1, * y2, * y3;
   char * z = strupperdup(other);
   int result;
@@ -119,12 +119,12 @@ int ndist(const char* title, const char* author, const char* other)
   result=min3(edist(y1,z),
 	      edist(y2,z),
 	      edist(y3,z));
-  deallocate(z);
-  deallocate(y1);
-  deallocate(y2);
-  deallocate(y3);
-  deallocate(x1);
-  deallocate(x2);
-  deallocate(x3);
+  bpmdj_deallocate(z);
+  bpmdj_deallocate(y1);
+  bpmdj_deallocate(y2);
+  bpmdj_deallocate(y3);
+  bpmdj_deallocate(x1);
+  bpmdj_deallocate(x2);
+  bpmdj_deallocate(x3);
   return result;
 }

@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -29,5 +29,5 @@
 #define MAGIC_2_7 0xBDE9
 #define MAGIC_2_8 0xBDEA
 #define MAGIC_2_9 0xBDEB
-#define MAGIC_NOW MAGIC_2_9
-
+#define MAGIC_3_0 0xBDEC
+#define MAGIC_NOW MAGIC_3_0

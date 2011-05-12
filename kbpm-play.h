@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -25,7 +25,8 @@ extern PlayerConfig    * config;
 extern SongPlayerLogic * player_window;
 extern char * arg_config;
 
-enum {InitAndStart = QEvent::User, PlayingStateChanged};
-void get_rawpath();
+enum {InitAndStart = QEvent::User, PlayingStateChanged, WritingFinished};
+QString get_rawpath();
 bool show_error(int err, int err2, const char*text);
 void msg_playing_state_changed();
+void msg_writing_finished();

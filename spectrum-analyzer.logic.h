@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -28,7 +28,6 @@ class SpectrumDialogLogic : public SpectrumDialog, public ReentrantAnalyzer
  public:
    SpectrumDialogLogic(SongPlayer*parent=0, const char * name=0, bool modal=FALSE, WFlags f=0);
  public slots:
-   virtual void fetchSpectrum_old();
    virtual void fetchSpectrum_normal();
    virtual void run() { fetchSpectrum_normal();};
    virtual void fetchSpectrum() {startAnalyzer(); };

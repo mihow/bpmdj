@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -62,7 +62,7 @@ History::History(const QString filename, DataBase *db, QListView * putin)
 	  mark_as_played(db, s);
 	}
       if (line)
-	deallocate(line);
+	bpmdj_deallocate(line);
     }
   history_filename = filename;
   f=fopen(filename,"ab");
@@ -91,9 +91,7 @@ void History::save_history()
   // ask for filename
   QString s = QFileDialog::getSaveFileName("","History (*.log)",NULL,"Save Play History","Choose a filename" );
   if (s.isNull()) return;
-  // open target file
-  const char* filename = s;
-  vexecute(CP"\"%s\" \"%s\"",(const char*)history_filename,filename);
+  start_cp(history_filename,s);
 }
 
 void History::clear_history(DataBase * db)
@@ -149,7 +147,7 @@ void History::this_is_playing(Song * main_now)
 	{
 	  f = i.add_next_song(t_0->get_file());
 	  info = f -> comment;
-	  if (Config::get_ask_mix())
+	  if (Config::ask_mix)
 	    {
 	      bool ok;
 	      QString mixinfo = QInputDialog::getText("How did the mix go ?",

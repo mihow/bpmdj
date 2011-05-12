@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ void BpmCounter::init(unsigned4 slen, sample_type *blk, int inrate, double lower
   measured = 1;
   while(measured <= atmost) measured *=2;
   measured/=2;
-  audio = allocate(measured,double);
+  audio = bpmdj_allocate(measured,double);
   
   /**
    * Preparation of the fourier windows, for every band we will have
@@ -60,16 +60,17 @@ void BpmCounter::init(unsigned4 slen, sample_type *blk, int inrate, double lower
     }
   else
     {
-      if (log) fprintf(log,"Information: The first analysis might take a long time due to calibration of the fftw lib\n");
+      if (log) 
+	fprintf(log,"Information: The first analysis might take a long time due to calibration of the fftw lib\n");
     }
   
-  en = allocate(measured * 2,double);
-  ts = allocate(measured * 2,double);
-  co = allocate(measured * 2,double);
+  en = bpmdj_allocate(measured, double);
+  ts = bpmdj_allocate(measured, double);
+  co = bpmdj_allocate(measured, double);
   
   if (log) fprintf(log,"Preparing fourier transform (%ld)\n",measured);
   forward = fftw_plan_r2r_1d(measured, &(audio[0]), en, FFTW_R2HC, FFTW_MEASURE);
-  backward = fftw_plan_r2r_1d(measured * 2, ts, co, FFTW_HC2R, FFTW_MEASURE);
+  backward = fftw_plan_r2r_1d(measured, ts, co, FFTW_HC2R, FFTW_MEASURE);
   
   
   /**
@@ -97,9 +98,9 @@ void BpmCounter::init(unsigned4 slen, sample_type *blk, int inrate, double lower
 
 BpmCounter::~BpmCounter()
 {
-  deallocate(en);
-  deallocate(co);
-  deallocate(ts);
+  bpmdj_deallocate(en);
+  bpmdj_deallocate(co);
+  bpmdj_deallocate(ts);
 }
 
 double BpmCounter::measure()
@@ -128,33 +129,25 @@ double BpmCounter::measure()
     }
   energize(audio,measured,blsi);
 
-  double * w = allocate(measured,double);
-  for(int x = 0 ; x < measured ; x ++)
+  double * w = bpmdj_allocate(measured,double);
+  for(unsigned int x = 0 ; x < measured ; x ++)
     w[x]=audio[x];
   differentiate(w,measured);
   normalize_abs_max(w,measured);
   normalize_abs_max(audio,measured);
-  for(int x = 0 ; x < measured ; x ++)
+  for(unsigned int x = 0 ; x < measured ; x ++)
     audio[x]+=w[x];
-  deallocate(w);
-
-  // we take the logarithm of the energy in order to have more accurate comparisons
-  /*  for(int x = 0 ; x < measured ; x ++)
-    {
-      double r = ::log(audio[x]);
-      if (r < 0 || isinf(r) || isnan(r)) r=-60;
-      r+=60;
-      audio[x]=r;
-    }
-  */
-
+  bpmdj_deallocate(w);
+  
   // 3. Mask
   if (log) fprintf(log,"Masking\n");
   for(unsigned4 x = 0 ; x < measured ; x ++)
     audio[x]*= 0.5 - 0.5 * cos(M_PI*2.0*(double)x/(double)measured);
+  
   // 4. Forward transform
   if (log) fprintf(log,"Forward transform\n");
   fftw_execute(forward);
+  
   // 5. Measure energy
   if (log) fprintf(log,"Frequency Content\n");
   for(unsigned4 x = 1 ; x < measured / 2; x ++)
@@ -166,7 +159,7 @@ double BpmCounter::measure()
     ts[x]=en[x];
   
   // 6. Zero pad & backward transform
-  for(unsigned4 x = measured / 2 ; x < measured * 2 ; x ++)
+  for(unsigned4 x = measured / 2 ; x < measured ; x ++)
     ts[x]=0;
   if (log) fprintf(log,"Autocorrelate\n");
   fftw_execute(backward);

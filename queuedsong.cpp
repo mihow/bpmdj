@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@
 #include "queuedsong.h"
 #include "tags.h"
 #include "config.h"
+#include "scripts.h"
 
 #define QUEUED_ANKER 0
 #define QUEUED_DLINE 1
@@ -92,7 +93,7 @@ void QueuedSong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid, 
 	}
       break;
     case QUEUED_CUES:
-      if (Config::get_color_cues() && !song->get_has_cues())
+      if (Config::color_cues && !song->get_has_cues())
 	{
 	  QColorGroup ncg(cg);
 	  ncg.setColor(QColorGroup::Base,QColor(0,0,255));
@@ -105,7 +106,7 @@ void QueuedSong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid, 
       break;
       
     case QUEUED_TITLE:
-      if (Config::get_color_played() && song->get_played())
+      if (Config::color_played && song->get_played())
 	{
 	  QColorGroup ncg(cg);
 	  ncg.setColor(QColorGroup::Base,Config::get_color_played_song());
@@ -140,7 +141,7 @@ void QueuedSong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid, 
       }
       
     case QUEUED_SPECTRUM:
-      if (Config::get_color_spectrum())
+      if (Config::color_spectrum)
 	if (song->get_spectrum()!=no_spectrum)
 	  {
 	    QColorGroup ncg(cg);
@@ -150,7 +151,7 @@ void QueuedSong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid, 
 	  }
       break;
     }
-  if (Config::get_color_ondisk() && !song->get_ondisk())
+  if (Config::color_ondisk && !song->get_ondisk())
     {
       QColorGroup ncg(cg);
       ncg.setColor(QColorGroup::Base,Config::get_color_unavailable());
@@ -214,46 +215,19 @@ QueuedAnalSong::QueuedAnalSong(QListView* parent, Song * s) :
 
 void QueuedSong::setSong(Song* s, double d)
 {
-  song=s; 
-  distance=d;   
+  song=s;
+  distance=d;
   if (song)
-    setText(QUEUED_TEMPO, song->tempo_str()); 
+    setText(QUEUED_TEMPO, song->tempo_str());
 }
 
-QString QueuedAnalSong::getCommand(QString form)
+QString QueuedAnalSong::getCommand(SongProcess &analyzer)
 {
-  QString tempoLine = "";
-  if (needs_tempo())
-    {
-      char frombound[500], tobound[500];
-      frombound[0]=tobound[0]=0;
-      if (Config::get_anal_bpm_from())
-	sprintf(frombound,"--low %g",Config::get_anal_bpm_from());
-      if (Config::get_anal_bpm_to())
-	sprintf(tobound,"--high %g",Config::get_anal_bpm_to());
-      int technique = Config::get_anal_bpm_technique();
-      tempoLine=QString("--bpm ")+QString::number(technique)+" "+frombound+" "+tobound;
-    }
-
-  QString spectrumLine = "";
-  if (needs_spectrum() || needs_echo())
-    spectrumLine="--spectrum";
-  
-  QString energyLine = "";
-  if (needs_energy())
-    energyLine="--energy";
-  
-  QString rythmLine = "";
-  if (needs_rythm() || needs_composition()) 
-    rythmLine="--rythm";
-  
-  song->realize();
-  return 
-    form+
-    QString(" -q --batch ") + 
-    QString(tempoLine)+" "+
-    QString(spectrumLine)+" "+
-    QString(energyLine)+" "+
-    QString(rythmLine)+" "+
-    QString("\"")+song->get_storedin()+"\"";
+  return analyzer.getAnalCommand(needs_tempo(),
+				 Config::get_anal_bpm_technique(),
+				 Config::get_anal_bpm_from(), Config::get_anal_bpm_to(),
+				 needs_spectrum() || needs_echo(),
+				 needs_energy(),
+				 needs_rythm() || needs_composition(),
+				 song->get_storedin());
 }

@@ -12,20 +12,6 @@
             <height>523</height>
         </rect>
     </property>
-    <property name="paletteForegroundColor">
-        <color>
-            <red>255</red>
-            <green>255</green>
-            <blue>255</blue>
-        </color>
-    </property>
-    <property name="paletteBackgroundColor">
-        <color>
-            <red>0</red>
-            <green>0</green>
-            <blue>0</blue>
-        </color>
-    </property>
     <property name="caption">
         <string>About</string>
     </property>
@@ -309,270 +295,6 @@
             <property name="name">
                 <cstring>pages</cstring>
             </property>
-            <property name="paletteForegroundColor">
-                <color>
-                    <red>255</red>
-                    <green>255</green>
-                    <blue>255</blue>
-                </color>
-            </property>
-            <property name="paletteBackgroundColor">
-                <color>
-                    <red>0</red>
-                    <green>0</green>
-                    <blue>0</blue>
-                </color>
-            </property>
-            <property name="palette">
-                <palette>
-                    <active>
-                        <color>
-                            <red>255</red>
-                            <green>255</green>
-                            <blue>255</blue>
-                        </color>
-                        <color>
-                            <red>213</red>
-                            <green>213</green>
-                            <blue>213</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>255</green>
-                            <blue>255</blue>
-                        </color>
-                        <color>
-                            <red>234</red>
-                            <green>234</green>
-                            <blue>234</blue>
-                        </color>
-                        <color>
-                            <red>106</red>
-                            <green>106</green>
-                            <blue>106</blue>
-                        </color>
-                        <color>
-                            <red>142</red>
-                            <green>142</green>
-                            <blue>142</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>255</green>
-                            <blue>255</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>255</green>
-                            <blue>255</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>255</green>
-                            <blue>255</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>0</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>0</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>0</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>128</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>255</green>
-                            <blue>255</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>0</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>0</blue>
-                        </color>
-                    </active>
-                    <disabled>
-                        <color>
-                            <red>128</red>
-                            <green>128</green>
-                            <blue>128</blue>
-                        </color>
-                        <color>
-                            <red>213</red>
-                            <green>213</green>
-                            <blue>213</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>255</green>
-                            <blue>255</blue>
-                        </color>
-                        <color>
-                            <red>244</red>
-                            <green>244</green>
-                            <blue>244</blue>
-                        </color>
-                        <color>
-                            <red>106</red>
-                            <green>106</green>
-                            <blue>106</blue>
-                        </color>
-                        <color>
-                            <red>142</red>
-                            <green>142</green>
-                            <blue>142</blue>
-                        </color>
-                        <color>
-                            <red>128</red>
-                            <green>128</green>
-                            <blue>128</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>255</green>
-                            <blue>255</blue>
-                        </color>
-                        <color>
-                            <red>128</red>
-                            <green>128</green>
-                            <blue>128</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>0</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>0</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>0</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>128</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>255</green>
-                            <blue>255</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>192</blue>
-                        </color>
-                        <color>
-                            <red>128</red>
-                            <green>0</green>
-                            <blue>128</blue>
-                        </color>
-                    </disabled>
-                    <inactive>
-                        <color>
-                            <red>255</red>
-                            <green>255</green>
-                            <blue>255</blue>
-                        </color>
-                        <color>
-                            <red>213</red>
-                            <green>213</green>
-                            <blue>213</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>255</green>
-                            <blue>255</blue>
-                        </color>
-                        <color>
-                            <red>244</red>
-                            <green>244</green>
-                            <blue>244</blue>
-                        </color>
-                        <color>
-                            <red>106</red>
-                            <green>106</green>
-                            <blue>106</blue>
-                        </color>
-                        <color>
-                            <red>142</red>
-                            <green>142</green>
-                            <blue>142</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>255</green>
-                            <blue>255</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>255</green>
-                            <blue>255</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>255</green>
-                            <blue>255</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>0</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>0</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>0</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>128</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>255</green>
-                            <blue>255</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>192</blue>
-                        </color>
-                        <color>
-                            <red>128</red>
-                            <green>0</green>
-                            <blue>128</blue>
-                        </color>
-                    </inactive>
-                </palette>
-            </property>
             <property name="backgroundOrigin">
                 <enum>AncestorOrigin</enum>
             </property>
@@ -614,9 +336,9 @@
 
 Creating this program takes a lot of work. On one side there is the creative process of inventing new algorithms and concepts, on the other side there is the realization of these concepts into a program.
 
-The past 4 years the software has been open sourced, free to use by anybody under a GPL license. Recently I've become very frustrated about this. Open source promises a lot of things. Among those things is the possibility to develop with many people on the same thing. In practice however, I've been contacted by many people which all 'wants' things, but very few people actually offer help and those who actually do are far from qualified to do so in a useable manner.
+The past 5 years the software has been open sourced, free to use by anybody under a GPL license. Recently I've become very frustrated about this. Open source promises a lot of things. Among those things is the possibility to develop with many people on the same thing. In practice however, I've been contacted by many people which all 'wants' things, but very few people actually offer help and those who actually do are far from qualified to do so in a useable manner.
 
-Aside from this, the development of the algorithms expressed in this program are worth money, a lot of money. Also here I've been contacted by people interested in whether the output of the algorithm can be used for free and whether they can use the algorithm in their own software. Interestingly, because they already have the software, I'm never in a position to negotiate properly.
+Aside from this, the development of the algorithms expressed in this program are worth a lot of money. Also here I've been contacted by people interested in whether the output of the algorithm can be used for free and whether they can use the algorithm in their own software. Interestingly, because they already have the software, I'm never in a position to negotiate properly.
 
 Other people contact me to see whether I want to help them out with their student project based on this software, others simply claim that they wrote it. Bottomline here is that people seem to have absolutely no respect whatsoever for the effort it took to create this software.
 
@@ -629,7 +351,7 @@ I don't expect end users to pay for this stuff, however I insist that
  
 The time I spent to write this software and invent the algorithms seems easily forgotten when the dealine comes close.
 
-Since I'm a researcher in heart, the software remains GPL, but please if you are in the possiblity to support this work in any way, please do so. You can help 
+Since I'm a researcher at heart, the software remains GPL, but if you are in the possiblity to support this work in any way, please do so. You can help 
 
 - by putting a reference to this work on your webpage
 - by publicily acknowledging the use of this software where you use it
@@ -661,6 +383,9 @@ werner.van.belle@itek.norut.no
                     <property name="name">
                         <cstring>unnamed</cstring>
                     </property>
+                    <property name="spacing">
+                        <number>0</number>
+                    </property>
                     <widget class="QLabel" row="0" column="0">
                         <property name="name">
                             <cstring>versionLabel</cstring>
@@ -676,6 +401,13 @@ werner.van.belle@itek.norut.no
                         <property name="paletteForegroundColor">
                             <color>
                                 <red>255</red>
+                                <green>0</green>
+                                <blue>0</blue>
+                            </color>
+                        </property>
+                        <property name="paletteBackgroundColor">
+                            <color>
+                                <red>0</red>
                                 <green>0</green>
                                 <blue>0</blue>
                             </color>
@@ -708,9 +440,16 @@ werner.van.belle@itek.norut.no
                         </property>
                         <property name="paletteForegroundColor">
                             <color>
-                                <red>0</red>
+                                <red>85</red>
                                 <green>255</green>
-                                <blue>127</blue>
+                                <blue>0</blue>
+                            </color>
+                        </property>
+                        <property name="paletteBackgroundColor">
+                            <color>
+                                <red>0</red>
+                                <green>0</green>
+                                <blue>0</blue>
                             </color>
                         </property>
                         <property name="backgroundOrigin">
@@ -753,6 +492,13 @@ Electric Fence : Bruce Perens (bruce@pixar.com)</string>
                                 <blue>0</blue>
                             </color>
                         </property>
+                        <property name="paletteBackgroundColor">
+                            <color>
+                                <red>0</red>
+                                <green>0</green>
+                                <blue>0</blue>
+                            </color>
+                        </property>
                         <property name="backgroundOrigin">
                             <enum>ParentOrigin</enum>
                         </property>
@@ -763,9 +509,9 @@ Electric Fence : Bruce Perens (bruce@pixar.com)</string>
                             </font>
                         </property>
                         <property name="text">
-                            <string>(c) Werner Van Belle  2001-2005
-e-mail: werner.van.belle@itek.norut.no
-werner@onlinux.be
+                            <string>(c) Werner Van Belle  2001-2006
+e-mail: werner@onlinux.be
+werner.van.belle@gmail.com
 
 http://bpmdj.sourceforge.net/</string>
                         </property>
@@ -794,6 +540,13 @@ http://bpmdj.sourceforge.net/</string>
                                 <blue>0</blue>
                             </color>
                         </property>
+                        <property name="paletteBackgroundColor">
+                            <color>
+                                <red>0</red>
+                                <green>0</green>
+                                <blue>0</blue>
+                            </color>
+                        </property>
                         <property name="backgroundOrigin">
                             <enum>ParentOrigin</enum>
                         </property>
@@ -816,9 +569,16 @@ http://bpmdj.sourceforge.net/</string>
                         </property>
                         <property name="paletteForegroundColor">
                             <color>
-                                <red>128</red>
-                                <green>128</green>
+                                <red>170</red>
+                                <green>0</green>
                                 <blue>255</blue>
+                            </color>
+                        </property>
+                        <property name="paletteBackgroundColor">
+                            <color>
+                                <red>0</red>
+                                <green>0</green>
+                                <blue>0</blue>
                             </color>
                         </property>
                         <property name="font">

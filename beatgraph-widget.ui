@@ -148,6 +148,12 @@
         <slot>changeVisualisation()</slot>
     </connection>
 </connections>
+<tabstops>
+    <tabstop>periodDelta10</tabstop>
+    <tabstop>periodDelta</tabstop>
+    <tabstop>pushButton4</tabstop>
+    <tabstop>haar</tabstop>
+</tabstops>
 <slots>
     <slot>setTempo()</slot>
     <slot>showPattern()</slot>

@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -71,10 +71,31 @@ void PlayerConfig::init()
   init_disabled_capacities();
 }
 
+/**
+ * This is a tricky piece of code because not all window managers
+ * behave properly. IceWM for instance will fill in the borders and
+ * the likes after the window has positioned, resulting in a differnce
+ * between setting a position and reading it afterwards when 
+ * finishing the dialogbox. An extra problem is that the window
+ * decoration is filled in by the window manager, resulting in an 
+ * asynchronous change of the window position.
+ * So in this function we cannot siomply measure the shift introduced
+ * by setting the position. We can also not simply measure new updates
+ * to the position and ignore them because then the end user cannot 
+ * reposition the window. We cannot use the window rect and the internal
+ * rect because some window managers might behave differently.
+ * So what can we do ? We can try to position the window again once the 
+ * decorations are complete..
+ */
 void PlayerConfig::load_ui_position(QDialog * dialog)
 {
   if (get_ui_posx()>-1 && get_ui_posy()>-1)
-    dialog->move(get_ui_posx(),get_ui_posy());
+    {
+      // measure the shift ...
+      int X = get_ui_posx();
+      int Y = get_ui_posy();
+      dialog->move(X,Y);
+    }
 }
 
 void PlayerConfig::save_ui_position(QDialog * dialog)
@@ -147,6 +168,26 @@ void PlayerConfig::load()
 	  s >> w; set_ui_posx(w);
 	  s >> w; set_ui_posy(w);
 	}
+  else if (magic == MAGIC_3_0)
+	{
+	  s >> str; set_core_rawpath(str);
+	  s >> w; set_player_dsp(w);
+	  s >> w; set_alsa_latency(w);
+	  s >> b; set_alsa_verbose(b);
+	  s >> str; set_alsa_dev(str);
+	  s >> str; set_oss_dsp(str);
+	  s >> b; set_oss_init_fragments(b);
+	  s >> w; set_oss_fragments(w);
+	  s >> b; set_oss_verbose(b);
+	  s >> b; set_oss_nolatencyaccounting(b);
+	  s >> w; set_oss_latency(w);
+	  s >> w; set_mixed_channel(w);
+	  s >> b; set_player_rms(b);
+	  s >> fl; set_player_rms_target(fl);
+	  s >> w; set_disabled_capacities(w);
+	  s >> w; set_ui_posx(w);
+	  s >> w; set_ui_posy(w);
+	}
   else
-    printf("Kbpm-play wrong config file format\n");
+    Error(true,"Kbpm-play wrong config file format\n");
 }

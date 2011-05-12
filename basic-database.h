@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -17,17 +17,34 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#ifndef BASIC_TYPES_H
-#define BASIC_TYPES_H
+#ifndef BDATABASE_H
+#define BDATABASE_H
 
-typedef unsigned           char unsigned1;
-typedef signed   long long  int signed8;
-typedef unsigned long long  int unsigned8;
-typedef signed        long  int signed4;
-typedef unsigned      long  int unsigned4;
-typedef signed        short int signed2;
-typedef unsigned      short int unsigned2;
-typedef                   float float4;
-typedef                  double float8;
+#include "avltree.h"
+#include "growing-array.h"
+
+class Song;
+class SongMetriek;
+class SongSelectorLogic;
+class QVectorView;
+
+class BasicDataBase
+{
+  protected:
+    GrowingArray<Song*> all;
+    AvlTree<QString>* file_tree;
+    virtual void init();
+    virtual void clear();
+  public:
+    BasicDataBase();
+    virtual ~BasicDataBase();
+    void     reset();
+    void     add(Song*);
+    Song *   find(QString song_filename);
+    GrowingArray<Song*> * getAllSongs() { return &all;};
+    AvlTree<QString> * getFileTreeRef();
+    AvlTree<QString> * getFileTreeCopy();
+};
 
 #endif
+

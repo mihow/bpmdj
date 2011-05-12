@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -33,14 +33,16 @@
 #include <math.h>
 #include <qdialog.h>
 #include "player-core.h"
+#include "memory.h"
 #include "scripts.h"
 #include "version.h"
 #include "dsp-drivers.h"
 #include "fourier.h"
 #include "energy-analyzer.h"
-#include "memory.h"
 #include "player-config.h"
 #include "capacity.h"
+
+using namespace std;
 
 //#define DEBUG_WAIT_STATES
 
@@ -51,7 +53,7 @@
 
 volatile int stop = 0;
 volatile int finished = 0;
-static volatile int paused = 0;
+static volatile bool paused = true;
 
 quad_period_type targetperiod;
 quad_period_type currentperiod;
@@ -98,37 +100,39 @@ void writer_died(int sig, siginfo_t *info, void* hu)
   // now we have the complete length of the file...
   // if it differs from the length in the .ini file we update it
   // get length;
-  unsigned long long sec;
-  unsigned long long min; 
   writing = 0;
-  if (!wave_file) return;
-  sec = samples2s(wave_max());
-  min = sec/60;
-  sec = sec%60;
-  sprintf(newstr,"%02d:%02d",(int)min,(int)sec);
-  playing->set_time(newstr);
+  unsigned long long sec = samples2s(wave_max());
+  unsigned long long min; 
+  if (wave_file) 
+    {
+      min = sec/60;
+      sec = sec%60;
+      sprintf(newstr,"%02d:%02d",(int)min,(int)sec);
+      playing->set_time(newstr);
+    }
+  msg_writing_finished();
 }
 
 int wave_open(Index * playing, bool synchronous)
 {
   if (!playing) return err_none;
-  char * fname = playing->get_filename();
+  const char * fname = playing->get_filename();
   int decoder = set_decoder_environment(config,playing);
   if (!decoder) return err_noraw;
-
+  
   // start decoding the file; this means: fork bpmdj-raw process
   // wait 1 second and start reading the file
   if (synchronous)
     {
       writing = 1;
-      if (!vexecute(CREATERAW_CMD,(const char*)get_rawpath(),fname))
+      if (!start_bpmdj_raw(get_rawpath(),fname))
 	return err_nospawn;
       writing = 0;
     }
   else 
     {
       // prepare signals
-      struct sigaction *act = allocate(1,struct sigaction);
+      struct sigaction *act = bpmdj_allocate(1,struct sigaction);
       act->sa_sigaction = writer_died;
       act->sa_flags = SA_SIGINFO;
       sigaction(SIGUSR1,act,NULL);
@@ -136,7 +140,7 @@ int wave_open(Index * playing, bool synchronous)
       writing = 1;
       if (!(writer = fork()))
 	{
-	  vexecute(CREATERAW_CMD,(const char*)get_rawpath(),fname);
+	  start_bpmdj_raw(get_rawpath(),fname);
 	  kill(getppid(),SIGUSR1);
 	  /**
 	   * If we use exit instead of _exit our own static data structures
@@ -196,13 +200,13 @@ void wave_process(stereo_sample2 *wave_buffer, int size)
 
   if (!tot_energy)
     {
-      tot_energy = allocate(size,double);
+      tot_energy = bpmdj_allocate(size,double);
       for(int i = 0 ; i < size ; i ++)
 	tot_energy[i]=0;
-      amp = allocate(size,double);
-      co = allocate(size,double);
-      si = allocate(size,double);
-      dl = allocate(size,double);
+      amp = bpmdj_allocate(size,double);
+      co = bpmdj_allocate(size,double);
+      si = bpmdj_allocate(size,double);
+      dl = bpmdj_allocate(size,double);
     }
   for(int i = 0 ; i < size ; i ++)
     {
@@ -263,7 +267,7 @@ int wave_read(unsigned4 pos, stereo_sample2 *val)
 	    wave_buffer[i].value(0);
 	  val->value(0);
 	  return 0;
-	} 
+	}
       wave_bufferpos=pos;
       fseek(wave_file,pos*4,SEEK_SET);
       int r = fread(wave_buffer,4,wave_bufsize,wave_file);
@@ -401,7 +405,7 @@ unsigned8   map_stop_pos = 0;
 bool        map_loop = false;
 signed8     map_exit_pos = 0;
 bool        map_do;
-map_data    map = NULL;
+map_data    bpmdj_map = NULL;
 signed2     map_size = 0;
 
 void map_loop_set(bool l)
@@ -458,16 +462,16 @@ unsigned8 map_active(unsigned8 a)
   unsigned8 segment_start = segment * (map_stop_pos-map_start_pos) / map_size;
   unsigned8 segment_offset = dx - segment_start;
   // obtain segment of new postion
-  signed2 new_segment = map[segment].take_from;
+  signed2 new_segment = bpmdj_map[segment].take_from;
   
   // calculate speed
   segment_offset = ((signed4)segment_offset) 
-    * ((signed4)map[segment].speed_mult) 
-    / ((signed4)map[segment].speed_div);
+    * ((signed4)bpmdj_map[segment].speed_mult) 
+    / ((signed4)bpmdj_map[segment].speed_div);
   if (new_segment < 0)
     return map_stop_pos;
   // transfer volume
-  volume = map[segment].volume;
+  volume = bpmdj_map[segment].volume;
   // obtain new segment start position
   unsigned8 new_segment_start = new_segment * (map_stop_pos-map_start_pos) / map_size;
   // fix should play position with actual map_start_pos and fine grained segment offset
@@ -481,8 +485,8 @@ void map_stop()
       x = map_active(x);
       y = y_normalise(x);
       map_do=false;
-      if (map) deallocate(map);
-      map=NULL;
+      if (bpmdj_map) bpmdj_deallocate(bpmdj_map);
+      bpmdj_map=NULL;
     }
 }
 
@@ -497,7 +501,7 @@ void map_set(signed2 size, map_data inmap, unsigned8 msize, signed8 mexit, bool 
     mstart = x_normalise(::y - dsp->latency());
   mstop = mstart + msize;
   map_exit_pos = mexit;
-  map_data old_map = map;
+  map_data old_map = bpmdj_map;
   // should we inactivate it ?
   if (size<=0) map_do=false;
   // should we modify first the size or the data ?
@@ -506,7 +510,7 @@ void map_set(signed2 size, map_data inmap, unsigned8 msize, signed8 mexit, bool 
     {
       map_start_pos = mstart;
       map_stop_pos = mstop;
-      map=inmap;
+      bpmdj_map=inmap;
       map_size=size;
     }
   else
@@ -514,13 +518,13 @@ void map_set(signed2 size, map_data inmap, unsigned8 msize, signed8 mexit, bool 
       map_start_pos = mstart;
       map_stop_pos = mstop;
       map_size=size;
-      map=inmap;
+      bpmdj_map=inmap;
     }
   map_loop = l;
   // should we now activate it ?
   map_do = size > 0;
   // free old map ?
-  if (old_map) deallocate(old_map);
+  if (old_map) bpmdj_deallocate(old_map);
   // unpause ?
   if (paused)
     {
@@ -626,14 +630,16 @@ void rms_init()
   sample4_type max = playing->get_max();
   sample4_type mean = playing->get_mean();
   power_type pow = playing->get_power();
-  if (!min.fully_defined() || !max.fully_defined() || 
-      !mean.fully_defined() || !pow.fully_defined())
+  if (min.badly_defined() ||
+      max.badly_defined() ||
+      mean.badly_defined() || 
+      pow.badly_defined())
     {
       Info("Switching of rms normalisation, this song has no known energy levels");
       opt_rms=0;
       return;
     }
-  
+
   // obtain amplitude maximisation factor factor 
   left_sub = mean.left;
   left_fact = normalization_factor(min.left,max.left,mean.left);
@@ -871,7 +877,7 @@ void unpause_playing()
  *-------------------------------------------*/ 
 void copyright()
 {
-  printf("BpmDj Player v%s, Copyright (c) 2001-2005 Werner Van Belle\n",VERSION);
+  printf("BpmDj Player v%s, Copyright (c) 2001-2006 Werner Van Belle\n",VERSION);
   printf("This software is distributed under the GPL2 license. See copyright.txt\n");
   printf("--------------------------------------------------------------------\n");
   fflush(stdout);
@@ -959,7 +965,6 @@ void core_done()
 	  if (!opt_quiet) Info("Updating index file");
 	  playing->write_idx();
 	}
-      delete playing;
     }
 #ifdef DEBUG_WAIT_STATES
   Debug("finished marked true");
@@ -996,7 +1001,7 @@ static void * go2(void* neglect)
       core_done();
       return err;
     }
-  pthread_t *y = allocate(1,pthread_t);
+  pthread_t *y = bpmdj_allocate(1,pthread_t);
   pthread_create(y,NULL,go,NULL);
   return err_none;
 }
@@ -1010,7 +1015,7 @@ int core_start()
       core_close();
       return err;
     }
-  pthread_t *y = allocate(1,pthread_t);
+  pthread_t *y = bpmdj_allocate(1,pthread_t);
   pthread_create(y,NULL,go2,NULL);
   return err_none;
 }

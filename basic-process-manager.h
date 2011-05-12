@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@
 #ifndef BPROCESS_MGR_H
 #define BPROCESS_MGR_H
 
-#include "config.h"
 #include "growing-array.h"
 
 class DiedProcesses;
@@ -37,7 +36,7 @@ class BasicProcessManager
     virtual ~BasicProcessManager() {};
     virtual void checkSignals();
     virtual void start(int id, const char* command) {assert(0);};
-    virtual void start(int id, const char* command, QString logname);
+    virtual void start(int id, const char* command, QString logname, bool append);
 };
 
 #endif

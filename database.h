@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 #ifndef DATABASE_H
 #define DATABASE_H
 
+#include "basic-database.h"
 #include "avltree.h"
 #include "growing-array.h"
 
@@ -28,10 +29,9 @@ class SongMetriek;
 class SongSelectorLogic;
 class QVectorView;
 
-class DataBase
+class DataBase: public BasicDataBase
 {
   private:
-    GrowingArray<Song*> all;
     GrowingArray<Song*> cache;
     bool *      and_include;
     bool *      or_include;
@@ -45,24 +45,19 @@ class DataBase
     bool tagFilter(Song*);
     void updateCache(SongSelectorLogic * selector);
     bool filter(SongSelectorLogic* selector, Song* song, Song* main, float limit);
-    AvlTree<QString>* file_tree;
-    void     init();
-    void     clear();
+ protected: 
+    virtual void init();
+    virtual void clear();
+ private:
     int      get_unheaped_selection(SongSelectorLogic* selector, Song* main, QVectorView* target);
     int      set_answer(Song * * show, int length, QVectorView* target);
-  public:
+    bool     rebuild_cache;
+ public:
     DataBase();
     virtual ~DataBase();
-    void     reset();
-    void     add(Song*);
-    // void     del(Song*);
-    Song *   find(QString song_filename);
+    void     flush_cache() {rebuild_cache = true;};
     void     start_existence_check();
-   // bool     lookfor(const QString z);
     int      getSelection(SongSelectorLogic* selector, Song* main, QVectorView* target, int nr = 0);
-    GrowingArray<Song*> * getAllSongs() { return &all;};
-    AvlTree<QString> * getFileTreeRef();
-    AvlTree<QString> * getFileTreeCopy();
     Song * * closestSongs(SongSelectorLogic * selector,Song * target1, float weight1, Song * target2, float weight2, SongMetriek * metriek, int maximum, int &count);
 };
 

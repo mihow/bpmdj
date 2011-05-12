@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -20,9 +20,15 @@
 #ifndef HISTOGRAM_PROPERTY_H
 #define HISTOGRAM_PROPERTY_H
 
+#include <assert.h>
+#include <math.h>
+#include <stdlib.h>
 #include "memory.h"
 #include "smallhistogram-type.h"
 #include "spectrum-type.h"
+#include "common.h"
+#include "memory.h"
+#include "signals.h"
 
 template<int bandsize> class histogram_property
 {
@@ -44,16 +50,14 @@ template<int bandsize> class histogram_property
     {
       bark=NULL;
     }
-  bool empty()
+  bool empty() const
     {
       return bark==NULL;
     }
   virtual void init();
-  void read_idx(const char* str);
-  const void write_idx(FILE * f, char* fieldname);
-  const void write_bib_v272(FILE * index);
-  void read_bib_v271();
-  void read_bib_v272();
+
+  Data get_data(int version) const;
+  void set_data(Data& data); 
   unsigned1 get_freq_energy_probability(int band, int delay)
     {
       return bark[band].get_probability(delay);
@@ -71,5 +75,36 @@ template<int bandsize> class histogram_property
       return bandsize;
     }
 };
+
+template <int bandsize> void histogram_property<bandsize>::init()
+{
+  bark = new smallhistogram_type<bandsize>[spectrum_size]();
+}
+
+template <int bandsize> 
+Data histogram_property<bandsize>::get_data(int version) const
+{
+  if (empty()) 
+    return Array<1,Data>();
+  Array<1,Data> result(spectrum_size);
+  for(int i = 0 ; i < spectrum_size ; i++)
+    result[i]=bark[i].get_data(version);
+  return result;
+}
+
+template <int bandsize> 
+void histogram_property<bandsize>::set_data(Data & data) 
+{
+  Array<1,Data> ar = data;
+  if (ar.empty()) 
+    bark = NULL;
+  else
+    {
+      init();
+      assert(ar.size(0)==spectrum_size);
+      for(int i = 0 ; i < spectrum_size ; i++)
+	bark[i].set_data(ar[i]);
+    }
+}
 
 #endif

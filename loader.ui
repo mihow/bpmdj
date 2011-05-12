@@ -77,6 +77,28 @@
             </rect>
         </property>
     </spacer>
+    <widget class="QProgressBar">
+        <property name="name">
+            <cstring>progress</cstring>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>10</x>
+                <y>160</y>
+                <width>378</width>
+                <height>27</height>
+            </rect>
+        </property>
+        <property name="backgroundOrigin">
+            <enum>ParentOrigin</enum>
+        </property>
+        <property name="progress">
+            <number>0</number>
+        </property>
+        <property name="percentageVisible">
+            <bool>true</bool>
+        </property>
+    </widget>
     <widget class="QLabel">
         <property name="name">
             <cstring>reading</cstring>
@@ -91,25 +113,6 @@
         </property>
         <property name="backgroundOrigin">
             <enum>ParentOrigin</enum>
-        </property>
-    </widget>
-    <widget class="QProgressBar">
-        <property name="name">
-            <cstring>progress</cstring>
-        </property>
-        <property name="geometry">
-            <rect>
-                <x>10</x>
-                <y>160</y>
-                <width>378</width>
-                <height>27</height>
-            </rect>
-        </property>
-        <property name="progress">
-            <number>0</number>
-        </property>
-        <property name="percentageVisible">
-            <bool>true</bool>
         </property>
     </widget>
 </widget>

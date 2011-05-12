@@ -140,7 +140,7 @@
         </widget>
         <widget class="QWidgetStack" row="0" column="1" rowspan="2" colspan="3">
             <property name="name">
-                <cstring>widgetStack3</cstring>
+                <cstring>widgetStack</cstring>
             </property>
             <property name="enabled">
                 <bool>true</bool>
@@ -186,16 +186,13 @@
                         <property name="sizePolicy">
                             <sizepolicy>
                                 <hsizetype>5</hsizetype>
-                                <vsizetype>3</vsizetype>
+                                <vsizetype>4</vsizetype>
                                 <horstretch>0</horstretch>
                                 <verstretch>0</verstretch>
                             </sizepolicy>
                         </property>
                         <property name="text">
-                            <string>&lt;b&gt;Player commands
-&lt;/b&gt;&lt;br&gt;Every commandline must have two %s placeholders. 
-&lt;br&gt;- The first placeholder is replaced by the song to match with.
-&lt;br&gt;- The second placeholder is replaced with the song to play</string>
+                            <string>&lt;b&gt;Player commands</string>
                         </property>
                         <property name="alignment">
                             <set>WordBreak|AlignVCenter|AlignLeft</set>
@@ -233,182 +230,12 @@
                     </spacer>
                     <widget class="QLayoutWidget" row="2" column="0" rowspan="1" colspan="2">
                         <property name="name">
-                            <cstring>layout24</cstring>
+                            <cstring>playerStack</cstring>
                         </property>
                         <vbox>
                             <property name="name">
                                 <cstring>unnamed</cstring>
                             </property>
-                            <widget class="QLayoutWidget">
-                                <property name="name">
-                                    <cstring>layout23</cstring>
-                                </property>
-                                <hbox>
-                                    <property name="name">
-                                        <cstring>unnamed</cstring>
-                                    </property>
-                                    <widget class="QLabel">
-                                        <property name="name">
-                                            <cstring>TextLabel1</cstring>
-                                        </property>
-                                        <property name="paletteForegroundColor">
-                                            <color>
-                                                <red>255</red>
-                                                <green>0</green>
-                                                <blue>0</blue>
-                                            </color>
-                                        </property>
-                                        <property name="text">
-                                            <string>First Player</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QLineEdit">
-                                        <property name="name">
-                                            <cstring>playerCommand1</cstring>
-                                        </property>
-                                    </widget>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>pushButton3</cstring>
-                                        </property>
-                                        <property name="text">
-                                            <string>create</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>configureP1</cstring>
-                                        </property>
-                                        <property name="text">
-                                            <string>configure</string>
-                                        </property>
-                                    </widget>
-                                </hbox>
-                            </widget>
-                            <widget class="QLayoutWidget">
-                                <property name="name">
-                                    <cstring>layout21</cstring>
-                                </property>
-                                <hbox>
-                                    <property name="name">
-                                        <cstring>unnamed</cstring>
-                                    </property>
-                                    <widget class="QLabel">
-                                        <property name="name">
-                                            <cstring>TextLabel2</cstring>
-                                        </property>
-                                        <property name="paletteForegroundColor">
-                                            <color>
-                                                <red>255</red>
-                                                <green>0</green>
-                                                <blue>0</blue>
-                                            </color>
-                                        </property>
-                                        <property name="text">
-                                            <string>Second Player</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QLineEdit">
-                                        <property name="name">
-                                            <cstring>playerCommand2</cstring>
-                                        </property>
-                                    </widget>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>pushButton4</cstring>
-                                        </property>
-                                        <property name="text">
-                                            <string>create</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>configureP2</cstring>
-                                        </property>
-                                        <property name="text">
-                                            <string>configure</string>
-                                        </property>
-                                    </widget>
-                                </hbox>
-                            </widget>
-                            <widget class="QLayoutWidget">
-                                <property name="name">
-                                    <cstring>layout20</cstring>
-                                </property>
-                                <hbox>
-                                    <property name="name">
-                                        <cstring>unnamed</cstring>
-                                    </property>
-                                    <widget class="QLabel">
-                                        <property name="name">
-                                            <cstring>TextLabel1_2</cstring>
-                                        </property>
-                                        <property name="text">
-                                            <string>Player 3</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QLineEdit">
-                                        <property name="name">
-                                            <cstring>playerCommand3</cstring>
-                                        </property>
-                                    </widget>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>pushButton5</cstring>
-                                        </property>
-                                        <property name="text">
-                                            <string>create</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>configureP3</cstring>
-                                        </property>
-                                        <property name="text">
-                                            <string>configure</string>
-                                        </property>
-                                    </widget>
-                                </hbox>
-                            </widget>
-                            <widget class="QLayoutWidget">
-                                <property name="name">
-                                    <cstring>layout19</cstring>
-                                </property>
-                                <hbox>
-                                    <property name="name">
-                                        <cstring>unnamed</cstring>
-                                    </property>
-                                    <widget class="QLabel">
-                                        <property name="name">
-                                            <cstring>TextLabel2_2</cstring>
-                                        </property>
-                                        <property name="text">
-                                            <string>Player 4</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QLineEdit">
-                                        <property name="name">
-                                            <cstring>playerCommand4</cstring>
-                                        </property>
-                                    </widget>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>pushButton6</cstring>
-                                        </property>
-                                        <property name="text">
-                                            <string>create</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>configureP4</cstring>
-                                        </property>
-                                        <property name="text">
-                                            <string>configure</string>
-                                        </property>
-                                    </widget>
-                                </hbox>
-                            </widget>
                         </vbox>
                     </widget>
                 </grid>
@@ -532,332 +359,12 @@
                     </widget>
                     <widget class="QLayoutWidget" row="2" column="0" rowspan="1" colspan="3">
                         <property name="name">
-                            <cstring>layout21</cstring>
+                            <cstring>analyzerStack</cstring>
                         </property>
                         <vbox>
                             <property name="name">
                                 <cstring>unnamed</cstring>
                             </property>
-                            <widget class="QLayoutWidget">
-                                <property name="name">
-                                    <cstring>layout13</cstring>
-                                </property>
-                                <hbox>
-                                    <property name="name">
-                                        <cstring>unnamed</cstring>
-                                    </property>
-                                    <widget class="QLineEdit">
-                                        <property name="name">
-                                            <cstring>analyzerCommand1</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>true</bool>
-                                        </property>
-                                    </widget>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>pushButton69</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>true</bool>
-                                        </property>
-                                        <property name="text">
-                                            <string>create</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>configure1</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>true</bool>
-                                        </property>
-                                        <property name="text">
-                                            <string>configure</string>
-                                        </property>
-                                    </widget>
-                                </hbox>
-                            </widget>
-                            <widget class="QLayoutWidget">
-                                <property name="name">
-                                    <cstring>layout14</cstring>
-                                </property>
-                                <hbox>
-                                    <property name="name">
-                                        <cstring>unnamed</cstring>
-                                    </property>
-                                    <widget class="QLineEdit">
-                                        <property name="name">
-                                            <cstring>analyzerCommand2</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>true</bool>
-                                        </property>
-                                    </widget>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>pushButton69_2</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>true</bool>
-                                        </property>
-                                        <property name="text">
-                                            <string>create</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>configure2</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>true</bool>
-                                        </property>
-                                        <property name="text">
-                                            <string>configure</string>
-                                        </property>
-                                    </widget>
-                                </hbox>
-                            </widget>
-                            <widget class="QLayoutWidget">
-                                <property name="name">
-                                    <cstring>layout15</cstring>
-                                </property>
-                                <hbox>
-                                    <property name="name">
-                                        <cstring>unnamed</cstring>
-                                    </property>
-                                    <widget class="QLineEdit">
-                                        <property name="name">
-                                            <cstring>analyzerCommand3</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>true</bool>
-                                        </property>
-                                    </widget>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>pushButton69_2_2</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>true</bool>
-                                        </property>
-                                        <property name="text">
-                                            <string>create</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>configure3</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>true</bool>
-                                        </property>
-                                        <property name="text">
-                                            <string>configure</string>
-                                        </property>
-                                    </widget>
-                                </hbox>
-                            </widget>
-                            <widget class="QLayoutWidget">
-                                <property name="name">
-                                    <cstring>layout16</cstring>
-                                </property>
-                                <hbox>
-                                    <property name="name">
-                                        <cstring>unnamed</cstring>
-                                    </property>
-                                    <widget class="QLineEdit">
-                                        <property name="name">
-                                            <cstring>analyzerCommand4</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>true</bool>
-                                        </property>
-                                    </widget>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>pushButton69_2_3</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>true</bool>
-                                        </property>
-                                        <property name="text">
-                                            <string>create</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>configure4</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>true</bool>
-                                        </property>
-                                        <property name="text">
-                                            <string>configure</string>
-                                        </property>
-                                    </widget>
-                                </hbox>
-                            </widget>
-                            <widget class="QLayoutWidget">
-                                <property name="name">
-                                    <cstring>layout17</cstring>
-                                </property>
-                                <hbox>
-                                    <property name="name">
-                                        <cstring>unnamed</cstring>
-                                    </property>
-                                    <widget class="QLineEdit">
-                                        <property name="name">
-                                            <cstring>analyzerCommand5</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>true</bool>
-                                        </property>
-                                    </widget>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>pushButton69_2_3_2</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>true</bool>
-                                        </property>
-                                        <property name="text">
-                                            <string>create</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>configure5</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>true</bool>
-                                        </property>
-                                        <property name="text">
-                                            <string>configure</string>
-                                        </property>
-                                    </widget>
-                                </hbox>
-                            </widget>
-                            <widget class="QLayoutWidget">
-                                <property name="name">
-                                    <cstring>layout18</cstring>
-                                </property>
-                                <hbox>
-                                    <property name="name">
-                                        <cstring>unnamed</cstring>
-                                    </property>
-                                    <widget class="QLineEdit">
-                                        <property name="name">
-                                            <cstring>analyzerCommand6</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>true</bool>
-                                        </property>
-                                    </widget>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>pushButton69_2_3_2_2</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>true</bool>
-                                        </property>
-                                        <property name="text">
-                                            <string>create</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>configure6</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>true</bool>
-                                        </property>
-                                        <property name="text">
-                                            <string>configure</string>
-                                        </property>
-                                    </widget>
-                                </hbox>
-                            </widget>
-                            <widget class="QLayoutWidget">
-                                <property name="name">
-                                    <cstring>layout19</cstring>
-                                </property>
-                                <hbox>
-                                    <property name="name">
-                                        <cstring>unnamed</cstring>
-                                    </property>
-                                    <widget class="QLineEdit">
-                                        <property name="name">
-                                            <cstring>analyzerCommand7</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>true</bool>
-                                        </property>
-                                    </widget>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>pushButton69_2_3_2_3</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>true</bool>
-                                        </property>
-                                        <property name="text">
-                                            <string>create</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>configure7</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>true</bool>
-                                        </property>
-                                        <property name="text">
-                                            <string>configure</string>
-                                        </property>
-                                    </widget>
-                                </hbox>
-                            </widget>
-                            <widget class="QLayoutWidget">
-                                <property name="name">
-                                    <cstring>layout20</cstring>
-                                </property>
-                                <hbox>
-                                    <property name="name">
-                                        <cstring>unnamed</cstring>
-                                    </property>
-                                    <widget class="QLineEdit">
-                                        <property name="name">
-                                            <cstring>analyzerCommand8</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>true</bool>
-                                        </property>
-                                    </widget>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>pushButton69_2_3_2_2_2</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>true</bool>
-                                        </property>
-                                        <property name="text">
-                                            <string>create</string>
-                                        </property>
-                                    </widget>
-                                    <widget class="QPushButton">
-                                        <property name="name">
-                                            <cstring>configure8</cstring>
-                                        </property>
-                                        <property name="enabled">
-                                            <bool>true</bool>
-                                        </property>
-                                        <property name="text">
-                                            <string>configure</string>
-                                        </property>
-                                    </widget>
-                                </hbox>
-                            </widget>
                         </vbox>
                     </widget>
                     <widget class="QPushButton" row="3" column="2">
@@ -1471,17 +978,6 @@
                             <string>Color of already played songs</string>
                         </property>
                     </widget>
-                    <widget class="QLabel" row="1" column="0">
-                        <property name="name">
-                            <cstring>textLabel1_5</cstring>
-                        </property>
-                        <property name="enabled">
-                            <bool>true</bool>
-                        </property>
-                        <property name="text">
-                            <string>Color of already played authors</string>
-                        </property>
-                    </widget>
                     <widget class="QPushButton" row="0" column="1" rowspan="1" colspan="2">
                         <property name="name">
                             <cstring>colorPlayedSong</cstring>
@@ -1494,6 +990,88 @@
                                 <red>255</red>
                                 <green>0</green>
                                 <blue>0</blue>
+                            </color>
+                        </property>
+                        <property name="text">
+                            <string></string>
+                        </property>
+                        <property name="flat">
+                            <bool>true</bool>
+                        </property>
+                    </widget>
+                    <spacer row="6" column="2">
+                        <property name="name">
+                            <cstring>spacer10</cstring>
+                        </property>
+                        <property name="orientation">
+                            <enum>Vertical</enum>
+                        </property>
+                        <property name="sizeType">
+                            <enum>Expanding</enum>
+                        </property>
+                        <property name="sizeHint">
+                            <size>
+                                <width>20</width>
+                                <height>260</height>
+                            </size>
+                        </property>
+                    </spacer>
+                    <widget class="QLabel" row="5" column="0" rowspan="1" colspan="2">
+                        <property name="name">
+                            <cstring>textLabel1</cstring>
+                        </property>
+                        <property name="text">
+                            <string>Author Decay (#songs)</string>
+                        </property>
+                    </widget>
+                    <widget class="QSpinBox" row="5" column="2">
+                        <property name="name">
+                            <cstring>authorDecay</cstring>
+                        </property>
+                        <property name="maxValue">
+                            <number>100</number>
+                        </property>
+                        <property name="minValue">
+                            <number>1</number>
+                        </property>
+                        <property name="value">
+                            <number>6</number>
+                        </property>
+                    </widget>
+                    <widget class="QLabel" row="4" column="0">
+                        <property name="name">
+                            <cstring>textLabel1_5_3_2</cstring>
+                        </property>
+                        <property name="enabled">
+                            <bool>true</bool>
+                        </property>
+                        <property name="text">
+                            <string>Color of unchecked songs</string>
+                        </property>
+                    </widget>
+                    <widget class="QLabel" row="3" column="0">
+                        <property name="name">
+                            <cstring>textLabel1_5_3</cstring>
+                        </property>
+                        <property name="enabled">
+                            <bool>true</bool>
+                        </property>
+                        <property name="text">
+                            <string>Color of unavailable songs</string>
+                        </property>
+                    </widget>
+                    <widget class="QPushButton" row="4" column="1" rowspan="1" colspan="2">
+                        <property name="name">
+                            <cstring>colorUncheckedSong</cstring>
+                        </property>
+                        <property name="enabled">
+                            <bool>true</bool>
+                        </property>
+                        <property name="paletteBackgroundColor">
+                            <color>
+                                <red>202</red>
+                                <green>202</green>
+                                <blue>202</blue>
                             </color>
                         </property>
                         <property name="text">
@@ -1524,46 +1102,7 @@
                             <bool>true</bool>
                         </property>
                     </widget>
-                    <spacer row="5" column="2">
-                        <property name="name">
-                            <cstring>spacer10</cstring>
-                        </property>
-                        <property name="orientation">
-                            <enum>Vertical</enum>
-                        </property>
-                        <property name="sizeType">
-                            <enum>Expanding</enum>
-                        </property>
-                        <property name="sizeHint">
-                            <size>
-                                <width>20</width>
-                                <height>190</height>
-                            </size>
-                        </property>
-                    </spacer>
-                    <widget class="QLabel" row="4" column="0" rowspan="1" colspan="2">
-                        <property name="name">
-                            <cstring>textLabel1</cstring>
-                        </property>
-                        <property name="text">
-                            <string>Author Decay (#songs)</string>
-                        </property>
-                    </widget>
-                    <widget class="QSpinBox" row="4" column="2">
-                        <property name="name">
-                            <cstring>authorDecay</cstring>
-                        </property>
-                        <property name="maxValue">
-                            <number>100</number>
-                        </property>
-                        <property name="minValue">
-                            <number>1</number>
-                        </property>
-                        <property name="value">
-                            <number>6</number>
-                        </property>
-                    </widget>
-                    <widget class="QPushButton" row="2" column="1" rowspan="1" colspan="2">
+                    <widget class="QPushButton" row="3" column="1" rowspan="1" colspan="2">
                         <property name="name">
                             <cstring>colorUnavailableSong</cstring>
                         </property>
@@ -1584,40 +1123,18 @@
                             <bool>true</bool>
                         </property>
                     </widget>
-                    <widget class="QLabel" row="2" column="0">
+                    <widget class="QPushButton" row="2" column="1" rowspan="1" colspan="2">
                         <property name="name">
-                            <cstring>textLabel1_5_3</cstring>
-                        </property>
-                        <property name="enabled">
-                            <bool>true</bool>
-                        </property>
-                        <property name="text">
-                            <string>Color of unavailable songs</string>
-                        </property>
-                    </widget>
-                    <widget class="QLabel" row="3" column="0">
-                        <property name="name">
-                            <cstring>textLabel1_5_3_2</cstring>
-                        </property>
-                        <property name="enabled">
-                            <bool>true</bool>
-                        </property>
-                        <property name="text">
-                            <string>Color of unchecked songs</string>
-                        </property>
-                    </widget>
-                    <widget class="QPushButton" row="3" column="1" rowspan="1" colspan="2">
-                        <property name="name">
-                            <cstring>colorUncheckedSong</cstring>
+                            <cstring>colorAlltimePlaycount</cstring>
                         </property>
                         <property name="enabled">
                             <bool>true</bool>
                         </property>
                         <property name="paletteBackgroundColor">
                             <color>
-                                <red>202</red>
-                                <green>202</green>
-                                <blue>202</blue>
+                                <red>0</red>
+                                <green>0</green>
+                                <blue>255</blue>
                             </color>
                         </property>
                         <property name="text">
@@ -1625,6 +1142,28 @@
                         </property>
                         <property name="flat">
                             <bool>true</bool>
+                        </property>
+                    </widget>
+                    <widget class="QLabel" row="1" column="0">
+                        <property name="name">
+                            <cstring>textLabel1_5</cstring>
+                        </property>
+                        <property name="enabled">
+                            <bool>true</bool>
+                        </property>
+                        <property name="text">
+                            <string>Color of already played authors</string>
+                        </property>
+                    </widget>
+                    <widget class="QLabel" row="2" column="0">
+                        <property name="name">
+                            <cstring>textLabel1_5_4</cstring>
+                        </property>
+                        <property name="enabled">
+                            <bool>true</bool>
+                        </property>
+                        <property name="text">
+                            <string>Alltime playcount color</string>
                         </property>
                     </widget>
                 </grid>
@@ -2017,6 +1556,12 @@
         <slot>reject()</slot>
     </connection>
     <connection>
+        <sender>colorAlltimePlaycount</sender>
+        <signal>clicked()</signal>
+        <receiver>PreferencesDialog</receiver>
+        <slot>modifyAlltimeColor()</slot>
+    </connection>
+    <connection>
         <sender>colorPlayedAuthor</sender>
         <signal>clicked()</signal>
         <receiver>PreferencesDialog</receiver>
@@ -2077,6 +1622,12 @@
         <slot>setText(const QString&amp;)</slot>
     </connection>
     <connection>
+        <sender>comboBox6</sender>
+        <signal>activated(const QString&amp;)</signal>
+        <receiver>mixerCommand</receiver>
+        <slot>setText(const QString&amp;)</slot>
+    </connection>
+    <connection>
         <sender>greenTimeColor</sender>
         <signal>clicked()</signal>
         <receiver>PreferencesDialog</receiver>
@@ -2095,78 +1646,6 @@
         <slot>installRemotes()</slot>
     </connection>
     <connection>
-        <sender>pushButton3</sender>
-        <signal>clicked()</signal>
-        <receiver>PreferencesDialog</receiver>
-        <slot>createPlayerOne()</slot>
-    </connection>
-    <connection>
-        <sender>pushButton4</sender>
-        <signal>clicked()</signal>
-        <receiver>PreferencesDialog</receiver>
-        <slot>createPlayerTwo()</slot>
-    </connection>
-    <connection>
-        <sender>pushButton5</sender>
-        <signal>clicked()</signal>
-        <receiver>PreferencesDialog</receiver>
-        <slot>createPlayerThree()</slot>
-    </connection>
-    <connection>
-        <sender>pushButton6</sender>
-        <signal>clicked()</signal>
-        <receiver>PreferencesDialog</receiver>
-        <slot>createPlayerFour()</slot>
-    </connection>
-    <connection>
-        <sender>pushButton69</sender>
-        <signal>clicked()</signal>
-        <receiver>PreferencesDialog</receiver>
-        <slot>createAnal1()</slot>
-    </connection>
-    <connection>
-        <sender>pushButton69_2</sender>
-        <signal>clicked()</signal>
-        <receiver>PreferencesDialog</receiver>
-        <slot>createAnal2()</slot>
-    </connection>
-    <connection>
-        <sender>pushButton69_2_2</sender>
-        <signal>clicked()</signal>
-        <receiver>PreferencesDialog</receiver>
-        <slot>createAnal3()</slot>
-    </connection>
-    <connection>
-        <sender>pushButton69_2_3</sender>
-        <signal>clicked()</signal>
-        <receiver>PreferencesDialog</receiver>
-        <slot>createAnal4()</slot>
-    </connection>
-    <connection>
-        <sender>pushButton69_2_3_2</sender>
-        <signal>clicked()</signal>
-        <receiver>PreferencesDialog</receiver>
-        <slot>createAnal5()</slot>
-    </connection>
-    <connection>
-        <sender>pushButton69_2_3_2_2</sender>
-        <signal>clicked()</signal>
-        <receiver>PreferencesDialog</receiver>
-        <slot>createAnal6()</slot>
-    </connection>
-    <connection>
-        <sender>pushButton69_2_3_2_2_2</sender>
-        <signal>clicked()</signal>
-        <receiver>PreferencesDialog</receiver>
-        <slot>createAnal8()</slot>
-    </connection>
-    <connection>
-        <sender>pushButton69_2_3_2_3</sender>
-        <signal>clicked()</signal>
-        <receiver>PreferencesDialog</receiver>
-        <slot>createAnal7()</slot>
-    </connection>
-    <connection>
         <sender>pushButton74</sender>
         <signal>clicked()</signal>
         <receiver>PreferencesDialog</receiver>
@@ -2181,7 +1660,7 @@
     <connection>
         <sender>subtabs</sender>
         <signal>highlighted(int)</signal>
-        <receiver>widgetStack3</receiver>
+        <receiver>widgetStack</receiver>
         <slot>raiseWidget(int)</slot>
     </connection>
     <connection>
@@ -2189,78 +1668,6 @@
         <signal>clicked()</signal>
         <receiver>PreferencesDialog</receiver>
         <slot>modifyYellowTime()</slot>
-    </connection>
-    <connection>
-        <sender>configure1</sender>
-        <signal>clicked()</signal>
-        <receiver>PreferencesDialog</receiver>
-        <slot>setupAnal1()</slot>
-    </connection>
-    <connection>
-        <sender>configure2</sender>
-        <signal>clicked()</signal>
-        <receiver>PreferencesDialog</receiver>
-        <slot>setupAnal2()</slot>
-    </connection>
-    <connection>
-        <sender>configure3</sender>
-        <signal>clicked()</signal>
-        <receiver>PreferencesDialog</receiver>
-        <slot>setupAnal3()</slot>
-    </connection>
-    <connection>
-        <sender>configure4</sender>
-        <signal>clicked()</signal>
-        <receiver>PreferencesDialog</receiver>
-        <slot>setupAnal4()</slot>
-    </connection>
-    <connection>
-        <sender>configure5</sender>
-        <signal>clicked()</signal>
-        <receiver>PreferencesDialog</receiver>
-        <slot>setupAnal5()</slot>
-    </connection>
-    <connection>
-        <sender>configure6</sender>
-        <signal>clicked()</signal>
-        <receiver>PreferencesDialog</receiver>
-        <slot>setupAnal6()</slot>
-    </connection>
-    <connection>
-        <sender>configure8</sender>
-        <signal>clicked()</signal>
-        <receiver>PreferencesDialog</receiver>
-        <slot>setupAnal8()</slot>
-    </connection>
-    <connection>
-        <sender>configure7</sender>
-        <signal>clicked()</signal>
-        <receiver>PreferencesDialog</receiver>
-        <slot>setupAnal7()</slot>
-    </connection>
-    <connection>
-        <sender>configureP1</sender>
-        <signal>clicked()</signal>
-        <receiver>PreferencesDialog</receiver>
-        <slot>setupPlayer1()</slot>
-    </connection>
-    <connection>
-        <sender>configureP2</sender>
-        <signal>clicked()</signal>
-        <receiver>PreferencesDialog</receiver>
-        <slot>setupPlayer2()</slot>
-    </connection>
-    <connection>
-        <sender>configureP3</sender>
-        <signal>clicked()</signal>
-        <receiver>PreferencesDialog</receiver>
-        <slot>setupPlayer3()</slot>
-    </connection>
-    <connection>
-        <sender>configureP4</sender>
-        <signal>clicked()</signal>
-        <receiver>PreferencesDialog</receiver>
-        <slot>setupPlayer4()</slot>
     </connection>
 </connections>
 <tabstops>
@@ -2306,9 +1713,10 @@
     <slot>setupPlayer2()</slot>
     <slot>setupPlayer3()</slot>
     <slot>setupPlayer4()</slot>
+    <slot>modifyAlltimeColor()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 <includehints>
-    <includehint>metricwidget.h</includehint>
+    <includehint>metric-widget.h</includehint>
 </includehints>
 </UI>

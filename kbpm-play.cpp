@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -58,9 +58,10 @@
 #include "player-core.h"
 #include "scripts.h"
 #include "signals-template.cpp"
-#include "histogram-property.cpp"
-#include "smallhistogram-type.cpp"
+#include "histogram-property.h"
+#include "smallhistogram-type.h"
 #include "kbpm-play.h"
+#include "capacity-checker.h"
 
 /*-------------------------------------------
  *         Templates we need
@@ -121,6 +122,7 @@ static bool   opt_remote = false;
 static char * arg_remote = "";
 static bool   opt_setup = false;
        char * arg_config = "";
+       bool   opt_check = false;
 PlayerConfig* config;
 
 /*-------------------------------------------
@@ -153,7 +155,7 @@ void options_failure(char* err)
 	 "               --rythm               obtain rythm information\n"
 	 "   -e          --energy              measure energy levels\n"
 	 "   argument                          the index file of the song to handle\n\n%s\n\n",err);
-  exit(1);
+  _exit(1);
 }
 
 #define next_arg if (++i>=argc) options_failure("missing argument to last option");
@@ -230,13 +232,13 @@ void process_options(int argc, char* argv[])
 	      if (strcmp(argv[i],VERSION)!=0)
 		{
 		  char err[5000];
-		  sprintf(err,"version mismatch\nkbpm-play is version "VERSION
-			  "\nkbpm-dj is version %s",argv[i]);
+		  sprintf(err,"version mismatch\nkbpm-play (%s) is version "VERSION
+			  "\nkbpm-dj is version %s",arg_config,argv[i]);
 		  options_failure(err);
-		  exit(1);
+		  _exit(1);
 		}
-	      exit(0);
-	    } 
+	      opt_check=true;
+	    }
 	  else if (option(arg,"match","m"))
 	    { 
 	      opt_match=true;
@@ -274,10 +276,13 @@ void process_options(int argc, char* argv[])
 	{
 	  dsp = dsp_driver::get_driver(config);
 	  if (dsp->is_none())
-	    QMessageBox::information(NULL, "DSP Driver Selection",
-				     "No DSP driver has been selected. Go to the\n"
-				     "options tab and select an appropriate one.",
-				     QMessageBox::Ok,QMessageBox::NoButton);
+	    {
+	      if (!opt_check)
+		QMessageBox::information(NULL, "DSP Driver Selection",
+					 "No DSP driver has been selected. Go to the\n"
+					 "options tab and select an appropriate one.",
+					 QMessageBox::Ok,QMessageBox::NoButton);
+	    }
 	}
       
       // initialize the dsp now
@@ -319,6 +324,7 @@ bool show_error(int err, int err2, const char*text)
 void setup_start()
 {
   playing = NULL;
+  check_capacities();
   player_window = new SongPlayerLogic();
   app->setMainWidget(player_window);
   player_window->tab->setCurrentPage(TAB_OPTIONS);
@@ -333,9 +339,11 @@ void setup_start()
 void normal_start()
 {
   int err = core_meta_init();
-  if (show_error(err, err_needidx, "Please enter the index file, not the "SONG_EXT" file\nAn index file can be made with 'kbpm-play -c'\n"
+  if (show_error(err, err_needidx, 
+		 "Please enter the index file, not the "SONG_EXT
+		 " file\nAn index file can be made with 'kbpm-play -c'\n"
 		 "The argument you passed was "+QString(argument)))
-    exit(err);
+    _exit(err);
   player_window = new SongPlayerLogic();
   app->setMainWidget(player_window);
   player_window->show();
@@ -346,19 +354,47 @@ void normal_start()
   delete(player_window);
 }
 
+
+/**
+ * When checking the player we automatically check 
+ * which players are available and check this with the player
+ * configuration...
+ */
+void check_start()
+{
+  int err = core_meta_init();
+  assert(err!=err_needidx);
+  check_capacities();
+  // do we have unavailable capacities that are enabled (!disabled)
+  if (unavailable_capacities & ~config->get_disabled_capacities())
+    {
+      const QString a=QString("Mismatched capacities");
+      const QString b=QString("The enabled capacities include at least one capacity\n"
+			      "that cannot be found on this machine (")+arg_config+")";
+      QMessageBox::critical(NULL,a,b,QMessageBox::Ok,0,0);
+      _exit(10);
+    }
+  player_window = new SongPlayerLogic();
+  app->setMainWidget(player_window);
+  player_window->showMinimized();
+  app->postEvent(player_window,new QCustomEvent(InitAndStart));
+  app->exec();
+  delete(player_window);
+}
+
 void batch_start()
 {
   int nr=0;
   // 0. core init: synchronous without opening dsp
   core_meta_init();
   core_object_init(true);
-  Info("%d. Wave written: %s",nr++,playing->readable_description());
+  Info("%d. Wave written: %s",nr++,(const char*)playing->readable_description());
   // 1. md5sum
   if (!playing->get_md5sum() || strcmp(playing->get_md5sum(),"")==0)
     {
       Md5Analyzer * md5_analyzer = new Md5Analyzer();
       md5_analyzer->run();
-      Info("%d. Md5 sum: %s",nr++,playing->get_md5sum());
+      Info("%d. Md5 sum: %s",nr++,(const char*)playing->get_md5sum());
     }
   // 2. energy levels
   if (!playing->fully_defined_energy() || opt_energy)
@@ -379,15 +415,22 @@ void batch_start()
   // 3. bpm
   if (opt_bpm)
     {
-      BpmAnalyzerDialog *counter = new BpmAnalyzerDialog();
-      counter->setBpmBounds(arg_low,arg_high);
-      if (arg_bpm==2) counter->ultraLongFFT->setChecked(true);
-      else if (arg_bpm==3) counter->enveloppeSpectrum->setChecked(true);
-      else if (arg_bpm==4) counter->fullAutoCorrelation->setChecked(true);
-      else if (arg_bpm==5) counter->weightedEnvCor->setChecked(true);
-      counter->run();
-      counter->finish();
-      Info("%d. Bpm count: %s",nr++,playing->get_tempo().get_charstr());
+      if (playing->get_time_in_seconds()<760)
+	{
+	  BpmAnalyzerDialog *counter = new BpmAnalyzerDialog();
+	  counter->setBpmBounds(arg_low,arg_high);
+	  if (arg_bpm==2) counter->ultraLongFFT->setChecked(true);
+	  else if (arg_bpm==3) counter->enveloppeSpectrum->setChecked(true);
+	  else if (arg_bpm==4) counter->fullAutoCorrelation->setChecked(true);
+	  else if (arg_bpm==5) counter->weightedEnvCor->setChecked(true);
+	  counter->run();
+	  counter->finish();
+	  Info("%d. Bpm count: %s",nr++,playing->get_tempo().get_charstr());
+	}
+      else
+	{
+	  Info("%d. Bpm count skipped because song is longer than 760s",nr++);
+	}
     }
   // 4. spectrum
   if (opt_color)
@@ -396,39 +439,23 @@ void batch_start()
       counter->fetchSpectrum();
       Info("%d. Spectrum / Echo",nr++);
     }
-  // 5. spectrum
+  // 5. rythm
   if (opt_rythm)
     {
-      RythmDialogLogic *r = new RythmDialogLogic();
-      r->calculate();
-      Info("%d. Rythm",nr++);
+      if (playing->get_time_in_seconds()<760)
+	{
+	  RythmDialogLogic *r = new RythmDialogLogic();
+	  r->calculate();
+	  Info("%d. Rythm",nr++);
+	}
+      else
+	{
+	  Info("%d. Bpm count skipped because song is longer than 760s",nr++);
+	}
     }
   // 99. finish the core -> remove the raw file
   core_done();
 }
-
-// The escaping necessary for ssh to work is ridicoulous..
-// An ordinary containement within " ... " does not work, so we must
-// escape every character on its own. Especially the & is important
-// because this spawns a background procses.
-char * escape(char * in)
-{
-  char escaped[2048];
-  int c;
-  int i=0;
-  while((c=*(in++)) && i < 2048)
-    {
-      if (c=='\n' || c=='&' || c=='\\' || c==' ' || c=='(' || c==')' || c=='\'')
-	{
-	  escaped[i++]='\\';
-	}
-      escaped[i++]=c;
-    }
-  assert(i<2048);
-  escaped[i]=0;
-  return strdup(escaped);
-}
-
 
 bool to_remote(char* filename)
 {
@@ -453,7 +480,7 @@ int remote(int argc, char* argv[])
     {
       Index * toplay = new Index(argument);
       Remote("Uploading song & index file");
-      sprintf(mp3,"./music/%s",toplay->get_filename());
+      sprintf(mp3,"./music/%s",(const char*)toplay->get_filename());
       if (!to_remote(mp3)) return 1;
       if (!to_remote(argument)) return 2;
       if (opt_match && strcmp(arg_match,argument)) if (!to_remote(arg_match)) return 3;
@@ -480,32 +507,21 @@ int remote(int argc, char* argv[])
 
 int main(int argc, char *argv[])
 {
+  init_embedded_files();
+
   app = new QApplication(argc,argv);
   process_options(argc,argv);
   if (opt_remote)
     _exit(remote(argc,argv));
-  // if we need to create an index file we'll make it.
   if (opt_create)
     {
-      char newname[500];
-      strcpy(newname,argument);
-      int len = strlen(newname);
-      if (len>=4 && newname[len-4]=='.')
-	strcpy(newname+len-3,"idx");
-      else
-	options_failure("Sorry, song must end on either " SONG_EXT);
-      // create index and write it..
-      Index *index = new Index();
-      index->set_filename(strdup(argument));
-      index->set_tags(strdup("New"));
-      index->set_period(-1);
-      index->set_changed();
-      index->write_idx(newname);
+      Index *index = createNewIndexFor(argument,"./");
+      argument = strdup(index->get_storedin());
       delete(index);
-      argument = strdup(newname);
     }
-  
-  if (opt_batch)
+  if (opt_check)
+    check_start();
+  else if (opt_batch)
     batch_start();
   else if (opt_setup)
     setup_start();

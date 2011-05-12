@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -17,8 +17,10 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
+#include <qlayout.h>
 #include <qlineedit.h>
 #include <qcheckbox.h>
+#include <qwidgetstack.h>
 #include <qmessagebox.h>
 #include <qtextedit.h>
 #include <qcolordialog.h>
@@ -32,62 +34,30 @@
 #include "preferences.logic.h"
 #include "scripts.h"
 #include "common.h"
-#include "playercommandwizard.h"
-#include "analcommandwizard.h"
 #include "installbpmplay.h"
+#include "config.h"
 
 PreferencesLogic::PreferencesLogic(QWidget*parent,const char*name, bool modal, WFlags f):
   PreferencesDialog(parent,name,modal,f)
 {
+  QWidget * w = widgetStack->widget(2);
+  for(int i = 0 ; i < 8; i ++)
+    analyzerStack->add(new SongProcPrefView(w,Config::analyzers[i])); 
+  w = widgetStack->widget(0);
+  for(int i = 0 ; i < 4 ; i++)
+    playerStack->add(new SongProcPrefView(w,Config::players[i]));
 }
-
-void PreferencesLogic::createPlayerOne()
-{
-  QString command = getCommand("player1");
-  if (command.isNull()) return;
-  playerCommand1->setText(command);
-}
-
-void PreferencesLogic::createPlayerTwo()
-{
-  QString command = getCommand("player2");
-  if (command.isNull()) return;
-  playerCommand2->setText(command);
-}
-
-void PreferencesLogic::createPlayerThree()
-{
-  QString command = getCommand("player3");
-  if (command.isNull()) return;
-  playerCommand3->setText(command);
-}
-
-void PreferencesLogic::createPlayerFour()
-{
-  QString command = getCommand("player4");
-  if (command.isNull()) return;
-  playerCommand4->setText(command);
-}
-
-#define ANAL(XX) void PreferencesLogic::createAnal##XX() { \
-  QString command = getAnal("analyzer"#XX); \
-  if (command.isEmpty()) return; \
-  analyzerCommand##XX->setText(command); }
-ANAL(1);
-ANAL(2);
-ANAL(3);
-ANAL(4);
-ANAL(5);
-ANAL(6);
-ANAL(7);
-ANAL(8);
-#undef ANAL
 
 void PreferencesLogic::fixColorOf(QWidget *p)
 {
   QColor c = p->paletteBackgroundColor();
   c = QColorDialog::getColor(c,this);
   p->setPaletteBackgroundColor(c);
+}
+
+void PreferencesLogic::modifyAlltimeColor()
+{
+  fixColorOf(colorAlltimePlaycount);
 }
 
 void PreferencesLogic::modifyTempo44Color()
@@ -155,68 +125,40 @@ void PreferencesLogic::modifydColorCol()
   fixColorOf(colordColorCol);
 }
 
-QString PreferencesLogic::getCommand(QString name_suggestion)
-{
-  PlayerCommandWizard commandCreator(NULL,NULL,TRUE);
-  commandCreator.player_name->setText(name_suggestion);
-  
-  if (commandCreator.exec()!=QDialog::Accepted)
-    return "";
-  
-  // xmms player
-  if (commandCreator.xmms->isChecked())
-    return "xmms-play \"%s\" -m \"%s\"";
-  
-  // the common options
-  QString options = "kbpm-play ";
-  if (!commandCreator.remote->text().isEmpty())
-    options += "--remote "+commandCreator.remote->text()+" ";
-  options += "--config "+commandCreator.player_name->text();
-
-  if (commandCreator.verbose->isChecked() 
-      && !commandCreator.none->isChecked())
-    options+="-v ";
-  
-  // creation of the command line
-  options+=" -m \"%s\" \"%s\"";
-  return options;
-}
-
-QString PreferencesLogic::getAnal(QString name_suggestion)
-{
-  AnalyzerCommandWizard commandCreator(NULL,NULL,TRUE);
-  commandCreator.player_name->setText(name_suggestion);
-  
-  if (commandCreator.exec()!=QDialog::Accepted)
-    return "";
-  
-  // the common options
-  QString options = "kbpm-play ";
-  if (!commandCreator.remote->text().isEmpty())
-    options += "--remote "+commandCreator.remote->text()+" ";
-  options += "--config "+commandCreator.player_name->text();
-  
-  // creation of the command line
-  options+=" ";
-  return options;
-}
-
 void PreferencesLogic::copyProgramTo(QString program, QString host, InstallBpmPlay * dialog)
 {
   QString command = QString("scp -B ")+program+" "+host+":";
+  QString makeexec = QString("ssh ")+host+" chmod +rx kbpm-play bpmdj-raw";
+
   dialog->output->setBold(true);
   dialog->output->setColor(QColor(255,0,0));
   dialog->output->append(host+"\n");
   dialog->output->setColor(QColor(0,0,0));
+  dialog->output->setBold(true);
   dialog->output->append(QString("$ ")+command+"\n");
   dialog->output->setBold(false);
   app->processEvents();
+
   QFile log("install.log");
   log.open(IO_WriteOnly);
   log.close();
   execute(command+" >>install.log 2>>install.log");
   log.open(IO_ReadOnly);
   QString log_line;
+  while(log.readLine(log_line,5000)>=0)
+    dialog->output->append(log_line);
+  log.close();
+
+  dialog->output->setBold(true);
+  dialog->output->append(QString("$ ")+makeexec+"\n");
+  dialog->output->setBold(false);
+
+  log.open(IO_WriteOnly);
+  log.close();
+  
+  execute(makeexec+" >>install.log 2>>install.log");
+  
+  log.open(IO_ReadOnly);
   while(log.readLine(log_line,5000)>=0)
     dialog->output->append(log_line);
   log.close();
@@ -252,7 +194,8 @@ void PreferencesLogic::installRemotes(InstallBpmPlay * dialog)
     {
       QListViewItem *i = *it;
       QString host = i -> text(0);
-      copyProgramTo(location_kbpmplay+" "+location_bpmdjraw,host,dialog);
+      QString program_files = location_kbpmplay+" "+location_bpmdjraw;
+      copyProgramTo(program_files,host,dialog);
       it++;
     }
   
@@ -269,72 +212,26 @@ void PreferencesLogic::installRemotes(InstallBpmPlay * dialog)
 void PreferencesLogic::installRemotes()
 {
   InstallBpmPlay dialog;
-  QString command;
-#define PLAYER(XX) command = getHostFor(playerCommand##XX ->text()); \
-  if(!command.isEmpty() && !dialog.hosts->findItem(command,0)) \
-    new QListViewItem(dialog.hosts,command);
-PLAYER(1);
-PLAYER(2);
-PLAYER(3);
-PLAYER(4);
-#undef PLAYER
-
-#define ANAL(XX) command = getHostFor(analyzerCommand##XX ->text()); \
-  if(!command.isEmpty() && !dialog.hosts->findItem(command,0)) \
-    new QListViewItem(dialog.hosts,command);
-ANAL(1);
-ANAL(2);
-ANAL(3);
-ANAL(4);
-ANAL(5);
-ANAL(6);
-ANAL(7);
-ANAL(8);
-#undef ANAL
- if (dialog.hosts->childCount()==0)
-   {
-     QMessageBox::message("Install","Install is only necessary for remote players\n"
-			  "There seem to be no remote players present.\n");
-     return;
-   }
- installRemotes(&dialog);
- dialog.exec();
+  QString remote;
+  for(int i = 0 ; i < 4; i++)
+    {
+      remote = Config::players[i].getRemote();
+      if(!remote.isEmpty() && !dialog.hosts->findItem(remote,0)) 
+	new QListViewItem(dialog.hosts,remote);
+    }
+  for(int i = 0 ; i < 8; i++)
+    {
+      remote = Config::analyzers[i].getRemote();
+      if(!remote.isEmpty() && !dialog.hosts->findItem(remote,0)) 
+	new QListViewItem(dialog.hosts,remote);
+    }
+  if (dialog.hosts->childCount()==0)
+    {
+      QMessageBox::message("Install","Install is only necessary for remote players\n"
+			   "There seem to be no remote players present.\n");
+      return;
+    }
+  installRemotes(&dialog);
+  dialog.exec();
 };
 
-
-QString PreferencesLogic::getHostFor(QString command)
-{
-  int idx = command.find("--remote ");
-  if (idx<0) return "";
-  QString host = command.mid(idx+QString("--remote ").length());
-  host = host.stripWhiteSpace();
-  idx = host.find(' ');
-  if (idx) host=host.left(idx);
-  host = host.stripWhiteSpace();
-  return host;
-}
-
-#define PLAYER(XX) void PreferencesLogic::setupPlayer##XX () { \
-  setup(playerCommand##XX ->text()); }
-#define ANAL(XX) void PreferencesLogic::setupAnal##XX () { \
-  setup(analyzerCommand##XX ->text()); }
-PLAYER(1);
-PLAYER(2);
-PLAYER(3);
-PLAYER(4);
-ANAL(1);
-ANAL(2);
-ANAL(3);
-ANAL(4);
-ANAL(5);
-ANAL(6);
-ANAL(7);
-ANAL(8);
-#undef ANAL
-#undef PLAYER
-
-void PreferencesLogic::setup(QString commandline)
-{
-  commandline+=" --setup";
-  spawn(commandline);
-}

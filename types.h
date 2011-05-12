@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@
 #ifndef TYPES_BH
 #define TYPES_BH
 
-#include "basic-types.h"
 #include "tempo-type.h"
 #include "period-type.h"
 #include "stereo-sample2.h"

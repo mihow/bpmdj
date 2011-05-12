@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -68,7 +68,7 @@ class Song: public Point
  private:
   void  init(const QString fullname, bool checkondisk);
   void  clearFloatingFields();
- public: 
+ public:
   QString  tempo_str();
  public:
   Song();
@@ -77,7 +77,6 @@ class Song: public Point
   void refill(Index &read, bool allowed_to_write=false);
   void reread();
   bool has_all_cluster_fields();
-  void realize();
   void checkondisk();
   void setColor(QColor c);
   QString getDisplayTitle();
@@ -95,6 +94,14 @@ class Song: public Point
   virtual void color_sub_elements(int a, int b, float d);
   virtual ~Song();
   bool    modifiedOnDisk();
+
+  bool needs_energy() const { return  !get_power().fully_defined(); };
+  bool needs_tempo() const { return !get_tempo().valid(); };
+  bool needs_spectrum() const { return get_spectrum()==no_spectrum; };
+  bool needs_echo() const { return get_histogram().empty(); };
+  bool needs_rythm() const { return get_rythm().empty(); };
+  bool needs_composition() const { return get_composition().empty(); };
+  bool needs_analysis();
 };
 
 #endif

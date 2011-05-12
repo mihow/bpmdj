@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 #include <math.h>
 #include "dirscanner.h"
 #include "common.h"
-#include "basic-types.h"
+#include "memory.h"
 
 void common_init()
 {
@@ -33,33 +33,6 @@ void common_init()
    assert(sizeof(signed8)==8);
    assert(sizeof(float8)==8);
    assert(sizeof(float4)==4);
-}
-
-bool strxeq(const char* a, const char* b)
-{
-  if (a==NULL || !*a)
-    return (b==NULL || !*b);
-  if (b==NULL || !*b)
-    return false;
-  return strcmp(a,b)==0;
-}
-
-char* findUniqueName(const char* filename)
-{
-  char indexname[500];
-  char *temp;
-  char halfindexname[500];
-  temp=strdup(basename(strdup(filename)));
-  temp[strlen(temp)-4]=0;
-  sprintf(halfindexname,"%s.idx",temp);
-  sprintf(indexname,"./index/%s.idx",temp);
-  int nr=2;
-  while(exists(indexname))
-    {
-      sprintf(halfindexname,"%s%d.idx",temp,nr);
-      sprintf(indexname,"./index/%s%d.idx",temp,nr++);
-    }
-  return strdup(indexname);
 }
 
 bool exists(const char* fn)
@@ -123,5 +96,18 @@ long toint(const char* name)
       else assert(0);
     }
   return result;
+}
+
+QString readable(unsigned8 L)
+{
+  if (L < 1024) return QString::number(L)+" bytes";
+  L/=1024;
+  if (L < 1024) return QString::number(L)+" kilobytes";
+  L/=1024;
+  if (L < 1024) return QString::number(L)+" megabytes";
+  L/=1024;
+  if (L < 1024) return QString::number(L)+" gigabytes";
+  L/=1024;
+  return QString::number(L)+" terrabytes";
 }
 

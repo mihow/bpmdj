@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -49,11 +49,11 @@ void Song::refill(Index &reader, bool allowed_to_write)
   set_tags(Tags::parse_tags(reader.get_tags()));
   set_time(QStringFactory::create(reader.get_time()));
   set_md5sum(QStringFactory::create(reader.get_md5sum()));
-  if (get_spectrum()!=no_spectrum) deallocate(get_spectrum());
+  if (get_spectrum()!=no_spectrum) bpmdj_deallocate(get_spectrum());
   set_spectrum(reader.get_spectrum());
   set_title(QStringFactory::create(reader.get_display_title()));
-  set_author(QStringFactory::create(reader.get_display_author()));
-  set_version(QStringFactory::create(reader.get_display_version()));
+  set_author(QStringFactory::create(reader.get_author()));
+  set_version(QStringFactory::create(reader.get_version()));
   set_albums(reader.copy_albums());
   set_min_amp(reader.get_min());
   set_max_amp(reader.get_max());
@@ -82,7 +82,16 @@ void Song::checkondisk()
 {
   QString songfilename = MusicDir + "/" + get_file();
   // printf("Checking ondisk of %s",(const char*)songfilename);
-  set_ondisk(exists(songfilename));
+  FILE * f = fopen(songfilename,"rb");
+  if (f)
+    {
+      set_ondisk(true);
+      //      fseek(f,0,SEEK_END);
+      //      total_music_body+=(unsigned8)ftell(f);
+      fclose(f);
+    }
+  else
+    set_ondisk(false);
   set_ondisk_checked(true);
 }
 
@@ -152,27 +161,6 @@ void Song::reread()
 {
   Index reader((const char*)get_storedin());
   refill(reader);
-}
-
-
-void Song::realize()
-{
-  // hier creeeren we een nieuwe index file omdat kbpm-play enkel met index files overweg kan
-  // Dit vereist natuurlijk een unieke naam
-  if (get_storedin().endsWith(".bib"))
-    {
-      Index transfer(get_storedin());
-      char * proposal = transfer.readable_description();
-      char fullprop[500];
-      sprintf(fullprop,"%s.idx",proposal);
-      char * uniquename = findUniqueName(fullprop);
-      // printf("Debug: realizing song %s as %s\n",proposal, uniquename);
-      set_storedin(uniquename);
-      transfer.nolonger_inbib();
-      transfer.write_idx(get_storedin());
-      deallocate(uniquename);
-      deallocate(proposal);
-    }
 }
 
 void Song::setColor(QColor transfer)
@@ -281,8 +269,8 @@ bool Song::get_distance_to_main(float limit)
 {
   set_color_distance(2);
   if (get_spectrum()!=no_spectrum)
-    if (ProcessManager::playingInMain())
-      set_color_distance(SongMetriek::std.distance(*this, *ProcessManager::playingInMain(),limit));
+    if (::main_song)
+      set_color_distance(SongMetriek::std.distance(*this, *::main_song,limit));
   if (get_color_distance()>1.0)
     set_distance_string(QString::null);
   else
@@ -308,3 +296,14 @@ QString Song::tempo_str()
 {
   return get_tempo().qstring();
 }
+
+bool Song::needs_analysis()
+{
+  return needs_energy()
+    || needs_tempo()
+    || needs_spectrum()
+    || needs_echo()
+    || needs_rythm()
+    || needs_composition();
+}
+

@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -93,13 +93,13 @@ void BeatGraphAnalyzer::readFileSigned()
   long newaudiosize=fsize(raw)/4;
   if (newaudiosize!=audiosize)
     {
-      if (signed_data) deallocate(signed_data);
-      if (data) deallocate(data);
+      if (signed_data) bpmdj_deallocate(signed_data);
+      if (data) bpmdj_deallocate(data);
       if (bank) 
 	{
 	  for(int i = 0 ; i <= maxslice ; i++)
-	    deallocate(bank[i]);
-	  deallocate(bank);
+	    bpmdj_deallocate(bank[i]);
+	  bpmdj_deallocate(bank);
 	}
       signed_data = NULL;
       data = NULL;
@@ -111,7 +111,7 @@ void BeatGraphAnalyzer::readFileSigned()
       fclose(raw);
       return;
     };
-  signed_data = allocate(audiosize/COLLAPSE,uncompressed);
+  signed_data = bpmdj_allocate(audiosize/COLLAPSE,uncompressed);
   
   signed4 pos = 0;
   fseek(raw,pos,SEEK_SET);
@@ -226,15 +226,15 @@ void BeatGraphAnalyzer::calculateEnergy()
   if (data) return;
   // unsigned4 collapsed_period = period  / COLLAPSE ;
   unsigned4 collapsed_size = audiosize / COLLAPSE ;
-  data = allocate(collapsed_size,compressed);
+  data = bpmdj_allocate(collapsed_size,compressed);
   
   unsigned fs = 256;  //  fs = collapsed_period / 16;
   double me = 0;
-  array(bt,collapsed_size,float);
+  bpmdj_array(bt,collapsed_size,float);
   for(unsigned4 i = 0 ; i < collapsed_size ; i++)
     bt[i]=0;
   // we take the mean of everything
-  array(rr,fs,float);
+  bpmdj_array(rr,fs,float);
   for(unsigned4 i = 0 ; i < fs ; i++)
     rr[i]=0;
   double S = 0;
@@ -257,26 +257,26 @@ void BeatGraphAnalyzer::calculateEnergy()
       bt[x>=fs ? x - fs : 0 ] = R;
       if (R>me) me=R;
     }
-  deallocate(rr);
+  bpmdj_deallocate(rr);
   
   for(unsigned4 x = 0 ; x < collapsed_size ; x ++)
     data[x]=(unsigned1)(bt[x]*255.0/me);
   
   // now we have the joy to run through the entire set and select the first maximas
   /*  int cs = collapsed_period / 4;
-  printf("ms\tintensity\n---in steps of %d-----------\n",cs);
-  for(unsigned4 x = 0 ; x < collapsed_size - cs ; x += cs)
-    {
+      printf("ms\tintensity\n---in steps of %d-----------\n",cs);
+      for(unsigned4 x = 0 ; x < collapsed_size - cs ; x += cs)
+      {
       int z = x+cs-1;
       double m = bt[z];
       for(int y = cs - 1 ; y >= 0 ; y--)
-	if (bt[x+y]>=m) 
-	  m=bt[z=x+y];
+      if (bt[x+y]>=m) 
+      m=bt[z=x+y];
       for(int y = 0 ; y < 100 ; y++)
-	data[z+y]=(100-y)*255/100;
+      data[z+y]=(100-y)*255/100;
       printf("%g\t%g\n",(double)z*((double)COLLAPSE*1000.0/(double)WAVRATE),bt[z]/me);
       }*/
-  deallocate(bt);
+  bpmdj_deallocate(bt);
 }
 
 void BeatGraphAnalyzer::calculateHaar()
@@ -286,8 +286,8 @@ void BeatGraphAnalyzer::calculateHaar()
   // First we calculate a number of layers, based on the audio-stream...
   // In every step we will modify the signed_data set by subtracting the
   // current mean...
-  bank = allocate(maxslice+1,float*);
-  array(bank_energy,maxslice+1,double);
+  bank = bpmdj_allocate(maxslice+1,float*);
+  bpmdj_array(bank_energy,maxslice+1,double);
   bool power = false;
   for(int filter = maxslice ; filter >= 0 ; filter --)
     {
@@ -295,17 +295,17 @@ void BeatGraphAnalyzer::calculateHaar()
       int window_size = 1 << filter;
       int haar_size = collapsed_size / window_size;
       float * filtered = NULL;
-      filtered = bank[filter] = allocate(haar_size+1, float);
+      filtered = bank[filter] = bpmdj_allocate(haar_size+1, float);
       if (!filter)
 	{
-	  filtered = bank[filter] = allocate(haar_size+1, float);
+	  filtered = bank[filter] = bpmdj_allocate(haar_size+1, float);
 	  filtered[haar_size]=0;
 	  for(unsigned4 i = 0 ; i < collapsed_size ; i++)
 	    filtered[i]=signed_data[i];
 	}
       else
 	{
-	  filtered = bank[filter] = allocate(haar_size+1, float);
+	  filtered = bank[filter] = bpmdj_allocate(haar_size+1, float);
 	  filtered[haar_size]=0;
 	  if (!power)
 	    for(int y = 0 ; y < haar_size ; y ++)

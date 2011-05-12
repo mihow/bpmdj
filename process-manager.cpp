@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -22,112 +22,118 @@
 #include "scripts.h"
 #include "history.h"
 
-Song* *ProcessManager::playing_songs = NULL;
+Song* main_song = NULL;
+Song* monitor_song = NULL;
 
-// when a process stops this method is called
-// normally it will immidatelly invoke the one and
-// only process manager.
 ProcessManager::ProcessManager(SongSelectorLogic * sel) :
   BasicProcessManager(4)
 {
   listener = sel;
-  monitorPlayCommand=1;
   selector = sel;
-  playing_songs = allocate(pid_count,Song*);
-  for(int i = 0; i < pid_count; i++)
-    playing_songs[i]=NULL;
 };
 
 void ProcessManager::setMainSong(Song* song)
 {
-  song->realize();
-  playing_songs[0]=song;
+  /** 
+   * Here it is difficult to guess in which player the current
+   * song is playing. Very likely will we not have succeeded
+   * in opening that player. So that player should then be 
+   * the choosen one. The challenge here lies in choosing
+   * tjhe right empty one. Since we cannot assume anything 
+   * useful here. We do not fill in the slot as such.
+   */
+  ::main_song = song;
   get_selector()->updateProcessView(true);
 }
 
 void ProcessManager::clearId(int id)
 {
-  if (id == 0)
+  // was there something on that slot ?
+  Song * song = Config::players[id].getSong();
+  if(!song) return;
+  // reread the stopped file
+  Config::players[id].reread();
+  Config::players[id].stop();
+  // we clear the active pid
+  BasicProcessManager::clearId(id);
+  // was the song the main_song ???
+  if (main_song == song)
     switchMonitorToMain();
-  else
-    clearPlayer(id,true);
-}
-
-void ProcessManager::clearPlayer(int id, bool update)
-{
-  if(!playing_songs[id]) return;
-  playing_songs[id]->reread();
-  active_pids[id] = 0;
-  playing_songs[id]=NULL;
-  if (update)
-    get_selector()->updateProcessView(id==0);
+  else if (monitor_song == song)
+    monitor_song = NULL;
 }
 
 void ProcessManager::switchMonitorToMain()
 {
-  // clear the playing song
-  clearPlayer(0,false);
-  // clear the monitor
-  active_pids[0]=active_pids[1];
-  active_pids[1]=0;
-  // the song is already playing, now use the next command next time
-  monitorPlayCommand=(monitorPlayCommand == 1 ? 2 : 1);
-  playing_songs[0]=playing_songs[1];
-  playing_songs[1]=NULL;
-  // write playing sucker to disk
-  History::this_is_playing(playing_songs[0]);
+  main_song = monitor_song;
+  monitor_song = NULL;
+  History::this_is_playing(main_song);
   get_selector()->resetCounter();
   get_selector()->updateProcessView(true);
 }
 
-void ProcessManager::startExtraSong(int id, Song *song)
+void ProcessManager::start(int id, Song *song)
 {
-  char playercommand[500];
-  // create suitable start command
-  song->realize();
-  Song *matchWith=playingInMain();
-  if (!matchWith) 
-    matchWith=song;
-  playing_songs[id]=song;
-  sprintf(playercommand,
-	  (const char*)(id == 3 ? Config::get_playCommand4()
-			: Config::get_playCommand3()),
-	  (const char*)matchWith->get_storedin(), 
-	  (const char*)song->get_storedin());
-  start(id,playercommand, QString("player#")+QString::number(id == 3 ? 4 : 3));
-  get_selector()->updateProcessView(false);
+  Song *matchWith=main_song;
+  if (!matchWith) matchWith=song;
+  Index a(matchWith->get_storedin());
+  Index b(song->get_storedin());
+  QString playercommand = Config::players[id].getPlayCommand(a,b);
+  BasicProcessManager::start(id, playercommand,
+			     Config::players[id].getLogName(),
+			     false);
+  Config::players[id].start(song);
 }
 
-void ProcessManager::startSong(Song *song)
+#ifdef INCOMPLETE_FEATURES
+void ProcessManager::startExtraSong(int id, Song *song)
+{
+  start(id,song);
+  get_selector()->updateProcessView(false);
+}
+#endif
+
+bool ProcessManager::startSong(Song *song)
 {
   assert(song);
   QString player;
-  song->realize();
-  Song *matchWith;
-  char playercommand[500];
   // if there is still a song playing in the monitor, don't go
-  if (active_pids[1]!=0)
+#ifdef INCOMPLETE_FEATURES
+  if (::monitor_song)
     {
       Error(true,"Cannot start playing in monitor, other monitor song still playing !");
-      return;
+      return false;
     }
-  // create suitable start command
-  playing_songs[1]=song;
-  matchWith=playingInMain();
-  if (!matchWith) matchWith=playing_songs[1];
-  player = monitorPlayCommand == 1 ? Config::get_playCommand1() : Config::get_playCommand2();
-  sprintf(playercommand, 
-	  (const char*)player, 
-	  (const char*)matchWith->get_storedin(), 
-	  (const char*)playing_songs[1]->get_storedin());
-  // fork the command and once the player exists immediatelly stop
-  start(1,playercommand, QString("player#")+QString::number(monitorPlayCommand == 1 ? 1 : 2));
-  // if there is no main song playing. Place it in the main, otherwise, try the monitor
-  if (!playingInMain())
+#endif
+  int nextSlot=-1;
+  for(int i = 0 ; i< 4 ; i ++)
     {
-      switchMonitorToMain();
-      return;
+      // !active_pids[i] && 
+      if (Config::players[i].canRun())
+	{
+	  nextSlot=i;
+	  break;
+	}
     }
-  // update the process view of course
-  get_selector()->updateProcessView(false);
+  if (nextSlot==-1)
+    {
+      Error(true,"No free slots to play song");
+      return false;
+    }
+
+  start(nextSlot,song);
+  // if there is no main song playing. Place it in the main, otherwise, try the monitor
+  if (!main_song)
+    {
+      main_song = song;
+      History::this_is_playing(main_song);
+      get_selector()->resetCounter();
+      get_selector()->updateProcessView(true);
+    }
+  else if (!monitor_song)
+    {
+      monitor_song = song;
+      get_selector()->updateProcessView(false);
+    };
+  return true;
 }

@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 #include <dirent.h>
 #include <ctype.h>
 #include <assert.h>
+#include <qstring.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <signal.h>
@@ -30,6 +31,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
+#include "config.h"
 #include "history.h"
 #include "basic-process-manager.h"
 #include "scripts.h"
@@ -57,7 +59,8 @@ public:
 
 void DiedProcesses::check()
 {
-  if (!sigs_installed) return;
+  if (!sigs_installed) 
+    return;
   int tmp;
   for(int i = 0 ; i < MAX_PROCESSES ; i ++)
     {
@@ -82,14 +85,13 @@ void ToSwitchOrNotToSwitchSignal(int sig, siginfo_t *info, void* hu)
   waitpid(info->si_pid,&blah,0);
   // grmpf ! error here !!!
   for(int i = 0 ; i < MAX_PROCESSES ; i ++)
-    if (dead_processes.died_pids[i]==-1)
+    if (dead_processes.died_pids[i] == -1)
       {
 	dead_processes.died_pids[i] = info->si_pid;
 	return;
       }
   printf("Warning: not enough place to store died pids\n");
 }
-
 
 void DiedProcesses::init(BasicProcessManager * l)
 {
@@ -102,7 +104,7 @@ void DiedProcesses::init(BasicProcessManager * l)
 	died_pids[i]=-1;
       // catch signals
       struct sigaction *act;
-      act=allocate(1,struct sigaction);
+      act=bpmdj_allocate(1,struct sigaction);
       act->sa_sigaction=ToSwitchOrNotToSwitchSignal;
       act->sa_flags=SA_SIGINFO;
       sigaction(SIGUSR1,act,NULL);
@@ -118,7 +120,7 @@ BasicProcessManager::BasicProcessManager(int count)
   dead_processes.init(this);
   // initialise fields
   pid_count = count;
-  active_pids = allocate(count,int);
+  active_pids = bpmdj_allocate(count,int);
   for(int i = 0 ; i < count ; i ++)
     active_pids[i]=0;
 };
@@ -145,16 +147,16 @@ void BasicProcessManager::clearId(int id)
   active_pids[id] = 0;
 }
 
-void BasicProcessManager::start(int id,const char* command, QString logname)
+void BasicProcessManager::start(int id,const char* command, QString logname, bool append)
 {
   QString final_command(command);
   if (!logname.isEmpty())
     {
       QString fulllog = "/tmp/"+logname+".kbpmdj.log";
       final_command+=QString(" >>")+fulllog+" 2>&1";
-      FILE * flog = fopen(fulllog,"wb");
+      FILE * flog = fopen(fulllog,append ? "ab" : "wb");
       assert(flog);
-      fprintf(flog,"%s\n%s\n\n",(const char*)logname,command);
+      fprintf(flog,"%s\n<u><b>Command: %s</b></u>\n\n",(const char*)logname,command);
       fclose(flog);
     }
   

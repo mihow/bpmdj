@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 #include "common.h"
 #include "signals.h"
 #include "files.h"
+#include "Data/om-data.h"
 
 #define spectrum_size 24
 #define barksize spectrum_size
@@ -39,19 +40,21 @@ extern double barkbounds[barksize+1];
 
 class spectrum_type
 {
- private:
-  spectrum_freq bark[spectrum_size];
  public:
+  spectrum_freq bark[spectrum_size];
   spectrum_type()
     {
       for(int i = 0 ; i < spectrum_size; i ++)
 	bark[i]=0;
     };
+  spectrum_type(Data &d)
+    {
+      set_data(d);
+    }
   spectrum_type(spectrum_type * other)
     {
       memcpy(bark,other->bark,sizeof(spectrum_freq)*spectrum_size);
     }
-  spectrum_type(const char* t);
   spectrum_freq band(int i) 
     {
       return bark[i];
@@ -70,26 +73,8 @@ class spectrum_type
     {
       return bark[i];
     }
-  void pre27init(const char* txt);
-  void post27init(const char * txt);
-  const void write_idx(FILE * f)
-    {
-      fprintf(f,"spectrum : ");
-      for(int i = 0 ; i < spectrum_size ; i++)
-	fprintf(f,"%g ",bark[i]);
-      fprintf(f,"\n");
-    }
-  const void write_bib_v27(FILE * index)
-    {
-      for(int i = 0 ; i < spectrum_size ; i ++)
-	file_float4(bark[i],index);
-    }
-  void read_bib_v27()
-    {
-      for(int i = 0 ; i < spectrum_size ; i ++)
-	bark[i]=buffer_float4();
-    }
-  
+  Data get_data() const;
+  void set_data(Data &data);
 };
 
 #endif

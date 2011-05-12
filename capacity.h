@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -19,8 +19,7 @@
 
 #ifndef CAPACITY_H
 #define CAPACITY_H
-
-#include "basic-types.h"
+#include "Data/om-data.h"
 
 /**
  * Capacities specify which programs are available and which 
@@ -40,6 +39,7 @@
 typedef unsigned2   Capacity;
 typedef Capacity    capacity_type;
 const capacity_type no_disabled_capacities = 0;
+extern Capacity     unavailable_capacities;
 
 // Which capacities are not available for the given extension 
 Capacity get_ext_disabled_capacities(QString full_name);
@@ -47,6 +47,7 @@ Capacity get_ext_disabled_capacities(QString full_name);
 // returns the capacity bit number for the given file and host the decoder 
 // number is the one which will be used in the. Zero indicates no single 
 // available capacity.
+int capacity_to_prognr(int full_capacity);
 int get_decoder_program(Capacity host_disabled, Capacity ext_disabled, Capacity song_disabled);
 
 // is something an extenstion with capacity ?

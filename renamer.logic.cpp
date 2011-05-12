@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,6 +16,14 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
+
+/**
+ * The next step we need here is the ability to get a list of songnames,
+ * two operators and the possibility to get back a set of actions. The question
+ * now is whether we want to realize the renaming immediatelly or not.
+ * Probably it is best to select them and use them immediatelly as input into 
+ * the full renamer box...
+ */
 
 #include <assert.h>
 #include <ctype.h>
@@ -269,13 +277,19 @@ QString RenamerLogic::subStringIsAuthor(QString txt)
 
 QString RenamerLogic::subStringIsMix(QString txt)
 {
-  printf("Not Implemented Yet...\n");
+  // we must place the substring before the '[' if there is one,
+  // otherwise we must place it before the last ., if there is one
+  int posbracket = txt.find("[");
+  if (posbracket<0)
+    posbracket = txt.findRev(".");
+  if (posbracket>=0)
+    txt.insert(posbracket,QString("{")+SubString->text()+"}");
   return txt;
 }
 
-void RenamerLogic::betweenBracesIsMix() 
-{ 
-  printf("Not Implemented Yet\n"); 
+QString RenamerLogic::betweenBracesIsMix(QString txt)
+{
+  return txt.replace("(","{").replace(")","}");
 }
 
 void RenamerLogic::replaceSubString()
@@ -309,6 +323,9 @@ void RenamerLogic::beforeMinusIsAuthor()
 
 void RenamerLogic::betweenBracesIsTrash() 
   FOREACH(betweenBracesIsTrash);
+
+void RenamerLogic::betweenBracesIsMix() 
+  FOREACH(betweenBracesIsMix);
 
 void RenamerLogic::substringIsMix() 
   FOREACH(subStringIsMix);
@@ -380,7 +397,6 @@ void RenamerLogic::realizeSelection()
 	  // position 1 is the old name
 	  // position 2 is the full name, with location prefixed.
 	  // find in str2 str1 and replace it by str0
-	  char fullcommand[1024];
 	  QString from = item->text(2);
 	  QString toreplace = item->text(1);
 	  QString replaceby = item->text(0);
@@ -407,8 +423,9 @@ void RenamerLogic::realizeSelection()
 		  while (exists(nto));
 		  to=nto;
 		}
-	      sprintf(fullcommand,MV"\"%s\" \"%s\"",((const char*)from),((const char*)to));
-	      execute(fullcommand);
+	      
+	      start_mv(from,to);
+
 	      // does the target file exist, if so, we inform the 
 	      // interested one
 	      if (exists(to) && inform)
@@ -445,6 +462,7 @@ void RenamerLogic::ignoreSelection()
     }
 }
 
+#ifdef INCOMPLETE_FEATURES
 //---------------------------------------------------------
 //   Updating changing index files
 //---------------------------------------------------------
@@ -469,8 +487,10 @@ UpdateIndexedSong::UpdateIndexedSong(SongSelectorLogic * l)
 
 bool UpdateIndexedSong::shouldFilenameBeExcluded(QString name)
 {
-  Index i(name);
-  return i.valid_tar_info();
+  assert(0);
+  //Index i(name);
+  //  return i.valid_tar_info();
+  return false;
 }
 
 void UpdateIndexedSong::filenameChanged(QString from, QString to)
@@ -486,12 +506,14 @@ void UpdateIndexedSong::filenameChanged(QString from, QString to)
   // we update the selector
   selector -> reread_and_repaint(song);
 };
+#endif
 
 //---------------------------------------------------------
 //   Starting the stuff from within the song selector
 //---------------------------------------------------------
 void SongSelectorLogic::startRenamer()
 {
+#ifdef INCOMPLETE_FEATURES
   RenamerStart which_renamer;
   int result = which_renamer.exec();
   if (result!=which_renamer.Accepted) return;
@@ -502,6 +524,7 @@ void SongSelectorLogic::startRenamer()
       renamer->scan(IndexDir);
     }
   else if (which_renamer.not_yet_indexed->isOn())
+#endif
     {
       QString text = QFileDialog::getExistingDirectory(NULL,this,NULL,"Specify directory to look for songs with wrong name");
       if (!text.isEmpty())

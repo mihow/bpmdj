@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -98,6 +98,11 @@ tag_type Tags::add_tag(QString tag)
   return found->index;
 }
 
+tag_type Tags::find_tag_create_if_necessary(QString tag)
+{
+  return add_tag(tag);
+}
+
 QString Tags::full_string(tags_type tags)
 {
   if (tags == NULL) return EMPTY;
@@ -125,7 +130,7 @@ tags_type Tags::parse_tags(QString tagstring)
       }
   
   // allocate and fill array
-  result = allocate(count+1,tag_type);
+  result = bpmdj_allocate(count+1,tag_type);
   char* tagss = original;
   runner = tagss;
   count = 0;
@@ -144,7 +149,7 @@ tags_type Tags::parse_tags(QString tagstring)
 	  else
 	    result[count++]=add_tag(tagss);
 	}
-      deallocate(original);
+      bpmdj_deallocate(original);
     }
   result[count]=tag_end;
   return result;

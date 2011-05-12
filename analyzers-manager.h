@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 #include "basic-process-manager.h"
 class Song;
+class SongProcess;
 
 class AnalyzerChanged
 {
@@ -38,23 +39,16 @@ class AnalyzersManager:
   public BasicProcessManager
 {
   private:
-    int    * running_time;              // the current running time
-    long   * total_running_time;        // the cummulated running time
-    int    * songs_analyzed;            // the amount of stopped songs
-    time_t * started_at;                // start_time when running
     int      limit_time;                // the timeout before considering child non responsive
-    int      report_time;               // the color die out time
-    Song * * songs_under_investigation; // the song under investigation
     AnalyzerChanged * listener;
-    virtual void clearId(int id);    
+    virtual void clearId(int id);
   public:
-    AnalyzersManager(int nr, AnalyzerChanged *sel, int timeout, int report);
+    AnalyzersManager(int nr, AnalyzerChanged *sel, int timeout);
     virtual ~AnalyzersManager() {};
     virtual void start(int id, Song* song, const char* command);
     virtual void checkSignals();
-    virtual float relative_running_time(int slot);
+    void songKilled(SongProcess*);
     virtual bool slot_free(int slot);
-    virtual float songs_per_second(int slot);
 };
 
 #endif

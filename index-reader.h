@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -24,23 +24,20 @@ class SongSelectorLogic;
 class Song;
 class QProgressBar;
 class QLabel;
-class DataBase;
+class BasicDataBase;
 
-class IndexReader:
-  public DirectoryScanner
+class IndexReader: public DirectoryScanner
 {
- public: 
-  int total_files;
-  int idx_files;
- protected:
-  bool reading_bib;
-  QProgressBar * progress;
-  QLabel * reading;
-  virtual void checkfile(const QString prefix, const QString filename);
-  virtual void recursing(const QString dirname);
-  void add(Song * song);
-  DataBase * database;
-  AvlTree<QString> tree;
- public:
-  IndexReader(QProgressBar * b, QLabel * l, DataBase*);
+  protected:
+    int  step_size;
+    QProgressBar  * progress;
+    QLabel        * reading;
+    BasicDataBase * database;
+    virtual void checkfile(const QString prefix, const QString filename);
+    virtual void recursing(const QString dirname);
+    void add(Song * song);
+  public:
+    int total_files;
+    int idx_files;
+    IndexReader(QProgressBar * b, QLabel * l, BasicDataBase*, int expected);
 };

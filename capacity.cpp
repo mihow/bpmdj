@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -43,13 +43,8 @@ bool goodExtension(QString ext)
 	  ext.endsWith(".flac"));
 }
 
-int get_decoder_program(Capacity host_disabled, Capacity ext_disabled, Capacity song_disabled)
+int capacity_to_prognr(int full_capacity)
 {
-  Capacity full_capacity=(CAPACITY_LAST*2)-1;
-  full_capacity&=~host_disabled;
-  full_capacity&=~ext_disabled;
-  full_capacity&=~song_disabled;
-  if (!full_capacity) return 0;
   int nr = 1;
   while(!(full_capacity%2)) 
     {
@@ -57,6 +52,16 @@ int get_decoder_program(Capacity host_disabled, Capacity ext_disabled, Capacity 
       nr++;
     }
   return nr;
+}
+
+int get_decoder_program(Capacity host_disabled, Capacity ext_disabled, Capacity song_disabled)
+{
+  Capacity full_capacity=(CAPACITY_LAST*2)-1;
+  full_capacity&=~host_disabled;
+  full_capacity&=~ext_disabled;
+  full_capacity&=~song_disabled;
+  if (!full_capacity) return 0;
+  return capacity_to_prognr(full_capacity);
 }
 
 static int used_capacity = 0;
@@ -67,13 +72,27 @@ static void used(QCheckBox * b)
     b->setText(b->text()+" (used)");
 }
 
+static void unavailable(QCheckBox * b)
+{
+  b->setPaletteBackgroundColor(QColor(255,0,0));
+}
+
+Capacity unavailable_capacities = no_disabled_capacities;
+
 void init_capacity_widget(CapacityWidget * cw, Capacity c)
 {
   cw->mpg123059r->setChecked(c &    CAPACITY_MPG123059R);
-  cw->mpg321->setChecked(c &        CAPACITY_MPG321); 
+  cw->mpg321->setChecked(c &        CAPACITY_MPG321);
   cw->mplayer1pre6->setChecked(c &  CAPACITY_MPLAYER1PRE6);
   cw->mplayer1pre7->setChecked(c &  CAPACITY_MPLAYER1PRE7);
   cw->ogg123->setChecked(c &        CAPACITY_OGG123);
+
+  // inform user on unavailble decoders
+  if (unavailable_capacities & CAPACITY_MPG123059R) unavailable(cw->mpg123059r);
+  if (unavailable_capacities & CAPACITY_MPG321)      unavailable(cw->mpg321);
+  if (unavailable_capacities & CAPACITY_MPLAYER1PRE6) unavailable(cw->mplayer1pre6);
+  if (unavailable_capacities & CAPACITY_MPLAYER1PRE7) unavailable(cw->mplayer1pre7);
+  if (unavailable_capacities & CAPACITY_OGG123) unavailable(cw->ogg123);
 
   // make the used capacity text somewhat different
   if (used_capacity & CAPACITY_MPG123059R) used(cw->mpg123059r);

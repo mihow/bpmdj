@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,13 +16,15 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-#include <stdio.h>
+
 #include "sample4-type.h"
 
-void sample4_type::write(const char* prefix, FILE * f)
+Data sample4_type::get_data(int versionnr) const
 {
-  if (left==no_sample && right==no_sample) return;
-  fprintf(f,"%s %d %d\n", prefix, left, right);
+  Array<1,signed4> result(2);
+  result[0] = left;
+  result[1] = right;
+  return result;
 }
 
 void sample4_type::read(char* l)
@@ -33,3 +35,11 @@ void sample4_type::read(char* l)
   right = atoi(l);
 }
 
+
+void sample4_type::set_data(Data &data)
+{
+  Array<1,signed4> cast;
+  cast = (Array<1,signed4>)data;
+  left  = cast[0];
+  right = cast[1];
+}

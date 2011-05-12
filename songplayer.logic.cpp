@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -129,7 +129,7 @@ void store_config_into(PlayerConfig * from, SongPlayerLogic* player)
 
   player->rms_toggle->setChecked(from->get_player_rms());
   player->rms->setText(QString::number(from->get_player_rms_target()));
-  init_capacity_widget(player->capacity,from->get_disabled_capacities());  
+  init_capacity_widget(player->capacity,from->get_disabled_capacities());
 }
 
 void SongPlayerLogic::done(int r)
@@ -209,14 +209,9 @@ void SongPlayerLogic::captionize_according_to_index()
       if (arg_config==NULL || arg_config[0]==0) blah+=" standard configuration";
       else blah += QString(arg_config) + " configuration";
     }
-  else if (playing->valid_tar_info())
+  else
     {
-      blah = playing->encoded_tar();
-    }
-  else if (playing->get_storedin())
-    {
-      blah = playing->get_storedin();
-      blah.replace("./index/","");
+      blah = playing->readable_description();
     }
   setCaption(blah);
 }
@@ -393,16 +388,19 @@ void SongPlayerLogic::timerTick()
 {
   static int no_raw_file_error_box = 10;
   unsigned4 m=wave_max();
-  if (no_raw_file_error_box>0)
+  if (no_raw_file_error_box-->0)
     {
+      // see comments in PlayerConfig::load_ui_position
+      if (no_raw_file_error_box==9) 
+	config->load_ui_position(this);
       // should we start playing ?
-      if (!autostarted && m>0 && get_paused())
+      if (!autostarted && m>5*44100 && get_paused())
 	{
 	  autostarted=true;
 	  restart();
 	}
       // error on the disk stuff ?
-      if (m==0 && no_raw_file_error_box--==0 && playing)
+      if (m==0 && no_raw_file_error_box==0 && playing)
 	{
 	  QMessageBox::information(NULL,"No .raw file",
 				   "it seems like there is no .raw file on disk\n"
@@ -749,7 +747,7 @@ void SongPlayerLogic::update_map_scale_box()
 void SongPlayerLogic::mapLengthChanged(int new_size)
 {
   startStopButton->setFocus();
-  map_data new_map = allocate(new_size,map_segment);
+  map_data new_map = bpmdj_allocate(new_size,map_segment);
   int i = 0;
   if (map)
     {
@@ -760,7 +758,7 @@ void SongPlayerLogic::mapLengthChanged(int new_size)
 	  new_map[i].speed_div =map[i].speed_div;
 	  new_map[i].volume = map[i].volume;
 	}
-      deallocate(map);
+      bpmdj_deallocate(map);
     }
   while(i<new_size)
     {
@@ -873,7 +871,7 @@ void SongPlayerLogic::loadMap()
 
 void SongPlayerLogic::mapStart()
 {
-  map_data mapcopy = allocate(map_size,map_segment);
+  map_data mapcopy = bpmdj_allocate(map_size,map_segment);
   // copy all data and take scaling into account...
   for(int i = 0 ; i < map_size ; i ++)
     {
@@ -1237,6 +1235,10 @@ void SongPlayerLogic::customEvent(QCustomEvent * e)
     {
       set_start_stop_text();
     }
+  else if ((int)e->type()==(int)WritingFinished)
+    {
+      if (opt_check) accept();
+    }
 }
 
 /**
@@ -1277,4 +1279,11 @@ void msg_playing_state_changed()
 {
   app->postEvent(player_window,new QCustomEvent(PlayingStateChanged));
 }
+
+void msg_writing_finished()
+{
+  if (player_window)
+    app->postEvent(player_window,new QCustomEvent(WritingFinished));
+}
+
 

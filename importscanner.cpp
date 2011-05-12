@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -66,24 +66,17 @@ void ImportScanner::checkfile(const QString pathname, const QString filen)
     }
   else
     {    
-      char * indexname = findUniqueName(filename);
-      Index *index = new Index();
-      index->set_storedin(indexname);
-      deallocate(indexname);
+      Index * index = createNewIndexFor(filename,"./index/");
+      Song  * song = new Song(index,true,true);
+      selector -> acceptNewSong( song );
       
       char log[500];
-      sprintf(log,"Writing %s",index->get_storedin());
+      sprintf(log,"Writing %s",(const char*)index->get_storedin());
       Created->insertLine(log);
       Created->setCursorPosition(Created->numLines(),1);
       
       app->processEvents();
       
-      index->set_filename(strdup(filename));
-      index->set_tags(strdup("New"));
-      index->fix_tar_info();  // to fix filenames that had the correct name
-      index->set_period(-1);  // writes immediatelly to disk
-      Song * song = new Song(index,true,true);
       delete index;
-      selector -> acceptNewSong( song );
     }
 }

@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 #include <errno.h>
 #include <assert.h>
 #include "files.h"
+#include "Data/types.h"
 
 long fsize(FILE * f)
 {
@@ -31,42 +32,6 @@ long fsize(FILE * f)
   answer=ftell(f);
   fseek(f,pos,SEEK_SET);
   return answer;
-}
-
-void file_sequence(unsigned1*a, int c, FILE *f)
-{
-  for(int i = 0 ; i < c ; i ++)
-    file_unsigned1(a[i],f);
-}
-
-void file_float8(float8 i, FILE * f)
-{
-  int written = fwrite(&i,8,1,f);
-  assert(written==1);
-}
-
-void file_signed4(long i, FILE * f)
-{
-  int written = fwrite(&i,4,1,f);
-  assert(written==1);
-}
-
-void file_unsigned4(unsigned4 i, FILE * f)
-{
-  int written = fwrite(&i,4,1,f);
-  assert(written==1);
-}
-
-void file_unsigned1(unsigned1 i, FILE * f)
-{
-  int written = fwrite(&i,1,1,f);
-  assert(written==1);
-}
-
-void file_float4(float4 i, FILE * f)
-{
-  int written = fwrite(&i,4,1,f);
-  assert(written==1);
 }
 
 long readsamples(void* target, int count, FILE* file)

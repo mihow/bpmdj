@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -47,6 +47,7 @@ class Tags
     static bool      new_tags;
     static void      init();
     static tag_type  find_tag(QString tag);
+    static tag_type  find_tag_create_if_necessary(QString tag);
     static tags_type parse_tags(QString tag_string);
     static QString   full_string(tags_type tags);
 };

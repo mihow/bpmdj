@@ -107,6 +107,11 @@
         <slot>changeLogView(QListViewItem*)</slot>
     </connection>
 </connections>
+<tabstops>
+    <tabstop>list</tabstop>
+    <tabstop>text</tabstop>
+    <tabstop>pushButton49</tabstop>
+</tabstops>
 <slots>
     <slot>changeLogView(QListViewItem*)</slot>
 </slots>

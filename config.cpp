@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -37,35 +37,78 @@
 #include "scripts.h"
 #include "magic.h"
 
+ConfigState::ConfigState(bool val): QObject(NULL,NULL), state(val)
+{
+}
+
+void ConfigState::setMenuText(const QString & text)
+{
+  menu = NULL;
+  menu_text=text;
+}
+
+bool ConfigState::isOn() const
+{
+  return state;
+}
+
+void ConfigState::addTo(QPopupMenu * m)
+{
+  menu = m;
+  item = m->insertItem(menu_text,this,SLOT(toggle()));
+  update();
+}
+
+void ConfigState::update()
+{
+  if (menu) 
+    menu->setItemChecked(item,state);
+}
+
+void ConfigState::toggle()
+{
+  setOn(!state);
+}
+
+void ConfigState::set(bool new_state)
+{
+  state = new_state;
+}
+
+void ConfigState::setOn(bool new_state)
+{
+  state = new_state;
+  update();
+  emit toggled();
+}
+
 init_singleton_var(Config,file_count,int,1000);
 init_singleton_var(Config,yellowTime,int,120);
 init_singleton_var(Config,orangeTime,int,150);
 init_singleton_var(Config,redTime,int,180); 
 init_singleton_var(Config,filterBpm,int,0);
 init_singleton_var(Config,authorDecay,int,5);
-init_singleton_var(Config,color_range,bool,true);
-init_singleton_var(Config,color_played,bool,true);
-init_singleton_var(Config,color_authorplayed,bool,true);
-init_singleton_var(Config,color_ondisk,bool,true);
-init_singleton_var(Config,color_cues,bool,true);
-init_singleton_var(Config,color_dcolor,bool,true);
-init_singleton_var(Config,color_spectrum,bool,true);
-init_singleton_var(Config,limit_ondisk,bool,true);
-init_singleton_var(Config,limit_nonplayed,bool,false);
-init_singleton_var(Config,limit_uprange,bool,false);
-init_singleton_var(Config,limit_downrange,bool,false);
-init_singleton_var(Config,limit_indistance,bool,false);
-init_singleton_var(Config,limit_authornonplayed,bool,false);
+ConfigState Config::color_range(true);
+ConfigState Config::color_played(true);
+ConfigState Config::color_authorplayed(true);
+ConfigState Config::color_ondisk(true);
+ConfigState Config::color_cues(true);
+ConfigState Config::color_dcolor(true);
+ConfigState Config::color_spectrum(true);
+ConfigState Config::limit_ondisk(true);
+ConfigState Config::limit_nonplayed(false);
+ConfigState Config::limit_uprange(false);
+ConfigState Config::limit_downrange(false);
+ConfigState Config::limit_indistance(false);
+ConfigState Config::limit_authornonplayed(false);
+ConfigState Config::color_songs_based_on_history(true);
 init_singleton_var(Config,shown_aboutbox,bool,false);
-init_singleton_var(Config,open_mixer,bool,false);
+// ConfigState Config::open_mixer(false);
 init_singleton_var(Config,distance_temposcale,float,0.06);
-init_singleton_var(Config,distance_spectrumweight,float,1.0);
-init_singleton_var(Config,ask_mix,bool,true);
-init_singleton_var(Config,auto_popqueue,bool,false);
-init_singleton_var(Config,playCommand1,QString,"");
-init_singleton_var(Config,playCommand2,QString,"");
-init_singleton_var(Config,playCommand3,QString,"");
-init_singleton_var(Config,playCommand4,QString,"");
+init_singleton_var(Config,distance_spectrumweight,float,11);
+ConfigState Config::ask_mix(true);
+ConfigState Config::auto_popqueue(false);
+SongProcess Config::players[4];
 init_singleton_var(Config,mixer_command,QString,"");
 init_singleton_var(Config,record_command,QString,"");
 init_singleton_var(Config,replay_command,QString,"");
@@ -94,24 +137,18 @@ init_singleton_var(Config,color_cluster_depth,int,3);
 init_singleton_var(Config,taglist,QListView*,NULL);
 init_singleton_var(Config,header,QHeader*,NULL);
 init_singleton_var(Config,bpm_mixer_command,QString,"kbpm-mix --alsa");
-init_singleton_var(Config,open_bpmmixer,bool,false); 
-init_singleton_var(Config,distance_tempoweight,float,0.2);
-init_singleton_var(Config,distance_echoweight,float,0.7);
-init_singleton_var(Config,distance_rythmweight,float,2.5);
-init_singleton_var(Config,distance_compositionweight,float,1.0);
+ConfigState Config::open_bpmmixer(false);
+init_singleton_var(Config,distance_tempoweight,float,2);
+init_singleton_var(Config,distance_echoweight,float,62);
+init_singleton_var(Config,distance_rythmweight,float,26);
+init_singleton_var(Config,distance_compositionweight,float,33);
 init_singleton_var(Config,max_songs,int,100);
 init_singleton_var(Config,color_unchecked,QColor,QColor(219,219,219));
-init_singleton_var(Config,analCommand1,QString,"");
-init_singleton_var(Config,analCommand2,QString,"");
-init_singleton_var(Config,analCommand3,QString,"");
-init_singleton_var(Config,analCommand4,QString,"");
-init_singleton_var(Config,analCommand5,QString,"");
-init_singleton_var(Config,analCommand6,QString,"");
-init_singleton_var(Config,analCommand7,QString,"");
-init_singleton_var(Config,analCommand8,QString,"");
+SongProcess Config::analyzers[8];
 init_singleton_var(Config,anal_bpm_from,float,90);
 init_singleton_var(Config,anal_bpm_to,float,160);
 init_singleton_var(Config,anal_bpm_technique,int,1);
+init_singleton_var(Config,color_alltime,QColor,QColor(0,0,255));
 
 /**
  * we don't open the mixer command because the program its normal 
@@ -158,31 +195,33 @@ void Config::save()
   s << (Q_UINT16)get_orangeTime();
   s << (Q_UINT16)get_redTime();
   s << (Q_UINT16)get_filterBpm();
-  s << (Q_INT8)get_color_range();
-  s << (Q_INT8)get_color_played();
-  s << (Q_INT8)get_color_authorplayed();
-  s << (Q_INT8)get_color_ondisk();
-  s << (Q_INT8)get_color_cues();
-  s << (Q_INT8)get_color_dcolor();
-  s << (Q_INT8)get_color_spectrum();
+  s << (Q_INT8)color_range;
+  s << (Q_INT8)color_played;
+  s << (Q_INT8)color_authorplayed;
+  s << (Q_INT8)color_ondisk;
+  s << (Q_INT8)color_cues;
+  s << (Q_INT8)color_dcolor;
+  s << (Q_INT8)color_spectrum;
   s << (Q_INT8)get_authorDecay();
-  s << (Q_INT8)get_limit_ondisk();
-  s << (Q_INT8)get_limit_nonplayed();
-  s << (Q_INT8)get_limit_uprange();
-  s << (Q_INT8)get_limit_downrange();
-  s << (Q_INT8)get_limit_indistance();
-  s << get_playCommand1();
-  s << get_playCommand2();
-  s << get_playCommand3();
-  s << get_playCommand4();
+  s << (Q_INT8)limit_ondisk;
+  s << (Q_INT8)limit_nonplayed;
+  s << (Q_INT8)limit_uprange;
+  s << (Q_INT8)limit_downrange;
+  s << (Q_INT8)limit_indistance;
+  for(int i = 0 ; i < 4 ; i ++)
+    {
+      s << (Q_UINT16)players[i].getCmd();
+      s << players[i].getName();
+      s << players[i].getRemote();
+    }
   s << get_distance_temposcale();
   s << get_distance_spectrumweight();
-  s << (Q_INT8)get_limit_authornonplayed();
+  s << (Q_INT8)limit_authornonplayed;
   s << (Q_INT8)get_shown_aboutbox();
   s << get_mixer_command();
-  s << (Q_INT8)get_open_mixer();
-  s << (Q_INT8)get_ask_mix();
-  s << (Q_INT8)get_auto_popqueue();
+  s << (Q_INT8)0; // the obsolte open_mixer flag
+  s << (Q_INT8)ask_mix;
+  s << (Q_INT8)auto_popqueue;
   s << get_record_command();
   s << get_replay_command();
   s << get_record_mixer_command();
@@ -208,7 +247,7 @@ void Config::save()
   s << get_color_dcolor_col();
   s << (Q_UINT16)get_color_cluster_depth();
   s << get_bpm_mixer_command();
-  s << (Q_INT8)get_open_bpmmixer();
+  s << (Q_INT8)open_bpmmixer;
   // export the taglist... tricky thing (tm)
   Q_UINT16 nr = get_taglist()->childCount();
   s << nr;
@@ -242,21 +281,29 @@ void Config::save()
   s << (Q_UINT16)get_max_songs();
   // save pixmap if it is there
   s << get_color_unchecked();
-  s << get_analCommand1();
-  s << get_analCommand2();
-  s << get_analCommand3();
-  s << get_analCommand4();
-  s << get_analCommand5();
-  s << get_analCommand6();
-  s << get_analCommand7();
-  s << get_analCommand8();
+  for(int i = 0 ; i < 8 ; i ++)
+    {
+      s << (Q_UINT16)analyzers[i].getCmd();
+      s << analyzers[i].getName();
+      s << analyzers[i].getRemote();
+    }
   s << get_anal_bpm_from();
   s << get_anal_bpm_to();
   s << (Q_UINT16)get_anal_bpm_technique();
+  s << (Q_INT8) color_songs_based_on_history;
+  s << get_color_alltime();
 }
 
-void Config::load()
+bool Config::load()
 {
+  // initialize the analyzers and players
+  for(int i = 0 ; i < 8 ; i++)
+    {
+      analyzers[i].setNameId("analyzer"+QString::number(i),i);
+      analyzers[i].setAnalyzer();
+    }
+  for(int i = 0 ; i < 4 ; i++)
+    players[i].setNameId("player"+QString::number(i),i);
   set_taglist(new QListView());
   set_header(new QHeader());
   if (QFile::exists(".kbpmdj"))
@@ -271,317 +318,55 @@ void Config::load()
       f.open(IO_ReadOnly);
       QDataStream s(&f);
       s >> magic;
-      if (magic == MAGIC_1_6)
+      if ( (magic == MAGIC_1_6)
+	   || (magic == MAGIC_1_7)
+	   || (magic == MAGIC_1_8)
+	   || (magic == MAGIC_1_9)
+	   || (magic == MAGIC_2_1)
+	   || (magic == MAGIC_2_2)
+	   || (magic == MAGIC_2_4)
+	   || (magic == MAGIC_2_5)
+	   || (magic == MAGIC_2_6)
+	   || (magic == MAGIC_2_7)
+	   || (magic == MAGIC_2_8)
+	   || (magic == MAGIC_2_9))
 	{
-	  s >> w; set_file_count (w);
-	  s >> w; set_yellowTime (w);
-	  s >> w; set_orangeTime (w);
-	  s >> w; set_redTime (w);
-	  s >> w; set_filterBpm (w);
-	  s >> b; set_color_range(b);
-	  s >> b; set_color_played(b);
-	  s >> b; set_color_authorplayed(b);
-	  s >> b; set_authorDecay(b);
-	  s >> str; set_playCommand1(str);
-	  s >> str; set_playCommand2(str);
+	  return false;
 	}
-      else if (magic == MAGIC_1_7)
+      else if (magic == MAGIC_3_0)
 	{
 	  s >> w; set_file_count (w);
 	  s >> w; set_yellowTime (w);
 	  s >> w; set_orangeTime (w);
 	  s >> w; set_redTime (w);
 	  s >> w; set_filterBpm (w);
-	  s >> b; set_color_range(b);
-	  s >> b; set_color_played(b);
-	  s >> b; set_color_authorplayed(b);
-	  s >> b; set_color_ondisk(b);
-	  s >> b; set_color_cues(b);
-	  s >> b; set_color_dcolor(b);
-	  s >> b; set_color_spectrum(b);
+	  s >> b; color_range.state=b;
+	  s >> b; color_played.state=b;
+	  s >> b; color_authorplayed.state=b;
+	  s >> b; color_ondisk.state=b;
+	  s >> b; color_cues.state=b;
+	  s >> b; color_dcolor.state=b;
+	  s >> b; color_spectrum.state=b;
 	  s >> b; set_authorDecay(b);
-	  s >> b; set_limit_ondisk(b);
-	  s >> b; set_limit_nonplayed(b);
-	  s >> b; set_limit_uprange(b);
-	  s >> b; set_limit_downrange(b);
-	  s >> b; set_limit_indistance(b);
-	  s >> b; // limit_inspectrum
-	  s >> str; set_playCommand1(str);
-	  s >> str; set_playCommand2(str);
-	  s >> str; set_playCommand3(str);
-	  s >> str; set_playCommand4(str);
-	}
-      else if (magic == MAGIC_1_8)
-	{
-	  s >> w; set_file_count (w);
-	  s >> w; set_yellowTime (w);
-	  s >> w; set_orangeTime (w);
-	  s >> w; set_redTime (w);
-	  s >> w; set_filterBpm (w);
-	  s >> b; set_color_range(b);
-	  s >> b; set_color_played(b);
-	  s >> b; set_color_authorplayed(b);
-	  s >> b; set_color_ondisk(b);
-	  s >> b; set_color_cues(b);
-	  s >> b; set_color_dcolor(b);
-	  s >> b; set_color_spectrum(b);
-	  s >> b; set_authorDecay(b);
-	  s >> b; set_limit_ondisk(b);
-	  s >> b; set_limit_nonplayed(b);
-	  s >> b; set_limit_uprange(b);
-	  s >> b; set_limit_downrange(b);
-	  s >> b; set_limit_indistance(b);
-	  s >> str; set_playCommand1(str);
-	  s >> str; set_playCommand2(str);
-	  s >> str; set_playCommand3(str);
-	  s >> str; set_playCommand4(str);
-	}
-      else if (magic == MAGIC_1_9)
-	{
-	  s >> w; set_file_count (w);
-	  s >> w; set_yellowTime (w);
-	  s >> w; set_orangeTime (w);
-	  s >> w; set_redTime (w);
-	  s >> w; set_filterBpm (w);
-	  s >> b; set_color_range(b);
-	  s >> b; set_color_played(b);
-	  s >> b; set_color_authorplayed(b);
-	  s >> b; set_color_ondisk(b);
-	  s >> b; set_color_cues(b);
-	  s >> b; set_color_dcolor(b);
-	  s >> b; set_color_spectrum(b);
-	  s >> b; set_authorDecay(b);
-	  s >> b; set_limit_ondisk(b);
-	  s >> b; set_limit_nonplayed(b);
-	  s >> b; set_limit_uprange(b);
-	  s >> b; set_limit_downrange(b);
-	  s >> b; set_limit_indistance(b);
-	  s >> str; set_playCommand1(str);
-	  s >> str; set_playCommand2(str);
-	  s >> str; set_playCommand3(str);
-	  s >> str; set_playCommand4(str);
-	  s >> fl; set_distance_temposcale(fl);
-	  s >> fl; set_distance_spectrumweight(fl);
-	  s >> b; set_limit_authornonplayed(b);
-	  s >> b; set_shown_aboutbox(b);
-	}
-      else if (magic == MAGIC_2_1)
-	{
-	  s >> w; set_file_count (w);
-	  s >> w; set_yellowTime (w);
-	  s >> w; set_orangeTime (w);
-	  s >> w; set_redTime (w);
-	  s >> w; set_filterBpm (w);
-	  s >> b; set_color_range(b);
-	  s >> b; set_color_played(b);
-	  s >> b; set_color_authorplayed(b);
-	  s >> b; set_color_ondisk(b);
-	  s >> b; set_color_cues(b);
-	  s >> b; set_color_dcolor(b);
-	  s >> b; set_color_spectrum(b);
-	  s >> b; set_authorDecay(b);
-	  s >> b; set_limit_ondisk(b);
-	  s >> b; set_limit_nonplayed(b);
-	  s >> b; set_limit_uprange(b);
-	  s >> b; set_limit_downrange(b);
-	  s >> b; set_limit_indistance(b);
-	  s >> str; set_playCommand1(str);
-	  s >> str; set_playCommand2(str);
-	  s >> str; set_playCommand3(str);
-	  s >> str; set_playCommand4(str);
-	  s >> fl; set_distance_temposcale(fl);
-	  s >> fl; set_distance_spectrumweight(fl);
-	  s >> b; set_limit_authornonplayed(b);
-	  s >> b; set_shown_aboutbox(b);
-	  s >> str; 
-	  s >> str; set_mixer_command(str);
-	  s >> b; set_open_mixer(b);
-	}
-      else if (magic == MAGIC_2_2)
-	{
-	  s >> w; set_file_count (w);
-	  s >> w; set_yellowTime (w);
-	  s >> w; set_orangeTime (w);
-	  s >> w; set_redTime (w);
-	  s >> w; set_filterBpm (w);
-	  s >> b; set_color_range(b);
-	  s >> b; set_color_played(b);
-	  s >> b; set_color_authorplayed(b);
-	  s >> b; set_color_ondisk(b);
-	  s >> b; set_color_cues(b);
-	  s >> b; set_color_dcolor(b);
-	  s >> b; set_color_spectrum(b);
-	  s >> b; set_authorDecay(b);
-	  s >> b; set_limit_ondisk(b);
-	  s >> b; set_limit_nonplayed(b);
-	  s >> b; set_limit_uprange(b);
-	  s >> b; set_limit_downrange(b);
-	  s >> b; set_limit_indistance(b);
-	  s >> str; set_playCommand1(str);
-	  s >> str; set_playCommand2(str);
-	  s >> str; set_playCommand3(str);
-	  s >> str; set_playCommand4(str);
-	  s >> fl; set_distance_temposcale(fl);
-	  s >> fl; set_distance_spectrumweight(fl);
-	  s >> b; set_limit_authornonplayed(b);
-	  s >> b; set_shown_aboutbox(b);
-	  s >> str; 
-	  s >> str; set_mixer_command(str);
-	  s >> b; set_open_mixer(b);
-	  s >> b; set_ask_mix(b);
-	  s >> b; set_auto_popqueue(b);
-	}
-      else if (magic == MAGIC_2_4)
-	{
-	  s >> w; set_file_count (w);
-	  s >> w; set_yellowTime (w);
-	  s >> w; set_orangeTime (w);
-	  s >> w; set_redTime (w);
-	  s >> w; set_filterBpm (w);
-	  s >> b; set_color_range(b);
-	  s >> b; set_color_played(b);
-	  s >> b; set_color_authorplayed(b);
-	  s >> b; set_color_ondisk(b);
-	  s >> b; set_color_cues(b);
-	  s >> b; set_color_dcolor(b);
-	  s >> b; set_color_spectrum(b);
-	  s >> b; set_authorDecay(b);
-	  s >> b; set_limit_ondisk(b);
-	  s >> b; set_limit_nonplayed(b);
-	  s >> b; set_limit_uprange(b);
-	  s >> b; set_limit_downrange(b);
-	  s >> b; set_limit_indistance(b);
-	  s >> str; set_playCommand1(str);
-	  s >> str; set_playCommand2(str);
-	  s >> str; set_playCommand3(str);
-	  s >> str; set_playCommand4(str);
-	  s >> fl; set_distance_temposcale(fl);
-	  s >> fl; set_distance_spectrumweight(fl);
-	  s >> b; set_limit_authornonplayed(b);
-	  s >> b; set_shown_aboutbox(b);
-	  s >> str; 
-	  s >> str; set_mixer_command(str);
-	  s >> b; set_open_mixer(b);
-	  s >> b; set_ask_mix(b);
-	  s >> b; set_auto_popqueue(b);
-	  s >> str; set_record_command(str);
-	  s >> str; set_replay_command(str);
-	  s >> str; set_record_mixer_command(str);
-	}
-      else if (magic == MAGIC_2_5)
-	{
-	  s >> w; set_file_count (w);
-	  s >> w; set_yellowTime (w);
-	  s >> w; set_orangeTime (w);
-	  s >> w; set_redTime (w);
-	  s >> w; set_filterBpm (w);
-	  s >> b; set_color_range(b);
-	  s >> b; set_color_played(b);
-	  s >> b; set_color_authorplayed(b);
-	  s >> b; set_color_ondisk(b);
-	  s >> b; set_color_cues(b);
-	  s >> b; set_color_dcolor(b);
-	  s >> b; set_color_spectrum(b);
-	  s >> b; set_authorDecay(b);
-	  s >> b; set_limit_ondisk(b);
-	  s >> b; set_limit_nonplayed(b);
-	  s >> b; set_limit_uprange(b);
-	  s >> b; set_limit_downrange(b);
-	  s >> b; set_limit_indistance(b);
-	  s >> str; set_playCommand1(str);
-	  s >> str; set_playCommand2(str);
-	  s >> str; set_playCommand3(str);
-	  s >> str; set_playCommand4(str);
-	  s >> fl; set_distance_temposcale(fl);
-	  s >> fl; set_distance_spectrumweight(fl);
-	  s >> b; set_limit_authornonplayed(b);
-	  s >> b; set_shown_aboutbox(b);
-	  s >> str; 
-	  s >> str; set_mixer_command(str);
-	  s >> b; set_open_mixer(b);
-	  s >> b; set_ask_mix(b);
-	  s >> b; set_auto_popqueue(b);
-	  s >> str; set_record_command(str);
-	  s >> str; set_replay_command(str);
-	  s >> str; set_record_mixer_command(str);
-	  s >> clr; set_color_tempo44(clr);
-	  s >> clr; set_color_tempo54(clr);
-	  s >> clr; set_color_tempo64(clr);
-	  s >> clr; set_color_tempo74(clr);
-	  s >> clr; set_color_tempo84(clr);
-	  s >> b; set_show_tempo54(b);
-	  s >> b; set_show_tempo64(b);
-	  s >> b; set_show_tempo74(b);
-	  s >> b; set_show_tempo84(b);
-	  s >> b; set_show_unknown_tempo(b);
-	  s >> clr; set_color_green_time(clr);
-	  s >> clr; set_color_yellow_time(clr);
-	  s >> clr; set_color_orange_time(clr);
-	  s >> clr; set_color_red_time(clr);
-	  s >> b; set_color_main_window(b);
-	  s >> b; set_log_spectrum_distance(b);
-	  s >> clr; set_color_played_song(clr);
-	  s >> clr; set_color_played_author(clr);
-	  s >> clr; set_color_unavailable(clr);
-	  s >> clr; set_color_dcolor_col(clr);
-	  s >> w; set_color_cluster_depth (w);
-	  // read tag data
-	  s >> w; 
-	  while(w-->0)
+	  s >> b; limit_ondisk.state=b;
+	  s >> b; limit_nonplayed.state=b;
+	  s >> b; limit_uprange.state=b;
+	  s >> b; limit_downrange.state=b;
+	  s >> b; limit_indistance.state=b;
+	  for(int i = 0 ; i < 4 ; i ++)
 	    {
-	      QString t;
-	      Q_INT8 i,m,e;
-	      s >> t;
-	      s >> i; 
-	      s >> m; 
-	      s >> e; 
-	      new QListViewItem(get_taglist(), t, i ? TAG_TRUE : TAG_FALSE,
-				m ? TAG_TRUE : TAG_FALSE,
-				e ? TAG_TRUE : TAG_FALSE);
+	      s >> w;   players[i].setCommand((SongProcess::command_type)w);
+	      s >> str; players[i].setName(str);
+	      s >> str; players[i].setRemote(str);
 	    }
-	  // read header
-	  s >> w; 
-	  for(int i = 0 ; i < w ; i++)
-	    get_header()->addLabel("");
-	  for(int i = 0 ; i < w ; i++)
-	    {
-	      Q_UINT16 m1,m2; s >> m1; s >> m2;
-	      realize_mapping(get_header(),i,m1,m2);
-	    }
-	}
-      else if (magic == MAGIC_2_6)
-	{
-	  s >> w; set_file_count (w);
-	  s >> w; set_yellowTime (w);
-	  s >> w; set_orangeTime (w);
-	  s >> w; set_redTime (w);
-	  s >> w; set_filterBpm (w);
-	  s >> b; set_color_range(b);
-	  s >> b; set_color_played(b);
-	  s >> b; set_color_authorplayed(b);
-	  s >> b; set_color_ondisk(b);
-	  s >> b; set_color_cues(b);
-	  s >> b; set_color_dcolor(b);
-	  s >> b; set_color_spectrum(b);
-	  s >> b; set_authorDecay(b);
-	  s >> b; set_limit_ondisk(b);
-	  s >> b; set_limit_nonplayed(b);
-	  s >> b; set_limit_uprange(b);
-	  s >> b; set_limit_downrange(b);
-	  s >> b; set_limit_indistance(b);
-	  s >> str; set_playCommand1(str);
-	  s >> str; set_playCommand2(str);
-	  s >> str; set_playCommand3(str);
-	  s >> str; set_playCommand4(str);
 	  s >> fl; set_distance_temposcale(fl);
 	  s >> fl; set_distance_spectrumweight(fl);
-	  s >> b; set_limit_authornonplayed(b);
+	  s >> b; limit_authornonplayed.state=b;
 	  s >> b; set_shown_aboutbox(b);
-	  s >> str; 
 	  s >> str; set_mixer_command(str);
-	  s >> b; set_open_mixer(b);
-	  s >> b; set_ask_mix(b);
-	  s >> b; set_auto_popqueue(b);
+	  s >> b; // open_mixer.set(b);
+	  s >> b; ask_mix.set(b);
+	  s >> b; auto_popqueue.set(b);
 	  s >> str; set_record_command(str);
 	  s >> str; set_replay_command(str);
 	  s >> str; set_record_mixer_command(str);
@@ -607,179 +392,7 @@ void Config::load()
 	  s >> clr; set_color_dcolor_col(clr);
 	  s >> w; set_color_cluster_depth (w);
 	  s >> str; set_bpm_mixer_command(str);
-	  s >> b; set_open_bpmmixer(b);
-	  // read tag data
-	  s >> w; 
-	  while(w-->0)
-	    {
-	      QString t;
-	      Q_INT8 i,m,e;
-	      s >> t;
-	      s >> i; 
-	      s >> m; 
-	      s >> e; 
-	      new QListViewItem(get_taglist(), t, i ? TAG_TRUE : TAG_FALSE,
-				m ? TAG_TRUE : TAG_FALSE,
-				e ? TAG_TRUE : TAG_FALSE);
-	    }
-	  // read header
-	  s >> w; 
-	  for(int i = 0 ; i < w ; i++)
-	    get_header()->addLabel("");
-	  for(int i = 0 ; i < w ; i++)
-	    {
-	      Q_UINT16 m1,m2; s >> m1; s >> m2;
-	      realize_mapping(get_header(),i,m1,m2);
-	    }
-	}
-      else if (magic == MAGIC_2_7)
-	{
-	  s >> w; set_file_count (w);
-	  s >> w; set_yellowTime (w);
-	  s >> w; set_orangeTime (w);
-	  s >> w; set_redTime (w);
-	  s >> w; set_filterBpm (w);
-	  s >> b; set_color_range(b);
-	  s >> b; set_color_played(b);
-	  s >> b; set_color_authorplayed(b);
-	  s >> b; set_color_ondisk(b);
-	  s >> b; set_color_cues(b);
-	  s >> b; set_color_dcolor(b);
-	  s >> b; set_color_spectrum(b);
-	  s >> b; set_authorDecay(b);
-	  s >> b; set_limit_ondisk(b);
-	  s >> b; set_limit_nonplayed(b);
-	  s >> b; set_limit_uprange(b);
-	  s >> b; set_limit_downrange(b);
-	  s >> b; set_limit_indistance(b);
-	  s >> str; set_playCommand1(str);
-	  s >> str; set_playCommand2(str);
-	  s >> str; set_playCommand3(str);
-	  s >> str; set_playCommand4(str);
-	  s >> fl; set_distance_temposcale(fl);
-	  s >> fl; set_distance_spectrumweight(fl);
-	  s >> b; set_limit_authornonplayed(b);
-	  s >> b; set_shown_aboutbox(b);
-	  s >> str; 
-	  s >> str; set_mixer_command(str);
-	  s >> b; set_open_mixer(b);
-	  s >> b; set_ask_mix(b);
-	  s >> b; set_auto_popqueue(b);
-	  s >> str; set_record_command(str);
-	  s >> str; set_replay_command(str);
-	  s >> str; set_record_mixer_command(str);
-	  s >> clr; set_color_tempo44(clr);
-	  s >> clr; set_color_tempo54(clr);
-	  s >> clr; set_color_tempo64(clr);
-	  s >> clr; set_color_tempo74(clr);
-	  s >> clr; set_color_tempo84(clr);
-	  s >> b; set_show_tempo54(b);
-	  s >> b; set_show_tempo64(b);
-	  s >> b; set_show_tempo74(b);
-	  s >> b; set_show_tempo84(b);
-	  s >> b; set_show_unknown_tempo(b);
-	  s >> clr; set_color_green_time(clr);
-	  s >> clr; set_color_yellow_time(clr);
-	  s >> clr; set_color_orange_time(clr);
-	  s >> clr; set_color_red_time(clr);
-	  s >> b; set_color_main_window(b);
-	  s >> b; set_log_spectrum_distance(b);
-	  s >> clr; set_color_played_song(clr);
-	  s >> clr; set_color_played_author(clr);
-	  s >> clr; set_color_unavailable(clr);
-	  s >> clr; set_color_dcolor_col(clr);
-	  s >> w; set_color_cluster_depth (w);
-	  s >> str; set_bpm_mixer_command(str);
-	  s >> b; set_open_bpmmixer(b);
-	  // read tag data
-	  s >> w; 
-	  while(w-->0)
-	    {
-	      QString t;
-	      Q_INT8 i,m,e;
-	      s >> t;
-	      s >> i; 
-	      s >> m; 
-	      s >> e; 
-	      new QListViewItem(get_taglist(), t, i ? TAG_TRUE : TAG_FALSE,
-				m ? TAG_TRUE : TAG_FALSE,
-				e ? TAG_TRUE : TAG_FALSE);
-	    }
-	  // read header
-	  s >> w; 
-	  for(int i = 0 ; i < w ; i++)
-	    get_header()->addLabel("");
-	  for(int i = 0 ; i < w ; i++)
-	    {
-	      Q_UINT16 m1,m2; s >> m1; s >> m2;
-	      realize_mapping(get_header(),i,m1,m2);
-	    }
-	  float F;
-	  s >> F; set_distance_tempoweight(F);
-	  s >> F; set_distance_echoweight(F);
-	  s >> F; set_distance_rythmweight(F);
-	  s >> F; set_distance_compositionweight(F);
-	  s >> w; set_max_songs(w);
-	}
-      else if (magic == MAGIC_2_8)
-	{
-	  s >> w; set_file_count (w);
-	  s >> w; set_yellowTime (w);
-	  s >> w; set_orangeTime (w);
-	  s >> w; set_redTime (w);
-	  s >> w; set_filterBpm (w);
-	  s >> b; set_color_range(b);
-	  s >> b; set_color_played(b);
-	  s >> b; set_color_authorplayed(b);
-	  s >> b; set_color_ondisk(b);
-	  s >> b; set_color_cues(b);
-	  s >> b; set_color_dcolor(b);
-	  s >> b; set_color_spectrum(b);
-	  s >> b; set_authorDecay(b);
-	  s >> b; set_limit_ondisk(b);
-	  s >> b; set_limit_nonplayed(b);
-	  s >> b; set_limit_uprange(b);
-	  s >> b; set_limit_downrange(b);
-	  s >> b; set_limit_indistance(b);
-	  s >> str; set_playCommand1(str);
-	  s >> str; set_playCommand2(str);
-	  s >> str; set_playCommand3(str);
-	  s >> str; set_playCommand4(str);
-	  s >> fl; set_distance_temposcale(fl);
-	  s >> fl; set_distance_spectrumweight(fl);
-	  s >> b; set_limit_authornonplayed(b);
-	  s >> b; set_shown_aboutbox(b);
-	  s >> str; 
-	  s >> str; set_mixer_command(str);
-	  s >> b; set_open_mixer(b);
-	  s >> b; set_ask_mix(b);
-	  s >> b; set_auto_popqueue(b);
-	  s >> str; set_record_command(str);
-	  s >> str; set_replay_command(str);
-	  s >> str; set_record_mixer_command(str);
-	  s >> clr; set_color_tempo44(clr);
-	  s >> clr; set_color_tempo54(clr);
-	  s >> clr; set_color_tempo64(clr);
-	  s >> clr; set_color_tempo74(clr);
-	  s >> clr; set_color_tempo84(clr);
-	  s >> b; set_show_tempo54(b);
-	  s >> b; set_show_tempo64(b);
-	  s >> b; set_show_tempo74(b);
-	  s >> b; set_show_tempo84(b);
-	  s >> b; set_show_unknown_tempo(b);
-	  s >> clr; set_color_green_time(clr);
-	  s >> clr; set_color_yellow_time(clr);
-	  s >> clr; set_color_orange_time(clr);
-	  s >> clr; set_color_red_time(clr);
-	  s >> b; set_color_main_window(b);
-	  s >> b; set_log_spectrum_distance(b);
-	  s >> clr; set_color_played_song(clr);
-	  s >> clr; set_color_played_author(clr);
-	  s >> clr; set_color_unavailable(clr);
-	  s >> clr; set_color_dcolor_col(clr);
-	  s >> w; set_color_cluster_depth (w);
-	  s >> str; set_bpm_mixer_command(str);
-	  s >> b; set_open_bpmmixer(b);
+	  s >> b; open_bpmmixer.set(b);
 	  // read tag data
 	  s >> w; 
 	  while(w-->0)
@@ -810,142 +423,29 @@ void Config::load()
 	  s >> F; set_distance_compositionweight(F);
 	  s >> w; set_max_songs(w);
 	  s >> clr; set_color_unchecked(clr);
-	}
-      else if (magic == MAGIC_2_9)
-	{
-	  s >> w; set_file_count (w);
-	  s >> w; set_yellowTime (w);
-	  s >> w; set_orangeTime (w);
-	  s >> w; set_redTime (w);
-	  s >> w; set_filterBpm (w);
-	  s >> b; set_color_range(b);
-	  s >> b; set_color_played(b);
-	  s >> b; set_color_authorplayed(b);
-	  s >> b; set_color_ondisk(b);
-	  s >> b; set_color_cues(b);
-	  s >> b; set_color_dcolor(b);
-	  s >> b; set_color_spectrum(b);
-	  s >> b; set_authorDecay(b);
-	  s >> b; set_limit_ondisk(b);
-	  s >> b; set_limit_nonplayed(b);
-	  s >> b; set_limit_uprange(b);
-	  s >> b; set_limit_downrange(b);
-	  s >> b; set_limit_indistance(b);
-	  s >> str; set_playCommand1(str);
-	  s >> str; set_playCommand2(str);
-	  s >> str; set_playCommand3(str);
-	  s >> str; set_playCommand4(str);
-	  s >> fl; set_distance_temposcale(fl);
-	  s >> fl; set_distance_spectrumweight(fl);
-	  s >> b; set_limit_authornonplayed(b);
-	  s >> b; set_shown_aboutbox(b);
-	  s >> str; set_mixer_command(str);
-	  s >> b; set_open_mixer(b);
-	  s >> b; set_ask_mix(b);
-	  s >> b; set_auto_popqueue(b);
-	  s >> str; set_record_command(str);
-	  s >> str; set_replay_command(str);
-	  s >> str; set_record_mixer_command(str);
-	  s >> clr; set_color_tempo44(clr);
-	  s >> clr; set_color_tempo54(clr);
-	  s >> clr; set_color_tempo64(clr);
-	  s >> clr; set_color_tempo74(clr);
-	  s >> clr; set_color_tempo84(clr);
-	  s >> b; set_show_tempo54(b);
-	  s >> b; set_show_tempo64(b);
-	  s >> b; set_show_tempo74(b);
-	  s >> b; set_show_tempo84(b);
-	  s >> b; set_show_unknown_tempo(b);
-	  s >> clr; set_color_green_time(clr);
-	  s >> clr; set_color_yellow_time(clr);
-	  s >> clr; set_color_orange_time(clr);
-	  s >> clr; set_color_red_time(clr);
-	  s >> b; set_color_main_window(b);
-	  s >> b; set_log_spectrum_distance(b);
-	  s >> clr; set_color_played_song(clr);
-	  s >> clr; set_color_played_author(clr);
-	  s >> clr; set_color_unavailable(clr);
-	  s >> clr; set_color_dcolor_col(clr);
-	  s >> w; set_color_cluster_depth (w);
-	  s >> str; set_bpm_mixer_command(str);
-	  s >> b; set_open_bpmmixer(b);
-	  // read tag data
-	  s >> w; 
-	  while(w-->0)
+	  for(int i = 0 ; i < 8 ; i ++)
 	    {
-	      QString t;
-	      Q_INT8 i,m,e;
-	      s >> t;
-	      s >> i; 
-	      s >> m; 
-	      s >> e; 
-	      new QListViewItem(get_taglist(), t, i ? TAG_TRUE : TAG_FALSE,
-				m ? TAG_TRUE : TAG_FALSE,
-				e ? TAG_TRUE : TAG_FALSE);
+	      s >> w;   analyzers[i].setCommand((SongProcess::command_type)w);
+	      s >> str; analyzers[i].setName(str);
+	      s >> str; analyzers[i].setRemote(str);
 	    }
-	  // read header
-	  s >> w; 
-	  for(int i = 0 ; i < w ; i++)
-	    get_header()->addLabel("");
-	  for(int i = 0 ; i < w ; i++)
-	    {
-	      Q_UINT16 m1,m2; s >> m1; s >> m2;
-	      realize_mapping(get_header(),i,m1,m2);
-	    }
-	  float F;
-	  s >> F; set_distance_tempoweight(F);
-	  s >> F; set_distance_echoweight(F);
-	  s >> F; set_distance_rythmweight(F);
-	  s >> F; set_distance_compositionweight(F);
-	  s >> w; set_max_songs(w);
-	  s >> clr; set_color_unchecked(clr);
-	  s >> str; set_analCommand1(str);
-	  s >> str; set_analCommand2(str);
-	  s >> str; set_analCommand3(str);
-	  s >> str; set_analCommand4(str);
-	  s >> str; set_analCommand5(str);
-	  s >> str; set_analCommand6(str);
-	  s >> str; set_analCommand7(str);
-	  s >> str; set_analCommand8(str);
 	  s >> fl;  set_anal_bpm_from(fl);
 	  s >> fl;  set_anal_bpm_to(fl);
 	  s >> w;   set_anal_bpm_technique(w);
+	  s >> b;   color_songs_based_on_history.set(b);
+	  s >> clr; set_color_alltime(clr);
 	}
       else
 	printf("Wrong config file format\n");
-      if (magic != MAGIC_NOW)
-	{
-	  set_shown_aboutbox(false);
-	  if (MAGIC_NOW == MAGIC_2_1)
-	    {
-	      set_playCommand1("");
-	      set_playCommand2("");
-	      set_playCommand3("");
-	      set_playCommand4("");
-	    }
-	}
-      //      dump_header(get_header());
       calc_and_cache();
     }
+  return true;
 }
 
 bool Config::open_ui(int pane)
 {
   char tmp[50];
   PreferencesLogic preferences(NULL,NULL,TRUE);
-  preferences.playerCommand1 -> setText ( get_playCommand1() ) ;
-  preferences.playerCommand2 -> setText ( get_playCommand2() ) ;
-  preferences.playerCommand3 -> setText ( get_playCommand3() ) ;
-  preferences.playerCommand4 -> setText ( get_playCommand4() ) ;
-
-  preferences.analyzerCommand1 -> setText( get_analCommand1() );
-  preferences.analyzerCommand2 -> setText( get_analCommand2() );
-  preferences.analyzerCommand3 -> setText( get_analCommand3() );
-  preferences.analyzerCommand4 -> setText( get_analCommand4() );
-  preferences.analyzerCommand5 -> setText( get_analCommand5() );
-  preferences.analyzerCommand6 -> setText( get_analCommand6() );
-  preferences.analyzerCommand7 -> setText( get_analCommand7() );
-  preferences.analyzerCommand8 -> setText( get_analCommand8() );
 
   sprintf(tmp,"%d",get_yellowTime());
   preferences.yellowTime->setText(tmp);
@@ -971,7 +471,8 @@ bool Config::open_ui(int pane)
   preferences.colorTempo64 -> setPaletteBackgroundColor( get_color_tempo64 ());
   preferences.colorTempo74 -> setPaletteBackgroundColor( get_color_tempo74 ());
   preferences.colorTempo84 -> setPaletteBackgroundColor( get_color_tempo84 ());
-
+  preferences.colorAlltimePlaycount -> setPaletteBackgroundColor( get_color_alltime ());
+  
   preferences.showTempo54 -> setChecked( get_show_tempo54 ());
   preferences.showTempo64 -> setChecked( get_show_tempo64 ());
   preferences.showTempo74 -> setChecked( get_show_tempo74 ());
@@ -1002,20 +503,6 @@ bool Config::open_ui(int pane)
 
   if (preferences.exec()==QDialog::Accepted)
     {
-      set_playCommand1(preferences.playerCommand1->text());
-      set_playCommand2(preferences.playerCommand2->text());
-      set_playCommand3(preferences.playerCommand3->text());
-      set_playCommand4(preferences.playerCommand4->text());
-
-      set_analCommand1(preferences.analyzerCommand1->text());
-      set_analCommand2(preferences.analyzerCommand2->text());
-      set_analCommand3(preferences.analyzerCommand3->text());
-      set_analCommand4(preferences.analyzerCommand4->text());
-      set_analCommand5(preferences.analyzerCommand5->text());
-      set_analCommand6(preferences.analyzerCommand6->text());
-      set_analCommand7(preferences.analyzerCommand7->text());
-      set_analCommand8(preferences.analyzerCommand8->text());
-
       set_yellowTime(atoi(preferences.yellowTime->text()));
       set_orangeTime(atoi(preferences.orangeTime->text()));
       set_redTime(atoi(preferences.redTime->text()));
@@ -1032,6 +519,7 @@ bool Config::open_ui(int pane)
       set_color_tempo64(preferences.colorTempo64->paletteBackgroundColor());
       set_color_tempo74(preferences.colorTempo74->paletteBackgroundColor());
       set_color_tempo84(preferences.colorTempo84->paletteBackgroundColor());
+      set_color_alltime(preferences.colorAlltimePlaycount->paletteBackgroundColor());
 
       set_show_tempo54 (preferences.showTempo54->isChecked());
       set_show_tempo64 (preferences.showTempo64->isChecked());
@@ -1076,11 +564,6 @@ bool Config::open_ui(int pane)
     }
   return false;
 }
-/*      if (bounds->resamplingScan->isChecked()) technique = 1;
-      else if (bounds->ultraLongFFT->isChecked()) technique = 2;
-      else if (bounds->enveloppeSpectrum->isChecked()) technique = 3;
-      else if (bounds->fullAutoCorrelation->isChecked()) technique = 4;
-*/
 
 void Config::calc_and_cache()
 {

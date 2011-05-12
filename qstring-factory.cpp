@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -50,16 +50,14 @@ QString tonumber(const float f)
 AvlTree<QString> QStringFactory::tree;
 bool QStringFactory::killed = false;
 
-// unsigned long winst = 0;
-QString QStringFactory::create(char*  str)
+QString QStringFactory::create(QString newly_allocated)
 {
-  if (str==NULL) return QString::null;
-  if (killed) return QString(str);
-  QString newly_allocated(str);
+  if (killed) return newly_allocated;
+  if (newly_allocated.isEmpty()) return QString::null;
+  
   QStringNode * found = (QStringNode*) tree.search(newly_allocated);
   if (found)
     {
-      // winst+=found->content.length()*2+1;
       return found->content;
       // the newly allocated string will be destroyed at the moment
       // this function returns. The data stored in the found content

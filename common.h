@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -20,11 +20,11 @@
 #ifndef COMMON_H
 #define COMMON_H
 #include <stdio.h>
+#include <qstring.h>
 #include <string.h>
+#include "Data/types.h"
 
 void   common_init();
-bool   strxeq(const char* a, const char* b); // also works when a or b or NULL
-char * findUniqueName(const char* filename); // will prefix the extention of filename with a number until a unique filename is found
 bool   exists(const char* fn);
 double minimum(double a, double b);
 double abs_minimum(double a, double b);
@@ -34,4 +34,6 @@ inline bool option(char* arg, char* name) { return strcmp(arg,name)==0; };
 inline bool option(char* arg, char* namea, char* nameb) { return (strcmp(arg,namea)==0 || strcmp(arg,nameb)==0); };
 char * tohex(long i);
 long   toint(const char* name);
+QString readable(unsigned8);
+
 #endif

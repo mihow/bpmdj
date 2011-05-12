@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,14 +16,24 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "power-type.h"
 
-void power_type::write(const char* prefix, FILE * f)
+Data power_type::get_data(int version) const
 {
-  if (left==no_power && right==no_power) return;
-  fprintf(f,"%s %g %g\n", prefix, left, right);
+  Array<1,float4> result(2);
+  result[0]=left;
+  result[1]=right;
+  return result;
+}
+
+void power_type::set_data(Data data) 
+{
+  Array<1,float4> cast = data;
+  left = cast[0];
+  right = cast[1];
 }
 
 void power_type::read(char* l)

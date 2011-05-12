@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -30,8 +30,10 @@
 void Md5Analyzer::run()
 {
   FILE * kloink;
-  if (!vexecute("md5sum \"%s\" | awk '{printf $1}' >sum.tmp",argument))
-    exit(101);
+  char * a = escape(argument);
+  if (!vexecute("md5sum %s | awk '{printf $1}' >sum.tmp",a))
+    _exit(101);
+  bpmdj_deallocate(a);
   kloink=fopen("sum.tmp","r");
   char s[40];
   int i=0;

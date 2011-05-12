@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ void EnergyAnalyzer::readAudio()
   FILE * raw = openCoreRawFile();
   audiosize=fsize(raw);
   audiosize/=4;
-  audio=allocate(audiosize+1,stereo_sample2);
+  audio=bpmdj_allocate(audiosize+1,stereo_sample2);
   if (audiosize==0) return;
   readsamples(audio,audiosize,raw);
 }

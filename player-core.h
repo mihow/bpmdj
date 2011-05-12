@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -19,8 +19,8 @@
 
 #ifndef PLAYER_CORE_H
 #define PLAYER_CORE_H
-#include "index.h"
 #include "dsp-drivers.h"
+#include "index.h"
 
 /*-------------------------------------------
  *         Wavrate conversion routines
@@ -117,10 +117,12 @@ extern int   opt_quiet;
 extern int   opt_match;
 extern char* arg_match;
 extern char* argument;
+extern bool  opt_check;
 
 extern int app_init(int argc, char *argv[]);
 extern void process_options(int argc,char *argv[]);
 extern void msg_playing_state_changed();
+extern void msg_writing_finished();
 
 // exported functions
 FILE * openCoreRawFile();

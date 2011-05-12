@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -47,6 +47,7 @@
 #include <pthread.h>
 #include <sys/types.h>
 #include <sys/mman.h>
+#include <errno.h>
 #include "mixerdialog.logic.h"
 #include "dsp-drivers.h"
 #include "dsp-oss.h"
@@ -86,7 +87,7 @@ void * go(void* neglect)
 
 void terminal_start()
 {
-  pthread_t *y = allocate(1,pthread_t);
+  pthread_t *y = bpmdj_allocate(1,pthread_t);
   mixer_window = new MixerDialogLogic();
   app->setMainWidget(mixer_window);
   mixer_window->show();

@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -19,12 +19,20 @@
 
 #ifndef SMALLHISTOGRAM_TYPE_H
 #define SMALLHISTOGRAM_TYPE_H
-
+#include <stdlib.h>
 #include <assert.h>
-#include "basic-types.h"
+#include <math.h>
 #include "common.h"
+#include "Data/om-data.h"
+#include "histogram-type.h"
+#include "common.h"
+#include "memory.h"
+#include "signals.h"
+#include "files.h"
 
 class histogram_type;
+extern Symbol key_content;
+extern Symbol key_scale;
 
 template <int smallhistogram_size> class smallhistogram_type
 {
@@ -32,14 +40,11 @@ template <int smallhistogram_size> class smallhistogram_type
   double scale;
   //  int    count;
   unsigned1 bin[smallhistogram_size];
-  smallhistogram_type();
+  smallhistogram_type() 
+    {
+    };
   void init(histogram_type * other);
   void init();
-  void read_idx(const char*);
-  const void write_idx(FILE * f);
-  const void write_bib_v272(FILE * index);
-  void read_bib_v271();
-  void read_bib_v272();
   void set_energy(int x, unsigned1 v)
     {
       assert(x<smallhistogram_size);
@@ -51,6 +56,8 @@ template <int smallhistogram_size> class smallhistogram_type
       assert(x<smallhistogram_size);
       return bin[x];
     }
+  Data get_data(int version) const;
+  void set_data(Data& data);
   void set_scale(double s)
     {
       scale = s;
@@ -68,5 +75,61 @@ template <int smallhistogram_size> class smallhistogram_type
       return (float4)bin[delay]*scale;
     }
 };
+
+template <int smallhistogram_size> void smallhistogram_type<smallhistogram_size>::validate_scale()
+{
+  if (isnan(scale) || isinf(scale))
+    scale = 0;
+}
+
+template <int smallhistogram_size> void smallhistogram_type<smallhistogram_size>::init(histogram_type * other)
+{
+  set_scale(other->scale);
+  if (other->count<smallhistogram_size)
+    {
+      for(int i = 0 ; i < other->count; i++)
+	bin[i]=abs(other->bins[i]);
+      for(int i = other->count ; i < smallhistogram_size ; i ++)
+	bin[i]=0;
+    }
+  else
+    {
+      for(int i = 0 ; i < smallhistogram_size; i++)
+	bin[i]=abs(other->bins[i]);
+    }
+}
+
+template <int smallhistogram_size> void smallhistogram_type<smallhistogram_size>::init()
+{
+  for(int i = 0 ; i < smallhistogram_size; i++)
+    bin[i]=0;
+}
+
+template <int smallhistogram_size> Data smallhistogram_type<smallhistogram_size>::get_data(int version) const
+{
+  Token result;
+  result[key_scale]=Float8(scale);
+  Array<1,unsigned1> a(smallhistogram_size);
+  result[key_content]=a;
+  for(int i = 0 ; i < smallhistogram_size ; i++)
+    a[i]=bin[i];
+  return result;
+}
+
+template <int smallhistogram_size> 
+void smallhistogram_type<smallhistogram_size>::set_data(Data& data)
+{
+  Token result = data;
+  scale = (Float8)result[key_scale];
+  Array<1,unsigned1> a = result[key_content];
+  // can we make use of an ordere array ?
+  typename Array<1,unsigned1>::ordered i(a);
+  if (i.linear() && i.size()==smallhistogram_size)
+    memcpy(bin,i.current(),smallhistogram_size);
+  // if not copy one by one
+  else
+    for(int i = 0 ; i < smallhistogram_size ; i++)
+      bin[i]=a[i];
+}
 
 #endif

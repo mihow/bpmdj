@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -339,7 +339,7 @@ int dsp_alsa::open()
     snd_pcm_dump(dsp,output);
 
   // allocate buffer of correct size
-  buffer = allocate(period_size,unsigned4);
+  buffer = bpmdj_allocate(period_size,unsigned4);
   
   start();
   return err_none;

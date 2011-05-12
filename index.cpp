@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -30,10 +30,10 @@
 #include <signal.h>
 #include <assert.h>
 #include <qlabel.h>
-#include <sys/mman.h>
 #include <qlineedit.h>
-#include <unistd.h>
 #include <time.h>
+#include <string.h>
+#include <qstring.h>
 #include "common.h"
 #include "index.h"
 #include "version.h"
@@ -44,151 +44,59 @@
 #include "smallhistogram-type.h"
 #include "histogram-property.h"
 
+using namespace std;
+
+
 /*-------------------------------------------
- *         Performance operations
+ *         Symbols used
  *-------------------------------------------*/
-static char* buffer = NULL;
-static long int buffer_size;
-static long int buffer_ptr;
-static FILE* buffer_file;
+static Symbol key_bpmdj_version("version");
+static Symbol key_file("file");
+static Symbol key_author("author");
+static Symbol key_title("title");
+static Symbol key_remix("remix");
+static Symbol key_tags("tag");
+static Symbol key_version("number");
+static Symbol key_cue("cue");
+static Symbol key_cuez("cuez");
+static Symbol key_cuex("cuex");
+static Symbol key_cuec("cuec");
+static Symbol key_cuev("cuev");
+static Symbol key_min("min");
+static Symbol key_max("max");
+static Symbol key_mean("mean");
+static Symbol key_power("power");
+static Symbol key_albums("albums");
+static Symbol key_echo("histogram");
+static Symbol key_rythm("rythm");
+static Symbol key_composition("composition");
+static Symbol key_spectrum("spectrum");
+static Symbol key_md5sum("md5sum");
+static Symbol key_time("time");
+static Symbol key_count("count");
+static Symbol key_info("info");
+static Symbol key_name("name");
+static Symbol key_period("period");
+static Symbol key_nr("nr");
+static Symbol key_prev("prev");
+static Symbol key_next("next");
+       Symbol key_content("content");
+       Symbol key_scale("scale");
+static Symbol key_disabled_capacities("disabled_capacities");
 
-static void buffer_init(FILE * stream)
-{
-  // read new buffer
-  fseek(stream,0,SEEK_END);
-  buffer_size=ftell(stream);
-  buffer = allocate(buffer_size+1,char);
-  // read file
-  fseek(stream,0,SEEK_SET);
-  fread(buffer,buffer_size,1,stream);
-  // sentinel.. so nextchar can work faster
-  buffer[buffer_size]='\n';
-  buffer_ptr=0;
-  buffer_file=stream;
-}
-
-static void buffer_map(int fd)
-{
-  // get size
-  buffer_size = lseek(fd,0,SEEK_END);
-  // map into memory
-  buffer = (char *)mmap(0,buffer_size,PROT_READ,MAP_SHARED,fd,0);
-  assert(buffer);
-  // set initial buffer_ptr
-  buffer_ptr=0;
-}
-
-static void buffer_unmap()
-{
-  munmap(buffer,buffer_size);
-}
-
-static int nextchar()
-{
-  // no end-of-file check because 
-  // this is done in the beginning in getline
-  return buffer[buffer_ptr++];
-}
-
-static char* strldup(char* str, int l)
-{
-  char * result = allocate(l+1,char);
-  strncpy(result,str,l+1);
-  return result;
-}
-
-long int buffer_signed4()
-{
-  signed4 p = *(long*)(buffer+buffer_ptr);
-  buffer_ptr+=4;
-  return p;
-}
-
-unsigned4 buffer_unsigned4()
-{
-  unsigned4 p = *(unsigned4*)(buffer+buffer_ptr);
-  buffer_ptr+=4;
-  return p;
-}
-
-void buffer_sequence(unsigned1 *a, int l)
-{
-  memcpy(a,buffer+buffer_ptr,1*l);
-  buffer_ptr+=l;
-}
-
-float4 buffer_float4()
-{
-  float p = *(float*)(buffer+buffer_ptr);
-  buffer_ptr+=4;
-  return p;
-}
-
-unsigned1 buffer_unsigned1()
-{
-  unsigned1 p = *(unsigned1*)(buffer+buffer_ptr);
-  buffer_ptr+=1;
-  return p;
-}
-
-static float8 buffer_float8()
-{
-  float8 p = *(float8*)(buffer+buffer_ptr);
-  buffer_ptr+=8;
-  return p;
-}
-
-static char* buffer_strdup()
-{
-  int l = strlen(buffer+buffer_ptr);
-  char * result =  strldup(buffer+buffer_ptr,l);
-  buffer_ptr+=l+1;
-  return result;
-}
-
-static void buffer_done()
-{
-  deallocate(buffer);
-  buffer=NULL;
-  buffer_size=0;
-  buffer_file=NULL;
-}
-
-ssize_t fast_getline(char **lineptr)
-     // warning !!!! -- semantics differ seriously from getline.
-{
-  int c;
-  int l=0;
-  char * result;
-  // check end of line !
-  if (buffer_ptr>=buffer_size)
-    return -1;
-  // now, we are sure we can read till the end of this line !
-  result = buffer+buffer_ptr;
-  while((c=nextchar())!='\n') l++;
-  // give a pointer back
-  *lineptr = result;
-  // zero terminate the thing
-  result[l]=0;
-  return l;
-}
+static String VersionString(QString("BpmDj v"VERSION));
 
 /*-------------------------------------------
  *         Index operations
  *-------------------------------------------*/
 void Index::init()
 {
-  meta_contains_tar = false;
-  meta_inbib = false;
   index_period = -1;
-  index_file = 0;
-  index_tags = NULL;
-  index_md5sum = NULL;
-  index_remark = 0;
+  index_file = "";
+  index_tags = "";
+  index_md5sum = "";
   meta_changed = 0;
-  index_bpmcount_from = -1;
-  index_bpmcount_to = -1;
-  index_time = NULL;
+  index_time = "";
   index_cue_z = 0;
   index_cue_x = 0;
   index_cue_c = 0;
@@ -198,15 +106,15 @@ void Index::init()
   index_histogram.clear();
   index_rythm.clear();
   index_composition.clear();
-  title = NULL;
-  author = NULL;
-  remix = NULL;
-  version = NULL;
-  prev = allocate(1, HistoryField*);
+  title = "";
+  author = "";
+  remix = "";
+  version = "";
+  prev = bpmdj_allocate(1, HistoryField*);
   prev[0]=NULL;
-  next = allocate(1,HistoryField*);
+  next = bpmdj_allocate(1,HistoryField*);
   next[0]=NULL;
-  albums = allocate(1, AlbumField*);
+  albums = bpmdj_allocate(1, AlbumField*);
   albums[0]=NULL;
   clear_energy();
   index_disabled_capacities = no_disabled_capacities;
@@ -214,134 +122,149 @@ void Index::init()
 
 void Index::free()
 {
-  if (meta_filename) ::deallocate(meta_filename);
-  meta_filename=NULL;
-  if (index_remark)   ::deallocate(index_remark);
-  if (index_file)     ::deallocate(index_file);
-  if (index_tags)     ::deallocate(index_tags);
-  if (index_md5sum)   ::deallocate(index_md5sum);
-  if (index_time)     ::deallocate(index_time);
-  if (index_spectrum) delete index_spectrum;
-  // if (index_pattern) deallocate(index_pattern);
-  if (title)   ::deallocate(title);
-  if (author)  ::deallocate(author);
-  if (remix)   ::deallocate(remix);
-  if (version) ::deallocate(version);
+  meta_filename="";
+  if (index_spectrum) 
+    delete index_spectrum;
   assert(prev && next);
-  while (*prev) delete(*prev++);
-  while (*next) delete(*next++);
-  while (*albums) delete(*albums++);
+  while (*prev) 
+    delete(*prev++);
   prev = NULL;
+  
+  while (*next) 
+    delete(*next++);
   next = NULL;
+
+  while (*albums) 
+    delete(*albums++);
   albums = NULL;
+}
+
+Data Index::get_data(const period_type &p)
+{
+  return Signed4(p.period);
+}
+
+Data Index::get_data(HistoryField ** history)
+{
+  // first count them;
+  int c=0;
+  HistoryField* *tmp = history;
+  while(*tmp) {c++; tmp++;};
+  // allocate array
+  Array<1,Data> history_data(c);
+  c=0;
+  tmp = history;
+  while(*tmp) 
+    {
+      history_data[c]=(*tmp)->get_data(0);
+      c++; 
+      tmp++;
+    };
+  return history_data;
+}
+
+HistoryField::HistoryField(QString f)
+{
+  file = f;
+  count = 0;
+  comment = "";
+}
+
+Data HistoryField::get_data(int version)
+{
+  Token result;
+  result[key_file]  = String(file);
+  result[key_count] = Signed4(count);
+  result[key_info]  = String(comment);
+  return result;
+}
+
+void HistoryField::set_data(Data &data)
+{
+  Token token=data;
+  file=(String)token[key_file];
+  count=(Signed4)token[key_count];
+  comment=(String)token[key_info];
+}
+
+Data AlbumField::get_data(int version) const
+{
+  Token result;
+  result[key_name]=String(name);
+  result[key_nr]=Signed4(nr);
+  return result;
+}
+
+void AlbumField::set_data(Data &data)
+{
+  Token cast = data;
+  name=(String)cast[key_name];
+  nr=(Signed4)cast[key_nr];
 }
 
 void Index::write_idx()
 {
-   FILE*f;
-   assert(!meta_inbib);
    if (!meta_filename)
      {
        printf("Error: no name given to write index file to\n");
        return;
      }
-   f=fopen(meta_filename,"wb");
-   if (!f)
-     {
-       printf("Warning: cannot open %s for writing\n",meta_filename);
-       return;
-     }
-   fprintf(f,"version  : BpmDj v"VERSION"\n");
-   fprintf(f,"file     : %s\n",index_file);
-   if (meta_contains_tar)
-     {
-       if (title && *title) fprintf(f,"title   : %s\n",title);
-       if (author && *author) fprintf(f,"author  : %s\n",author);
-       if (remix && *remix) fprintf(f,"remix   : %s\n",remix);
-       if (version && *version) fprintf(f,"number  : %s\n",version);
-     }
-   index_period.write_idx(f);
-   get_tempo().write_idx(f);
-   if (index_tags) fprintf(f,"tag      : %s\n",index_tags);
-   if (index_cue>0) fprintf(f,"cue      : %ld\n",index_cue);
-   if (index_cue_z>0) fprintf(f,"cue-z    : %ld\n",index_cue_z);
-   if (index_cue_x>0) fprintf(f,"cue-x    : %ld\n",index_cue_x);
-   if (index_cue_c>0) fprintf(f,"cue-c    : %ld\n",index_cue_c);
-   if (index_cue_v>0) fprintf(f,"cue-v    : %ld\n",index_cue_v);
-   if (index_bpmcount_from>=0) fprintf(f,"bpmcount-from : %d\n",index_bpmcount_from);
-   if (index_bpmcount_to>=0) fprintf(f,"bpmcount-to   : %d\n",index_bpmcount_to);
-   if (index_md5sum) fprintf(f,"md5sum : %s\n",index_md5sum);
-   if (index_remark) fprintf(f,"remark   : %s\n",index_remark);
-   if (index_time) fprintf(f,"time : %s\n",index_time);
-   if (index_spectrum!=no_spectrum) index_spectrum->write_idx(f);
-   if (index_disabled_capacities!=no_disabled_capacities) fprintf(f,"disabled-capacities : %d\n",index_disabled_capacities);
-   index_histogram.write_idx(f,"histogram");
-   index_rythm.write_idx(f,"rythm");
-   index_composition.write_idx(f,"composition");
-   index_min.write("min : ",f);
-   index_max.write("max : ",f);
-   index_mean.write("mean : ",f);
-   index_power.write("power : ",f);
-   // dumping of history fields..
-   HistoryField **tmp = prev;
-   while (*tmp) 
-     {
-       (*tmp)->write("prev",f);
-       tmp++;
-     }
-   tmp = next;
-   while (*tmp) 
-     {
-       (*tmp)->write("next",f);
-       tmp++;
-     }
+
+   Token token;
+   token[key_bpmdj_version]=VersionString;
+   token[key_file]=String(index_file);
+   token[key_title]=String(title);
+   token[key_author]=String(author);
+   token[key_remix]=String(remix);
+   token[key_version]=String(version);
+   token[key_period]=get_data(index_period);
+   token[key_tags]=String(index_tags);
+   token[key_cuez]=(Signed8)index_cue_z;
+   token[key_cuex]=(Signed8)index_cue_x;
+   token[key_cuec]=(Signed8)index_cue_c;
+   token[key_cuev]=(Signed8)index_cue_v;
+   token[key_cue]=(Signed8)index_cue;
+   token[key_md5sum]=String(index_md5sum);
+   token[key_time]=String(index_time);
+   if (index_spectrum!=no_spectrum)
+     token[key_spectrum]=index_spectrum->get_data();
+   token[key_disabled_capacities]=Unsigned2(index_disabled_capacities);
+   token[key_prev]=get_data(prev);
+   token[key_next]=get_data(next);
+   
+   const int versionnr = -1;
+   token[key_echo]=index_histogram.get_data(versionnr);
+   token[key_rythm]=index_rythm.get_data(versionnr);
+   token[key_composition]=index_composition.get_data(versionnr);
+   token[key_min]=index_min.get_data(versionnr);
+   token[key_max]=index_max.get_data(versionnr);
+   token[key_mean]=index_mean.get_data(versionnr);
+   token[key_power]=index_power.get_data(versionnr);
+
+   // count the albums
    AlbumField **amp = albums;
+   int c = 0;
    while (*amp)
      {
-       fprintf(f,"album : %d : %s\n",(*amp)->nr,(*amp)->name);
+       c++;
        amp++;
      }
-   fclose(f);
+   Array<1,Data> album_data(c);
+   amp = albums;
+   c=0;
+   while (*amp)
+     {
+       album_data[c++]=(*amp)->get_data(versionnr);
+       amp++;
+     }
+   token[key_albums]=album_data;
+   DataBinner::write(token,(const char*)meta_filename);
 }
 
-void HistoryField::write(const char* prefix, FILE * f)
+AlbumField::AlbumField(int r, QString n)
 {
-  fprintf(f,"%s : file  : %s\n", prefix, file);
-  fprintf(f,"%s : count : %d\n", prefix, count);
-  fprintf(f,"%s : info  : %s\n", prefix, comment ? comment : "");
-}
-
-HistoryField::HistoryField(char* primary)
-{
-  file = strdup(primary);
-  count = 0;
-  comment = NULL;
-}
-
-AlbumField::AlbumField(int r, const char * n)
-{
-  name = strdup(n);
+  name = n;
   nr = r;
-}
-
-char* strip_begin(char*tostrip)
-{
-  while(*tostrip && (*tostrip==' ' || *tostrip=='\t' || *tostrip=='\n')) tostrip++;
-  return tostrip;
-}
-
-char* strip_end(char*tostrip,char*theend)
-{
-  int c;
-  while(theend>=tostrip && (c=*theend) && (c==' ' || c=='\t' || c=='\n')) theend--;
-  *(theend+1)=0;
-  return tostrip;
-}
-
-char* strip(char*tostrip, char* theend)
-{
-   tostrip=strip_begin(tostrip);
-   return strip_end(tostrip,theend);
 }
 
 int strcompare(const void *a, const void * b)
@@ -379,7 +302,7 @@ bool Index::fix_tagline()
   // now sort them 
   qsort(words,nextword,sizeof(char*),strcompare);
   // remove duplicates and create result
-  new_tags = allocate(length+1,char);
+  new_tags = bpmdj_allocate(length+1,char);
   runner = new_tags;
   lastword = "";
   for(i = 0 ; i <nextword ; i ++)
@@ -398,15 +321,14 @@ bool Index::fix_tagline()
     *(runner)=0;
   if (strcmp(index_tags,new_tags)==0)
     {
-      ::deallocate(new_tags);
-      ::deallocate(temp);
+      bpmdj_deallocate(new_tags);
+      bpmdj_deallocate(temp);
       return false;
     }
   else
     {
-      printf("Index: tags '%s' to '%s'\n",index_tags,new_tags);
-      ::deallocate(index_tags);
-      ::deallocate(temp);
+      // printf("Index: tags '%s' to '%s'\n",index_tags,new_tags);
+      bpmdj_deallocate(temp);
       index_tags=new_tags;
       return true;
     }
@@ -419,7 +341,7 @@ void Index::add_history(HistoryField **& history, HistoryField * field)
   HistoryField* *tmp = history;
   while(*tmp) {c++; tmp++;};
   c++;
-  history=reallocate(history,c+1,HistoryField*);
+  history=bpmdj_reallocate(history,c+1,HistoryField*);
   history[c-1]=field;
   history[c]=NULL;
 }
@@ -429,7 +351,7 @@ void Index::add_album(AlbumField * a)
   int c=1;
   AlbumField* *tmp = albums;
   while(*tmp) {c++; tmp++;};
-  albums=reallocate(albums,c+1,AlbumField*);
+  albums=bpmdj_reallocate(albums,c+1,AlbumField*);
   albums[c-1]=a;
   albums[c]=NULL;
 }
@@ -438,26 +360,30 @@ AlbumField ** Index::copy_albums()
 {
   AlbumField ** tmp = albums;
   int c=1;
-  while ( *tmp ) { c++; tmp++; } ;
-  AlbumField ** result = allocate(c,AlbumField*);
+  while ( *tmp ) 
+    { 
+      c++; 
+      tmp++; 
+    } ;
+  AlbumField ** result = bpmdj_allocate(c,AlbumField*);
   result[ --c ] = NULL ;
   while( --c >= 0 ) 
     result[c] = new AlbumField(albums[c]->nr, albums[c]->name);
   return result;
 }
 
-AlbumField * Index::find_album(const char* n)
+AlbumField * Index::find_album(QString n)
 {
   AlbumField* *tmp = albums;
-  while(*tmp && (strcmp(n,(*tmp)->name)!=0)) 
+  while(*tmp && n!=(*tmp)->name) 
     tmp++;
   return *tmp;
 }
 
-void Index::delete_album(const char * n)
+void Index::delete_album(QString n)
 {
   AlbumField* *tmp = albums;
-  while(*tmp && (strcmp(n,(*tmp)->name)!=0)) 
+  while(*tmp && n!=(*tmp)->name)
     tmp++;
   while(tmp[0])
     {
@@ -476,23 +402,8 @@ void Index::add_next_history(HistoryField * h)
   add_history(next,h);
 }
 
-bool Index::split_field_value(char * c, char * & field, char * & value)
-{
-  char * line = c;
-  while(*c!=':' && *c!=0)
-    {
-      *c=tolower(*c);
-      c++;
-    }
-  if (!*c) return false;
-  *c=0;
-  field = strip_end(line,c-1);
-  value = strip_begin(c+1);
-  return true;
-}
-
 bool Index::fix_tempo_fields()
-{ 
+{
   if (index_period.valid())
     {
       tempo_type T=get_tempo();
@@ -507,1027 +418,63 @@ bool Index::fix_tempo_fields()
   return false;
 }
 
-void Index::read_idx(const char* indexn)
+void Index::read_idx(QString indexn)
 {
-  char * meta_version = NULL;      // the version format of the index file
-  char * line=NULL;
-  HistoryField * current = NULL;
-  int read;
   // open file
-  FILE* index;
-  meta_filename = strdup(indexn);
-  index=fopen(meta_filename,"rb");
-  if (!index) 
-    {
-      printf("Couldn't read %s\n",indexn);
-      exit(5);
-    }
+  meta_filename = indexn;
   // clear all fields
   init();
-  // inititalize buffer
-  buffer_init(index);
-  // read fields
-  while((read=fast_getline(&line))!=-1)
+  // we assume we have a text file format
+  Token token = (Token)DataBinner::read_file((const char*)meta_filename);
+
+  // we retrieve all fields that we are interested in
+  String meta_version = (String)token[key_bpmdj_version];
+  index_period = period_type((Signed4)token[key_period]);
+  index_file   = (String)token[key_file];
+  index_time   = (String)token[key_time];
+  index_cue    = (Signed8)token[key_cue];
+  index_cue_z  = (Signed8)token[key_cuez];
+  index_cue_x  = (Signed8)token[key_cuex];
+  index_cue_c  = (Signed8)token[key_cuec];
+  index_cue_v  = (Signed8)token[key_cuev];
+  index_md5sum = (String)token[key_md5sum];
+  index_min.set_data(token[key_min]);
+  index_max.set_data(token[key_max]);
+  index_mean.set_data(token[key_mean]);
+  index_power.set_data(token[key_power]);
+  Data d = token[key_spectrum];
+  if (!d.isNull())
+    index_spectrum=new spectrum_type(d);
+  index_histogram.set_data(token[key_echo]);
+  index_rythm.set_data(token[key_rythm]);
+  index_composition.set_data(token[key_composition]);
+  index_disabled_capacities=(Unsigned2)token[key_disabled_capacities];
+  // the previous and next fields are somewhat more interesting...
+  Array<1,Data>::values iterator;
+  Array<1,Data> prevfields = (Array<1,Data>)token[key_prev];
+  for(iterator.reset(prevfields) ; iterator.more() ; ++iterator)
+    add_prev_history(new HistoryField(*iterator));
+  Array<1,Data> nextfields = (Array<1,Data>)token[key_next];
+  for(iterator.reset(nextfields) ; iterator.more() ; ++iterator)
+    add_next_history(new HistoryField(*iterator));
+  // albums
+  Array<1,Data> albums = (Array<1,Data>)token[key_albums];
+  iterator.reset(albums);
+  while(iterator.more())
     {
-      char * field, * value;
-      char * end = line + read;
-      if (!split_field_value(strip(line, end - 1), field, value)) continue;
-      if (strcmp(field,"version")==0) meta_version=strldup(value,end-value);
-      else if(strcmp(field,"period")==0) index_period=atoi(value);
-      else if(strcmp(field,"file")==0) index_file=strldup(value,end-value);
-      else if(strcmp(field,"tempo")==0) ;
-      else if(strcmp(field,"bpmcount-to")==0) index_bpmcount_to=atoi(value);
-      else if(strcmp(field,"bpmcount-from")==0) index_bpmcount_from=atoi(value);
-      else if(strcmp(field,"comment")==0) index_remark=strldup(value,end-value);
-      else if(strcmp(field,"time")==0) index_time=strldup(value,end-value);
-      else if(strcmp(field,"cue")==0) index_cue=atol(value);
-      else if(strcmp(field,"cue-z")==0) index_cue_z=atol(value);
-      else if(strcmp(field,"cue-x")==0) index_cue_x=atol(value);
-      else if(strcmp(field,"cue-c")==0) index_cue_c=atol(value);
-      else if(strcmp(field,"cue-v")==0) index_cue_v=atol(value);
-      else if(strcmp(field,"md5sum")==0) index_md5sum=strldup(value,end-value);
-      else if(strcmp(field,"min")==0) index_min.read(value);
-      else if(strcmp(field,"max")==0) index_max.read(value);
-      else if(strcmp(field,"mean")==0) index_mean.read(value);
-      else if(strcmp(field,"power")==0) index_power.read(value);
-      else if(strcmp(field,"spectrum")==0) index_spectrum=new spectrum_type(value);
-      else if(strcmp(field,"histogram")==0) index_histogram.read_idx(value);
-      else if(strcmp(field,"rythm")==0) index_rythm.read_idx(value);
-      else if(strcmp(field,"composition")==0) index_composition.read_idx(value);
-      else if(strcmp(field,"disabled-capacities")==0) index_disabled_capacities=atol(value);
-      else if(strcmp(field,"prev")==0 || strcmp(field,"next")==0)
-	{
-	  char * subfield, * subvalue;
-	  if (!split_field_value(value,subfield,subvalue)) continue;
-	  if (strcmp(subfield,"file")==0) current = new HistoryField(subvalue);
-	  else if (strcmp(subfield,"count")==0)
-	    {
-	      assert(current);
-	      current->count = atol(subvalue);
-	    }
-	  else if (strcmp(subfield,"info")==0)
-	    {
-	      assert(current);
-	      current->comment = strdup(subvalue);
-	      if (*field=='p') add_prev_history(current);
-	      else add_next_history(current);
-	      current = NULL;
-	    }
-	}
-      else if(strcmp(field,"album")==0)
-	{
-	  char * subfield,* subvalue;
-	  if (!split_field_value(value,subfield,subvalue)) continue;
-	  int nr = atoi(subfield);
-	  add_album(new AlbumField(nr,subvalue));
-	}
-      else if(strcmp(field,"title")==0) 
-	{
-	  title=strldup(value,end-value);
-	  meta_contains_tar=true;
-	}
-      else if(strcmp(field,"author")==0) 
-	{
-	  author=strldup(value,end-value);
-	  meta_contains_tar=true;
-	}
-      else if(strcmp(field,"remix")==0) 
-	{
-	  remix=strldup(value,end-value);
-	  meta_contains_tar=true;
-	}
-      else if(strcmp(field,"number")==0) 
-	{
-	  version=strldup(value,end-value);
-	  meta_contains_tar=true;
-	}
-      else if(strcmp(field,"pattern")==0) 
-	{
-	  int index_pattern_size=atol(value);
-	  assert(index_pattern_size>0);
-	  // index_pattern=allocate(index_pattern_size,unsigned char);
-	  for(read = 0 ; read < index_pattern_size ; read++)
-	    // index_pattern[read] =      
-	      nextchar();
-	  meta_changed = 1;
-	}
-      else if(strcmp(field,"tag")==0) 
-	{
-	  if (!index_tags) index_tags=strldup(value,end-value);
-	  else 
-	    {
-	      char tmp[1000];
-	      sprintf(tmp,"%s %s",index_tags,value);
-	      ::deallocate(index_tags);
-	      index_tags=strdup(tmp);
-	    }
-	}
-      else 
-	{
-	  printf("Warning: Unknown field '%s' in %s \n",field,meta_filename);
-	  continue;
-	}
+      add_album(new AlbumField(*iterator));
+      ++iterator;
     }
-  // finish file access
-  buffer_done();
-  fclose(index);
-  // check for old non-versioned files
-  if (!meta_version)
-    {
-      printf("Error: too old index file %s\n",basename(meta_filename));
-      exit(40);
-    }
-  
-  // check for old versions running 22050 samplerate
-  if ((strcmp(meta_version,"BpmDj v1.5")==0)
-      ||(strcmp(meta_version,"BpmDj v1.4")==0)
-      ||(strcmp(meta_version,"BpmDj v1.3")==0)
-      ||(strcmp(meta_version,"BpmDj v1.2")==0)
-      ||(strcmp(meta_version,"BpmDj v1.1")==0)
-      ||(strcmp(meta_version,"BpmDj v1.0")==0)
-      ||(strcmp(meta_version,"BpmDj v0.9")==0)
-      ||(strcmp(meta_version,"BpmDj v0.8")==0)
-      ||(strcmp(meta_version,"BpmDj v0.7")==0)
-      ||(strcmp(meta_version,"BpmDj v0.6")==0)
-      ||(strcmp(meta_version,"BpmDj v0.5")==0))
-    {
-      index_cue_z *= 2;
-      index_cue_x *= 2;
-      index_cue_c *= 2;
-      index_cue_v *= 2;
-      index_cue   *= 2; 
-      meta_changed = 1;
-    }
+  title=(String)token[key_title];
+  author=(String)token[key_author];
+  remix=(String)token[key_remix];
+  version=(String)token[key_version];
+  index_tags=(String)token[key_tags];
 
   if (fix_tempo_fields())
     meta_changed=true;
-  // the problem of duplicate tags..
   if (fix_tagline())
-    meta_changed=1;
-
-  // the problem of no-tar information...
-  if (fix_tar_info())
-    meta_changed=1;
-  
-  // release the meta_version, this is no longer necessary because
-  // we know which version we currently are
-  ::deallocate(meta_version);
-}
-
-char* zeroable(char* in)
-{
-  if (!in) return NULL;
-  if (!*in) 
-    {
-      deallocate(in);
-      return NULL;
-    }
-  return in;
-}
-void Index::read_v23_field()
-{
-  HistoryField * current = NULL;
-  // initialize the buffer to the correct size
-  // 1. read all kinds of strings
-  meta_contains_tar = true;   // otherwise it should not be placed into the .bib file
-  title = buffer_strdup();
-  author = buffer_strdup();
-  remix = zeroable(buffer_strdup());
-  version = buffer_strdup();
-  index_file= buffer_strdup();
-  buffer_strdup();  // this was the tempo string in previous versions
-  index_remark= zeroable(buffer_strdup());
-  index_time= buffer_strdup();
-  index_md5sum= buffer_strdup();
-  char * tmp = zeroable(buffer_strdup());
-  index_spectrum = tmp ? new spectrum_type(tmp) : no_spectrum;
-  index_tags=buffer_strdup();
-  // 2. read all kinds of numbers
-  index_period = buffer_signed4();
-  index_bpmcount_from = buffer_signed4();
-  index_bpmcount_to = buffer_signed4();
-  index_cue = buffer_signed4();
-  index_cue_z = buffer_signed4();
-  index_cue_x = buffer_signed4();
-  index_cue_c = buffer_signed4();
-  index_cue_v = buffer_signed4();
-  // 3. read the list structures... (prev, next, album)
-  int count;
-  count = buffer_signed4();
-  // printf("prev_count = %ld\n",count);
-  while(count-->0)
-    {
-      current = new HistoryField(buffer_strdup());
-      current->count = buffer_signed4();
-      current->comment = buffer_strdup();
-      add_prev_history(current);
-    }
-  count = buffer_signed4();
-  // printf("next_count = %ld\n",count);
-  while(count-->0)
-    {
-      current = new HistoryField(buffer_strdup());
-      current->count = buffer_signed4();
-      current->comment = buffer_strdup();
-      add_next_history(current);
-    }
-  count = buffer_signed4();
-  // printf("album_count = %ld\n",count);
-  while(count-->0)
-    {
-      int   nr = buffer_signed4();
-      char * n = buffer_strdup();
-      add_album(new AlbumField(nr,n));
-      // printf("Located in album %d : %s\n",nr,n);
-    }
-}
-
-void Index::read_v261_field()
-{
-  HistoryField * current = NULL;
-  // initialize the buffer to the correct size
-  // 1. read all kinds of strings
-  meta_contains_tar = true;   // otherwise it should not be placed into the .bib file
-  title = buffer_strdup();
-  author = buffer_strdup();
-  remix = zeroable(buffer_strdup());
-  version = buffer_strdup();
-  index_file= buffer_strdup();
-  buffer_strdup();  // was index_tempo
-  index_remark= zeroable(buffer_strdup());
-  index_time= buffer_strdup();
-  index_md5sum= buffer_strdup();
-  char * tmp = zeroable(buffer_strdup());
-  index_spectrum = tmp ? new spectrum_type(tmp) : no_spectrum;
-  index_tags=buffer_strdup();
-  // 2. read all kinds of numbers
-  index_period = buffer_signed4();
-  index_bpmcount_from = buffer_signed4();
-  index_bpmcount_to = buffer_signed4();
-  index_cue = buffer_signed4();
-  index_cue_z = buffer_signed4();
-  index_cue_x = buffer_signed4();
-  index_cue_c = buffer_signed4();
-  index_cue_v = buffer_signed4();
-  index_min.left = buffer_signed4();
-  index_min.right = buffer_signed4();
-  index_max.left = buffer_signed4();
-  index_max.right = buffer_signed4();
-  index_mean.left = buffer_signed4();
-  index_mean.right = buffer_signed4();
-  index_power.left = buffer_float8();
-  index_power.right = buffer_float8();
-  // 3. read the list structures... (prev, next, album)
-  int count;
-  count = buffer_signed4();
-  // printf("prev_count = %ld\n",count);
-  while(count-->0)
-    {
-      current = new HistoryField(buffer_strdup());
-      current->count = buffer_signed4();
-      current->comment = buffer_strdup();
-      add_prev_history(current);
-    }
-  count = buffer_signed4();
-  // printf("next_count = %ld\n",count);
-  while(count-->0)
-    {
-      current = new HistoryField(buffer_strdup());
-      current->count = buffer_signed4();
-      current->comment = buffer_strdup();
-      add_next_history(current);
-    }
-  count = buffer_signed4();
-  // printf("album_count = %ld\n",count);
-  while(count-->0)
-    {
-      int   nr = buffer_signed4();
-      char * n = buffer_strdup();
-      add_album(new AlbumField(nr,n));
-      // printf("Located in album %d : %s\n",nr,n);
-    }
-}
-
-void Index::read_v27_field()
-{
-  HistoryField * current = NULL;
-  // initialize the buffer to the correct size
-  // 1. read all kinds of strings
-  meta_contains_tar = true;   // otherwise it should not be placed into the .bib file
-  title = buffer_strdup();
-  author = buffer_strdup();
-  remix = zeroable(buffer_strdup());
-  version = buffer_strdup();
-  index_file= buffer_strdup();
-  buffer_strdup();  // was index_tempo
-  index_remark= zeroable(buffer_strdup());
-  index_time= buffer_strdup();
-  index_md5sum= buffer_strdup();
-  if (buffer_signed4())
-    {
-      index_spectrum = new spectrum_type();
-      index_spectrum->read_bib_v27();
-    }
-  else
-    index_spectrum = no_spectrum;
-  index_tags=buffer_strdup();
-  // 2. read all kinds of numbers
-  index_period = buffer_signed4();
-  index_bpmcount_from = buffer_signed4();
-  index_bpmcount_to = buffer_signed4();
-  index_cue = buffer_signed4();
-  index_cue_z = buffer_signed4();
-  index_cue_x = buffer_signed4();
-  index_cue_c = buffer_signed4();
-  index_cue_v = buffer_signed4();
-  index_min.left = buffer_signed4();
-  index_min.right = buffer_signed4();
-  index_max.left = buffer_signed4();
-  index_max.right = buffer_signed4();
-  index_mean.left = buffer_signed4();
-  index_mean.right = buffer_signed4();
-  index_power.left = buffer_float8();
-  index_power.right = buffer_float8();
-  // 3. read the list structures... (prev, next, album)
-  int count;
-  count = buffer_signed4();
-  // printf("prev_count = %ld\n",count);
-  while(count-->0)
-    {
-      current = new HistoryField(buffer_strdup());
-      current->count = buffer_signed4();
-      current->comment = buffer_strdup();
-      add_prev_history(current);
-    }
-  count = buffer_signed4();
-  // printf("next_count = %ld\n",count);
-  while(count-->0)
-    {
-      current = new HistoryField(buffer_strdup());
-      current->count = buffer_signed4();
-      current->comment = buffer_strdup();
-      add_next_history(current);
-    }
-  count = buffer_signed4();
-  // printf("album_count = %ld\n",count);
-  while(count-->0)
-    {
-      int   nr = buffer_signed4();
-      char * n = buffer_strdup();
-      add_album(new AlbumField(nr,n));
-      // printf("Located in album %d : %s\n",nr,n);
-    }
-}
-
-
-void Index::read_v271_field()
-{
-  HistoryField * current = NULL;
-  // initialize the buffer to the correct size
-  // 1. read all kinds of strings
-  meta_contains_tar = true;   // otherwise it should not be placed into the .bib file
-  title = buffer_strdup();
-  author = buffer_strdup();
-  remix = zeroable(buffer_strdup());
-  version = buffer_strdup();
-  index_file= buffer_strdup();
-  buffer_strdup();  // was index_tempo
-  index_remark= zeroable(buffer_strdup());
-  index_time= buffer_strdup();
-  index_md5sum= buffer_strdup();
-  if (buffer_signed4())
-    {
-      index_spectrum = new spectrum_type();
-      index_spectrum->read_bib_v27();
-    }
-  else
-    index_spectrum = no_spectrum;
-  index_histogram.read_bib_v271();
-  index_tags=buffer_strdup();
-  // 2. read all kinds of numbers
-  index_period = buffer_signed4();
-  index_bpmcount_from = buffer_signed4();
-  index_bpmcount_to = buffer_signed4();
-  index_cue = buffer_signed4();
-  index_cue_z = buffer_signed4();
-  index_cue_x = buffer_signed4();
-  index_cue_c = buffer_signed4();
-  index_cue_v = buffer_signed4();
-  index_min.left = buffer_signed4();
-  index_min.right = buffer_signed4();
-  index_max.left = buffer_signed4();
-  index_max.right = buffer_signed4();
-  index_mean.left = buffer_signed4();
-  index_mean.right = buffer_signed4();
-  index_power.left = buffer_float8();
-  index_power.right = buffer_float8();
-  // 3. read the list structures... (prev, next, album)
-  int count;
-  count = buffer_signed4();
-  // printf("prev_count = %ld\n",count);
-  while(count-->0)
-    {
-      current = new HistoryField(buffer_strdup());
-      current->count = buffer_signed4();
-      current->comment = buffer_strdup();
-      add_prev_history(current);
-    }
-  count = buffer_signed4();
-  // printf("next_count = %ld\n",count);
-  while(count-->0)
-    {
-      current = new HistoryField(buffer_strdup());
-      current->count = buffer_signed4();
-      current->comment = buffer_strdup();
-      add_next_history(current);
-    }
-  count = buffer_signed4();
-  // printf("album_count = %ld\n",count);
-  while(count-->0)
-    {
-      int   nr = buffer_signed4();
-      char * n = buffer_strdup();
-      add_album(new AlbumField(nr,n));
-      // printf("Located in album %d : %s\n",nr,n);
-    }
-}
-
-void Index::read_v272_field()
-{
-  HistoryField * current = NULL;
-  // initialize the buffer to the correct size
-  // 1. read all kinds of strings
-  meta_contains_tar = true;   // otherwise it should not be placed into the .bib file
-  title = buffer_strdup();
-  author = buffer_strdup();
-  remix = zeroable(buffer_strdup());
-  version = buffer_strdup();
-  index_file= buffer_strdup();
-  buffer_strdup();  // was index_tempo
-  index_remark= zeroable(buffer_strdup());
-  index_time= buffer_strdup();
-  index_md5sum= buffer_strdup();
-  if (buffer_signed4())
-    {
-      index_spectrum = new spectrum_type();
-      index_spectrum->read_bib_v27();
-    }
-  else
-    index_spectrum = no_spectrum;
-  index_histogram.read_bib_v272();
-  index_tags=buffer_strdup();
-  // 2. read all kinds of numbers
-  index_period = buffer_signed4();
-  index_bpmcount_from = buffer_signed4();
-  index_bpmcount_to = buffer_signed4();
-  index_cue = buffer_signed4();
-  index_cue_z = buffer_signed4();
-  index_cue_x = buffer_signed4();
-  index_cue_c = buffer_signed4();
-  index_cue_v = buffer_signed4();
-  index_min.left = buffer_signed4();
-  index_min.right = buffer_signed4();
-  index_max.left = buffer_signed4();
-  index_max.right = buffer_signed4();
-  index_mean.left = buffer_signed4();
-  index_mean.right = buffer_signed4();
-  index_power.left = buffer_float8();
-  index_power.right = buffer_float8();
-  // 3. read the list structures... (prev, next, album)
-  int count;
-  count = buffer_signed4();
-  // printf("prev_count = %ld\n",count);
-  while(count-->0)
-    {
-      current = new HistoryField(buffer_strdup());
-      current->count = buffer_signed4();
-      current->comment = buffer_strdup();
-      add_prev_history(current);
-    }
-  count = buffer_signed4();
-  // printf("next_count = %ld\n",count);
-  while(count-->0)
-    {
-      current = new HistoryField(buffer_strdup());
-      current->count = buffer_signed4();
-      current->comment = buffer_strdup();
-      add_next_history(current);
-    }
-  count = buffer_signed4();
-  // printf("album_count = %ld\n",count);
-  while(count-->0)
-    {
-      int   nr = buffer_signed4();
-      char * n = buffer_strdup();
-      add_album(new AlbumField(nr,n));
-      // printf("Located in album %d : %s\n",nr,n);
-    }
-}
-
-void Index::read_v273_field()
-{
-  HistoryField * current = NULL;
-  // initialize the buffer to the correct size
-  // 1. read all kinds of strings
-  meta_contains_tar = true;   // otherwise it should not be placed into the .bib file
-  title = buffer_strdup();
-  author = buffer_strdup();
-  remix = zeroable(buffer_strdup());
-  version = buffer_strdup();
-  index_file= buffer_strdup();
-  buffer_strdup();  // was index_tempo
-  index_remark= zeroable(buffer_strdup());
-  index_time= buffer_strdup();
-  index_md5sum= buffer_strdup();
-  if (buffer_signed4())
-    {
-      index_spectrum = new spectrum_type();
-      index_spectrum->read_bib_v27();
-    }
-  else
-    index_spectrum = no_spectrum;
-  index_histogram.read_bib_v272();
-  index_rythm.read_bib_v272();
-  index_tags=buffer_strdup();
-  // 2. read all kinds of numbers
-  index_period = buffer_signed4();
-  index_bpmcount_from = buffer_signed4();
-  index_bpmcount_to = buffer_signed4();
-  index_cue = buffer_signed4();
-  index_cue_z = buffer_signed4();
-  index_cue_x = buffer_signed4();
-  index_cue_c = buffer_signed4();
-  index_cue_v = buffer_signed4();
-  index_min.left = buffer_signed4();
-  index_min.right = buffer_signed4();
-  index_max.left = buffer_signed4();
-  index_max.right = buffer_signed4();
-  index_mean.left = buffer_signed4();
-  index_mean.right = buffer_signed4();
-  index_power.left = buffer_float8();
-  index_power.right = buffer_float8();
-  // 3. read the list structures... (prev, next, album)
-  int count;
-  count = buffer_signed4();
-  // printf("prev_count = %ld\n",count);
-  while(count-->0)
-    {
-      current = new HistoryField(buffer_strdup());
-      current->count = buffer_signed4();
-      current->comment = buffer_strdup();
-      add_prev_history(current);
-    }
-  count = buffer_signed4();
-  // printf("next_count = %ld\n",count);
-  while(count-->0)
-    {
-      current = new HistoryField(buffer_strdup());
-      current->count = buffer_signed4();
-      current->comment = buffer_strdup();
-      add_next_history(current);
-    }
-  count = buffer_signed4();
-  // printf("album_count = %ld\n",count);
-  while(count-->0)
-    {
-      int   nr = buffer_signed4();
-      char * n = buffer_strdup();
-      add_album(new AlbumField(nr,n));
-      // printf("Located in album %d : %s\n",nr,n);
-    }
-}
-
-void Index::read_v274_field()
-{
-  HistoryField * current = NULL;
-  // initialize the buffer to the correct size
-  // 1. read all kinds of strings
-  meta_contains_tar = true;   // otherwise it should not be placed into the .bib file
-  title = buffer_strdup();
-  author = buffer_strdup();
-  remix = zeroable(buffer_strdup());
-  version = buffer_strdup();
-  index_file= buffer_strdup();
-  buffer_strdup();  // was index_tempo
-  index_remark= zeroable(buffer_strdup());
-  index_time= buffer_strdup();
-  index_md5sum= buffer_strdup();
-  if (buffer_signed4())
-    {
-      index_spectrum = new spectrum_type();
-      index_spectrum->read_bib_v27();
-    }
-  else
-    index_spectrum = no_spectrum;
-  index_histogram.read_bib_v272();
-  index_rythm.read_bib_v272();
-  index_composition.read_bib_v272();
-  index_tags=buffer_strdup();
-  // 2. read all kinds of numbers
-  index_period = buffer_signed4();
-  index_bpmcount_from = buffer_signed4();
-  index_bpmcount_to = buffer_signed4();
-  index_cue = buffer_signed4();
-  index_cue_z = buffer_signed4();
-  index_cue_x = buffer_signed4();
-  index_cue_c = buffer_signed4();
-  index_cue_v = buffer_signed4();
-  index_min.left = buffer_signed4();
-  index_min.right = buffer_signed4();
-  index_max.left = buffer_signed4();
-  index_max.right = buffer_signed4();
-  index_mean.left = buffer_signed4();
-  index_mean.right = buffer_signed4();
-  index_power.left = buffer_float8();
-  index_power.right = buffer_float8();
-  // 3. read the list structures... (prev, next, album)
-  int count;
-  count = buffer_signed4();
-  // printf("prev_count = %ld\n",count);
-  while(count-->0)
-    {
-      current = new HistoryField(buffer_strdup());
-      current->count = buffer_signed4();
-      current->comment = buffer_strdup();
-      add_prev_history(current);
-    }
-  count = buffer_signed4();
-  // printf("next_count = %ld\n",count);
-  while(count-->0)
-    {
-      current = new HistoryField(buffer_strdup());
-      current->count = buffer_signed4();
-      current->comment = buffer_strdup();
-      add_next_history(current);
-    }
-  count = buffer_signed4();
-  // printf("album_count = %ld\n",count);
-  while(count-->0)
-    {
-      int   nr = buffer_signed4();
-      char * n = buffer_strdup();
-      add_album(new AlbumField(nr,n));
-      // printf("Located in album %d : %s\n",nr,n);
-    }
-}
-
-void Index::read_v291_field()
-{
-  HistoryField * current = NULL;
-  // initialize the buffer to the correct size
-  // 1. read all kinds of strings
-  meta_contains_tar = true;   // otherwise it should not be placed into the .bib file
-  title = buffer_strdup();
-  author = buffer_strdup();
-  remix = zeroable(buffer_strdup());
-  version = buffer_strdup();
-  index_file= buffer_strdup();
-  buffer_strdup();  // was index_tempo
-  index_remark= zeroable(buffer_strdup());
-  index_time= buffer_strdup();
-  index_md5sum= buffer_strdup();
-  if (buffer_signed4())
-    {
-      index_spectrum = new spectrum_type();
-      index_spectrum->read_bib_v27();
-    }
-  else
-    index_spectrum = no_spectrum;
-  index_histogram.read_bib_v272();
-  index_rythm.read_bib_v272();
-  index_composition.read_bib_v272();
-  index_tags=buffer_strdup();
-  // 2. read all kinds of numbers
-  index_period = buffer_signed4();
-  index_bpmcount_from = buffer_signed4();
-  index_bpmcount_to = buffer_signed4();
-  index_cue = buffer_signed4();
-  index_cue_z = buffer_signed4();
-  index_cue_x = buffer_signed4();
-  index_cue_c = buffer_signed4();
-  index_cue_v = buffer_signed4();
-  index_min.left = buffer_signed4();
-  index_min.right = buffer_signed4();
-  index_max.left = buffer_signed4();
-  index_max.right = buffer_signed4();
-  index_mean.left = buffer_signed4();
-  index_mean.right = buffer_signed4();
-  index_power.left = buffer_float8();
-  index_power.right = buffer_float8();
-  index_disabled_capacities = buffer_unsigned4();
-
-  // 3. read the list structures... (prev, next, album)
-  int count;
-  count = buffer_signed4();
-  // printf("prev_count = %ld\n",count);
-  while(count-->0)
-    {
-      current = new HistoryField(buffer_strdup());
-      current->count = buffer_signed4();
-      current->comment = buffer_strdup();
-      add_prev_history(current);
-    }
-  count = buffer_signed4();
-  // printf("next_count = %ld\n",count);
-  while(count-->0)
-    {
-      current = new HistoryField(buffer_strdup());
-      current->count = buffer_signed4();
-      current->comment = buffer_strdup();
-      add_next_history(current);
-    }
-  count = buffer_signed4();
-  // printf("album_count = %ld\n",count);
-  while(count-->0)
-    {
-      int   nr = buffer_signed4();
-      char * n = buffer_strdup();
-      add_album(new AlbumField(nr,n));
-      // printf("Located in album %d : %s\n",nr,n);
-    }
-}
-
-static void file_string(char*str, FILE * f)
-{
-  int written;
-  if (str)
-    {
-      int len = strlen(str)+1;
-      written = fwrite(str,len,1,f);
-    }
-  else
-    {
-      int n = 0;
-      written = fwrite(&n,1,1,f);
-    }
-  assert(written==1);
-}
-
-void Index::write_v291_field(FILE * index)
-{
-  HistoryField * current = NULL;
-  // initialize the buffer to the correct size
-  // 1. write all kinds of strings
-  assert(meta_contains_tar);   // otherwise it should not be placed into the .bib file
-  file_string(title,index);
-  file_string(author,index);
-  file_string(remix,index);
-  file_string(version,index);
-  file_string(index_file,index);
-  file_string(get_tempo().get_charstr(),index);
-  file_string(index_remark,index);
-  file_string(index_time,index);
-  file_string(index_md5sum,index);
-  if (index_spectrum==no_spectrum)
-    file_signed4(0,index);
-  else
-    {
-      file_signed4(1,index);
-      index_spectrum->write_bib_v27(index);
-    }
-  index_histogram.write_bib_v272(index);
-  index_rythm.write_bib_v272(index);
-  index_composition.write_bib_v272(index);
-  file_string(index_tags,index);
-  // 2. write all kinds of numbers
-  index_period.write_bib_v261(index);
-  file_signed4(index_bpmcount_from,index);
-  file_signed4(index_bpmcount_to,index);
-  file_signed4(index_cue,index);
-  file_signed4(index_cue_z,index);
-  file_signed4(index_cue_x,index);
-  file_signed4(index_cue_c,index);
-  file_signed4(index_cue_v,index);
-  file_signed4(index_min.left,index);
-  file_signed4(index_min.right,index);
-  file_signed4(index_max.left,index);
-  file_signed4(index_max.right,index);
-  file_signed4(index_mean.left,index);
-  file_signed4(index_mean.right,index);
-  file_float8(index_power.left,index);
-  file_float8(index_power.right,index);
-  file_unsigned4(index_disabled_capacities,index);
-  
-  // 3. write the list structures... (prev, next, album)
-  HistoryField ** tmp = prev;
-  int count = 0;
-  while(*(tmp++)) count++;
-  file_signed4(count,index);
-  tmp = prev;
-  while(*tmp)
-    {
-      current = *tmp;
-      file_string(current->file,index);
-      file_signed4(current->count,index);
-      file_string(current->comment,index);
-      tmp++;
-    }
-
-  tmp = next;
-  count = 0;
-  while(*(tmp++)) count++;
-  file_signed4(count,index);
-  tmp = next;
-  while(*tmp)
-    {
-      current = *tmp;
-      file_string(current->file,index);
-      file_signed4(current->count,index);
-      file_string(current->comment,index);
-      tmp++;
-    }
-  
-  count = 0;
-  AlbumField**album = albums;
-  while(*(album++)) count++;
-  file_signed4(count,index);
-  album=albums;
-  while(*album)
-    {
-      
-      file_signed4((*album)->nr,index);
-      file_string((*album)->name,index);
-      album++;
-    }
-}
-
-void Index::write_bib_field(FILE * index)
-{
-  file_signed4(291,index);
-  write_v291_field(index);
-}
-
-long Index::read_bib_field(long position, const char* meta_shortname)
-{
-  int meta_version;
-  // open file and jump to position
-  assert(buffer);
-  buffer_ptr=position;
-  // clear all fields
-  init();
-  // version describing the format of this field
-  meta_version = buffer_signed4();
-  // depending on the field we can call different routines
-  if (meta_version==23) read_v23_field();
-  else if (meta_version==261) read_v261_field();
-  else if (meta_version==27) read_v27_field();
-  else if (meta_version==271) read_v271_field();
-  else if (meta_version==272) read_v272_field();
-  else if (meta_version==273) read_v273_field();
-  else if (meta_version==274) read_v274_field();
-  else if (meta_version==291) read_v291_field();
-  else assert(0);
-  // fix fields when necessary
-  if (fix_tempo_fields()) meta_changed=true;
-  if (fix_tagline()) meta_changed=true;
-  meta_inbib=true;
-  if (meta_shortname)
-    {
-      char d[500];
-      sprintf(d,"%s#%s.bib",meta_shortname,tohex(position));
-      meta_filename=strdup(d);
-    }
-  // return the current position, (= the start of the next field)
-  return buffer_ptr;
-}
-
-int batch_read_fd;
-void Index::init_bib_batchread(const char* name)
-{
-  batch_read_fd = open(name,O_RDONLY);
-  if (batch_read_fd == -1)
-    {
-      printf("Could not open \"%s\"",name);
-      assert(batch_read_fd!=-1);
-    }
-  buffer_map(batch_read_fd);
-}
-
-void Index::done_bib_batchread()
-{
-  buffer_unmap();
-  close(batch_read_fd);
-}
-
-bool Index::batch_has_ended()
-{
-  //printf("buffer_ptr = %ld\n",buffer_ptr);
-  //printf("buffer_size = %ld\n",buffer_size);
-  return buffer_ptr == buffer_size;
-}
-
-void Index::read_bib_field(const char * name)
-{
-  long field_position = 0;
-  assert(name);
-  int l = strlen(name);
-  int i ;
-  assert(l>4);
-  assert(strcmp(name+l-4,".bib")==0);
-  for (i = 0 ; i < l ; i++)
-    if (name[i]=='#')
-      {
-	assert(i+8<=l-4);
-	field_position=toint(name+i+1);
-	break;
-      }
-  // printf("name %s gives position %ld\n",name,field_position);
-  assert(i!=l);
-  char correctname[l-9];
-  strncpy(correctname,name,i);
-  strncpy(correctname+i,name+i+9,l-i-8);
-  // open file
-  init_bib_batchread(correctname);
-  read_bib_field(field_position);
-  done_bib_batchread();
-  meta_filename = strdup(name);
-}
-
-bool Index::fix_tar_info()
-{
-  // WVB -- dat leakt hier nogal wat memory denk ik.. nu who cares, dit is enkel tijdens transitie
-  // if there already is title/autor/remix/version info then we skip this
-  if (meta_contains_tar) 
-    return false;
-  assert(meta_filename);
-  char * original = strdup(meta_filename);
-  int l = strlen(original);
-  // if the filename does not end on .idx then we skip
-  if (l>4)
-    if (strcmp(original+l-4,".idx")!=0)
-      return false;
-  // ditch the last three characters (.idx)
-  original[l-4]=0;
-  char * fulltitle = basename(original);
-  // obtain title and author
-  char * tmp = fulltitle;
-  int busy=0;
-  assert(!title);
-  assert(!version);
-  assert(!author);
-  assert(!remix);
-  title = fulltitle;
-  // busy = 0, begonnen aan title
-  // busy = 1, begonnen aan remix
-  // busy = 2, geeindigt met remix
-  // busy = 3, begonnen met author
-  // busy = 4, geeindigt met author, begonnen met version
-  // busy >= 6, geeindigt met crash
-  while(*tmp)
-    {
-      if (*tmp == '{')
-	{
-	  if (busy!=0) { busy=6; break; }
-	  remix=tmp+1;
-	  *tmp=0;
-	  busy=1;
-	}
-      if (*tmp == '}')
-	{
-	  if (busy!=1) { busy=7; break; }
-	  *tmp=0;
-	  busy=2;
-	  tmp++;
-	  if (*tmp!='[') { busy=8; break; }
-	}
-      if (*tmp == '[')
-	{
-	  if (busy!=2 && busy!=0) { busy=9; break; }
-	  author = tmp+1;
-	  *tmp=0;
-	  busy=3;
-	}
-      if (*tmp == ']')
-	{
-	  if (busy!=3) { busy=10; break; }
-	  *tmp=0;
-	  busy=4;
-	  version = tmp+1;
-	}
-      tmp++;
-    }
-  if (busy!=4)
-    {
-      // printf("failed because of %d\n",busy);
-      title=NULL;
-      version=NULL;
-      remix=NULL;
-      author=NULL;
-    }
-  else
-    {
-      // printf("Index: fixed %s { %s } [ %s ] %s\n",title,remix, author, version);
-      if (title) 
-	title = strdup(title);
-      if (version)
-	version = strdup(version);
-      if (author)
-	author=strdup(author);
-      if (remix)
-	remix=strdup(remix);
-    }
-  ::deallocate(original);
-  return meta_contains_tar=busy==4;
+    meta_changed=true;
 }
 
 // constructors and destructors
@@ -1536,14 +483,9 @@ Index::Index()
   init();
 }
 
-Index::Index(const char* from)
+Index::Index(QString from)
 {
-  int l = strlen(from);
-  assert(l>4);
-  if (strcmp(from+l-4,".idx")==0)
-    read_idx(from);
-  else 
-    read_bib_field(from);
+  read_idx(from);
 }
 
 Index::~Index()
@@ -1552,48 +494,23 @@ Index::~Index()
 }
 
 // accessors
-char * Index::encoded_tar()
+QString Index::readable_description()
 {
-  assert(meta_contains_tar);
-  char *res;
-  char r[200];
-  char a[200];
-  res=allocate(2000,char);
-  if (remix && *remix)
-    sprintf(r,"{%s}",remix);
-  else
-    r[0]=0;
-  if (author && *author)
-    sprintf(a,"[%s]", author);
-  else
-    a[0]=0;
-  sprintf(res,"%s%s%s%s",
-	  (title ? title : ""), 
-	  r, 
-	  a, 
-	  (version ? version : " "));
-  return res;
+  QString r,a;
+  if (!remix.isEmpty())
+    r=QString("{")+remix+"}";
+  if (!author.isEmpty())
+    a=QString("[")+author+"]";
+  return title+r+a+version;
 }
 
-char * Index::readable_description()
-{ 
-  if (meta_contains_tar) 
-    return encoded_tar();
-  else
-    return strdup(meta_filename);
-}
-
-char* Index::get_display_title()
+QString Index::get_display_title()
 {
-  if (!title)
-    return strdup(meta_filename);
-  else if (remix)
-    {
-      char tmp[2000];
-      sprintf(tmp,"%s{%s}",title,remix);
-      return strdup(tmp);
-    }
-  return strdup(title);
+  if (title.isEmpty())
+    return meta_filename;
+  else if (!remix.isEmpty())
+    return title+"{"+remix+"}";
+  return title;
 }
 
 void Index::set_period(period_type t, bool update_on_disk)
@@ -1612,10 +529,9 @@ void Index::set_period(period_type t, bool update_on_disk)
 }; 
 
 // dialog boxes to update the state of an index file
-#define field2this(namea,nameb) if (!strxeq(info.namea##Edit->text(),nameb)) \
-  { const char* t = info.namea##Edit->text(); \
-    nameb = t ? strdup(t) : NULL; \
-    meta_contains_tar = ( meta_changed = true ); }
+#define field2this(namea,nameb) if (info.namea##Edit->text()!=nameb) \
+  { nameb = info.namea##Edit->text(); \
+    meta_changed = true; }
 void Index::executeInfoDialog()
 {
   SongInformation info(NULL,NULL,TRUE);
@@ -1640,7 +556,7 @@ void Index::executeInfoDialog()
     }
 }
 
-HistoryField *Index::add_prev_song(const char* mp3)
+HistoryField *Index::add_prev_song(QString mp3)
 {
   HistoryField * f = find_field(prev,mp3);
   f->count++;
@@ -1648,7 +564,7 @@ HistoryField *Index::add_prev_song(const char* mp3)
   return f;
 }
 
-HistoryField *Index::add_next_song(const char* mp3)
+HistoryField *Index::add_next_song(QString mp3)
 {
   HistoryField * f = find_field(next,mp3);
   f->count++;
@@ -1656,25 +572,25 @@ HistoryField *Index::add_next_song(const char* mp3)
   return f;
 }
 
-HistoryField* Index::find_field(HistoryField **&ar, const char * mp3)
+HistoryField* Index::find_field(HistoryField **&ar, QString mp3)
 {
   HistoryField ** cur = ar;
   while(*cur)
     {
-      if (strcmp((*cur)->file,mp3)==0)
+      if ((*cur)->file==mp3)
 	return *cur;
       cur++;
     }
-  HistoryField *g = new HistoryField(strdup(mp3));
+  HistoryField *g = new HistoryField(mp3);
   add_history(ar,g);
   return g;
 }
 
-void Index::set_time(const char* str)
+void Index::set_time(QString str)
 {
-  if (!index_time || (strcmp(str,index_time)!=0))
+  if (meta_changed || index_time!=str)
     {
-      index_time = strdup(str);
+      index_time = str;
       meta_changed = 1;
     }
 };
@@ -1703,29 +619,13 @@ void Index::clear_energy()
 
 int Index::get_time_in_seconds()
 {
-  char * T = get_time();
+  const char * T = get_time();
   if (!T) return -1;
   int minutes = atoi(T);
   while(*T && isdigit(*T)) T++;
   if (*T!=':') return -1;
   int seconds = atoi(T);
   return minutes*60+seconds;
-}
-
-void Index::make_valid_tar()
-{
-  if (valid_tar_info()) return;
-  title = strdup(meta_filename);
-  meta_contains_tar = true;
-  meta_changed = true;
-}
-
-void Index::set_author(char * new_author)
-{
-  if (!valid_tar_info()) make_valid_tar();
-  if (author) ::deallocate(author);
-  author = new_author;
-  meta_changed = true;
 }
 
 int Index::get_playcount()
@@ -1744,4 +644,148 @@ int Index::get_playcount()
 	total+=next[i++]->count;
     }
   return total;
+}
+
+/**
+ * This function tries to find title, author and remix in the
+ * filename and set the specified fields in the index.
+ *
+ * This function probably still leaks memory but it is only
+ * used when a new index is created. So at the moment I don't
+ * care that much. 
+ */
+bool Index::set_title_author_remix(QString meta_filename)
+{
+  char * original = strdup(meta_filename);
+  if(!original) return false;
+  int l = strlen(original);
+  // if the filename does not end on .idx then we skip
+  if (l<4) return false;
+  if (l>4)
+    if (strcmp(original+l-4,".idx")!=0)
+      return false;
+  // ditch the last three characters (.idx)
+  original[l-4]=0;
+  char * fulltitle = basename(original);
+  // obtain title and author
+  char * tmp = fulltitle;
+  int busy=0;
+  
+  char * _title = fulltitle;
+  char * _remix = NULL;
+  char * _author = NULL;
+  char * _version = NULL;
+  title = fulltitle;
+  // busy = 0, begonnen aan title
+  // busy = 1, begonnen aan remix
+  // busy = 2, geeindigt met remix
+  // busy = 3, begonnen met author
+  // busy = 4, geeindigt met author, begonnen met version
+  // busy >= 6, geeindigt met crash
+  while(*tmp)
+    {
+      if (*tmp == '{')
+	{
+	  if (busy!=0) 
+	    { 
+	      busy=6; 
+	      break; 
+	    }
+	  _remix=tmp+1;
+	  *tmp=0;
+	  busy=1;
+	}
+      if (*tmp == '}')
+	{
+	  if (busy!=1) 
+	    { 
+	      busy=7; 
+	      break;
+	    }
+	  *tmp=0;
+	  busy=2;
+	  tmp++;
+	  if (*tmp!='[') 
+	    { 
+	      busy=8; 
+	      break; 
+	    }
+	}
+      if (*tmp == '[')
+	{
+	  if (busy!=2 && busy!=0) 
+	    {
+	      busy=9; 
+	      break; 
+	    }
+	  _author = tmp+1;
+	  *tmp=0;
+	  busy=3;
+	}
+      if (*tmp == ']')
+	{
+	  if (busy!=3) 
+	    { 
+	      busy=10; 
+	      break; 
+	    }
+	  *tmp=0;
+	  busy=4;
+	  _version = tmp+1;
+	}
+      tmp++;
+    }
+  if (busy==4)
+    {
+      // printf("OldIndex: fixed %s { %s } [ %s ] %s\n",title,remix, author, version);
+      if (_title) 
+	title = _title;
+      if (_version)
+	version = _version;
+      if (_author)
+	author = _author;
+      if (_remix)
+	remix = _remix;
+    }
+  bpmdj_deallocate(original);
+  return busy==4;
+}
+
+char* findUniqueName(const char * directory, const char* filename)
+{
+  char indexname[500];
+  char *temp;
+  char halfindexname[500];
+  temp=strdup(basename(strdup(filename)));
+  temp[strlen(temp)-4]=0;
+  sprintf(halfindexname,"%s.idx",temp);
+  sprintf(indexname,"%s%s.idx",(const char*)directory,temp);
+  int nr=2;
+  while(exists(indexname))
+    {
+      sprintf(halfindexname,"%s%d.idx",temp,nr);
+      sprintf(indexname,"%s%s%d.idx",(const char*)directory,temp,nr++);
+    }
+  return strdup(indexname);
+}
+
+Index* createNewIndexFor(QString filename, QString directory)
+{
+  // find a unique index filename
+  char * indexname = findUniqueName(directory,filename);
+  printf("Creating index file %s\n",indexname);
+  // create an index and set the file in which it is stored
+  Index *index = new Index();
+  index->set_storedin(indexname);
+  // set the songname 
+  index->set_filename(filename);
+  index->set_tags("New");
+  index->set_title_author_remix(indexname);
+  // we set the period to unknown, which will also 
+  // immediatelly write the index to disk
+  index->set_period(-1);
+  index->set_changed();
+  index->write_idx();
+  bpmdj_deallocate(indexname);
+  return index;
 }

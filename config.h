@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -23,7 +23,9 @@
 #include <qlistview.h>
 #include <qcolor.h>
 #include <qheader.h>
+#include <qpopupmenu.h>
 #include "data.h"
+#include "song-process.h"
 
 // constants that should not be modified
 const QString MusicDir = "./music";
@@ -31,6 +33,34 @@ const QString IndexDir = "./index";
 
 void realize_mapping(QHeader * h, int column, int location, int size);
 void copy_header(QHeader * in, QHeader * out);
+
+class QPopupMenu;
+
+class ConfigState: public QObject
+{
+    Q_OBJECT
+  protected:
+    bool state;
+    friend class Config;
+    QString menu_text;
+    QPopupMenu * menu;
+    int item;
+    void update();
+  public:
+    ConfigState(bool init = false);
+    virtual void setMenuText ( const QString & );
+    bool isOn() const;
+    virtual void addTo ( QPopupMenu * w );
+    operator bool() const {return state;};  
+    // the set function bypasses the signal emit phase and does not update the UI
+    void set(bool);
+  public slots:
+    void toggle ();
+    // setOn will emit a modification signal to the relevant partners.
+    virtual void setOn ( bool );
+  signals:
+    void toggled();
+};
 
 class Config
 {
@@ -41,24 +71,20 @@ class Config
   singleton_accessors(int,orangeTime);
   singleton_accessors(int,redTime);
   singleton_accessors(int,filterBpm);
-  singleton_accessors(bool,color_range);
-  singleton_accessors(bool,color_played);
-  singleton_accessors(bool,color_authorplayed);
+  static ConfigState color_range;
+  static ConfigState color_played;
+  static ConfigState color_authorplayed;
   singleton_accessors(int,authorDecay);
-  singleton_accessors(QString,playCommand1);
-  singleton_accessors(QString,playCommand2);
-  // version 1.7
-  singleton_accessors(QString,playCommand3);
-  singleton_accessors(QString,playCommand4);
-  singleton_accessors(bool,color_ondisk);
-  singleton_accessors(bool,color_cues);
-  singleton_accessors(bool,color_dcolor);
-  singleton_accessors(bool,color_spectrum);
-  singleton_accessors(bool,limit_ondisk);
-  singleton_accessors(bool,limit_nonplayed);
-  singleton_accessors(bool,limit_uprange);
-  singleton_accessors(bool,limit_downrange);
-  singleton_accessors(bool,limit_indistance);
+  static SongProcess players[4];
+  static ConfigState color_ondisk;
+  static ConfigState color_cues;
+  static ConfigState color_dcolor;
+  static ConfigState color_spectrum;
+  static ConfigState limit_ondisk;
+  static ConfigState limit_nonplayed;
+  static ConfigState limit_uprange;
+  static ConfigState limit_downrange;
+  static ConfigState limit_indistance;
   // version 1.8
   //   removed limit_inspectrum from version 1.7
   // version 1.9
@@ -66,15 +92,15 @@ class Config
   singleton_accessors(float,distance_temposcale);
  public:
   singleton_accessors(float,distance_spectrumweight);
-  singleton_accessors(bool,limit_authornonplayed);
+  static ConfigState limit_authornonplayed;
   singleton_accessors(bool,shown_aboutbox);
   // version 2.1
   // removed tmp_directory from version 2.9
   singleton_accessors(QString,mixer_command);
-  singleton_accessors(bool,open_mixer);
+  // static ConfigState open_mixer;
   // version 2.2
-  singleton_accessors(bool,ask_mix);
-  singleton_accessors(bool,auto_popqueue);
+  static ConfigState ask_mix;
+  static ConfigState auto_popqueue;
   // version 2.4
   singleton_accessors(QString,record_command);
   singleton_accessors(QString,replay_command);
@@ -107,7 +133,7 @@ class Config
   singleton_accessors(QHeader*,header);
   // 2.6
   singleton_accessors(QString,bpm_mixer_command);
-  singleton_accessors(bool,open_bpmmixer);
+  static ConfigState open_bpmmixer;
   // 2.7
   singleton_accessors(float,distance_tempoweight);
   singleton_accessors(float,distance_echoweight);
@@ -117,24 +143,68 @@ class Config
   // 2.8
   singleton_accessors(QColor,color_unchecked);
   // 2.9
-  singleton_accessors(QString,analCommand1);
-  singleton_accessors(QString,analCommand2);
-  singleton_accessors(QString,analCommand3);
-  singleton_accessors(QString,analCommand4);
-  singleton_accessors(QString,analCommand5);
-  singleton_accessors(QString,analCommand6);
-  singleton_accessors(QString,analCommand7);
-  singleton_accessors(QString,analCommand8);
+  static SongProcess analyzers[8];
   // from here on the options are saved again
   singleton_accessors(float, anal_bpm_from);
   singleton_accessors(float, anal_bpm_to);
   singleton_accessors(int, anal_bpm_technique);
+  // 3.0
+  static ConfigState color_songs_based_on_history;
+  singleton_accessors(QColor, color_alltime);
  private:
   static void calc_and_cache();
+  static void set_playCommand1(QString s) 
+    {
+      players[0].setOldCommand(s);
+    };
+  static void set_playCommand2(QString s)
+    {
+      players[1].setOldCommand(s);
+    };
+  static void set_playCommand3(QString s)
+    {
+      players[2].setOldCommand(s);
+    };
+  static void set_playCommand4(QString s)
+    {
+      players[3].setOldCommand(s);
+    };
+  static void set_analCommand1(QString s)
+    {
+      analyzers[0].setOldCommand(s);
+    };
+  static void set_analCommand2(QString s)
+    {
+      analyzers[1].setOldCommand(s);
+    };
+  static void set_analCommand3(QString s)
+    {
+      analyzers[2].setOldCommand(s);
+    };
+  static void set_analCommand4(QString s)
+    {
+      analyzers[3].setOldCommand(s);
+    };
+  static void set_analCommand5(QString s)
+    {
+      analyzers[4].setOldCommand(s);
+    };
+  static void set_analCommand6(QString s)
+    {
+      analyzers[5].setOldCommand(s);
+    };
+  static void set_analCommand7(QString s)
+    {
+      analyzers[6].setOldCommand(s);
+    };
+  static void set_analCommand8(QString s) 
+    {
+      analyzers[7].setOldCommand(s);
+    };
  public:
   static bool open_ui(int pane = 0);
   static void save();
-  static void load();
+  static bool load();
 };
 
 #endif

@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -19,12 +19,10 @@
 
 #ifndef BEATGRAPH_ANALYZER_H
 #define BEATGRAPH_ANALYZER_H
-
 #include <qpainter.h>
 #include "songplayer.h"
 #include "common.h"
 #include "beatgraph-widget.h"
-#include "basic-types.h"
 
 typedef unsigned char compressed;
 typedef float uncompressed;

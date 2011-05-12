@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>214</width>
-            <height>127</height>
+            <width>273</width>
+            <height>162</height>
         </rect>
     </property>
     <property name="caption">
@@ -67,5 +67,12 @@
         </widget>
     </grid>
 </widget>
+<tabstops>
+    <tabstop>mpg123059r</tabstop>
+    <tabstop>mpg321</tabstop>
+    <tabstop>ogg123</tabstop>
+    <tabstop>mplayer1pre6</tabstop>
+    <tabstop>mplayer1pre7</tabstop>
+</tabstops>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

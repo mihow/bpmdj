@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -44,8 +44,8 @@
 #include "qsong.h"
 #include "magic.h"
 #include "embedded-files.h"
-#include "histogram-property.cpp"
-#include "smallhistogram-type.cpp"
+#include "histogram-property.h"
+#include "smallhistogram-type.h"
 #include "avltree.cpp"
 #include "growing-array.cpp"
 #include "signals-template.cpp"
@@ -162,13 +162,22 @@ int main(int argc, char* argv[])
   Tags::init();
 
   QApplication application(argc,argv);
-  SongSelectorLogic main_window;
   app = &application;
   
   // 2. read the configuration
-  Config::load();    
+  if (!Config::load())
+    {
+      Error(true,"The old configuration file is no longer supported.\n"
+	    "Please remove \".kbpmdj\". Also make sure to read the\n"
+	    "release notes because .bib files are no longer supported\n"
+	    "and the index file format has changed\n");
+      exit(10);
+    }
+  SongSelectorLogic main_window;
+  song_selector_window = & main_window;
   BpmDjSplash * splash = new BpmDjSplash();
-
+  removeAllLog();
+  
   // 1.a first check the availability of a number of directories...
   DIR * mdir;
   DIR * idir;
@@ -187,17 +196,6 @@ int main(int argc, char* argv[])
     }
   while (mdir==NULL || idir==NULL);
   
-  // 1.b check the availability of programs/the PATH evironment variabe...
-  //     we only check the existence of kbpm-play to guide the user. 
-  if(!(execute("kbpm-play --check-version "VERSION" 2>/dev/null >/dev/null")))
-    {
-      QMessageBox::warning(NULL,"Missing kbpm-play",
-			   "Could not start kbpm-play.\n" 
-			   "Make sure the correct version of the\n"
-			   "program is installed in your PATH");
-      exit(0);
-    }
-  
   // 1.c checking left over raw files (deze komt laatst omdat tmp_directory het kuiste pad bevat)
   RawScanner raw;
   raw.scan();
@@ -205,7 +203,7 @@ int main(int argc, char* argv[])
     if (QMessageBox::warning(NULL,RAW_EXT " files check",
 			     "There are some left over "RAW_EXT" files. These are:\n"+raw.result,
 			     "Remove", "Ignore", 0, 0, 1)==0)
-      removeAllRaw("./");  
+      removeAllRaw("./");
   
   // 3. read all the files in memory
   main_window.initialize_using_config();
@@ -213,18 +211,13 @@ int main(int argc, char* argv[])
   
   // create the index in memory
   splash->progress->setEnabled(true);
-  IndexReader * indexReader = new IndexReader(splash->progress, splash->reading ,main_window.database);
+  IndexReader * indexReader = new IndexReader(splash->progress, splash->reading ,main_window.database, Config::get_file_count());
   Config::set_file_count(indexReader->total_files);
   if (indexReader->total_files == 0)
     QMessageBox::message(NULL,
 			 "You have no songs indexed in the database. You can\n"
 			 "import songs from the music directory by selecting\n"
 			 "'Import Songs' from the Management menu.");
-  if (indexReader->idx_files > 1000)
-    QMessageBox::message(NULL,"You have more than 1000 songs\n"
-			 "in index files. You can compact them\n"
-			 "and ensure faster data acess by selecting\n"
-			 "Management|Compact Index Directory");
   delete indexReader;
   indexReader = NULL;
   
@@ -262,9 +255,7 @@ int main(int argc, char* argv[])
   splash = NULL;
 
   // 5b. startup mixers ?
-  if (Config::get_open_mixer())
-    main_window.openMixer();
-  if (Config::get_open_bpmmixer())
+  if (Config::open_bpmmixer)
     main_window.openBpmMixer();
   
   // 6. start the application
@@ -276,8 +267,7 @@ int main(int argc, char* argv[])
       Config::set_shown_aboutbox(true);
       QMessageBox::message(NULL,"If you use this software regularly, then please put a\n"
 			        "link to http://bpmdj.sourceforge.net/ on your homepage\n"
-			        "(together with some nice words of course :) If you don't\n"
-			        "have a homepage, it should not be too difficult to create one.");
+			        "(together with some nice words of course :)");
     }
   Config::save();
   return result;

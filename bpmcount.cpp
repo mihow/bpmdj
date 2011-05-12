@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ template double find_abs_max<double>(double*, long);
 
 int main(int argc, char *argv[])
 {
-  printf("bpmcount v"VERSION" (c) Werner Van Belle 2000-2005, all rights reserved\n");
+  printf("bpmcount v"VERSION" (c) Werner Van Belle 2000-2006, all rights reserved\n");
   printf("http://bpmdj.sourceforge.net/\n");
   printf("_________________________________________________________________\n");
 

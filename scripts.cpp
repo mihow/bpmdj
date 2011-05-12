@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 #include <libgen.h>
 #include <qmessagebox.h>
 #include <unistd.h>
+#include <sys/wait.h>
 #include "index.h"
 #include "scripts.h"
 #include "stdarg.h"
@@ -41,7 +42,7 @@ FILE * openRawFile(Index* index, const char * rawpath)
   char * name = getRawFilename(rawpath, index->get_filename());
   assert(name);
   raw = fopen(name,"rb");
-  deallocate(name);
+  bpmdj_deallocate(name);
   return raw;
 }
 
@@ -51,7 +52,7 @@ FILE * openRawFileForWriting(Index* index, const char *d)
   char * name = getRawFilename(d,index->get_filename());
   assert(name);
   raw = fopen(name,"r+b");
-  deallocate(name);
+  bpmdj_deallocate(name);
   return raw;
 }
 
@@ -59,12 +60,7 @@ void removeRaw(Index* index, char* d)
 {
   char * name = getRawFilename(d,index->get_filename());
   remove(name);
-  deallocate(name);
-}
-
-void removeAllRaw(const char* d)
-{
-  vexecute(RM"%s/*"RAW_EXT,d);
+  bpmdj_deallocate(name);
 }
 
 void dumpAudio(const char* fname, unsigned4 *buffer, long length)
@@ -90,15 +86,30 @@ void spawn(const char* script)
 
 int execute(const char* script)
 {
-  if (system(script)<=256) 
-    {
-      Debug("started %s",script);
-      return 1;
+  Debug("Started %s",script);
+  int status = system(script);
+  if  (status == -1)
+    { 
+      Error(false,"couldn't execute [fork failed] %s",script);
+      return false;
     }
-  // we cannot simply make this true because then we might end up using the
-  // wrong thrzead to access graphics, with disaster as a result.
-  Error(false,"couldn't execute %s",script);
-  return 0;
+  if (WIFEXITED(status))
+    {
+      status = WEXITSTATUS(status);
+      return status==0;
+    }
+  if (WIFSIGNALED(status))
+    {
+      Error(false,"couldn't execute [signal] %s",script);
+      return false;
+    }
+  if ( WCOREDUMP(status))
+    {
+      Error(false,"couldn't execute [core dumped] %s",script);
+      return false;
+    }
+  Fatal("Unknown exit status %d: %s",status,script);
+  return false;
 }
 
 int vexecute(const char* script, ...)
@@ -162,6 +173,17 @@ void Debug(const char* script, ...)
   Log("Debug: ", toexecute);
 };
 
+void Fatal(const char* script, ...)
+{
+  char toexecute[1024];
+  va_list ap;
+  va_start(ap,script);
+  vsprintf(toexecute,script,ap);
+  va_end(ap);
+  Log("Fatal: ", toexecute);
+  _exit(100);
+};
+
 void Error(bool ui, const char* script, ...)
 {
   char toexecute[1024];
@@ -183,3 +205,96 @@ void Remote(const char* script, ...)
   va_end(ap);
   Log("Remote: ", toexecute);
 };
+
+// The escaping necessary for ssh to work is ridicoulous..
+// An ordinary containement within " ... " does not work, so we must
+// escape every character on its own. Especially the & is important
+// because this would otherwise spawns a background procses.
+char * escape(const char * in)
+{
+  assert(in);
+  char escaped[strlen(in)*2+1];
+  int c;
+  int i=0;
+  while((c=*(in++)) && i < 2048)
+    {
+      if (c=='\n' || c=='&' || c=='\\' || c==' ' || c=='(' || c==')'
+       || c=='\'' || c=='`')
+	{
+	  escaped[i++]='\\';
+	}
+      escaped[i++]=c;
+    }
+  assert(i<2048);
+  escaped[i]=0;
+  return strdup(escaped);
+}
+
+int start_bpmdj_raw(const char* where, const char* file)
+{
+  char * w = escape(where);
+  char * f = escape(file);
+  int  err = vexecute("bpmdj-raw %s %s",w,f);
+  bpmdj_deallocate(w);
+  bpmdj_deallocate(f);
+  return err;
+}
+
+void start_mkdir(const char* dir)
+{
+  char * d = escape(dir);
+  vexecute("mkdir -p -- %s",d);
+  free(d);
+}
+
+void start_cp(const char* from, const char* to)
+{
+  char * a = escape(from);
+  char * b = escape(to);
+  vexecute("cp -- %s %s",a,b);
+  bpmdj_deallocate(a);
+  bpmdj_deallocate(b);
+}
+
+int start_mv(const char* from, const char* to)
+{
+  char * a = escape(from);
+  char * b = escape(to);
+  int err = vexecute("mv -i -- %s %s",a,b);
+  bpmdj_deallocate(a);
+  bpmdj_deallocate(b);
+  return err;
+}
+
+
+void start_rm(const char* what)
+{
+  char * a = escape(what);
+  vexecute("rm -- %s",a);
+  bpmdj_deallocate(a);
+}
+
+void removeAllRaw(const char* d)
+{
+  char * a = escape(d);
+  vexecute("rm -- %s/*"RAW_EXT,a);
+  bpmdj_deallocate(a);
+}
+
+void removeAllLog()
+{
+  execute("rm -- /tmp/*.kbpmdj.log");
+}
+
+int start_umount_cdrom(bool eject)
+{
+  int err = execute("umount "CDROM);
+  if (eject) execute("eject "CDROM);
+  return err;
+}
+
+int start_mount_cdrom()
+{
+  int err = execute("mount "CDROM);
+  return err;
+}

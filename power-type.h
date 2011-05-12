@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -17,13 +17,29 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
+#include <math.h>
+#include "Data/om-data.h"
+
 const float no_power = -1.0;
+
 class power_type
 {
  public:
   float left;
   float right;
-  bool fully_defined() {return left!=no_power && right!=no_power;};
+  bool fully_defined() 
+    {
+      return 
+	left!=no_power && 
+	right!=no_power;
+    };
+  bool badly_defined() 
+    {
+      return 
+	!fully_defined() ||
+	!isnormal(left) ||
+	!isnormal(right);
+    };
   power_type()
     {
       right = left = no_power;
@@ -33,7 +49,8 @@ class power_type
       left = l;
       right = r;
     }
-  void write(const char*prefix, FILE * output);
+  Data get_data(int version) const;
+  void set_data(Data d);
   void read(char*);
 };
 

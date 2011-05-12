@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -54,22 +54,23 @@ class QueuedSong:
 #define ANAL_COMPOSITION 7
 #define ANAL_INDEX 8
 
+class SongProcess;
 class QueuedAnalSong: 
   public QListViewItem
 {
   private:
     Song * song;
-    bool needs_energy() const { return  !song->get_power().fully_defined(); };
-    bool needs_tempo() const { return !song->get_tempo().valid(); };
-    bool needs_spectrum() const { return song->get_spectrum()==no_spectrum; };
-    bool needs_echo() const { return song->get_histogram().empty(); };
-    bool needs_rythm() const { return song->get_rythm().empty(); };
-    bool needs_composition() const { return song->get_composition().empty(); };
+    bool needs_energy() const { return  song->needs_energy(); };
+    bool needs_tempo() const { return song->needs_tempo(); };
+    bool needs_spectrum() const { return song->needs_spectrum();};
+    bool needs_echo() const { return song->needs_echo();};
+    bool needs_rythm() const { return song->needs_rythm();};
+    bool needs_composition() const { return song->needs_composition();};
   public:
     //    void setSong(Song* s, double d);
     Song* getSong() { return song; };
     QString getDisplayTitle() {return song->getDisplayTitle();};
     QueuedAnalSong(QListView* parent,Song *song);
     virtual QString text(int i) const;
-    QString getCommand(QString form);
+    QString getCommand(SongProcess& p);
 };

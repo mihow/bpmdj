@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -44,5 +44,5 @@ AlbumItem::AlbumItem(int nr, Song * s, QListViewItem* parent) :
 void AlbumItem::fixNr()
 {
   if (text(0).length()<2)
-    setText(0,zero+text(0));
+    setText(0,QString("0")+text(0));
 }

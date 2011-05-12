@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -30,65 +30,42 @@
 #include "growing-array.h"
 #include "tags.h"
 #include "heap.h"
+#include "song-statistics.h"
 #include "kbpm-dj.h"
 
 /**
  * The database cache contains items that are visible when only considereing the taglist
  */
 
-DataBase::DataBase() : all(), cache()
+DataBase::DataBase() : cache()
 {
   init();
 }
 
 DataBase::~DataBase()
 {
-  clear();
-}
-
-void DataBase::reset()
-{
-  clear();
-  init();
 }
 
 void DataBase::init()
 {
-  all.reset();
+  BasicDataBase::init();
   cache.reset();
   and_include = NULL;
   or_include = NULL;
   exclude = NULL;
   tag = NULL;
   tag_size = 0;
-  file_tree = new AvlTree<QString>();
+  rebuild_cache = false;
 }
 
 void DataBase::clear()
 {
-  for(int i = 0 ; i < all.count ; i ++)
-    delete all.elements[i];
-  all.reset();
+  BasicDataBase::clear();
   cache.reset();
-  deallocate(and_include);
-  deallocate(or_include);
-  deallocate(exclude);
+  bpmdj_deallocate(and_include);
+  bpmdj_deallocate(or_include);
+  bpmdj_deallocate(exclude);
   delete[] tag;
-  delete file_tree;
-}
-
-void DataBase::add(Song* song)
-{
-  all.add(song);
-  if (file_tree->search(song->get_file()))
-    {
-      printf("Fatal: The song %s occurs at least two times in different index files\n",(const char*)song->get_file());
-      printf("The first index file is %s\n",(const char*)song->get_storedin());
-      song = ((SongSortedByFile*)(file_tree->search(song->get_file())))->song;
-      printf("The second index file is %s\n",(const char*)song->get_storedin());
-      exit(0);
-    }
-  file_tree->add(new SongSortedByFile(song));
 }
 
 void* existence_checker(void * something)
@@ -101,26 +78,21 @@ void* existence_checker(void * something)
       song -> checkondisk();
       i++;
     }
-  status->message("Finished checking existence of "+QString::number(i)+" songs",2000);
+  //  status->message("Finished checking existence of "+QString::number(i)+"["+readable(total_music_body)+"]",2000);
+  status->message("Finished checking existence of "+QString::number(i),10000);
+  song_selector_window->updateItemList();
   return something;
 }
 
 void DataBase::start_existence_check()
 {
-  pthread_t *checker = allocate(1,pthread_t);
+  pthread_t *checker = bpmdj_allocate(1,pthread_t);
   pthread_create(checker,NULL,existence_checker,&all); 
-}
-
-Song * DataBase::find(QString song_filename)
-{
-  SongSortedByFile* ssbf = (SongSortedByFile*)file_tree->search(song_filename);
-  if (!ssbf) return NULL;
-  return ssbf->song;
 }
 
 bool DataBase::cacheValid(SongSelectorLogic * selector)
 {
-  if (selector->tagList->childCount() != tag_size)
+  if (rebuild_cache || selector->tagList->childCount() != tag_size)
     return false;
   QListViewItemIterator it(selector->tagList);
   int i = 0;
@@ -141,14 +113,14 @@ bool DataBase::cacheValid(SongSelectorLogic * selector)
 
 void DataBase::copyTags(SongSelectorLogic * selector)
 {
-  if (and_include) deallocate(and_include);
-  if (or_include) deallocate(or_include);
-  if (exclude) deallocate(exclude);
+  if (and_include) bpmdj_deallocate(and_include);
+  if (or_include) bpmdj_deallocate(or_include);
+  if (exclude) bpmdj_deallocate(exclude);
   if (tag) delete[](tag);
   tag_size    = selector->tagList->childCount();
-  and_include = allocate(tag_size,bool);
-  or_include  = allocate(tag_size,bool);
-  exclude     = allocate(tag_size,bool);
+  and_include = bpmdj_allocate(tag_size,bool);
+  or_include  = bpmdj_allocate(tag_size,bool);
+  exclude     = bpmdj_allocate(tag_size,bool);
   tag         = new tag_type[tag_size];
   and_includes_checked = false;
   excludes_checked = false;
@@ -194,6 +166,7 @@ bool DataBase::tagFilter(Song* item)
 void DataBase::updateCache(SongSelectorLogic* selector)
 {
   if (cacheValid(selector)) return;
+  rebuild_cache = false;
   copyTags(selector);
   cache.reset();
   for(int i = 0 ; i < all.count ; i ++)
@@ -212,20 +185,20 @@ bool DataBase::filter(SongSelectorLogic* selector, Song *item, Song* main, float
   if (main!=NULL && main->get_author()==item->get_author() && !main->get_author().isEmpty())
     item->set_played_author_at_time(History::get_songs_played());
   // song on disk ?
-  if (Config::get_limit_ondisk() && !item->get_ondisk())
+  if (Config::limit_ondisk && !item->get_ondisk())
     return false;
   // song played ?
-  if (Config::get_limit_nonplayed() && item->get_played())
+  if (Config::limit_nonplayed && item->get_played())
     return false;
   // okay, no similar authors please..
-  if (Config::get_limit_authornonplayed() && 
+  if (Config::limit_authornonplayed && 
       History::get_songs_played() - item->get_played_author_at_time() < Config::get_authorDecay())
     return false;
   // now check the tempo stuff
-  if (main && (Config::get_limit_uprange() || Config::get_limit_downrange()))
+  if (main && (Config::limit_uprange || Config::limit_downrange))
     if (!item->tempo_show(main,
-			  Config::get_limit_uprange(),
-			  Config::get_limit_downrange())) return false;
+			  Config::limit_uprange,
+			  Config::limit_downrange)) return false;
   // search
   const QString lookingfor = selector -> searchLine -> text();
   if (!lookingfor.isEmpty())
@@ -237,23 +210,9 @@ bool DataBase::filter(SongSelectorLogic* selector, Song *item, Song* main, float
     }
   // obtain the distance
   bool indistance = item->get_distance_to_main(limit);
-  if (Config::get_limit_indistance() && !indistance)
+  if (Config::limit_indistance && !indistance)
     return false;
   return true;
-}
-
-AvlTree<QString>* DataBase::getFileTreeCopy()
-{
-  AvlTree<QString> * file_tree = new AvlTree<QString>();
-  for(int i = 0 ; i < all.count ; i ++)
-    if (!file_tree->search(all.elements[i]->get_file()))
-      file_tree->add(new SongSortedByFile(all.elements[i]));
-  return file_tree;
-}
-
-AvlTree<QString>* DataBase::getFileTreeRef()
-{
-  return file_tree;
 }
 
 int DataBase::get_unheaped_selection(SongSelectorLogic* selector, Song* main, QVectorView* target)
@@ -261,7 +220,7 @@ int DataBase::get_unheaped_selection(SongSelectorLogic* selector, Song* main, QV
   // to get an appropriate selection we allocate the nessary vector
   int itemcount=0;
   updateCache(selector);
-  Song * * show = allocate(cache.count,Song*);
+  Song * * show = bpmdj_allocate(cache.count,Song*);
   for(int i = 0; i < cache.count ; i ++)
     {
       Song *song = cache.elements[i];
@@ -275,11 +234,11 @@ int DataBase::get_unheaped_selection(SongSelectorLogic* selector, Song* main, QV
 int DataBase::set_answer(Song ** show, int itemcount, QVectorView* target)
 {
   if (itemcount)
-    show = reallocate(show, itemcount, Song*);
+    show = bpmdj_reallocate(show, itemcount, Song*);
   else
     {
       show = NULL;
-      deallocate(show);
+      bpmdj_deallocate(show);
     }
   int ibefore = target->currentItem();
   // store old current item if available
@@ -319,15 +278,15 @@ static int itemUpdateingCount = 0;
 int DataBase::getSelection(SongSelectorLogic* selector, Song* main, QVectorView* target, int count)
 {
   // only when we have a dcolor limitation can we use the amount limitation
-  if (!Config::get_limit_indistance() || count==0 || main==NULL) return get_unheaped_selection(selector, main, target);
+  if (!Config::limit_indistance || count==0 || main==NULL) return get_unheaped_selection(selector, main, target);
   assert(count>0);
   
   // to get an appropriate selection we allocate the nessary vector
   itemUpdateingCount++;
   updateCache(selector);
-  Song * * show = allocate(count,Song*);
+  Song * * show = bpmdj_allocate(count,Song*);
   SongHeap heap(count);
-  if (Config::get_limit_indistance()) heap.maximum = 1.0;
+  if (Config::limit_indistance) heap.maximum = 1.0;
   for(int i = 0; i < cache.count ; i ++)
     {
       Song *song = cache.elements[i];
@@ -347,8 +306,8 @@ Song * * DataBase::closestSongs(SongSelectorLogic * selector,
 				SongMetriek * metriek, int maximum, int &count)
 {
   int i, j;
-  float * minima = allocate(maximum,float);
-  Song * * entries = allocate(maximum,Song*);
+  float * minima = bpmdj_allocate(maximum,float);
+  Song * * entries = bpmdj_allocate(maximum,Song*);
   count = 0;
   for(i = 0 ; i < maximum ; i++)
     {

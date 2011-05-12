@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -48,6 +48,7 @@ extern const QString TAG_FALSE;
 
 class QProgressBar;
 class QSong;
+class ConfigState;
 
 class SongSelectorLogic: 
 public SongSelector, public ProcessChanged, public AnalyzerChanged
@@ -61,28 +62,6 @@ public SongSelector, public ProcessChanged, public AnalyzerChanged
     int mainTicks;
     QPopupMenu *selection;
     QPopupMenu *queuemenu;
-    // toggles
-    int coloralreadyplayed_item;
-    int colorauthorplayed_item;
-    int colorinrange_item;
-    int colorsongondisk_item;
-    int colorcues_item;
-    int colordcolor_item;
-    int colorspectrum_item;
-    int notyetplayed_item;
-    int onlyuptemporange_item;
-    int onlydowntemporange_item;
-    int temporange_item;
-    int onlyondisk_item;
-    int onlyindistance_item;
-    int onlynonplayedauthors_item;
-    int auto_popq_item;
-    int auto_askmix_item;
-    int auto_mixer_item;
-    int auto_bpmmixer_item;
-    int amountlimited_item;
-    QPopupMenu *view;
-    QPopupMenu *autom;
   public:
     QVectorView* songList;
     DataBase *database;
@@ -96,19 +75,14 @@ public SongSelector, public ProcessChanged, public AnalyzerChanged
     virtual void resetCounter();
     virtual void updateProcessView(bool main_changed);
     // batch analyzer functions
-    void checkAnalyzers();
-    void setAnalyzersColors();
     virtual void startAnotherAnalyzer(Song * finished_analyzing, int on_slot);
     // tag functionality
-    void findsimilarnames(const QString & name, const QString & fullname);
     void initialize_using_config();
   private:
     void parse_tags();
     void insertSongInAlbum(Song*, const QString & a, int nr);
     void deleteSongFromAlbum(AlbumItem *);
-    void updateItemList();
     void updateFrequencyMap();
-    void toggleItem(int which);
     void toggleAutoItem(int which);
     QListViewItem *filterView(QListViewItem * who, QListViewItem * parent);
     void updateColors();
@@ -120,9 +94,17 @@ public SongSelector, public ProcessChanged, public AnalyzerChanged
     void songEditInfo(Song * song);
     void queueFindAndRename(int oldpos, int newpos);
     void queueOrder();
+    void linkViewProp(ConfigState & prop, QPopupMenu *menu, QString text);
+    void linkAutoProp(ConfigState & prop, QPopupMenu *menu, QString text);
   public: 
     void reread_and_repaint(Song* song);
+#ifdef INCOMPLETE_FEATURES
+    virtual void findsimilarnames();
+    virtual void findallsimilarnames();
+    virtual void doMarkDups();
+#endif
   public slots:
+    void updateItemList();
     void start_spectrum_pca();
     void start_existence_check();
     virtual void selectAllButTagged();
@@ -141,9 +123,7 @@ public SongSelector, public ProcessChanged, public AnalyzerChanged
     virtual void openReplay();
     virtual void doAbout();
     virtual void doLicense();
-    virtual void doFilterChanged();
     virtual void searchLineEntered();
-    virtual void doAutoFilterChanged();
     virtual void fetchSelection();
     virtual void checkDisc();
     virtual void exportPlayList();
@@ -159,38 +139,12 @@ public SongSelector, public ProcessChanged, public AnalyzerChanged
     virtual void selectionAddQueue();
     virtual void selectionEditInfo();
     virtual void selectionInsertInAlbum();
-    virtual void doMarkDups();
     virtual void quitButton();
-    virtual void playersChanged();
-    virtual void compactIdxDirectory();
     
     // color toggles...
-    virtual void toggle_coloralreadyplayed();
-    virtual void toggle_colorinrange();
-    virtual void toggle_colorauthorplayed();
-    virtual void toggle_colorsongsnotondisk();
-    virtual void toggle_colorsongswithoutcues();
-    virtual void toggle_colordcolor();
-    virtual void toggle_colorspectrum();
-    
-    virtual void toggle_notyetplayed();
-    virtual void toggle_onlyuptemporange();
-    virtual void toggle_onlydowntemporange();
     virtual void toggle_temporange();
-    virtual void toggle_onlyondisk();
-    virtual void toggle_onlyindistance();
-    virtual void toggle_onlynonplayedauthors();
-    virtual void toggle_amountlimited();
-    
-    virtual void toggle_autopop();
-    virtual void toggle_askmix();
-    virtual void toggle_openmixer();
-    virtual void toggle_openbpmmixer();
-    
     virtual void show_freq_shaping_dialog();
 
-    virtual void findsimilarnames();
-    virtual void findallsimilarnames();
     virtual void importSongs();
     virtual void queueAnalysis();
     virtual void toAnalyzeOrNot();
@@ -232,4 +186,5 @@ public SongSelector, public ProcessChanged, public AnalyzerChanged
     virtual void changeTagList(QListViewItem* item, const QPoint & pos, int col);
 };
 
+extern SongSelectorLogic * song_selector_window;
 #endif

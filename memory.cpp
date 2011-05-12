@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -65,5 +65,16 @@ void* myrealloc(void* thing, int size)
 #endif
   assert(result);
   return result;
+}
+
+char* zeroable(char* in)
+{
+  if (!in) return NULL;
+  if (!*in) 
+    {
+      bpmdj_deallocate(in);
+      return NULL;
+    }
+  return in;
 }
 

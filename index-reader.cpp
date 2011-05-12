@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -30,46 +30,35 @@
 #include <qdatastream.h>
 #include "index-reader.h"
 #include "kbpm-dj.h"
-#include "qsong.h"
-#include "config.h"
+#include "song.h"
 #include "spectrum-type.h"
 #include "database.h"
-#include "songtree.h"
-#include "avltree.h"
 
-static int songs_already_in_database = 0;
-
-IndexReader::IndexReader(QProgressBar * b, QLabel *l, DataBase * db) : 
-  DirectoryScanner(".bib"),tree()
-{ 
+IndexReader::IndexReader(QProgressBar * b, QLabel *l, BasicDataBase * db, int expected) : 
+  DirectoryScanner(".idx")
+{
   database = db;
   progress = b;
   reading = l;
   total_files = 0;
   idx_files = 0;
-  reading_bib = true;
-  progress->setTotalSteps(Config::get_file_count());
-  songs_already_in_database = 0;
+  step_size = expected / 100;
+  if (step_size<=0) step_size = 10;
+  if (progress) progress->setTotalSteps(expected);
   scan(IndexDir,IndexDir);
-  // printf("Debug: %d songs already in database when scanning .bib files\n",songs_already_in_database);
-  required_extension = ".idx";
-  reading_bib = false;
-  songs_already_in_database = 0;
-  scan(IndexDir,IndexDir);
-  // printf("Debug: %d songs already in database when scanning .idx files\n",songs_already_in_database);
-  progress -> setProgress(total_files);
+  if (progress) progress -> setProgress(total_files);
   QStringFactory::kill();
 }
 
 void IndexReader::recursing(const QString dirname)
 {
-  reading -> setText(dirname);
+  if (reading) reading -> setText(dirname);
 }
 
 void IndexReader::add(Song * song)
 {
   database->add(song);
-  if ( ++ total_files % (Config::get_file_count()/100 > 0 ? Config::get_file_count() / 100 : 10) == 0)
+  if ( progress && ++ total_files % step_size == 0)
     {
       progress -> setProgress(total_files);
       app -> processEvents();
@@ -79,38 +68,11 @@ void IndexReader::add(Song * song)
 void IndexReader::checkfile(const QString prefix, const QString  filename)
 {
   QString fullname = prefix + "/" + filename;
-  if (reading_bib)
-    {
-      Index::init_bib_batchread(fullname);
-      QString shortname = fullname.left(fullname.findRev(".bib"));
-      long position = 0;
-      while(!Index::batch_has_ended())
-	{
-	  Index index;
-	  // printf("position = %ld\n",position);
-	  position = index.read_bib_field(position,shortname);
-	  Song * song = database->find(index.get_filename());
-	  if (song)
-	    {
-	      song->refill(index);
-	      songs_already_in_database++;
-	    }
-	  else
-	    add(new Song(&index,false,false));
-	}
-      Index::done_bib_batchread();
-    }
+  idx_files++;
+  Index index(fullname);
+  Song * song = database->find(index.get_filename());
+  if (song)
+    song->refill(index,true);
   else
-    {
-      idx_files++;
-      Index index(fullname);
-      Song * song = database->find(index.get_filename());
-      if (song)
-	{
-	  song->refill(index,true);
-	  songs_already_in_database++;
-	}
-      else
-	add(new Song(&index,true,false));
-    }
+    add(new Song(&index,true,false));
 }

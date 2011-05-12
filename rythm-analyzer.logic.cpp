@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -58,6 +58,7 @@
 #include "version.h"
 #include "scripts.h"
 #include "pca.h"
+#include "Data/types.h"
 
 RythmDialogLogic::RythmDialogLogic(SongPlayer*parent, const char*name, bool modal, WFlags f) :
   RythmDialog(0,name,modal,f)
@@ -184,7 +185,7 @@ void subtraction_test(long slice_size, unsigned4* phases, int maximum_slice, con
  * Calculates the raw overlay pattern and writes it out to disk after shaping
  * the spectrum to fit the perfect spectrum.
  */
-static double perfectspectrum[barksize] = 
+/*static double perfectspectrum[barksize] = 
   {
     7.48973,   8.60855,   7.30108,   6.08735,
     5.05958,   4.22398,   3.55564,   2.84894,
@@ -192,6 +193,17 @@ static double perfectspectrum[barksize] =
    -0.125073, -0.522579, -0.939505, -1.68769,
    -2.2336,   -3.15377,  -4.26618,  -5.23179,
    -6.09273,  -7.06462,  -8.35773,  -10.1641
+  };
+*/
+
+static double perfectspectrum[barksize] = 
+  {
+    9.9,   8.60855,   7.30108,   6.08735,
+    5.05958,   4.22398,   3.55564,   2.84894,
+    1.99757,   1.37338,   0.814002,  0.479557,
+    -0.125073, -0.522579, -0.939505, -1.68769,
+    -2.2336,   -3.15377,  -4.26618,  -5.23179,
+    -6.09273,  -7.06462,  -8.35773,  -10.1641
   };
 
 void shape(Signal<double,2> &in)
@@ -569,7 +581,7 @@ void write_out_projection_old(long slice_size, unsigned4* phases, int maximum_sl
   normalize_abs_max(pattern_l,slice_size);
   normalize_abs_max(pattern_r,slice_size);
 
-  deallocate(slice);
+  bpmdj_deallocate(slice);
   
   out = fopen(target,"wb");
   for(int y = 0 ; y < slice_size ; y++)
@@ -631,8 +643,8 @@ static double *fft_out = NULL;
 static double *fft_in = NULL;
 static double *init_bark_fft2(int window_size)
 {
-  fft_in  = allocate(window_size,double);
-  fft_out = allocate(window_size,double);
+  fft_in  = bpmdj_allocate(window_size,double);
+  fft_out = bpmdj_allocate(window_size,double);
   plan = fftw_plan_r2r_1d(window_size,fft_in,fft_out,FFTW_R2HC,FFTW_MEASURE);
   return fft_in;
 }
@@ -675,10 +687,10 @@ void RythmDialogLogic::calculateRythmPattern2()
   int slice_samples = normalperiod * beats->value() / 4;
   int slice_frames = 192;
   // allocate arrays
-  stereo_sample2 * slice_audio = allocate(slice_samples,stereo_sample2);
-  spectrum_type * slice_freq = allocate(slice_frames,spectrum_type);
-  spectrum_type * slice_prot = allocate(slice_frames,spectrum_type);
-  spectrum_type * last_measure = allocate(slice_frames,spectrum_type);
+  stereo_sample2 * slice_audio = bpmdj_allocate(slice_samples,stereo_sample2);
+  spectrum_type * slice_freq = bpmdj_allocate(slice_frames,spectrum_type);
+  spectrum_type * slice_prot = bpmdj_allocate(slice_frames,spectrum_type);
+  spectrum_type * last_measure = bpmdj_allocate(slice_frames,spectrum_type);
   for(int i = 0 ; i < slice_frames ; i ++)
     for(int b = 0 ; b < 24 ; b++)
       {
@@ -690,11 +702,11 @@ void RythmDialogLogic::calculateRythmPattern2()
   FILE * raw = openCoreRawFile();
   long int audio_size = fsize(raw)/4;
   int max_slices = audio_size / slice_samples;
-  spectrum_type * changes = allocate(max_slices,spectrum_type);
+  spectrum_type * changes = bpmdj_allocate(max_slices,spectrum_type);
   for(int i = 0 ; i < max_slices ; i ++)
     for(int b = 0 ; b < 24 ; b ++)
       changes[i].set_bark(b,0);
-  unsigned4 * phases = allocate(max_slices,unsigned4);
+  unsigned4 * phases = bpmdj_allocate(max_slices,unsigned4);
   // go through song slice by slice
   status_bar->setText("Calibrating");
   for(int slice = 0 ; slice < max_slices ; slice++)
@@ -968,11 +980,11 @@ void RythmDialogLogic::calculateRythmPattern2()
   int ws = higher_power_of_two(max_slices);
   if (ps>ws) 
     ws = higher_power_of_two(ps);
-  double * ain = allocate(ws,double);
-  double * aou = allocate(ws,double);
-  double * aio = allocate(ws,double);
-  double * periods = allocate(ps,double);
-  // int *counts = allocate(ps,int);
+  double * ain = bpmdj_allocate(ws,double);
+  double * aou = bpmdj_allocate(ws,double);
+  double * aio = bpmdj_allocate(ws,double);
+  double * periods = bpmdj_allocate(ps,double);
+  // int *counts = bpmdj_allocate(ps,int);
   pm = new QPixmap(ps, 24);
   p.begin(pm);
   composition_property cp;
@@ -1016,9 +1028,9 @@ void RythmDialogLogic::calculateRythmPattern2()
 	}
     }
   // the data which we will write out in the index file are the non absed periods
-  deallocate(aio);
-  deallocate(aou);
-  deallocate(ain);
+  bpmdj_deallocate(aio);
+  bpmdj_deallocate(aou);
+  bpmdj_deallocate(ain);
   p.end(); 
   composition_freq->setPixmap(*pm);
   playing->set_composition(cp);

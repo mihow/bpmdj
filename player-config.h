@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -20,8 +20,8 @@
 #ifndef _PLAYER_CONFIG_H
 #define _PLAYER_CONFIG_H
 
+#include "Data/types.h"
 #include "data.h"
-#include "basic-types.h"
 
 class SongPlayerLogic;
 
@@ -36,8 +36,8 @@ class PlayerConfig
   accessors(int,ui_posx,-1);
   accessors(int,ui_posy,-1);
   accessors(QString,core_rawpath,"./"); // goes into the environment
-  accessors(int,player_dsp,0);  // which dsp do we want ?
-  accessors(int,alsa_latency,150);  // 0 = none; 1 = oss; 2 = alsa; 3 = mixed
+  accessors(int,player_dsp,0);          // which dsp do we want ?
+  accessors(int,alsa_latency,150);      // 0 = none; 1 = oss; 2 = alsa; 3 = mixed
   accessors(bool,alsa_verbose,false);
   accessors(QString, alsa_dev, "hw:0,0");
   accessors(QString, oss_dsp,"/dev/dsp");

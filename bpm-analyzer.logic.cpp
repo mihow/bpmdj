@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -120,8 +120,6 @@ BpmAnalyzerDialog::BpmAnalyzerDialog(SongPlayer*parent, const char*name, bool mo
   stopbpm = 160;
   startshift = 0;
   stopshift = 0;
-  playing->set_bpmcount_from(0);
-  playing->set_bpmcount_to(100);
   bufsiz = 32 * 1024;
   freq = NULL;
   // internal communicative variables
@@ -191,7 +189,6 @@ unsigned long BpmAnalyzerDialog::phasefit(unsigned long i, unsigned long clip)
   return mismatch;
 }
 
-
 void BpmAnalyzerDialog::setBpmBounds(long start, long stop)
 {
    char tmp[500];
@@ -202,20 +199,6 @@ void BpmAnalyzerDialog::setBpmBounds(long start, long stop)
    FromBpmEdit->setText(tmp);
    sprintf(tmp2,"%d",(int)stopbpm);
    ToBpmEdit->setText(tmp2);
-}
-
-void BpmAnalyzerDialog::setPercentBounds(long startper, long stopper)
-{
-   char tmp[500];
-   char tmp2[500];
-   // de bpmcount_from en bpm_count_to fields moeten 
-   // ingevuld worden
-   playing->set_bpmcount_from(startper);
-   playing->set_bpmcount_to(stopper);
-   sprintf(tmp,"%d",playing->get_bpmcount_from());
-   FromPercentEdit->setText(tmp);
-   sprintf(tmp2,"%d",playing->get_bpmcount_to());
-   ToPercentEdit->setText(tmp2);
 }
 
 void BpmAnalyzerDialog::timerTick()
@@ -230,13 +213,13 @@ void BpmAnalyzerDialog::readAudio()
   
   // read complete file shrunken down into memory
   audiosize=fsize(raw);
-  long startpercent=(long)((long long)audiosize*(long long)playing->get_bpmcount_from()/(long long)100);
+  long startpercent=0;
   startpercent-=startpercent%4;
-  long stoppercent=(long)((long long)audiosize*(long long)playing->get_bpmcount_to()/(long long)100);
+  long stoppercent=audiosize;
   stoppercent-=stoppercent%4;
   audiosize=stoppercent-startpercent;
   audiosize/=(4*(WAVRATE/audiorate));
-  audio=allocate(audiosize+1,unsigned char);
+  audio=bpmdj_allocate(audiosize+1,unsigned char);
   
   // reading in memory
   StatusLabel->setText("Reading");
@@ -273,7 +256,7 @@ void BpmAnalyzerDialog::readAudio()
   fclose(raw);
   if (stop_signal)
     {
-      deallocate(audio);
+      bpmdj_deallocate(audio);
       audio=NULL;
       audiosize=0;
       StatusLabel->setText("Canceled while reading");
@@ -288,13 +271,13 @@ void BpmAnalyzerDialog::readAudioBlock(int blocksize)
   
   // read complete file shrunken down into memory
   audiosize=fsize(raw);  // uitgedrukt in bytes...
-  long startpercent=(long)((long long)audiosize*(long long)playing->get_bpmcount_from()/(long long)100);
+  long startpercent=0;
   startpercent/=4;       // uitgedrukt in sample dus...
-  long stoppercent=(long)((long long)audiosize*(long long)playing->get_bpmcount_to()/(long long)100);
+  long stoppercent=audiosize;
   stoppercent/=4;        // uitgedrukt in samples
   audiosize = stoppercent-startpercent;  // uitgedrukt in samples
   audiosize /= blocksize;        // uitgedrukt in blokken
-  audio = allocate( audiosize, unsigned char );
+  audio = bpmdj_allocate( audiosize, unsigned char );
   
   // reading in memory
   processing_progress = 0;
@@ -327,7 +310,7 @@ void BpmAnalyzerDialog::readAudioBlock(int blocksize)
   
   if (stop_signal)
     {
-      deallocate(audio);
+      bpmdj_deallocate(audio);
       audio=NULL;
       audiosize=0;
       StatusLabel->setText("Canceled while reading");
@@ -338,28 +321,22 @@ void BpmAnalyzerDialog::readAudioBlock(int blocksize)
 }
 
 void BpmAnalyzerDialog::rangeCheck()
-  {
-    unsigned long int val;
-    bool changed = false;
-    val = atoi(FromPercentEdit->text());
-    if (changed |= (unsigned)playing->get_bpmcount_from() != val) 
-      playing->set_bpmcount_from(val);
-    val = atoi(ToPercentEdit->text());
-    if (changed |= (unsigned)playing->get_bpmcount_to() != val) 
-      playing->set_bpmcount_to(val);
-    val = atoi(FromBpmEdit->text());
-    if (startbpm != val)
-      startbpm=val;
-    val = atoi(ToBpmEdit->text());
-    if (stopbpm != val)
-      stopbpm=val;
-    if (changed && audio)
-      {
-	deallocate(audio);
+{
+  unsigned long int val;
+  bool changed = false;
+  val = atoi(FromBpmEdit->text());
+  if (startbpm != val)
+    startbpm=val;
+  val = atoi(ToBpmEdit->text());
+  if (stopbpm != val)
+    stopbpm=val;
+  if (changed && audio)
+    {
+	bpmdj_deallocate(audio);
 	audio=NULL;
 	audiosize=0;
-      }
-  }
+    }
+}
 
 fft_type index2autocortempo(int i)
 {
@@ -497,8 +474,8 @@ void BpmAnalyzerDialog::fft()
   // owkee, nu moeten we dat delen door 2^shifter dan brengt ons dat binnen range van 322.9 BPM
   audiosize>>=shifter;
   signed4 blocksize = 1 << shifter;
-  stereo_sample2 *block = allocate(blocksize,stereo_sample2);
-  double *audio = allocate(audiosize,double);
+  stereo_sample2 *block = bpmdj_allocate(blocksize,stereo_sample2);
+  double *audio = bpmdj_allocate(audiosize,double);
   for(int i = 0 ; i < audiosize; i++)
     {
       signed8 sum = 0;
@@ -521,8 +498,8 @@ void BpmAnalyzerDialog::fft()
   // printf ("windowsize = %d\n",(int) windowsize);
   // printf ("blocksize = %d\n",(int) blocksize);
   
-  freq = allocate(windowsize,fft_type);
-  fft_type *freqi = allocate(windowsize,fft_type);
+  freq = bpmdj_allocate(windowsize,fft_type);
+  fft_type *freqi = bpmdj_allocate(windowsize,fft_type);
   ::fft(windowsize,false,audio,NULL,freq,freqi);
 
   // rescale the entire thing
@@ -537,9 +514,9 @@ void BpmAnalyzerDialog::fft()
   
   // detect peak bpm's
   peaks = 10;
-  peak_bpm = allocate(peaks, fft_type);
-  peak_energy = allocate(peaks, fft_type);
-  fft_type *copy = allocate(windowsize / 2, fft_type);
+  peak_bpm = bpmdj_allocate(peaks, fft_type);
+  peak_energy = bpmdj_allocate(peaks, fft_type);
+  fft_type *copy = bpmdj_allocate(windowsize / 2, fft_type);
   for(int i = 0 ; i < windowsize/2 ; i++) copy[i]=freq[i];
   fft_type range = 0.5; // bpm left and right...
   
@@ -582,8 +559,8 @@ void BpmAnalyzerDialog::fft()
 	}
     }
   
-  deallocate(freqi);
-  deallocate(audio);
+  bpmdj_deallocate(freqi);
+  bpmdj_deallocate(audio);
 }
 
 void BpmAnalyzerDialog::enveloppe_spectrum()
@@ -598,8 +575,8 @@ void BpmAnalyzerDialog::enveloppe_spectrum()
   // owkee, nu moeten we dat delen door 2^spectrum_shifter
   audiosize>>=spectrum_shifter;
   signed4 blocksize = 1 << spectrum_shifter;
-  stereo_sample2 *block = allocate(blocksize,stereo_sample2);
-  fft_type *audio = allocate(audiosize,fft_type);
+  stereo_sample2 *block = bpmdj_allocate(blocksize,stereo_sample2);
+  fft_type *audio = bpmdj_allocate(audiosize,fft_type);
   for(int i = 0 ; i < audiosize; i++)
     {
       signed8 sum = 0;
@@ -619,8 +596,8 @@ void BpmAnalyzerDialog::enveloppe_spectrum()
   for(int tmp = audiosize; tmp; tmp>>=1, windowsize<<=1) ;
   if (windowsize>audiosize) windowsize>>=1;
   
-  freq = allocate(windowsize,fft_type);
-  fft_type *freqi = allocate(windowsize,fft_type);
+  freq = bpmdj_allocate(windowsize,fft_type);
+  fft_type *freqi = bpmdj_allocate(windowsize,fft_type);
   ::fft(windowsize,false,audio,NULL,freq,freqi);
   printf("FFT has been done\n");
 
@@ -646,9 +623,9 @@ void BpmAnalyzerDialog::enveloppe_spectrum()
   
   // detect peak bpm's
   peaks = 10;
-  peak_bpm = allocate(peaks, fft_type);
-  peak_energy = allocate(peaks, fft_type);
-  fft_type *copy = allocate(windowsize / 2, fft_type);
+  peak_bpm = bpmdj_allocate(peaks, fft_type);
+  peak_energy = bpmdj_allocate(peaks, fft_type);
+  fft_type *copy = bpmdj_allocate(windowsize / 2, fft_type);
   for(int i = 0 ; i < windowsize/2 ; i++) copy[i]=freq[i];
   fft_type range = 0.5; // bpm left and right...
   
@@ -696,8 +673,8 @@ void BpmAnalyzerDialog::enveloppe_spectrum()
 	}
     }
   
-  deallocate(freqi);
-  deallocate(audio);
+  bpmdj_deallocate(freqi);
+  bpmdj_deallocate(audio);
 }
 
 void BpmAnalyzerDialog::autocorrelate_spectrum()
@@ -712,8 +689,8 @@ void BpmAnalyzerDialog::autocorrelate_spectrum()
   // owkee, nu moeten we dat delen door 2^spectrum_shifter
   audiosize>>=spectrum_shifter;
   signed4 blocksize = 1 << spectrum_shifter;
-  stereo_sample2 *block = allocate(blocksize,stereo_sample2);
-  fft_type *audio = allocate(audiosize,fft_type);
+  stereo_sample2 *block = bpmdj_allocate(blocksize,stereo_sample2);
+  fft_type *audio = bpmdj_allocate(audiosize,fft_type);
   for(int i = 0 ; i < audiosize; i++)
     {
       signed8 sum = 0;
@@ -734,10 +711,10 @@ void BpmAnalyzerDialog::autocorrelate_spectrum()
   for(int tmp = audiosize; tmp; tmp>>=1, windowsize<<=1) ;
   if (windowsize>audiosize) windowsize>>=1;
   
-  fft_type *freq_tmp  = allocate(windowsize,fft_type);
-  fft_type *freqi_tmp = allocate(windowsize,fft_type);
+  fft_type *freq_tmp  = bpmdj_allocate(windowsize,fft_type);
+  fft_type *freqi_tmp = bpmdj_allocate(windowsize,fft_type);
   ::fft(windowsize,false,audio,NULL,freq_tmp,freqi_tmp);
-  deallocate(audio);
+  bpmdj_deallocate(audio);
   printf("Forward FFT has been done\n");
 
   // 2. modify freq[i]=abs(freq[i]);
@@ -747,11 +724,11 @@ void BpmAnalyzerDialog::autocorrelate_spectrum()
   printf("Copy has been made\n");
   
   // 3. do an inverse fourier transform of freq[i]
-  freq  = allocate(windowsize,fft_type);
+  freq  = bpmdj_allocate(windowsize,fft_type);
   ::fft(windowsize,true,freq_tmp,NULL,freq,freqi_tmp);
   
-  deallocate(freq_tmp);
-  deallocate(freqi_tmp);
+  bpmdj_deallocate(freq_tmp);
+  bpmdj_deallocate(freqi_tmp);
   printf("Backward FFT has been done\n");
 
   // 4. rescale & find peaks 
@@ -775,9 +752,9 @@ void BpmAnalyzerDialog::autocorrelate_spectrum()
   
   // detect peak bpm's
   peaks = 10;
-  peak_bpm = allocate(peaks, fft_type);
-  peak_energy = allocate(peaks, fft_type);
-  fft_type *copy = allocate(windowsize / 2, fft_type);
+  peak_bpm = bpmdj_allocate(peaks, fft_type);
+  peak_energy = bpmdj_allocate(peaks, fft_type);
+  fft_type *copy = bpmdj_allocate(windowsize / 2, fft_type);
   for(int i = 0 ; i < windowsize/2 ; i++) copy[i]=freq[i];
   fft_type range = 0.5; // bpm left and right...
   
@@ -861,8 +838,8 @@ void BpmAnalyzerDialog::run()
   printf("songtime : %s : title : %s[%s]%s\n",
 	 (const char*)(playing->get_time()),
 	 (const char*)(playing->get_display_title()),
-	 (const char*)(playing->get_display_author()),
-	 (const char*)(playing->get_display_version()));
+	 (const char*)(playing->get_author()),
+	 (const char*)(playing->get_version()));
   set_measured_period("Manually",normalperiod);
   
   rayshoot_scan();
@@ -963,7 +940,7 @@ void BpmAnalyzerDialog::rayshoot_scan()
   startshift = 44100 * 60 * 4 / stopbpm ;
   for( unsigned4 i = 0; i <= blockshifter_max ; i ++)
     {
-      mismatch_array[i] = allocate(stopshift-startshift, signed);
+      mismatch_array[i] = bpmdj_allocate(stopshift-startshift, signed);
       for(unsigned4 j = 0 ; j < stopshift-startshift ; j ++)
 	mismatch_array[i][j] = -1;
     }
@@ -1163,7 +1140,7 @@ void BpmAnalyzerDialog::peak_scan()
   unsigned long match[stopshift-startshift];
   for (unsigned i = 0 ; i < stopshift - startshift ; i ++)
     match[i]=0;
-  peak_fit = allocate(peaks, int);
+  peak_fit = bpmdj_allocate(peaks, int);
   for (int i = 0 ; i < peaks ; i ++)
     peak_fit[i]=0;
   

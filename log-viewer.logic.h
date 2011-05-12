@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@ public LogViewer, protected DirectoryScanner
  public:
    LogViewerLogic(QWidget*parent=0);
    void addLog(const char* name, const char* file);
+   void goTo(QString name);
  public slots:
    virtual void changeLogView(QListViewItem *);
 };

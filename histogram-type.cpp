@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 #include "memory.h"
 #include "signals.h"
 #include "files.h"
+#include "signals-template.cpp"
 
 histogram_type::histogram_type()
 {
@@ -49,7 +50,7 @@ void histogram_type::init(double l, double r, int c)
   right = r;
   count = c;
   assert(right>left);
-  bins = allocate(c,signed4);
+  bins = bpmdj_allocate(c,signed4);
   for(int i = 0 ; i < count; i++)
     bins[i]=0;
   sum = 0;
@@ -103,11 +104,11 @@ void histogram_type::strip()
   double new_right = left + (b+1) * (right-left) / count;
   int    new_count = b-a+1;
   if (new_count<=0) new_count=1;
-  signed4 * new_bins = allocate(new_count,signed4);
+  signed4 * new_bins = bpmdj_allocate(new_count,signed4);
   for(int i = a ; i <= b ; i++)
     new_bins[i-a]=bins[i];
   // printf("Stripped histogram from %d to %d\n",count,new_count);
-  deallocate(bins);
+  bpmdj_deallocate(bins);
   bins = new_bins;
   left = new_left;
   right = new_right;
@@ -149,18 +150,17 @@ double histogram_type::mean()
   return sum/total;
 }
 
-
 void histogram_type::normalize_autocorrelation_diff(int val)
 {
   // convert it to doubles
   int ns = higher_power_of_two(count);
-  double *in = allocate(ns,double);
+  double *in = bpmdj_allocate(ns,double);
   for(int i = 0; i < count ;i++)
     in[i]=bins[i];
   for(int i = count ; i < ns; i++)
     in[i]=0;
   unbiased_autocorrelation(in,ns);
-  normalize_abs_max(in,ns);
+  ::normalize_abs_max<double>(in,ns);
   for(int i = 0 ; i < ns ; i++)
     in[i]=sqrt(fabs(in[i]));
   differentiate(in,ns);
@@ -168,14 +168,14 @@ void histogram_type::normalize_autocorrelation_diff(int val)
   normalize_abs_max(in,ns);
   for(int i = 0 ; i < count ; i++)
     bins[i]=(int)(in[i]*(double)val);
-  deallocate(in);
+  bpmdj_deallocate(in);
 }
 
 double histogram_type::best_dist(histogram_type *a)
 {
   int m = count > a->count ? count : a->count;
-  double *A = allocate(m,double);
-  double *B = allocate(m,double);
+  double *A = bpmdj_allocate(m,double);
+  double *B = bpmdj_allocate(m,double);
   for(int i = 0 ; i < m; i++)
     B[i]=A[i]=0;
   for(int i = 0; i < m ;i++)
@@ -194,8 +194,8 @@ double histogram_type::cor_dist(histogram_type *a)
   // convert it to doubles
   int m = count > a->count ? count : a->count;
   int ns = higher_power_of_two(m);
-  double *A = allocate(ns,double);
-  double *B = allocate(ns,double);
+  double *A = bpmdj_allocate(ns,double);
+  double *B = bpmdj_allocate(ns,double);
   for(int i = 0 ; i < ns; i++)
     B[i]=A[i]=0;
   for(int i = 0; i < m ;i++)

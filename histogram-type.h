@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -19,8 +19,7 @@
 
 #ifndef HISTOGRAM_TYPE_H
 #define HISTOGRAM_TYPE_H
-
-#include "basic-types.h"
+#include "Data/types.h"
 #include "common.h"
 
 class histogram_type

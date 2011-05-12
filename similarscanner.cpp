@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@ void SimilarScanner::alreadyHave()
 	  if (selected->isSelected())
 	    {
 	      QString fullname = selected -> text(LIST_FULLSONGNAME);
-	      vexecute(RM" \"%s\"",(const char*)fullname);
+	      start_rm(fullname);
 	      getRidOff(fullname);
 	      reset=true;
 	      break;
@@ -105,7 +105,7 @@ void SimilarScanner::goFetch()
 void SimilarScanner::goFetch(QString fullname)
 {
   QString newname = fullname+".tofetch";
-  vexecute(MV" \"%s\" \"%s\" ",(const char*)fullname,(const char*)newname);
+  start_mv(fullname,newname);
 }
 
 void SimilarScanner::checkfile(const QString pathname, const QString filename)

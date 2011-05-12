@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -72,126 +72,6 @@ SpectrumDialogLogic::SpectrumDialogLogic(SongPlayer*parent, const char*name, boo
   p.end();
 }
 
-void SpectrumDialogLogic::fetchSpectrum_old()
-{
-  long int slidesize = WAVRATE*10;
-  long int slide;
-  long int blocksize = 65536;
-  double *fftdata;
-  double *fftfreq;
-  double *fftfreqi;
-  double *fftwindowfreq;
-  signed short *data;
-  double *barkscale;
-  int bark;
-  barkscale = allocate(barksize,double);
-  fftdata = allocate(blocksize+slidesize,double);
-  fftwindowfreq = allocate(blocksize,double);
-  fftfreq = allocate(blocksize/2,double);
-  fftfreqi = allocate(blocksize,double);
-  // hieronder x 2 omdat we zowel links als rechts binnen krijgen
-  data=allocate((blocksize+slidesize)*2 ,signed short);
-  FILE * raw = openCoreRawFile();
-  // reset the fftfreq
-  long pos;
-  for(pos=0;pos<blocksize/2;pos++)
-    fftwindowfreq[pos]=0.0;
-  // position file
-  long startpos = cue ? cue * 4 : fsize(raw)/2;
-  if (startpos+(blocksize+slidesize)*2<=fsize(raw))
-    startpos = fsize(raw)/2;
-  if (startpos+(blocksize+slidesize)*2<=fsize(raw))
-    {
-      // printf("Fetching spectrum at position = %d\n",(int)cue);
-      fseek(raw,startpos,SEEK_SET);
-      // read in memory
-      pos=0;
-      while(pos<blocksize+slidesize)
-	pos += readsamples((unsigned4*)(data+pos),(blocksize+slidesize-pos)/2,raw)*2;
-      // shrink down
-      for(pos=0;pos<blocksize+slidesize;pos++)
-	fftdata[pos]=(double)data[pos*2];
-      // cummulate different windows
-      for(slide=0;slide<slidesize;slide+=slidesize/100)
-	{
-	  Progress->setProgress(slide,slidesize);
-	  app->processEvents();
-	  // do an fft on that position and normalize the result
-	  fft_double(blocksize,0,fftdata+slide,NULL,fftwindowfreq,fftfreqi);
-	  for(pos=0;pos<blocksize/2;pos++)
-	    fftfreq[pos]+=fftwindowfreq[pos];
-	}
-      Progress->setProgress(slidesize,slidesize);
-      app->processEvents();
-      fclose(raw);
-      // normalize the result
-      double max = 0;
-      for(pos=0;pos<blocksize/2;pos++)
-	// fftfreq[pos]=fabs(fftfreq[pos]*(double)pos/((double)blocksize*10.0));
-	fftfreq[pos]=fabs(fftfreq[pos]);
-      for(pos=0;pos<blocksize/2;pos++)
-	if (fftfreq[pos]>max) 
-	  max=fftfreq[pos];
-      for(pos=0;pos<blocksize/2;pos++)
-	fftfreq[pos]=fftfreq[pos]*100.0/max;
-
-      // bring all frequency relatively to the bark-scales
-      for(bark=0;bark<barksize;bark++)
-	barkscale[bark]=0;
-      for(pos=0;pos<blocksize/2;pos++)
-	{
-	  double freq = Index_to_frequency(blocksize,pos)*(double)WAVRATE;
-	  for(bark=0;bark<barksize;bark++)
-	    if (freq>barkbounds[bark] &&
-		freq<barkbounds[bark+1])
-	      {
-		double length = barkbounds[bark+1]-barkbounds[bark];
-		double barkcentre = barkbounds[bark]+length/2.0;
-		double dist = fabs(freq-barkcentre)*2.0/length;
-		double scale = 1.0 - dist;
-		assert(scale>=0.0);
-		barkscale[bark]+=fftfreq[pos]*scale;
-		assert(barkscale[bark]>=0.0);
-	      }
-	}
-      // rescale bark information..
-      // the first entry in the scale is always halved because this is the bass level
-      barkscale[0]/=2.0;
-      max=0;
-      for(bark=0;bark<barksize;bark++)
-	if (barkscale[bark]>max)
-	  max=barkscale[bark];
-      for(bark=0;bark<barksize;bark++)
-	{
-	  barkscale[bark]=barkscale[bark]*99.0/max;
-	  assert(barkscale[bark]>=0.0);
-	}
-      // update the meters...
-      //      for(pos=0;pos<barksize;pos++)
-      //	meters[pos]->setValue((int)barkscale[pos]);
-      // write out values...
-      char spectrum[barksize+1];
-      for(pos=0;pos<barksize;pos++)
-	{
-	  // printf("%d : %g -> %g\n",pos,barkscale[pos]/4,
-	  // 10*log(barkscale[pos]/4)/log(10));
-	  spectrum[pos]='a'+(char)(barkscale[pos]/4);
-	}
-      spectrum[barksize]=0;
-      // playing->set_spectrum(strdup(spectrum));
-    }
-  else
-    {
-      printf("Could not measure spectrum because there is not enough data at position (bytes) %d\n",(int)startpos);
-    }
-  // free everything involved
-  deallocate(fftwindowfreq);
-  deallocate(fftfreq);
-  deallocate(fftfreqi);
-  deallocate(fftdata);
-  deallocate(data);
-}
-
 static double tovol(double a)
 {
   double r = 10*log(a)/log(10);
@@ -232,8 +112,8 @@ static double *fft_in = NULL;
 
 static double* init_bark_fft(int window_size)
 {
-  fft_out = allocate(window_size,double);
-  fft_in = allocate(window_size,double);
+  fft_out = bpmdj_allocate(window_size,double);
+  fft_in = bpmdj_allocate(window_size,double);
   plan = fftw_plan_r2r_1d(window_size,fft_in,fft_out,FFTW_R2HC,FFTW_MEASURE);
   return fft_in;
 }
@@ -260,14 +140,14 @@ void SpectrumDialogLogic::fetchSpectrum_normal()
   const int show_size_histo = 256;
   // const int barksize = window_size/2;
   // allocate empty arrays
-  double *  bark_energy = allocate(barksize,double);
+  double *  bark_energy = bpmdj_allocate(barksize,double);
   double * fft_in = init_bark_fft(window_size);
   // we need to go two times through the entire file 2 times. First to find the maxima
   // then to obtain the distribution
   FILE * raw = openCoreRawFile();
   long int fs = fsize(raw)/4;
-  stereo_sample2 * block = allocate(window_size, stereo_sample2);
-  histogram_type * * bark_energy_distri = allocate (barksize,histogram_type *);
+  stereo_sample2 * block = bpmdj_allocate(window_size, stereo_sample2);
+  histogram_type * * bark_energy_distri = bpmdj_allocate (barksize,histogram_type *);
   for(int i = 0 ; i < barksize ; i++)
     bark_energy_distri[i] = new histogram_type(0.0,96,distri_size); // 96 dB should suffice no ?
   long indicate = fs/step_size;
@@ -309,7 +189,7 @@ void SpectrumDialogLogic::fetchSpectrum_normal()
   // determination of dB range
   for(int i = 0 ; i < barksize ; i ++)
     bark_energy_distri[i]->normalize(255);
-  double dBmin, dBmax;
+  double dBmin = 0, dBmax = 0;
   for(int i = 0 ; i < barksize ; i++)
     {
       // printf("%d : %g\n",i,bark_energy_distri[i]->mean());
@@ -372,8 +252,8 @@ void SpectrumDialogLogic::fetchSpectrum_normal()
   free_bark_fft();
   for(int i = 0 ; i < barksize ; i ++)
     delete bark_energy_distri[i];
-  deallocate(bark_energy_distri);
-  deallocate(fft_in);
-  deallocate(block);
+  bpmdj_deallocate(bark_energy_distri);
+  bpmdj_deallocate(fft_in);
+  bpmdj_deallocate(block);
 }
 

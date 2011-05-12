@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@
 
 #include <assert.h>
 #include "common.h"
-#include "basic-types.h"
 
 // TODO: by taking all elements in realcontent immediatelly from
 // Qsong global if the index is below type_mark 
@@ -52,12 +51,12 @@ class Point
     void prefix(int d);
 };
 
-struct Position
+struct ClusterPosition
 {
   float distance;
   signed2 x;
   signed2 y;
-  bool operator == (Position & other)
+  bool operator == (ClusterPosition & other)
   {
     return x == other.x && y == other.y;
   }
@@ -103,8 +102,8 @@ class Cluster
     static inline bool isPoint(int xidx);
     
     static float * * similarity;
-    static Position * * prev;
-    static Position * * next;
+    static ClusterPosition * * prev;
+    static ClusterPosition * * next;
     // the similarity matrix
     Cluster();
     static float distance(int x, int y, Metriek * metriek);

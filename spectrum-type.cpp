@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -25,44 +25,20 @@
 #include "signals.h"
 #include "files.h"
 
-spectrum_type::spectrum_type(const char* str)
+Data spectrum_type::get_data() const
 {
-  while(str[0]==' ' || str[0]=='\t') str++;
-  if (strlen(str)==24)
-    pre27init(str);
-  else
-    post27init(str);
+  Array<1,float4> spectrumdata(spectrum_size);
+  for(int i = 0 ; i < spectrum_size ; i++)
+    spectrumdata[i]=bark[i];
+  return spectrumdata;
 }
 
-void spectrum_type::pre27init(const char * txt)
+void spectrum_type::set_data(Data &data)
 {
-  for(int i = 0 ; i < spectrum_size; i++)
-    {
-      spectrum_freq d = txt[i]-'a';
-      if (i==0) d*=2;
-      d/=barkbounds[i+1]-barkbounds[i];
-      bark[i]=30+10*log(d)/log(10);
-      if (isnan(bark[i])) bark[i]=0;
-      else if (bark[i]<0) bark[i]=0;
-    }
-  //for(int i = 0 ; i < spectrum_size; i++)
-  //    printf("%g ",bark[i]);
-  //printf("\n");
-  translate_mean(bark,spectrum_size);
-};
-
-void spectrum_type::post27init(const char * txt)
-{
-  const char *cur = txt;
-  for(int i = 0 ; i < spectrum_size; i++)
-    {
-      char* nxt;
-      bark[i]=strtof(cur,&nxt);
-      if (isnan(bark[i])) bark[i]=0;
-      cur=nxt;
-    }
-  // normalize_mean(bark,spectrum_size);
-};
+  Array<1,float4> spectrumdata = data;
+  for(int i = 0 ; i < spectrum_size ; i++)
+    bark[i]=spectrumdata[i];
+}
 
 double barkbounds[barksize+1] =
   {

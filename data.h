@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -42,7 +42,3 @@
   static inline void set_##var(int idx, type2 v) {_##var[idx]=v;};
 
 #define init_singleton_var(klasse, var, type, init) type klasse::_##var = init
-
-
-// Step 1. write accessors for all variables.
-// 

@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@
 
 spectrum_freq devs[spectrum_size] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 spectrum_freq means[spectrum_size] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+// unsigned8 total_music_body = 0;
 
 static int spectra = 0;
 
@@ -98,12 +99,12 @@ void mean_echo_old(echo_property echo)
   echos++;
   if (echo_mean==NULL)
     {
-      echo_mean=allocate(spectrum_size,float8*);
-      echo_dev=allocate(spectrum_size,float8*);
+      echo_mean=bpmdj_allocate(spectrum_size,float8*);
+      echo_dev=bpmdj_allocate(spectrum_size,float8*);
       for(int i = 0 ; i < spectrum_size ; i ++)
 	{
-	  echo_mean[i]=allocate(echo_prop_sx,float8);
-	  echo_dev[i]=allocate(echo_prop_sx,float8);
+	  echo_mean[i]=bpmdj_allocate(echo_prop_sx,float8);
+	  echo_dev[i]=bpmdj_allocate(echo_prop_sx,float8);
 	  for(int j = 0 ; j < echo_prop_sx ; j++)
 	    echo_mean[i][j]=echo_dev[i][j]=0;
 	}
@@ -229,6 +230,11 @@ void SongSelectorLogic::openStatistics()
   StatisticsDialog * statistics = new StatisticsDialog(this);
   
   //---------------------------------------
+  //    Music body size
+  //---------------------------------------
+  //  statistics->bodysize->setText(QString("Music body size ")+readable(total_music_body));
+  
+  //---------------------------------------
   //    The mean spectrum characteristics
   //---------------------------------------
   // the frequency means and deviations
@@ -304,7 +310,7 @@ void SongSelectorLogic::openStatistics()
   app->processEvents();
 
   GrowingArray<Song*> *all = database->getAllSongs();
-  float * * echo_stack = allocate(all->count,float *);
+  float * * echo_stack = bpmdj_allocate(all->count,float *);
   int vec_size = spectrum_size*echo_prop_sx;
   int nr = 0;
   for(int i = 0 ; i < all->count ; i++)
@@ -313,21 +319,21 @@ void SongSelectorLogic::openStatistics()
       echo_property echo = song->get_histogram();
       if (!echo.empty())
 	{
-	  echo_stack[nr] = allocate(vec_size,float);
+	  echo_stack[nr] = bpmdj_allocate(vec_size,float);
 	  for(int x = 0 ; x < echo_prop_sx ; x++)
 	    for(int y = 0 ; y < spectrum_size ; y++)
 	      echo_stack[nr][x+y*echo_prop_sx]=echo.get_freq_energy_probability_scaled(y,x);
 	  nr++;
 	}
     }
-  echo_stack = reallocate(echo_stack,nr,float*);
+  echo_stack = bpmdj_reallocate(echo_stack,nr,float*);
   printf("   we have %d elements\n",nr);
 
   // 2 - normalize the mean value for every element
   statistics->status->setText("2- translating mean");
   app->processEvents();
 
-  float * mean = allocate(vec_size, float);
+  float * mean = bpmdj_allocate(vec_size, float);
   for(int i = 0 ; i < vec_size ; i ++)
     mean[i]=0;
   for(int i = 0 ; i < nr ; i ++)
@@ -343,7 +349,7 @@ void SongSelectorLogic::openStatistics()
   statistics->status->setText("3- normalizing standard deviation");
   app->processEvents();
 
-  float * stddev = allocate(vec_size, float);
+  float * stddev = bpmdj_allocate(vec_size, float);
   for(int i = 0 ; i < vec_size ; i ++)
     stddev[i]=0;
   for(int i = 0 ; i < nr ; i ++)
@@ -360,10 +366,10 @@ void SongSelectorLogic::openStatistics()
   app->processEvents();
 
   int nr_colors = 16 ;
-  float * * colors = allocate(nr_colors , float *);
+  float * * colors = bpmdj_allocate(nr_colors , float *);
   for(int i = 0 ; i < nr_colors ; i++)
     {
-      colors[i] = allocate(vec_size , float);
+      colors[i] = bpmdj_allocate(vec_size , float);
       for(int j = 0 ; j < vec_size ; j++)
 	colors[i][j]=0.0;
     }
@@ -480,7 +486,7 @@ void SongSelectorLogic::openStatistics()
   
   // 6d - determine angle
   printf("Determining angle\n");
-  int * tmphue = allocate(nr_colors,int);
+  int * tmphue = bpmdj_allocate(nr_colors,int);
   for(int y = 1 ; y <= nr_colors ; y++)
     {
       pca_in_out[y][3]=atan2(pca_in_out[y][2],pca_in_out[y][1]);
@@ -497,7 +503,7 @@ void SongSelectorLogic::openStatistics()
   // the new tmphue array has the sorted indices if we divide it by 
   // 1000. So c=tmphue[idx]/1000 specifies that c is the color which
   // is enumerated at idx. We need to reverse this
-  int *hue = allocate(nr_colors,int);
+  int *hue = bpmdj_allocate(nr_colors,int);
   for(int i = 0 ; i < nr_colors ; i++)
     {
       int j = (tmphue[i]/1000)-1;
@@ -505,7 +511,7 @@ void SongSelectorLogic::openStatistics()
       assert(j<nr_colors);
       hue[j]=i;
     }
-  deallocate(tmphue);
+  bpmdj_deallocate(tmphue);
   
   // 6d - to determine the colors for every position we select which
   //     correlation vectort had the most influence
@@ -513,7 +519,7 @@ void SongSelectorLogic::openStatistics()
   statistics->status->setText("Preparing Pixmap");
   app->processEvents();
   
-  /*  float * values =  allocate(vec_size, float);
+  /*  float * values =  bpmdj_allocate(vec_size, float);
   float m = mean[0];
   for(int i = 1 ; i < vec_size ; i ++)
     if (mean[i]<m) m = mean[i];

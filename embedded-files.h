@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -21,11 +21,12 @@
  * the pointers refers to files that are embedded as object files
  * before they are usefull init_embedded_files should be called
  */
-
 void init_embedded_files();
 
 #define EMBEDDED_FILES \
-FILE(logo_png)
+FILE(logo_png)  \
+FILE(noise_ogg) \
+FILE(noise_mp3)
 
 #define FILE(name) \
   extern         int name## _size; \

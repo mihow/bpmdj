@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -67,7 +67,6 @@ class BpmAnalyzerDialog : public CountDialog, ThreadedAnalyzer
    void          readAudio();  // reads the file in memory
    void          readAudioBlock(int blocksize);  // reads the file in memory divided by blocks
  public:
-   void          setPercentBounds(long startper, long stopper);
    void          setBpmBounds(long start, long stop);
    void          getMd5();     // retrieves MD5 sum
    void          writeAudio(); // writes audio to disk

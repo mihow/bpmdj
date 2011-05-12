@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -64,13 +64,15 @@ LogItem::LogItem(QListView * parent, QString dirname, QString logfilename) :
       QString t(line);
       if (++lineno==1)
 	{
+	  t.replace("\n","");
 	  setText(0,t);
 	  logtext.append(QString("<b>Name: "+t+"</b>"));
 	}
-      else if (lineno==2)
+      /*      else if (lineno==2)
 	{
 	  logtext.append(QString("<u><b>Command: "+t+"</b></u>"));
 	}
+      */
       else if (t.startsWith("BpmDj Player v") ||
 	       t.startsWith("This software is distributed") ||
 	       t.startsWith("---------------------------"))
@@ -120,4 +122,14 @@ void LogViewerLogic::changeLogView(QListViewItem * i)
   if (!i) return;
   LogItem *cast = (LogItem*)i;
   text->setText(cast->getLogText());
+}
+
+void LogViewerLogic::goTo(QString name)
+{
+  QListViewItem * i = list->findItem(name,0);
+  if (i) 
+    {
+      list->setSelected(i,true);
+      list->setCurrentItem(i);
+    }
 }

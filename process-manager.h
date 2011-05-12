@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -35,28 +35,28 @@ class ProcessChanged
 class SongSelectorLogic;
 class Song;
 
+extern Song* main_song;
+extern Song* monitor_song;
+
 class ProcessManager:
   public BasicProcessManager
 {
   public:
-    static Song* *playing_songs;
     SongSelectorLogic * selector;
     ProcessChanged* listener;
   private:
-    int monitorPlayCommand;
     inline SongSelectorLogic* get_selector() { return selector; };
     virtual void clearId(int id);
+    void start(int id, Song * song);
   public:
-    static inline Song* playingInMain() {return playing_songs[0];};
-    static inline Song* playingInMonitor() {return playing_songs[1];};
-    static inline bool monitorFree() {return playing_songs[1]==NULL;};
     ProcessManager(SongSelectorLogic *sel);
     virtual ~ProcessManager() {};
-    void clearPlayer(int id, bool update=true);
     void switchMonitorToMain();
     void setMainSong(Song * song);
-    void startSong(Song *song);
+    bool startSong(Song *song);
+#ifdef INCOMPLETE_FEATURES
     void startExtraSong(int id, Song *song);
+#endif
 };
 
 #endif

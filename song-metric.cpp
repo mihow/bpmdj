@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -128,9 +128,7 @@ float SongMetriek::histogram_dist(const Song& self, const Song & song, double br
     return 1000000;
   float distance=0;
   /* recalculate breakat */
-  breakat /= 10;
   breakat *= (spectrum_size*echo_prop_sx)/100;
-  breakat *= breakat;
   breakat *= breakat;
   /* The distance measure using the differential of the autocorrelation */
   for (int x = 0; x < spectrum_size && distance < breakat; x ++ )
@@ -167,12 +165,10 @@ float SongMetriek::histogram_dist(const Song& self, const Song & song, double br
 	    distance+=d;
 	  }
     }
-  if (distance>=breakat) 
+  if (distance>=breakat)
     return 1000000;
   distance = sqrt(distance);
-  distance = sqrt(distance);
   distance /= (spectrum_size*echo_prop_sx)/100;
-  distance *= 10;
   return distance;
 }
 
@@ -305,4 +301,3 @@ void SongMetriek::prepare()
   harmonic47_term=calculate_harmonic_term(4.0/7.0,get_tempo_limits());
   harmonic48_term=calculate_harmonic_term(4.0/8.0,get_tempo_limits());
 }
-

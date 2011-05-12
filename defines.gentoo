@@ -1,7 +1,7 @@
 CPP = g++ -O3 -Wall
 CC = gcc -O3 -Wall
 
-CFLAGS += -D COMPILE_OSS -D COMPILE_ALSA
+CFLAGS += -D COMPILE_OSS -D COMPILE_ALSA -D QT_THREAD_SUPPORT
 LDFLAGS+= -lpthread -lm -lasound -lrt -lfftw3
 
 CP = cp

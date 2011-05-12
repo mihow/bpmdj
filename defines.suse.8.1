@@ -1,7 +1,7 @@
 ## SuSe 8.1
 CPP=g++ -O3 -Wall
 CC=gcc -O3 -Wall
-CFLAGS+=-D COMPILE_ALSA -D COMPILE_OSS
+CFLAGS+=-D COMPILE_ALSA -D COMPILE_OSS -D QT_THREAD_SUPPORT
 LDFLAGS+= -lpthread -lm -lasound -lrt
 
 CP = cp

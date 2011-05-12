@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2005 Werner Van Belle
+ Copyright (C) 2001-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -19,10 +19,9 @@
 
 #ifndef SIGNALS_H
 #define SIGNALS_H
-
 #include <fftw3.h>
 #include <stdlib.h>
-#include "basic-types.h"
+#include "Data/types.h"
 
 template <class Type, int Channels> class Sample
 {
@@ -184,7 +183,6 @@ template<class Input, class Output, int Channels> class Haar: public BasicConver
     Haar(BasicSignal<Input,Channels> &in, BasicSignal<Output,Channels> &out, bool forward);
     void execute();
 };
-
 
 /**
  * General usefull functions
