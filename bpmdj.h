@@ -31,9 +31,7 @@ using namespace std;
 #include "fragment-player.h"
 #include "spectrum-pca.h"
 #include "existence-scanner.h"
-#include "clusterer.h"
 #include "clock-drivers.h"
-#include "ext-clock.h"
 
 #if (DATA_VERSION_MAJOR != 0) || (DATA_VERSION_MINOR != 2)
 #error "DATA has wrong version number"
@@ -55,8 +53,4 @@ extern SpectrumPca    spectrumPca;
  * The active object that scans the existence of files
  */
 extern ExistenceScanner existenceScanner;
-/**
- * The active object that clusters songs using a maximum distance aggregation
- */
-extern Clusterer clusterer;
 #endif // __loaded__bpmdj_h__

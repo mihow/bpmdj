@@ -133,7 +133,6 @@ void terminate_and_quit(int exitcode)
   fragmentCreator.terminate();
   spectrumPca.terminate();
   indexReader.terminate();
-  clusterer.terminate();
   aoPool->wait_for_finish();
   exit(exitcode);
 }
@@ -220,11 +219,7 @@ int main(int argc, char* argv[])
   /**
    * Starting bpmclock process 
    */
-#ifdef EXT_CLOCK
-  metronome = new ext_clock();
-#else
   metronome = new clock_driver();
-#endif
   metronome->init();
   metronome->attach_clock(false);
   

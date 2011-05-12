@@ -260,7 +260,7 @@ void SpectrumAnalyzer::fetchSpectrum_normal()
 	  p.setPen(QColor(m,0,0));
 	p.drawPoint(x,y);
       }
-  p.end(); 
+  p.end();
   distri->setPixmap(*pm);
   // deallocate everything
   free_bark_fft();

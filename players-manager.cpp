@@ -88,27 +88,11 @@ void ProcessManager::start(SongSlot* slot, Song *song)
   fragmentPlayer.waitForStart();
 }
 
-#ifdef INCOMPLETE_FEATURES
-void ProcessManager::startExtraSong(int id, Song *song)
-{
-  start(Config::players[id],song);
-  selector->updateProcessView(false);
-}
-#endif
-
 bool ProcessManager::startSong(Song *song)
 {
   assert(song);
   QString player;
   // if there is still a song playing in the monitor, don't go
-#ifdef INCOMPLETE_FEATURES
-  if (::monitor_song)
-    {
-      Error(true,"Cannot start playing in monitor, "
-	    "other monitor song still playing !");
-      return false;
-    }
-#endif
   int nextSlot=-1;
   for(int i = 0 ; i< 4 ; i ++)
     {

@@ -72,13 +72,9 @@ public:
   virtual void updateProcessView(bool main_changed);
   virtual void startAnotherAnalyzer(Song * finished_analyzing, int on_slot);
 
-//-----------------------------------------------------------------------
-// FUNCTIONS TO HELP THE INDEXREADER 
-//-----------------------------------------------------------------------
-
   /**
-   * Will start the indexreader active object, which will go through 
-   * all the index files in the index directory and read them in memory. 
+   * Will start the indexreader active object, which will go through
+   * all the index files in the index directory and read them in memory.
    * During this process step_reading_indices will be called regularly.
    * At the end of the process stop_reading_indices will be called.
    */
@@ -114,11 +110,6 @@ private:
   QAction* linkAutoProp(ConfigState & prop, QMenu *menu, QString text);
 public: 
   void reread_and_repaint(Song* song);
-#ifdef INCOMPLETE_FEATURES
-  virtual void findsimilarnames();
-  virtual void findallsimilarnames();
-  virtual void doMarkDups();
-#endif
 public slots:
   virtual void updateItemList();
   virtual void startExistenceCheck();
@@ -137,13 +128,10 @@ public slots:
   virtual void exportPlayList();
   virtual void doSpectrumPca(bool fulldatabase = false, 
 			     bool update_process_view = true);
-  virtual void doClustering();
   virtual void exportTempoList();
   virtual void doBackup();
   virtual void selectionAddTags();
   virtual void selectionSetAuthor();
-  virtual void selectionPlayIn3th();
-  virtual void selectionPlayIn4th();
   virtual void selectionSetMainSong();
   virtual void selectionDelTags();
   virtual void selectionAddQueue();

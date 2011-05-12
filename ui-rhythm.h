@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'ui-rhythm.ui'
 **
-** Created: Thu May 12 14:15:37 2011
+** Created: Thu May 12 15:19:16 2011
 **      by: Qt User Interface Compiler version 4.7.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -17,7 +17,6 @@
 #include <QtGui/QGridLayout>
 #include <QtGui/QHeaderView>
 #include <QtGui/QLabel>
-#include <QtGui/QLineEdit>
 #include <QtGui/QProgressBar>
 #include <QtGui/QPushButton>
 #include <QtGui/QSpinBox>
@@ -40,8 +39,6 @@ public:
     QLabel *projection;
     QPushButton *calculate;
     QLabel *textLabel1_2;
-    QLabel *status_bar_2;
-    QLineEdit *outfile;
     QLabel *status_bar;
 
     void setupUi(QWidget *RhythmAnalyzer)
@@ -55,7 +52,7 @@ public:
         gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         composition_freq = new QLabel(RhythmAnalyzer);
         composition_freq->setObjectName(QString::fromUtf8("composition_freq"));
-        QSizePolicy sizePolicy(static_cast<QSizePolicy::Policy>(5), static_cast<QSizePolicy::Policy>(7));
+        QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(composition_freq->sizePolicy().hasHeightForWidth());
@@ -84,8 +81,8 @@ public:
 
         beats = new QSpinBox(RhythmAnalyzer);
         beats->setObjectName(QString::fromUtf8("beats"));
-        beats->setMaximum(32);
         beats->setMinimum(1);
+        beats->setMaximum(32);
         beats->setValue(4);
 
         gridLayout->addWidget(beats, 8, 2, 1, 1);
@@ -97,7 +94,7 @@ public:
 
         rhythm = new QLabel(RhythmAnalyzer);
         rhythm->setObjectName(QString::fromUtf8("rhythm"));
-        QSizePolicy sizePolicy1(static_cast<QSizePolicy::Policy>(7), static_cast<QSizePolicy::Policy>(7));
+        QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Expanding);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
         sizePolicy1.setHeightForWidth(rhythm->sizePolicy().hasHeightForWidth());
@@ -140,32 +137,11 @@ public:
 
         gridLayout->addWidget(textLabel1_2, 0, 0, 1, 3);
 
-        status_bar_2 = new QLabel(RhythmAnalyzer);
-        status_bar_2->setObjectName(QString::fromUtf8("status_bar_2"));
-        QSizePolicy sizePolicy2(static_cast<QSizePolicy::Policy>(4), static_cast<QSizePolicy::Policy>(5));
-        sizePolicy2.setHorizontalStretch(0);
-        sizePolicy2.setVerticalStretch(0);
-        sizePolicy2.setHeightForWidth(status_bar_2->sizePolicy().hasHeightForWidth());
-        status_bar_2->setSizePolicy(sizePolicy2);
-        status_bar_2->setWordWrap(false);
-
-        gridLayout->addWidget(status_bar_2, 7, 0, 1, 1);
-
-        outfile = new QLineEdit(RhythmAnalyzer);
-        outfile->setObjectName(QString::fromUtf8("outfile"));
-        QSizePolicy sizePolicy3(static_cast<QSizePolicy::Policy>(4), static_cast<QSizePolicy::Policy>(0));
-        sizePolicy3.setHorizontalStretch(0);
-        sizePolicy3.setVerticalStretch(0);
-        sizePolicy3.setHeightForWidth(outfile->sizePolicy().hasHeightForWidth());
-        outfile->setSizePolicy(sizePolicy3);
-
-        gridLayout->addWidget(outfile, 7, 1, 1, 2);
-
         status_bar = new QLabel(RhythmAnalyzer);
         status_bar->setObjectName(QString::fromUtf8("status_bar"));
         status_bar->setWordWrap(false);
 
-        gridLayout->addWidget(status_bar, 7, 3, 1, 2);
+        gridLayout->addWidget(status_bar, 7, 0, 1, 5);
 
 
         retranslateUi(RhythmAnalyzer);
@@ -181,7 +157,6 @@ public:
         textLabel1_2_2_2->setText(QApplication::translate("RhythmAnalyzer", "Probability of composition change after x measures at freq y", 0, QApplication::UnicodeUTF8));
         calculate->setText(QApplication::translate("RhythmAnalyzer", "Calculate", 0, QApplication::UnicodeUTF8));
         textLabel1_2->setText(QApplication::translate("RhythmAnalyzer", "1 Measure looks like", 0, QApplication::UnicodeUTF8));
-        status_bar_2->setText(QApplication::translate("RhythmAnalyzer", "File output", 0, QApplication::UnicodeUTF8));
         status_bar->setText(QApplication::translate("RhythmAnalyzer", "...", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 

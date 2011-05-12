@@ -78,7 +78,6 @@ using namespace std;
 #include "song-metric.h"
 #include "bpmdj.h"
 #include "players-manager.h"
-#include "cluster.h"
 #include "queuedsong.h"
 #include "historysong.h"
 #include "ui-bpmmerge.h"
@@ -91,7 +90,6 @@ using namespace std;
 #include "ui-freq-mapping.h"
 #include "memory.h"
 #include "statistics.h"
-#include "ui-clustering.h"
 #include "history.h"
 #include "log-viewer.h"
 #include <qaction.h>
@@ -195,17 +193,6 @@ SongSelectorLogic::SongSelectorLogic(QWidget * parent) :
 		     this,SLOT(startExistenceCheck()));
   before->addAction("Rename songs with wrong title...",
 		     this,SLOT(startRenamerOnSongs()));
-#ifdef INCOMPLETE_FEATURES
-  /**
-   * Checks whether the songs on a disk can be found somewhere in the indices
-   * Currently disabled since we don't really have a good algorithm to help 
-   * with this problem.
-   */
-  before->insertSeparator(
-  before->addAction("Find similar song names in directory...",
-		    this,SLOT(findallsimilarnames()))
-  );
-#endif
   before->insertSeparator(
   before->addAction("Backup indices",this,SLOT(doBackup()))
   );
@@ -263,20 +250,11 @@ SongSelectorLogic::SongSelectorLogic(QWidget * parent) :
   selection->addAction("&Analyze",this,SLOT(queueAnalysis()));
   selection->addAction("Clear metadata",this,SLOT(clearMetaData()));
   selection->addAction("Pca Analysis Sound Color",this,SLOT(doSpectrumPca()));
-  selection->addAction("Cluster Analysis",this,SLOT(doClustering()));
   selection->insertSeparator(
      selection->addAction("This is the main song, but don't play it",
 		  this,SLOT(selectionSetMainSong()))
 			     );
   selection->addAction("Export Filename / tempo list",this,SLOT(exportTempoList()));
-#ifdef INCOMPLETE_FEATURES
-  selection->addAction("Avoid this song",this,SLOT(avoidSongs()));
-  selection->addAction("Clear Song Avoidance",this,SLOT(avoidNoSongs()));
-  selection->addAction("Play in 1st Extra Player",
-			this,SLOT(selectionPlayIn3th()));
-  selection->addAction("Play in 2nd Extra Player",
-			this,SLOT(selectionPlayIn4th()));
-#endif
   selection->addAction("Queue",this,SLOT(selectionAddQueue()));
   selection->insertSeparator(
   selection->addAction("Select all songs without tag",
@@ -919,37 +897,6 @@ ITERATE_OVER(svic)
   spectrumPca.pcaThis(all);
 }
 
-void SongSelectorLogic::doClustering()
-{
-  QMutexLocker _ml(&lock);
-  // 0. Clear all existing colors
-  QColor white(0,0,0);
-  const vector<Song*> &all = database->getAllSongs();
-  constVectorIterator<Song*> i(all);
-ITERATE_OVER(i)
-
-    i.val()->set_color(white);
-    i.val()->set_spectrum_string(EMPTY);
-  }
-  // 1. add all information in 1 cluster
-  clusterer.reset();
-  selectedSongIterator svi;
-ITERATE_OVER(svi)
-
-    if (svi.val()->has_all_cluster_fields()) 
-      clusterer.add(svi.val()); 
-  }
-  // 2. Get the information from the user
-  QDialog dialog(this);
-  Ui::ClusterDialog dialogcontent;
-  dialogcontent.setupUi(&dialog);
-  if (dialog.exec()==Rejected) return;
-  SongMetriek metriek=*dialogcontent.metrics;
-  
-  // 3. Start the analysis
-  clusterer.agglomerate(metriek);
-}
-
 void SongSelectorLogic::exportPlayList()
 {
   QMutexLocker _ml(&lock);
@@ -1320,31 +1267,6 @@ ITERATE_OVER(svi)
 songEditInfo(svi.val());};
 }
 
-void SongSelectorLogic::selectionPlayIn3th()
-{
-#ifdef INCOMPLETE_FEATURES
-  QMutexLocker _ml(&lock);
-  selectedSongIterator svi;
-ITERATE_OVER(svi)
-
-    processManager->startExtraSong(2,svi.val());
-    return;
-  }
-#endif
-}
-
-void SongSelectorLogic::selectionPlayIn4th()
-{
-#ifdef INCOMPLETE_FEATURES
-  QMutexLocker _ml(&lock);
-  selectedSongIterator svi;
-ITERATE_OVER(svi)
-
-    processManager->startExtraSong(3,svi.val());
-    return;}
-#endif
-}
-
 void SongSelectorLogic::selectionAddQueue()
 {
   QMutexLocker _ml(&lock);
@@ -1558,38 +1480,6 @@ void SongSelectorLogic::addTag(const QString tag)
   lst<<tag<<TAG_FALSE<<TAG_FALSE<<TAG_FALSE;
   new QTreeWidgetItem(tagList,lst);
 }
-
-#ifdef INCOMPLETE_FEATURES
-void SongSelectorLogic::findallsimilarnames()
-{
-  QMutexLocker _ml(&lock);
-  QString text = QFileDialog::getExistingDirectory(this,NULL,this,NULL,
-	   "Specify directory to compare with database");
-  if (!text.isEmpty())
-    {
-      SimilarScanner *scanner = new SimilarScanner(this);
-      scanner->setRoot(text);
-      scanner->exec();
-    }
-}
-
-void SongSelectorLogic::findsimilarnames()
-{
-  QMutexLocker _ml(&lock);
-  
-  bool ok;
-  QString text = QInputDialog::getText(this,
-				       "Input name to compare with",
-				       "label",QLineEdit::Normal,
-				       "insert name",&ok);
-  if (ok && !text.isEmpty())
-    {
-      dist_init();
-      findsimilarnames(text,"");
-      dist_done();
-    }
-}
-#endif
 
 extern bool reading_index;
 void SongSelectorLogic::importSongs()

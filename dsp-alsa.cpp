@@ -61,26 +61,6 @@ void dsp_alsa::internal_unpause()
     Warning("dsp: unpause error: %s",snd_strerror(err));
 }
 
-// the normal write routine without buffering...
-void dsp_alsa::wwrite(unsigned4 *value)
-{
-  int err = 0;
-  while(!err)
-    {
-      err = snd_pcm_writei(dsp,value,1);
-    }
-  assert(err!=-EAGAIN);
-  assert(err!=-ESTRPIPE);
-  if (err==-EPIPE)
-    {
-      Warning("underrun occurred...");
-      err = snd_pcm_prepare(dsp);
-      if (err < 0)
-	Error(false,"cant recover from underrun: %s",snd_strerror(err));
-      return;
-    }
-}
-
 void dsp_alsa::write(stereo_sample2 value)
 {
   buffer[filled]=value.value();
@@ -126,6 +106,9 @@ signed8 dsp_alsa::latency()
   assert(err==0);
   if (verbose)
     Info("delay = %d",(int)delay);
+  if (delay < 0 || (unsigned4)delay > buffer_size)
+    Fatal("dsp-alsa latency call returned weird values %ld, buffersize: %ld",
+	  delay,buffer_size);
   assert(delay >= 0 && (unsigned4)delay <= buffer_size);
   return delay + filled;
 }

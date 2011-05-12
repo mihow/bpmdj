@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'ui-player.ui'
 **
-** Created: Thu May 12 14:15:37 2011
+** Created: Thu May 12 15:19:16 2011
 **      by: Qt User Interface Compiler version 4.7.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -124,7 +124,6 @@ public:
     QPushButton *PushButton20;
     QPushButton *PushButton24;
     QPushButton *startStopButton;
-    QPushButton *clocksync;
     QPushButton *AboutButton;
     QWidget *scramblerTab;
     QGridLayout *gridLayout_3;
@@ -870,13 +869,6 @@ public:
 
         horizontalLayout_6->addWidget(startStopButton);
 
-        clocksync = new QPushButton(playerTab);
-        clocksync->setObjectName(QString::fromUtf8("clocksync"));
-        sizePolicy4.setHeightForWidth(clocksync->sizePolicy().hasHeightForWidth());
-        clocksync->setSizePolicy(sizePolicy4);
-
-        horizontalLayout_6->addWidget(clocksync);
-
         AboutButton = new QPushButton(playerTab);
         AboutButton->setObjectName(QString::fromUtf8("AboutButton"));
         AboutButton->setEnabled(true);
@@ -1568,7 +1560,6 @@ public:
         QObject::connect(beatGraphAnalyzer, SIGNAL(normalTempo()), SongPlayer, SLOT(normalTempo()));
         QObject::connect(beatGraphAnalyzer, SIGNAL(targetTempo()), SongPlayer, SLOT(targetTempo()));
         QObject::connect(jackcombo, SIGNAL(activated(QString)), jack_dev, SLOT(setText(QString)));
-        QObject::connect(clocksync, SIGNAL(clicked()), SongPlayer, SLOT(switchClock()));
         QObject::connect(jackloutcombo, SIGNAL(activated(QString)), jack_lout, SLOT(setText(QString)));
         QObject::connect(jackroutcombo, SIGNAL(activated(QString)), jack_rout, SLOT(setText(QString)));
 
@@ -1776,7 +1767,6 @@ public:
 #endif // QT_NO_TOOLTIP
         startStopButton->setText(QApplication::translate("SongPlayer", "Stop", 0, QApplication::UnicodeUTF8));
         startStopButton->setShortcut(QString());
-        clocksync->setText(QApplication::translate("SongPlayer", "Sync", 0, QApplication::UnicodeUTF8));
         AboutButton->setText(QApplication::translate("SongPlayer", "About", 0, QApplication::UnicodeUTF8));
         tab->setTabText(tab->indexOf(playerTab), QApplication::translate("SongPlayer", "Pla&yer", 0, QApplication::UnicodeUTF8));
 #ifndef QT_NO_TOOLTIP

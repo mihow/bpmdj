@@ -38,8 +38,5 @@ class ProcessManager: public DeathProcessListener
     void switchMonitorToMain();
     void setMainSong(Song * song);
     bool startSong(Song *song);
-#ifdef INCOMPLETE_FEATURES
-    void startExtraSong(int id, Song *song);
-#endif
 };
 #endif // __loaded__players_manager_h__

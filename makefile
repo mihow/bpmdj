@@ -1,6 +1,6 @@
-VERSION = 4.1pl2
-DEMOS = index-demo idx2txt bos
-BIN =  $(DEMOS) bpmplay bpmmerge bpmcount bpmclock bpmdj
+VERSION = 4.2b
+DEMOS = index-demo idx2txt
+BIN =  $(DEMOS) bpmplay bpmcount bpmdj
 .EXPORT_ALL_VARIABLES:
 all: .link-targets .ui-forms .rc-files .source-creator .depend .compile 
 

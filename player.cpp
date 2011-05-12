@@ -55,20 +55,11 @@ using namespace std;
 #include "dsp-drivers.h"
 #include "about.h"
 #include "bpmplay-event.h"
-#include "ao-som-beatgraph.h"
 #include "clock-drivers.h"
 #include "info.h"
 #include "dsp-jack.h"
 #include "clock-drivers.h"
-#include "ext-clock.h"
 #include "qt-helpers.h"
-
-/**
- * The user interface is a secondary aspect, and fast updates (especially 10 
- * per second) interfere with the proper operation of the player on my machine
- * (which is kinda old). If you want another speed, consider setting it in the
- * defines file
- */
 
 /** 
  * BF: tempo fading should not be related with the UI.
@@ -79,9 +70,11 @@ using namespace std;
 #ifndef REFRESH_TIME
 #define REFRESH_TIME 1000
 #endif
+
 #ifndef FINE_REFRESH_TIME
-#define FINE_REFRESH_TIME 100
+#define FINE_REFRESH_TIME 1000
 #endif
+
 #ifdef MIDI
 #include "midi-bindings.h"
 #endif
@@ -250,10 +243,6 @@ Player::Player(): QDialog()
 #ifndef COMPILE_JACK
   jacktab->setDisabled(true);
 #endif  
-#ifndef EXT_CLOCK
-  clocksync->setDisabled(true);
-#endif
-
   // set colors of tempo change buttons
   init_tempo_switch_time();
   updateTempoColors();
@@ -564,31 +553,6 @@ void Player::timerTick()
       NormalTempoLCD -> display(T1);
       TempoLd->display(100.0*(float4)normalperiod/(float4)currentperiod);
       updateTempoColors();
-#ifdef EXT_CLOCK
-      if (currentperiod > 0) {
-	ext_clock *c = (ext_clock *)::metronome;
-	/*
-	  char bbtstr[20];
-	  char timestr[20];
-	  unsigned8 ct = samples2s(c->clock->currentframe);
-
-	  T1 = mperiod2bpm(c->clock->currentperiod);
-	  if (T1 < -1) T1=0;
-	  clockbpm->display(T1);
-	  sprintf(timestr,"%02d:%02d:%02d",(int)(ct/3600),
-	  (int)(ct%3600)/60,(int)(ct%60));
-	  clocktime->display(timestr);
-	  int bar = ((::y-dsp->latency()-c->first_beat) / currentperiod) + 1;
-	  int beat = (((::y-dsp->latency()-c->first_beat) % currentperiod) / (currentperiod / 4)) + 1;
-	  sprintf(bbtstr, "%02d:%02d", (int)bar, (int)beat);      
-	  clockbbt->display(bbtstr);
-	*/
-	if (c->sync)
-	  clocksync->setText("Detach from clock");
-	else	  
-	  clocksync->setText("Sync with clock");
-      }
-#endif
     }
   else
     {
@@ -602,7 +566,6 @@ void Player::fineTimerTick()
 {
   if (fade_time>0)
     targetStep();
-  ::metronome->sync_with_clock();
 }
 
 void Player::setCue()
@@ -1308,12 +1271,7 @@ static void init_dsp_and_clock()
   // grab old
   clock_driver* old=metronome;
   // replace with new
-#ifdef EXT_CLOCK
-  if (!opt_check) 
-    metronome=new ext_clock();
-  else
-#endif
-    metronome=new clock_driver();
+  metronome=new clock_driver();
   delete old;
 }
 

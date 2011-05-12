@@ -33,7 +33,6 @@ public:
   SpectrumAnalyzer(QWidget*parent=0);
 public slots:
   virtual void fetchSpectrum_normal();
-  virtual void fetchSpectrum_wavelet();
   virtual void analyze() { fetchSpectrum_normal(); };
   virtual void on_fetchSpectrum_clicked() {start(); };
 };

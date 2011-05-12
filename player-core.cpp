@@ -47,7 +47,6 @@ using namespace std;
 #include "player-config.h"
 #include "capacity.h"
 #include "clock-drivers.h"
-//#include "resampler.h"
 #include "info.h"
 
 /*-------------------------------------------
@@ -232,40 +231,6 @@ int wave_read(unsigned4 pos, stereo_sample2 *val)
   *val=wave_buffer[pos-wave_bufferpos];
   return 0;
 }
-
-/*-------------------------------------------
- *         Resampling read
- *-------------------------------------------*/
-/*int resample_read(unsigned4 pos, stereo_sample2 *val)
-{
-  static int musthave=640;
-  // we need at least 64 samples available whole the time
-  if (pos<wave_bufferpos || pos+musthave-wave_bufferpos>=wave_bufsize)
-    {
-      // we only stop one second later than necessary
-      if (pos>=wave_max()+(long)WAVRATE) return -1;
-      if (pos>=wave_max())
-	{
-	  wave_bufferpos=pos;
-	  for(int i = 0 ; i < wave_bufsize ; i ++)
-	    wave_buffer[i].value(0);
-	  val->value(0);
-	  return 0;
-	}
-      wave_bufferpos=pos;
-      if (wave_bufferpos<0) wave_bufferpos=0;
-      fseek(wave_file,pos*4,SEEK_SET);
-      int r = fread(wave_buffer,4,wave_bufsize,wave_file);
-      if (r>-1 && r < wave_bufsize)
-	for(int i = r ; i < wave_bufsize ; i ++)
-	  wave_buffer[i].value(0);
-    }
-  // here we have an array with values starting at 
-  stereo_sample2 * sixtyfour=wave_buffer+pos-wave_bufferpos;
-  *val = resampler.resample(sixtyfour);
-  return 0;
-}
- */
 
 /*-------------------------------------------
  *         Volume Synth operations
