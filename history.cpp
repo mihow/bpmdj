@@ -31,9 +31,9 @@
 #include <qlineedit.h>
 #include <assert.h>
 #include <stdio.h>
-#include "kbpm-played.h"
+#include <qinputdialog.h>
+#include "history.h"
 #include "common.h"
-#include "mixinformation.h"
 
 int Played::songs_played = 0;
 int Played::size = 1;
@@ -118,12 +118,12 @@ void Played::Play(Song * main_now)
 	  info = f -> comment;
 	  if (Config::ask_mix)
 	    {
-	      MixInformation mixinfo(NULL,NULL,TRUE);
-	      mixinfo.fromLabel->setText(t_1->title+"["+t_1->author+"]"+t_1->version);
-	      mixinfo.toLabel->setText(t_0->title+"["+t_0->author+"]"+t_0->version);
-	      mixinfo.commentEdit->setText(info);
-	      if (mixinfo.exec()==QDialog::Accepted)
-		f-> comment = strdup(mixinfo.commentEdit->text());
+	      bool ok;
+	      QString mixinfo = QInputDialog::getText("How did the mix go ?",
+						      "From : " + t_1->title + "[" + t_1->author+"]" + t_1->version + "\n"+
+						      "To: " + t_0->title + "[" + t_0->author + "]" + t_0->version + "\n",QLineEdit::Normal,
+						      info,&ok);
+	      if (ok) f-> comment = strdup(mixinfo);
 	    }
 	}
       if (t_2) 

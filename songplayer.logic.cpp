@@ -26,6 +26,7 @@
 #include <qlabel.h>
 #include <math.h>
 #include <qslider.h>
+#include <assert.h>
 #include <qmessagebox.h>
 #include <sys/times.h>
 #include "version.h"
@@ -36,7 +37,6 @@
 #include "spectrumanalyzer.logic.h"
 #include "impulseanalyzer.logic.h"
 #include "tempolineanalyzer.logic.h"
-#include <assert.h>
 #include "about.h"
 
 static int test=0;
@@ -286,7 +286,7 @@ void SongPlayerLogic::setCue()
 
 void SongPlayerLogic::shiftBack()
 {
-   ::y=y_normalise(cue)+dsp_latency();
+   ::y=y_normalise(cue)+dsp->latency();
 }
 
 void SongPlayerLogic::restart()
@@ -521,47 +521,47 @@ void SongPlayerLogic::nudgeCueForward8M()
 
 void SongPlayerLogic::fastSaw()
 {
-   lfo_set("Saw",lfo_saw,16,::y-dsp_latency());
+   lfo_set("Saw",lfo_saw,16,::y-dsp->latency());
 }
 
 void SongPlayerLogic::slowSaw()
 {
-   lfo_set("Saw",lfo_saw,8,::y-dsp_latency());
+   lfo_set("Saw",lfo_saw,8,::y-dsp->latency());
 }
 
 void SongPlayerLogic::fastPan()
 {
-   lfo_set("Pan",lfo_pan,16,::y-dsp_latency());
+   lfo_set("Pan",lfo_pan,16,::y-dsp->latency());
 }
 
 void SongPlayerLogic::slowPan()
 {
-   lfo_set("Pan",lfo_pan,8,::y-dsp_latency()); 
+   lfo_set("Pan",lfo_pan,8,::y-dsp->latency()); 
 }
 
 void SongPlayerLogic::normalLfo()
 {
-   lfo_set("No",lfo_no,4,::y-dsp_latency()); 
+   lfo_set("No",lfo_no,4,::y-dsp->latency()); 
 }
 
 void SongPlayerLogic::fastRevSaw()
 {
- lfo_set("Reverse saw",lfo_revsaw,16,::y-dsp_latency());
+  lfo_set("Reverse saw",lfo_revsaw,16,::y-dsp->latency());
 }
 
 void SongPlayerLogic::slowRevSaw()
 {
-   lfo_set("Reverse saw",lfo_revsaw,8,::y-dsp_latency()); 
+  lfo_set("Reverse saw",lfo_revsaw,8,::y-dsp->latency()); 
 }
 
 void SongPlayerLogic::metronome()
 {
-   lfo_set("Metronome",lfo_metronome,16,::y-dsp_latency()); 
+  lfo_set("Metronome",lfo_metronome,16,::y-dsp->latency()); 
 }
 
 void SongPlayerLogic::breakLfo()
 {
-  lfo_set("Break",lfo_break,1,::y-dsp_latency());
+  lfo_set("Break",lfo_break,1,::y-dsp->latency());
 }
 
 void SongPlayerLogic::openBpmCounter()

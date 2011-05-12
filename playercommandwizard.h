@@ -1,8 +1,8 @@
 /****************************************************************************
 ** Form interface generated from reading ui file 'playercommandwizard.ui'
 **
-** Created: Fri Oct 10 19:42:54 2003
-**      by: The User Interface Compiler ($Id: playercommandwizard.h,v 1.2 2003/10/10 18:56:00 krubbens Exp $)
+** Created: Sat May 8 12:31:21 2004
+**      by: The User Interface Compiler ($Id: qt/main.cpp   3.2.3   edited May 19 14:22 $)
 **
 ** WARNING! All changes made in this file will be lost!
 ****************************************************************************/
@@ -34,9 +34,10 @@ public:
     QButtonGroup* buttonGroup1;
     QCheckBox* oss;
     QCheckBox* alsa;
+    QCheckBox* xmms;
+    QCheckBox* none;
     QButtonGroup* buttonGroup2;
     QLabel* textLabel4;
-    QCheckBox* verbose;
     QLabel* textLabel3;
     QLineEdit* latency;
     QComboBox* comboBox5;
@@ -44,10 +45,7 @@ public:
     QLineEdit* x;
     QLabel* textLabel5;
     QLineEdit* y;
-    QButtonGroup* buttonGroup4;
-    QLabel* textLabel9;
-    QLineEdit* dev;
-    QComboBox* comboBox2;
+    QCheckBox* verbose;
     QButtonGroup* buttonGroup3;
     QLabel* textLabel6;
     QLineEdit* dsp;
@@ -56,16 +54,20 @@ public:
     QCheckBox* nolatency;
     QComboBox* comboBox3;
     QComboBox* comboBox4;
-    QPushButton* pushButton7;
+    QButtonGroup* buttonGroup4;
+    QLabel* textLabel9;
+    QLineEdit* dev;
+    QComboBox* comboBox2;
     QPushButton* pushButton8;
+    QPushButton* pushButton7;
 
 protected:
     QGridLayout* PlayerCommandWizardLayout;
     QGridLayout* buttonGroup1Layout;
     QGridLayout* buttonGroup2Layout;
     QHBoxLayout* layout1;
-    QGridLayout* buttonGroup4Layout;
     QGridLayout* buttonGroup3Layout;
+    QGridLayout* buttonGroup4Layout;
 
 protected slots:
     virtual void languageChange();

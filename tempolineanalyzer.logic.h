@@ -54,6 +54,8 @@ public slots:
   //- maximum/minimum search per column
   //- rescaled tot 0 -> 1, geen kwadraat genomen
   //- maxima per row aangeduid
-  virtual void showTempoLine() {showTempoLine_4();};
+  virtual void showCorrelationMatrix1();
+  virtual void showCorrelationMatrix2();
+  virtual void showTempoLine() {showCorrelationMatrix2();};
   virtual void balanceChanged();
 };

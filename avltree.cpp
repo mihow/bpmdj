@@ -386,8 +386,7 @@ template <class Key> void AvlTree<Key>::PurgeAll(Node<Key>* root)
 
 template <class Key> AvlTree<Key>::~AvlTree()
 {
-  PurgeAll(root);
-  root = NULL;
+  purge();
 };
 
 template <class Key> Node<Key>* AvlTree<Key>::AddAvlNode(Node<Key>* root, Node<Key>* who)

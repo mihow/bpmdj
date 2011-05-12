@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>781</width>
-            <height>419</height>
+            <height>422</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -437,7 +437,7 @@
         </widget>
         <widget class="QButtonGroup" row="0" column="0" rowspan="2" colspan="1">
             <property name="name">
-                <cstring>buttonGroup1</cstring>
+                <cstring>enveloppeFft</cstring>
             </property>
             <property name="title">
                 <string>Algorithm</string>
@@ -454,7 +454,7 @@
                         <cstring>resamplingScan</cstring>
                     </property>
                     <property name="text">
-                        <string>Resampling Energy Scan</string>
+                        <string>Rayshoot, Resampling</string>
                     </property>
                     <property name="checked">
                         <bool>true</bool>
@@ -465,10 +465,26 @@
                         <cstring>ultraLongFFT</cstring>
                     </property>
                     <property name="text">
-                        <string>Ultra Long FFT Guidance</string>
+                        <string>Rayshoot, FFT Guidance</string>
                     </property>
                     <property name="checked">
                         <bool>false</bool>
+                    </property>
+                </widget>
+                <widget class="QRadioButton" row="2" column="0">
+                    <property name="name">
+                        <cstring>enveloppeSpectrum</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Enveloppe Spectrum</string>
+                    </property>
+                </widget>
+                <widget class="QRadioButton" row="3" column="0">
+                    <property name="name">
+                        <cstring>fullAutoCorrelation</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Full Autocorrelation</string>
                     </property>
                 </widget>
             </grid>
@@ -728,7 +744,7 @@
     <connection>
         <sender>BusyToggle</sender>
         <signal>toggled(bool)</signal>
-        <receiver>buttonGroup1</receiver>
+        <receiver>enveloppeFft</receiver>
         <slot>setDisabled(bool)</slot>
     </connection>
 </connections>

@@ -95,7 +95,11 @@ void spawn(const char* script)
 
 int execute(const char* script)
 {
-  if (system(script)<=256) return 1;
+  if (system(script)<=256) 
+    {
+      //      printf("Information: started %s\n",script);
+      return 1;
+    }
   printf("Error: couldn't execute %s\n",script);
   return 0;
 }

@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ Duploc: 
  Copyright (C) 2001 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
@@ -18,16 +18,31 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#include <qstring.h>
-#include "avltree.h"
+#include "duploc-dialog.h"
 
-class QStringFactory
+class Duploc : public DuplocDialog
 {
-  private:
-    static bool killed;
-    static AvlTree<QString> tree;
-    static QString * lookup(QString *str);
-  public:
-    static QString create(char* str);
-    static void kill();
+  Q_OBJECT
+public:
+  char * * line;
+  char * * orig;
+  int lastline;
+  int lines;
+  bool **matrix;
+  bool *keepx;
+  bool *keepy;
+  int   keepxc;
+  int   keepyc;
+  int   *mapx;
+  int   *mapy;
+  Duploc(QWidget *parent=0, const char * name=0, bool modal=FALSE, WFlags f=0);
+  void readFiles();
+  void readFile(char* f);
+  void addline(char* fn, int nr, char*o, char*l);
+  void dump();
+  void correlate();
+  void fold();
+  virtual void mousePressEvent(QMouseEvent * e);
+public slots:
+  virtual void showPattern();
 };

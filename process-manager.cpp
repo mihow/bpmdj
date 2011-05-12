@@ -40,9 +40,8 @@
 #include <libgen.h>
 #include "preferences.h"
 #include "about.h"
-#include "tagbox.h"
 #include "songselector.logic.h"
-#include "kbpm-played.h"
+#include "history.h"
 #include "version.h"
 #include "kbpm-dj.h"
 #include "process-manager.h"
@@ -123,15 +122,13 @@ void ProcessManager::processDied(int pid)
 
 void ProcessManager::checkSignals()
 {
+  int tmp;
   for(int i = 0 ; i < 4 ; i ++)
-    {
-      int tmp;
-      if ((tmp=died_pids[i])!=-1)
-	{
-	  died_pids[i]=-1;
-	  processDied(tmp);
-	}
-    }
+    if ((tmp=died_pids[i])!=-1)
+      {
+	died_pids[i]=-1;
+	processDied(tmp);
+      }
 }
 
 void ProcessManager::clearPlayer(int id, bool update)
@@ -173,8 +170,8 @@ void ProcessManager::startExtraSong(int id, Song *song)
     matchWith=song;
   playing_songs[id]=song;
   sprintf(playercommand,
-	  (const char*)(id == 3 ? Config::playCommand3
-			: Config::playCommand4),
+	  (const char*)(id == 3 ? Config::playCommand4
+			: Config::playCommand3),
 	  (const char*)Config::tmp_directory,
 	  (const char*)matchWith->storedin, 
 	  (const char*)song->storedin);

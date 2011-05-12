@@ -1,0 +1,3 @@
+#!/bin/bash
+xhost +
+ssh root@asus DISPLAY=cubical:0 aumix &

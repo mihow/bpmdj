@@ -11,10 +11,10 @@
 #  - alsa-headers (for alsa support)
 
 CPP = ccache g++ -O3
-CC = ccache gcc -O3 
+CC = ccache gcc -O3
 
-#CPP = ccache g++ -O0 -g -pg
-#CC = ccache gcc -O0 -g -pg 
+#CPP = distcc g++ -O0 -g -pg
+#CC = distcc gcc -O0 -g -pg 
 
 CP = cp
 MV = mv
@@ -25,7 +25,7 @@ MKDIR = mkdir
 STRIP = strip
 INSTALL = install
 
-CFLAGS+= -D COMPILE_ALSA -D COMPILE_OSS
+CFLAGS+= -D COMPILE_ALSA -D COMPILE_OSS -D COMPILE_NONE
 LDFLAGS+= -lpthread -lm -lasound
 
 QT_INCLUDE_PATH=-I/usr/include/qt3/

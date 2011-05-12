@@ -61,6 +61,11 @@ QString PreferencesLogic::getCommand()
   PlayerCommandWizard commandCreator(NULL,NULL,TRUE);
   if (commandCreator.exec()!=QDialog::Accepted)
     return "";
+
+  // xmms player
+  if (commandCreator.xmms->isChecked())
+    return "xmms-play \"%s\" -m \"%s\"";
+  
   // the common options
   QString options = "kbpm-play ";
   QString text = commandCreator.latency->text();
@@ -73,7 +78,11 @@ QString PreferencesLogic::getCommand()
     options+="-v ";
   
   // the player specific options
-  if (commandCreator.oss->isChecked())
+  if (commandCreator.none->isChecked())
+    {
+      options+="--none ";
+    }
+  else if (commandCreator.oss->isChecked())
     {
       options+="--oss ";
       text = commandCreator.dsp->text();

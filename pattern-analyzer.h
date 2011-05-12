@@ -1,8 +1,8 @@
 /****************************************************************************
 ** Form interface generated from reading ui file 'pattern-analyzer.ui'
 **
-** Created: Mon Nov 17 09:50:05 2003
-**      by: The User Interface Compiler ($Id: pattern-analyzer.h,v 1.2 2003/11/23 11:17:02 krubbens Exp $)
+** Created: Sun Apr 18 15:41:31 2004
+**      by: The User Interface Compiler ($Id: qt/main.cpp   3.2.3   edited May 19 14:22 $)
 **
 ** WARNING! All changes made in this file will be lost!
 ****************************************************************************/
@@ -11,7 +11,6 @@
 #define PATTERNDIALOG_H
 
 #include <qvariant.h>
-#include <qpixmap.h>
 #include <qdialog.h>
 
 class QVBoxLayout;
@@ -48,6 +47,16 @@ public:
     QLabel* textLabel1_3;
     QLabel* pattern;
     QLabel* projection;
+    QWidget* TabPage;
+    QPushButton* pushButton4_2;
+    QLabel* pattern_demo;
+    QLabel* rythm_pattern;
+    QLabel* textLabel2_2_3;
+    QLabel* textLabel2_2_4;
+    QLabel* textLabel2_2;
+    QLabel* textLabel2_2_2_2;
+    QLabel* textLabel2_2_2;
+    QLabel* textLabel2_2_2_3;
     QWidget* tab_2;
     QLabel* filterImage;
     QLabel* textLabel1_4;
@@ -71,17 +80,17 @@ public slots:
     virtual void balanceChanged();
     virtual void dumpPatternToIdx();
     virtual void filterChanged();
+    virtual void calculateRythmPattern();
 
 protected:
     QGridLayout* PatternDialogLayout;
     QGridLayout* tabLayout;
+    QGridLayout* TabPageLayout;
+    QHBoxLayout* layout5;
     QGridLayout* tabLayout_2;
 
 protected slots:
     virtual void languageChange();
-
-private:
-    QPixmap image0;
 
 };
 

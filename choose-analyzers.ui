@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>604</width>
-            <height>352</height>
+            <width>765</width>
+            <height>473</height>
         </rect>
     </property>
     <property name="caption">
@@ -28,152 +28,6 @@
         <property name="spacing">
             <number>6</number>
         </property>
-        <widget class="QTabWidget" row="0" column="0" rowspan="1" colspan="3">
-            <property name="name">
-                <cstring>tabWidget2</cstring>
-            </property>
-            <widget class="QWidget">
-                <property name="name">
-                    <cstring>tab</cstring>
-                </property>
-                <attribute name="title">
-                    <string>Analyzers</string>
-                </attribute>
-                <grid>
-                    <property name="name">
-                        <cstring>unnamed</cstring>
-                    </property>
-                    <widget class="QLabel" row="0" column="0">
-                        <property name="name">
-                            <cstring>textLabel1</cstring>
-                        </property>
-                        <property name="text">
-                            <string>This process starts a number of analyzers on a song. Below you can choose which analyzers you want to apply. Once you press the 'Start Batch' button a backgroundprocess will be started. 
-
-Warning: If the process is killed when you close kbpm-dj. Start analyze.sh manually (certain bashes kills childs without parent).</string>
-                        </property>
-                        <property name="alignment">
-                            <set>WordBreak|AlignVCenter</set>
-                        </property>
-                    </widget>
-                    <spacer row="1" column="0">
-                        <property name="name">
-                            <cstring>spacer2</cstring>
-                        </property>
-                        <property name="orientation">
-                            <enum>Vertical</enum>
-                        </property>
-                        <property name="sizeType">
-                            <enum>Expanding</enum>
-                        </property>
-                        <property name="sizeHint">
-                            <size>
-                                <width>20</width>
-                                <height>30</height>
-                            </size>
-                        </property>
-                    </spacer>
-                    <widget class="QCheckBox" row="2" column="0">
-                        <property name="name">
-                            <cstring>tempoAnalyzer</cstring>
-                        </property>
-                        <property name="text">
-                            <string>Tempo Analyzer</string>
-                        </property>
-                    </widget>
-                    <widget class="QCheckBox" row="3" column="0">
-                        <property name="name">
-                            <cstring>spectrumAnalyzer</cstring>
-                        </property>
-                        <property name="text">
-                            <string>Spectrum Analyzer</string>
-                        </property>
-                    </widget>
-                </grid>
-            </widget>
-            <widget class="QWidget">
-                <property name="name">
-                    <cstring>tab</cstring>
-                </property>
-                <attribute name="title">
-                    <string>Tempo</string>
-                </attribute>
-                <grid>
-                    <property name="name">
-                        <cstring>unnamed</cstring>
-                    </property>
-                    <widget class="QLabel" row="2" column="0">
-                        <property name="name">
-                            <cstring>TextLabel1</cstring>
-                        </property>
-                        <property name="text">
-                            <string>From :</string>
-                        </property>
-                        <property name="alignment">
-                            <set>AlignVCenter|AlignRight</set>
-                        </property>
-                        <property name="hAlign" stdset="0">
-                        </property>
-                    </widget>
-                    <widget class="QLabel" row="3" column="0">
-                        <property name="name">
-                            <cstring>TextLabel2</cstring>
-                        </property>
-                        <property name="text">
-                            <string>To :</string>
-                        </property>
-                        <property name="alignment">
-                            <set>AlignVCenter|AlignRight</set>
-                        </property>
-                        <property name="hAlign" stdset="0">
-                        </property>
-                    </widget>
-                    <widget class="Line" row="1" column="0" rowspan="1" colspan="2">
-                        <property name="name">
-                            <cstring>Line7</cstring>
-                        </property>
-                        <property name="frameShape">
-                            <enum>HLine</enum>
-                        </property>
-                        <property name="frameShadow">
-                            <enum>Sunken</enum>
-                        </property>
-                        <property name="orientation">
-                            <enum>Horizontal</enum>
-                        </property>
-                    </widget>
-                    <widget class="QLineEdit" row="2" column="1">
-                        <property name="name">
-                            <cstring>From</cstring>
-                        </property>
-                    </widget>
-                    <widget class="QLineEdit" row="3" column="1">
-                        <property name="name">
-                            <cstring>To</cstring>
-                        </property>
-                    </widget>
-                    <widget class="QLabel" row="0" column="0" rowspan="1" colspan="2">
-                        <property name="name">
-                            <cstring>TextLabel4</cstring>
-                        </property>
-                        <property name="text">
-                            <string>Enter the bounds of the BPM search algorithm. If no bounds are specified the bounds currently specified in the .idx will be used.
-
-Determining the BPM of a song takes a while, therefore a background process will be spawned. When that process has finished you should restart kbpm-dj, otherwise the selector will still work with old (wrong) tempos. This also means that you can close kbpm-dj any time you want.</string>
-                        </property>
-                        <property name="alignment">
-                            <set>WordBreak|AlignTop|AlignLeft</set>
-                        </property>
-                        <property name="hAlign" stdset="0">
-                        </property>
-                        <property name="vAlign" stdset="0">
-                        </property>
-                        <property name="wordwrap" stdset="0">
-                        </property>
-                    </widget>
-                </grid>
-            </widget>
-        </widget>
         <widget class="QPushButton" row="1" column="2">
             <property name="name">
                 <cstring>pushButton3</cstring>
@@ -207,6 +61,307 @@ Determining the BPM of a song takes a while, therefore a background process will
                 </size>
             </property>
         </spacer>
+        <widget class="QTabWidget" row="0" column="0" rowspan="1" colspan="3">
+            <property name="name">
+                <cstring>tabWidget2</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>3</hsizetype>
+                    <vsizetype>3</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <widget class="QWidget">
+                <property name="name">
+                    <cstring>tab</cstring>
+                </property>
+                <attribute name="title">
+                    <string>Analyzers</string>
+                </attribute>
+                <grid>
+                    <property name="name">
+                        <cstring>unnamed</cstring>
+                    </property>
+                    <widget class="QLabel" row="0" column="0">
+                        <property name="name">
+                            <cstring>textLabel1</cstring>
+                        </property>
+                        <property name="text">
+                            <string>This process starts a number of analyzers on a song. Below you can choose which analyzers you want to apply. Once you press the 'Start Batch' button a backgroundprocess will be started. 
+
+Warning: If the process is killed when you close kbpm-dj. Start analyze.sh manually (certain bashes kills childs without parent).</string>
+                        </property>
+                        <property name="alignment">
+                            <set>WordBreak|AlignVCenter</set>
+                        </property>
+                    </widget>
+                    <spacer row="4" column="0">
+                        <property name="name">
+                            <cstring>spacer9</cstring>
+                        </property>
+                        <property name="orientation">
+                            <enum>Vertical</enum>
+                        </property>
+                        <property name="sizeType">
+                            <enum>Expanding</enum>
+                        </property>
+                        <property name="sizeHint">
+                            <size>
+                                <width>20</width>
+                                <height>90</height>
+                            </size>
+                        </property>
+                    </spacer>
+                    <widget class="QCheckBox" row="2" column="0">
+                        <property name="name">
+                            <cstring>tempoAnalyzer</cstring>
+                        </property>
+                        <property name="text">
+                            <string>Tempo Analyzer</string>
+                        </property>
+                    </widget>
+                    <widget class="QCheckBox" row="3" column="0">
+                        <property name="name">
+                            <cstring>spectrumAnalyzer</cstring>
+                        </property>
+                        <property name="text">
+                            <string>Spectrum Analyzer</string>
+                        </property>
+                    </widget>
+                    <widget class="Line" row="1" column="0">
+                        <property name="name">
+                            <cstring>line2</cstring>
+                        </property>
+                        <property name="frameShape">
+                            <enum>HLine</enum>
+                        </property>
+                        <property name="frameShadow">
+                            <enum>Sunken</enum>
+                        </property>
+                        <property name="orientation">
+                            <enum>Horizontal</enum>
+                        </property>
+                    </widget>
+                </grid>
+            </widget>
+            <widget class="QWidget">
+                <property name="name">
+                    <cstring>tab</cstring>
+                </property>
+                <attribute name="title">
+                    <string>Tempo</string>
+                </attribute>
+                <grid>
+                    <property name="name">
+                        <cstring>unnamed</cstring>
+                    </property>
+                    <widget class="QLabel" row="0" column="0" rowspan="1" colspan="2">
+                        <property name="name">
+                            <cstring>TextLabel4</cstring>
+                        </property>
+                        <property name="text">
+                            <string>Enter the bounds of the BPM search algorithm. If no bounds are specified the bounds currently specified in the .idx will be used.
+
+Determining the BPM of a song takes a while, therefore a background process will be spawned. When that process has finished you should restart kbpm-dj, otherwise the selector will still work with old (wrong) tempos. This also means that you can close kbpm-dj any time you want.</string>
+                        </property>
+                        <property name="alignment">
+                            <set>WordBreak|AlignTop|AlignLeft</set>
+                        </property>
+                        <property name="hAlign" stdset="0">
+                        </property>
+                        <property name="vAlign" stdset="0">
+                        </property>
+                        <property name="wordwrap" stdset="0">
+                        </property>
+                    </widget>
+                    <widget class="Line" row="1" column="0" rowspan="2" colspan="2">
+                        <property name="name">
+                            <cstring>Line7</cstring>
+                        </property>
+                        <property name="frameShape">
+                            <enum>HLine</enum>
+                        </property>
+                        <property name="frameShadow">
+                            <enum>Sunken</enum>
+                        </property>
+                        <property name="orientation">
+                            <enum>Horizontal</enum>
+                        </property>
+                    </widget>
+                    <widget class="QButtonGroup" row="2" column="1" rowspan="3" colspan="1">
+                        <property name="name">
+                            <cstring>enveloppeFft</cstring>
+                        </property>
+                        <property name="title">
+                            <string>Algorithm</string>
+                        </property>
+                        <property name="radioButtonExclusive">
+                            <bool>true</bool>
+                        </property>
+                        <grid>
+                            <property name="name">
+                                <cstring>unnamed</cstring>
+                            </property>
+                            <widget class="QRadioButton" row="0" column="0">
+                                <property name="name">
+                                    <cstring>resamplingScan</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Rayshoot, Resampling</string>
+                                </property>
+                                <property name="checked">
+                                    <bool>true</bool>
+                                </property>
+                            </widget>
+                            <widget class="QRadioButton" row="1" column="0">
+                                <property name="name">
+                                    <cstring>ultraLongFFT</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Rayshoot, FFT Guidance</string>
+                                </property>
+                                <property name="checked">
+                                    <bool>false</bool>
+                                </property>
+                            </widget>
+                            <widget class="QRadioButton" row="2" column="0">
+                                <property name="name">
+                                    <cstring>enveloppeSpectrum</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Enveloppe Spectrum</string>
+                                </property>
+                            </widget>
+                            <widget class="QRadioButton" row="3" column="0">
+                                <property name="name">
+                                    <cstring>fullAutoCorrelation</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>Full Autocorrelation</string>
+                                </property>
+                            </widget>
+                        </grid>
+                    </widget>
+                    <widget class="QLayoutWidget" row="3" column="0">
+                        <property name="name">
+                            <cstring>layout13</cstring>
+                        </property>
+                        <hbox>
+                            <property name="name">
+                                <cstring>unnamed</cstring>
+                            </property>
+                            <widget class="QLayoutWidget">
+                                <property name="name">
+                                    <cstring>layout11</cstring>
+                                </property>
+                                <vbox>
+                                    <property name="name">
+                                        <cstring>unnamed</cstring>
+                                    </property>
+                                    <widget class="QLabel">
+                                        <property name="name">
+                                            <cstring>TextLabel1</cstring>
+                                        </property>
+                                        <property name="sizePolicy">
+                                            <sizepolicy>
+                                                <hsizetype>1</hsizetype>
+                                                <vsizetype>5</vsizetype>
+                                                <horstretch>0</horstretch>
+                                                <verstretch>0</verstretch>
+                                            </sizepolicy>
+                                        </property>
+                                        <property name="text">
+                                            <string>From</string>
+                                        </property>
+                                        <property name="alignment">
+                                            <set>AlignVCenter|AlignRight</set>
+                                        </property>
+                                        <property name="hAlign" stdset="0">
+                                        </property>
+                                    </widget>
+                                    <widget class="QLabel">
+                                        <property name="name">
+                                            <cstring>TextLabel2</cstring>
+                                        </property>
+                                        <property name="sizePolicy">
+                                            <sizepolicy>
+                                                <hsizetype>1</hsizetype>
+                                                <vsizetype>5</vsizetype>
+                                                <horstretch>0</horstretch>
+                                                <verstretch>0</verstretch>
+                                            </sizepolicy>
+                                        </property>
+                                        <property name="text">
+                                            <string>To</string>
+                                        </property>
+                                        <property name="alignment">
+                                            <set>AlignVCenter|AlignRight</set>
+                                        </property>
+                                        <property name="hAlign" stdset="0">
+                                        </property>
+                                    </widget>
+                                </vbox>
+                            </widget>
+                            <widget class="QLayoutWidget">
+                                <property name="name">
+                                    <cstring>layout12</cstring>
+                                </property>
+                                <vbox>
+                                    <property name="name">
+                                        <cstring>unnamed</cstring>
+                                    </property>
+                                    <widget class="QLineEdit">
+                                        <property name="name">
+                                            <cstring>From</cstring>
+                                        </property>
+                                        <property name="sizePolicy">
+                                            <sizepolicy>
+                                                <hsizetype>5</hsizetype>
+                                                <vsizetype>0</vsizetype>
+                                                <horstretch>0</horstretch>
+                                                <verstretch>0</verstretch>
+                                            </sizepolicy>
+                                        </property>
+                                    </widget>
+                                    <widget class="QLineEdit">
+                                        <property name="name">
+                                            <cstring>To</cstring>
+                                        </property>
+                                        <property name="sizePolicy">
+                                            <sizepolicy>
+                                                <hsizetype>5</hsizetype>
+                                                <vsizetype>0</vsizetype>
+                                                <horstretch>0</horstretch>
+                                                <verstretch>0</verstretch>
+                                            </sizepolicy>
+                                        </property>
+                                    </widget>
+                                </vbox>
+                            </widget>
+                        </hbox>
+                    </widget>
+                    <spacer row="4" column="0">
+                        <property name="name">
+                            <cstring>spacer7</cstring>
+                        </property>
+                        <property name="orientation">
+                            <enum>Vertical</enum>
+                        </property>
+                        <property name="sizeType">
+                            <enum>Expanding</enum>
+                        </property>
+                        <property name="sizeHint">
+                            <size>
+                                <width>20</width>
+                                <height>40</height>
+                            </size>
+                        </property>
+                    </spacer>
+                </grid>
+            </widget>
+        </widget>
     </grid>
 </widget>
 <connections>

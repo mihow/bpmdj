@@ -22,11 +22,13 @@
 #include "songplayer.h"
 #include "bpmcounter.h"
 
+typedef double fft_type;
+
 class BpmAnalyzerDialog : public CountDialog, ThreadedAnalyzer
 {
    Q_OBJECT
  private:
-            // fine scanning
+   // fine scanning
    unsigned char * audio;
    unsigned long   audiosize;
    unsigned long   audiorate;
@@ -40,19 +42,26 @@ class BpmAnalyzerDialog : public CountDialog, ThreadedAnalyzer
             int    tapcount;
             int    starttime;
 	    // fft fields
-	  double * freq;
-	  double * peak_bpm;
-	  double * peak_energy;
+        fft_type * freq;
+	fft_type * peak_bpm;
+	fft_type * peak_energy;
 	    int  * peak_fit;
  	    int    windowsize;
 	    int    peaks;
+   void          set_measured_period(QString technique, int period);
+	    // Enveloppe fft's
+   void          enveloppe_spectrum();
+   void          autocorrelate_spectrum();
 	    // FFT guidance routines
    void          fft();        // do a quick fft to obtain a set of 'hints'
-   void          fft_draw(QPainter &p, int xs, int ys);
+   void          fft_draw(QPainter &p, int xs, int ys, int shifter, double bpm_divisor);
+   void          autocorrelate_draw(QPainter &p, int xs, int ys, int shifter);
             // finding the error fit of a curve
+   unsigned long phasefit_mult(unsigned long i);
+   unsigned long phasefit_diff(unsigned long i);
    unsigned long phasefit(unsigned long i);
    unsigned long phasefit(unsigned long i, unsigned long clip);
-   void          block_scan(); // first energy scan, second fine scan
+   void          rayshoot_scan();
    void          peak_scan();   // scan based on fft-peaks
    void          readAudio();  // reads the file in memory
    void          readAudioBlock(int blocksize);  // reads the file in memory divided by blocks

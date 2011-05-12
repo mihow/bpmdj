@@ -24,7 +24,7 @@
 #include "player-core.h"
 #include "md5-analyzer.h"
 #include "scripts.h"
-
+#include <assert.h>
 void Md5Analyzer::run()
 {
   FILE * kloink;
@@ -36,10 +36,11 @@ void Md5Analyzer::run()
   while(i<32)
     {
       int c = getc(kloink);
+      assert(c>0);
       s[i]=c;
       i++;
     }
   s[32]=0;
   fclose(kloink);
-  playing->set_md5sum(s);
+  playing->set_md5sum(strdup(s));
 }

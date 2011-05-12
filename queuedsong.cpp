@@ -27,7 +27,7 @@
 #include "songselector.logic.h"
 #include "qsong.h"
 #include "process-manager.h"
-#include "kbpm-played.h"
+#include "history.h"
 #include "dirscanner.h"
 #include "spectrum.h"
 #include "queuedsong.h"

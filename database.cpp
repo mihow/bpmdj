@@ -19,10 +19,10 @@
 ****/
 
 #include <qlabel.h>
+#include "history.h"
 #include "database.h"
 #include "qsong.h"
 #include "songselector.logic.h"
-#include "kbpm-played.h"
 #include "process-manager.h"
 #include "songtree.h"
 #include "avltree.cpp"
@@ -131,6 +131,7 @@ bool DataBase::cacheValid(SongSelectorLogic * selector)
 	   (t->text(TAGS_NOT) == TAG_TRUE) != exclude[i])
 	return false;
       i++;
+      it++;
     }
   return true;
 }

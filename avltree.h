@@ -110,6 +110,7 @@ template <class Key> class AvlTree
   int count()                  { return root->count(); };
   int depth()                  { return root->depth(); };
   void print()                 { root->print(0); };
+  void purge()                 { PurgeAll(root); root = NULL; };
   Node<Key> *top()             { return root->toAnswer(); };
 };
 

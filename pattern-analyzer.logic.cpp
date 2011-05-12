@@ -55,6 +55,7 @@
 #include "spectrumanalyzer.logic.h"
 #include "sys/times.h"
 #include "kbpm-play.h"
+#include "fourier.h"
 #include "version.h"
 #include "scripts.h"
 
@@ -473,4 +474,299 @@ void PatternAnalyzerLogic::filterChanged()
   free(data);
   data=NULL;
   audiosize=0;
+}
+
+
+//---------------------------------------------------------------------
+//
+//  rythm analysis
+//
+//---------------------------------------------------------------------
+// The rythm analysis contains 6 parts
+// red & blue : fourier analysis of the signal
+// green & yellow : autocorrelation sequence
+
+void PatternAnalyzerLogic::calculateRythmPattern()
+{
+  int **** data; // make sure shadowing happens
+  int **** audiosize;
+  int shrinker = COLLAPSE;
+  signed8 samples;
+  long int bufsize = 65536;
+  longtrick buffer[bufsize];
+  FILE * raw=openRawFile(playing,arg_rawpath);
+  samples=fsize(raw)/4;
+  if (samples == 0) return;
+  signed4 pos = 0;
+  fseek(raw,pos,SEEK_SET);
+  signed8 length = 2;
+  for(signed8 shifter = samples ; shifter > 1 ; shifter/=2, length*=2);
+  assert(length>=samples);
+  length/=shrinker;
+  double * audio = allocate(length,double);
+  printf("Pattern-Analyzer: allocated data-store with size %d for %d samples\n",(int)length,(int)samples);
+
+  QProgressDialog * progress = NULL;
+  progress = new QProgressDialog();
+  progress->setTotalSteps(samples/bufsize);
+  progress->show();
+  
+  while(pos<samples)
+    {
+      signed8 toread = samples - pos;
+      if (toread>bufsize) toread = bufsize;
+      long count=readsamples((unsigned4*)buffer,toread,raw);
+      
+      if (progress) progress->setProgress(pos/bufsize);
+      app->processEvents();
+      
+      for(int i = 0 ; i < count; i++)
+	audio[(pos+i)/shrinker]=(buffer[i].leftright.left)+(buffer[i].leftright.right);
+      pos+=count;
+    }
+  printf("Pattern-Analyzer: Reading %ld samples\n",samples);
+  samples/=shrinker;
+  
+  fclose(raw);
+  delete(progress);
+  
+  // centralize the audio
+  double total = 0;
+  for(int i = 0 ; i < samples ; i++)
+    total+=audio[i];
+  total/=samples;
+  if (total!=0)
+    for(int i = 0 ; i < samples ; i++)
+      audio[i]-=total;
+  printf("Pattern-Analyzer: Removed DC offset %g\n",total);
+
+  // clear the remainder of the array
+  for(int i = samples ; i < length ; i ++)
+    audio[i]=0;
+  
+  // normalize the audio
+  double maximum = 0;
+  for(int i = 0 ; i < samples ; i++)
+    {
+      double sample = fabs(audio[i]);
+      if (sample>maximum)
+	maximum=sample;
+    }
+  if (maximum==0) return;
+  for(int i = 0 ; i < samples ; i++)
+    audio[i]/=maximum;
+  printf("Pattern-Analyzer: Normalized audio %g\n",maximum);
+
+  // create the enveloppe
+  array(env,length,double);
+  for(int i = 0 ; i < length ; i ++)
+    env[i]=fabs(audio[i]);
+  printf("Pattern-Analyzer: Created audio enveloppe\n");
+  
+  // do the fourier transformation of the enveloppe
+  double * env_fr = allocate(length,double);
+  double * env_fi = allocate(length,double);
+  fft_double(length,false,env,NULL,env_fr, env_fi);
+  for(int i = 0 ; i < length ; i ++)
+    {
+      double re = env_fr[i];
+      double im = env_fi[i];
+      env_fr[i]=sqrt(re*re+im*im);
+      env_fi[i]=atan2(im,re);
+    }
+  printf("Pattern-Analyzer: Obtained enveloppe spectrum\n");
+  
+  // obtain beat information
+  array(notes_energy,64,double);
+  array(notes_phase,64,double);
+  // the normaperiod is the length of onbe measure, 
+  // which is assumed to be 4 beats
+  double beat_freq_in_bpm = mperiod2bpm(normalperiod);
+  double measures_per_sec = beat_freq_in_bpm/(4.0*60.0);
+  // notes[i] contains the strength of 1/i notes, or the frequency tempo/i
+  // measures[i] contains the strength of 32/i notes
+  for(int x = 0 ; x < 32 ; x ++)
+    {
+      // calculate the right part
+      double startfreq = measures_per_sec*(((double)(x+1))-0.1);
+      double stopfreq = measures_per_sec*(((double)(x+1))+0.1);
+      double start_index = startfreq * length / (double)WAVRATE;
+      double stop_index = stopfreq * length / (double)WAVRATE;
+      double energy = 0;
+      double phase = 0;
+      for(int i = start_index ; i < stop_index ; i ++)
+	{
+	  energy+=env_fr[i];
+	  phase+=env_fi[i];
+	}
+      energy/=(stop_index-start_index);
+      phase/=(stop_index-start_index);
+      while (phase<0) phase+=2*M_PI;
+      notes_energy[x+32]=log(energy);
+      notes_phase[x+32]=phase;
+      
+      // calculate the left part
+      startfreq /= (32.0-x);
+      stopfreq /= (32.0-x);
+      start_index = startfreq * length / (double)WAVRATE;
+      stop_index = stopfreq * length / (double)WAVRATE;
+      energy = phase = 0;
+      for(int i = start_index ; i < stop_index ; i ++)
+	{
+	  energy+=env_fr[i];
+	  phase+=env_fi[i];
+	}
+      energy/=(stop_index-start_index);
+      phase/=(stop_index-start_index);
+      while (phase<0) phase+=2*M_PI;
+      notes_energy[x]=log(energy);
+      notes_phase[x]=phase;
+    }
+  
+  // do the autocorrelation
+  double * tmp_fr = env_fr; env_fr = NULL;  // reuse array
+  double * tmp_fi = env_fi; env_fi = NULL;  // reuse array
+  fft_double(length, false, audio, NULL, tmp_fr, tmp_fi);
+  printf("Pattern-Analyzer: Autocorrelation forward transform\n");
+  for(int i = 0 ; i < length ; i ++)
+    tmp_fr[i]=tmp_fr[i]*tmp_fr[i]+tmp_fi[i]*tmp_fi[i];
+  printf("Pattern-Analyzer: Noramlised for the next step\n");
+  double * cor_r = audio; audio = NULL; // reuse array
+  double * cor_i = env; env = NULL; // reuse array
+  fft_double(length,true,tmp_fr, NULL, cor_r, cor_i);
+  free(tmp_fr);
+  free(tmp_fi);  
+  free(cor_i);
+  // env   audio
+  // env   audio env_fr env_fi
+  // env   audio tmp_fr tmp_fi
+  // cor_i cor_r tmp_fr tmp_fi
+  printf("Pattern-Analyzer: Calculated autocorrelation\n");
+  
+  // obtain beat information based on autocorrelation
+  array(notes_cor,64,double);
+  // the length of a beat can be calculated based on 
+  double note_period = normalperiod;  // normalperiod is expressed in measures
+  for(int x = 0 ; x < 32 ; x ++)
+    {
+      // the right part
+      double start_index = note_period/(((double)x)+1.1);
+      double stop_index = note_period/(((double)x)+0.9);
+      double energy = 0;
+      for(int i = start_index ; i < stop_index ; i ++)
+	if (cor_r[i] > energy) energy=cor_r[i];
+      notes_cor[x+32]=energy;
+      
+      // the left part
+      start_index *= (32-x);
+      stop_index *= (32-x);
+      energy = 0;
+      for(int i = start_index ; i < stop_index ; i ++)
+	if (cor_r[i] > energy) energy=cor_r[i];
+      notes_cor[x]=energy;
+    }
+
+  // normalize differente ranges
+  double minimum = notes_energy[32];
+  for(int i = 0 ; i < 64 ; i ++)
+    if (notes_energy[i]<minimum)
+      minimum=notes_energy[i];
+  for(int i = 0 ; i < 64 ; i ++)
+    notes_energy[i]-=minimum;
+  maximum = 0;
+  for(int i = 0 ; i < 64 ; i ++)
+    if (notes_energy[i]>maximum)
+      maximum=notes_energy[i];
+  if (maximum>0)
+    for(int i = 0 ; i < 64 ; i ++)
+      notes_energy[i]/=maximum;
+
+  minimum = notes_cor[32];
+  for(int i = 0 ; i < 64 ; i ++)
+    if (notes_cor[i]<minimum)
+      minimum=notes_cor[i];
+  for(int i = 0 ; i < 64 ; i ++)
+    notes_cor[i]-=minimum;
+  maximum = 0 ;
+  for(int i = 0 ; i < 64 ; i ++)
+    if (notes_cor[i]>maximum)
+      maximum=notes_cor[i];
+  if (maximum>0)
+    for(int i = 0 ; i < 64 ; i ++)
+      notes_cor[i]/=maximum;
+  
+  for(int i = 32 ; i < 64 ; i ++)
+    {
+      double phase = notes_phase[i]-notes_phase[32];
+      while (phase<0) phase += 2*M_PI;
+      while (phase>M_PI) phase -= 2*M_PI;
+      notes_phase[i]=phase;
+    }
+  notes_phase[32]=0;
+  
+  // draw everything
+  int demo_size_x = 400;
+  int demo_size_y = 64;
+  QPixmap *pm1 = new QPixmap(40,100);
+  QPixmap *pm2 = new QPixmap(demo_size_x,demo_size_y);
+  QPainter p, d;
+  p.begin(pm1);
+  d.begin(pm2);
+  QRect r(0,0,40,100), s(0,0,demo_size_x,demo_size_y);
+  p.fillRect(r,Qt::white);
+  d.fillRect(s,Qt::white);
+  for(int i = 63 ; i >=24 ; i --)
+    {
+      int x = (i - 24);
+      double mean_energy=(notes_energy[i]+notes_cor[i])/2;
+      p.setPen(Qt::gray);
+      p.drawLine(x,99,x,(int)(99.0-(mean_energy*99.0)));
+      p.setPen(Qt::green);
+      p.drawPoint(x,(int)(99.0-(notes_energy[i]*99.0)));
+      p.setPen(Qt::yellow);
+      p.drawPoint(x,(int)(99.0-(notes_cor[i]*99.0)));
+      if (i==32)
+	{
+	  p.setPen(Qt::black);
+	  p.drawPoint(x,0);
+	  p.drawPoint(x,99);
+	}
+      if (i>31)
+	{
+	  p.setPen(Qt::blue);
+	  p.drawPoint(x,(int)(50.0-(notes_phase[i]*49.0/M_PI)));
+	}
+    }
+  p.end();
+  rythm_pattern->setPixmap(*pm1);
+  
+  d.setPen(Qt::gray);
+  for(int i = 0 ; i < 8 ; i ++)
+    {
+      int x = i * demo_size_x / 8;
+      d.drawLine(x,0,x,63);
+    }
+  
+  d.setPen(Qt::black);
+  for(double x = 0 ; x < demo_size_x ; x +=1.0)
+    {
+      double amplitude = 0;
+      double rx = x*2.0*M_PI/((double)demo_size_x);
+      for(int i = 0 ; i < 32 ; i ++)
+	{
+	  double energy = (notes_energy[i+32]+notes_cor[i+32])/2;
+	  double sine = cos((rx+notes_phase[i+32])*(i+1));
+	  if (sine > 0.98)
+	    amplitude += sine*energy/(double)(i+5); // +5 flattens the exponential curve by goign more towards its tail
+	}
+      int y=demo_size_y-1-demo_size_y*amplitude*3;
+      d.drawPoint((int)x,y);
+    }
+  d.end();
+  
+  pattern_demo->setPixmap(*pm2);
+  
+  free(notes_phase);
+  free(notes_cor);
+  free(notes_energy);
 }

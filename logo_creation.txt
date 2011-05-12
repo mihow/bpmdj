@@ -1,7 +1,0 @@
-Bledner
-  - choose appropriate colors in blender and create images...
-Gimp 
-  - zet .tga file om naar .web.png
-  - layers
-    top layer = bpmdj image (ADDITION)
-

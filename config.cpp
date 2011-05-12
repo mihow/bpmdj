@@ -62,6 +62,9 @@ QString Config::playCommand3 = "";
 QString Config::playCommand4 = "";
 QString Config::tmp_directory = "./";
 QString Config::mixer_command = "";
+QString Config::record_command = "";
+QString Config::replay_command = "";
+QString Config::record_mixer_command = "";
 
 void Config::save()
 {
@@ -100,6 +103,9 @@ void Config::save()
   s << (Q_INT8)open_mixer;
   s << (Q_INT8)ask_mix;
   s << (Q_INT8)auto_popqueue;
+  s << record_command;
+  s << replay_command;
+  s << record_mixer_command;
 }
 
 void Config::load()
@@ -280,6 +286,44 @@ void Config::load()
 	  s >> b; ask_mix = b;
 	  s >> b; auto_popqueue = b;
 	}
+      else if (magic == MAGIC_2_4)
+	{
+	  printf("Loading config v2.4\n");
+	  s >> w; file_count = w;
+	  s >> w; yellowTime = w;
+	  s >> w; orangeTime = w;
+	  s >> w; redTime = w;
+	  s >> w; filterBpm = w;
+	  s >> b; color_range = b;
+	  s >> b; color_played = b;
+	  s >> b; color_authorplayed = b;
+	  s >> b; color_ondisk = b;
+	  s >> b; color_cues = b;
+	  s >> b; color_dcolor = b;
+	  s >> b; color_spectrum = b;
+	  s >> b; authorDecay = b;
+	  s >> b; limit_ondisk = b;
+	  s >> b; limit_nonplayed = b;
+	  s >> b; limit_uprange = b;
+	  s >> b; limit_downrange = b;
+	  s >> b; limit_indistance = b;
+	  s >> playCommand1;
+	  s >> playCommand2;
+	  s >> playCommand3;
+	  s >> playCommand4;
+	  s >> fl; distance_temposcale = fl;
+	  s >> fl; distance_spectrumscale = fl;
+	  s >> b; limit_authornonplayed = b;
+	  s >> b; shown_aboutbox = b;
+	  s >> tmp_directory;
+	  s >> mixer_command;
+	  s >> b; open_mixer = b;
+	  s >> b; ask_mix = b;
+	  s >> b; auto_popqueue = b;
+	  s >> record_command;
+	  s >> replay_command;
+	  s >> record_mixer_command;
+	}
       else
 	printf("Wrong config file format\n");
       if (magic != MAGIC_NOW)
@@ -300,22 +344,24 @@ void Config::openUi()
 {
   char tmp[50];
   PreferencesLogic preferences(NULL,NULL,TRUE);
-  preferences.playerCommand1->setText(playCommand1);
-  preferences.playerCommand2->setText(playCommand2);
-  preferences.playerCommand3->setText(playCommand3);
-  preferences.playerCommand4->setText(playCommand4);
+  preferences.playerCommand1 -> setText ( playCommand1 ) ;
+  preferences.playerCommand2 -> setText ( playCommand2 ) ;
+  preferences.playerCommand3 -> setText ( playCommand3 ) ;
+  preferences.playerCommand4 -> setText ( playCommand4 ) ;
   sprintf(tmp,"%d",yellowTime);
   preferences.yellowTime->setText(tmp);
   sprintf(tmp,"%d",orangeTime);
   preferences.orangeTime->setText(tmp);
   sprintf(tmp,"%d",redTime);
   preferences.redTime->setText(tmp);
-  preferences.authorDecay->setValue(authorDecay);
-  preferences.tempoSpin->setValue((int)(distance_temposcale*100.0));
-  preferences.spectrumSpin->setValue((int)(distance_spectrumscale*100.0));
-  preferences.tmpDirectory->setText(tmp_directory);
-  preferences.mixerCommand->setText(mixer_command);
-  preferences.open_mixer->setChecked(open_mixer);
+  preferences.authorDecay  -> setValue ( authorDecay ) ;
+  preferences.tempoSpin    -> setValue ( (int)(distance_temposcale*100.0) ) ;
+  preferences.spectrumSpin -> setValue ( (int)(distance_spectrumscale*100.0) );
+  preferences.tmpDirectory -> setText  ( tmp_directory ) ;
+  preferences.mixerCommand -> setText  ( mixer_command ) ;
+  preferences.record       -> setText  ( record_command ) ;
+  preferences.record_mixer -> setText  ( record_mixer_command ) ;
+  preferences.replay       -> setText  ( replay_command ) ;
   if (preferences.exec()==QDialog::Accepted)
     {
       playCommand1=preferences.playerCommand1->text();
@@ -330,7 +376,9 @@ void Config::openUi()
       distance_spectrumscale = (float)(preferences.spectrumSpin->value())/100.0;
       tmp_directory = preferences.tmpDirectory->text();
       mixer_command = preferences.mixerCommand->text();
-      open_mixer = preferences.open_mixer->isChecked();
+      record_command = preferences.record->text();
+      replay_command = preferences.replay->text();
+      record_mixer_command = preferences.record_mixer->text();
       save();
     }
 }

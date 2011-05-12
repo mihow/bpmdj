@@ -37,6 +37,7 @@
 #include "database.h"
 #include "songtree.h"
 #include "avltree.cpp"
+#include "qstring-factory.h"
 
 static int songs_already_in_database = 0;
 
@@ -51,15 +52,15 @@ IndexReader::IndexReader(QProgressBar * b, QLabel *l, DataBase * db) :
   progress->setTotalSteps(Config::file_count);
   songs_already_in_database = 0;
   scan(IndexDir,IndexDir);
-  printf("Debug: %d songs already in database when scanning .bib files\n",songs_already_in_database);
+  // printf("Debug: %d songs already in database when scanning .bib files\n",songs_already_in_database);
   required_extension = ".idx";
   reading_bib = false;
   songs_already_in_database = 0;
   scan(IndexDir,IndexDir);
-  printf("Debug: %d songs already in database when scanning .idx files\n",songs_already_in_database);
+  // printf("Debug: %d songs already in database when scanning .idx files\n",songs_already_in_database);
   progress -> setProgress(total_files);
-  lastSpectrum();
-  
+  lastSpectrum();  
+  QStringFactory::kill();
 }
 
 void IndexReader::recursing(const QString dirname)
@@ -69,13 +70,13 @@ void IndexReader::recursing(const QString dirname)
 
 void IndexReader::add(Song * song)
 {
-  database->add(song);
-  song->checkondisk();
-  if ( ++ total_files % (Config::file_count > 0 ? Config::file_count / 100 : 10) == 0)
-    {
+   database->add(song);
+   song->checkondisk();
+   if ( ++ total_files % (Config::file_count/100 > 0 ? Config::file_count / 100 : 10) == 0)
+     {
       progress -> setProgress(total_files);
-      app -> processEvents();
-    }
+	app -> processEvents();
+     }
 }
 
 void IndexReader::checkfile(const QString prefix, const QString  filename)
@@ -108,7 +109,7 @@ void IndexReader::checkfile(const QString prefix, const QString  filename)
       Song * song = database->find(index.get_filename());
       if (song)
 	{
-	  song->refill(index);
+	  song->refill(index,true);
 	  songs_already_in_database++;
 	}
       else

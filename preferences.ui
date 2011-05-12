@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>684</width>
-            <height>399</height>
+            <width>676</width>
+            <height>404</height>
         </rect>
     </property>
     <property name="caption">
@@ -28,16 +28,60 @@
         <property name="spacing">
             <number>6</number>
         </property>
+        <widget class="QPushButton" row="1" column="1">
+            <property name="name">
+                <cstring>PushButton12</cstring>
+            </property>
+            <property name="text">
+                <string>&amp;Ok</string>
+            </property>
+            <property name="accel">
+                <string>Alt+O</string>
+            </property>
+        </widget>
+        <spacer row="1" column="0">
+            <property name="name">
+                <cstring>spacer1</cstring>
+            </property>
+            <property name="orientation">
+                <enum>Horizontal</enum>
+            </property>
+            <property name="sizeType">
+                <enum>Expanding</enum>
+            </property>
+            <property name="sizeHint">
+                <size>
+                    <width>40</width>
+                    <height>20</height>
+                </size>
+            </property>
+        </spacer>
+        <widget class="QPushButton" row="1" column="2">
+            <property name="name">
+                <cstring>PushButton13</cstring>
+            </property>
+            <property name="text">
+                <string>&amp;Cancel</string>
+            </property>
+        </widget>
         <widget class="QTabWidget" row="0" column="0" rowspan="1" colspan="3">
             <property name="name">
                 <cstring>tabWidget2</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>5</hsizetype>
+                    <vsizetype>7</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
             </property>
             <widget class="QWidget">
                 <property name="name">
                     <cstring>Players</cstring>
                 </property>
                 <attribute name="title">
-                    <string>Commands</string>
+                    <string>Play Commands</string>
                 </attribute>
                 <grid>
                     <property name="name">
@@ -59,14 +103,16 @@
                         <property name="wordwrap" stdset="0">
                         </property>
                     </widget>
-                    <widget class="QLineEdit" row="6" column="1">
-                        <property name="name">
-                            <cstring>mixerCommand</cstring>
-                        </property>
-                    </widget>
                     <widget class="QLabel" row="1" column="0">
                         <property name="name">
                             <cstring>TextLabel1</cstring>
+                        </property>
+                        <property name="paletteForegroundColor">
+                            <color>
+                                <red>255</red>
+                                <green>0</green>
+                                <blue>0</blue>
+                            </color>
                         </property>
                         <property name="text">
                             <string>First Monitor/Main Player</string>
@@ -85,35 +131,12 @@
                             <cstring>playerCommand2</cstring>
                         </property>
                     </widget>
-                    <widget class="QLabel" row="6" column="0">
-                        <property name="name">
-                            <cstring>textLabel1_4</cstring>
-                        </property>
-                        <property name="text">
-                            <string>Open Mixer Command</string>
-                        </property>
-                    </widget>
                     <widget class="QPushButton" row="2" column="3">
                         <property name="name">
                             <cstring>pushButton4</cstring>
                         </property>
                         <property name="text">
                             <string>create</string>
-                        </property>
-                    </widget>
-                    <widget class="QComboBox" row="6" column="2" rowspan="1" colspan="2">
-                        <item>
-                            <property name="text">
-                                <string>/usr/bin/kmix &amp;</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>alsamixergui</string>
-                            </property>
-                        </item>
-                        <property name="name">
-                            <cstring>comboBox6</cstring>
                         </property>
                     </widget>
                     <widget class="QLineEdit" row="1" column="1" rowspan="1" colspan="2">
@@ -137,19 +160,6 @@
                             <string>Second Extra Player</string>
                         </property>
                     </widget>
-                    <widget class="QLabel" row="2" column="0">
-                        <property name="name">
-                            <cstring>TextLabel2</cstring>
-                        </property>
-                        <property name="text">
-                            <string>Second Monitor/Main Player</string>
-                        </property>
-                    </widget>
-                    <widget class="QLineEdit" row="3" column="1" rowspan="1" colspan="2">
-                        <property name="name">
-                            <cstring>playerCommand3</cstring>
-                        </property>
-                    </widget>
                     <widget class="QPushButton" row="4" column="3">
                         <property name="name">
                             <cstring>pushButton6</cstring>
@@ -166,14 +176,6 @@
                             <string>create</string>
                         </property>
                     </widget>
-                    <widget class="QLabel" row="3" column="0">
-                        <property name="name">
-                            <cstring>TextLabel1_2</cstring>
-                        </property>
-                        <property name="text">
-                            <string>First Extra Player</string>
-                        </property>
-                    </widget>
                     <widget class="QLineEdit" row="4" column="1" rowspan="1" colspan="2">
                         <property name="name">
                             <cstring>playerCommand4</cstring>
@@ -182,6 +184,142 @@
                     <widget class="QLineEdit" row="5" column="1" rowspan="1" colspan="3">
                         <property name="name">
                             <cstring>tmpDirectory</cstring>
+                        </property>
+                    </widget>
+                    <widget class="QLabel" row="2" column="0">
+                        <property name="name">
+                            <cstring>TextLabel2</cstring>
+                        </property>
+                        <property name="paletteForegroundColor">
+                            <color>
+                                <red>255</red>
+                                <green>0</green>
+                                <blue>0</blue>
+                            </color>
+                        </property>
+                        <property name="text">
+                            <string>Second Monitor/Main Player</string>
+                        </property>
+                    </widget>
+                    <widget class="QLabel" row="3" column="0">
+                        <property name="name">
+                            <cstring>TextLabel1_2</cstring>
+                        </property>
+                        <property name="text">
+                            <string>First Extra Player</string>
+                        </property>
+                    </widget>
+                    <widget class="QLineEdit" row="3" column="1" rowspan="1" colspan="2">
+                        <property name="name">
+                            <cstring>playerCommand3</cstring>
+                        </property>
+                    </widget>
+                    <widget class="QComboBox" row="6" column="2" rowspan="1" colspan="2">
+                        <item>
+                            <property name="text">
+                                <string>/usr/bin/kmix &amp;</string>
+                            </property>
+                        </item>
+                        <item>
+                            <property name="text">
+                                <string>alsamixergui</string>
+                            </property>
+                        </item>
+                        <property name="name">
+                            <cstring>comboBox6</cstring>
+                        </property>
+                    </widget>
+                    <widget class="QLineEdit" row="6" column="1">
+                        <property name="name">
+                            <cstring>mixerCommand</cstring>
+                        </property>
+                    </widget>
+                    <widget class="QLabel" row="6" column="0">
+                        <property name="name">
+                            <cstring>textLabel1_4</cstring>
+                        </property>
+                        <property name="text">
+                            <string>Open Mixer Command</string>
+                        </property>
+                    </widget>
+                </grid>
+            </widget>
+            <widget class="QWidget">
+                <property name="name">
+                    <cstring>TabPage</cstring>
+                </property>
+                <attribute name="title">
+                    <string>Record Commands</string>
+                </attribute>
+                <grid>
+                    <property name="name">
+                        <cstring>unnamed</cstring>
+                    </property>
+                    <widget class="QLabel" row="0" column="0" rowspan="1" colspan="2">
+                        <property name="name">
+                            <cstring>textLabel2</cstring>
+                        </property>
+                        <property name="text">
+                            <string>The record command must have one "%s" placeholder. This will be filled in with the session name.</string>
+                        </property>
+                        <property name="alignment">
+                            <set>WordBreak|AlignVCenter</set>
+                        </property>
+                    </widget>
+                    <spacer row="4" column="1">
+                        <property name="name">
+                            <cstring>spacer4_2</cstring>
+                        </property>
+                        <property name="orientation">
+                            <enum>Vertical</enum>
+                        </property>
+                        <property name="sizeType">
+                            <enum>Expanding</enum>
+                        </property>
+                        <property name="sizeHint">
+                            <size>
+                                <width>20</width>
+                                <height>40</height>
+                            </size>
+                        </property>
+                    </spacer>
+                    <widget class="QLineEdit" row="3" column="1">
+                        <property name="name">
+                            <cstring>record_mixer</cstring>
+                        </property>
+                    </widget>
+                    <widget class="QLineEdit" row="2" column="1">
+                        <property name="name">
+                            <cstring>replay</cstring>
+                        </property>
+                    </widget>
+                    <widget class="QLineEdit" row="1" column="1">
+                        <property name="name">
+                            <cstring>record</cstring>
+                        </property>
+                    </widget>
+                    <widget class="QLabel" row="1" column="0">
+                        <property name="name">
+                            <cstring>TextLabel1_2_2</cstring>
+                        </property>
+                        <property name="text">
+                            <string>Record</string>
+                        </property>
+                    </widget>
+                    <widget class="QLabel" row="2" column="0">
+                        <property name="name">
+                            <cstring>TextLabel1_2_3</cstring>
+                        </property>
+                        <property name="text">
+                            <string>Replay</string>
+                        </property>
+                    </widget>
+                    <widget class="QLabel" row="3" column="0">
+                        <property name="name">
+                            <cstring>textLabel3</cstring>
+                        </property>
+                        <property name="text">
+                            <string>Mixer</string>
                         </property>
                     </widget>
                 </grid>
@@ -360,39 +498,6 @@
                 </grid>
             </widget>
         </widget>
-        <widget class="QPushButton" row="1" column="1">
-            <property name="name">
-                <cstring>PushButton12</cstring>
-            </property>
-            <property name="text">
-                <string>&amp;Ok</string>
-            </property>
-        </widget>
-        <spacer row="1" column="0">
-            <property name="name">
-                <cstring>spacer1</cstring>
-            </property>
-            <property name="orientation">
-                <enum>Horizontal</enum>
-            </property>
-            <property name="sizeType">
-                <enum>Expanding</enum>
-            </property>
-            <property name="sizeHint">
-                <size>
-                    <width>40</width>
-                    <height>20</height>
-                </size>
-            </property>
-        </spacer>
-        <widget class="QPushButton" row="1" column="2">
-            <property name="name">
-                <cstring>PushButton13</cstring>
-            </property>
-            <property name="text">
-                <string>&amp;Cancel</string>
-            </property>
-        </widget>
     </grid>
 </widget>
 <connections>
@@ -431,12 +536,6 @@
         <signal>clicked()</signal>
         <receiver>PreferencesDialog</receiver>
         <slot>createPlayerFour()</slot>
-    </connection>
-    <connection>
-        <sender>comboBox6</sender>
-        <signal>activated(const QString&amp;)</signal>
-        <receiver>mixerCommand</receiver>
-        <slot>setText(const QString&amp;)</slot>
     </connection>
 </connections>
 <tabstops>

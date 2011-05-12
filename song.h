@@ -100,11 +100,12 @@ class Song: public Point
     Song();
     Song(Index* idx, bool allow_write, bool checkondisk, bool account_spectrum);
     // WVB -- need to add delete operation here...
-    void refill(Index &read);
+    void refill(Index &read, bool allowed_to_write=false);
     void reread();
     void realize();
     void checkondisk();
     void setColor(QColor c);
+    QString getDisplayTitle();
     bool getDistance();
     bool containsTag(const QString which);
     QString tempo_between(Song*, float);

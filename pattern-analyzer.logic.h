@@ -50,6 +50,7 @@ public slots:
   virtual void slantChanged();
   virtual void setTempo();
   virtual void filterChanged();
+  virtual void calculateRythmPattern();
   // virtual void dumpPatternToIdx();
   // run will calculate the projection of the pattern and dump it into the index file...
 };

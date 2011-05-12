@@ -31,7 +31,8 @@ const QString IndexDir = "./index";
 #define MAGIC_1_9 0xBDE3
 #define MAGIC_2_1 0xBDE4
 #define MAGIC_2_2 0xBDE5
-#define MAGIC_NOW MAGIC_2_2
+#define MAGIC_2_4 0xBDE6
+#define MAGIC_NOW MAGIC_2_4
 
 class Config
 {
@@ -74,6 +75,10 @@ class Config
     // version 2.2
     static bool    ask_mix;
     static bool    auto_popqueue;
+    // version 2.4
+    static QString record_command;
+    static QString replay_command;
+    static QString record_mixer_command;
  public:
     static void openUi();
     static void save();

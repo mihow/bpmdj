@@ -55,10 +55,54 @@
 #include "fourier.h"
 #include "scripts.h"
 
-// #define PROFILER
+//#define PROFILER
+
 #define IMAGE_XS 640
 #define IMAGE_YS 480
 const int shifter = 12;
+const int spectrum_shifter = 2;
+
+#ifdef PROFILER
+long running_time;
+clock_t last_start;
+void start_timer()
+{
+  running_time = 0 ;
+  last_start = times(NULL);
+}
+
+void pause_timer()
+{
+  running_time += times(NULL) - last_start;
+}
+
+void unpause_timer()
+{
+  last_start = times(NULL);
+}
+
+void stop_timer()
+{
+  running_time += times(NULL) - last_start;
+  running_time/=CLOCK_FREQ;
+}
+#else
+#define start_timer()
+#define pause_timer()
+#define unpause_timer()
+#define stop_timer()
+#endif
+
+
+void fft(unsigned windowsize, 
+	 bool reverse, 
+	 fft_type * audio, 
+	 fft_type * audioi, 
+	 fft_type * freq,
+	 fft_type *freqi)
+{
+  fft_double(windowsize,reverse,audio,audioi,freq,freqi);
+}
 
 BpmAnalyzerDialog::BpmAnalyzerDialog(SongPlayer*parent, const char*name, bool modal, WFlags f) :
   CountDialog(0,name,modal,f),
@@ -89,15 +133,48 @@ BpmAnalyzerDialog::BpmAnalyzerDialog(SongPlayer*parent, const char*name, bool mo
   BpmPix->setPixmap(*pm);
 }
 
-unsigned long BpmAnalyzerDialog::phasefit(unsigned long i)
+//#define TEST
+unsigned long BpmAnalyzerDialog::phasefit_diff(unsigned long i)
 {
   unsigned long c;
   unsigned long mismatch=0;
-  assert(i<audiosize);
+#ifdef TEST
+  for(c=i;c<audiosize;c++)
+    mismatch+=abs((long)abs(audio[c])-(long)abs(audio[c-i]));
+#else
   for(c=i;c<audiosize;c++)
     mismatch+=abs((long)audio[c]-(long)audio[c-i]);
+#endif
   return mismatch;
 }
+
+
+unsigned long BpmAnalyzerDialog::phasefit_mult(unsigned long i)
+{
+#ifndef TEST
+  unsigned long c;       
+  unsigned long mismatch=0;
+  for(c=i;c<audiosize;c++)
+    mismatch+=((long)audio[c]*(long)audio[c-i])/4;
+  return mismatch;
+#else
+  unsigned long c;       
+  unsigned long mismatch=0x3fffffff;
+  for(c=i;c<audiosize;c++)
+    mismatch-=((long)audio[c]*(long)audio[c-i])/16;
+  return mismatch;
+#endif
+}
+
+unsigned long BpmAnalyzerDialog::phasefit(unsigned long i)
+{
+#ifdef TEST
+  return phasefit_mult(i);
+#else
+  return phasefit_diff(i);
+#endif
+}
+
 
 unsigned long BpmAnalyzerDialog::phasefit(unsigned long i, unsigned long clip)
 {
@@ -172,10 +249,17 @@ void BpmAnalyzerDialog::readAudio()
       for (i = 0 ; i < count * 2 ; i += 2 * (WAVRATE/audiorate) )
 	{
 	  signed long int left, right,mean;
+#ifndef TEST
 	  left=abs(buffer[i]);
 	  right=abs(buffer[i+1]);
 	  mean=(left+right)/2;
 	  redux=abs(mean)/128;
+#else
+	  left=buffer[i];
+	  right=buffer[i+1];
+	  mean=(left+right)/2;
+	  redux=mean/128;
+#endif
 	  if (pos+i/(2*(WAVRATE/audiorate))>=audiosize) break;
 	  assert(pos+i/(2*(WAVRATE/audiorate))<audiosize);
 	  audio[pos+i/(2*(WAVRATE/audiorate))]=(unsigned char)redux;
@@ -273,25 +357,116 @@ void BpmAnalyzerDialog::rangeCheck()
       }
   }
 
-void BpmAnalyzerDialog::fft_draw(QPainter &p, int xs, int ys)
+fft_type index2autocortempo(int i)
+{
+  assert(i);
+  fft_type measure_period_in_ticks = i<<spectrum_shifter;
+  fft_type measure_period_in_secs  = measure_period_in_ticks/(fft_type)WAVRATE;
+  fft_type measure_frequency_in_hz = 1/measure_period_in_secs;
+  fft_type measure_frequency_in_bpm = measure_frequency_in_hz*60.0;
+  fft_type beat_frequency_in_bpm = measure_frequency_in_bpm*4.0;
+  return beat_frequency_in_bpm;
+}
+
+void BpmAnalyzerDialog::autocorrelate_draw(QPainter &p, int xs, int ys, int shifter)
 {
   if (!freq) return;
   p.setPen(Qt::gray);
-  for(int i = 0 ; i <windowsize/2; i ++)
+  
+  // first find the upper and lower bounds of the energy spectrum
+  double min_energy=1.0;
+  double max_energy=0.0;
+  for(int i = 0 ; i < windowsize/2 ; i ++)
     {
-      // calculate bpm
-      double bpm = Index_to_frequency(windowsize,i);         // uitgedruk relatief tov WAVRATE
-      bpm*=(double)WAVRATE;                           // uitgedrukt in Hz tov non collapsed WAVRATE
-      for(int j = 0 ; j < shifter; j ++) bpm/=2.0;    // uitgedrukt in collapsed WAVRATE
-      bpm*=60.0;                                      // uitgedrukt in BPM.
+      if (freq[i]>max_energy)
+	max_energy=freq[i];
+      if (freq[i]<min_energy)
+	min_energy=freq[i];
+    }
+  max_energy-=min_energy;
+
+  // then draw it using these bounds
+  int lastx = 0, lasty = 0, lastcount = 0;
+  for(int i = 1 ; i <windowsize/2; i ++)
+    {
+      fft_type bpm = index2autocortempo(i);      
       // calculate position
       int x = (int)((double)xs*(bpm-startbpm)/(stopbpm-startbpm));
       int y = (int)((double)ys-(double)ys*freq[i]);
       if (x<0 || x>=xs) continue;
       if (y>=ys) continue;
       if (y<0) y=0;
-      p.drawLine(x,y,x,ys);
+      
+      if (x!=lastx && lastcount)
+	{
+	  p.drawLine(lastx,lasty/lastcount,lastx,ys);
+	  lastx=x;
+	  lasty=0;
+	  lastcount=0;
+	}
+      lasty+=y;
+      lastcount++;
     }
+  
+  // now draw all the peaks..
+  for (int i = 0 ; i < peaks ; i ++)
+    {
+      // jus for the fun of it, choose other colors...
+      QColor c(255-255*i/peaks,0,0);
+      p.setPen(c);
+      double bpm = peak_bpm[i];
+      double energy = peak_energy[i];
+      int x = (int)((double)xs*(bpm-startbpm)/(stopbpm-startbpm));
+      int y = (int)((double)ys-(double)ys*energy);
+      QString text = QString::number(i)+") "+QString::number(bpm);
+      p.drawText(x,y,text);
+    }
+}
+
+void BpmAnalyzerDialog::fft_draw(QPainter &p, int xs, int ys, int shifter, double bpm_divisor)
+{
+  if (!freq) return;
+  p.setPen(Qt::gray);
+  
+  // first find the upper and lower bounds of the energy spectrum
+  double min_energy=1.0;
+  double max_energy=0.0;
+  for(int i = 0 ; i < windowsize/2 ; i ++)
+    {
+      if (freq[i]>max_energy)
+	max_energy=freq[i];
+      if (freq[i]<min_energy)
+	min_energy=freq[i];
+    }
+  max_energy-=min_energy;
+
+  // then draw it using these bounds
+  int lastx = 0, lasty = 0, lastcount = 0;
+  for(int i = 0 ; i <windowsize/2; i ++)
+    {
+      // calculate bpm
+      double bpm = Index_to_frequency(windowsize,i);  // relatief tov WAVRATE
+      bpm*=(double)WAVRATE;                           // in Hz tov non collapsed WAVRATE
+      for(int j = 0 ; j < shifter; j ++) bpm/=2.0;    // in collapsed WAVRATE
+      bpm*=60.0/bpm_divisor;                                      // in BPM.
+      // calculate position
+      int x = (int)((double)xs*(bpm-startbpm)/(stopbpm-startbpm));
+      int y = (int)((double)ys-(double)ys*freq[i]);
+      if (x<0 || x>=xs) continue;
+      if (y>=ys) continue;
+      if (y<0) y=0;
+      
+      if (x!=lastx)
+	{
+	  p.drawLine(lastx,lasty/lastcount,lastx,ys);
+	  lastx=x;
+	  lasty=0;
+	  lastcount=0;
+	}
+      lasty+=y;
+      lastcount++;
+    }
+  
   // now draw all the peaks..
   for (int i = 0 ; i < peaks ; i ++)
     {
@@ -328,7 +503,7 @@ void BpmAnalyzerDialog::fft()
 	read+=readsamples(block+read,blocksize-read,raw);
       for (int j = 0 ; j < blocksize ; j ++)
 	sum+=abs(block[j].leftright.left);
-      // sum+=block[j].leftright.left;
+      // sum+=(long)block[j].leftright.left*(long)block[j].leftright.left;
       sum/=blocksize;
       audio[i]=sum;
     }
@@ -341,10 +516,10 @@ void BpmAnalyzerDialog::fft()
   // printf ("audiosize = %d\n",(int) audiosize);
   // printf ("windowsize = %d\n",(int) windowsize);
   // printf ("blocksize = %d\n",(int) blocksize);
-
-  freq = allocate(windowsize,double);
-  double *freqi = allocate(windowsize,double);
-  fft_double(windowsize,0,audio,NULL,freq,freqi);
+  
+  freq = allocate(windowsize,fft_type);
+  fft_type *freqi = allocate(windowsize,fft_type);
+  ::fft(windowsize,false,audio,NULL,freq,freqi);
 
   // rescale the entire thing
   double max = 0;
@@ -358,11 +533,11 @@ void BpmAnalyzerDialog::fft()
   
   // detect peak bpm's
   peaks = 10;
-  peak_bpm = allocate(peaks, double);
-  peak_energy = allocate(peaks, double);
-  double *copy = allocate(windowsize / 2, double);
+  peak_bpm = allocate(peaks, fft_type);
+  peak_energy = allocate(peaks, fft_type);
+  fft_type *copy = allocate(windowsize / 2, fft_type);
   for(int i = 0 ; i < windowsize/2 ; i++) copy[i]=freq[i];
-  double range = 0.5; // bpm left and right...
+  fft_type range = 0.5; // bpm left and right...
   
   for(int j = 0 ; j < peaks ; j ++)
     {
@@ -388,7 +563,7 @@ void BpmAnalyzerDialog::fft()
       // store peak
       peak_bpm[j]=at;
       peak_energy[j]=energy;
-      // printf("Peak %d at %g with strength %g\n",j,at,energy);
+      printf("Peak %d at %g with strength %g\n",j,at,energy);
       // clear neighbors
       for(int i = 0 ; i <windowsize/2 ; i ++)
 	{
@@ -405,6 +580,238 @@ void BpmAnalyzerDialog::fft()
   
   free(freqi);
   free(audio);
+}
+
+void BpmAnalyzerDialog::enveloppe_spectrum()
+{
+  // first we need to read all data in memory en scale it down
+  start_timer();
+  signed8 audiosize;
+  FILE * raw = openRawFile(playing,arg_rawpath);
+  fseek(raw,0,SEEK_END);
+  audiosize = ftell(raw) / 4;
+  fseek(raw,0,SEEK_SET);
+  // owkee, nu moeten we dat delen door 2^spectrum_shifter
+  audiosize>>=spectrum_shifter;
+  signed4 blocksize = 1 << spectrum_shifter;
+  longtrick *block = allocate(blocksize,longtrick);
+  fft_type *audio = allocate(audiosize,fft_type);
+  for(int i = 0 ; i < audiosize; i++)
+    {
+      signed8 sum = 0;
+      signed4 read = 0;
+      while(read<blocksize)
+	read+=readsamples(block+read,blocksize-read,raw);
+      for (int j = 0 ; j < blocksize ; j ++)
+	sum+=abs(block[j].leftright.left);
+      sum/=blocksize;
+      audio[i]=sum;
+    }
+  printf("Audio has been read...\n");
+  
+  // obtain FFT windowsize
+  // FFT with a windowsize smaller than the maximum length
+  windowsize = 1;
+  for(int tmp = audiosize; tmp; tmp>>=1, windowsize<<=1) ;
+  if (windowsize>audiosize) windowsize>>=1;
+  
+  freq = allocate(windowsize,fft_type);
+  fft_type *freqi = allocate(windowsize,fft_type);
+  ::fft(windowsize,false,audio,NULL,freq,freqi);
+  printf("FFT has been done\n");
+
+  // rescale the entire thing
+  fft_type max = 0;
+  fft_type min = -1.0;
+  for(int i = 0 ; i <windowsize/2 ; i ++)
+    {
+      fft_type bpm = Index_to_frequency(windowsize,i); // tov WAVRATE
+      bpm*=(fft_type)WAVRATE;                          // in Hz tov non collapsed WAVRATE
+      for(int j = 0 ; j < spectrum_shifter; j ++) bpm/=2.0;    // uitgedrukt in collapsed WAVRATE
+      bpm*=60.0;                                      // uitgedrukt in BPM.
+      if (bpm<startbpm) continue;
+      if (bpm>stopbpm) break;
+      freq[i]=10.0*log(fabs(freq[i]));
+      // freq[i]=fabs(freq[i]);
+      if (freq[i]>max) max=freq[i];
+      if (freq[i]<min || min < 0.0) min=freq[i];
+    }
+  printf("maximum =%g, minimum = %g\n",max,min);
+  for (int i = 0 ; i < windowsize / 2 ; i ++)
+    freq[i]=(freq[i]-min)/(max-min);
+  
+  // detect peak bpm's
+  peaks = 10;
+  peak_bpm = allocate(peaks, fft_type);
+  peak_energy = allocate(peaks, fft_type);
+  fft_type *copy = allocate(windowsize / 2, fft_type);
+  for(int i = 0 ; i < windowsize/2 ; i++) copy[i]=freq[i];
+  fft_type range = 0.5; // bpm left and right...
+  
+  for(int j = 0 ; j < peaks ; j ++)
+    {
+      fft_type  energy = 0, at = 0;
+      for(int i = 0 ; i <windowsize/2 ; i ++)
+	{
+	  fft_type bpm = Index_to_frequency(windowsize,i); // tov WAVRATE
+	  bpm*=(fft_type)WAVRATE;                          // in Hz tov non collapsed WAVRATE
+	  for(int j = 0 ; j < spectrum_shifter; j ++) bpm/=2.0;    // uitgedrukt in collapsed WAVRATE
+	  bpm*=60.0;                                      // uitgedrukt in BPM.
+	  // skip or break ?
+	  if (bpm<startbpm) continue;
+	  if (bpm>stopbpm) break;
+	  // is larger than any of the known peaks ?
+	  if (copy[i]>energy)
+	    {
+	      energy = copy[i];
+	      at = bpm;
+	    }
+	}
+      
+      // store peak
+      peak_bpm[j]=at;
+      peak_energy[j]=energy;
+      printf("Peak %d at %g with strength %g\n",j,at,energy);
+      if (j == 0) 
+	{
+	  stop_timer();
+	  set_measured_period("Enveloppe",(int)(4.0*11025.0*60.0*4.0/at));
+	}
+      
+      // clear neighbors
+      for(int i = 0 ; i <windowsize/2 ; i ++)
+	{
+	  // obtain bpm
+	  fft_type bpm = Index_to_frequency(windowsize,i); // relatief tov WAVRATE
+	  bpm*=(double)WAVRATE;                           // in Hz tov non collapsed WAVRATE
+	  for(int j = 0 ; j < spectrum_shifter; j ++) bpm/=2.0;    // in collapsed WAVRATE
+	  bpm*=60.0;                                      // in BPM.
+	  if (bpm>=at-range && bpm<=at+range)
+	    copy[i]=0;
+	  if (bpm>at+range) break;
+	}
+    }
+  
+  free(freqi);
+  free(audio);
+}
+
+void BpmAnalyzerDialog::autocorrelate_spectrum()
+{
+  // 0. read everything in memory
+  start_timer();
+  signed8 audiosize;
+  FILE * raw = openRawFile(playing,arg_rawpath);
+  fseek(raw,0,SEEK_END);
+  audiosize = ftell(raw) / 4;
+  fseek(raw,0,SEEK_SET);
+  // owkee, nu moeten we dat delen door 2^spectrum_shifter
+  audiosize>>=spectrum_shifter;
+  signed4 blocksize = 1 << spectrum_shifter;
+  longtrick *block = allocate(blocksize,longtrick);
+  fft_type *audio = allocate(audiosize,fft_type);
+  for(int i = 0 ; i < audiosize; i++)
+    {
+      signed8 sum = 0;
+      signed4 read = 0;
+      while(read<blocksize)
+	read+=readsamples(block+read,blocksize-read,raw);
+      for (int j = 0 ; j < blocksize ; j ++)
+	sum+=block[j].leftright.left;
+      sum/=blocksize;
+      audio[i]=sum;
+    }
+  printf("Audio has been read...\n");
+  
+  // 1. do a FFT of the entire sample
+  // obtain FFT windowsize
+  // FFT with a windowsize smaller than the maximum length
+  windowsize = 1;
+  for(int tmp = audiosize; tmp; tmp>>=1, windowsize<<=1) ;
+  if (windowsize>audiosize) windowsize>>=1;
+  
+  fft_type *freq_tmp  = allocate(windowsize,fft_type);
+  fft_type *freqi_tmp = allocate(windowsize,fft_type);
+  ::fft(windowsize,false,audio,NULL,freq_tmp,freqi_tmp);
+  free(audio);
+  printf("Forward FFT has been done\n");
+
+  // 2. modify freq[i]=abs(freq[i]);
+  for(int i = 0 ; i < windowsize; i ++)
+    freq_tmp[i]=freq_tmp[i]*freq_tmp[i]+freqi_tmp[i]*freqi_tmp[i];
+  printf("Copy has been made\n");
+  
+  // 3. do an inverse fourier transform of freq[i]
+  freq  = allocate(windowsize,fft_type);
+  ::fft(windowsize,true,freq_tmp,NULL,freq,freqi_tmp);
+  
+  free(freq_tmp);
+  free(freqi_tmp);
+  printf("Backward FFT has been done\n");
+
+  // 4. rescale & find peaks 
+  // rescale the entire thing
+  fft_type max = 0;
+  fft_type min = -1.0;
+  for(int i = 1 ; i <windowsize/2 ; i ++)
+    {
+      fft_type bpm = index2autocortempo(i);
+      if (bpm<startbpm) break;
+      if (bpm>stopbpm) continue;
+      freq[i]=log(fabs(freq[i]));
+      // freq[i]=fabs(freq[i]);
+      if (freq[i]>max) max=freq[i];
+      if (freq[i]<min || min < 0.0) min=freq[i];
+    }
+  
+  printf("maximum =%g, minimum = %g\n",max,min);
+  for (int i = 0 ; i < windowsize / 2 ; i ++)
+    freq[i]=(freq[i]-min)/(max-min);
+  
+  // detect peak bpm's
+  peaks = 10;
+  peak_bpm = allocate(peaks, fft_type);
+  peak_energy = allocate(peaks, fft_type);
+  fft_type *copy = allocate(windowsize / 2, fft_type);
+  for(int i = 0 ; i < windowsize/2 ; i++) copy[i]=freq[i];
+  fft_type range = 0.5; // bpm left and right...
+  
+  for(int j = 0 ; j < peaks ; j ++)
+    {
+      fft_type  energy = 0, at = 0;
+      for(int i = 1 ; i <windowsize/2 ; i ++)
+	{
+	  fft_type bpm = index2autocortempo(i);
+	  
+	  // skip or break ?
+	  if (bpm<startbpm) break;
+	  if (bpm>stopbpm) continue;
+	  // is larger than any of the known peaks ?
+	  if (copy[i]>energy)
+	    {
+	      energy = copy[i];
+	      at = bpm;
+	    }
+	}
+      // store peak
+      peak_bpm[j]=at;
+      peak_energy[j]=energy;
+      if (j == 0)
+	{
+	  stop_timer();
+	  set_measured_period("Autocorrelation",(int)(4.0*11025.0*60.0*4.0/at));
+	}
+      printf("Peak %d at %g with strength %g\n",j,at,energy);
+      
+      // clear neighbors
+      for(int i = 1 ; i <windowsize/2 ; i ++)
+	{
+	  fft_type bpm = index2autocortempo(i);
+	  if (bpm>=at-range && bpm<=at+range)
+	    copy[i]=0;
+	  if (bpm<at-range) break;
+	}
+    }
 }
 
 // momenteel wordt een scan 457 keer uitgevoerd... ongeveer...
@@ -425,8 +832,54 @@ void BpmAnalyzerDialog::run()
   X1->setText(d);
   sprintf(d,"%2g",(double)stopbpm);
   X4->setText(d);
+  
+
+#ifdef PROFILER
+  printf("songtime : %s : title : %s[%s]%s\n",
+	 (const char*)(playing->get_time()),
+	 (const char*)(playing->get_display_title()),
+	 (const char*)(playing->get_display_author()),
+	 (const char*)(playing->get_display_version()));
+  set_measured_period("Manually",normalperiod);
+  
+  rayshoot_scan();
+  autocorrelate_spectrum();
+  enveloppe_spectrum();
+  return;
+#endif
+  
+  if (stop_signal) return;
+  
+  if (enveloppeSpectrum->isChecked())
+    {
+      enveloppe_spectrum();
+      QPixmap *pm = new QPixmap(IMAGE_XS,IMAGE_YS);
+      QPainter p;
+      p.begin(pm);
+      QRect r(QRect(0,0,pm->width(),pm->height()));
+      p.fillRect(r,Qt::white);
+      fft_draw(p, IMAGE_XS, IMAGE_YS, spectrum_shifter,1.0);
+      p.end();
+      BpmPix->setPixmap(*pm);
+      return;
+    }
+
+  if (fullAutoCorrelation->isChecked())
+    {
+      autocorrelate_spectrum();
+      QPixmap *pm = new QPixmap(IMAGE_XS,IMAGE_YS);
+      QPainter p;
+      p.begin(pm);
+      QRect r(QRect(0,0,pm->width(),pm->height()));
+      p.fillRect(r,Qt::white);
+      autocorrelate_draw(p, IMAGE_XS, IMAGE_YS, spectrum_shifter);
+      p.end();
+      BpmPix->setPixmap(*pm);
+      return;
+    }
 
   if (stop_signal) return;
+
   if (ultraLongFFT->isChecked()) 
     {
       fft();
@@ -435,7 +888,7 @@ void BpmAnalyzerDialog::run()
       p.begin(pm);
       QRect r(QRect(0,0,pm->width(),pm->height()));
       p.fillRect(r,Qt::white);
-      fft_draw(p, IMAGE_XS, IMAGE_YS);
+      fft_draw(p, IMAGE_XS, IMAGE_YS, shifter,1.0);
       p.end();
       BpmPix->setPixmap(*pm);
     }
@@ -443,7 +896,7 @@ void BpmAnalyzerDialog::run()
   if (stop_signal) return;
   if (resamplingScan->isChecked())
     {
-      block_scan();
+      rayshoot_scan();
       return;
     }
   else
@@ -455,7 +908,7 @@ void BpmAnalyzerDialog::run()
     }
 }
 
-void BpmAnalyzerDialog::block_scan()
+void BpmAnalyzerDialog::rayshoot_scan()
 {
   const unsigned blockshifter_max = 8;  // this is a good start, goes fast and is accurately enough to skip no import points
   unsigned blockshifter = blockshifter_max;
@@ -466,7 +919,7 @@ void BpmAnalyzerDialog::block_scan()
   for (unsigned i = 0 ; i <= blockshifter_max; i++) mean[i]=0;
   unsigned maxima[blockshifter_max+1];
 #ifdef PROFILER
-  clock_t start = times(NULL);
+  start_timer();
   unsigned rays_shot[blockshifter_max+1];
   for (int i = 0 ; i <= blockshifter_max; i++) rays_shot[i]=0;
 #endif
@@ -579,7 +1032,9 @@ void BpmAnalyzerDialog::block_scan()
 	  }
       maxima[blockshifter]=maximum;
       mean[blockshifter]=total/count;
+      
       // draw the sucker
+      pause_timer();
       QPixmap *pm = new QPixmap(IMAGE_XS,IMAGE_YS);
       QPainter p;
       p.begin(pm);
@@ -623,11 +1078,14 @@ void BpmAnalyzerDialog::block_scan()
 	}
       p.end();
       BpmPix->setPixmap(*pm);
+      unpause_timer();
       
       // next step
       blockshifter --;
     }
 
+  stop_timer();
+  
   if (stop_signal)
     {
       StatusLabel->setText("Canceled");
@@ -641,22 +1099,18 @@ void BpmAnalyzerDialog::block_scan()
   for(int i = blockshifter_max ; i > blockshifter_min ; i--)
     q+=(double)rays_shot[i-1]/(double)rays_shot[i];
   q/=(double)(blockshifter_max-blockshifter_min+1);
-  clock_t stop = times(NULL);
-  unsigned diff = (stop-start)/CLOCK_FREQ;
-  printf("Q: %g\nactual period: %d  measured period: %d  calctime: %d  songtime: %s  title: %s[%s]%s\n",
-	 q,
-	 playing->index_period, 
-	 minimum_at/4,
-	 diff,
-	 playing->index_time,
-	 (const char*)(playing->get_display_title()),
-	 (const char*)(playing->get_display_author()),
-	 (const char*)(playing->get_display_version())
-	 );
+  printf("Q: %g\n",q);
 #endif
-  
-#ifndef PROFILER
-  playing->set_period(minimum_at/4);
+  set_measured_period("Rayshooting",minimum_at);
+}
+
+void BpmAnalyzerDialog::set_measured_period(QString technique, int p)
+{
+#ifdef PROFILER
+  printf("technique : %s : result : %d : time : %d\n",
+	 (const char*) technique, p, running_time, playing->get_time());
+#else
+  playing->set_period(p/4);
   normalperiod=playing->get_period()*4;
   currentperiod=normalperiod;
 #endif
@@ -784,7 +1238,7 @@ void BpmAnalyzerDialog::peak_scan()
   p.begin(pm);
   QRect r(QRect(0,0,pm->width(),pm->height()));
   p.fillRect(r,Qt::white);
-  fft_draw(p,IMAGE_XS,IMAGE_YS);
+  fft_draw(p,IMAGE_XS,IMAGE_YS, shifter,1.0);
   int X,Y;
   p.setPen(Qt::green);
   p.drawLine(IMAGE_XS/2,0,IMAGE_XS/2,IMAGE_YS-1);

@@ -20,14 +20,24 @@
 #include "version.h"
 
 #ifdef COMPILE_ALSA
-#include "common.h"
+#include <alsa/asoundlib.h>
+#include "dsp-drivers.h"
 
-extern char* arg_dev;
-
-void    alsa_start();
-void    alsa_pause();
-void    alsa_write(unsigned4 *value);
-signed8 alsa_latency();
-int     alsa_open();
-void    alsa_close();
+class dsp_alsa: public dsp_driver
+{
+ private:
+  static snd_pcm_t     *dsp;
+  static snd_pcm_uframes_t buffer_size;
+  static snd_pcm_uframes_t period_size;
+  void    wwrite(unsigned4 *value);
+ public:
+  static  char * arg_dev;
+  
+  void    start();
+  void    pause();
+  void    write(unsigned4 *value);
+  signed8 latency();
+  int     open();
+  void    close();
+};
 #endif

@@ -2,4 +2,4 @@
 cat $3 | grep file | awk -F ": " '{print "xmms -e \"" $2 "\""}' >/tmp/filename
 cat /tmp/filename
 cd music
-. /tmp/filename
+. /tmp/filename &

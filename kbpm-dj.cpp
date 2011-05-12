@@ -30,7 +30,7 @@
 #include <qmessagebox.h>
 #include "setupwizard.h"
 #include "songselector.logic.h"
-#include "kbpm-played.h"
+#include "history.h"
 #include "index-reader.h"
 #include "version.h"
 #include "dirscanner.h"
@@ -83,8 +83,6 @@ int main(int argc, char* argv[])
     loader.show();
   
     // 1.a first check the availability of a number of directories...
-    loader.programs->setEnabled(true);
-    application.processEvents();
     DIR * mdir;
     DIR * idir;
     do
@@ -114,8 +112,6 @@ int main(int argc, char* argv[])
       }
     
     // 2. read the configuration
-    loader.config->setEnabled(true);
-    application.processEvents();
     Config::load();
     
     // 1.c checking left over raw files (deze komt laatst omdat tmp_directory het kuiste pad bevat)
@@ -134,14 +130,12 @@ int main(int argc, char* argv[])
     
     // create the index in memory
     loader.progressBar1->setEnabled(true);
-    loader.directory->setEnabled(true);
     {
       IndexReader indexReader(loader.progressBar1, loader.readingDir ,main_window.database);
       Config::file_count=indexReader.total_files;
     }
     
     // 4. Retrieve tags and spectra
-    loader.scanning->setEnabled(true);
     application.processEvents();
     main_window.findAllTags();
   }

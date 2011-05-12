@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
  Copyright (C) 2001 Werner Van Belle
- See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -18,16 +17,47 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#include <qstring.h>
-#include "avltree.h"
+#ifdef COMPILE_NONE
 
-class QStringFactory
+#include <stdlib.h>
+#include <stdio.h>
+#include <assert.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include "player-core.h"
+#include "version.h"
+#include "dsp-none.h"
+
+/*-------------------------------------------
+ *         Dsp operations
+ *-------------------------------------------*/ 
+
+void dsp_none::start()
 {
-  private:
-    static bool killed;
-    static AvlTree<QString> tree;
-    static QString * lookup(QString *str);
-  public:
-    static QString create(char* str);
-    static void kill();
-};
+}
+
+void dsp_none::pause()
+{
+}
+
+void dsp_none::write(unsigned4 *value)
+{
+  usleep(1000000/44100);
+}
+
+signed8 dsp_none::latency()
+{
+  return 0;
+}
+
+int dsp_none::open()
+{
+  return err_none;
+}
+
+void dsp_none::close()
+{
+}
+
+#endif

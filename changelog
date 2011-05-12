@@ -1,5 +1,25 @@
+2.4:
+  ksel  - removed bug in database cache	
+  ksel  + added possibility to select bpm measure algorithm	 
+  ksel  + made splash screen smaller
+  kplay + added pattern analyzer to measure strength of 1/4th, 1/8th, 1/16th notes are present
+  ksel  + added xmms queueing support	 
+  tool  + created duploc to find duplicate code lines.	
+  doc   + added report on a comparison between 3 different techniques
+  kplay - removed total_files scanning bug. If files smaller than 100 -> floating point exception
+  kplay + improved the autocorrelation technique substantailly	 
+  ksel  - removed bug in process-maanger: player 3 and 4 were inverted.
+  kplay + added the 'none' audio driver.
+  kplay - removed manual dispatching in dsp_drivers.cpp	
+  kplay - removed bad md5-scanning bug
+  ksel  + reduced memory usage by avoiding allocations of similar strings	
+  ksel  - removed useless .ui files and replaced them with simply QInputDialogs
+  ksel  - a index file also present in the .bib was not automatically updated.	 
+  ksel  + added record functionality (if you have enough sound cards of
+          course:)
 2.3:
-  ksel  - removed ***ing bug from PCA analysis... If you don't write it yourself... You're fucked..	
+  ksel  - removed ***ing bug from PCA analysis... 
+          If you don't write it yourself... You're fucked..
   ksel  + modified the shortcut of Song Management
   ksel  - added some 'free' and 'delete' code.. It seems XLib wastes memory with regard to pixmaps
   ksel  - removed useless ondisk check when a kbpm-play returns	 

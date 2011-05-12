@@ -29,7 +29,7 @@
 #include "songselector.logic.h"
 #include "qsong.h"
 #include "process-manager.h"
-#include "kbpm-played.h"
+#include "history.h"
 #include "dirscanner.h"
 #include "spectrum.h"
 
@@ -41,19 +41,21 @@ SongMetriek SongMetriek::ALL(true,true,true,false);
 SongMetriek SongMetriek::ALL_WITHOUT_TEMPO_WEIGHT(true,false,true,false);
 SongMetriek SongMetriek::PATTERN(false,false,false,true);
 
-void Song::refill(Index &reader)
+void Song::refill(Index &reader, bool allowed_to_write)
 {
+  if (allowed_to_write && reader.changed())
+    reader.write_idx();
   /* copy everything to object */
-  storedin = reader.get_storedin();
-  tempo = reader.get_tempo_str();
-  file = reader.get_filename();
-  tags = reader.get_tags();
-  time = reader.get_time();
-  md5sum = reader.get_md5sum();
-  spectrum = reader.get_spectrum();
-  title = reader.get_display_title();
-  author = reader.get_display_author();
-  version = reader.get_display_version();
+  storedin = QStringFactory::create(reader.get_storedin());
+  tempo = QStringFactory::create(reader.get_tempo_str());
+  file = QStringFactory::create(reader.get_filename());
+  tags = QStringFactory::create(reader.get_tags());
+  time = QStringFactory::create(reader.get_time());
+  md5sum = QStringFactory::create(reader.get_md5sum());
+  spectrum = QStringFactory::create(reader.get_spectrum());
+  title = QStringFactory::create(reader.get_display_title());
+  author = QStringFactory::create(reader.get_display_author());
+  version = QStringFactory::create(reader.get_display_version());
   albums = reader.copy_albums();
   /* are there any cues stored */
   has_cues = reader.get_cue_z() + reader.get_cue_x() + reader.get_cue_c() + reader.get_cue_v();
@@ -106,9 +108,7 @@ Song::Song()
 Song::Song(Index * idx, bool allowwrite, bool check_ondisk, bool accountspectrum)
 {
   ondisk = false;
-  if (allowwrite && idx->changed())
-    idx->write_idx();
-  refill(*idx);
+  refill(*idx, allowwrite);
   clearFloatingFields();
   if (accountspectrum)
     newSpectrum(spectrum);
@@ -444,3 +444,13 @@ QPixmap *Song::getPixmap(int width, int height, const QColorGroup &cg)
   return result;
 }
 */
+
+QString Song::getDisplayTitle()
+{
+  QString result  = "";
+  if (!title.isNull())
+    result+=title;
+  if (!author.isNull())
+    result+=QString("[")+author+QString("]");
+  return result;
+}

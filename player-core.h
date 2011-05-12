@@ -21,6 +21,7 @@
 #ifndef PLAYER_CORE_H
 #define PLAYER_CORE_H
 #include "index.h"
+#include "dsp-drivers.h"
 
 /*-------------------------------------------
  *         Wavrate conversion routines
@@ -59,15 +60,12 @@ void      cue_set();
 void      cue_store(char*, int);
 void      cue_retrieve(char*, int);
 void      jumpto(signed8, int);
-signed8   dsp_latency();
 void      changetempo(signed8);
 void      cue_shift(char*, signed8);
-//void      mixer_set_main(int percent);
-//void      mixer_set_pcm(int percent);
-//int       mixer_get_main();
-//int       mixer_get_pcm();
 void      doubleperiod();
 void      halveperiod();
+
+extern dsp_driver *dsp;
 
 #define   err_none    0
 // initializes the index fields

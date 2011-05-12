@@ -26,19 +26,19 @@
 #include <string.h>
 #define ALSA_PCM_NEW_HW_PARAMS_API
 #define ALSA_PCM_NEW_SW_PARAMS_API
-#include <alsa/asoundlib.h>
 #include "player-core.h"
 #include "version.h"
+#include "dsp-alsa.h"
 
 /*-------------------------------------------
  *         Dsp operations
  *-------------------------------------------*/ 
-static snd_pcm_t     *dsp;
-static snd_pcm_uframes_t buffer_size;
-static snd_pcm_uframes_t period_size;
-char * arg_dev = "hw:0,0";
+char            * dsp_alsa::arg_dev = "hw:0,0";
+snd_pcm_t       * dsp_alsa::dsp;
+snd_pcm_uframes_t dsp_alsa::buffer_size;
+snd_pcm_uframes_t dsp_alsa::period_size;
 
-void alsa_start()
+void dsp_alsa::start()
 {
   int err = 0;
   err = snd_pcm_prepare(dsp);
@@ -48,7 +48,7 @@ void alsa_start()
     }
 }
 
-void alsa_pause()
+void dsp_alsa::pause()
 {
   // can the device pause if yes... we pause it
   // otherwise we simply drop frames and restart it afterward
@@ -90,7 +90,7 @@ void alsa_pause()
 }
 
 // the normal write routine without prebuffering...
-void alsa_wwrite(unsigned4 *value)
+void dsp_alsa::wwrite(unsigned4 *value)
 {
   int err = 0;
   do
@@ -112,7 +112,7 @@ void alsa_wwrite(unsigned4 *value)
 
 static unsigned4 *buffer;
 static unsigned4  filled = 0;
-void alsa_write(unsigned4 *value)
+void dsp_alsa::write(unsigned4 *value)
 {
   buffer[filled]=*value;
   if (++filled>=period_size)
@@ -144,7 +144,7 @@ void alsa_write(unsigned4 *value)
     }
 }
 
-signed8 alsa_latency()
+signed8 dsp_alsa::latency()
 {
   snd_pcm_sframes_t delay;
   int err = snd_pcm_delay(dsp,&delay);
@@ -159,7 +159,7 @@ signed8 alsa_latency()
   return delay + filled;
 }
 
-int alsa_open()
+int dsp_alsa::open()
 {
   int err;
   unsigned int buffer_time, period_time;
@@ -332,11 +332,11 @@ int alsa_open()
   // allocate buffer of correct size
   buffer = allocate(period_size,unsigned4);
   
-  alsa_start();
+  start();
   return err_none;
 }
 
-void alsa_close()
+void dsp_alsa::close()
 {
   snd_pcm_drain(dsp);
   snd_pcm_close(dsp);

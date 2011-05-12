@@ -1,8 +1,8 @@
 /****************************************************************************
 ** Form implementation generated from reading ui file 'playercommandwizard.ui'
 **
-** Created: Fri Oct 10 19:42:54 2003
-**      by: The User Interface Compiler ($Id: playercommandwizard.cpp,v 1.2 2003/10/10 18:56:00 krubbens Exp $)
+** Created: Sat May 8 12:31:21 2004
+**      by: The User Interface Compiler ($Id: qt/main.cpp   3.2.3   edited May 19 14:22 $)
 **
 ** WARNING! All changes made in this file will be lost!
 ****************************************************************************/
@@ -20,8 +20,8 @@
 #include <qtooltip.h>
 #include <qwhatsthis.h>
 
-/* 
- *  Constructs a PlayerCommandWizard as a child of 'parent', with the 
+/*
+ *  Constructs a PlayerCommandWizard as a child of 'parent', with the
  *  name 'name' and widget flags set to 'f'.
  *
  *  The dialog will by default be modeless, unless you set 'modal' to
@@ -52,6 +52,14 @@ PlayerCommandWizard::PlayerCommandWizard( QWidget* parent, const char* name, boo
 
     buttonGroup1Layout->addWidget( alsa, 1, 0 );
 
+    xmms = new QCheckBox( buttonGroup1, "xmms" );
+
+    buttonGroup1Layout->addWidget( xmms, 2, 0 );
+
+    none = new QCheckBox( buttonGroup1, "none" );
+
+    buttonGroup1Layout->addWidget( none, 3, 0 );
+
     PlayerCommandWizardLayout->addWidget( buttonGroup1, 0, 0 );
 
     buttonGroup2 = new QButtonGroup( this, "buttonGroup2" );
@@ -64,11 +72,6 @@ PlayerCommandWizard::PlayerCommandWizard( QWidget* parent, const char* name, boo
     textLabel4 = new QLabel( buttonGroup2, "textLabel4" );
 
     buttonGroup2Layout->addMultiCellWidget( textLabel4, 1, 1, 0, 1 );
-
-    verbose = new QCheckBox( buttonGroup2, "verbose" );
-    verbose->setChecked( TRUE );
-
-    buttonGroup2Layout->addWidget( verbose, 2, 0 );
 
     textLabel3 = new QLabel( buttonGroup2, "textLabel3" );
 
@@ -103,28 +106,12 @@ PlayerCommandWizard::PlayerCommandWizard( QWidget* parent, const char* name, boo
 
     buttonGroup2Layout->addLayout( layout1, 1, 2 );
 
+    verbose = new QCheckBox( buttonGroup2, "verbose" );
+    verbose->setChecked( TRUE );
+
+    buttonGroup2Layout->addMultiCellWidget( verbose, 2, 2, 0, 3 );
+
     PlayerCommandWizardLayout->addMultiCellWidget( buttonGroup2, 0, 0, 1, 3 );
-
-    buttonGroup4 = new QButtonGroup( this, "buttonGroup4" );
-    buttonGroup4->setColumnLayout(0, Qt::Vertical );
-    buttonGroup4->layout()->setSpacing( 6 );
-    buttonGroup4->layout()->setMargin( 11 );
-    buttonGroup4Layout = new QGridLayout( buttonGroup4->layout() );
-    buttonGroup4Layout->setAlignment( Qt::AlignTop );
-
-    textLabel9 = new QLabel( buttonGroup4, "textLabel9" );
-
-    buttonGroup4Layout->addWidget( textLabel9, 0, 0 );
-
-    dev = new QLineEdit( buttonGroup4, "dev" );
-
-    buttonGroup4Layout->addWidget( dev, 0, 1 );
-
-    comboBox2 = new QComboBox( FALSE, buttonGroup4, "comboBox2" );
-
-    buttonGroup4Layout->addWidget( comboBox2, 0, 2 );
-
-    PlayerCommandWizardLayout->addMultiCellWidget( buttonGroup4, 2, 2, 0, 3 );
 
     buttonGroup3 = new QButtonGroup( this, "buttonGroup3" );
     buttonGroup3->setColumnLayout(0, Qt::Vertical );
@@ -162,18 +149,39 @@ PlayerCommandWizard::PlayerCommandWizard( QWidget* parent, const char* name, boo
     buttonGroup3Layout->addWidget( comboBox4, 1, 2 );
 
     PlayerCommandWizardLayout->addMultiCellWidget( buttonGroup3, 1, 1, 0, 3 );
-    QSpacerItem* spacer = new QSpacerItem( 460, 20, QSizePolicy::Expanding, QSizePolicy::Minimum );
+
+    buttonGroup4 = new QButtonGroup( this, "buttonGroup4" );
+    buttonGroup4->setColumnLayout(0, Qt::Vertical );
+    buttonGroup4->layout()->setSpacing( 6 );
+    buttonGroup4->layout()->setMargin( 11 );
+    buttonGroup4Layout = new QGridLayout( buttonGroup4->layout() );
+    buttonGroup4Layout->setAlignment( Qt::AlignTop );
+
+    textLabel9 = new QLabel( buttonGroup4, "textLabel9" );
+
+    buttonGroup4Layout->addWidget( textLabel9, 0, 0 );
+
+    dev = new QLineEdit( buttonGroup4, "dev" );
+
+    buttonGroup4Layout->addWidget( dev, 0, 1 );
+
+    comboBox2 = new QComboBox( FALSE, buttonGroup4, "comboBox2" );
+
+    buttonGroup4Layout->addWidget( comboBox2, 0, 2 );
+
+    PlayerCommandWizardLayout->addMultiCellWidget( buttonGroup4, 2, 2, 0, 3 );
+    QSpacerItem* spacer = new QSpacerItem( 278, 20, QSizePolicy::Expanding, QSizePolicy::Minimum );
     PlayerCommandWizardLayout->addMultiCell( spacer, 3, 3, 0, 1 );
-
-    pushButton7 = new QPushButton( this, "pushButton7" );
-
-    PlayerCommandWizardLayout->addWidget( pushButton7, 3, 2 );
 
     pushButton8 = new QPushButton( this, "pushButton8" );
 
-    PlayerCommandWizardLayout->addWidget( pushButton8, 3, 3 );
+    PlayerCommandWizardLayout->addWidget( pushButton8, 3, 2 );
+
+    pushButton7 = new QPushButton( this, "pushButton7" );
+
+    PlayerCommandWizardLayout->addWidget( pushButton7, 3, 3 );
     languageChange();
-    resize( QSize(558, 378).expandedTo(minimumSizeHint()) );
+    resize( QSize(557, 459).expandedTo(minimumSizeHint()) );
     clearWState( WState_Polished );
 
     // signals and slots connections
@@ -204,9 +212,10 @@ void PlayerCommandWizard::languageChange()
     buttonGroup1->setTitle( tr( "Device Driver" ) );
     oss->setText( tr( "OSS" ) );
     alsa->setText( tr( "ALSA" ) );
+    xmms->setText( tr( "XMMS" ) );
+    none->setText( tr( "no sound" ) );
     buttonGroup2->setTitle( tr( "Common" ) );
     textLabel4->setText( tr( "Screen Position" ) );
-    verbose->setText( tr( "verbose" ) );
     textLabel3->setText( tr( "Latency (ms)" ) );
     latency->setText( tr( "150" ) );
     comboBox5->clear();
@@ -223,15 +232,7 @@ void PlayerCommandWizard::languageChange()
     x->setText( tr( "0" ) );
     textLabel5->setText( tr( "," ) );
     y->setText( tr( "0" ) );
-    buttonGroup4->setTitle( tr( "ALSA options" ) );
-    textLabel9->setText( tr( "ALSA device to use" ) );
-    dev->setText( tr( "hw:0" ) );
-    comboBox2->clear();
-    comboBox2->insertItem( tr( "hw:0,0" ) );
-    comboBox2->insertItem( tr( "hw:1,0" ) );
-    comboBox2->insertItem( tr( "plughw:0" ) );
-    comboBox2->insertItem( tr( "plughw:1" ) );
-    comboBox2->insertItem( tr( "default" ) );
+    verbose->setText( tr( "Verbose" ) );
     buttonGroup3->setTitle( tr( "OSS options" ) );
     textLabel6->setText( tr( "DSP device to use" ) );
     dsp->setText( tr( "/dev/dsp" ) );
@@ -247,7 +248,16 @@ void PlayerCommandWizard::languageChange()
     comboBox4->insertItem( tr( "8" ) );
     comboBox4->insertItem( tr( "4" ) );
     comboBox4->insertItem( tr( "2" ) );
-    pushButton7->setText( tr( "Ok" ) );
+    buttonGroup4->setTitle( tr( "ALSA options" ) );
+    textLabel9->setText( tr( "ALSA device to use" ) );
+    dev->setText( tr( "hw:0" ) );
+    comboBox2->clear();
+    comboBox2->insertItem( tr( "hw:0,0" ) );
+    comboBox2->insertItem( tr( "hw:1,0" ) );
+    comboBox2->insertItem( tr( "plughw:0" ) );
+    comboBox2->insertItem( tr( "plughw:1" ) );
+    comboBox2->insertItem( tr( "default" ) );
     pushButton8->setText( tr( "Cancel" ) );
+    pushButton7->setText( tr( "Ok" ) );
 }
 

@@ -313,7 +313,7 @@ bool Index::fix_tagline()
   char * new_tags;
   int i = 0;
   if (index_tags==NULL)
-    return 0;
+    return false;
   // find all tags
   temp=strdup(index_tags);
   runner=temp;
@@ -351,7 +351,7 @@ bool Index::fix_tagline()
     {
       ::free(new_tags);
       ::free(temp);
-      return 0;
+      return false;
     }
   else
     {
@@ -359,7 +359,7 @@ bool Index::fix_tagline()
       ::free(index_tags);
       ::free(temp);
       index_tags=new_tags;
-      return 1;
+      return true;
     }
 }
 

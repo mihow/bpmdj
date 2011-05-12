@@ -20,56 +20,40 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <qstring.h>
 #include "qstring-factory.h"
+#include "songtree.h"
 
-QString **QStringFactory::content = NULL;
-int QStringFactory::next = 0;
-int QStringFactory::size = 0;
+AvlTree<QString> QStringFactory::tree;
+bool QStringFactory::killed = false;
 
-static int winst = 0;
+unsigned long winst = 0;
 QString QStringFactory::create(char*  str)
 {
-  enlarge();
-  if (str==NULL || !*str) 
-    return QString::null;
-  QString * newqstr = new QString(str);
-  QString * answer = lookup(newqstr);
-  if (answer == NULL)
-    content[next++]=answer=newqstr;
+  if (str==NULL) return QString::null;
+  if (killed) return QString(str);
+  QString newly_allocated(str);
+  QStringNode * found = (QStringNode*) tree.search(newly_allocated);
+  if (found)
+    {
+      winst+=found->content.length()*2+1;
+      return found->content;
+      // the newly allocated string will be destroyed at the moment
+      // this function returns. The data stored in the found content
+      // will be refered an extra time.
+    }
   else
     {
-      winst+=newqstr->length();
-      printf("Winst = %d  %s\n",winst,(const char*)(*newqstr));
-      delete newqstr;
+      tree.add(new QStringNode(newly_allocated));
+      // we add this newly allocated string, the object located in 
+      // this method will be removed, however, the content will be passed 
+      // on to the result and in the tree.
+      return newly_allocated;
     }
-  return *answer;
 }
 
-QString *QStringFactory::lookup(QString *str)
+void QStringFactory::kill()
 {
-  for(int i=0;i<next;i++)
-    {
-      if (*content[i]==*str)
-	return content[i];
-    }
-  return NULL;
+  // printf("Advantage by using QString factory = %d\n",winst);
+  tree.purge();
+  killed=true;
 }
-
-void QStringFactory::enlarge()
-{
-  if (content == NULL)
-    {
-      size = 1;
-      next = 0;
-      content=(QString**)malloc(sizeof(QString*)*size);
-    }
-  if (next>=size)
-    {
-      size*=2;
-      content=(QString**)realloc(content,size*sizeof(QString*));
-    }
-}
-
-
-

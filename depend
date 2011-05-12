@@ -10,19 +10,19 @@ about.o: about.cpp about.h /usr/include/qt3/qvariant.h \
   /usr/include/qt3/qstrlist.h /usr/include/qt3/qptrlist.h \
   /usr/include/qt3/qglist.h /usr/include/qt3/qptrcollection.h \
   /usr/include/qt3/qmap.h /usr/include/qt3/qpair.h \
-  /usr/include/qt3/qpixmap.h /usr/include/qt3/qpaintdevice.h \
+  /usr/include/qt3/qdialog.h /usr/include/qt3/qwidget.h \
   /usr/include/qt3/qwindowdefs.h /usr/include/qt3/qobjectdefs.h \
-  /usr/include/qt3/qnamespace.h /usr/include/qt3/qrect.h \
-  /usr/include/qt3/qsize.h /usr/include/qt3/qpoint.h \
-  /usr/include/qt3/qcolor.h /usr/include/qt3/qdialog.h \
-  /usr/include/qt3/qwidget.h /usr/include/qt3/qobject.h \
+  /usr/include/qt3/qnamespace.h /usr/include/qt3/qobject.h \
   /usr/include/qt3/qevent.h /usr/include/qt3/qregion.h \
-  /usr/include/qt3/qmime.h /usr/include/qt3/qpalette.h \
-  /usr/include/qt3/qbrush.h /usr/include/qt3/qfont.h \
-  /usr/include/qt3/qfontmetrics.h /usr/include/qt3/qfontinfo.h \
-  /usr/include/qt3/qsizepolicy.h /usr/include/qt3/qpushbutton.h \
-  /usr/include/qt3/qbutton.h /usr/include/qt3/qkeysequence.h \
-  /usr/include/qt3/qiconset.h /usr/include/qt3/qtabwidget.h \
+  /usr/include/qt3/qrect.h /usr/include/qt3/qsize.h \
+  /usr/include/qt3/qpoint.h /usr/include/qt3/qmime.h \
+  /usr/include/qt3/qpaintdevice.h /usr/include/qt3/qpalette.h \
+  /usr/include/qt3/qcolor.h /usr/include/qt3/qbrush.h \
+  /usr/include/qt3/qfont.h /usr/include/qt3/qfontmetrics.h \
+  /usr/include/qt3/qfontinfo.h /usr/include/qt3/qsizepolicy.h \
+  /usr/include/qt3/qpushbutton.h /usr/include/qt3/qbutton.h \
+  /usr/include/qt3/qkeysequence.h /usr/include/qt3/qiconset.h \
+  /usr/include/qt3/qpixmap.h /usr/include/qt3/qtabwidget.h \
   /usr/include/qt3/qlabel.h /usr/include/qt3/qframe.h \
   /usr/include/qt3/qtextedit.h /usr/include/qt3/qscrollview.h \
   /usr/include/qt3/qscrollbar.h /usr/include/qt3/qrangecontrol.h \
@@ -30,7 +30,7 @@ about.o: about.cpp about.h /usr/include/qt3/qvariant.h \
   /usr/include/qt3/qgvector.h /usr/include/qt3/qdict.h \
   /usr/include/qt3/qgdict.h /usr/include/qt3/qlayout.h \
   /usr/include/qt3/qtooltip.h /usr/include/qt3/qwhatsthis.h \
-  /usr/include/qt3/qcursor.h /usr/include/qt3/qimage.h
+  /usr/include/qt3/qcursor.h
 albumbox.o: albumbox.cpp albumbox.h /usr/include/qt3/qvariant.h \
   /usr/include/qt3/qstring.h /usr/include/qt3/qcstring.h \
   /usr/include/qt3/qmemarray.h /usr/include/qt3/qgarray.h \
@@ -83,46 +83,18 @@ albumitem.o: albumitem.cpp /usr/include/qt3/qlistview.h \
   /usr/include/qt3/qbrush.h /usr/include/qt3/qfont.h \
   /usr/include/qt3/qfontmetrics.h /usr/include/qt3/qfontinfo.h \
   /usr/include/qt3/qsizepolicy.h /usr/include/qt3/qscrollbar.h \
-  /usr/include/qt3/qrangecontrol.h qstring-factory.h songselector.logic.h \
-  /usr/include/qt3/qtimer.h /usr/include/qt3/qpushbutton.h \
-  /usr/include/qt3/qbutton.h /usr/include/qt3/qkeysequence.h \
-  /usr/include/qt3/qiconset.h /usr/include/qt3/qpixmap.h \
-  /usr/include/qt3/qcheckbox.h /usr/include/qt3/qlineedit.h \
+  /usr/include/qt3/qrangecontrol.h qstring-factory.h avltree.h \
+  songselector.logic.h /usr/include/qt3/qtimer.h \
+  /usr/include/qt3/qpushbutton.h /usr/include/qt3/qbutton.h \
+  /usr/include/qt3/qkeysequence.h /usr/include/qt3/qiconset.h \
+  /usr/include/qt3/qpixmap.h /usr/include/qt3/qcheckbox.h \
+  /usr/include/qt3/qgroupbox.h /usr/include/qt3/qlineedit.h \
   /usr/include/qt3/qmenubar.h /usr/include/qt3/qpopupmenu.h \
   /usr/include/qt3/qmenudata.h /usr/include/qt3/qsignal.h \
   /usr/include/qt3/qvariant.h songselector.h /usr/include/qt3/qdialog.h \
-  song.h config.h cluster.h common.h index.h database.h avltree.h \
-  albumitem.h qsong.h process-manager.h kbpm-played.h dirscanner.h \
-  spectrum.h
+  song.h config.h cluster.h common.h index.h database.h albumitem.h \
+  qsong.h process-manager.h dirscanner.h spectrum.h
 analyzer.o: analyzer.cpp analyzer.h
-askinput.o: askinput.cpp askinput.h /usr/include/qt3/qvariant.h \
-  /usr/include/qt3/qstring.h /usr/include/qt3/qcstring.h \
-  /usr/include/qt3/qmemarray.h /usr/include/qt3/qgarray.h \
-  /usr/include/qt3/qshared.h /usr/include/qt3/qglobal.h \
-  /usr/include/qt3/qconfig.h /usr/include/qt3/qmodules.h \
-  /usr/include/qt3/qfeatures.h /usr/include/qt3/qwinexport.h \
-  /usr/include/qt3/qvaluelist.h /usr/include/qt3/qtl.h \
-  /usr/include/qt3/qtextstream.h /usr/include/qt3/qiodevice.h \
-  /usr/include/qt3/qdatastream.h /usr/include/qt3/qstringlist.h \
-  /usr/include/qt3/qstrlist.h /usr/include/qt3/qptrlist.h \
-  /usr/include/qt3/qglist.h /usr/include/qt3/qptrcollection.h \
-  /usr/include/qt3/qmap.h /usr/include/qt3/qpair.h \
-  /usr/include/qt3/qdialog.h /usr/include/qt3/qwidget.h \
-  /usr/include/qt3/qwindowdefs.h /usr/include/qt3/qobjectdefs.h \
-  /usr/include/qt3/qnamespace.h /usr/include/qt3/qobject.h \
-  /usr/include/qt3/qevent.h /usr/include/qt3/qregion.h \
-  /usr/include/qt3/qrect.h /usr/include/qt3/qsize.h \
-  /usr/include/qt3/qpoint.h /usr/include/qt3/qmime.h \
-  /usr/include/qt3/qpaintdevice.h /usr/include/qt3/qpalette.h \
-  /usr/include/qt3/qcolor.h /usr/include/qt3/qbrush.h \
-  /usr/include/qt3/qfont.h /usr/include/qt3/qfontmetrics.h \
-  /usr/include/qt3/qfontinfo.h /usr/include/qt3/qsizepolicy.h \
-  /usr/include/qt3/qlabel.h /usr/include/qt3/qframe.h \
-  /usr/include/qt3/qpushbutton.h /usr/include/qt3/qbutton.h \
-  /usr/include/qt3/qkeysequence.h /usr/include/qt3/qiconset.h \
-  /usr/include/qt3/qpixmap.h /usr/include/qt3/qlineedit.h \
-  /usr/include/qt3/qlayout.h /usr/include/qt3/qtooltip.h \
-  /usr/include/qt3/qwhatsthis.h /usr/include/qt3/qcursor.h
 avltree-test.o: avltree-test.cpp avltree.cpp avltree.h
 avltree.o: avltree.cpp avltree.h
 bpm-analyzer.logic.o: bpm-analyzer.logic.cpp \
@@ -160,8 +132,8 @@ bpm-analyzer.logic.o: bpm-analyzer.logic.cpp \
   /usr/include/qt3/qprogressbar.h /usr/include/qt3/qspinbox.h \
   /usr/include/qt3/qrangecontrol.h bpm-analyzer.logic.h analyzer.h \
   songplayer.h /usr/include/qt3/qvariant.h /usr/include/qt3/qdialog.h \
-  bpmcounter.h version.h player-core.h index.h common.h fourier.h \
-  scripts.h
+  bpmcounter.h version.h player-core.h index.h common.h dsp-drivers.h \
+  fourier.h scripts.h
 bpmcounter.o: bpmcounter.cpp bpmcounter.h /usr/include/qt3/qvariant.h \
   /usr/include/qt3/qstring.h /usr/include/qt3/qcstring.h \
   /usr/include/qt3/qmemarray.h /usr/include/qt3/qgarray.h \
@@ -196,7 +168,7 @@ bpmcounter.o: bpmcounter.cpp bpmcounter.h /usr/include/qt3/qvariant.h \
   /usr/include/qt3/qwhatsthis.h /usr/include/qt3/qcursor.h
 cache-testing.o: cache-testing.cpp
 cbpm-play.o: cbpm-play.cpp player-core.h index.h common.h dsp-drivers.h \
-  dsp-oss.h dsp-alsa.h version.h scripts.h
+  scripts.h
 choose-analyzers.o: choose-analyzers.cpp choose-analyzers.h \
   /usr/include/qt3/qvariant.h /usr/include/qt3/qstring.h \
   /usr/include/qt3/qcstring.h /usr/include/qt3/qmemarray.h \
@@ -224,9 +196,10 @@ choose-analyzers.o: choose-analyzers.cpp choose-analyzers.h \
   /usr/include/qt3/qiconset.h /usr/include/qt3/qpixmap.h \
   /usr/include/qt3/qtabwidget.h /usr/include/qt3/qlabel.h \
   /usr/include/qt3/qframe.h /usr/include/qt3/qcheckbox.h \
-  /usr/include/qt3/qlineedit.h /usr/include/qt3/qlayout.h \
-  /usr/include/qt3/qtooltip.h /usr/include/qt3/qwhatsthis.h \
-  /usr/include/qt3/qcursor.h
+  /usr/include/qt3/qbuttongroup.h /usr/include/qt3/qgroupbox.h \
+  /usr/include/qt3/qradiobutton.h /usr/include/qt3/qlineedit.h \
+  /usr/include/qt3/qlayout.h /usr/include/qt3/qtooltip.h \
+  /usr/include/qt3/qwhatsthis.h /usr/include/qt3/qcursor.h
 cluster.o: cluster.cpp cluster.h common.h
 common.o: common.cpp dirscanner.h /usr/include/qt3/qstring.h \
   /usr/include/qt3/qcstring.h /usr/include/qt3/qmemarray.h \
@@ -312,28 +285,104 @@ database.o: database.cpp /usr/include/qt3/qlabel.h \
   /usr/include/qt3/qptrlist.h /usr/include/qt3/qglist.h \
   /usr/include/qt3/qptrcollection.h /usr/include/qt3/qbrush.h \
   /usr/include/qt3/qfont.h /usr/include/qt3/qfontmetrics.h \
-  /usr/include/qt3/qfontinfo.h /usr/include/qt3/qsizepolicy.h database.h \
-  avltree.h qsong.h /usr/include/qt3/qlistview.h \
+  /usr/include/qt3/qfontinfo.h /usr/include/qt3/qsizepolicy.h history.h \
+  song.h /usr/include/qt3/qpixmap.h config.h cluster.h common.h index.h \
+  database.h avltree.h qsong.h /usr/include/qt3/qlistview.h \
   /usr/include/qt3/qscrollview.h /usr/include/qt3/qscrollbar.h \
-  /usr/include/qt3/qrangecontrol.h config.h cluster.h common.h song.h \
-  /usr/include/qt3/qpixmap.h index.h songselector.logic.h \
+  /usr/include/qt3/qrangecontrol.h songselector.logic.h \
   /usr/include/qt3/qtimer.h /usr/include/qt3/qpushbutton.h \
   /usr/include/qt3/qbutton.h /usr/include/qt3/qkeysequence.h \
   /usr/include/qt3/qiconset.h /usr/include/qt3/qcheckbox.h \
-  /usr/include/qt3/qlineedit.h /usr/include/qt3/qmenubar.h \
-  /usr/include/qt3/qpopupmenu.h /usr/include/qt3/qmenudata.h \
-  /usr/include/qt3/qsignal.h /usr/include/qt3/qvariant.h songselector.h \
-  /usr/include/qt3/qdialog.h albumitem.h kbpm-played.h process-manager.h \
-  songtree.h avltree.cpp
+  /usr/include/qt3/qgroupbox.h /usr/include/qt3/qlineedit.h \
+  /usr/include/qt3/qmenubar.h /usr/include/qt3/qpopupmenu.h \
+  /usr/include/qt3/qmenudata.h /usr/include/qt3/qsignal.h \
+  /usr/include/qt3/qvariant.h songselector.h /usr/include/qt3/qdialog.h \
+  albumitem.h process-manager.h songtree.h avltree.cpp
 dirscanner.o: dirscanner.cpp dirscanner.h /usr/include/qt3/qstring.h \
   /usr/include/qt3/qcstring.h /usr/include/qt3/qmemarray.h \
   /usr/include/qt3/qgarray.h /usr/include/qt3/qshared.h \
   /usr/include/qt3/qglobal.h /usr/include/qt3/qconfig.h \
   /usr/include/qt3/qmodules.h /usr/include/qt3/qfeatures.h \
   /usr/include/qt3/qwinexport.h common.h
-dsp-alsa.o: dsp-alsa.cpp player-core.h index.h common.h version.h
-dsp-drivers.o: dsp-drivers.cpp dsp-oss.h common.h dsp-alsa.h version.h
-dsp-oss.o: dsp-oss.cpp player-core.h index.h common.h version.h scripts.h
+dsp-alsa.o: dsp-alsa.cpp player-core.h index.h common.h dsp-drivers.h \
+  version.h dsp-alsa.h
+dsp-drivers.o: dsp-drivers.cpp dsp-oss.h dsp-drivers.h common.h \
+  dsp-alsa.h version.h
+dsp-none.o: dsp-none.cpp player-core.h index.h common.h dsp-drivers.h \
+  version.h dsp-none.h
+dsp-oss.o: dsp-oss.cpp player-core.h index.h common.h dsp-drivers.h \
+  version.h scripts.h dsp-oss.h
+duploc-dialog.o: duploc-dialog.cpp duploc-dialog.h \
+  /usr/include/qt3/qvariant.h /usr/include/qt3/qstring.h \
+  /usr/include/qt3/qcstring.h /usr/include/qt3/qmemarray.h \
+  /usr/include/qt3/qgarray.h /usr/include/qt3/qshared.h \
+  /usr/include/qt3/qglobal.h /usr/include/qt3/qconfig.h \
+  /usr/include/qt3/qmodules.h /usr/include/qt3/qfeatures.h \
+  /usr/include/qt3/qwinexport.h /usr/include/qt3/qvaluelist.h \
+  /usr/include/qt3/qtl.h /usr/include/qt3/qtextstream.h \
+  /usr/include/qt3/qiodevice.h /usr/include/qt3/qdatastream.h \
+  /usr/include/qt3/qstringlist.h /usr/include/qt3/qstrlist.h \
+  /usr/include/qt3/qptrlist.h /usr/include/qt3/qglist.h \
+  /usr/include/qt3/qptrcollection.h /usr/include/qt3/qmap.h \
+  /usr/include/qt3/qpair.h /usr/include/qt3/qpixmap.h \
+  /usr/include/qt3/qpaintdevice.h /usr/include/qt3/qwindowdefs.h \
+  /usr/include/qt3/qobjectdefs.h /usr/include/qt3/qnamespace.h \
+  /usr/include/qt3/qrect.h /usr/include/qt3/qsize.h \
+  /usr/include/qt3/qpoint.h /usr/include/qt3/qcolor.h \
+  /usr/include/qt3/qdialog.h /usr/include/qt3/qwidget.h \
+  /usr/include/qt3/qobject.h /usr/include/qt3/qevent.h \
+  /usr/include/qt3/qregion.h /usr/include/qt3/qmime.h \
+  /usr/include/qt3/qpalette.h /usr/include/qt3/qbrush.h \
+  /usr/include/qt3/qfont.h /usr/include/qt3/qfontmetrics.h \
+  /usr/include/qt3/qfontinfo.h /usr/include/qt3/qsizepolicy.h \
+  /usr/include/qt3/qlabel.h /usr/include/qt3/qframe.h \
+  /usr/include/qt3/qtextbrowser.h /usr/include/qt3/qtextedit.h \
+  /usr/include/qt3/qscrollview.h /usr/include/qt3/qscrollbar.h \
+  /usr/include/qt3/qrangecontrol.h /usr/include/qt3/qstylesheet.h \
+  /usr/include/qt3/qptrvector.h /usr/include/qt3/qgvector.h \
+  /usr/include/qt3/qdict.h /usr/include/qt3/qgdict.h \
+  /usr/include/qt3/qlayout.h /usr/include/qt3/qtooltip.h \
+  /usr/include/qt3/qwhatsthis.h /usr/include/qt3/qcursor.h \
+  /usr/include/qt3/qimage.h
+duploc.o: duploc.cpp /usr/include/qt3/qapplication.h \
+  /usr/include/qt3/qdesktopwidget.h /usr/include/qt3/qwidget.h \
+  /usr/include/qt3/qwindowdefs.h /usr/include/qt3/qobjectdefs.h \
+  /usr/include/qt3/qglobal.h /usr/include/qt3/qconfig.h \
+  /usr/include/qt3/qmodules.h /usr/include/qt3/qfeatures.h \
+  /usr/include/qt3/qstring.h /usr/include/qt3/qcstring.h \
+  /usr/include/qt3/qmemarray.h /usr/include/qt3/qgarray.h \
+  /usr/include/qt3/qshared.h /usr/include/qt3/qwinexport.h \
+  /usr/include/qt3/qnamespace.h /usr/include/qt3/qobject.h \
+  /usr/include/qt3/qevent.h /usr/include/qt3/qregion.h \
+  /usr/include/qt3/qrect.h /usr/include/qt3/qsize.h \
+  /usr/include/qt3/qpoint.h /usr/include/qt3/qmime.h \
+  /usr/include/qt3/qmap.h /usr/include/qt3/qdatastream.h \
+  /usr/include/qt3/qiodevice.h /usr/include/qt3/qpair.h \
+  /usr/include/qt3/qvaluelist.h /usr/include/qt3/qtl.h \
+  /usr/include/qt3/qtextstream.h /usr/include/qt3/qpaintdevice.h \
+  /usr/include/qt3/qpalette.h /usr/include/qt3/qcolor.h \
+  /usr/include/qt3/qstringlist.h /usr/include/qt3/qstrlist.h \
+  /usr/include/qt3/qptrlist.h /usr/include/qt3/qglist.h \
+  /usr/include/qt3/qptrcollection.h /usr/include/qt3/qbrush.h \
+  /usr/include/qt3/qfont.h /usr/include/qt3/qfontmetrics.h \
+  /usr/include/qt3/qfontinfo.h /usr/include/qt3/qsizepolicy.h \
+  /usr/include/qt3/qasciidict.h /usr/include/qt3/qgdict.h \
+  /usr/include/qt3/qtranslator.h /usr/include/qt3/qlineedit.h \
+  /usr/include/qt3/qframe.h /usr/include/qt3/qpixmap.h \
+  /usr/include/qt3/qpainter.h /usr/include/qt3/qpen.h \
+  /usr/include/qt3/qpointarray.h /usr/include/qt3/qwmatrix.h \
+  /usr/include/qt3/qpushbutton.h /usr/include/qt3/qbutton.h \
+  /usr/include/qt3/qkeysequence.h /usr/include/qt3/qiconset.h \
+  /usr/include/qt3/qlcdnumber.h /usr/include/qt3/qbitarray.h \
+  /usr/include/qt3/qcheckbox.h /usr/include/qt3/qlabel.h \
+  /usr/include/qt3/qprogressbar.h /usr/include/qt3/qprogressdialog.h \
+  /usr/include/qt3/qsemimodal.h /usr/include/qt3/qdialog.h \
+  /usr/include/qt3/qtextbrowser.h /usr/include/qt3/qtextedit.h \
+  /usr/include/qt3/qscrollview.h /usr/include/qt3/qscrollbar.h \
+  /usr/include/qt3/qrangecontrol.h /usr/include/qt3/qstylesheet.h \
+  /usr/include/qt3/qptrvector.h /usr/include/qt3/qgvector.h \
+  /usr/include/qt3/qdict.h /usr/include/qt3/qmessagebox.h duploc.h \
+  duploc-dialog.h /usr/include/qt3/qvariant.h
 edit-distance.o: edit-distance.cpp common.h
 edit.o: edit.cpp edit.h /usr/include/qt3/qvariant.h \
   /usr/include/qt3/qstring.h /usr/include/qt3/qcstring.h \
@@ -363,6 +412,31 @@ edit.o: edit.cpp edit.h /usr/include/qt3/qvariant.h \
   /usr/include/qt3/qframe.h /usr/include/qt3/qlineedit.h \
   /usr/include/qt3/qlayout.h /usr/include/qt3/qtooltip.h \
   /usr/include/qt3/qwhatsthis.h /usr/include/qt3/qcursor.h
+history.o: history.cpp /usr/include/qt3/qlabel.h \
+  /usr/include/qt3/qframe.h /usr/include/qt3/qwidget.h \
+  /usr/include/qt3/qwindowdefs.h /usr/include/qt3/qobjectdefs.h \
+  /usr/include/qt3/qglobal.h /usr/include/qt3/qconfig.h \
+  /usr/include/qt3/qmodules.h /usr/include/qt3/qfeatures.h \
+  /usr/include/qt3/qstring.h /usr/include/qt3/qcstring.h \
+  /usr/include/qt3/qmemarray.h /usr/include/qt3/qgarray.h \
+  /usr/include/qt3/qshared.h /usr/include/qt3/qwinexport.h \
+  /usr/include/qt3/qnamespace.h /usr/include/qt3/qobject.h \
+  /usr/include/qt3/qevent.h /usr/include/qt3/qregion.h \
+  /usr/include/qt3/qrect.h /usr/include/qt3/qsize.h \
+  /usr/include/qt3/qpoint.h /usr/include/qt3/qmime.h \
+  /usr/include/qt3/qmap.h /usr/include/qt3/qdatastream.h \
+  /usr/include/qt3/qiodevice.h /usr/include/qt3/qpair.h \
+  /usr/include/qt3/qvaluelist.h /usr/include/qt3/qtl.h \
+  /usr/include/qt3/qtextstream.h /usr/include/qt3/qpaintdevice.h \
+  /usr/include/qt3/qpalette.h /usr/include/qt3/qcolor.h \
+  /usr/include/qt3/qstringlist.h /usr/include/qt3/qstrlist.h \
+  /usr/include/qt3/qptrlist.h /usr/include/qt3/qglist.h \
+  /usr/include/qt3/qptrcollection.h /usr/include/qt3/qbrush.h \
+  /usr/include/qt3/qfont.h /usr/include/qt3/qfontmetrics.h \
+  /usr/include/qt3/qfontinfo.h /usr/include/qt3/qsizepolicy.h \
+  /usr/include/qt3/qlineedit.h /usr/include/qt3/qinputdialog.h \
+  /usr/include/qt3/qdialog.h history.h song.h /usr/include/qt3/qpixmap.h \
+  config.h cluster.h common.h index.h
 historysong.o: historysong.cpp /usr/include/qt3/qlistview.h \
   /usr/include/qt3/qscrollview.h /usr/include/qt3/qframe.h \
   /usr/include/qt3/qwidget.h /usr/include/qt3/qwindowdefs.h \
@@ -386,17 +460,18 @@ historysong.o: historysong.cpp /usr/include/qt3/qlistview.h \
   /usr/include/qt3/qbrush.h /usr/include/qt3/qfont.h \
   /usr/include/qt3/qfontmetrics.h /usr/include/qt3/qfontinfo.h \
   /usr/include/qt3/qsizepolicy.h /usr/include/qt3/qscrollbar.h \
-  /usr/include/qt3/qrangecontrol.h qstring-factory.h songselector.logic.h \
-  /usr/include/qt3/qtimer.h /usr/include/qt3/qpushbutton.h \
-  /usr/include/qt3/qbutton.h /usr/include/qt3/qkeysequence.h \
-  /usr/include/qt3/qiconset.h /usr/include/qt3/qpixmap.h \
-  /usr/include/qt3/qcheckbox.h /usr/include/qt3/qlineedit.h \
+  /usr/include/qt3/qrangecontrol.h qstring-factory.h avltree.h \
+  songselector.logic.h /usr/include/qt3/qtimer.h \
+  /usr/include/qt3/qpushbutton.h /usr/include/qt3/qbutton.h \
+  /usr/include/qt3/qkeysequence.h /usr/include/qt3/qiconset.h \
+  /usr/include/qt3/qpixmap.h /usr/include/qt3/qcheckbox.h \
+  /usr/include/qt3/qgroupbox.h /usr/include/qt3/qlineedit.h \
   /usr/include/qt3/qmenubar.h /usr/include/qt3/qpopupmenu.h \
   /usr/include/qt3/qmenudata.h /usr/include/qt3/qsignal.h \
   /usr/include/qt3/qvariant.h songselector.h /usr/include/qt3/qdialog.h \
-  song.h config.h cluster.h common.h index.h database.h avltree.h \
-  albumitem.h qsong.h process-manager.h kbpm-played.h dirscanner.h \
-  spectrum.h historysong.h
+  song.h config.h cluster.h common.h index.h database.h albumitem.h \
+  qsong.h process-manager.h history.h dirscanner.h spectrum.h \
+  historysong.h
 importscanner.o: importscanner.cpp /usr/include/qt3/qmultilineedit.h \
   /usr/include/qt3/qtextedit.h /usr/include/qt3/qscrollview.h \
   /usr/include/qt3/qframe.h /usr/include/qt3/qwidget.h \
@@ -429,14 +504,14 @@ importscanner.o: importscanner.cpp /usr/include/qt3/qmultilineedit.h \
   scanningprogress.h /usr/include/qt3/qvariant.h \
   /usr/include/qt3/qdialog.h songselector.logic.h \
   /usr/include/qt3/qtimer.h /usr/include/qt3/qlistview.h \
-  /usr/include/qt3/qcheckbox.h /usr/include/qt3/qlineedit.h \
-  /usr/include/qt3/qmenubar.h /usr/include/qt3/qpopupmenu.h \
-  /usr/include/qt3/qmenudata.h /usr/include/qt3/qsignal.h songselector.h \
-  song.h config.h cluster.h common.h index.h database.h avltree.h \
-  albumitem.h dirscanner.h qsong.h kbpm-dj.h \
-  /usr/include/qt3/qapplication.h /usr/include/qt3/qdesktopwidget.h \
-  /usr/include/qt3/qasciidict.h /usr/include/qt3/qtranslator.h \
-  avltree.cpp
+  /usr/include/qt3/qcheckbox.h /usr/include/qt3/qgroupbox.h \
+  /usr/include/qt3/qlineedit.h /usr/include/qt3/qmenubar.h \
+  /usr/include/qt3/qpopupmenu.h /usr/include/qt3/qmenudata.h \
+  /usr/include/qt3/qsignal.h songselector.h song.h config.h cluster.h \
+  common.h index.h database.h avltree.h albumitem.h dirscanner.h qsong.h \
+  kbpm-dj.h /usr/include/qt3/qapplication.h \
+  /usr/include/qt3/qdesktopwidget.h /usr/include/qt3/qasciidict.h \
+  /usr/include/qt3/qtranslator.h avltree.cpp
 impulseanalyzer.o: impulseanalyzer.cpp impulseanalyzer.h \
   /usr/include/qt3/qvariant.h /usr/include/qt3/qstring.h \
   /usr/include/qt3/qcstring.h /usr/include/qt3/qmemarray.h \
@@ -503,7 +578,7 @@ impulseanalyzer.logic.o: impulseanalyzer.logic.cpp \
   /usr/include/qt3/qrangecontrol.h /usr/include/qt3/qslider.h \
   impulseanalyzer.logic.h songplayer.h /usr/include/qt3/qvariant.h \
   impulseanalyzer.h common.h fourier.h kbpm-play.h player-core.h index.h \
-  version.h scripts.h
+  dsp-drivers.h version.h scripts.h
 index-reader.o: index-reader.cpp /usr/include/qt3/qlistview.h \
   /usr/include/qt3/qscrollview.h /usr/include/qt3/qframe.h \
   /usr/include/qt3/qwidget.h /usr/include/qt3/qwindowdefs.h \
@@ -533,7 +608,7 @@ index-reader.o: index-reader.cpp /usr/include/qt3/qlistview.h \
   /usr/include/qt3/qdesktopwidget.h /usr/include/qt3/qasciidict.h \
   /usr/include/qt3/qgdict.h /usr/include/qt3/qtranslator.h qsong.h \
   config.h cluster.h common.h song.h /usr/include/qt3/qpixmap.h index.h \
-  spectrum.h database.h songtree.h avltree.cpp
+  spectrum.h database.h songtree.h avltree.cpp qstring-factory.h
 index.o: index.cpp /usr/include/qt3/qlabel.h /usr/include/qt3/qframe.h \
   /usr/include/qt3/qwidget.h /usr/include/qt3/qwindowdefs.h \
   /usr/include/qt3/qobjectdefs.h /usr/include/qt3/qglobal.h \
@@ -596,7 +671,7 @@ kbpm-dj.o: kbpm-dj.cpp /usr/include/qt3/qapplication.h \
   /usr/include/qt3/qlineedit.h /usr/include/qt3/qmenubar.h \
   /usr/include/qt3/qpopupmenu.h /usr/include/qt3/qmenudata.h \
   /usr/include/qt3/qsignal.h songselector.h song.h config.h cluster.h \
-  common.h index.h database.h avltree.h albumitem.h kbpm-played.h \
+  common.h index.h database.h avltree.h albumitem.h history.h \
   index-reader.h dirscanner.h version.h scripts.h loader.h
 kbpm-play.o: kbpm-play.cpp /usr/include/qt3/qapplication.h \
   /usr/include/qt3/qdesktopwidget.h /usr/include/qt3/qwidget.h \
@@ -628,37 +703,13 @@ kbpm-play.o: kbpm-play.cpp /usr/include/qt3/qapplication.h \
   /usr/include/qt3/qlcdnumber.h /usr/include/qt3/qbitarray.h \
   /usr/include/qt3/qheader.h /usr/include/qt3/qiconset.h \
   /usr/include/qt3/qpixmap.h /usr/include/qt3/qgroupbox.h \
-  songplayer.logic.h /usr/include/qt3/qtimer.h /usr/include/qt3/qbutton.h \
-  /usr/include/qt3/qkeysequence.h songplayer.h \
-  /usr/include/qt3/qvariant.h player-core.h index.h common.h \
-  bpm-analyzer.logic.h analyzer.h bpmcounter.h spectrumanalyzer.logic.h \
-  spectrumanalyzer.h pattern-analyzer.logic.h pattern-analyzer.h \
-  md5-analyzer.h dsp-drivers.h dsp-oss.h dsp-alsa.h version.h scripts.h
-kbpm-played.o: kbpm-played.cpp /usr/include/qt3/qlabel.h \
-  /usr/include/qt3/qframe.h /usr/include/qt3/qwidget.h \
-  /usr/include/qt3/qwindowdefs.h /usr/include/qt3/qobjectdefs.h \
-  /usr/include/qt3/qglobal.h /usr/include/qt3/qconfig.h \
-  /usr/include/qt3/qmodules.h /usr/include/qt3/qfeatures.h \
-  /usr/include/qt3/qstring.h /usr/include/qt3/qcstring.h \
-  /usr/include/qt3/qmemarray.h /usr/include/qt3/qgarray.h \
-  /usr/include/qt3/qshared.h /usr/include/qt3/qwinexport.h \
-  /usr/include/qt3/qnamespace.h /usr/include/qt3/qobject.h \
-  /usr/include/qt3/qevent.h /usr/include/qt3/qregion.h \
-  /usr/include/qt3/qrect.h /usr/include/qt3/qsize.h \
-  /usr/include/qt3/qpoint.h /usr/include/qt3/qmime.h \
-  /usr/include/qt3/qmap.h /usr/include/qt3/qdatastream.h \
-  /usr/include/qt3/qiodevice.h /usr/include/qt3/qpair.h \
-  /usr/include/qt3/qvaluelist.h /usr/include/qt3/qtl.h \
-  /usr/include/qt3/qtextstream.h /usr/include/qt3/qpaintdevice.h \
-  /usr/include/qt3/qpalette.h /usr/include/qt3/qcolor.h \
-  /usr/include/qt3/qstringlist.h /usr/include/qt3/qstrlist.h \
-  /usr/include/qt3/qptrlist.h /usr/include/qt3/qglist.h \
-  /usr/include/qt3/qptrcollection.h /usr/include/qt3/qbrush.h \
-  /usr/include/qt3/qfont.h /usr/include/qt3/qfontmetrics.h \
-  /usr/include/qt3/qfontinfo.h /usr/include/qt3/qsizepolicy.h \
-  /usr/include/qt3/qlineedit.h kbpm-played.h song.h \
-  /usr/include/qt3/qpixmap.h config.h cluster.h common.h index.h \
-  mixinformation.h /usr/include/qt3/qvariant.h /usr/include/qt3/qdialog.h
+  /usr/include/qt3/qradiobutton.h /usr/include/qt3/qbutton.h \
+  /usr/include/qt3/qkeysequence.h songplayer.logic.h \
+  /usr/include/qt3/qtimer.h songplayer.h /usr/include/qt3/qvariant.h \
+  player-core.h index.h common.h dsp-drivers.h bpm-analyzer.logic.h \
+  analyzer.h bpmcounter.h spectrumanalyzer.logic.h spectrumanalyzer.h \
+  pattern-analyzer.logic.h pattern-analyzer.h md5-analyzer.h dsp-oss.h \
+  dsp-alsa.h version.h dsp-none.h scripts.h
 loader.o: loader.cpp loader.h /usr/include/qt3/qvariant.h \
   /usr/include/qt3/qstring.h /usr/include/qt3/qcstring.h \
   /usr/include/qt3/qmemarray.h /usr/include/qt3/qgarray.h \
@@ -687,7 +738,7 @@ loader.o: loader.cpp loader.h /usr/include/qt3/qvariant.h \
   /usr/include/qt3/qwhatsthis.h /usr/include/qt3/qcursor.h \
   /usr/include/qt3/qimage.h
 md5-analyzer.o: md5-analyzer.cpp player-core.h index.h common.h \
-  md5-analyzer.h analyzer.h scripts.h
+  dsp-drivers.h md5-analyzer.h analyzer.h scripts.h
 merger-dialog.o: merger-dialog.cpp merger-dialog.h \
   /usr/include/qt3/qvariant.h /usr/include/qt3/qstring.h \
   /usr/include/qt3/qcstring.h /usr/include/qt3/qmemarray.h \
@@ -720,7 +771,7 @@ merger-dialog.o: merger-dialog.cpp merger-dialog.h \
   /usr/include/qt3/qtooltip.h /usr/include/qt3/qwhatsthis.h \
   /usr/include/qt3/qcursor.h
 merger.o: merger.cpp index.h common.h scripts.h
-mixinformation.o: mixinformation.cpp mixinformation.h \
+pattern-analyzer.o: pattern-analyzer.cpp pattern-analyzer.h \
   /usr/include/qt3/qvariant.h /usr/include/qt3/qstring.h \
   /usr/include/qt3/qcstring.h /usr/include/qt3/qmemarray.h \
   /usr/include/qt3/qgarray.h /usr/include/qt3/qshared.h \
@@ -742,45 +793,15 @@ mixinformation.o: mixinformation.cpp mixinformation.h \
   /usr/include/qt3/qpalette.h /usr/include/qt3/qcolor.h \
   /usr/include/qt3/qbrush.h /usr/include/qt3/qfont.h \
   /usr/include/qt3/qfontmetrics.h /usr/include/qt3/qfontinfo.h \
-  /usr/include/qt3/qsizepolicy.h /usr/include/qt3/qlabel.h \
-  /usr/include/qt3/qframe.h /usr/include/qt3/qlineedit.h \
-  /usr/include/qt3/qpushbutton.h /usr/include/qt3/qbutton.h \
-  /usr/include/qt3/qkeysequence.h /usr/include/qt3/qiconset.h \
-  /usr/include/qt3/qpixmap.h /usr/include/qt3/qlayout.h \
-  /usr/include/qt3/qtooltip.h /usr/include/qt3/qwhatsthis.h \
-  /usr/include/qt3/qcursor.h
-pattern-analyzer.o: pattern-analyzer.cpp pattern-analyzer.h \
-  /usr/include/qt3/qvariant.h /usr/include/qt3/qstring.h \
-  /usr/include/qt3/qcstring.h /usr/include/qt3/qmemarray.h \
-  /usr/include/qt3/qgarray.h /usr/include/qt3/qshared.h \
-  /usr/include/qt3/qglobal.h /usr/include/qt3/qconfig.h \
-  /usr/include/qt3/qmodules.h /usr/include/qt3/qfeatures.h \
-  /usr/include/qt3/qwinexport.h /usr/include/qt3/qvaluelist.h \
-  /usr/include/qt3/qtl.h /usr/include/qt3/qtextstream.h \
-  /usr/include/qt3/qiodevice.h /usr/include/qt3/qdatastream.h \
-  /usr/include/qt3/qstringlist.h /usr/include/qt3/qstrlist.h \
-  /usr/include/qt3/qptrlist.h /usr/include/qt3/qglist.h \
-  /usr/include/qt3/qptrcollection.h /usr/include/qt3/qmap.h \
-  /usr/include/qt3/qpair.h /usr/include/qt3/qpixmap.h \
-  /usr/include/qt3/qpaintdevice.h /usr/include/qt3/qwindowdefs.h \
-  /usr/include/qt3/qobjectdefs.h /usr/include/qt3/qnamespace.h \
-  /usr/include/qt3/qrect.h /usr/include/qt3/qsize.h \
-  /usr/include/qt3/qpoint.h /usr/include/qt3/qcolor.h \
-  /usr/include/qt3/qdialog.h /usr/include/qt3/qwidget.h \
-  /usr/include/qt3/qobject.h /usr/include/qt3/qevent.h \
-  /usr/include/qt3/qregion.h /usr/include/qt3/qmime.h \
-  /usr/include/qt3/qpalette.h /usr/include/qt3/qbrush.h \
-  /usr/include/qt3/qfont.h /usr/include/qt3/qfontmetrics.h \
-  /usr/include/qt3/qfontinfo.h /usr/include/qt3/qsizepolicy.h \
-  /usr/include/qt3/qpushbutton.h /usr/include/qt3/qbutton.h \
-  /usr/include/qt3/qkeysequence.h /usr/include/qt3/qiconset.h \
+  /usr/include/qt3/qsizepolicy.h /usr/include/qt3/qpushbutton.h \
+  /usr/include/qt3/qbutton.h /usr/include/qt3/qkeysequence.h \
+  /usr/include/qt3/qiconset.h /usr/include/qt3/qpixmap.h \
   /usr/include/qt3/qtabwidget.h /usr/include/qt3/qslider.h \
   /usr/include/qt3/qrangecontrol.h /usr/include/qt3/qframe.h \
   /usr/include/qt3/qlabel.h /usr/include/qt3/qspinbox.h \
   /usr/include/qt3/qcombobox.h /usr/include/qt3/qlineedit.h \
   /usr/include/qt3/qlayout.h /usr/include/qt3/qtooltip.h \
-  /usr/include/qt3/qwhatsthis.h /usr/include/qt3/qcursor.h \
-  /usr/include/qt3/qimage.h
+  /usr/include/qt3/qwhatsthis.h /usr/include/qt3/qcursor.h
 pattern-analyzer.logic.o: pattern-analyzer.logic.cpp \
   /usr/include/qt3/qapplication.h /usr/include/qt3/qdesktopwidget.h \
   /usr/include/qt3/qwidget.h /usr/include/qt3/qwindowdefs.h \
@@ -819,7 +840,8 @@ pattern-analyzer.logic.o: pattern-analyzer.logic.cpp \
   /usr/include/qt3/qslider.h /usr/include/qt3/qmessagebox.h \
   pattern-analyzer.logic.h songplayer.h /usr/include/qt3/qvariant.h \
   pattern-analyzer.h spectrumanalyzer.logic.h spectrumanalyzer.h \
-  kbpm-play.h player-core.h index.h common.h version.h scripts.h
+  kbpm-play.h player-core.h index.h common.h dsp-drivers.h fourier.h \
+  version.h scripts.h
 pca.o: pca.cpp kbpm-dj.h /usr/include/qt3/qapplication.h \
   /usr/include/qt3/qdesktopwidget.h /usr/include/qt3/qwidget.h \
   /usr/include/qt3/qwindowdefs.h /usr/include/qt3/qobjectdefs.h \
@@ -844,8 +866,8 @@ pca.o: pca.cpp kbpm-dj.h /usr/include/qt3/qapplication.h \
   /usr/include/qt3/qfontinfo.h /usr/include/qt3/qsizepolicy.h \
   /usr/include/qt3/qasciidict.h /usr/include/qt3/qgdict.h \
   /usr/include/qt3/qtranslator.h pca.h common.h
-player-core.o: player-core.cpp player-core.h index.h common.h scripts.h \
-  version.h dsp-drivers.h dsp-oss.h dsp-alsa.h
+player-core.o: player-core.cpp player-core.h index.h common.h \
+  dsp-drivers.h scripts.h version.h
 playercommandwizard.o: playercommandwizard.cpp playercommandwizard.h \
   /usr/include/qt3/qvariant.h /usr/include/qt3/qstring.h \
   /usr/include/qt3/qcstring.h /usr/include/qt3/qmemarray.h \
@@ -968,14 +990,14 @@ process-manager.o: process-manager.cpp /usr/include/qt3/qmessagebox.h \
   /usr/include/qt3/qptrvector.h /usr/include/qt3/qgvector.h \
   /usr/include/qt3/qlineedit.h /usr/include/qt3/qcheckbox.h \
   /usr/include/qt3/qbutton.h /usr/include/qt3/qkeysequence.h \
-  preferences.h /usr/include/qt3/qvariant.h about.h \
-  /usr/include/qt3/qpixmap.h tagbox.h songselector.logic.h \
+  preferences.h /usr/include/qt3/qvariant.h about.h songselector.logic.h \
   /usr/include/qt3/qtimer.h /usr/include/qt3/qlistview.h \
   /usr/include/qt3/qpushbutton.h /usr/include/qt3/qiconset.h \
+  /usr/include/qt3/qpixmap.h /usr/include/qt3/qgroupbox.h \
   /usr/include/qt3/qmenubar.h /usr/include/qt3/qpopupmenu.h \
   /usr/include/qt3/qmenudata.h /usr/include/qt3/qsignal.h songselector.h \
   song.h config.h cluster.h common.h index.h database.h avltree.h \
-  albumitem.h kbpm-played.h version.h kbpm-dj.h \
+  albumitem.h history.h version.h kbpm-dj.h \
   /usr/include/qt3/qapplication.h /usr/include/qt3/qdesktopwidget.h \
   /usr/include/qt3/qasciidict.h /usr/include/qt3/qtranslator.h \
   process-manager.h qsong.h scripts.h
@@ -997,29 +1019,41 @@ qsong.o: qsong.cpp /usr/include/qt3/qpainter.h /usr/include/qt3/qcolor.h \
   /usr/include/qt3/qfontinfo.h /usr/include/qt3/qregion.h \
   /usr/include/qt3/qpen.h /usr/include/qt3/qbrush.h \
   /usr/include/qt3/qpointarray.h /usr/include/qt3/qwmatrix.h \
-  qstring-factory.h songselector.logic.h /usr/include/qt3/qtimer.h \
-  /usr/include/qt3/qobject.h /usr/include/qt3/qevent.h \
-  /usr/include/qt3/qmime.h /usr/include/qt3/qmap.h \
-  /usr/include/qt3/qpair.h /usr/include/qt3/qlistview.h \
-  /usr/include/qt3/qscrollview.h /usr/include/qt3/qframe.h \
-  /usr/include/qt3/qwidget.h /usr/include/qt3/qpaintdevice.h \
-  /usr/include/qt3/qpalette.h /usr/include/qt3/qsizepolicy.h \
-  /usr/include/qt3/qscrollbar.h /usr/include/qt3/qrangecontrol.h \
-  /usr/include/qt3/qpushbutton.h /usr/include/qt3/qbutton.h \
-  /usr/include/qt3/qkeysequence.h /usr/include/qt3/qiconset.h \
-  /usr/include/qt3/qpixmap.h /usr/include/qt3/qcheckbox.h \
+  qstring-factory.h avltree.h songselector.logic.h \
+  /usr/include/qt3/qtimer.h /usr/include/qt3/qobject.h \
+  /usr/include/qt3/qevent.h /usr/include/qt3/qmime.h \
+  /usr/include/qt3/qmap.h /usr/include/qt3/qpair.h \
+  /usr/include/qt3/qlistview.h /usr/include/qt3/qscrollview.h \
+  /usr/include/qt3/qframe.h /usr/include/qt3/qwidget.h \
+  /usr/include/qt3/qpaintdevice.h /usr/include/qt3/qpalette.h \
+  /usr/include/qt3/qsizepolicy.h /usr/include/qt3/qscrollbar.h \
+  /usr/include/qt3/qrangecontrol.h /usr/include/qt3/qpushbutton.h \
+  /usr/include/qt3/qbutton.h /usr/include/qt3/qkeysequence.h \
+  /usr/include/qt3/qiconset.h /usr/include/qt3/qpixmap.h \
+  /usr/include/qt3/qcheckbox.h /usr/include/qt3/qgroupbox.h \
   /usr/include/qt3/qlineedit.h /usr/include/qt3/qmenubar.h \
   /usr/include/qt3/qpopupmenu.h /usr/include/qt3/qmenudata.h \
   /usr/include/qt3/qsignal.h /usr/include/qt3/qvariant.h songselector.h \
   /usr/include/qt3/qdialog.h song.h config.h cluster.h common.h index.h \
-  database.h avltree.h albumitem.h qsong.h process-manager.h \
-  kbpm-played.h dirscanner.h spectrum.h
-qstring-factory.o: qstring-factory.cpp /usr/include/qt3/qstring.h \
-  /usr/include/qt3/qcstring.h /usr/include/qt3/qmemarray.h \
-  /usr/include/qt3/qgarray.h /usr/include/qt3/qshared.h \
-  /usr/include/qt3/qglobal.h /usr/include/qt3/qconfig.h \
-  /usr/include/qt3/qmodules.h /usr/include/qt3/qfeatures.h \
-  /usr/include/qt3/qwinexport.h qstring-factory.h
+  database.h albumitem.h qsong.h process-manager.h history.h dirscanner.h \
+  spectrum.h
+qstring-factory.o: qstring-factory.cpp qstring-factory.h \
+  /usr/include/qt3/qstring.h /usr/include/qt3/qcstring.h \
+  /usr/include/qt3/qmemarray.h /usr/include/qt3/qgarray.h \
+  /usr/include/qt3/qshared.h /usr/include/qt3/qglobal.h \
+  /usr/include/qt3/qconfig.h /usr/include/qt3/qmodules.h \
+  /usr/include/qt3/qfeatures.h /usr/include/qt3/qwinexport.h avltree.h \
+  songtree.h song.h /usr/include/qt3/qcolor.h \
+  /usr/include/qt3/qwindowdefs.h /usr/include/qt3/qobjectdefs.h \
+  /usr/include/qt3/qnamespace.h /usr/include/qt3/qstringlist.h \
+  /usr/include/qt3/qvaluelist.h /usr/include/qt3/qtl.h \
+  /usr/include/qt3/qtextstream.h /usr/include/qt3/qiodevice.h \
+  /usr/include/qt3/qdatastream.h /usr/include/qt3/qstrlist.h \
+  /usr/include/qt3/qptrlist.h /usr/include/qt3/qglist.h \
+  /usr/include/qt3/qptrcollection.h /usr/include/qt3/qpixmap.h \
+  /usr/include/qt3/qpaintdevice.h /usr/include/qt3/qrect.h \
+  /usr/include/qt3/qsize.h /usr/include/qt3/qpoint.h config.h cluster.h \
+  common.h index.h
 queuedsong.o: queuedsong.cpp /usr/include/qt3/qlistview.h \
   /usr/include/qt3/qscrollview.h /usr/include/qt3/qframe.h \
   /usr/include/qt3/qwidget.h /usr/include/qt3/qwindowdefs.h \
@@ -1043,17 +1077,18 @@ queuedsong.o: queuedsong.cpp /usr/include/qt3/qlistview.h \
   /usr/include/qt3/qbrush.h /usr/include/qt3/qfont.h \
   /usr/include/qt3/qfontmetrics.h /usr/include/qt3/qfontinfo.h \
   /usr/include/qt3/qsizepolicy.h /usr/include/qt3/qscrollbar.h \
-  /usr/include/qt3/qrangecontrol.h qstring-factory.h songselector.logic.h \
-  /usr/include/qt3/qtimer.h /usr/include/qt3/qpushbutton.h \
-  /usr/include/qt3/qbutton.h /usr/include/qt3/qkeysequence.h \
-  /usr/include/qt3/qiconset.h /usr/include/qt3/qpixmap.h \
-  /usr/include/qt3/qcheckbox.h /usr/include/qt3/qlineedit.h \
+  /usr/include/qt3/qrangecontrol.h qstring-factory.h avltree.h \
+  songselector.logic.h /usr/include/qt3/qtimer.h \
+  /usr/include/qt3/qpushbutton.h /usr/include/qt3/qbutton.h \
+  /usr/include/qt3/qkeysequence.h /usr/include/qt3/qiconset.h \
+  /usr/include/qt3/qpixmap.h /usr/include/qt3/qcheckbox.h \
+  /usr/include/qt3/qgroupbox.h /usr/include/qt3/qlineedit.h \
   /usr/include/qt3/qmenubar.h /usr/include/qt3/qpopupmenu.h \
   /usr/include/qt3/qmenudata.h /usr/include/qt3/qsignal.h \
   /usr/include/qt3/qvariant.h songselector.h /usr/include/qt3/qdialog.h \
-  song.h config.h cluster.h common.h index.h database.h avltree.h \
-  albumitem.h qsong.h process-manager.h kbpm-played.h dirscanner.h \
-  spectrum.h queuedsong.h
+  song.h config.h cluster.h common.h index.h database.h albumitem.h \
+  qsong.h process-manager.h history.h dirscanner.h spectrum.h \
+  queuedsong.h
 renamer.o: renamer.cpp renamer.h /usr/include/qt3/qvariant.h \
   /usr/include/qt3/qstring.h /usr/include/qt3/qcstring.h \
   /usr/include/qt3/qmemarray.h /usr/include/qt3/qgarray.h \
@@ -1133,8 +1168,8 @@ scanningprogress.o: scanningprogress.cpp scanningprogress.h \
   /usr/include/qt3/qpalette.h /usr/include/qt3/qcolor.h \
   /usr/include/qt3/qbrush.h /usr/include/qt3/qfont.h \
   /usr/include/qt3/qfontmetrics.h /usr/include/qt3/qfontinfo.h \
-  /usr/include/qt3/qsizepolicy.h /usr/include/qt3/qframe.h \
-  /usr/include/qt3/qlabel.h /usr/include/qt3/qmultilineedit.h \
+  /usr/include/qt3/qsizepolicy.h /usr/include/qt3/qlabel.h \
+  /usr/include/qt3/qframe.h /usr/include/qt3/qmultilineedit.h \
   /usr/include/qt3/qtextedit.h /usr/include/qt3/qscrollview.h \
   /usr/include/qt3/qscrollbar.h /usr/include/qt3/qrangecontrol.h \
   /usr/include/qt3/qstylesheet.h /usr/include/qt3/qptrvector.h \
@@ -1233,14 +1268,14 @@ similarscanner.o: similarscanner.cpp /usr/include/qt3/qlabel.h \
   /usr/include/qt3/qtimer.h /usr/include/qt3/qpushbutton.h \
   /usr/include/qt3/qbutton.h /usr/include/qt3/qkeysequence.h \
   /usr/include/qt3/qiconset.h /usr/include/qt3/qpixmap.h \
-  /usr/include/qt3/qcheckbox.h /usr/include/qt3/qlineedit.h \
-  /usr/include/qt3/qmenubar.h /usr/include/qt3/qpopupmenu.h \
-  /usr/include/qt3/qmenudata.h /usr/include/qt3/qsignal.h songselector.h \
-  song.h config.h cluster.h common.h index.h database.h avltree.h \
-  albumitem.h qsong.h kbpm-dj.h /usr/include/qt3/qapplication.h \
-  /usr/include/qt3/qdesktopwidget.h /usr/include/qt3/qasciidict.h \
-  /usr/include/qt3/qgdict.h /usr/include/qt3/qtranslator.h \
-  edit-distance.h scripts.h
+  /usr/include/qt3/qcheckbox.h /usr/include/qt3/qgroupbox.h \
+  /usr/include/qt3/qlineedit.h /usr/include/qt3/qmenubar.h \
+  /usr/include/qt3/qpopupmenu.h /usr/include/qt3/qmenudata.h \
+  /usr/include/qt3/qsignal.h songselector.h song.h config.h cluster.h \
+  common.h index.h database.h avltree.h albumitem.h qsong.h kbpm-dj.h \
+  /usr/include/qt3/qapplication.h /usr/include/qt3/qdesktopwidget.h \
+  /usr/include/qt3/qasciidict.h /usr/include/qt3/qgdict.h \
+  /usr/include/qt3/qtranslator.h edit-distance.h scripts.h
 song-information.o: song-information.cpp song-information.h \
   /usr/include/qt3/qvariant.h /usr/include/qt3/qstring.h \
   /usr/include/qt3/qcstring.h /usr/include/qt3/qmemarray.h \
@@ -1288,23 +1323,24 @@ song.o: song.cpp /usr/include/qt3/qpainter.h /usr/include/qt3/qcolor.h \
   /usr/include/qt3/qfontinfo.h /usr/include/qt3/qregion.h \
   /usr/include/qt3/qpen.h /usr/include/qt3/qbrush.h \
   /usr/include/qt3/qpointarray.h /usr/include/qt3/qwmatrix.h \
-  qstring-factory.h songselector.logic.h /usr/include/qt3/qtimer.h \
-  /usr/include/qt3/qobject.h /usr/include/qt3/qevent.h \
-  /usr/include/qt3/qmime.h /usr/include/qt3/qmap.h \
-  /usr/include/qt3/qpair.h /usr/include/qt3/qlistview.h \
-  /usr/include/qt3/qscrollview.h /usr/include/qt3/qframe.h \
-  /usr/include/qt3/qwidget.h /usr/include/qt3/qpaintdevice.h \
-  /usr/include/qt3/qpalette.h /usr/include/qt3/qsizepolicy.h \
-  /usr/include/qt3/qscrollbar.h /usr/include/qt3/qrangecontrol.h \
-  /usr/include/qt3/qpushbutton.h /usr/include/qt3/qbutton.h \
-  /usr/include/qt3/qkeysequence.h /usr/include/qt3/qiconset.h \
-  /usr/include/qt3/qpixmap.h /usr/include/qt3/qcheckbox.h \
+  qstring-factory.h avltree.h songselector.logic.h \
+  /usr/include/qt3/qtimer.h /usr/include/qt3/qobject.h \
+  /usr/include/qt3/qevent.h /usr/include/qt3/qmime.h \
+  /usr/include/qt3/qmap.h /usr/include/qt3/qpair.h \
+  /usr/include/qt3/qlistview.h /usr/include/qt3/qscrollview.h \
+  /usr/include/qt3/qframe.h /usr/include/qt3/qwidget.h \
+  /usr/include/qt3/qpaintdevice.h /usr/include/qt3/qpalette.h \
+  /usr/include/qt3/qsizepolicy.h /usr/include/qt3/qscrollbar.h \
+  /usr/include/qt3/qrangecontrol.h /usr/include/qt3/qpushbutton.h \
+  /usr/include/qt3/qbutton.h /usr/include/qt3/qkeysequence.h \
+  /usr/include/qt3/qiconset.h /usr/include/qt3/qpixmap.h \
+  /usr/include/qt3/qcheckbox.h /usr/include/qt3/qgroupbox.h \
   /usr/include/qt3/qlineedit.h /usr/include/qt3/qmenubar.h \
   /usr/include/qt3/qpopupmenu.h /usr/include/qt3/qmenudata.h \
   /usr/include/qt3/qsignal.h /usr/include/qt3/qvariant.h songselector.h \
   /usr/include/qt3/qdialog.h song.h config.h cluster.h common.h index.h \
-  database.h avltree.h albumitem.h qsong.h process-manager.h \
-  kbpm-played.h dirscanner.h spectrum.h
+  database.h albumitem.h qsong.h process-manager.h history.h dirscanner.h \
+  spectrum.h
 songplayer.o: songplayer.cpp songplayer.h /usr/include/qt3/qvariant.h \
   /usr/include/qt3/qstring.h /usr/include/qt3/qcstring.h \
   /usr/include/qt3/qmemarray.h /usr/include/qt3/qgarray.h \
@@ -1367,7 +1403,7 @@ songplayer.logic.o: songplayer.logic.cpp /usr/include/qt3/qlcdnumber.h \
   /usr/include/qt3/qapplication.h /usr/include/qt3/qdesktopwidget.h \
   /usr/include/qt3/qasciidict.h /usr/include/qt3/qgdict.h \
   /usr/include/qt3/qtranslator.h player-core.h index.h common.h \
-  songplayer.logic.h /usr/include/qt3/qtimer.h songplayer.h \
+  dsp-drivers.h songplayer.logic.h /usr/include/qt3/qtimer.h songplayer.h \
   /usr/include/qt3/qvariant.h bpm-analyzer.logic.h analyzer.h \
   bpmcounter.h pattern-analyzer.logic.h pattern-analyzer.h \
   spectrumanalyzer.logic.h spectrumanalyzer.h impulseanalyzer.logic.h \
@@ -1426,16 +1462,15 @@ songselector.o: songselector.cpp songselector.h \
   /usr/include/qt3/qsizepolicy.h /usr/include/qt3/qpushbutton.h \
   /usr/include/qt3/qbutton.h /usr/include/qt3/qkeysequence.h \
   /usr/include/qt3/qiconset.h /usr/include/qt3/qpixmap.h \
-  /usr/include/qt3/qgroupbox.h /usr/include/qt3/qframe.h \
-  /usr/include/qt3/qlabel.h /usr/include/qt3/qtabwidget.h \
-  /usr/include/qt3/qheader.h /usr/include/qt3/qlistview.h \
-  /usr/include/qt3/qscrollview.h /usr/include/qt3/qscrollbar.h \
-  /usr/include/qt3/qrangecontrol.h /usr/include/qt3/qlineedit.h \
-  /usr/include/qt3/qlcdnumber.h /usr/include/qt3/qbitarray.h \
-  /usr/include/qt3/qspinbox.h /usr/include/qt3/qcheckbox.h \
-  /usr/include/qt3/qlayout.h /usr/include/qt3/qtooltip.h \
-  /usr/include/qt3/qwhatsthis.h /usr/include/qt3/qcursor.h \
-  /usr/include/qt3/qimage.h
+  /usr/include/qt3/qtabwidget.h /usr/include/qt3/qheader.h \
+  /usr/include/qt3/qlistview.h /usr/include/qt3/qscrollview.h \
+  /usr/include/qt3/qframe.h /usr/include/qt3/qscrollbar.h \
+  /usr/include/qt3/qrangecontrol.h /usr/include/qt3/qlcdnumber.h \
+  /usr/include/qt3/qbitarray.h /usr/include/qt3/qlineedit.h \
+  /usr/include/qt3/qlabel.h /usr/include/qt3/qspinbox.h \
+  /usr/include/qt3/qcheckbox.h /usr/include/qt3/qlayout.h \
+  /usr/include/qt3/qtooltip.h /usr/include/qt3/qwhatsthis.h \
+  /usr/include/qt3/qcursor.h /usr/include/qt3/qimage.h
 songselector.logic.o: songselector.logic.cpp \
   /usr/include/qt3/qinputdialog.h /usr/include/qt3/qdialog.h \
   /usr/include/qt3/qwidget.h /usr/include/qt3/qwindowdefs.h \
@@ -1477,20 +1512,22 @@ songselector.logic.o: songselector.logic.cpp \
   /usr/include/qt3/qcursor.h /usr/include/qt3/qtabwidget.h \
   /usr/include/qt3/qiconset.h /usr/include/qt3/qpixmap.h \
   /usr/include/qt3/qspinbox.h /usr/include/qt3/qradiobutton.h \
-  /usr/include/qt3/qprogressbar.h /usr/include/qt3/qcombobox.h \
+  /usr/include/qt3/qprogressbar.h /usr/include/qt3/qpainter.h \
+  /usr/include/qt3/qpen.h /usr/include/qt3/qpointarray.h \
+  /usr/include/qt3/qwmatrix.h /usr/include/qt3/qcombobox.h \
   importscanner.h scanningprogress.h /usr/include/qt3/qvariant.h \
   songselector.logic.h /usr/include/qt3/qtimer.h \
   /usr/include/qt3/qpushbutton.h /usr/include/qt3/qmenubar.h \
   /usr/include/qt3/qpopupmenu.h /usr/include/qt3/qmenudata.h \
   /usr/include/qt3/qsignal.h songselector.h song.h config.h cluster.h \
   common.h index.h database.h avltree.h albumitem.h dirscanner.h \
-  renamer.logic.h renamer.h about.h tagbox.h albumbox.h qsong.h \
-  kbpm-played.h askinput.h version.h kbpm-dj.h \
-  /usr/include/qt3/qapplication.h /usr/include/qt3/qdesktopwidget.h \
-  /usr/include/qt3/qasciidict.h /usr/include/qt3/qtranslator.h \
-  choose-analyzers.h process-manager.h similarscanner.h similars.h \
-  queuedsong.h historysong.h merger-dialog.h pca.h songtree.h avltree.cpp \
-  edit-distance.h compacter.h index-reader.h scripts.h
+  renamer.logic.h renamer.h about.h albumbox.h qsong.h version.h \
+  kbpm-dj.h /usr/include/qt3/qapplication.h \
+  /usr/include/qt3/qdesktopwidget.h /usr/include/qt3/qasciidict.h \
+  /usr/include/qt3/qtranslator.h choose-analyzers.h process-manager.h \
+  similarscanner.h similars.h queuedsong.h historysong.h merger-dialog.h \
+  pca.h songtree.h avltree.cpp edit-distance.h compacter.h index-reader.h \
+  scripts.h spectrum.h
 songtree.o: songtree.cpp songtree.h /usr/include/qt3/qstring.h \
   /usr/include/qt3/qcstring.h /usr/include/qt3/qmemarray.h \
   /usr/include/qt3/qgarray.h /usr/include/qt3/qshared.h \
@@ -1579,35 +1616,7 @@ spectrumanalyzer.logic.o: spectrumanalyzer.logic.cpp \
   /usr/include/qt3/qslider.h spectrumanalyzer.logic.h songplayer.h \
   /usr/include/qt3/qvariant.h /usr/include/qt3/qdialog.h \
   spectrumanalyzer.h fourier.h kbpm-play.h player-core.h index.h common.h \
-  version.h scripts.h
-tagbox.o: tagbox.cpp tagbox.h /usr/include/qt3/qvariant.h \
-  /usr/include/qt3/qstring.h /usr/include/qt3/qcstring.h \
-  /usr/include/qt3/qmemarray.h /usr/include/qt3/qgarray.h \
-  /usr/include/qt3/qshared.h /usr/include/qt3/qglobal.h \
-  /usr/include/qt3/qconfig.h /usr/include/qt3/qmodules.h \
-  /usr/include/qt3/qfeatures.h /usr/include/qt3/qwinexport.h \
-  /usr/include/qt3/qvaluelist.h /usr/include/qt3/qtl.h \
-  /usr/include/qt3/qtextstream.h /usr/include/qt3/qiodevice.h \
-  /usr/include/qt3/qdatastream.h /usr/include/qt3/qstringlist.h \
-  /usr/include/qt3/qstrlist.h /usr/include/qt3/qptrlist.h \
-  /usr/include/qt3/qglist.h /usr/include/qt3/qptrcollection.h \
-  /usr/include/qt3/qmap.h /usr/include/qt3/qpair.h \
-  /usr/include/qt3/qdialog.h /usr/include/qt3/qwidget.h \
-  /usr/include/qt3/qwindowdefs.h /usr/include/qt3/qobjectdefs.h \
-  /usr/include/qt3/qnamespace.h /usr/include/qt3/qobject.h \
-  /usr/include/qt3/qevent.h /usr/include/qt3/qregion.h \
-  /usr/include/qt3/qrect.h /usr/include/qt3/qsize.h \
-  /usr/include/qt3/qpoint.h /usr/include/qt3/qmime.h \
-  /usr/include/qt3/qpaintdevice.h /usr/include/qt3/qpalette.h \
-  /usr/include/qt3/qcolor.h /usr/include/qt3/qbrush.h \
-  /usr/include/qt3/qfont.h /usr/include/qt3/qfontmetrics.h \
-  /usr/include/qt3/qfontinfo.h /usr/include/qt3/qsizepolicy.h \
-  /usr/include/qt3/qlabel.h /usr/include/qt3/qframe.h \
-  /usr/include/qt3/qlineedit.h /usr/include/qt3/qpushbutton.h \
-  /usr/include/qt3/qbutton.h /usr/include/qt3/qkeysequence.h \
-  /usr/include/qt3/qiconset.h /usr/include/qt3/qpixmap.h \
-  /usr/include/qt3/qlayout.h /usr/include/qt3/qtooltip.h \
-  /usr/include/qt3/qwhatsthis.h /usr/include/qt3/qcursor.h
+  dsp-drivers.h version.h scripts.h
 tempolineanalyzer.o: tempolineanalyzer.cpp tempolineanalyzer.h \
   /usr/include/qt3/qvariant.h /usr/include/qt3/qstring.h \
   /usr/include/qt3/qcstring.h /usr/include/qt3/qmemarray.h \
@@ -1674,8 +1683,9 @@ tempolineanalyzer.logic.o: tempolineanalyzer.logic.cpp \
   /usr/include/qt3/qrangecontrol.h /usr/include/qt3/qslider.h \
   tempolineanalyzer.logic.h songplayer.h /usr/include/qt3/qvariant.h \
   tempolineanalyzer.h common.h fourier.h kbpm-play.h player-core.h \
-  index.h version.h scripts.h
+  index.h dsp-drivers.h version.h scripts.h avltree.cpp avltree.h
 test.o: test.cpp
+unphaser.o: unphaser.cpp fourier.h common.h
 fftmisc.o: fftmisc.c fourier.h
 fixform.o: fixform.c
 fourierd.o: fourierd.c fourier.h ddcmath.h

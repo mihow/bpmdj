@@ -60,6 +60,7 @@ char*   arg_latency = "300";
 char*   arg_rawpath = "./";
 char*   argument;
 Index*  playing = NULL;
+dsp_driver *dsp = NULL;
 
 /*-------------------------------------------
  *         File input oprations
@@ -436,7 +437,7 @@ cue_info cues[4] = {0,0,0,0};
 
 void cue_set()
 {
-   cue=x_normalise(y-dsp_latency());
+   cue=x_normalise(y-dsp->latency());
    printf("Setting cue\n");
 }
 
@@ -575,7 +576,7 @@ void jumpto(signed8 mes, int txt)
       // - we can fix this difference to fit a measure
       // - this fixed difference is added to gotopos.
       signed8 gotopos=y_normalise(cue)-currentperiod*mes;
-      // signed8 difference=gotopos-y+dsp_latency();
+      // signed8 difference=gotopos-y+dsp->latency();
       signed8 difference=gotopos-y;
       signed8 fixeddiff=(difference/currentperiod)*currentperiod;
       y+=fixeddiff;
@@ -594,12 +595,12 @@ void read_write_loop()
 {
   unsigned4 value[1];
   lfo_init();
-  dsp_start();
+  dsp->start();
   while(!stop)
     {
       // wait for pause
-      if (paused) 
-	dsp_pause();
+      if (paused)
+	dsp->pause();
       // calculate value
       x=y*normalperiod/currentperiod;
       if (x>loop_at)
@@ -614,7 +615,7 @@ void read_write_loop()
       y=y+1;
       
       // write value
-      dsp_write(value);
+      dsp->write(value);
     }
 }
 
@@ -686,11 +687,7 @@ int core_init(int sync)
 
 int core_open()
 {
-  int err;
-  //  err = mixer_open();
-  // if (err) return err;
-  err = dsp_open();
-  return err;
+  return dsp->open();
 }
 
 void core_play()
@@ -700,8 +697,7 @@ void core_play()
 
 void core_close()
 {
-   dsp_close();
-   //   mixer_close();
+  dsp->close();
 }
 
 void core_done()

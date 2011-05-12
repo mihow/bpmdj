@@ -1,8 +1,9 @@
-VERSION = 2.3
+VERSION = 2.4
 
 include defines
-BIN = kbpm-play kbpm-dj merger bpmdj-raw rbpm-play xmms-play alsamixerguis
-DOC = authors changelog copyright todo readme ${shell ls *.html *.png *.css *.pdf}
+BIN = kbpm-play kbpm-dj merger bpmdj-raw rbpm-play xmms-play alsamixerguis \
+      bpmdj-replay bpmdj-record record_mixer bpmdj-import-mp3.pl bpmdj-import-ogg.pl
+DOC = authors changelog copyright readme
 UIS = ${shell ls *.ui}
 
 all: $(BIN)
@@ -49,14 +50,14 @@ clean:
 	$(RM) plot.ps gmon.out toplot.dat build sum.tmp fetchfiles.sh
 	$(RM) cbpm-count cbpm-play kbpm-play kbpm-dj kbpm-count merger
 	$(RM) *.moc.cpp *.ui.cpp *.ui.h 
-	$(RM) tagbox.h tagbox.cpp songplayer.h songplayer.cpp
+	$(RM) songplayer.h songplayer.cpp
 	$(RM) albumbox.h albumbox.cpp
 	$(RM) bpmcounter.h bpmcounter.cpp
 	$(RM) setupwizard.h setupwizard.cpp
 	$(RM) scanningprogress.h scanningprogress.cpp
 	$(RM) songselector.h songselector.cpp
 	$(RM) about.h about.cpp legende.h legende.cpp
-	$(RM) askinput.h askinput.cpp loader.h loader.cpp
+	$(RM) loader.h loader.cpp
 	$(RM) compacter.h compacter.cpp
 	$(RM) merger-dialog.h merger-dialog.cpp
 	$(RM) preferences.h preferences.cpp
@@ -79,18 +80,19 @@ mrproper: clean
 install: 
 	for bin in $(BIN); do $(INSTALL) -D -m 755 $$bin ${DESTDIR}/usr/bin/$$bin; done
 	for doc in $(DOC); do $(INSTALL) -D -m 755 $$doc ${DESTDIR}/usr/share/doc/bpmdj/$$doc; done
+	for doc in documentation/*; do $(INSTALL) -D -m 755 documentation/$$doc ${DESTDIR}/usr/share/doc/bpmdj/$$doc; done
 
 uninstall: 
 	for bin in $(BIN); do $(RM) ${DESTDIR}/usr/bin/$$bin; done
 	for doc in $(DOC); do $(RM) ${DESTDIR}/usr/share/doc/bpmdj/$$doc; done
 
 website: 
-	rsync -e ssh -xavz *.html *.css *.png *.pdf krubbens@bpmdj.sourceforge.net:/home/groups/b/bp/bpmdj/htdocs/
+	rsync -e ssh -xavz documentation/* krubbens@bpmdj.sourceforge.net:/home/groups/b/bp/bpmdj/htdocs/
 
 nancy: nens
 nens:	
 	tar -cvzf index.tgz index
-	scp index.tgz root@tnm:/home/nens/
+	scp index.tgz root@orbit:/home/nens/; exit 0
 	mv index.tgz ..
 
 #############################################################################
@@ -108,9 +110,9 @@ include depend
 #############################################################################
 # Objects
 #############################################################################
-KPLAY_OBJECTS = about.o about.moc.o\
+KPLAY_OBJECTS = avltree.o about.o about.moc.o\
 	songplayer.o songplayer.moc.o\
-	player-core.o dsp-drivers.o dsp-oss.o dsp-alsa.o\
+	player-core.o dsp-oss.o dsp-alsa.o dsp-none.o\
 	song-information.o song-information.moc.o\
 	index.o kbpm-play.o analyzer.o\
 	songplayer.logic.o songplayer.logic.moc.o\
@@ -131,16 +133,18 @@ KCOUNT_OBJECTS = bpmcounter.o bpmcounter.moc.o\
 	index.o kbpm-count.o kbpm-count.moc.o\
 	scripts.o merger.o
 
+DUPLOC_OBJECTS = duploc-dialog.o duploc-dialog.moc.o\
+	duploc.o duploc.moc.o
+
+UNPHASER_OBJECTS = unphaser.o common.o fourierd.o fftmisc.o
+
 avltree-test:
 	g++ -pg -g avltree-test.cpp
 
 KSEL_OBJECTS = 	avltree.o songtree.o qstring-factory.o spectrum.o\
-	scripts.o cluster.o pca.o\
-	about.o about.moc.o\
+	scripts.o cluster.o pca.o about.o about.moc.o\
 	loader.o loader.moc.o compacter.o compacter.moc.o\
-	mixinformation.o mixinformation.moc.o\
-	askinput.o askinput.moc.o \
-	tagbox.o tagbox.moc.o albumbox.o albumbox.moc.o\
+	albumbox.o albumbox.moc.o\
 	song-information.o song-information.moc.o\
 	scanningprogress.o scanningprogress.moc.o\
 	choose-analyzers.o choose-analyzers.moc.o\
@@ -149,7 +153,7 @@ KSEL_OBJECTS = 	avltree.o songtree.o qstring-factory.o spectrum.o\
 	process-manager.o playercommandwizard.o playercommandwizard.moc.o\
 	preferences.o preferences.moc.o preferences.logic.o preferences.logic.moc.o\
 	song.o qsong.o queuedsong.o historysong.o\
-	index-reader.o index.o kbpm-played.o albumitem.o\
+	index-reader.o index.o history.o albumitem.o\
 	setupwizard.moc.o setupwizard.o kbpm-dj.o edit-distance.o\
 	renamer.o renamer.moc.o renamer.logic.o renamer.logic.moc.o\
 	similars.o similars.moc.o similarscanner.o similarscanner.moc.o\
@@ -160,8 +164,12 @@ MERGER_OBJECTS = merger.o index.o common.o scripts.o song-information.o song-inf
 #############################################################################
 # Binaries
 #############################################################################
-#cbpm-play: cbpm-play.o index.o player-core.o common.o scripts.o dsp-drivers.o dsp-oss.o dsp-alsa.o
-#	$(CPP) $(CFLAGS) $(LDFLAGS) $^ -o $@
+duploc: $(DUPLOC_OBJECTS)
+	$(CPP) $(DUPLOC_OBJECTS) -o duploc\
+	  $(LDFLAGS) $(QT_INCLUDE_PATH) $(QT_LIBRARY_PATH) $(QT_LIBS)
+
+unphaser: $(UNPHASER_OBJECTS)
+	$(CPP) $(UNPHASER_OBJECTS) -o unphaser $(LDFLAGS)
 
 kbpm-play: $(KPLAY_OBJECTS)
 	$(CPP) $(KPLAY_OBJECTS) -o kbpm-play\
@@ -178,28 +186,33 @@ merger: $(MERGER_OBJECTS)
 #############################################################################
 # Distributions
 #############################################################################
-GOALS = $(DOC) $(BIN)
-
 directories: mrproper
 	$(RM) -r bpmdj-$(VERSION); exit 0
 	$(MKDIR) bpmdj-$(VERSION)
 	$(MKDIR) bpmdj-$(VERSION)/music
 	$(MKDIR) bpmdj-$(VERSION)/index
+	$(MKDIR) bpmdj-$(VERSION)/documentation
 
 source.tgz-dist: directories
 	$(CP) -f * bpmdj-$(VERSION); exit 0
 	$(CP) -fR debian bpmdj-$(VERSION); exit 0
+	$(CP) -fR documentation bpmdj-$(VERSION); exit 0
 	$(RM) -fR bpmdj-$(VERSION)/debian/tmp; exit 0
 	$(RM) -fR bpmdj-$(VERSION)/*.listing
+	$(RM) -fR bpmdj-$(VERSION)/Graphics
+	$(RM) -fR bpmdj-$(VERSION)/CVS
 	$(RM) -f depend
 	$(TAR) -cvzf bpmdj-$(VERSION).source.tgz bpmdj-$(VERSION)
 	$(MV) *.tgz ..
 	$(RM) -r bpmdj-$(VERSION); exit 0
 
+
 bin.tgz-dist: directories
 	$(MAKE) all
 	$(STRIP) $(BIN); exit 0
-	$(CP) -f $(GOALS) bpmdj-$(VERSION); exit 0
+	$(CP) -f $(BIN) bpmdj-$(VERSION); exit 0
+	$(CP) -f $(DOC) bpmdj-$(VERSION); exit 0
+	$(CP) documentation/* bpmdj-$(VERSION)/documentation/; exit 0
 	$(TAR) -cvzf bpmdj-$(VERSION).bin.tgz bpmdj-$(VERSION)
 	$(MV) *.tgz ..
 	$(RM) -r bpmdj-$(VERSION); exit 0
@@ -219,3 +232,5 @@ deb-install: all
 	$(MKDIR) $(DESTDIR)/usr/share/doc/bpmdj; exit 0
 	$(CP) $(BIN) $(DESTDIR)/usr/bin/
 	$(CP) $(DOC) $(DESTDIR)/usr/share/doc/bpmdj/
+	$(CP) documentation/* ${DESTDIR}/usr/share/doc/bpmdj/; exit 0
+	

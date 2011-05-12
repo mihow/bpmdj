@@ -26,6 +26,7 @@
 #include <dirent.h>
 #include <qpushbutton.h>
 #include <qcheckbox.h>
+#include <qgroupbox.h>
 #include <qlineedit.h>
 #include <qmenubar.h>
 #include "songselector.h"
@@ -96,11 +97,12 @@ class SongSelectorLogic:
     void deleteSongFromAlbum(AlbumItem *);
     void doAbout(int pg);
     void updateItemList();
+    void updateFrequencyMap();
     void toggleItem(int which);
     void toggleAutoItem(int which);
     QListViewItem *filterView(QListViewItem * who, QListViewItem * parent);
     void setColor(QColor color);
-    void setPlayerColor(QGroupBox *player, QColor color);
+    void setPlayerColor(QLabel *player, QColor color);
     void songAddTag(QListViewItem * song, const QString & tag);
     void songDelTag(QListViewItem * song, const QString & tag);
     void songEditInfo(QListViewItem * song);
@@ -115,6 +117,9 @@ class SongSelectorLogic:
     virtual void selectSong(QListViewItem* song);
     virtual void doPreferences();
     virtual void openMixer();
+    virtual void openRecorder();
+    virtual void openRecordMixer();
+    virtual void openReplay();
     virtual void doAbout();
     virtual void doLegende();
     virtual void doLicense();

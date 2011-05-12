@@ -43,6 +43,7 @@
 #include <stdio.h>
 #include <signal.h>
 #include <unistd.h>
+#include <qpainter.h>
 #include <qcombobox.h>
 #include <errno.h>
 #include <sys/mount.h>
@@ -52,11 +53,8 @@
 #include "importscanner.h"
 #include "renamer.logic.h"
 #include "about.h"
-#include "tagbox.h"
 #include "albumbox.h"
 #include "qsong.h"
-#include "kbpm-played.h"
-#include "askinput.h"
 #include "version.h"
 #include "kbpm-dj.h"
 #include "choose-analyzers.h"
@@ -73,6 +71,7 @@
 #include "compacter.h"
 #include "index-reader.h"
 #include "scripts.h"
+#include "spectrum.h"
 
 SongSelectorLogic::~SongSelectorLogic()
 {
@@ -108,7 +107,12 @@ SongSelectorLogic::SongSelectorLogic(QWidget * parent, const QString name) :
   // file menu
   file->insertItem("&Preferences",this,SLOT(doPreferences()));
   file->insertItem("&Switch Monitor To Main",this,SLOT(switchMonitorToMain()));
-  file->insertItem("&Mixer", this, SLOT (openMixer()));
+  file->insertItem("Play &Mixers", this, SLOT (openMixer()));
+  file->insertSeparator();
+  file->insertItem("Record", this, SLOT (openRecorder()));
+  file->insertItem("Replay", this, SLOT (openReplay()));
+  file->insertItem("Record Mixers", this, SLOT (openRecordMixer()));
+  file->insertSeparator();
   file->insertItem("&Quit",this,SLOT(quitButton()));
   
   // help menu
@@ -510,7 +514,7 @@ void SongSelectorLogic::setColor(QColor color)
   mainLCD->setBackgroundColor(color);
 }
 
-void SongSelectorLogic::setPlayerColor(QGroupBox *player ,QColor color)
+void SongSelectorLogic::setPlayerColor(QLabel *player ,QColor color)
 {
   player->setPaletteBackgroundColor(color);
 }
@@ -538,73 +542,115 @@ void SongSelectorLogic::updateProcessView()
   color.setHsv(0,0,128);
   if (song)
     {
-      title1->setText(song->title);
-      author1->setText(song->author);
+      title1->setText(song->getDisplayTitle());
+      tempo1->setText(song->tempo);
       color=song->color;
     }
   else
     {
       title1->setText(QString::null);
-      author1->setText(QString::null);
+      tempo1->setText(QString::null);
     }
-  setPlayerColor(player1,color);
+  setPlayerColor(title1,color);
   
   // set monitor song
   song = processManager->playing_songs[1];
   color.setHsv(0,0,128);
   if (song)
     {
-      title2->setText(song->title);
-      author2->setText(song->author);
+      title2->setText(song->getDisplayTitle());
+      tempo2->setText(song->tempo);
       color = song->color;
     }
   else
     {
-      title2->setText("");
-      author2->setText("");
+      title2->setText(QString::null);
+      tempo2->setText(QString::null);
     }
-  setPlayerColor(player2,color);
+  setPlayerColor(title2,color);
 
-  // set monitor song
+  // set first extra player
   song = processManager->playing_songs[2];
   color.setHsv(0,0,128);
   if (song)
     {
-      title3->setText(song->title);
-      author3->setText(song->author);
+      title3->setText(song->getDisplayTitle());
+      tempo3->setText(song->tempo);
       color = song->color;
     }
   else
     {
-      title3->setText("");
-      author3->setText("");
+      title3->setText(QString::null);
+      tempo3->setText(QString::null);
     }
-  setPlayerColor(player3,color);
+  setPlayerColor(title3,color);
 
-  // set monitor song
+  // set second extra player
   song = processManager->playing_songs[3];
   color.setHsv(0,0,128);
   if (song)
     {
-      title4->setText(song->title);
-      author4->setText(song->author);
+      title4->setText(song->getDisplayTitle());
+      tempo4->setText(song->tempo);
       color = song->color;
     }
   else
     {
-      title4->setText("");
-      author4->setText("");
+      title4->setText(QString::null);
+      tempo4->setText(QString::null);
     }
-  setPlayerColor(player4,color);
+  setPlayerColor(title4,color);
   
-  // set main tempo 
-  Song* main = ProcessManager::playingInMain();
-  if (main)
-    mainTempoText->setText(main->tempo);
-  else
-    mainTempoText->setText("");
   // update item list
   updateItemList();
+
+  // update the frequency picture
+  updateFrequencyMap();
+}
+
+void SongSelectorLogic::updateFrequencyMap()
+{
+  QPixmap *pm = new QPixmap(24,100);
+  float mid = 25.0;
+  float hh = 25.0 /* the maximum amplitude */
+    / (25.0); /* the strange scale - normalisation, see file spectrum.cpp */
+  QPainter p;
+  p.begin(pm);
+  QRect r(0,0,24,100);
+  p.fillRect(r,Qt::white);
+  
+  Song * song_a = processManager->playing_songs[0];
+  Song * song_b = processManager->playing_songs[1];
+  QString a = song_a ? song_a->spectrum : QString::null;
+  QString b = song_b ? song_b->spectrum : QString::null;
+  
+  for (int j = 0; j < 24 ; j++)
+    {
+      bool has_a = !a.isNull();
+      bool has_b = !b.isNull();
+      float a_j, b_j;
+      if (has_a)
+	{
+	  a_j = (char)(a.at(j).latin1()) - 'a';
+	  a_j*=scales[j];
+	  p.setPen(Qt::red);
+	  p.drawPoint(j,(int)(mid-hh*a_j));
+	}
+      if (has_b)
+	{
+	  b_j = (char)(b.at(j).latin1()) - 'a';
+	  b_j*=scales[j];
+	  p.setPen(Qt::blue);
+	  p.drawPoint(j,(int)(mid-hh*b_j));
+	}
+      if (has_a && has_b)
+	{
+	  p.setPen(Qt::black);
+	  p.drawPoint(j,(int)(mid-hh*(a_j-b_j)));
+	}
+    }
+  p.end();
+  frequency_map->setPixmap(*pm);
 }
 
 int songFileCompare(const void * a, const void* b)
@@ -619,13 +665,16 @@ int songFileCompare(const void * a, const void* b)
 void SongSelectorLogic::checkDisc()
 {
   // 0 - which CD is this ?
-  AskWhichCd whichCd(NULL,NULL,TRUE);
-  if (whichCd.exec()==whichCd.Rejected) return;
+  bool ok;
+  QString discname = QInputDialog::getText("Check/Import Disc"
+					   ,"1. Insert a CD\n2. Enter its number (without trailing slash)"
+					   ,QLineEdit::Normal,QString::null,&ok,this);
+  if (!ok || discname.isEmpty()) return;
   // 1 - mount cdrom
   execute(MOUNT_CDROM);
   // 2 - Scan directory
   ImportScanner scanner(this);
-  scanner.scan(CDROM,whichCd.LineEdit->text());
+  scanner.scan(CDROM,discname);
   updateItemList();
   // 3 - umount cdrom
   execute(UMOUNT_CDROM);
@@ -634,10 +683,56 @@ void SongSelectorLogic::checkDisc()
 
 void SongSelectorLogic::openMixer()
 {
-  if (Config::mixer_command.isNull())
+  if (Config::mixer_command.isEmpty())
     QMessageBox::message(NULL,"Please insert an appropriate command in the preferences dialog\n");
   else
     spawn(Config::mixer_command);
+}
+
+void SongSelectorLogic::openRecorder()
+{
+  if (Config::record_command.isEmpty())
+    QMessageBox::message(NULL,"Please create an appropriate record command in the preferences dialog\n");
+  else
+    {
+      bool ok;
+      QString trackname = QInputDialog::getText("Record track"
+						,"Please enter the trackname to record"
+						,QLineEdit::Normal,QString::null,&ok,this);
+      if (ok && !trackname.isEmpty())
+	{
+	  char command[1024];
+	  sprintf(command,(const char*)Config::record_command,(const char*)trackname);
+	  spawn(command);
+	}
+    }
+}
+
+void SongSelectorLogic::openReplay()
+{
+  if (Config::record_command.isEmpty())
+    QMessageBox::message(NULL,"Please create an appropriate replay command in the preferences dialog\n");
+  else
+    {
+      bool ok;
+      QString trackname = QInputDialog::getText("Replay track"
+						,"Please enter the trackname to play"
+						,QLineEdit::Normal,QString::null,&ok,this);
+      if (ok && !trackname.isEmpty())
+	{
+	  char command[1024];
+	  sprintf(command,(const char*)Config::replay_command,(const char*)trackname);
+	  spawn(command);
+	}
+    }
+}
+
+void SongSelectorLogic::openRecordMixer()
+{
+  if (Config::record_command.isNull())
+    QMessageBox::message(NULL,"Please create an appropriate record_mixer command in the preferences dialog\n");
+  else
+    spawn((const char*)Config::record_mixer_command);
 }
 
 void SongSelectorLogic::doSpectrumPca(bool fulldatabase)
@@ -1002,7 +1097,12 @@ void SongSelectorLogic::batchAnalyzing()
 	sprintf(frombound,"--low %s",(const char*)(bounds->From->text()));
       if (!bounds->To->text().isEmpty()) 
 	sprintf(tobound,"--high %s",(const char*)(bounds->To->text()));
-      sprintf(tempoLine,"--bpm %s %s",frombound,tobound);
+      int technique;
+      if (bounds->resamplingScan->isChecked()) technique = 1;
+      else if (bounds->ultraLongFFT->isChecked()) technique = 2;
+      else if (bounds->enveloppeSpectrum->isChecked()) technique = 3;
+      else if (bounds->fullAutoCorrelation->isChecked()) technique = 4;
+      sprintf(tempoLine,"--bpm %d %s %s",technique,frombound,tobound);
     }
   if (bounds->spectrumAnalyzer->isChecked())
     sprintf(spectrumLine,"--spectrum");
@@ -1146,19 +1246,22 @@ void SongSelectorLogic::songDelTag(QListViewItem *S, const QString & tag)
 
 void SongSelectorLogic::selectionAddTags()
 {
-  // ask user the tag to add
-  TagBox songdata(NULL,NULL,TRUE);
-  songdata.newTags->setText("");
-  if (songdata.exec()==QDialog::Accepted)
+
+
+  bool ok;
+  QString tags = QInputDialog::getText("Tags"
+				       ,"Enter tags to add (seperated by spaces)"
+				       ,QLineEdit::Normal,QString::null,&ok,this);
+  if (ok && !tags.isEmpty())
     {
       QListViewItemIterator it1(songList);
       for(;it1.current();++it1)
 	{
 	  QSong *svi=(QSong*)it1.current();
 	  if (svi->isSelected() && svi->isVisible()) 
-	    songAddTag(svi,songdata.newTags->text());
+	    songAddTag(svi,tags);
 	}
-      parseTags(songdata.newTags->text());
+      parseTags(tags);
     }
 }
 
@@ -1324,20 +1427,21 @@ void SongSelectorLogic::selectionSetMainSong()
 
 void SongSelectorLogic::selectionDelTags()
 {
-   // ask user the tag to add
-   TagBox songdata(NULL,NULL,TRUE);
-   songdata.newTags->setText("");
-   if (songdata.exec()==QDialog::Accepted)
-     {
-	QListViewItemIterator it1(songList);
-	for(;it1.current();++it1)
-	  {
-	     QSong *svi=(QSong*)it1.current();
-	     if (svi->isSelected() && svi->isVisible()) 
-	       songDelTag(svi,songdata.newTags->text());
-	  }
-	parseTags(songdata.newTags->text());
-     }
+  bool ok;
+  QString tags = QInputDialog::getText("Tags"
+				       ,"Enter tags to delete (seperated by spaces)"
+				       ,QLineEdit::Normal,QString::null,&ok,this);
+  if (ok && !tags.isEmpty())
+    {
+      QListViewItemIterator it1(songList);
+      for(;it1.current();++it1)
+	{
+	  QSong *svi=(QSong*)it1.current();
+	  if (svi->isSelected() && svi->isVisible()) 
+	    songDelTag(svi,tags);
+	}
+      parseTags(tags);
+    }
 }
 
 void SongSelectorLogic::doMarkDups()

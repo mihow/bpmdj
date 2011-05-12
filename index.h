@@ -28,61 +28,6 @@
  *         Index operations
  *-------------------------------------------*/
 
-// A. (v2.2) the transition from index-filename encoded title/remix/author/version
-// to storing this information within the index file itself should be handled very
-// carfeuly because this extra redundancy makes it possible to have al kinds
-// of conflicts
-// - to avoid invalid use of the field index_readfrom we only allow access
-//   through some new methods and rename index_readfrom to meta_filename;
-// - to avoid problems in the renamer box we assume that the filename of the
-//   indexfile is only relevant when the indexfile doesn't contain any
-//   title/author/remiux information. If it does the filename is simply useless
-//   (this information can be obtained through the validTarInformation())
-// - when reading the index file and there is no valid tar information then
-//   we try to obtain it from the filename. If this is possible the index reader
-//   will automatically assign title and so on to the filename.
-// - general dialog box added to change the song information.
-// - de player aanpassen en de selector aanpassen om deze titels te ondersteunen.
-// - uitbreiden van het index formaat om played-informatie te ondersteunen...
-
-// B. (v2.3) add album tags and introduce merging
-// - add album tag as album : nr : title
-// - album tab
-//   - expands album wanneer op geklikt, laat toe een song een nieuw nummer te geven
-//   - songs selecteren en toevoegen door add-queue moet wel marcheren normaal gesproken
-//   - hetzelfde geld voor dubbelklikken, begin de song te spelen
-//   - delete from album
-// - song tab
-//   - insert in album
-// - we moeten de mogelijkheid hebben de song info te editeren van al deze nummers
-//   door snel een nieuw album nummer in te tikken... 
-// / add reading and writing in .bib files (in index)
-//   / keep track of version number
-//   / read .bib file _only_ when correct version or when forced to do so..
-//   / read index in bibfile based on position in the index file. Specified in hex...
-//   / write to index file by appending to it... Make sure the lock is ours...
-//   / when .idx file
-
-// -- revise...
-// B. (v2.3) the transition towards .bib files should be handled carefully
-// - kbpm-play blijft met .idx files werken
-// - selector kan index bundles (.bib) lezen en schrijven
-// - when starting, first scan all .bib files
-// - then import all .idx files and modify the necessary fields when available
-//   a song is either described within the .bib file, or within an index file.
-//   in case it is to be found in the index file, the index file is updated, in the
-//   other situation an update is written to disk... The problem that might arise now 
-//   is what will happen when 
-// - afterward write out the .bib files and remove all .idx/.bib files
-// - the index field of every song has a reference to either the bib or the bun file. 
-//   in case it's a bib file that should be written out, select one and write it out..
-//   because the .bib files are only read by the songselector this shouldn't form many
-//   problems...
-//   after reading the entire tree we should immediatelyl dump the updated tree to disk
-//   so we should read 40M and write 40M every time we start up... Of course only when 
-//   .idx files were encountered. The problems are located within the songs without title..
-//   these cannot be squashed easily...
-
 class AlbumField
 {
  public:
@@ -217,7 +162,7 @@ class Index
   void             set_filename(char* fn)   { index_file = fn; meta_changed = true; };
   // md5 accessors
   char           * get_md5sum()             { return index_md5sum; };
-  void             set_md5sum(char*s)       { if (!index_md5sum || strcmp(index_md5sum,s)!=0) {index_md5sum = s; meta_changed=true; } };
+  void             set_md5sum(char*s)       { if (!index_md5sum || strcmp(index_md5sum,s)!=0) { index_md5sum = s; meta_changed=true; } };
   // tag accessors
   void             set_tags(char * str)     { index_tags = str; };
   char           * get_tags()               { return index_tags; };

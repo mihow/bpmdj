@@ -18,17 +18,29 @@
 ****/
 
 #ifdef COMPILE_OSS
-#include "common.h"
+#include <linux/soundcard.h>
+#include "dsp-drivers.h"
 
-extern int   opt_ossfragments;
-extern char* arg_dsp;
-extern char* arg_ossfragments;
-extern int   opt_oss_nolatencyaccounting;
+class dsp_oss: public dsp_driver
+{
+ private:
+  static int            dsp;
+  static signed8        dsp_writecount;
+  static audio_buf_info dsp_latency;
+  signed8 playcount();
+  void flush();
 
-void    oss_start();
-void    oss_pause();
-void    oss_write(unsigned4 *value);
-signed8 oss_latency();
-int     oss_open();
-void    oss_close();
+ public:
+  static char * arg_dsp;
+  static char * arg_fragments;
+  static int    opt_fragments;
+  static int    opt_nolatencyaccounting;
+  
+  void    start();
+  void    pause();
+  void    write(unsigned4 *value);
+  signed8 latency();
+  int     open();
+  void    close();
+};
 #endif

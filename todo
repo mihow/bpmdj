@@ -1,16 +1,18 @@
-- update alsa settings on webpage
+- bug: rename some index files using the 'find wrong index files' thing, afterward do a 'comapction of the index directoryt'. Clearly, the modified index files should also modify the song list, or else we should reread the index directory after modifying these files
+
+
+- die PCA analyse is eigenlijk niet zooo goed. HEtzelfde geld voor die dColor scale... We kunnen waarschijnlijk ook argumenteren dat de PCA analyse net de grootste variabiliteit vind en dat deze zaken variabel zijn omdat ze nu net niet zo belangrijk zijn...
+- fix the license of the BPM counting algorithm
 - Q: dubbel klikken als de monitor nog aan het spelen is brengt het nieuwe nummer in de queue
 - add xmms --queue in creation command
 - add extra version information in this release
-- cvs commit
 - compile under gentoo
 - logfile doc schrijven
   history documentation
 - centralizeren van een aantal funxties:
   - song.cpp: tonumber serie
   - index.cpp: toint & tohex
-- create full command line counter using the same codebase 
-
+- create full command line counter using the same codebase
 - alles representeren met QStrings ? ? ? 
 - selection menu hotkeys toevoegen... 
   hotkeys toevoegen...
@@ -64,10 +66,8 @@ LATER
     - tonumber centraliseren
     - min/max operators centraliseren
     - inlezen van files in een buffer...
-    - barkbounds in eigen file proppen
     - centralizeren van de vervelende bash-scripts...
     - inlezen van de volledige file en het compressen
-    - kbpm-counter.cpp kbpm-counter.h CountDialog en BpmCountDialog beter consistentere namen geven..
     - merge index_file creation into cbpm-index (kbpm-play.c bevat dergelijke code en import-scanner.cpp)
   - libmd5 gebruiken...
   - opzetten mailinglist...
@@ -107,9 +107,6 @@ kbpm-play:
   - should show remaining time instead of total time
   - when changing an lfo the current phase should remain the same.
 
-documentation:
-  - documentation for the browser
-
 kbpm-dj:
   - setup on a remote machine should be possible.
   - downloaden van mp3's automatically
@@ -118,9 +115,7 @@ kbpm-dj:
   - multiple players (asus, cubical, tnm etc ...) & automatically setup player on other machine
   - play songs at fixed given tempo instead of the tempo of the next song
   - setup - wizard
-       - DSP-parameters verzamelen wanneer gestart wordt
-       - Directories maken als het enigzins mogelijk is. Dit moet niet veranderen. Momenteel is dit namelijk perfect, ze moeten lezen wat er staat anders werkt het niet
-       - Laten selecteren van de directory waar de interesante file steken
-  - Memory stuff:
-    - remove duplicate strings (see qstring-factory.h/.cpp)
-
+    - DSP-parameters verzamelen wanneer gestart wordt
+    - Directories maken als het enigzins mogelijk is. 
+      Dit moet niet veranderen. Momenteel is dit namelijk perfect, ze moeten lezen wat er staat anders werkt het niet
+    - Laten selecteren van de directory waar de interesante file steken

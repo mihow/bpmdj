@@ -35,6 +35,7 @@
 #include <signal.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
+#include <qradiobutton.h>
 #include <libgen.h>
 #include <time.h>
 #include <sys/times.h>
@@ -47,6 +48,9 @@
 #include "pattern-analyzer.logic.h"
 #include "md5-analyzer.h"
 #include "dsp-drivers.h"
+#include "dsp-oss.h"
+#include "dsp-alsa.h"
+#include "dsp-none.h"
 #include "player-core.h"
 #include "scripts.h"
 
@@ -117,6 +121,10 @@ void options_failure(char* err)
 	  "   -F nbr      --fragments nbr       the number of fragments used to play audio.\n" 
 	  "   -X          --nolatencyaccounting does not take into account the latency when marking a cue\n"
 #endif 
+#ifdef COMPILE_NONE
+	  "  --none-driver---------------------------------\n"
+          "               --none                 use no sound driver\n"
+#endif
 #ifdef COMPILE_ALSA
 	  "  --alsa-driver---------------------------------\n"
           "               --alsa                 use OSS driver (default)\n"
@@ -124,7 +132,7 @@ void options_failure(char* err)
 #endif
 	  "  --analysis------------------------------------\n"
 	  "   -b          --batch               no ui output, md5sum is automatically checked\n"
-	  "               --bpm                 measure bpm\n"
+	  "               --bpm [1,2,3,4]       measure bpm with specified technique (default = 1)\n"
 	  //	  "               --pattern             dump pattern\n"
 	  "   -l nbr      --low nbr             lowest bpm to look for (default = 120)\n"
 	  "   -h nbr      --high nbr            highest bpm to look for (default = 160)\n"
@@ -154,9 +162,19 @@ void process_options(int argc, char* argv[])
 	       opt_quiet=1;
 	  else if (strcmp(arg,"batch")==0 ||
 		   strcmp(arg,"b")==0)
-	    opt_batch=1;
+	    {
+	      opt_batch=1;
+	    }
 	  else if (strcmp(arg,"bpm")==0)
-	    opt_bpm=1;
+	    {
+	      if (++i>=argc)
+		options_failure("bpm analysis techinque scanning error");
+	      opt_bpm=atoi(argv[i]);
+	      if (opt_bpm<1) 
+		options_failure("selected bpm analyzing technique too low (starts with 1)\n");
+	      if (opt_bpm>4)
+		options_failure("selected bpm analyzing technique too hi (ends with 4)\n");
+	    }
 	  //	  else if (strcmp(arg,"pattern")==0)
 	  // opt_pattern=1;
 	  else if (strcmp(arg,"verbose")==0 ||
@@ -176,22 +194,28 @@ void process_options(int argc, char* argv[])
 	    {
 	      if (++i>=argc) 
 		options_failure("dsp argument scanning error");
-	      arg_dsp=argv[i];
+	      dsp_oss::arg_dsp=argv[i];
 	    }
 	  else if (strcmp(arg,"fragments")==0 ||
 		   strcmp(arg,"F")==0)
 	    {
-	      opt_ossfragments=1;
+	      dsp_oss::opt_fragments=1;
 	      if (++i>=argc)
 		options_failure("fragments argument scanning error");
-	      arg_ossfragments = argv[i];
+	      dsp_oss::arg_fragments = argv[i];
 	    }
 	  else if (strcmp(arg,"nolatencyaccounting")==0 ||
 		   strcmp(arg,"L")==0)
-	    opt_oss_nolatencyaccounting=1;
+	    dsp_oss::opt_nolatencyaccounting=1;
 	  else if (strcmp(arg,"oss")==0)
 	    {
-	      dsp_driver=dsp_oss;
+	      dsp = new dsp_oss();
+	    }
+#endif
+#ifdef COMPILE_NONE
+	  else if (strcmp(arg,"none")==0)
+	    {
+	      dsp = new dsp_none();
 	    }
 #endif
 #ifdef COMPILE_ALSA
@@ -199,11 +223,11 @@ void process_options(int argc, char* argv[])
 	    {
 	      if (++i>=argc) 
 		options_failure("dsp argument scanning error");
-	      arg_dev=argv[i];
+	      dsp_alsa::arg_dev=argv[i];
 	    }
 	  else if (strcmp(arg,"alsa")==0)
 	    {
-	      dsp_driver=dsp_alsa;
+	      dsp = new dsp_alsa();
 	      if (!opt_latency)
 		arg_latency = "150";
 	    }
@@ -322,6 +346,9 @@ void batch_start()
     {
       BpmAnalyzerDialog *counter = new BpmAnalyzerDialog();
       counter->setBpmBounds(arg_low,arg_high);
+      if (opt_bpm==2) counter->ultraLongFFT->setChecked(true);
+      else if (opt_bpm==3) counter->enveloppeSpectrum->setChecked(true);
+      else if (opt_bpm==4) counter->fullAutoCorrelation->setChecked(true);
       counter->run();
       counter->finish();
       printf("%d. Bpm count: %s\n",nr++,playing->get_tempo_str());

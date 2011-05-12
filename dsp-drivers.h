@@ -19,34 +19,32 @@
 
 #ifndef DSP_DRIVERS
 #define DSP_DRIVERS
-
 #include "common.h"
-#include "dsp-oss.h"
-#include "dsp-alsa.h"
 
-extern int dsp_oss;
-extern int dsp_alsa;
-extern int dsp_driver;
+#ifndef COMPILE_OSS
+#ifndef COMPILE_ALSA
+#ifndef COMPILE_NONE
+#error -------------------------------------------
+#error Should at least compile one dsp driver !!! 
+#error Try using -D COMPILE_OSS, -D COMPILE_ALSA 
+#error        or -D COMPILE_NONE
+#error -------------------------------------------
+#endif
+#endif
+#endif
+
 /*-------------------------------------------
  *         Dsp operations
  *-------------------------------------------*/
-void dsp_start();
-void dsp_pause();
-void dsp_write(unsigned4 *value);
-signed8 dsp_latency();
-int dsp_open();
-void dsp_close();
-
-/*-------------------------------------------
- *         Mixer operations
- *-------------------------------------------*/
-/*int mixer_open();
-void mixer_close();
-int mixer_get_main();
-int mixer_get_pcm();
-void mixer_set_main(int v);
-void mixer_set_pcm(int v);
-*/
-
+class dsp_driver
+{
+  public:
+  virtual void start() = 0;
+  virtual void pause() = 0;
+  virtual void write(unsigned4 *value) = 0;
+  virtual signed8 latency() = 0;
+  virtual int  open() = 0;
+  virtual void close() = 0;
+};
 
 #endif
