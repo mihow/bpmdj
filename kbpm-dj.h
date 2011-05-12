@@ -25,9 +25,11 @@
 #include <qstatusbar.h>
 #include <qmutex.h>
 
+#include "Data/data.h"
+#if (DATA_VERSION_MAJOR != 0) || (DATA_VERSION_MINOR != 2)
+#error "OM-DATA has wrong version number"
+#endif
+
 extern QApplication *app;
 extern const char*   programname;
 extern QStatusBar*   status;
-extern QMutex        bpmdj_busy;
-
-#define EXCLUSIVE QMutexLocker bpmdj_entered(&::bpmdj_busy);

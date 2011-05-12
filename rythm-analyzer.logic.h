@@ -28,6 +28,7 @@ class RythmDialogLogic : public RythmDialog, public ReentrantAnalyzer
  public:
    RythmDialogLogic(SongPlayer*parent=0, const char * name=0, bool modal=FALSE, WFlags f=0);
  public slots:
+   //   virtual void calculateRythmPattern3();
    virtual void calculateRythmPattern2();
    virtual void run() { calculateRythmPattern2();};
    virtual void calculate() { startAnalyzer(); };

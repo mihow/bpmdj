@@ -1,3 +1,22 @@
+/****
+ Om-Data
+ Copyright (C) 2005-2006 Werner Van Belle
+
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+****/
+
 #ifndef OM_COORDINATES_H
 #define OM_COORDINATES_H
 
@@ -17,7 +36,16 @@ template <int D> class To;
 template <int D> class _Coordinate
 {
  protected:
+#ifdef WINDOWS
+  /**
+   * The mingw gcc compiler seems not want to instantiate an array of 0 elements
+   * so we add an extra element which will never be accessed
+   */
+  int coordinate[D+1];
+#endif
+#ifdef LINUX
   int coordinate[D];
+#endif
  public:
   _Coordinate() {for(int d = 0 ; d < D; d++) coordinate[d]=-1;};
   _Coordinate(int x)
@@ -172,6 +200,29 @@ template <int D> class To:       public _Coordinate<D>
   To(int x, int y, int z, int a) : _Coordinate<D>(x,y,z,a) {};
 };
 
+template <int D> class Position: public _Coordinate<D> 
+{
+ public:
+  Position() : _Coordinate<D>(0) {};
+  Position(int x) : _Coordinate<D>(x) {};
+  Position(int x, int y) : _Coordinate<D>(x,y) {};
+  Position(int x, int y, int z) : _Coordinate<D>(x,y,z) {};
+  Position(int x, int y, int z, int a) : _Coordinate<D>(x,y,z,a) {};
+  Position<D> operator /(const int div) const
+    {
+      Position<D> result; iterate_dimensions(d,D,
+	result.coordinate[d]=_Coordinate<D>::coordinate[d]/div);
+      return result;
+    };
+};
+
+template <class T>
+T min(T a, T b)
+{
+   if (a<b) return a;
+   return b;
+}
+
 template <int D> class Size: public _Coordinate<D> 
 {
  public:
@@ -182,23 +233,38 @@ template <int D> class Size: public _Coordinate<D>
   Size(int x, int y, int z, int a) : _Coordinate<D>(x,y,z,a) {};
   Size(int x, int y, int z, int a, int b) : _Coordinate<D>(x,y,z,a,b) {};
   Size(int x, int y, int z, int a, int b, int c) : _Coordinate<D>(x,y,z,a,b,c) {};
-  template<int R> void takeFrom(const Size<R> &from) 
-    {
-      if(R<D)
-	for(int i = 0 ; i < R ; i++) _Coordinate<D>::coordinate[i]=from[i];
-      else
-	for(int i = 0 ; i < D ; i++) _Coordinate<D>::coordinate[i]=from[i];
-    }
-};
 
-template <int D> class Position: public _Coordinate<D> 
-{
- public:
-  Position() : _Coordinate<D>(0) {};
-  Position(int x) : _Coordinate<D>(x) {};
-  Position(int x, int y) : _Coordinate<D>(x,y) {};
-  Position(int x, int y, int z) : _Coordinate<D>(x,y,z) {};
-  Position(int x, int y, int z, int a) : _Coordinate<D>(x,y,z,a) {};
+   /**
+    * Calculates the maximum size a subarray can have 
+    * when we start at position pos
+    */
+   void operator()(const From<D>& pos)
+     {
+	for(int i = 0 ; i < D ; i++) 
+	  {
+	     int ws = _Coordinate<D>::coordinate[i];
+	     ws -= pos[i];
+	     if(ws<0) ws=0;
+	     _Coordinate<D>::coordinate[i]=ws;
+	  }
+     }
+   
+   /**
+    * Will take the intersection of the two size boxes
+    */
+   void min(const Size<D> & o)
+     {
+	for(int i = 0 ; i < D ; i++)
+	  _Coordinate<D>::coordinate[i]=::min(_Coordinate<D>::coordinate[i],o[i]);
+     }
+   
+   template<int R> void takeFrom(const Size<R> &from) 
+     {
+	if(R<D)
+	  for(int i = 0 ; i < R ; i++) _Coordinate<D>::coordinate[i]=from[i];
+	else
+	  for(int i = 0 ; i < D ; i++) _Coordinate<D>::coordinate[i]=from[i];
+     }
 };
 
 typedef Position<2> XY;

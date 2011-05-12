@@ -60,7 +60,7 @@ class ThreadedAnalyzer: public Analyzer
   volatile bool stop_signal;
  public:
   void doit();
-  void doitwrapper();
+  //  void doitwrapper();
  public:
   ThreadedAnalyzer();
   virtual void startStopAnalyzer();
@@ -72,8 +72,6 @@ class ThreadedAnalyzer: public Analyzer
   
   virtual void run() = 0;
   // fill this in with appropriate logic
-  virtual void store() = 0;
-  // fill in with appropriate index store logic
 };
 
 #endif

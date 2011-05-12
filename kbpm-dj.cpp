@@ -226,25 +226,9 @@ int main(int argc, char* argv[])
   main_window.initialize_extras();
   // 5. Some extra version dependent blurb...
   if (!Config::get_shown_aboutbox())
-    {
-      if (MAGIC_NOW == MAGIC_2_1)
-	QMessageBox::message(NULL,"The player now supports OSS and ALSA, together\n"
-			     "with an extra (obligatory) parameter to specify where the\n"
-			     ".raw files are to be stored. Therefore, please go to\n"
-			     "Preferences and create suitable player commands");
-      if (MAGIC_NOW == MAGIC_2_5)
-	QMessageBox::message(NULL,"The selector has now a much better spectrum-matching\n"
-			     "algorithm. Please go to Preferences|spectrum to revert it\n"
-			     "back to the old (lesser accurate) version.\n"
-			     "Also, be sure to look at the fragment sequencer of the player !\n");
-      if (MAGIC_NOW == MAGIC_2_7)
-	QMessageBox::message(NULL,"This highly improved version of BpmDj can now\n"
-			     "analyze echo, rythm and composition characteristics !\n"
-			     "Be sure to read the copyright and licensing information.\n");
-      if (MAGIC_NOW == MAGIC_2_8)
-	QMessageBox::message(NULL,"BpmDj now depends on mplayer instead of mpg123 & ogg123\n"
-			     "make sure you have mplayer installed properly.\n");
-    }
+    if (MAGIC_NOW == MAGIC_2_8)
+      QMessageBox::message(NULL,"BpmDj now depends on mplayer instead of mpg123 & ogg123\n"
+			   "make sure you have mplayer installed properly.\n");
   
   // show the window immediatelly
   main_window.show();

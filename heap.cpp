@@ -33,8 +33,8 @@ public:
   {
     printf(" %s : %g",(const char*)song->getDisplayTitle(),song->get_color_distance());
   };
-  int SongWithDistance::compareSearchData(Song* w);
-  int SongWithDistance::compareAddData(Node<Song*>* n);
+  int compareSearchData(Song* w);
+  int compareAddData(Node<Song*>* n);
 };
 
 int SongWithDistance::compareAddData(Node<Song*>* n)

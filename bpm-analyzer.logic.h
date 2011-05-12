@@ -17,6 +17,8 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
+#include <qstring.h>
+#include "kbpm-play.h"
 #include "analyzer.h"
 #include "songplayer.h"
 #include "bpmcounter.h"
@@ -25,11 +27,11 @@ typedef double fft_type;
 
 class BpmAnalyzerDialog : public CountDialog, ThreadedAnalyzer
 {
-   Q_OBJECT
- private:
-   // fine scanning
+  Q_OBJECT
+private:
+  // fine scanning
    unsigned char * audio;
-   unsigned long   audiosize;
+     signed long   audiosize;
    unsigned long   audiorate;
    unsigned long   startbpm, stopbpm;
    unsigned long   startshift, stopshift;
@@ -63,9 +65,15 @@ class BpmAnalyzerDialog : public CountDialog, ThreadedAnalyzer
    unsigned long phasefit(unsigned long i);
    unsigned long phasefit(unsigned long i, unsigned long clip);
    void          rayshoot_scan();
-   void          peak_scan();   // scan based on fft-peaks
-   void          readAudio();  // reads the file in memory
+   void          peak_scan();                    // scan based on fft-peaks
+   void          readAudio();                    // reads the file in memory
    void          readAudioBlock(int blocksize);  // reads the file in memory divided by blocks
+ private:
+   // some functions that linkt he analyzer to qt visualisation functions
+   // these are necessary because Qt requries that all the qt depended functions
+   // are accessed from the same thread (or that any other thread holds a lock)
+   void status(QString text);
+   void set_labels();
  public:
    void          setBpmBounds(long start, long stop);
    void          getMd5();     // retrieves MD5 sum
@@ -81,11 +89,10 @@ class BpmAnalyzerDialog : public CountDialog, ThreadedAnalyzer
    virtual void stopAnalyzer();
    virtual void stoppedAnalyzing();
    virtual void timerTick();
- 
+   
    // call this if you want to stop the current process
    virtual void finish();
-   virtual void store();
- 
+   
    // user interface responses
    virtual void tap();
    virtual void reset();

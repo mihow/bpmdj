@@ -18,7 +18,9 @@
 ****/
 
 #include <stdio.h>
+#include "Data/array.h"
 
 long   fsize(FILE * f);
 long   readsamples(void* target, int count, FILE* file);
+long   readsamples(Array<1,float4>& target, FILE* file);
 long   writesamples(void* target, int count, FILE* file);

@@ -70,7 +70,7 @@ class QSong: public QVectorViewData
     static QColor * colorOfTempoCol(const Song* main, Song* song);
     static QColor * colorOfAuthorCol(Song * song);
     static QColor * colorOfPlaycount(Song * song);
-    static QColor * QSong::colorOfdColorCol(Song* song);
+    static QColor * colorOfdColorCol(Song* song);
     static void playedAuthorAtTime(int i, int t) {get_songs(i)->set_played_author_at_time(t);};
     static QString Text(Song * j, int i);
 };

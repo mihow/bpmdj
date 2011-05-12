@@ -1,0 +1,6 @@
+QT_INCLUDE_PATH=-I/usr/include/qt3/
+QT_LIBRARY_PATH=
+QT_LIBS= -lqt-mt
+
+#CPP = g++ -g -O0 -Wall -W
+CPP = g++ -O3 -Wall -W

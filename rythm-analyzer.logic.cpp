@@ -360,7 +360,7 @@ void write_out_projection(long slice_size, unsigned4* phases, int maximum_slice,
  * In this routine we go through the song window size by window size and 
  * we subtract the energy of x windows ago, we keep the phase as it was. 
  */
-void write_out_projection_hald_working(long slice_size, unsigned4* phases, int maximum_slice, const char* target)
+void write_out_projection_hald_working(unsigned long slice_size, unsigned4* phases, int maximum_slice, const char* target)
 {
   int frame_size = higher_power_of_two(2 * WAVRATE / 40);
   Signal<double,2> curr_frame(frame_size);

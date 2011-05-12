@@ -1,5 +1,8 @@
+3.1
+  ksel  - fixed import scanner box to not mention the no longer working scripts	 
 3.0
   kplay - fixed tab order in some dialogs	
+  ksel  + changed index file format
 2.9
   kplay - unknown tempo crashed the beatgraph
   ksel  + keeps output log from different players	

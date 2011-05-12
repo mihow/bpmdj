@@ -139,9 +139,9 @@ void BeatGraphAnalyzer::readFileSigned()
 	}
       pos+=count;
     }
-  
+
   fclose(raw);
-  
+
   // normalize the audio
   uncompressed maximum = 0;
   for(int i = 0 ; i < audiosize/COLLAPSE ; i++)
@@ -152,7 +152,6 @@ void BeatGraphAnalyzer::readFileSigned()
   for(int i = 0 ; i < audiosize/COLLAPSE ; i++)
     signed_data[i]/=maximum;
 }
-
 
 /**
  * This function shows the energy pattern stored in the data field.

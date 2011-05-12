@@ -17,20 +17,19 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#include <qapplication.h>
-#include "player-core.h"
+#ifndef BPMDJ_EVENT_H
+#define BPMDJ_EVENT_H
+#include "custom-event.h"
 
-#include "Data/data.h"
-#if (DATA_VERSION_MAJOR != 0) || (DATA_VERSION_MINOR != 2)
-#error "OM-DATA has wrong version number"
+class SongSelectorLogic;
+
+class BpmDjEvent: public BpmEvent
+{
+ public:
+  BpmDjEvent() : BpmEvent(BpmDjCustom)
+    {
+    }
+  virtual void run(SongSelectorLogic * song_selector_window) = 0;
+};
+
 #endif
-
-extern QApplication    * app;
-extern PlayerConfig    * config;
-extern SongPlayerLogic * player_window;
-extern char * arg_config;
-
-QString get_rawpath();
-bool show_error(int err, int err2, const char*text);
-void msg_playing_state_changed();
-void msg_writing_finished();

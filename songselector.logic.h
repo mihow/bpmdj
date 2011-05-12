@@ -27,6 +27,7 @@
 #include <qcheckbox.h>
 #include <qgroupbox.h>
 #include <qlineedit.h>
+#include <qmutex.h>
 #include <qmenubar.h>
 #include "songselector.h"
 #include "song.h"
@@ -62,6 +63,7 @@ public SongSelector, public ProcessChanged, public AnalyzerChanged
     int mainTicks;
     QPopupMenu *selection;
     QPopupMenu *queuemenu;
+    QMutex lock;
   public:
     QVectorView* songList;
     DataBase *database;
@@ -184,6 +186,9 @@ public SongSelector, public ProcessChanged, public AnalyzerChanged
 
     // taglist things
     virtual void changeTagList(QListViewItem* item, const QPoint & pos, int col);
+
+    // other
+    void customEvent(QCustomEvent * e);
 };
 
 extern SongSelectorLogic * song_selector_window;

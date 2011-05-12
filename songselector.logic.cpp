@@ -98,6 +98,7 @@
 #include "history.h"
 #include "log-viewer.logic.h"
 #include <qaction.h>
+#include "bpmdj-event.h"
 
 #define foreach_qsong(V,B)  for(int V##idx = 0 ; V##idx < QSong::get_song_count() ; V##idx++) { Song * V = QSong::get_songs(V##idx); B ; } 
 #define foreach_selected_qsong(V,B) foreach_qsong ( V, if ( QSong::get_selected(V##idx) ) { B ; } ; )
@@ -106,14 +107,15 @@ SongSelectorLogic * song_selector_window = NULL;
 
 SongSelectorLogic::~SongSelectorLogic()
 {
+  QMutexLocker _ml(&lock);
   delete processManager;
   delete database;
 }
 
 SongSelectorLogic::SongSelectorLogic(QWidget * parent, const QString name) :
-  SongSelector(parent,name)
+  SongSelector(parent,name), lock(true)
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
   QGridLayout* statuslayout = new QGridLayout(statusframe, 1, 1, 0, 0); 
   status = new QStatusBar(statusframe);
   status -> setSizeGripEnabled(false);
@@ -313,11 +315,13 @@ SongSelectorLogic::SongSelectorLogic(QWidget * parent, const QString name) :
 
 void SongSelectorLogic::initialize_using_config()
 {
+  QMutexLocker _ml(&lock);
   updateProcessView(false);
 };
 
 void SongSelectorLogic::linkViewProp(ConfigState & p, QPopupMenu *m, QString t)
 {
+  QMutexLocker _ml(&lock);
   p.setMenuText(t);
   p.addTo(m);
   connect(&p,SIGNAL(toggled()),this,SLOT(updateItemList()));
@@ -325,13 +329,14 @@ void SongSelectorLogic::linkViewProp(ConfigState & p, QPopupMenu *m, QString t)
 
 void SongSelectorLogic::linkAutoProp(ConfigState & p, QPopupMenu *m, QString t)
 {
+  QMutexLocker _ml(&lock);
   p.setMenuText(t);
   p.addTo(m);
 }
 
 void SongSelectorLogic::toggle_temporange()
 {
-  EXCLUSIVE;
+  QMutexLocker _ml(&lock);
   bool newstate =  !(Config::limit_uprange.isOn() || Config::limit_downrange.isOn());
   Config::limit_uprange.setOn(newstate);
   Config::limit_downrange.setOn(newstate);
@@ -339,7 +344,6 @@ void SongSelectorLogic::toggle_temporange()
 
 bool checkDocsAt(QString pos)
 {
-  EXCLUSIVE
   QString p = pos+"/bpmdj.html";
   if (!exists(p)) return false;
   p = pos+"/index.html";
@@ -348,7 +352,7 @@ bool checkDocsAt(QString pos)
 
 void SongSelectorLogic::doOnlineHelp()
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
   // data location
   QString pos;
   QString pp = dirname(strdup(programname));
@@ -372,7 +376,7 @@ void SongSelectorLogic::doOnlineHelp()
 
 void SongSelectorLogic::doBackup()
 {
-  EXCLUSIVE;
+  QMutexLocker _ml(&lock);
   time_t t_in=time(&t_in);
   struct tm * t = NULL;
   t = localtime(&t_in);
@@ -381,7 +385,6 @@ void SongSelectorLogic::doBackup()
 
 void* goSpectrumPca(void * whatever)
 {
-  EXCLUSIVE
   SongSelectorLogic* ss = (SongSelectorLogic*)whatever;
   ss -> doSpectrumPca(true,false);
   status->message("Spectrum PCA finished",2000);
@@ -390,21 +393,21 @@ void* goSpectrumPca(void * whatever)
 
 void SongSelectorLogic::start_spectrum_pca()
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
   pthread_t *checker = bpmdj_allocate(1,pthread_t);
   pthread_create(checker,NULL,goSpectrumPca,this); 
 }
 
 void SongSelectorLogic::start_existence_check()
-{
-  EXCLUSIVE
+{ 
+  QMutexLocker _ml(&lock);
   database->start_existence_check();
 }
 
 void SongSelectorLogic::initialize_extras()
-{
-  EXCLUSIVE
-  // first parse all the tags...
+{ 
+  QMutexLocker _ml(&lock);
+ // first parse all the tags...
   parse_tags();
   bool ok = false;
   QListViewItem * e = NULL;
@@ -472,7 +475,7 @@ void SongSelectorLogic::initialize_extras()
 
 void SongSelectorLogic::parse_tags()
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
   if (!Tags::new_tags) return;
   for(int i = 0 ; i < Tags::tag_names.count ; i++)
     addTag(Tags::tag_names.elements[i]);
@@ -481,7 +484,7 @@ void SongSelectorLogic::parse_tags()
 
 void SongSelectorLogic::acceptNewSong(Song* song)
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
   database->add(song);
 }
 
@@ -489,7 +492,7 @@ static bool alreadygavefilterwarning = false;
 
 void SongSelectorLogic::reread_and_repaint(Song* song)
 {
-  EXCLUSIVE;
+  QMutexLocker _ml(&lock);
   assert(song);
   song->reread();
   int a,b;
@@ -505,7 +508,7 @@ void SongSelectorLogic::reread_and_repaint(Song* song)
 
 void SongSelectorLogic::updateItemList()
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
   parse_tags();
   // if no song is playing...
   // backup & untoggle certain properties..
@@ -578,7 +581,7 @@ void SongSelectorLogic::updateItemList()
 
 void SongSelectorLogic::updateColors()
 {
-  EXCLUSIVE;
+  QMutexLocker _ml(&lock);
   if (mainTicks<Config::get_yellowTime())
     setColor(Config::get_color_green_time());
   else if (mainTicks<Config::get_orangeTime())
@@ -597,8 +600,10 @@ void SongSelectorLogic::timerTick()
    * below. We don' want that because then we might have 
    * race conditions.
    */
-  if (::bpmdj_busy.locked()) return;
-  EXCLUSIVE
+  if (!lock.tryLock()) return;
+  QMutexLocker _ml(&lock);
+  lock.unlock();
+  
   mainLCD->display(++mainTicks);
   if (mainTicks==1 
       || mainTicks==Config::get_yellowTime()
@@ -642,7 +647,7 @@ void SongSelectorLogic::timerTick()
 
 void SongSelectorLogic::setColor(QColor color)
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
   if (Config::get_color_main_window())
     {
       setPaletteBackgroundColor(color);
@@ -658,7 +663,7 @@ void SongSelectorLogic::setColor(QColor color)
 
 void SongSelectorLogic::setPlayerColor(QLabel *player ,QColor color)
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
   int r,g,b;
   color.getRgb(&r,&g,&b);
   if (r<128 && g < 128 && b < 128) 
@@ -669,20 +674,20 @@ void SongSelectorLogic::setPlayerColor(QLabel *player ,QColor color)
 
 void SongSelectorLogic::resetCounter()
 {
-  EXCLUSIVE;
+  QMutexLocker _ml(&lock);
   mainTicks=-1;
 }
 
 void SongSelectorLogic::switchMonitorToMain()
 {
-  EXCLUSIVE;
+  QMutexLocker _ml(&lock);
   // forced switch
   processManager->switchMonitorToMain();
 }
 
 void SongSelectorLogic::updateProcessView(bool main_changed)
 {
-  EXCLUSIVE;
+  QMutexLocker _ml(&lock);
   // update item list
   if (main_changed) updateItemList();
   // update the frequency picture
@@ -691,7 +696,7 @@ void SongSelectorLogic::updateProcessView(bool main_changed)
 
 void SongSelectorLogic::show_freq_shaping_dialog()
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
   if (!frequency_dialog)
     frequency_dialog = new FrequencyDialog();
   if (frequency_dialog->isVisible())
@@ -702,7 +707,7 @@ void SongSelectorLogic::show_freq_shaping_dialog()
 
 void SongSelectorLogic::updateFrequencyMap()
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
   if (!frequency_dialog || !frequency_dialog->isVisible()) return;
   QPixmap *pm = new QPixmap(spectrum_size,200);
   QPainter p;
@@ -761,7 +766,6 @@ void SongSelectorLogic::updateFrequencyMap()
 
 int songFileCompare(const void * a, const void* b)
 {
-  EXCLUSIVE
   Song **pa=(Song**)a;
   Song **pb=(Song**)b;
   Song *A=*pa;
@@ -771,7 +775,7 @@ int songFileCompare(const void * a, const void* b)
 
 void SongSelectorLogic::checkDisc()
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
   // 0 - which CD is this ?
   bool ok;
   QString discname = QInputDialog::getText("Check/Import Disc"
@@ -790,7 +794,7 @@ void SongSelectorLogic::checkDisc()
 
 void SongSelectorLogic::openMixer()
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
   if (Config::get_mixer_command().isEmpty())
     QMessageBox::message(NULL,"Please insert an appropriate command in the preferences dialog\n");
   else
@@ -799,7 +803,7 @@ void SongSelectorLogic::openMixer()
 
 void SongSelectorLogic::openBpmMixer()
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
   if (Config::get_bpm_mixer_command().isEmpty())
     QMessageBox::message(NULL,"Please insert an appropriate command in the preferences dialog\n");
   else
@@ -808,7 +812,7 @@ void SongSelectorLogic::openBpmMixer()
 
 void SongSelectorLogic::openRecorder()
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
   if (Config::get_record_command().isEmpty())
     QMessageBox::message(NULL,"Please create an appropriate record command in the preferences dialog\n");
   else
@@ -828,7 +832,7 @@ void SongSelectorLogic::openRecorder()
 
 void SongSelectorLogic::openReplay()
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
   if (Config::get_record_command().isEmpty())
     QMessageBox::message(NULL,"Please create an appropriate replay command in the preferences dialog\n");
   else
@@ -848,7 +852,7 @@ void SongSelectorLogic::openReplay()
 
 void SongSelectorLogic::openRecordMixer()
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
   if (Config::get_record_command().isNull())
     QMessageBox::message(NULL,"Please create an appropriate record_mixer command in the preferences dialog\n");
   else
@@ -857,7 +861,7 @@ void SongSelectorLogic::openRecordMixer()
 
 void SongSelectorLogic::doSpectrumPca(bool fulldatabase, bool update_process_view)
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
   int count = 0;
   float ** data;
   GrowingArray<Song*>* all = NULL;
@@ -971,7 +975,7 @@ void SongSelectorLogic::doSpectrumPca(bool fulldatabase, bool update_process_vie
 
 void SongSelectorLogic::doClustering()
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
   // 0. Clear all existing colors
   QColor white(0,0,0);
   GrowingArray<Song*> * all = database->getAllSongs();
@@ -1001,7 +1005,7 @@ void SongSelectorLogic::doClustering()
 
 void SongSelectorLogic::exportPlayList()
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
   // count nr of files to get 
   int selectionCount= queue->childCount();
   int next = 0;
@@ -1033,7 +1037,7 @@ void SongSelectorLogic::exportPlayList()
 
 void SongSelectorLogic::fetchSelection()
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
   /* count nr of files to get */
   int selectionCount = 0;
   foreach_selected_qsong(svi, {svi=svi; selectionCount ++;});
@@ -1110,7 +1114,7 @@ void SongSelectorLogic::fetchSelection()
  */
 void SongSelectorLogic::queueAnalysis()
 {
-  EXCLUSIVE;
+  QMutexLocker _ml(&lock);
   foreach_selected_qsong(svi, 
 			 new QueuedAnalSong(anal_queue,svi));
   bool there_is_one = false;
@@ -1124,7 +1128,7 @@ void SongSelectorLogic::queueAnalysis()
 
 void SongSelectorLogic::toAnalyzeOrNot()
 {
-  EXCLUSIVE;
+  QMutexLocker _ml(&lock);
   for(int i = 0 ; i < 8 ; i ++)
     if (analyzers->slot_free(i))
       startAnotherAnalyzer(NULL,i);
@@ -1137,7 +1141,7 @@ void SongSelectorLogic::toAnalyzeOrNot()
  */
 void SongSelectorLogic::startAnotherAnalyzer(Song * finished_analyzing, int on_slot)
 {
-  EXCLUSIVE;
+  QMutexLocker _ml(&lock);
   // reread the song which has finished
   QString analTag(QString("NoAnalysis@#")+QString::number(on_slot));
   if (finished_analyzing)
@@ -1199,7 +1203,7 @@ void SongSelectorLogic::startAnotherAnalyzer(Song * finished_analyzing, int on_s
 
 void SongSelectorLogic::selectSong(int i)
 {
-  EXCLUSIVE;
+  QMutexLocker _ml(&lock);
   Song * song = QSong::songEssence(i);
   if (!song) return;
   if (Config::players[0].isEmpty() ||
@@ -1214,7 +1218,7 @@ void SongSelectorLogic::selectSong(int i)
 
 void SongSelectorLogic::playQueueSong(QListViewItem *song)
 {
-  EXCLUSIVE;
+  QMutexLocker _ml(&lock);
   if (!song) return;
   QueuedSong * qs = (QueuedSong*)song;
   Song * s = qs->getSong();
@@ -1224,7 +1228,7 @@ void SongSelectorLogic::playQueueSong(QListViewItem *song)
 
 void SongSelectorLogic::playHistorySong(QListViewItem *song)
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
   if (!song) return;
   HistorySong * hs = (HistorySong*)song;
   Song * s = hs->getSong();
@@ -1233,18 +1237,20 @@ void SongSelectorLogic::playHistorySong(QListViewItem *song)
 }
 
 void SongSelectorLogic::savePlayHistory()
-{
-  History::save_history();
+{ 
+  QMutexLocker _ml(&lock);
+ History::save_history();
 }
 
 void SongSelectorLogic::clearPlayHistory()
 {
+  QMutexLocker _ml(&lock);
   History::clear_history(database);
 }
 
 void SongSelectorLogic::doPreferences()
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
   if (Config::open_ui())
     {
       updateItemList();
@@ -1255,7 +1261,7 @@ void SongSelectorLogic::doPreferences()
 
 void SongSelectorLogic::songAddTag(Song *song, const QString & tag)
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
   QString index = song->get_storedin();
   // read the index file
   Index * idx = new Index(index);
@@ -1272,7 +1278,7 @@ void SongSelectorLogic::songAddTag(Song *song, const QString & tag)
 
 void SongSelectorLogic::songSetAuthor(Song *song, const QString & tag)
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
   QString index = song->get_storedin();
   // read the index file
   Index * idx = new Index(index);
@@ -1284,7 +1290,7 @@ void SongSelectorLogic::songSetAuthor(Song *song, const QString & tag)
 
 void SongSelectorLogic::insertSongInAlbum(Song * song, const QString & album, int nr)
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
   QString index = song->get_storedin();
   // read the index file
   Index * idx = new Index(index);
@@ -1302,7 +1308,7 @@ void SongSelectorLogic::insertSongInAlbum(Song * song, const QString & album, in
 
 void SongSelectorLogic::songEditInfo(Song *song)
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
   QString index = song->get_storedin();
   Index * idx = new Index(index);
   idx->executeInfoDialog();
@@ -1318,7 +1324,7 @@ void SongSelectorLogic::songEditInfo(Song *song)
 
 void SongSelectorLogic::songDelTag(Song * song, const QString & tag)
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
   char* newtags;
   // read the index file
   Index * index = new Index(song->get_storedin());
@@ -1342,7 +1348,7 @@ void SongSelectorLogic::songDelTag(Song * song, const QString & tag)
 
 void SongSelectorLogic::selectionAddTags()
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
   bool ok;
   QString tags = QInputDialog::getText("Tags"
 				       ,"Enter tags to add (seperated by spaces)"
@@ -1353,7 +1359,7 @@ void SongSelectorLogic::selectionAddTags()
 
 void SongSelectorLogic::selectionSetAuthor()
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
   bool ok;
   QString text = QInputDialog::getText("Set Author...", 
 				       "Please enther the author name to be", 
@@ -1365,7 +1371,7 @@ void SongSelectorLogic::selectionSetAuthor()
 
 void SongSelectorLogic::selectionInsertInAlbum()
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
   static QString last = "";
   static int lastnr = 0;
   AlbumBox albumbox(NULL,NULL,TRUE);
@@ -1381,14 +1387,14 @@ void SongSelectorLogic::selectionInsertInAlbum()
 
 void SongSelectorLogic::selectionEditInfo()
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
   foreach_selected_qsong(svi, songEditInfo(svi));
 }
 
 void SongSelectorLogic::selectionPlayIn3th()
 {
 #ifdef INCOMPLETE_FEATURES
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
   foreach_selected_qsong(svi,
 			 processManager->startExtraSong(2,svi);
 			 return);
@@ -1398,7 +1404,7 @@ void SongSelectorLogic::selectionPlayIn3th()
 void SongSelectorLogic::selectionPlayIn4th()
 {
 #ifdef INCOMPLETE_FEATURES
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
   foreach_selected_qsong(svi,
 			 processManager->startExtraSong(3,svi);
 			 return);
@@ -1407,7 +1413,7 @@ void SongSelectorLogic::selectionPlayIn4th()
 
 void SongSelectorLogic::selectionAddQueue()
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
   queue->selectAll(false);
   QueuedSong *last = (QueuedSong*)queue->lastItem();
   if (last) last->setSelected(true);
@@ -1417,7 +1423,7 @@ void SongSelectorLogic::selectionAddQueue()
 
 void SongSelectorLogic::doAutoMix()
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
   // first obtain some interesting parameters..
   MergerDialog mergerDialog(this);
   int result = mergerDialog.exec();
@@ -1489,7 +1495,7 @@ void SongSelectorLogic::doAutoMix()
 
 void SongSelectorLogic::selectionSetMainSong()
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
   static bool dialog_shown=false;
   if (!dialog_shown)
     {
@@ -1504,7 +1510,7 @@ void SongSelectorLogic::selectionSetMainSong()
 
 void SongSelectorLogic::selectionDelTags()
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
   bool ok;
   QString tags = QInputDialog::getText("Tags"
 				       ,"Enter tags to delete (seperated by spaces)"
@@ -1515,19 +1521,20 @@ void SongSelectorLogic::selectionDelTags()
 
 void SongSelectorLogic::doLicense()
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
   ::doAbout(2);
 }
 
 void SongSelectorLogic::doAbout()
 {
-  EXCLUSIVE;
+  QMutexLocker _ml(&lock);
   ::doAbout(1);
 }
 
 void SongSelectorLogic::searchLineEntered()
 {
-  EXCLUSIVE;
+  QMutexLocker _ml(&lock);
+  ;
   searchLine -> setText(searchLine->text().upper());
   updateItemList();
   songList->setFocus();
@@ -1535,13 +1542,15 @@ void SongSelectorLogic::searchLineEntered()
 
 void SongSelectorLogic::quitButton()
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
+  
    close();
 }
 
 void SongSelectorLogic::selectAllButTagged()
-{
-  EXCLUSIVE
+{ 
+  QMutexLocker _ml(&lock);
+ 
   QListViewItemIterator it(tagList);
   while(it.current())
     {
@@ -1557,7 +1566,8 @@ void SongSelectorLogic::selectAllButTagged()
 
 void SongSelectorLogic::selectAllTags()
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
+  
   QListViewItemIterator it(tagList);
   while(it.current())
     {
@@ -1580,7 +1590,8 @@ void SongSelectorLogic::selectAllTags()
 
 void SongSelectorLogic::addTag(const QString tag)
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
+  
   if (tagList->findItem(tag,TAGS_TEXT)) return;
   new QListViewItem(tagList,tag,TAG_FALSE,TAG_FALSE,TAG_FALSE);
 }
@@ -1588,7 +1599,8 @@ void SongSelectorLogic::addTag(const QString tag)
 #ifdef INCOMPLETE_FEATURES
 void SongSelectorLogic::doMarkDups()
 {
-  EXCLUSIVE
+    QMutexLocker _ml(&lock);
+
   int nr=0;
   foreach_selected_qsong(svi,
     QString txt=svi->get_md5sum();
@@ -1606,7 +1618,8 @@ void SongSelectorLogic::doMarkDups()
 
 void SongSelectorLogic::findallsimilarnames()
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
+  
   QString text = QFileDialog::getExistingDirectory(NULL,this,NULL,"Specify directory to compare with database");
   // ask the name to start with
   if (!text.isEmpty())
@@ -1619,7 +1632,8 @@ void SongSelectorLogic::findallsimilarnames()
 
 void SongSelectorLogic::findsimilarnames()
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
+  
   bool ok;
   QString text = QInputDialog::getText("Input name to compare with",
 				       "label",QLineEdit::Normal,
@@ -1635,7 +1649,8 @@ void SongSelectorLogic::findsimilarnames()
 
 void SongSelectorLogic::importSongs()
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
+  
   bool explain_analysis = !Config::get_file_count();
   if (explain_analysis)
     Config::set_file_count(1);
@@ -1654,20 +1669,23 @@ void SongSelectorLogic::importSongs()
 
 void SongSelectorLogic::selectionMenu()
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
+  
   selection->exec(QCursor::pos());
   searchLine->setFocus();
 }
 
 void SongSelectorLogic::openQueueMenu()
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
+  
   queuemenu->exec(QCursor::pos());
 }
 
 void SongSelectorLogic::queueFindAndRename(int p_old, int p_new)
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
+  
   FOREACH(queue,QueuedSong *, entry,
     {
       int pos = entry->getPos();
@@ -1681,7 +1699,8 @@ void SongSelectorLogic::queueFindAndRename(int p_old, int p_new)
 
 void SongSelectorLogic::queueShiftUp()
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
+  
   bool restart = true;
   while(restart)
     {
@@ -1710,7 +1729,8 @@ void SongSelectorLogic::queueShiftUp()
 
 void SongSelectorLogic::queueShiftDown()
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
+  
   bool restart = true;
   while(restart)
     {
@@ -1739,7 +1759,8 @@ void SongSelectorLogic::queueShiftDown()
 
 void SongSelectorLogic::queueDelete()
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
+  
   bool restart;
   do
     {
@@ -1758,6 +1779,8 @@ void SongSelectorLogic::queueDelete()
 
 void SongSelectorLogic::queueAnker()
 {
+  QMutexLocker _ml(&lock);
+
   FOREACH(queue,QueuedSong *, entry, 
 	  if (entry->isSelected())
 	  entry->setAnkered(!entry->ankered()));
@@ -1766,7 +1789,8 @@ void SongSelectorLogic::queueAnker()
 
 void SongSelectorLogic::queueOrder()
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
+  
   // nu lopen we er nog eens door om ze normaal te nummeren
   int cur = 1;
   FOREACH(queue, QueuedSong * , entry, entry->setPos(cur++));
@@ -1775,7 +1799,8 @@ void SongSelectorLogic::queueOrder()
 
 void SongSelectorLogic::queueInsert(int count)
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
+  
   int cur = count+1;
   if (count==0) return;
   // eerst lopen we er door om ze allemaal een veelvoud van count te geven
@@ -1808,7 +1833,8 @@ void SongSelectorLogic::queueInsert(int count)
 
 void SongSelectorLogic::queueInsert()
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
+  
   bool ok;
   int count = 5;
   count = QInputDialog::getInteger("Insert Songs...","How many songs should be inserted ?",5,1,50,1,&ok);
@@ -1818,19 +1844,22 @@ void SongSelectorLogic::queueInsert()
 
 void SongSelectorLogic::queueSelectSong()
 {
-  EXCLUSIVE;
+  QMutexLocker _ml(&lock);
+  ;
   queueRandom(true);
 }
 
 void SongSelectorLogic::queueRandom()
 {
-  EXCLUSIVE;
+  QMutexLocker _ml(&lock);
+  ;
   queueRandom(false);
 }
 
 bool SongSelectorLogic::rejectQueueProposal(Song * song, int position)
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
+  
   // check the two things that are playhing
   if (song==::main_song) return true;
   if (song==::monitor_song) return true;
@@ -1848,7 +1877,8 @@ bool SongSelectorLogic::rejectQueueProposal(Song * song, int position)
 
 void SongSelectorLogic::filterProposedList(Song ** list, int &count, int position)
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
+  
   int i = 0;
   while(i<count)
     {
@@ -1866,7 +1896,8 @@ void SongSelectorLogic::filterProposedList(Song ** list, int &count, int positio
 
 void SongSelectorLogic::queueCopySongs()
 {
-  EXCLUSIVE;
+  QMutexLocker _ml(&lock);
+  ;
   QString target = QFileDialog::getExistingDirectory(NULL,this,NULL,"Specify directory to dump songs to");
   if (target.isEmpty()) return;
   FOREACH(queue, QueuedSong *, qs,
@@ -1876,7 +1907,8 @@ void SongSelectorLogic::queueCopySongs()
 
 void SongSelectorLogic::queueRandom(bool userChoice)
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
+  
   SongMetriek * metriek = NULL;
   // this loop will in every iteration try to find an 
   // undefined element and then assign a value to it
@@ -1970,7 +2002,8 @@ void SongSelectorLogic::queueRandom(bool userChoice)
 
 void SongSelectorLogic::selectAlbumItem(QListViewItem* i)
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
+  
   AlbumItem *album = (AlbumItem*)i;
   if (!album) return;
   if (album->get_song()) return;
@@ -1992,7 +2025,8 @@ void SongSelectorLogic::selectAlbumItem(QListViewItem* i)
 
 void SongSelectorLogic::renameAlbumItem(QListViewItem* i)
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
+  
   if (!i) return;
   AlbumItem *item = (AlbumItem*)i;
   if (!item->get_song()) return;
@@ -2001,7 +2035,8 @@ void SongSelectorLogic::renameAlbumItem(QListViewItem* i)
 
 void SongSelectorLogic::albumItemChanged(QListViewItem* i, int col)
 {
-  EXCLUSIVE
+  QMutexLocker _ml(&lock);
+  
   AlbumItem *item = (AlbumItem*)i;
   if (!item) return;
   Song *song = item->get_song();
@@ -2022,7 +2057,8 @@ void SongSelectorLogic::albumItemChanged(QListViewItem* i, int col)
 
 void SongSelectorLogic::changeTagList(QListViewItem* item, const QPoint & pos, int col)
 {
-  EXCLUSIVE;
+  QMutexLocker _ml(&lock);
+  ;
   if (col < TAGS_OR || col > TAGS_NOT) return;
   if (!item) return;
   QString c = item -> text(col);
@@ -2032,7 +2068,8 @@ void SongSelectorLogic::changeTagList(QListViewItem* item, const QPoint & pos, i
 
 void SongSelectorLogic::deleteSongFromAlbum(AlbumItem * item)
 {
-  EXCLUSIVE;
+  QMutexLocker _ml(&lock);
+  ;
   if (!item) return;
   Song *song = item->get_song();
   if (!song) return;
@@ -2051,6 +2088,7 @@ void SongSelectorLogic::deleteSongFromAlbum(AlbumItem * item)
 #define TABS_QUEUE 3
 bool SongSelectorLogic::eventFilter(QObject *o, QEvent *e)
 {
+  QMutexLocker _ml(&lock);
   if ( e->type() == QEvent::KeyPress )
     {
       QKeyEvent *k=(QKeyEvent*)e;
@@ -2080,12 +2118,23 @@ bool SongSelectorLogic::eventFilter(QObject *o, QEvent *e)
 
 void SongSelectorLogic::keyPressEvent(QKeyEvent* e)
 {
-  EXCLUSIVE;
+  QMutexLocker _ml(&lock);
+  ;
   if (e->key() == Qt::Key_Escape) return;
   SongSelector::keyPressEvent(e);
 }
 
+void SongSelectorLogic::customEvent(QCustomEvent * e)
+{
+  if ((int)e->type()==(int)BpmDjCustom)
+    {
+      BpmDjEvent * E = (BpmDjEvent*)e;
+      E->run(this);
+    }
+}
+
 void SongSelectorLogic::openLogDialog()
 {  
+  QMutexLocker _ml(&lock);
   LogViewerLogic(this).exec();
 }

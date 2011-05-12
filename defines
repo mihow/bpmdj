@@ -9,12 +9,8 @@
 #  - make
 #  - alsa-headers (for alsa support)
 
-# full optimalisation
-CPP =  distcc g++ -O3
-CC =   distcc gcc -O3
-
-#CPP = distcc g++ -g -O0 -Wall
-#CC = gcc -O3 -Wall
+CPP = distcc g++ -g -O3 -Wall
+CC  = distcc gcc -g -O3 -Wall
 
 UIC = uic
 MOC = moc
@@ -31,4 +27,3 @@ LDFLAGS+= -lpthread -lm -lasound -lrt -lfftw3
 QT_INCLUDE_PATH=-I/usr/include/qt3/
 QT_LIBRARY_PATH=
 QT_LIBS= -lqt-mt
-

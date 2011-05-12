@@ -1,3 +1,22 @@
+/****
+ Om-Data
+ Copyright (C) 2005-2006 Werner Van Belle
+
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+****/
+
 #ifndef ARRAY_META_H
 #define ARRAY_META_H
 #include "array-storage.h"
@@ -25,16 +44,32 @@ public:
   template <int O> ArrayMeta(const ArrayMeta<O,T>& o, const Select<D> & selected);
   ArrayMeta &operator = (const ArrayMeta&) 
     {
-      assert(0); 
+      assert(0);
       return *this;
     };
-  ~ArrayMeta() {};
-  void deref() {if (--storage->refcount==0) delete storage;};
-  void incref() {refcount++; storage->refcount++;}
-  bool decref() {deref(); return --refcount==0;}
+  ~ArrayMeta() 
+    {
+      deref();
+    };
+  void deref() 
+    {
+      if (--storage->refcount==0) 
+	delete storage;
+    };
+  void incref() 
+    {
+      refcount++; 
+    }
+  bool decref() 
+    {
+      return --refcount==0;
+    }
   void replaceAccess(ArrayMeta<D,T> *other);
   void setSize(const Size<D> & s);
-  void setAddress(T * start) {offset = start;};
+  void setAddress(T * start) 
+    {
+      offset = start;
+    };
   T *  address(const Position<D> & c);
   T *  address(const From<D> & c);
   void printMetaInfo();
@@ -115,7 +150,7 @@ ArrayMeta<D,T>::ArrayMeta(ArrayMeta<D,T> * other, const To<D> &to)
   size += 1;
 }
 
-template <int D, class T> 
+template <int D, class T>
 ArrayMeta<D,T>::ArrayMeta(ArrayMeta<D,T> * other, const From<D> &from, const Size<D> &sized)
 {
   refcount = 1;
@@ -149,14 +184,15 @@ ArrayMeta<D,T>::ArrayMeta(const ArrayMeta<O,T>& o, const Select<D> & selected)
   o.storage->refcount++;
   storage = o.storage;
   offset = o.offset;
+  assert(D<=O);
   for(int i = 0 ; i < D ; i ++)
     {
       int d = selected[i];
+      assert(d<O);
       delta[i] = o.delta[d];
       size[i]  = o.size[d];
     }
 }
-
 
 template <int D, class T> void ArrayMeta<D,T>::setSize(const Size<D> & s)
 {
@@ -170,6 +206,5 @@ template <int D, class T> void ArrayMeta<D,T>::setSize(const Size<D> & s)
   storage->allocate(totsize);
   offset=storage->data;
 }
-
 
 #endif

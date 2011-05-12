@@ -62,6 +62,7 @@
 #include "smallhistogram-type.h"
 #include "kbpm-play.h"
 #include "capacity-checker.h"
+#include "bpmplay-event.h"
 
 /*-------------------------------------------
  *         Templates we need
@@ -171,7 +172,7 @@ void process_options(int argc, char* argv[])
     {
       if (argv[i][0]=='-')
 	{
-	  char* arg;
+	  char* arg = NULL;
 	  // check long opt ?
 	  if (argv[i][1]=='-')
 	    arg=argv[i]+2;
@@ -330,7 +331,7 @@ void setup_start()
   player_window->tab->setCurrentPage(TAB_OPTIONS);
   player_window->show();
   config->load_ui_position(player_window);
-  app->postEvent(player_window,new QCustomEvent(InitAndStart));
+  app->postEvent(player_window,new InitAndStart());
   app->exec();
   config->save_ui_position(player_window);
   delete(player_window);
@@ -348,7 +349,7 @@ void normal_start()
   app->setMainWidget(player_window);
   player_window->show();
   config->load_ui_position(player_window);
-  app->postEvent(player_window,new QCustomEvent(InitAndStart));
+  app->postEvent(player_window,new InitAndStart());
   app->exec();
   config->save_ui_position(player_window);
   delete(player_window);
@@ -377,9 +378,13 @@ void check_start()
   player_window = new SongPlayerLogic();
   app->setMainWidget(player_window);
   player_window->showMinimized();
-  app->postEvent(player_window,new QCustomEvent(InitAndStart));
+  app->postEvent(player_window,new InitAndStart());
   app->exec();
+  err = player_window->result()==QDialog::Rejected;
   delete(player_window);
+  if (err)
+    _exit(10);
+
 }
 
 void batch_start()

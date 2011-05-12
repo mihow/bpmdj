@@ -103,7 +103,7 @@ void fft(unsigned windowsize,
 	 fft_type * audio, 
 	 fft_type * audioi, 
 	 fft_type * freq,
-	 fft_type *freqi)
+	 fft_type * freqi)
 {
   fft_double(windowsize,reverse,audio,audioi,freq,freqi);
 }
@@ -203,8 +203,10 @@ void BpmAnalyzerDialog::setBpmBounds(long start, long stop)
 
 void BpmAnalyzerDialog::timerTick()
 {
+  app->lock();
   ReadingBar->setProgress(reading_progress);
   CountingBar->setProgress(processing_progress);
+  app->unlock();
 }
 
 void BpmAnalyzerDialog::readAudio()
@@ -222,7 +224,7 @@ void BpmAnalyzerDialog::readAudio()
   audio=bpmdj_allocate(audiosize+1,unsigned char);
   
   // reading in memory
-  StatusLabel->setText("Reading");
+  status("Reading");
   unsigned long pos=0;
   long count, redux, i;
   signed short buffer[bufsiz];
@@ -259,10 +261,17 @@ void BpmAnalyzerDialog::readAudio()
       bpmdj_deallocate(audio);
       audio=NULL;
       audiosize=0;
-      StatusLabel->setText("Canceled while reading");
+      status("Canceled while reading");
       return;
     }
   reading_progress = 100;
+}
+
+void BpmAnalyzerDialog::status(QString text)
+{
+  app->lock();
+  StatusLabel->setText(text);
+  app->unlock();
 }
 
 void BpmAnalyzerDialog::readAudioBlock(int blocksize)
@@ -281,7 +290,7 @@ void BpmAnalyzerDialog::readAudioBlock(int blocksize)
   
   // reading in memory
   processing_progress = 0;
-  StatusLabel->setText("Reading audio (blocksize "+QString::number(blocksize)+")");
+  status("Reading audio (blocksize "+QString::number(blocksize)+")");
   unsigned long pos = 0;
   long count;
   stereo_sample2 buffer[blocksize];
@@ -313,7 +322,7 @@ void BpmAnalyzerDialog::readAudioBlock(int blocksize)
       bpmdj_deallocate(audio);
       audio=NULL;
       audiosize=0;
-      StatusLabel->setText("Canceled while reading");
+      status("Canceled while reading");
       return;
     }
   
@@ -407,6 +416,7 @@ void BpmAnalyzerDialog::autocorrelate_draw(QPainter &p, int xs, int ys, int shif
 void BpmAnalyzerDialog::fft_draw(QPainter &p, int xs, int ys, int shifter, double bpm_divisor)
 {
   if (!freq) return;
+  app->lock();
   p.setPen(Qt::gray);
   
   // first find the upper and lower bounds of the energy spectrum
@@ -461,6 +471,7 @@ void BpmAnalyzerDialog::fft_draw(QPainter &p, int xs, int ys, int shifter, doubl
       QString text = QString::number(i)+") "+QString::number(bpm);
       p.drawText(x,y,text);
     }
+  app->unlock();
 }
 
 void BpmAnalyzerDialog::fft()
@@ -814,12 +825,9 @@ void BpmAnalyzerDialog::wec()
   set_measured_period("Wec",tempo_to_period(result).period*4);
 }
 
-// momenteel wordt een scan 457 keer uitgevoerd... ongeveer...
-void BpmAnalyzerDialog::run()
+void BpmAnalyzerDialog::set_labels()
 {
-  // check wether ranges are changed
-  rangeCheck();
-  
+  app->lock();
   // set labels...
   char d[500];
   sprintf(d,"%2g",(double)startbpm);
@@ -832,7 +840,15 @@ void BpmAnalyzerDialog::run()
   X1->setText(d);
   sprintf(d,"%2g",(double)stopbpm);
   X4->setText(d);
-  
+  app->unlock();
+}
+
+// momenteel wordt een scan 457 keer uitgevoerd... ongeveer...
+void BpmAnalyzerDialog::run()
+{
+  // check wether ranges are changed
+  rangeCheck();
+  set_labels();
 
 #ifdef PROFILER
   printf("songtime : %s : title : %s[%s]%s\n",
@@ -853,6 +869,7 @@ void BpmAnalyzerDialog::run()
   if (enveloppeSpectrum->isChecked())
     {
       enveloppe_spectrum();
+      app->lock();
       QPixmap *pm = new QPixmap(IMAGE_XS,IMAGE_YS);
       QPainter p;
       p.begin(pm);
@@ -861,12 +878,14 @@ void BpmAnalyzerDialog::run()
       fft_draw(p, IMAGE_XS, IMAGE_YS, spectrum_shifter,1.0);
       p.end();
       BpmPix->setPixmap(*pm);
+      app->unlock();
       return;
     }
 
   if (fullAutoCorrelation->isChecked())
     {
       autocorrelate_spectrum();
+      app->lock();
       QPixmap *pm = new QPixmap(IMAGE_XS,IMAGE_YS);
       QPainter p;
       p.begin(pm);
@@ -875,6 +894,7 @@ void BpmAnalyzerDialog::run()
       autocorrelate_draw(p, IMAGE_XS, IMAGE_YS, spectrum_shifter);
       p.end();
       BpmPix->setPixmap(*pm);
+      app->unlock();
       return;
     }
 
@@ -889,6 +909,7 @@ void BpmAnalyzerDialog::run()
   if (ultraLongFFT->isChecked()) 
     {
       fft();
+      app->lock();
       QPixmap *pm = new QPixmap(IMAGE_XS,IMAGE_YS);
       QPainter p;
       p.begin(pm);
@@ -897,6 +918,7 @@ void BpmAnalyzerDialog::run()
       fft_draw(p, IMAGE_XS, IMAGE_YS, shifter,1.0);
       p.end();
       BpmPix->setPixmap(*pm);
+      app->unlock();
     }
    
   if (stop_signal) return;
@@ -960,8 +982,8 @@ void BpmAnalyzerDialog::rayshoot_scan()
 	  // the prev_mismatch  hence goes from  startshift to stopshift - 1
 	  prev_maximum = mean[blockshifter+1]; 
 	}
-      StatusLabel->setText("Scanning "+QString::number(blockshifter_max-blockshifter)
-			   +"/" + QString::number(blockshifter_max-blockshifter_min));
+      status("Scanning "+QString::number(blockshifter_max-blockshifter)
+	     +"/" + QString::number(blockshifter_max-blockshifter_min));
       if (!prev_mismatch)
 	for (unsigned i = startshift ; i < stopshift && ! stop_signal; i ++ )
 	  {
@@ -1050,6 +1072,8 @@ void BpmAnalyzerDialog::rayshoot_scan()
       
       // draw the sucker
       pause_timer();
+
+      app->lock();
       QPixmap *pm = new QPixmap(IMAGE_XS,IMAGE_YS);
       QPainter p;
       p.begin(pm);
@@ -1094,6 +1118,8 @@ void BpmAnalyzerDialog::rayshoot_scan()
 	}
       p.end();
       BpmPix->setPixmap(*pm);
+      app->unlock();
+
       unpause_timer();
       
       // next step
@@ -1104,11 +1130,11 @@ void BpmAnalyzerDialog::rayshoot_scan()
   
   if (stop_signal)
     {
-      StatusLabel->setText("Canceled");
+      status("Canceled");
       return;
     }
   
-  StatusLabel->setText("Ready");
+  status("Ready");
   
 #ifdef PROFILER
   float q = 0.0;
@@ -1134,7 +1160,7 @@ void BpmAnalyzerDialog::set_measured_period(QString technique, int p)
 
 void BpmAnalyzerDialog::peak_scan()
 {
-  StatusLabel->setText("Finding least broken ray based on FFT");
+  status("Finding least broken ray based on FFT");
   stopshift=audiorate*60*4/startbpm;
   startshift=audiorate*60*4/stopbpm;
   unsigned long match[stopshift-startshift];
@@ -1188,7 +1214,7 @@ void BpmAnalyzerDialog::peak_scan()
 
   if (stop_signal)
     {
-      StatusLabel->setText("Canceled while autocorrelating");
+      status("Canceled while autocorrelating");
       return;
     }
   
@@ -1231,13 +1257,13 @@ void BpmAnalyzerDialog::peak_scan()
 
   if (stop_signal)
     {
-      StatusLabel->setText("Canceled while autocorrelating");
+      status("Canceled while autocorrelating");
       return;
     }
 
   // update tempo information 
   processing_progress = 100;
-  StatusLabel->setText("Ready");
+  status("Ready");
   
   playing->set_period(global_minimum_at);
   normalperiod=period_to_quad(playing->get_period());
@@ -1249,6 +1275,7 @@ void BpmAnalyzerDialog::peak_scan()
     }
   
   // draw vertical lines at 1/4; 2/4; 3/4
+  app->lock();
   QPixmap *pm = new QPixmap(IMAGE_XS,IMAGE_YS);
   QPainter p;
   p.begin(pm);
@@ -1286,6 +1313,7 @@ void BpmAnalyzerDialog::peak_scan()
     }
   p.end();
   BpmPix->setPixmap(*pm);
+  app->unlock();
 }
 
 void BpmAnalyzerDialog::stoppedAnalyzing()
@@ -1309,7 +1337,7 @@ void BpmAnalyzerDialog::startAnalyzer()
 
 void BpmAnalyzerDialog::stopAnalyzer()
 {
-  StatusLabel->setText("Canceling...");
+  status("Canceling...");
   ThreadedAnalyzer::stopAnalyzer();
 }
 
@@ -1317,10 +1345,6 @@ void BpmAnalyzerDialog::finish()
 {
   ThreadedAnalyzer::finish();
   accept();
-}
-
-void BpmAnalyzerDialog::store()
-{
 }
 
 void BpmAnalyzerDialog::reset()
@@ -1335,7 +1359,7 @@ void BpmAnalyzerDialog::tap()
   tapcount++;
   if (tapcount==1)
     {
-	starttime=times(NULL);
+      starttime=times(NULL);
     }
   else
     {

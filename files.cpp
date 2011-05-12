@@ -20,8 +20,10 @@
 #include <string.h>
 #include <errno.h>
 #include <assert.h>
+#include "stereo-sample2.h"
 #include "files.h"
 #include "Data/types.h"
+#include "memory.h"
 
 long fsize(FILE * f)
 {
@@ -49,6 +51,34 @@ long readsamples(void* target, int count, FILE* file)
       printf("file: Could not read %d samples, errno = %d (%s)\n",count,err,strerror(err));
       assert(0);
     }
+  return result;
+}
+
+long readsamples(Array<1,float4>& signal, FILE* file)
+{
+  int count = signal.size(0);
+  if (count==0) return 0;
+  int result;
+  assert(file);
+  stereo_sample2 * target = bpmdj_allocate(count, stereo_sample2);
+  result = fread(target,sizeof(unsigned4),count,file);
+  if (result<=0)
+    {
+      int err = ferror(file);
+      if (feof(file)) 
+	return 0;
+      printf("file: Could not read %d samples, errno = %d (%s)\n",count,err,strerror(err));
+      assert(0);
+    }
+  Array<1,float4>::positions it(signal);
+  while(it.more())
+    {
+      int p = it.position[0];
+      int v = target[p].summed();
+      it = v;
+      it++;
+    }
+  bpmdj_deallocate(target);
   return result;
 }
 

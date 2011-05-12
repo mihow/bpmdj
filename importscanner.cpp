@@ -28,8 +28,7 @@
 
 void ImportScanner::recursing(const QString  dirname)
 {
-  Log->insertLine("Importing songs from "+dirname);
-  Log->setCursorPosition(Log->numLines(),1);
+  Log->setText("Importing songs from "+dirname);
   app->processEvents();
 }
 
@@ -50,7 +49,6 @@ void ImportScanner::scan(const QString dirname, const QString checkname)
 {
   show();
   DirectoryScanner::scan(dirname, checkname);
-  Okay->setEnabled(true);
 }
 
 void ImportScanner::checkfile(const QString pathname, const QString filen)

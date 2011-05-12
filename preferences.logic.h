@@ -30,7 +30,7 @@ class PreferencesLogic :
    void  installRemotes(InstallBpmPlay * dialog);
    void  copyProgramTo(QString program, QString host, InstallBpmPlay * dialog);
  public:
-   PreferencesLogic::PreferencesLogic(QWidget*parent=0,const char*name=0, bool modal=FALSE,WFlags f=0);
+   PreferencesLogic(QWidget*parent=0,const char*name=0, bool modal=FALSE,WFlags f=0);
  public slots:
    // player & anal installation options
    virtual void installRemotes();

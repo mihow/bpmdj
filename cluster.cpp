@@ -461,7 +461,11 @@ Couple *Cluster::agglomerate(Metriek * metriek)
    ClusterPosition p;
    p.x=0;
    p.y=0;
+   p.distance=0;
    ClusterPosition c;
+   c.x=0;
+   c.y=0;
+   c.distance=0;
    for (int i = 0 ; i <entriestosort; i++)
      {
        c = entries[i];
@@ -491,6 +495,7 @@ Couple *Cluster::agglomerate(Metriek * metriek)
       ClusterPosition second;
       second.x = next[first.x][first.y].x;
       second.y = next[first.x][first.y].y;
+      second.distance = next[first.x][first.y].distance;
       //if (!first.distance<=second.distance)
       //{
       //printf("first.distance = %g\n second.distance = %g\n",first.distance,second.distance);

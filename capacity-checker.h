@@ -34,11 +34,14 @@ protected:
     {
       return true; 
     };
-  DecoderChecker(int decoder, QString extension) : decoder_to_use(decoder), ext(extension) 
+  DecoderChecker(int decoder, QString extension) : ext(extension), decoder_to_use(decoder)
     {
     };
 public:
   virtual bool works();
+  virtual ~DecoderChecker()
+    {
+    };
 };
 
 void check_capacities();

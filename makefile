@@ -1,4 +1,4 @@
-VERSION = 3.0
+VERSION = 3.1
 DESTDIR = /usr/local/
 #TIME = /usr/bin/time -f ' '\[%e\]
 #ECHO = echo -n 
@@ -17,8 +17,9 @@ include defines
 UIS = ${shell ls *.ui}
 LINK = $(TIME) $(CPP) $(LDFLAGS) $(QT_INCLUDE_PATH) $(QT_LIBRARY_PATH) $(QT_LIBS)
 LINKQ0 = $(TIME) $(CPP) $(LDFLAGS)
+ELFBIN = kbpm-play kbpm-dj kbpm-merge kbpm-mix bpmcount explode-bib
 
-bin: kbpm-play kbpm-dj kbpm-merge kbpm-mix bpmcount explode-bib
+bin: $(ELFBIN)
 
 #############################################################################
 # Rules
@@ -83,9 +84,6 @@ bin: kbpm-play kbpm-dj kbpm-merge kbpm-mix bpmcount explode-bib
 %.h: %.ui
 	@$(ECHO) "  [uic] "$@
 	@$(TIME) $(UIC) -o `basename $< .ui`.h $<
-
-om-data.a: 
-	ln -s Data/om-data.a om-data.a
 
 #############################################################################
 # Cleanup section
@@ -165,7 +163,7 @@ bpmdj-source.tgz: source_files
 
 bpmdj-bin.tgz: install_files bin
 	@echo "[strip]"
-	@strip * 2>/dev/null; exit 0
+	@strip $(ELFBIN) 2>/dev/null; exit 0
 	@echo "  [tgz] install"
 	@tar -czh --no-recursion --ignore-failed-read -T install_files -f bpmdj-bin.tgz 2>/dev/null 
 
@@ -283,8 +281,8 @@ KPLAY_OBJECTS = avltree.o about.o aboutbox.o about.moc.o power-type.o\
 	dsp-drivers.o spectrum-type.o files.o noise-ogg.o noise-mp3.o \
 	song-information.o song-information.moc.o pca.o capacity.o\
 	index.o kbpm-play.o analyzer.o signals.o player-config.o \
-	om-data.a capacity-checker.o embedded-files.o logo-png.o \
-	types.o signals-template.o \
+	Data/om-data.a capacity-checker.o embedded-files.o logo-png.o \
+	types.o signals-template.o wavelet-analyzer.logic.o \
 	songplayer.logic.o songplayer.logic.moc.o capacity-widget.o capacity-widget.moc.o \
 	md5-analyzer.o efence.o page.o efence-print.o energy-analyzer.o\
 	bpmcounter.o bpmcounter.moc.o bpm-analyzer.logic.o bpm-analyzer.logic.moc.o\
@@ -292,15 +290,15 @@ KPLAY_OBJECTS = avltree.o about.o aboutbox.o about.moc.o power-type.o\
 	beatgraph-widget.o beatgraph-widget.moc.o beatgraph-analyzer.logic.o beatgraph-analyzer.logic.moc.o\
 	rythm-analyzer.o     rythm-analyzer.moc.o     rythm-analyzer.logic.o     rythm-analyzer.logic.moc.o\
 	fourierd.o histogram-type.o fftmisc.o common.o\
-	scripts.o bpm.o 
+	scripts.o bpm.o SignalProcessing/om-signal.a 
 
 BPM_LIB = bpm.o memory.o	
-BPMCOUNT_OBJECTS = bpmcount.o files.o signals.o fourierd.o fftmisc.o bpm.a
+BPMCOUNT_OBJECTS = bpmcount.o files.o signals.o fourierd.o fftmisc.o bpm.a 
 
 KMIX_OBJECTS = mixerdialog.o mixerdialog.moc.o mixerdialog.logic.o mixerdialog.logic.moc.o\
 	kbpm-mix.o dsp-oss.o dsp-alsa.o dsp-none.o memory.o dsp-drivers.o files.o \
 	efence.o page.o efence-print.o fourierd.o signals.o spectrum-type.o fftmisc.o \
-	types.o dsp-mixed-none.o player-config.o scripts.o om-data.a
+	types.o dsp-mixed-none.o player-config.o scripts.o Data/om-data.a
 
 KCOUNT_OBJECTS = bpmcounter.o bpmcounter.moc.o\
 	index.o kbpm-count.o kbpm-count.moc.o\
@@ -324,8 +322,8 @@ KSEL_OBJECTS = 	avltree.o songtree.o qstring-factory.o tags.o aboutbox.o \
 	spectrum-type.o scripts.o cluster.o pca.o about.o about.moc.o\
 	loader.o loader.moc.o histogram-type.o\
 	qvectorview.o qvectorview.moc.o freq-mapping.o freq-mapping.moc.o\
-	albumbox.o albumbox.moc.o memory.o \
-	types.o config.moc.o \
+	albumbox.o albumbox.moc.o memory.o analyzer.o \
+	types.o config.moc.o existence-scanner.o \
 	song-information.o song-information.moc.o sample4-type.o embedded-files.o\
 	scanningprogress.o scanningprogress.moc.o power-type.o analyzers-manager.o\
 	basic-process-manager.o \
@@ -342,7 +340,7 @@ KSEL_OBJECTS = 	avltree.o songtree.o qstring-factory.o tags.o aboutbox.o \
 	song-statistics.o statistics.o statistics.moc.o song-metric.o \
 	metric-widget.o metric-widget.moc.o cluster-dialog.o cluster-dialog.moc.o \
 	log-viewer.o log-viewer.moc.o log-viewer.logic.o log-viewer.logic.moc.o \
-	om-data.a
+	Data/om-data.a
 
 EXPLODE_OBJECTS = capacity.o spectrum-type.o scripts.o \
 	histogram-type.o explode-bib.o capacity-widget.o capacity-widget.moc.o \
@@ -351,12 +349,12 @@ EXPLODE_OBJECTS = capacity.o spectrum-type.o scripts.o \
 	scanningprogress.o scanningprogress.moc.o power-type.o \
 	dirscanner.o efence.o page.o efence-print.o \
 	signals.o fftmisc.o index.o albumitem.o fourierd.o files.o \
-	common.o om-data.a 
+	common.o Data/om-data.a 
 
 MERGER_OBJECTS = merger.o index.o common.o scripts.o song-information.o song-information.moc.o\
 	capacity.o capacity-widget.o capacity-widget.moc.o types.o player-config.o\
 	efence.o page.o efence-print.o memory.o sample4-type.o power-type.o spectrum-type.o \
-	signals.o fourierd.o fftmisc.o files.o histogram-type.o om-data.a
+	signals.o fourierd.o fftmisc.o files.o histogram-type.o Data/om-data.a
 
 #############################################################################
 # Binaries
@@ -378,7 +376,7 @@ kbpm-play: $(KPLAY_OBJECTS)
 
 bpmcount: $(BPMCOUNT_OBJECTS)
 	@$(ECHO) " [link] "$@
-	@$(LINKQ0) $(BPMCOUNT_OBJECTS) -o bpmcount
+	@$(LINK) $(BPMCOUNT_OBJECTS) -o bpmcount
 
 kbpm-mix: $(KMIX_OBJECTS)
 	@$(ECHO) " [link] "$@

@@ -1,6 +1,24 @@
+/****
+ Om-Data
+ Copyright (C) 2005-2006 Werner Van Belle
+
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+****/
+
 #ifndef DATAIO_H
 #define DATAIO_H
-#include <string>
 using namespace std;
 #include "data.h"
 #include "data-visitor.h"
@@ -16,7 +34,7 @@ class DataIo: public DataVisitor
   int    version;
  public:
   // constructor
-  DataIo(const char* fn, const char* mode);
+  DataIo(QString fn, const char* mode);
   DataIo(FILE *f);
   // desructors
   virtual ~DataIo(); 
@@ -43,13 +61,27 @@ class DataTexter: public DataIo
   int    written;
   int    margin;
  private:
-  int    get_pos() {return written;};
-  int    get_line() {return lines;};
-  bool   newline_waiting() { return newline; };
-  int    get_margin() { return margin;};
+  int    get_pos() 
+    {
+      return written;
+    };
+  int    get_line() 
+    {
+      return lines;
+    };
+  bool   newline_waiting()
+    {
+      return newline; 
+    };
+  int    get_margin() 
+    {
+      return margin;
+    };
   void   set_margin(int p) { margin = p;};
   void   set_margin() { set_margin(get_pos()); };
   void   padded(const char* text);
+  void   padded(QString c);
+  int    push(QString d);
   int    push(const char * d);
   int    push(const char d);
   void   pop(int w, const char* d);
@@ -81,14 +113,14 @@ class DataTexter: public DataIo
   virtual void visit(String & str);
  public:
   // constructors
-  DataTexter(const char * fn, const char* mode);
+  DataTexter(QString fn, const char* mode);
   DataTexter(FILE * f);
   // reader & writer
   virtual void read_into(Data & target);
   virtual void write(Data data);
   // static routines
-  static Data read_file(string filename);
-  static void write(Data data, const char* filename);
+  static Data read_file(QString filename);
+  static void write(Data data, QString filename);
   static void write(Data data, FILE *target);
 };
 
@@ -126,16 +158,15 @@ class DataBinner: public DataIo
   virtual int  read_fileformat_versionnr();
   virtual void read_into(Data & target);
  public:
-  DataBinner(const char * fn, const char* mode);
-  DataBinner(string fn, const char* mode);
+  DataBinner(QString fn, const char* mode);
   DataBinner(FILE *f);
   virtual ~DataBinner(); 
 
   virtual void start_reading();
   virtual void write(Data);
-  static Data read_file(string filename);
+  static Data read_file(QString filename);
  public:
-  static void write(Data data, const char* filename);
+  static void write(Data data, QString filename);
   static void write(Data data, FILE *target);
 
   // actual writing

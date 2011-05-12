@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>855</width>
-            <height>775</height>
+            <width>594</width>
+            <height>220</height>
         </rect>
     </property>
     <property name="caption">
@@ -28,7 +28,7 @@
         <property name="spacing">
             <number>6</number>
         </property>
-        <widget class="QLabel" row="2" column="0" rowspan="1" colspan="2">
+        <widget class="QLabel" row="1" column="0">
             <property name="name">
                 <cstring>TextLabel2</cstring>
             </property>
@@ -36,111 +36,54 @@
                 <string>Created index files :</string>
             </property>
         </widget>
-        <widget class="QMultiLineEdit" row="1" column="0" rowspan="1" colspan="2">
-            <property name="name">
-                <cstring>Log</cstring>
-            </property>
-        </widget>
-        <widget class="QMultiLineEdit" row="3" column="0" rowspan="1" colspan="2">
+        <widget class="QMultiLineEdit" row="2" column="0">
             <property name="name">
                 <cstring>Created</cstring>
             </property>
         </widget>
-        <widget class="QLabel" row="0" column="0" rowspan="1" colspan="2">
+        <widget class="QLayoutWidget" row="0" column="0">
             <property name="name">
-                <cstring>TextLabel1</cstring>
+                <cstring>layout1</cstring>
             </property>
-            <property name="sizePolicy">
-                <sizepolicy>
-                    <hsizetype>5</hsizetype>
-                    <vsizetype>0</vsizetype>
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                </sizepolicy>
-            </property>
-            <property name="text">
-                <string>Scanning :</string>
-            </property>
-        </widget>
-        <widget class="QLabel" row="5" column="0" rowspan="1" colspan="2">
-            <property name="name">
-                <cstring>TextLabel5</cstring>
-            </property>
-            <property name="sizePolicy">
-                <sizepolicy>
-                    <hsizetype>5</hsizetype>
-                    <vsizetype>0</vsizetype>
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                </sizepolicy>
-            </property>
-            <property name="text">
-                <string>After importing mp3's, a set of empty index files is created, tagged as 'New'. 
-&lt;br&gt;&lt;br&gt;
-Index files can be renamed and moved around within the ./index directory. When using a special index-filename convention, the program will be able to retrieve title, author, remix and version of the song. The file format used by the author (and as such, understood by the program) is:
-&lt;br&gt;&lt;br&gt;
-    title{remix}[author]version.idx
-&lt;br&gt;&lt;br&gt;
-Eg: LandOfFreedom{HappyPeopleRemix}[Transwave]3.idx
-&lt;br&gt;&lt;br&gt;
-Note: If you have a large amount of songs to import, which have correct meta-information, you might have a look at the two scripts &lt;font color="#ff0505"&gt;bpmdj-import-mp3.pl&lt;/font&gt; and &lt;font color="#ff0000"&gt;bpmdj-import-ogg.pl&lt;/font&gt;. Nevertheless, when you want to use these scripts do not import data with this dialogbox</string>
-            </property>
-            <property name="textFormat">
-                <enum>RichText</enum>
-            </property>
-            <property name="alignment">
-                <set>WordBreak|AlignTop|AlignLeft</set>
-            </property>
-            <property name="vAlign" stdset="0">
-            </property>
-            <property name="wordwrap" stdset="0">
-            </property>
-        </widget>
-        <spacer row="4" column="0">
-            <property name="name">
-                <cstring>spacer1</cstring>
-            </property>
-            <property name="orientation">
-                <enum>Horizontal</enum>
-            </property>
-            <property name="sizeType">
-                <enum>Expanding</enum>
-            </property>
-            <property name="sizeHint">
-                <size>
-                    <width>660</width>
-                    <height>20</height>
-                </size>
-            </property>
-        </spacer>
-        <widget class="QPushButton" row="4" column="1">
-            <property name="name">
-                <cstring>Okay</cstring>
-            </property>
-            <property name="enabled">
-                <bool>false</bool>
-            </property>
-            <property name="sizePolicy">
-                <sizepolicy>
-                    <hsizetype>4</hsizetype>
-                    <vsizetype>0</vsizetype>
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                </sizepolicy>
-            </property>
-            <property name="text">
-                <string>Okay</string>
-            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QLabel">
+                    <property name="name">
+                        <cstring>TextLabel1</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>4</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>Scanning :</string>
+                    </property>
+                </widget>
+                <widget class="QLabel">
+                    <property name="name">
+                        <cstring>Log</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>5</hsizetype>
+                            <vsizetype>0</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string></string>
+                    </property>
+                </widget>
+            </hbox>
         </widget>
     </grid>
 </widget>
-<connections>
-    <connection>
-        <sender>Okay</sender>
-        <signal>clicked()</signal>
-        <receiver>ScanningProgress</receiver>
-        <slot>accept()</slot>
-    </connection>
-</connections>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

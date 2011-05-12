@@ -32,11 +32,11 @@
 #include "heap.h"
 #include "song-statistics.h"
 #include "kbpm-dj.h"
+#include "existence-scanner.h"
 
 /**
  * The database cache contains items that are visible when only considereing the taglist
  */
-
 DataBase::DataBase() : cache()
 {
   init();
@@ -68,26 +68,9 @@ void DataBase::clear()
   delete[] tag;
 }
 
-void* existence_checker(void * something)
-{
-  GrowingArray<Song*> *all = (GrowingArray<Song*>*)something;
-  int i = 0;
-  while(i < all->count)
-    {
-      Song * song = all->elements[i];
-      song -> checkondisk();
-      i++;
-    }
-  //  status->message("Finished checking existence of "+QString::number(i)+"["+readable(total_music_body)+"]",2000);
-  status->message("Finished checking existence of "+QString::number(i),10000);
-  song_selector_window->updateItemList();
-  return something;
-}
-
 void DataBase::start_existence_check()
 {
-  pthread_t *checker = bpmdj_allocate(1,pthread_t);
-  pthread_create(checker,NULL,existence_checker,&all); 
+  (new ExistenceScanner(all))->startAnalyzer();
 }
 
 bool DataBase::cacheValid(SongSelectorLogic * selector)

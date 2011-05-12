@@ -55,7 +55,10 @@ class DataBase: public BasicDataBase
  public:
     DataBase();
     virtual ~DataBase();
-    void     flush_cache() {rebuild_cache = true;};
+    void     flush_cache() 
+      {
+	rebuild_cache = true;
+      };
     void     start_existence_check();
     int      getSelection(SongSelectorLogic* selector, Song* main, QVectorView* target, int nr = 0);
     Song * * closestSongs(SongSelectorLogic * selector,Song * target1, float weight1, Song * target2, float weight2, SongMetriek * metriek, int maximum, int &count);

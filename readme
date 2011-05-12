@@ -1,5 +1,5 @@
 This program is a fully automatic BPM counter ! Given an MP3 file it will
-automatically ind the tempo. The package contains a bpm-counter, a song-player
+automatically find the tempo. The package contains a bpm-counter, a song-player
 which uses this information to play a song at a different tempo and a file 
 selector that offers the possibility to manage a large amount of mp3's.
 

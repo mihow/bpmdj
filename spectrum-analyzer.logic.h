@@ -29,6 +29,7 @@ class SpectrumDialogLogic : public SpectrumDialog, public ReentrantAnalyzer
    SpectrumDialogLogic(SongPlayer*parent=0, const char * name=0, bool modal=FALSE, WFlags f=0);
  public slots:
    virtual void fetchSpectrum_normal();
-   virtual void run() { fetchSpectrum_normal();};
+   virtual void fetchSpectrum_wavelet();
+   virtual void run() { fetchSpectrum_normal(); };
    virtual void fetchSpectrum() {startAnalyzer(); };
 };

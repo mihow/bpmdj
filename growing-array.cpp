@@ -37,6 +37,17 @@ template <class T> void GrowingArray<T>::init()
   reset();
 }
 
+template <class T> 
+GrowingArray<T>* GrowingArray<T>::deepCopy() const
+{
+  GrowingArray<T>* result = new GrowingArray<T>();
+  result->allocated = allocated;
+  result->count  = count;
+  result->elements = new T[allocated]();
+  memcpy(result->elements,elements,sizeof(T)*allocated);
+  return result;
+}
+
 template <class T> void GrowingArray<T>::reset()
 {
   if (allocated>0)

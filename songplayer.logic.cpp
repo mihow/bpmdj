@@ -50,6 +50,7 @@
 #include "memory.h"
 #include "dsp-drivers.h"
 #include "aboutbox.h"
+#include "bpmplay-event.h"
 
 void fetch_config_from(PlayerConfig * target, const SongPlayerLogic& song_player);
 void store_config_into(PlayerConfig * from,   SongPlayerLogic* song_player);
@@ -379,7 +380,7 @@ void SongPlayerLogic::nudgeMinus8M()
 
 void SongPlayerLogic::accept()
 {
-  done(0);
+  done(Accepted);
 }
 
 static bool autostarted = false;
@@ -1224,20 +1225,25 @@ void SongPlayerLogic::restartCore()
   store_config_into(config,this);
 }
 
+void InitAndStart::run(SongPlayerLogic * player)
+{
+  player->initCore();
+  player->startCore();
+}
+
+void PlayingStateChanged::run(SongPlayerLogic * player)
+{
+  if (opt_check) 
+    player->accept();
+  player->set_start_stop_text();
+}
+
 void SongPlayerLogic::customEvent(QCustomEvent * e)
 {
-  if ((int)e->type()==(int)InitAndStart)
+  if ((int)e->type()==(int)BpmPlayCustom)
     {
-      initCore();
-      startCore();
-    }
-  else if ((int)e->type()==(int)PlayingStateChanged)
-    {
-      set_start_stop_text();
-    }
-  else if ((int)e->type()==(int)WritingFinished)
-    {
-      if (opt_check) accept();
+      BpmPlayEvent * E = (BpmPlayEvent*)e;
+      E->run(this);
     }
 }
 
@@ -1247,14 +1253,22 @@ void SongPlayerLogic::customEvent(QCustomEvent * e)
 void SongPlayerLogic::startCore()
 {
   int err = core_start();
-  if (show_error(err, err_dsp, "Unable to open dsp device\n"
-		 "Swithcing back to zero DSP driver\n"))
+  if (opt_check)
     {
-      config->set_player_dsp(0);
-      dsp = dsp_driver::get_driver(config);
-      err = core_start();
-      show_error(err, err_dsp, "Still unable to get anywhere\n");
-    };
+      if (show_error(err, err_dsp, "Unable to open dsp device"))
+	reject();
+    }
+  else
+    {
+      if (show_error(err, err_dsp, "Unable to open dsp device\n"
+		     "Swithcing back to zero DSP driver\n"))
+	{
+	  config->set_player_dsp(0);
+	  dsp = dsp_driver::get_driver(config);
+	  err = core_start();
+	  show_error(err, err_dsp, "Still unable to get anywhere\n");
+	};
+    }
 }
 
 /**
@@ -1270,20 +1284,24 @@ void SongPlayerLogic::stopCore()
 
 void SongPlayerLogic::initCore()
 {
-  int err = core_object_init(false);
-  show_error(err, err_noraw, "No raw file to be read. Probably the .mp3 is broken.\n");
-  show_error(err, err_nospawn, "Unable to spawn decoding process.\nPlease check your PATH environment variable\n");
-}
+  // if we check the raw file, we want to write the information synchronous
+  int err = core_object_init(opt_check);
+  if (show_error(err, err_noraw, "No raw file to be read. Probably the .mp3 is broken.\n")
+      || show_error(err, err_nospawn, "Unable to spawn decoding process.\nPlease check your PATH environment variable\n"))
+    if (opt_check) 
+      reject();
+};
 
 void msg_playing_state_changed()
 {
-  app->postEvent(player_window,new QCustomEvent(PlayingStateChanged));
+  app->postEvent(player_window,new PlayingStateChanged());
 }
 
 void msg_writing_finished()
 {
-  if (player_window)
+  /*  if (player_window)
     app->postEvent(player_window,new QCustomEvent(WritingFinished));
+  */
 }
 
 

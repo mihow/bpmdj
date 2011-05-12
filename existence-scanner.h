@@ -17,20 +17,35 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#include <qapplication.h>
-#include "player-core.h"
+#ifndef EXISTENCE_SCANNER_H
+#define EXISTENCE_SCANNER_H
+#include "growing-array.h"
+#include "analyzer.h"
+#include "bpmdj-event.h"
+class Song;
 
-#include "Data/data.h"
-#if (DATA_VERSION_MAJOR != 0) || (DATA_VERSION_MINOR != 2)
-#error "OM-DATA has wrong version number"
+class ExistenceScanner : public ThreadedAnalyzer
+{
+  GrowingArray<Song*> * all;
+ public:
+  ExistenceScanner(const GrowingArray<Song*> &i) : all(i.deepCopy())
+    {
+    };
+  virtual void run();
+  virtual void stoppedAnalyzing();
+  virtual ~ExistenceScanner();
+};
+
+
+class ExistenceScannerFinished: public BpmDjEvent
+{
+  ExistenceScanner * thread;
+ public:
+  ExistenceScannerFinished(ExistenceScanner *c) : thread(c)
+    {
+    }
+  virtual void run(SongSelectorLogic * song_selector_window);
+};
+
 #endif
 
-extern QApplication    * app;
-extern PlayerConfig    * config;
-extern SongPlayerLogic * player_window;
-extern char * arg_config;
-
-QString get_rawpath();
-bool show_error(int err, int err2, const char*text);
-void msg_playing_state_changed();
-void msg_writing_finished();

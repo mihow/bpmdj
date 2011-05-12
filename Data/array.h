@@ -1,3 +1,22 @@
+/****
+ Om-Data
+ Copyright (C) 2005-2006 Werner Van Belle
+
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+****/
+
 #ifndef ARRAY_H
 #define ARRAY_H
 #include "types.h"
@@ -95,6 +114,7 @@ template <int D, class T> class Array: public DataClass
   Array<D,T> &operator -=(const T &m);
   Array<D,T> &operator /=(const T &m);
   Array<D,T> &operator *=(const T &m);
+   
   ~Array() 
     { 
       deref(); 
@@ -125,14 +145,14 @@ template <int D, class T> class Array: public DataClass
     {
       return Array<O,T>(*this,keep); 
     };
-  
+
   // the sizes of the matrix. Once set this cannot be changed
   void setSize(const Size<D>& s);
   void setAddress(T* start) 
     {
       content->setAddress(start);
     };
-  int  size(int i) const 
+  int size(int i) const 
     {
       return content->size[i]; 
     };
@@ -166,6 +186,20 @@ template <int D, class T> class Array: public DataClass
       return !(*this==m);
     };
   void printMetaInfo() const;
+  
+   /**
+    * will copy the data in source to target using the asignmetn operator
+    * Both sizes must be equal and valid
+    */
+   void copyFrom(const Array<D,T> &source);
+
+   /**
+    * Will set an area of this area to the array given in o.
+    * No boundary warings are given, but no ill result should happen either.
+    * In other words, the copy area will be limited to the size of the possible
+    * target area.
+    */
+   void copyFrom(const Array<D,T> &source, const From<D>& where);
 
   // handy types
   typedef                                T value;
@@ -182,6 +216,11 @@ template <int D, class T> class Array: public DataClass
   typedef ArrayIterator<D,T,true ,2,false> matrix_positions;
 };
 
+/**
+ * The assignment operator will set the content of the array
+ * to the given value using the = operator. This function is optimized in cases 
+ * the array can be treated in linear blocks.
+ */
 template <int D, class T> Array<D,T> &Array<D,T>::operator =(const T &m)
 {
   ArrayIterator<D,T,false,0,false> values(*this);
@@ -204,13 +243,41 @@ template <int D, class T> Array<D,T> &Array<D,T>::operator =(const T &m)
 	}
     }
   // no big set, simply a fast iterator
-  for( ; values ; values++) values=m;
+  for( ; values.more() ; values++) values=m;
   return *this;
+}
+
+template <int D, class T>
+void Array<D,T>::copyFrom(const Array<D,T> &source, const From<D> &where)
+{
+   // limit the area size
+   Size<D> copySize(size());
+   copySize(where);
+   Size<D> source_size(source.size());
+   copySize.min(source_size);
+   // copy the area
+   Array<D,T> target_area((*this)(where,copySize));
+   Array<D,T> source_area(source(copySize));
+   target_area.copyFrom(source_area);
+}
+
+template <int D, class T>
+void Array<D,T>::copyFrom(const Array<D,T> &source)
+{
+   // an ordered iterator that ignores positions
+   ArrayIterator<D,T,false,0,true> d(this);
+   ArrayIterator<D,T,false,0,true> s(source);
+   while(d.more() && s.more())
+     {
+	d=(T&)s;
+	d++;
+	s++;
+     }
 }
 
 template <int D, class T> Array<D,T> &Array<D,T>::operator +=(const T &m)
 {
-  for(values value(this); value ; value++)
+  for(values value(this); value.more() ; value++)
     value+=m;
   return *this;
 }

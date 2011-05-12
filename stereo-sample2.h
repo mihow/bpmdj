@@ -36,13 +36,28 @@ class stereo_sample2
       left = l;
       right = r;
     }
+  signed4 summed()
+    {
+      return (signed4)left+(signed4)right;
+    }
   unsigned4 & value()
     {
       return *((unsigned4*)((void*)&left));
     }
   void value(unsigned4 v)
     {
-      *(unsigned4*)(&left) = v;
+      union 
+      {
+	struct
+	{
+	  signed2 left;
+	  signed2 right;
+	} split;
+	unsigned4 combined;
+      } trick;
+      trick.combined = v;
+      left = trick.split.left;
+      right = trick.split.right;
     }
   inline stereo_sample2 muldiv(signed4 mul, signed4 div)
     {

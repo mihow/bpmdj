@@ -17,20 +17,34 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#include <qapplication.h>
-#include "player-core.h"
+#include "existence-scanner.h"
+#include "songselector.logic.h"
+#include "kbpm-dj.h"
 
-#include "Data/data.h"
-#if (DATA_VERSION_MAJOR != 0) || (DATA_VERSION_MINOR != 2)
-#error "OM-DATA has wrong version number"
-#endif
+void ExistenceScanner::run()
+{
+  int i = 0;
+  while(i < all->count)
+    {
+      Song * song = all->elements[i];
+      song -> checkondisk();
+      i++;
+    }
+}
 
-extern QApplication    * app;
-extern PlayerConfig    * config;
-extern SongPlayerLogic * player_window;
-extern char * arg_config;
+void ExistenceScanner::stoppedAnalyzing()
+{
+  app->postEvent(song_selector_window, new ExistenceScannerFinished(this));
+}
 
-QString get_rawpath();
-bool show_error(int err, int err2, const char*text);
-void msg_playing_state_changed();
-void msg_writing_finished();
+ExistenceScanner::~ExistenceScanner()
+{
+  delete all;
+}
+
+void ExistenceScannerFinished::run(SongSelectorLogic * song_selector_window)
+{
+  status->message("Finished checking availability of songs",10000);
+  song_selector_window->updateItemList();
+  delete thread;
+}

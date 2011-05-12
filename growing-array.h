@@ -29,6 +29,7 @@ template <class T> class GrowingArray
     int   count;
     T * elements;
     GrowingArray();
+    GrowingArray<T> * deepCopy() const;
     void init();
     int  add(T e);
     void swap_del(int i);

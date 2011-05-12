@@ -37,7 +37,7 @@ class MixerDialogLogic :
    int sync;
    bool stop;
    bool stopped;
-   MixerDialogLogic::MixerDialogLogic(QWidget*parent=0,const char*name=0, bool modal=FALSE,WFlags f=0);
+   MixerDialogLogic(QWidget*parent=0,const char*name=0, bool modal=FALSE,WFlags f=0);
  public slots:
    virtual void volumesChanged();
    virtual void accept();

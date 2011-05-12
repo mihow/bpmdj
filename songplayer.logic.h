@@ -30,7 +30,9 @@ class BpmAnalyzerDialog;
 class SongPlayerLogic : 
   public SongPlayer
 {
-   Q_OBJECT
+  Q_OBJECT
+ public:
+  friend class PlayingStateChanged;
  private:
    QTimer *timer;
    map_data map;
@@ -57,7 +59,7 @@ class SongPlayerLogic :
    void set_start_stop_text();
    void captionize_according_to_index();
  public:
-   SongPlayerLogic::SongPlayerLogic(QWidget*parent=0,const char*name=0, bool modal=FALSE,WFlags f=0);
+   SongPlayerLogic(QWidget*parent=0,const char*name=0, bool modal=FALSE,WFlags f=0);
  public slots:
    virtual void mousePressEvent(QMouseEvent * e);
    virtual void mouseReleaseEvent(QMouseEvent * e);

@@ -52,7 +52,7 @@ using namespace std;
 #define  wave_bufsize (32L*1024L)
 
 volatile int stop = 0;
-volatile int finished = 0;
+volatile int finished = 1;
 static volatile bool paused = true;
 
 quad_period_type targetperiod;
@@ -93,14 +93,14 @@ FILE * wave_file;
 unsigned4 wave_bufferpos=wave_bufsize;
 
 static int writer = -1;
-static int writing = 0;
+static int writing = false;
 void writer_died(int sig, siginfo_t *info, void* hu)
 {
   char newstr[80];
   // now we have the complete length of the file...
   // if it differs from the length in the .ini file we update it
   // get length;
-  writing = 0;
+  writing = false;
   unsigned long long sec = samples2s(wave_max());
   unsigned long long min; 
   if (wave_file) 
@@ -124,10 +124,10 @@ int wave_open(Index * playing, bool synchronous)
   // wait 1 second and start reading the file
   if (synchronous)
     {
-      writing = 1;
+      writing = true;
       if (!start_bpmdj_raw(get_rawpath(),fname))
 	return err_nospawn;
-      writing = 0;
+      writing = false;
     }
   else 
     {
@@ -137,7 +137,7 @@ int wave_open(Index * playing, bool synchronous)
       act->sa_flags = SA_SIGINFO;
       sigaction(SIGUSR1,act,NULL);
       // fork and execute, send back signal when done 
-      writing = 1;
+      writing = true;
       if (!(writer = fork()))
 	{
 	  start_bpmdj_raw(get_rawpath(),fname);
@@ -165,12 +165,15 @@ int wave_open(Index * playing, bool synchronous)
 void wave_close()
 {
   if (wave_file)
-    fclose(wave_file);
+    {
+      fclose(wave_file);
+      wave_file = NULL;
+    }
   if (writing)
     {
       // send terminate (the insisting variant) signal
       kill(writer,SIGKILL);
-      writing = 0;
+      writing = false;
     }
   remove(wave_name);
 }
@@ -943,7 +946,7 @@ void core_play()
   else
     {
       stop = true;
-      finished = true;
+      finished = 1;
       pause_playing();
     }
 }
@@ -973,39 +976,12 @@ void core_done()
   finished = 2;
 }
 
-/*static void * go(void* neglect)
-{
-  core_play();
-  core_close();
-  core_done();
-  return neglect;
-}
-*/
-
 static void * go2(void* neglect)
 {
   core_play();
   core_close();
   return neglect;
 }
-
-/*int core_run()
-{
-  int err = core_object_init(false);
-  if (err==err_noraw || err==err_nospawn)
-    return err;
-  core_start();
-  err = core_open();
-  if (err==err_dsp) 
-    {
-      core_done();
-      return err;
-    }
-  pthread_t *y = bpmdj_allocate(1,pthread_t);
-  pthread_create(y,NULL,go,NULL);
-  return err_none;
-}
-*/
 
 int core_start()
 {
