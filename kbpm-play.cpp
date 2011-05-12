@@ -43,8 +43,9 @@
 #include <math.h>
 #include <pthread.h>
 #include "songplayer.logic.h"
-#include "kbpm-counter.h"
+#include "bpm-analyzer.logic.h"
 #include "spectrumanalyzer.logic.h"
+#include "md5-analyzer.h"
 
 extern "C"
 {
@@ -57,8 +58,9 @@ extern "C"
  *         Constants & Variables
  *-------------------------------------------*/
 static int   opt_batch = 0;
-static int   opt_create = 0;
+static int   opt_bpm = 0;
 static int   opt_color = 0;
+static int   opt_create = 0;
 static char* arg_posx = NULL;
 static char* arg_posy = NULL;
 static int   arg_low=120;
@@ -84,13 +86,13 @@ void msg_speedup(int change)
 
 void terminal_start()
 {
-   pthread_t y;
-   SongPlayerLogic *test=new SongPlayerLogic();
-   if (arg_posx && arg_posy)
-     test->move(atoi(arg_posx),atoi(arg_posy));
-   app->setMainWidget(test);
-   test->show();
-   pthread_create(&y,NULL,go,NULL);
+  pthread_t y;
+  SongPlayerLogic *test=new SongPlayerLogic();
+  if (arg_posx && arg_posy)
+    test->move(atoi(arg_posx),atoi(arg_posy));
+  app->setMainWidget(test);
+  test->show();
+  pthread_create(&y,NULL,go,NULL);
 }
 
 
@@ -113,10 +115,11 @@ void options_failure(char* err)
 	  "   -F nbr      --fragments nbr       the number of fragments used to play audio.\n" 
 	  "   -X          --nolatencyaccounting does not take into account the latency when marking a cue\n"
 	  "   -p nbr nbr  --position nbr nbr    position to place the window\n"
-	  "   -b          --batch               immediatelly obtain bpmcount, no sound, quit immidiatelly\n"
+	  "   -b          --batch               no ui output, md5sum is automatically checked\n"
+	  "               --bpm                 measure bpm\n"
 	  "   -l nbr      --low nbr             lowest bpm to look for (default = 120)\n"
 	  "   -h nbr      --high nbr            highest bpm to look for (default = 160)\n"
-	  "   -s          --spectrum            immediatelly obtain color at cue-point, no sound, quit imm\n"
+	  "               --spectrum            obtain color at cue-point, no sound, quit imm\n"
 	  "   argument                          the index file of the song to handle\n\n%s\n\n",err);
    exit(1);
 }
@@ -142,14 +145,15 @@ void process_options(int argc, char* argv[])
 	  else if (strcmp(arg,"batch")==0 ||
 		   strcmp(arg,"b")==0)
 	    opt_batch=1;
+	  else if (strcmp(arg,"bpm")==0)
+	    opt_bpm=1;
 	  else if (strcmp(arg,"verbose")==0 ||
 		   strcmp(arg,"v")==0)
 	    opt_dspverbose=1;
 	  else if (strcmp(arg,"create")==0 ||
 		   strcmp(arg,"c")==0)
 	    opt_create=1;
-	  else if (strcmp(arg,"spectrum")==0 ||
-		   strcmp(arg,"s")==0)
+	  else if (strcmp(arg,"spectrum")==0)
 	    opt_color=1;
 	  else if (strcmp(arg,"dsp")==0 ||
 		   strcmp(arg,"d")==0)
@@ -224,7 +228,10 @@ void process_options(int argc, char* argv[])
     {
       options_failure("requires at least one argument");
     }
-  
+  if ((opt_color || opt_bpm) && !opt_batch)
+    {
+      options_failure("to start an analyzer, you need to supply the --batch option");
+    }
 }
 
 void show_error(int err, int err2, const char*text)
@@ -257,6 +264,39 @@ void normal_start()
   core_done();
 }
 
+void batch_start()
+{
+  int nr=0;
+  // 0. core init: synchronous without opening dsp
+  core_init(1);
+  printf("%d. Wave written: %s\n",nr++,index_readfrom);
+  // 1. md5sum
+  if (!index_md5sum || strcmp(index_md5sum,"")==0)
+    {
+      Md5Analyzer * md5_analyzer = new Md5Analyzer();
+      md5_analyzer->run();
+      printf("%d. Md5 sum: %s\n",nr++,index_md5sum);
+    }
+  // 2. bpm
+  if (opt_bpm)
+    {
+      BpmAnalyzerDialog *counter = new BpmAnalyzerDialog();
+      counter->setBpmBounds(arg_low,arg_high);
+      counter->run();
+      counter->finish();
+      printf("%d. Bpm count: %s\n",nr++,index_tempo);
+    }
+  // 3. spectrum
+  if (opt_color)
+    {
+      SpectrumDialogLogic *counter = new SpectrumDialogLogic();
+      counter->fetchSpectrum();
+      printf("%d. Spectrum\n",nr++);
+    }
+  // 99. finish the core -> remove the raw file
+  core_done();
+}
+
 int main(int argc, char *argv[])
 {
   process_options(argc,argv);
@@ -271,7 +311,7 @@ int main(int argc, char *argv[])
       if (len>=4 && newname[len-4]=='.')
 	strcpy(newname+len-3,"idx");
       else
-	options_failure("Sorry, song must end on " SONG_EXT);
+	options_failure("Sorry, song must end on either " SONG_EXT);
       // create index and write it..
       index_init();
       index_setversion();
@@ -285,31 +325,9 @@ int main(int argc, char *argv[])
       index_free();
       argument = strdup(newname);
     }
+  
   if (opt_batch)
-    {
-      // init the core, we do not open it because
-      // we don't want any dsp access
-      core_init(1);
-      printf("Wave written\n");
-      // initialize the count dialog
-      BpmCountDialog *counter = new BpmCountDialog();
-      counter->setBpmBounds(arg_low,arg_high);
-      counter->doit();
-      counter->finish();
-      printf("Counting done\n");
-      // finish the core -> remove the raw file
-      core_done();
-    }
-  else if (opt_color)
-    {
-      core_init(1);
-      printf("Wave written\n");
-      // initialize the count dialog
-      SpectrumDialogLogic *counter = new SpectrumDialogLogic();
-      counter->fetchSpectrum();
-      printf("Fetching Color done\n");
-      core_done();
-    }
+    batch_start();
   else
     normal_start();
 }

@@ -1,13 +1,13 @@
 /****************************************************************************
-** Form implementation generated from reading ui file 'patternanalyzer.ui'
+** Form implementation generated from reading ui file 'pattern-analyzer.ui'
 **
-** Created: Sun Jul 13 15:59:12 2003
+** Created: Sun Aug 10 06:12:59 2003
 **      by: The User Interface Compiler ($Id: qt/main.cpp   3.1.2   edited Dec 19 11:45 $)
 **
 ** WARNING! All changes made in this file will be lost!
 ****************************************************************************/
 
-#include "patternanalyzer.h"
+#include "pattern-analyzer.h"
 
 #include <qvariant.h>
 #include <qslider.h>

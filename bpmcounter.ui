@@ -790,7 +790,7 @@
         <sender>StartButton</sender>
         <signal>clicked()</signal>
         <receiver>CountDialog</receiver>
-        <slot>startAutomaticCounter()</slot>
+        <slot>startStopButton()</slot>
     </connection>
     <connection>
         <sender>BusyToggle</sender>
@@ -890,7 +890,7 @@
     <slot>decBpm()</slot>
     <slot>play()</slot>
     <slot>reset()</slot>
-    <slot>startAutomaticCounter()</slot>
+    <slot>startStopButton()</slot>
     <slot>tap()</slot>
     <slot>fetchSpectrum()</slot>
 </slots>

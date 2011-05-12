@@ -1,0 +1,17 @@
+Tech 1: AnniversaryWalz - 80 - 180 - NormalCorrelation
+   - normal correlation between 80 and 180
+   - maximum/minimum search per image
+   - rescaled tot 0 -> 1 en kwadraat genomen
+   - maxima per row aangeduid
+Tech 2: AnniversaryWalz - 80 - 180 - AbsCorrelation
+   - absolute correlatie 
+   - between 80 en 180
+   - maximum/minimum search per row
+   - rescaled tot 0 -> 1 en kwadraat genomen
+   - maxima per row aangeduid
+Tech 3: AnniversaryWalz - 80 - 180 - AbsDistance
+   - abs waarde van afstand tussen absolute values
+   - between 80 en 180
+   - maximum/minimum search per image
+   - rescaled tot 0 -> 1, geen kwadraat genomen
+   - maxima per row aangeduid

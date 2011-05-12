@@ -24,6 +24,8 @@
 #include "songselector.logic.h"
 #include "kbpm-played.h"
 #include "process-manager.h"
+#include "songtree.h"
+#include "avltree.cpp"
 
 DataBase::DataBase()
 {
@@ -32,7 +34,8 @@ DataBase::DataBase()
   all = allocate(all_size,Song*);
   cache = NULL;
   clearCache();
-  include = NULL;
+  and_include = NULL;
+  or_include = NULL;
   exclude = NULL;
   tag = NULL;
   tag_size = 0;
@@ -73,7 +76,8 @@ bool DataBase::cacheValid(SongSelectorLogic * selector)
     return false;
   for (int i=0; i < tag_size; i++)
     if (selector->tagLines[i]->text()!=*(tag[i]) ||
-	selector->tagInclude[i]->isChecked()!=include[i] ||
+	selector->tagAndInclude[i]->isChecked()!=and_include[i] ||
+	selector->tagOrInclude[i]->isChecked()!=or_include[i] ||
 	selector->tagExclude[i]->isChecked()!=exclude[i])
       return false;
   return true;
@@ -81,35 +85,48 @@ bool DataBase::cacheValid(SongSelectorLogic * selector)
 
 void DataBase::copyTags(SongSelectorLogic * selector)
 {
-  if (include) free(include);
+  if (and_include) free(and_include);
+  if (or_include) free(or_include);
   if (exclude) free(exclude);
   if (tag) delete[](tag);
   tag_size = selector->nextTagLine;
-  include = allocate(tag_size,bool);
+  and_include = allocate(tag_size,bool);
+  or_include = allocate(tag_size,bool);
   exclude = allocate(tag_size,bool);
   tag = new QString[tag_size]();
+  and_includes_checked = false;
+  excludes_checked = false;
   for (int i=0; i < tag_size; i++)
     {
       tag[i] = selector->tagLines[i]->text();
-      include[i] = selector->tagInclude[i]->isChecked();
-      exclude[i] = selector->tagExclude[i]->isChecked();
+      or_include[i] = selector->tagOrInclude[i]->isChecked();
+      and_includes_checked |= and_include[i] = selector->tagAndInclude[i]->isChecked();
+      excludes_checked     |= exclude[i] = selector->tagExclude[i]->isChecked();
     }
 }
 
 bool DataBase::tagFilter(Song* item)
 {
-  bool matched=false;
-  for (int i=0; i < tag_size; i++)
-    if (include[i])
+  bool matched = false;
+  // first we check the or_include tags
+  for (int i = 0; !matched && i < tag_size; i++)
+    if (or_include[i])
       if (item->containsTag(tag[i]))
 	matched=true;
   if (!matched) return false;
-  for (int i=0; i < tag_size; i++)
-    if (exclude[i])
-      if (item->containsTag(tag[i]))
-	matched=false;
-  if (!matched) return false;
-  return true;
+  // now we check the and_include tags
+  if (and_includes_checked)
+    for(int i = 0; i < tag_size ; i ++)
+      if(and_include[i])
+	if (!item->containsTag(tag[i]))
+	  return false;
+  // now we check the exclusion tags
+  if (excludes_checked)
+    for (int i=0; i < tag_size; i++)
+      if (exclude[i])
+	if (item->containsTag(tag[i]))
+	  return false;
+  return matched;
 }
 
 void DataBase::updateCache(SongSelectorLogic* selector)
@@ -122,8 +139,7 @@ void DataBase::updateCache(SongSelectorLogic* selector)
     {
       Song * song = all[i];
       bool vis = tagFilter(song);
-      if (vis)
-	addToCache(song);
+      if (vis) addToCache(song);
     }
 }
 
@@ -174,6 +190,15 @@ bool DataBase::filter(SongSelectorLogic* selector, Song *item, Song* main)
 	return false;
     }
   return true;
+}
+
+AvlTree<QString>* DataBase::getFileTree()
+{
+  AvlTree<QString> * tree = new AvlTree<QString>();
+  for(int i = 0 ; i < all_count ; i ++)
+    if (!tree->search(all[i]->file))
+      tree->add(new SongSortedByFile(all[i]));
+  return tree;
 }
 
 int DataBase::getSelection(SongSelectorLogic* selector, Song* main, QListView* target)
@@ -234,3 +259,32 @@ Song * * DataBase::closestSongs(SongSelectorLogic * selector, Song * target, Son
   return entries;
 }
 
+void DataBase::del(Song* which)
+{
+  for (int i = 0 ; i < all_count ; i ++)
+    {
+      if (all[i]==which)
+	{
+	  while(i<all_count - 1)
+	    {
+	      all[i]=all[i+1];
+	      i++;
+	    }
+	  all_count -- ;
+	  break;
+	}
+    }
+  for (int i = 0 ; i < cache_count ; i ++)
+    {
+      if (cache[i]==which)
+	{
+	  while(i<cache_count - 1)
+	    {
+	      cache[i]=cache[i+1];
+	      i++;
+	    }
+	  cache_count -- ;
+	  break;
+	}
+    }
+}

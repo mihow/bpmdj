@@ -472,7 +472,7 @@
                                 <bool>true</bool>
                             </property>
                             <property name="text">
-                                <string>Patterns</string>
+                                <string>P&amp;atterns</string>
                             </property>
                         </widget>
                         <widget class="QPushButton">

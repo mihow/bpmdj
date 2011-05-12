@@ -133,7 +133,7 @@ void ProcessManager::clearPlayer(int id, bool update)
   if(!playing_songs[id])
     return;
   // reread the song that was playing
-  playing_songs[id]->reread();
+  playing_songs[id]->reread(false);
   // WVB - this should be done automatically
   selector->parseTags(playing_songs[id]->tags);
   player_pids[id] = 0;

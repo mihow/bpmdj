@@ -59,7 +59,7 @@ void Config::save()
   QFile f(".kbpmdj");
   f.open(IO_WriteOnly);
   QDataStream s(&f);
-  s << (Q_UINT16)0xBDE3;
+  s << (Q_UINT16)MAGIC_NOW;
   s << (Q_UINT16)file_count;
   s << (Q_UINT16)yellowTime;
   s << (Q_UINT16)orangeTime;
@@ -99,7 +99,7 @@ void Config::load()
       f.open(IO_ReadOnly);
       QDataStream s(&f);
       s >> w;
-      if (w == 0xBDE0)
+      if (w == MAGIC_1_6)
 	{
 	  printf("Loading config v1.6\n");
 	  s >> w; file_count = w;
@@ -114,7 +114,7 @@ void Config::load()
 	  s >> playCommand1;
 	  s >> playCommand2;
 	}
-      else if (w == 0xBDE1)
+      else if (w == MAGIC_1_7)
 	{
 	  printf("Loading config v1.7\n");
 	  s >> w; file_count = w;
@@ -141,7 +141,7 @@ void Config::load()
 	  s >> playCommand3;
 	  s >> playCommand4;
 	}
-      else if (w == 0xBDE2)
+      else if (w == MAGIC_1_8)
 	{
 	  printf("Loading config v1.8\n");
 	  s >> w; file_count = w;
@@ -167,7 +167,7 @@ void Config::load()
 	  s >> playCommand3;
 	  s >> playCommand4;
 	}
-      else if (w == 0xBDE3)
+      else if (w == MAGIC_1_9)
 	{
 	  printf("Loading config v1.9\n");
 	  s >> w; file_count = w;

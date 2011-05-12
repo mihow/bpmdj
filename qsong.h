@@ -33,7 +33,7 @@ class QSong:
   public:
     // Constructor
     QSong(Song * s, QListView* parent);
-    // Accessor
+    // Accessors
     Song *  songEssence() const {return song;};
     QString tags() const {return song->tags;};
     QString md5sum() const {return song->md5sum;};
@@ -51,7 +51,7 @@ class QSong:
     void    playedAuthorAtTime(int t) const {song->played_author_at_time = t;};
     // Inherited
     void reread() 
-      { song->reread(); };
+      { song->reread(true); };
     void invertColor(bool r, bool g, bool b) 
       { song->invertColor(r,g,b); };
     void setColor(QColor transfer) 

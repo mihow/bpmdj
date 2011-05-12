@@ -1,4 +1,5 @@
 2.0:
+  audiosize == 0 in pattern-analyzer crashed
 - Q: dubbel klikken als de monitor nog aan het spelen is brengt het nieuwe nummer in de queue
   Q: als de queue leeg is nemen we natuurlijk de huidige main-song.
      dan kunnen we een aantal songs er tussen proppen die
@@ -100,7 +101,7 @@ ten naar welke
     redesign van dat zooitje..
 
 
-- populaire halen van cd16: FeelTheFire... --60
+- populaire halen van cd20 ForTheRoses - Deus -- 70
 =====================================
 kbpm-play:
   - als de file al bestaat en we moeten correleren onmiddelijk binnen 10BPM bounds zoeken

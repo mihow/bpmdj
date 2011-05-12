@@ -25,7 +25,7 @@ extern "C" {
 #include "player-core.h"
 }
 
-class BpmCountDialog;
+class BpmAnalyzerDialog;
 
 class SongPlayerLogic : 
   public SongPlayer
@@ -39,7 +39,7 @@ class SongPlayerLogic :
    void setColor(QButton *button, bool enabled);
    void redrawCues();
    void normalReached(bool yes);
-   BpmCountDialog * bpmcounter;
+   BpmAnalyzerDialog * bpmcounter;
  protected:
    virtual void done(int r);
  public:

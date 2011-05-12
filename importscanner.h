@@ -21,6 +21,7 @@
 #include "scanningprogress.h"
 #include "songselector.logic.h"
 #include "dirscanner.h"
+#include "avltree.h"
 
 class QString;
 
@@ -29,6 +30,7 @@ class ImportScanner:
   public ScanningProgress
 {
   SongSelectorLogic * selector;
+  AvlTree<QString>* database;
  protected:
   virtual void recursing(const QString dirname);
   virtual void checkfile(const QString pathname, const QString filename);

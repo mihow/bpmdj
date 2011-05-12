@@ -143,7 +143,8 @@ void SpectrumDialogLogic::fetchSpectrum()
     fftwindowfreq[pos]=0.0;
   // position file
   long startpos = cue ? cue * 4 : fsize(raw)/2;
-  // printf("fsize = %d\n (blocksize+slidesize) * 2 = %d k\n",(int)fsize(raw),(int)(blocksize+slidesize)*2/1024);
+  if (startpos+(blocksize+slidesize)*2<=fsize(raw))
+    startpos = fsize(raw)/2;
   if (startpos+(blocksize+slidesize)*2<=fsize(raw))
     {
       // printf("Fetching spectrum at position = %d\n",(int)cue);

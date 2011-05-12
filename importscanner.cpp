@@ -23,6 +23,7 @@
 #include "importscanner.h"
 #include "qsong.h"
 #include "kbpm-dj.h"
+#include "avltree.cpp"
 
 extern "C"
 {
@@ -41,6 +42,7 @@ ImportScanner::ImportScanner(SongSelectorLogic* root) :
   ScanningProgress()
 {
   selector = root;
+  database = selector->database->getFileTree();
 }
 
 bool ImportScanner::matchextension(const QString filename)
@@ -62,10 +64,13 @@ void ImportScanner::checkfile(const QString pathname, const QString filen)
     filename = pathname + "/" + filen;
   else
     filename = filen;
-  if (!selector->lookfor(filename))
-    {	     
+  if (database->search(filename))
+    {
+      database->del(filename);
+    }
+  else
+    {    
       char *temp;
-      // replace last 3 chars with .idx
       char indexname[500];
       char halfindexname[500];
       temp=strdup(basename(strdup(filename)));
@@ -78,7 +83,7 @@ void ImportScanner::checkfile(const QString pathname, const QString filen)
 	  sprintf(halfindexname,"%s%d.idx",temp,nr);
 	  sprintf(indexname,"./index/%s%d.idx",temp,nr++);
 	}
-      // good create necessary data
+      
       index_init();
       index_readfrom=strdup(indexname);
       
@@ -86,6 +91,7 @@ void ImportScanner::checkfile(const QString pathname, const QString filen)
       sprintf(log,"Writing %s",index_readfrom);
       Created->insertLine(log);
       Created->setCursorPosition(Created->numLines(),1);
+      
       app->processEvents();
       
       index_setversion();
@@ -97,7 +103,6 @@ void ImportScanner::checkfile(const QString pathname, const QString filen)
       index_write();
       index_free();
       
-      // inform dataroot of new file
-      selector -> acceptNewSong( new Song( ( const QString ) halfindexname, IndexDir ) );
+      selector -> acceptNewSong( new Song( ( const QString ) halfindexname, IndexDir, true ) );
     }
 }

@@ -1,0 +1,227 @@
+<!DOCTYPE UI><UI version="3.1" stdsetdef="1">
+<class>ChooseAnalyzers</class>
+<widget class="QDialog">
+    <property name="name">
+        <cstring>ChooseAnalyzers</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>604</width>
+            <height>349</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>Batch Analyzing</string>
+    </property>
+    <property name="sizeGripEnabled">
+        <bool>true</bool>
+    </property>
+    <grid>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <property name="margin">
+            <number>11</number>
+        </property>
+        <property name="spacing">
+            <number>6</number>
+        </property>
+        <widget class="QTabWidget" row="0" column="0" rowspan="1" colspan="3">
+            <property name="name">
+                <cstring>tabWidget2</cstring>
+            </property>
+            <widget class="QWidget">
+                <property name="name">
+                    <cstring>tab</cstring>
+                </property>
+                <attribute name="title">
+                    <string>Analyzers</string>
+                </attribute>
+                <grid>
+                    <property name="name">
+                        <cstring>unnamed</cstring>
+                    </property>
+                    <widget class="QLabel" row="0" column="0">
+                        <property name="name">
+                            <cstring>textLabel1</cstring>
+                        </property>
+                        <property name="text">
+                            <string>This process starts a number of analyzers on a song. Below you can choose which analyzers you want to apply. Once you press the 'Start Batch' button a backgroundprocess will be started. 
+
+Warning: If the process is killed when you close kbpm-dj. Start analyze.sh manually (certain bashes kills childs without parent).</string>
+                        </property>
+                        <property name="alignment">
+                            <set>WordBreak|AlignVCenter</set>
+                        </property>
+                    </widget>
+                    <widget class="QCheckBox" row="3" column="0">
+                        <property name="name">
+                            <cstring>spectrumAnalyzer</cstring>
+                        </property>
+                        <property name="text">
+                            <string>Spectrum Analyzer</string>
+                        </property>
+                    </widget>
+                    <spacer row="1" column="0">
+                        <property name="name">
+                            <cstring>spacer2</cstring>
+                        </property>
+                        <property name="orientation">
+                            <enum>Vertical</enum>
+                        </property>
+                        <property name="sizeType">
+                            <enum>Expanding</enum>
+                        </property>
+                        <property name="sizeHint">
+                            <size>
+                                <width>20</width>
+                                <height>30</height>
+                            </size>
+                        </property>
+                    </spacer>
+                    <widget class="QCheckBox" row="2" column="0">
+                        <property name="name">
+                            <cstring>tempoAnalyzer</cstring>
+                        </property>
+                        <property name="text">
+                            <string>Tempo Analyzer</string>
+                        </property>
+                    </widget>
+                </grid>
+            </widget>
+            <widget class="QWidget">
+                <property name="name">
+                    <cstring>tab</cstring>
+                </property>
+                <attribute name="title">
+                    <string>Tempo</string>
+                </attribute>
+                <grid>
+                    <property name="name">
+                        <cstring>unnamed</cstring>
+                    </property>
+                    <widget class="QLabel" row="2" column="0">
+                        <property name="name">
+                            <cstring>TextLabel1</cstring>
+                        </property>
+                        <property name="text">
+                            <string>From :</string>
+                        </property>
+                        <property name="alignment">
+                            <set>AlignVCenter|AlignRight</set>
+                        </property>
+                        <property name="hAlign" stdset="0">
+                        </property>
+                    </widget>
+                    <widget class="QLabel" row="3" column="0">
+                        <property name="name">
+                            <cstring>TextLabel2</cstring>
+                        </property>
+                        <property name="text">
+                            <string>To :</string>
+                        </property>
+                        <property name="alignment">
+                            <set>AlignVCenter|AlignRight</set>
+                        </property>
+                        <property name="hAlign" stdset="0">
+                        </property>
+                    </widget>
+                    <widget class="Line" row="1" column="0" rowspan="1" colspan="2">
+                        <property name="name">
+                            <cstring>Line7</cstring>
+                        </property>
+                        <property name="frameShape">
+                            <enum>HLine</enum>
+                        </property>
+                        <property name="frameShadow">
+                            <enum>Sunken</enum>
+                        </property>
+                        <property name="orientation">
+                            <enum>Horizontal</enum>
+                        </property>
+                    </widget>
+                    <widget class="QLineEdit" row="2" column="1">
+                        <property name="name">
+                            <cstring>From</cstring>
+                        </property>
+                    </widget>
+                    <widget class="QLineEdit" row="3" column="1">
+                        <property name="name">
+                            <cstring>To</cstring>
+                        </property>
+                    </widget>
+                    <widget class="QLabel" row="0" column="0" rowspan="1" colspan="2">
+                        <property name="name">
+                            <cstring>TextLabel4</cstring>
+                        </property>
+                        <property name="text">
+                            <string>Enter the bounds of the BPM search algorithm. If no bounds are specified the bounds currently specified in the .idx will be used.
+
+Determining the BPM of a song takes a while, therefore a background process will be spawned. When that process has finished you should restart kbpm-dj, otherwise the selector will still work with old (wrong) tempos. This also means that you can close kbpm-dj any time you want.</string>
+                        </property>
+                        <property name="alignment">
+                            <set>WordBreak|AlignTop|AlignLeft</set>
+                        </property>
+                        <property name="hAlign" stdset="0">
+                        </property>
+                        <property name="vAlign" stdset="0">
+                        </property>
+                        <property name="wordwrap" stdset="0">
+                        </property>
+                    </widget>
+                </grid>
+            </widget>
+        </widget>
+        <widget class="QPushButton" row="1" column="2">
+            <property name="name">
+                <cstring>pushButton3</cstring>
+            </property>
+            <property name="text">
+                <string>Spawn Batch Process</string>
+            </property>
+        </widget>
+        <widget class="QPushButton" row="1" column="1">
+            <property name="name">
+                <cstring>pushButton4</cstring>
+            </property>
+            <property name="text">
+                <string>Cancel</string>
+            </property>
+        </widget>
+        <spacer row="1" column="0">
+            <property name="name">
+                <cstring>spacer1</cstring>
+            </property>
+            <property name="orientation">
+                <enum>Horizontal</enum>
+            </property>
+            <property name="sizeType">
+                <enum>Expanding</enum>
+            </property>
+            <property name="sizeHint">
+                <size>
+                    <width>40</width>
+                    <height>20</height>
+                </size>
+            </property>
+        </spacer>
+    </grid>
+</widget>
+<connections>
+    <connection>
+        <sender>pushButton3</sender>
+        <signal>clicked()</signal>
+        <receiver>ChooseAnalyzers</receiver>
+        <slot>accept()</slot>
+    </connection>
+    <connection>
+        <sender>pushButton4</sender>
+        <signal>clicked()</signal>
+        <receiver>ChooseAnalyzers</receiver>
+        <slot>reject()</slot>
+    </connection>
+</connections>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

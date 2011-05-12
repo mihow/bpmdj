@@ -117,23 +117,3 @@ FILE* openScriptFile(const char* name)
   fprintf(script,SHELL_HEADER);
   return script;
 }
-
-char * getMd5(const char* argument)
-{ 
-  FILE * kloink;
-  if (!vexecute("md5sum \"%s\" | awk '{printf $1}' >sum.tmp\n",argument))
-    exit(101);
-  kloink=fopen("sum.tmp","r");
-  char s[40];
-  int i=0;
-  while(i<32)
-    {
-      int c = getc(kloink);
-      s[i]=c;
-      i++;
-    }
-  s[32]=0;
-  fclose(kloink);
-  return strdup(s);
-}
-

@@ -50,10 +50,8 @@
 #include <math.h>
 #include <assert.h>
 #include <math.h>
-#include <pthread.h>
-#include "patternanalyzer.logic.h"
+#include "pattern-analyzer.logic.h"
 #include "sys/times.h"
-#include "fourier.h"
 #include "kbpm-play.h"
 
 extern "C"
@@ -68,9 +66,17 @@ PatternAnalyzerLogic::PatternAnalyzerLogic(SongPlayer*parent, const char*name, b
   PatternDialog(0,name,modal,f)
 {
   period=normalperiod;
+  data = NULL;
+  readFile();
+  showPattern();
+}
+
+void PatternAnalyzerLogic::readFile()
+{
+  if (data)
+    return;
   long int bufsize = 65536;
   longtrick buffer[bufsize];
-  
   // read in memory and shrink it 
   FILE * raw=openRawFile();
   audiosize=fsize(raw)/4;
@@ -123,10 +129,6 @@ PatternAnalyzerLogic::PatternAnalyzerLogic(SongPlayer*parent, const char*name, b
       maximum=data[i];
   for(int i = 0 ; i < audiosize/COLLAPSE ; i++)
     data[i]=(signed8)data[i]*(signed8)255/maximum;
-  
-  // immediatelly show data, user wouldn't select pattern if it wasn't to view
-  // the darn thing...
-  showPattern();
 }
 
 void PatternAnalyzerLogic::showPattern()
@@ -137,7 +139,7 @@ void PatternAnalyzerLogic::showPattern()
   int X = size/(period2*meass)-1;
   int Y = pattern->contentsRect().height();
   int dc = color->value();
-
+  
   QPixmap *pm = new QPixmap(X,Y);
   QPainter p;
   p.begin(pm);

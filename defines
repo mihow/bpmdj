@@ -1,23 +1,22 @@
-CPP=g++ -O9 -Wall 
-CC=gcc -O9 -Wall
-#CPP=g++ -O9 -fbranch-probabilities
-#CC=gcc -O9 -fbranch-probabilities
-#CPP=g++ -O9 -fprofile-arcs
-#CC=gcc -O9 -fprofile-arcs
-LDFLAGS+= -lpthread -lm
+CPP=distcc ccache g++ -O9
+CC=distcc ccache gcc -O9
 
 CP = cp
 MV = mv
 TAR = tar
+UIC = uic
+MOC = moc
 LYX = lyx
 LATEX = latex
 DVIPS = dvips
 MKDIR = mkdir
-UIC = uic
-MOC = moc
 STRIP = strip
 INSTALL = install
 
-QT_INCLUDE_PATH= -I ${QTDIR}/include/
-QT_LIBRARY_PATH= -L ${QTDIR}/lib/
+CFLAGS+=
+LDFLAGS+= -lpthread -lm
+
+QT_INCLUDE_PATH=-I/usr/include/qt3/
+QT_LIBRARY_PATH=
 QT_LIBS= -lqt
+

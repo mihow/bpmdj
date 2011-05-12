@@ -54,18 +54,20 @@
 #include "askinput.h"
 #include "version.h"
 #include "kbpm-dj.h"
-#include "bpmbounds.h"
+#include "choose-analyzers.h"
 #include "process-manager.h"
 #include "similarscanner.h"
 #include "cluster.h"
 #include "queuedsong.h"
 #include "merger-dialog.h"
+#include "pca.h"
+#include "songtree.h"
+#include "avltree.cpp"
 
 extern "C"
 {
 #include "cbpm-index.h"
 #include "edit-distance.h"
-#include "pca.h"
 #include "scripts.h"
 }
 
@@ -110,7 +112,6 @@ SongSelectorLogic::SongSelectorLogic(QWidget * parent, const QString name) :
   before->insertItem("&Check/import cdrom content",this,SLOT(checkDisc())); // checks wether the songs on a disk can be found somewhere in the indices
   before->insertItem("Mark duplicates (experimental)",this,SLOT(doMarkDups())); // searches the current list and marks all MD5sum duplicates
   before->insertItem("Find wrong index file names...",this,SLOT(findWrongIdxNames()));
-  
 
   // view color menu
   view->insertSeparator();
@@ -151,8 +152,7 @@ SongSelectorLogic::SongSelectorLogic(QWidget * parent, const QString name) :
   // selection menu
   selection->insertItem("&Add tag...",this,SLOT(selectionAddTags()));
   selection->insertItem("&Delete tag...",this,SLOT(selectionDelTags()));
-  selection->insertItem("&Measure Bpm ...",this,SLOT(measureBpms()));
-  selection->insertItem("Measure Sound Color ...",this,SLOT(measureSpectra()));
+  selection->insertItem("&Analyze Bpm/Spectrum ...",this,SLOT(batchAnalyzing()));
   selection->insertItem("Pca Analysis Sound Color",this,SLOT(doSpectrumPca()));
   // selection->insertItem("Cluster Analysis Sound Color",this,SLOT(doSpectrumClustering()));
   selection->insertSeparator();
@@ -281,24 +281,32 @@ void SongSelectorLogic::doOnlineHelp()
 
 void SongSelectorLogic::findAllTags()
 {
-  // add all tags
+  // add 'all' tag and enable it
   addTag("");
-  Song ** songs;
+  tagOrInclude[0] -> setChecked(true);
+  // first put all tags in tree, without duplicates
   int count;
-  songs=database->getAllSongs(count);
+  Song ** songs=database->getAllSongs(count);
+  AvlTree<QString> *tree = new AvlTree<QString>();
   for(int i = 0 ; i < count ; i ++)
     {
-      Song * song = songs[i];
-      parseTags(song->tags);
+      QString tags = songs[i]->tags;
+      if (tree->search(tags))
+	continue;
+      tree->add(new QStringNode(tags));
     }
-  // enable the first everything tag
-  tagInclude[0] -> setChecked(true);
+  // then parse all the tags
+  QStringNode *top;
+  while( (top = (QStringNode*)(tree->top())) )
+    {
+      parseTags(top->content);
+      tree->del(top->content);
+    }
+  delete(tree);
   // update the item list
   updateItemList();
   // do a pca on all the data
-  songList->selectAll(true);
-  doSpectrumPca();
-  songList->selectAll(false);
+  doSpectrumPca(true);
 }
 
 void SongSelectorLogic::parseTags(QString tagz)
@@ -327,8 +335,8 @@ void SongSelectorLogic::parseTags(QString tagz)
 
 void SongSelectorLogic::acceptNewSong(Song* song)
 {
-  QSong * ns = new QSong(song,songList);
-  parseTags(ns->tags());
+  database->add(song);
+  parseTags(song->tags);
 }
 
 static bool alreadygavefilterwarning = false;
@@ -353,6 +361,8 @@ void SongSelectorLogic::updateItemList()
   int itemcount = database -> getSelection(this,main,songList);
   songList->repaint();
   countLcd->display(itemcount);
+  for(int i = 0 ; i < songList -> columns() ; i ++)
+    songList->setColumnWidth(i,0);
   // nothing selected ?
   if (itemcount==0 && !alreadygavefilterwarning)
     {
@@ -392,18 +402,6 @@ void SongSelectorLogic::invertSpectrum()
     }
   updateProcessView();
 }
-
-bool SongSelectorLogic::lookfor(const QString w) 
-{ 
-  QListViewItemIterator it(songList);
-  for(;it.current();++it)
-    {
-      QSong *song = (QSong*)it.current();
-      if (song->file() == w)
-	return true;
-    }
-  return false;
-};
 
 void SongSelectorLogic::timerTick()
 {
@@ -564,43 +562,64 @@ void SongSelectorLogic::checkDisc()
   execute(EJECT_CDROM);
 }
 
-void SongSelectorLogic::doSpectrumPca()
+void SongSelectorLogic::doSpectrumPca(bool fulldatabase)
 {
-  // instead of exporting the frequency bands, we will 
-  // determine a suitable color.
-  // therefore we will do a principal component 
+  int count = 0;
+  float **data;
+  Song ** all = NULL;
   
-  // .. data = matrix
-  // 0. first count 
-  QListViewItemIterator it1(songList);
-  int count=0;
-  for(;it1.current();++it1)
+  if (fulldatabase)
     {
-      QSong *svi=(QSong*)it1.current();
-      if (svi->isSelected() && svi->isVisible())
-	if (svi->spectrum()!=QString::null)
-	  count++;
-    }
-  // 1. fill matrix
-  float **data = matrix(count,24);
-  QListViewItemIterator it2(songList);
-  int written=0;
-  for(;it2.current();++it2)
-    {
-      QSong *svi=(QSong*)it2.current();
-      if (svi->isSelected() && svi->isVisible())
+      all=database->getAllSongs(count);
+      data = matrix(count,24);
+      for(int i = 0, written = 0 ; i < count ; i ++)
 	{
-	  if (svi->spectrum()!=QString::null)
+	  Song *svi= all[i];
+	  if (!svi->spectrum.isNull())
 	    {
 	      for (int i = 0 ; i < 24 ; i++)
 		{
-		  char letter = svi->spectrum().at(i).latin1()-'a';
+		  char letter = svi->spectrum.at(i).latin1()-'a';
 		  data[written+1][i+1]=(float)letter;
 		}
 	      written++;
 	    }
 	}
     }
+  else
+    {
+      // 0. first count 
+      QListViewItemIterator it1(songList);
+      count=0;
+      for(;it1.current();++it1)
+	{
+	  QSong *svi=(QSong*)it1.current();
+	  if (svi->isSelected())
+	    if (svi->spectrum()!=QString::null)
+	      count++;
+	}
+      
+      // 1. fill matrix
+      data = matrix(count,24);
+      QListViewItemIterator it2(songList);
+      for(int written = 0 ; it2.current();++it2)
+	{
+	  QSong *svi=(QSong*)it2.current();
+	  if (svi->isSelected() && svi->isVisible())
+	    {
+	      if (svi->spectrum()!=QString::null)
+		{
+		  for (int i = 0 ; i < 24 ; i++)
+		    {
+		      char letter = svi->spectrum().at(i).latin1()-'a';
+		      data[written+1][i+1]=(float)letter;
+		    }
+		  written++;
+		}
+	    }
+	}
+    }
+
   // 2. do principal component analysis
   do_pca(count,24,data);
   float minx=0,miny=0,minz=0;
@@ -608,8 +627,8 @@ void SongSelectorLogic::doSpectrumPca()
   float dx,dy,dz;
   for(int i = 1 ; i <= count; i ++)
     {
-      #define MIN(A,B) if (B<A) A=B;
-      #define MAX(A,B) if (B>A) A=B;
+#define MIN(A,B) if (B<A) A=B;
+#define MAX(A,B) if (B>A) A=B;
       MIN(minx,data[i][1]);
       MIN(miny,data[i][2]);
       MIN(minz,data[i][3]);
@@ -626,15 +645,14 @@ void SongSelectorLogic::doSpectrumPca()
   dx/=255.0;
   dy/=255.0;
   dz/=255.0;
+
   // 3. modify colors of the selected items
-  QListViewItemIterator it3(songList);
-  written=0;
-  for(;it3.current();++it3)
+  if (fulldatabase)
     {
-      QSong *svi=(QSong*)it3.current();
-      if (svi->isSelected() && svi->isVisible())
+      for(int i = 0, written = 0 ; i < count ; i ++)
 	{
-	  if (svi->spectrum()!=QString::null)
+	  Song *svi= all[i];
+	  if (!svi->spectrum.isNull())
 	    {
 	      written++;
 	      float x = data[written][1];
@@ -652,6 +670,34 @@ void SongSelectorLogic::doSpectrumPca()
 	    }
 	}
     }
+  else
+    {
+      QListViewItemIterator it3(songList);
+      for(int written = 0 ;it3.current();++it3)
+	{
+	  QSong *svi=(QSong*)it3.current();
+	  if (svi->isSelected() && svi->isVisible())
+	    {
+	      if (svi->spectrum()!=QString::null)
+		{
+		  written++;
+		  float x = data[written][1];
+		  float y = data[written][2];
+		  float z = data[written][3];
+		  x-=minx;
+		  y-=miny;
+		  z-=minz;
+		  x/=dx;
+		  y/=dy;
+		  z/=dz;
+		  QColor transfer;
+		  transfer.setRgb((int)x,(int)y,(int)z);
+		  svi->setColor(transfer);
+		}
+	    }
+	}
+    }
+  
   // 4. clean up
   free_matrix(data, count, 24);
   updateProcessView();
@@ -851,56 +897,49 @@ void SongSelectorLogic::fetchSelection()
   execute(UMOUNT_CDROM);
 }
 
-void SongSelectorLogic::measureBpms()
+void SongSelectorLogic::batchAnalyzing()
 {
-  /* ask user the given bpm's */
-  BpmBounds *bounds = new BpmBounds(this,0,true);
+  char tempoLine[2048];
+  char spectrumLine[2048];
+  ChooseAnalyzers *bounds = new ChooseAnalyzers(this,0,true);
   int res = bounds->exec();
-  if (res==QDialog::Rejected)
-    return;
-  char frombound[500];
-  char tobound[500];
-  if (bounds->From->text().isEmpty())
-    sprintf(frombound," ");
-  else 
-    sprintf(frombound,"--low %s",(const char*)(bounds->From->text()));
-  if (bounds->To->text().isEmpty())
-    sprintf(tobound," ");
-  else
-    sprintf(tobound,"--high %s",(const char*)(bounds->To->text()));
-  /* write out executable batch processing for every line */
-  FILE* script=openScriptFile(PROCESS_BPM);
+  if (res==QDialog::Rejected) return;
+  tempoLine[0]=spectrumLine[0]=0;
+  if (bounds->tempoAnalyzer->isChecked())
+    {
+      char frombound[500], tobound[500];
+      frombound[0]=tobound[0]=0;
+      if (!bounds->From->text().isEmpty())
+	sprintf(frombound,"--low %s",(const char*)(bounds->From->text()));
+      if (!bounds->To->text().isEmpty()) 
+	sprintf(tobound,"--high %s",(const char*)(bounds->To->text()));
+      sprintf(tempoLine,"--bpm %s %s",frombound,tobound);
+    }
+  if (bounds->spectrumAnalyzer->isChecked())
+    sprintf(spectrumLine,"--spectrum");
+  // write out executable batch processing for every line
+  FILE* script=openScriptFile(PROCESS_ANALYZERS);
+  QListViewItemIterator it2(songList);
+  int count;
+  for(count = 0;it2.current();++it2)
+    {
+      QSong *svi=(QSong*)it2.current();
+      if (svi->isSelected() && svi->isVisible()) 
+	count++;
+    }
   QListViewItemIterator it1(songList);
-  for(;it1.current();++it1)
+  for(int nr = 0;it1.current();++it1)
     {
       QSong *svi=(QSong*)it1.current();
       if (svi->isSelected()  && svi->isVisible()) 
-	fprintf(script,"kbpm-play --batch %s %s \"%s\"\n",frombound,tobound,(const char*)svi->index());
+	{
+	  fprintf(script,"echo ======= %d / %d ==============\n",nr++,count);
+	  fprintf(script,"kbpm-play -q --batch %s %s \"%s\"\n",tempoLine,spectrumLine,(const char*)svi->index());
+	}
     }
   fclose(script);
-  chmod(PROCESS_BPM,S_IRUSR | S_IWUSR | S_IXUSR);
-  /* now start the sucker */
-  spawn(PROCESS_BPM);
-}
-
-void SongSelectorLogic::measureSpectra()
-{
-  QMessageBox::warning(this,"Measuring Song Colors",
-		       "I will now start a backgroundprocess that measures the color of all the selected songs.\n"
-		       "This can take a while. The color of a song is measured at the last used cue-position.\n"
-		       "The new colors will only be imported after you restart the application");
-  FILE* script=openScriptFile(PROCESS_SPECTRUM);
-  QListViewItemIterator it1(songList);
-  for(;it1.current();++it1)
-    {
-      QSong *svi=(QSong*)it1.current();
-      if (svi->isSelected()  && svi->isVisible()) 
-	fprintf(script,"kbpm-play --spectrum \"%s\"\n",(const char*)svi->index());
-    }
-  fclose(script);
-  chmod(PROCESS_SPECTRUM,S_IRUSR | S_IWUSR | S_IXUSR);
-  /* now start the sucker */
-  spawn(PROCESS_SPECTRUM);
+  chmod(PROCESS_ANALYZERS, S_IRUSR | S_IWUSR | S_IXUSR);
+  spawn(PROCESS_ANALYZERS);
 }
 
 
@@ -1219,7 +1258,7 @@ void SongSelectorLogic::addTag(const QString tag)
 {
   int baseline=40;
   int col=0, row=0;
-  int xbox=120;
+  int xbox=140;
   int i=0;
   /* does the tag already exist */
   for(i=0;i<nextTagLine;i++)
@@ -1231,18 +1270,23 @@ void SongSelectorLogic::addTag(const QString tag)
   col=nextTagLine/MAXTAGSPERCOL;
   row=nextTagLine-col*MAXTAGSPERCOL;
   tagLines[nextTagLine]   =  new QLabel( GroupBox2, "" );
-  tagLines[nextTagLine]   -> setGeometry( QRect( 50+col*xbox, baseline+30*row, 110, 30 ) );
+  tagLines[nextTagLine]   -> setGeometry( QRect( 70+col*xbox, baseline+30*row, 110, 30 ) );
   tagLines[nextTagLine]   -> setText( tag );
   tagLines[nextTagLine]   -> show();
-  tagInclude[nextTagLine] =  new QCheckBox( GroupBox2, "" );
-  tagInclude[nextTagLine] -> setGeometry( QRect( 10+col*xbox, baseline+30*row, 20, 30 ) );
-  tagInclude[nextTagLine] -> setText( tr( "" ) );
-  tagInclude[nextTagLine] -> show();
+  tagAndInclude[nextTagLine] =  new QCheckBox( GroupBox2, "" );
+  tagAndInclude[nextTagLine] -> setGeometry( QRect( 10+col*xbox, baseline+30*row, 20, 30 ) );
+  tagAndInclude[nextTagLine] -> setText( tr( "" ) );
+  tagAndInclude[nextTagLine] -> show();
+  tagOrInclude[nextTagLine] =  new QCheckBox( GroupBox2, "" );
+  tagOrInclude[nextTagLine] -> setGeometry( QRect( 30+col*xbox, baseline+30*row, 20, 30 ) );
+  tagOrInclude[nextTagLine] -> setText( tr( "" ) );
+  tagOrInclude[nextTagLine] -> show();
   tagExclude[nextTagLine] =  new QCheckBox( GroupBox2, "" );
-  tagExclude[nextTagLine] -> setGeometry( QRect( 30+col*xbox, baseline+30*row, 20, 30 ) );
+  tagExclude[nextTagLine] -> setGeometry( QRect( 50+col*xbox, baseline+30*row, 20, 30 ) );
   tagExclude[nextTagLine] -> setText( tr( "" ) );
   tagExclude[nextTagLine] -> show();
-  connect( tagInclude[nextTagLine], SIGNAL( stateChanged(int) ), this, SLOT( doFilterChanged() ) );
+  connect( tagAndInclude[nextTagLine], SIGNAL( stateChanged(int) ), this, SLOT( doFilterChanged() ) );
+  connect( tagOrInclude[nextTagLine], SIGNAL( stateChanged(int) ), this, SLOT( doFilterChanged() ) );
   connect( tagExclude[nextTagLine], SIGNAL( stateChanged(int) ), this, SLOT( doFilterChanged() ) );
   nextTagLine++;
   /* and now sort it */
@@ -1297,6 +1341,7 @@ void SongSelectorLogic::importSongs()
   ImportScanner scanner(this);
   scanner.scan(MusicDir);
   updateItemList();
+  scanner.exec();
 }
 
 void SongSelectorLogic::selectionMenu()

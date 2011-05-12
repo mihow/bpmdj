@@ -19,9 +19,7 @@
 ****/
 
 #include "songplayer.h"
-#include "patternanalyzer.h"
-
-#define barksize 24
+#include "pattern-analyzer.h"
 
 typedef unsigned char compressed;
 class PatternAnalyzerLogic : public PatternDialog
@@ -34,6 +32,7 @@ public:
   int  phasesize;
   compressed * data;
   PatternAnalyzerLogic(SongPlayer*parent=0, const char * name=0, bool modal=FALSE, WFlags f=0);
+  void readFile();
 public slots:
   virtual void showPattern();
   virtual void balanceChanged();

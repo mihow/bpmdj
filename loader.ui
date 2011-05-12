@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>703</width>
-            <height>148</height>
+            <width>588</width>
+            <height>151</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -27,7 +27,35 @@
         <property name="name">
             <cstring>unnamed</cstring>
         </property>
-        <widget class="QProgressBar" row="3" column="0" rowspan="1" colspan="2">
+        <widget class="QLabel" row="0" column="0">
+            <property name="name">
+                <cstring>programs</cstring>
+            </property>
+            <property name="enabled">
+                <bool>false</bool>
+            </property>
+            <property name="frameShape">
+                <enum>NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+                <enum>Plain</enum>
+            </property>
+            <property name="text">
+                <string>1. Checking programs/directories and files</string>
+            </property>
+        </widget>
+        <widget class="QLabel" row="1" column="0">
+            <property name="name">
+                <cstring>config</cstring>
+            </property>
+            <property name="enabled">
+                <bool>false</bool>
+            </property>
+            <property name="text">
+                <string>2. Reading configuration/cache</string>
+            </property>
+        </widget>
+        <widget class="QProgressBar" row="3" column="0">
             <property name="name">
                 <cstring>progressBar1</cstring>
             </property>
@@ -35,7 +63,7 @@
                 <bool>true</bool>
             </property>
         </widget>
-        <widget class="QLayoutWidget" row="2" column="0" rowspan="1" colspan="2">
+        <widget class="QLayoutWidget" row="2" column="0">
             <property name="name">
                 <cstring>layout1</cstring>
             </property>
@@ -59,7 +87,7 @@
                         </sizepolicy>
                     </property>
                     <property name="text">
-                        <string>3. Loading </string>
+                        <string>3. Verifying</string>
                     </property>
                 </widget>
                 <widget class="QLabel">
@@ -78,29 +106,7 @@
                 </widget>
             </hbox>
         </widget>
-        <widget class="QLabel" row="0" column="0">
-            <property name="name">
-                <cstring>programs</cstring>
-            </property>
-            <property name="enabled">
-                <bool>false</bool>
-            </property>
-            <property name="text">
-                <string>1. Checking programs/directories and files</string>
-            </property>
-        </widget>
-        <widget class="QLabel" row="1" column="0">
-            <property name="name">
-                <cstring>config</cstring>
-            </property>
-            <property name="enabled">
-                <bool>false</bool>
-            </property>
-            <property name="text">
-                <string>2. Reading configuration</string>
-            </property>
-        </widget>
-        <widget class="QLabel" row="4" column="0" rowspan="1" colspan="2">
+        <widget class="QLabel" row="4" column="0">
             <property name="name">
                 <cstring>scanning</cstring>
             </property>

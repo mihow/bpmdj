@@ -45,8 +45,7 @@
 #define EJECT_CDROM EJECT " " CDROM "\n"
 // filenames
 #define FETCHFILES "./fetchfiles.sh"
-#define PROCESS_BPM "./process_bpm.sh"
-#define PROCESS_SPECTRUM "./process_spectrum.sh"
+#define PROCESS_ANALYZERS "./analyze.sh"
 #define PROCESS_MIX "./process_mix.sh"
 #define MIXDUMP_NAME "mix.raw"
 #define TAILDUMP_NAME "tail.raw"
@@ -59,7 +58,6 @@ FILE * openScriptFile(const char* name);
 FILE * openRawFileForWriting();
 void   removeRawFile();
 void   removeAllRaw();
-char * getMd5(const char* argument);
 void   dumpAudio(const char* fname, unsigned4 * buffer, long length);
 void   spawn(const char* script);
 int    execute(const char* script);

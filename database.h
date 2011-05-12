@@ -21,6 +21,8 @@
 #ifndef DATABASE_H
 #define DATABASE_H
 
+#include "avltree.h"
+
 class Song;
 class SongMetriek;
 class SongSelectorLogic;
@@ -35,7 +37,10 @@ class DataBase
     Song * *    cache;
     int         cache_size;
     int         cache_count;
-    bool *      include;
+    bool *      and_include;
+    bool *      or_include;
+    bool        and_includes_checked;
+    bool        excludes_checked;
     bool *      exclude;
     QString *   tag;
     int         tag_size;
@@ -49,8 +54,11 @@ class DataBase
  public:
     DataBase();
     void     add(Song*);
+    void     del(Song*);
+    // bool     lookfor(const QString z);
     int      getSelection(SongSelectorLogic* selector, Song* main, QListView* target);
     Song * * getAllSongs(int &cnt) {cnt=all_count; return all;};
+    AvlTree<QString> * getFileTree();
     Song * * closestSongs(SongSelectorLogic * selector, Song * target, SongMetriek * metriek, int maximum, int &count);
 };
 

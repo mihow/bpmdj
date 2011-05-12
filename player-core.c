@@ -287,7 +287,7 @@ unsigned4 wave_bufferpos=wave_bufsize;
 
 static int writer = -1;
 static int writing = 0;
-void writer_died(int sig,siginfo_t *info, void* hu)
+void writer_died(int sig, siginfo_t *info, void* hu)
 {
   char newstr[80];
   // now we have the complete length of the file...
@@ -318,7 +318,7 @@ int wave_open(char* fname, int synchronous)
       writing = 1;
       if (!vexecute(CREATERAW_CMD,fname))
 	return err_nospawn;
-      writing=0;
+      writing = 0;
     }
   else 
     {
@@ -345,6 +345,10 @@ int wave_open(char* fname, int synchronous)
       sleep(1);
     }
   while (wave_file==NULL && tries-->0);
+  
+  if (synchronous)
+    writer_died(0,NULL,NULL);
+
   if (!wave_file)
     return err_noraw;
   return err_none;

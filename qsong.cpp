@@ -171,15 +171,11 @@ QString QSong::text(int i) const
     case LIST_SPECTRUM : return song->spectrum_string;
     case LIST_FILE : return song->file;
     case LIST_ONDISK :
-      if (song->ondisk) 
-	return TRUE_TEXT;
-      else 
-	return FALSE_TEXT;
+      if (song->ondisk) return TRUE_TEXT;
+      else              return FALSE_TEXT;
     case LIST_CUES :
-      if (song->has_cues) 
-	return TRUE_TEXT;
-      else 
-	return FALSE_TEXT;
+      if (song->has_cues) return TRUE_TEXT;
+      else                return FALSE_TEXT;
     }
   return QString::null;
 }

@@ -30,9 +30,11 @@
 #include "version.h"
 #include "kbpm-play.h"
 #include "songplayer.logic.h"
-#include "kbpm-counter.h"
+#include "bpm-analyzer.logic.h"
+#include "pattern-analyzer.logic.h"
 #include "spectrumanalyzer.logic.h"
-#include "patternanalyzer.logic.h"
+#include "impulseanalyzer.logic.h"
+#include "tempolineanalyzer.logic.h"
 #include "about.h"
 
 extern "C" 
@@ -48,30 +50,30 @@ void SongPlayerLogic::done(int r)
 SongPlayerLogic::SongPlayerLogic(QWidget*parent,const char*name, bool modal,WFlags f) :
   SongPlayer(parent,name,modal,f)
 {
-   bpmcounter  = new BpmCountDialog(this);
-   timer = new QTimer(this);
-   connect(timer,SIGNAL(timeout()), SLOT(timerTick()));
-   timer->start(1000);
-   tempo_fade=-1;
-   fade_time=0;
-   wantedcurrentperiod=0;
-   redrawCues();
-
-   // set caption
-   if (index_readfrom)
-     {
-       QString blah = index_readfrom;
-       blah.replace("./index/","");
-       setCaption(blah);
-     }
-   
-   TempoLd->display(100.0*(double)normalperiod/(double)currentperiod);
-   // set colors of tempo change buttons
-   normalReached(currentperiod==normalperiod);
-
-   // set volume sliders
-   Slider3->setValue(100-mixer_get_main());
-   Slider4->setValue(100-mixer_get_pcm());
+  bpmcounter  = new BpmAnalyzerDialog(this);
+  timer = new QTimer(this);
+  connect(timer,SIGNAL(timeout()), SLOT(timerTick()));
+  timer->start(1000);
+  tempo_fade=-1;
+  fade_time=0;
+  wantedcurrentperiod=0;
+  redrawCues();
+  
+  // set caption
+  if (index_readfrom)
+    {
+      QString blah = index_readfrom;
+      blah.replace("./index/","");
+      setCaption(blah);
+    }
+  
+  TempoLd->display(100.0*(double)normalperiod/(double)currentperiod);
+  // set colors of tempo change buttons
+  normalReached(currentperiod==normalperiod);
+  
+  // set volume sliders
+  Slider3->setValue(100-mixer_get_main());
+  Slider4->setValue(100-mixer_get_pcm());
 }
 
 
@@ -553,6 +555,8 @@ void SongPlayerLogic::openSpectrumAnalyzer()
 void SongPlayerLogic::openPatternAnalyzer()
 {
   PatternAnalyzerLogic analyzer;
+  // ImpulseAnalyzerLogic analyzer;
+  // TempoLineAnalyzerLogic analyzer;
   analyzer.exec();
 }
 

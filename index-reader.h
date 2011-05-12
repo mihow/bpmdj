@@ -20,6 +20,7 @@
 
 #include "dirscanner.h"
 #include "loader.h"
+#include "avltree.h"
 
 class SongSelectorLogic;
 class QSong;
@@ -28,13 +29,17 @@ class DataBase;
 class IndexReader:
   public DirectoryScanner
 {
-  public: 
-    int total_files;
-  protected:
-    Loader * loader;
-    virtual void checkfile(const QString prefix, const QString filename);
-    DataBase * database;
-  public:
-    IndexReader(Loader * l, DataBase*);
-    void add(QSong* newsong);
+ public: 
+  int total_files;
+ protected:
+  Loader * loader;
+  virtual void checkfile(const QString prefix, const QString filename);
+  DataBase * database;
+  AvlTree<QString> tree;
+ public:
+  IndexReader(Loader * l, DataBase*);
+  void add(QSong* newsong);
+  void writeCache();
+  void readCache();
+  void validateCache();
 };

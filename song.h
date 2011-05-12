@@ -20,6 +20,9 @@
 
 #ifndef SONG_H
 #define SONG_H
+#include <qstring.h>
+#include <time.h>
+#include <qcolor.h>
 #include "config.h"
 #include "cluster.h"
 
@@ -62,6 +65,8 @@ class Song:
     QString time;
     QString md5sum;
     QString spectrum;
+    // necessary for the cache invalidation
+    time_t  modification_time;
     // calculated as necessary
     QColor  color;
     QString spectrum_string;
@@ -72,12 +77,13 @@ class Song:
     int     has_cues;
     int     played_author_at_time;
   private:
-    void init(const QString filename, const QString currentpath);
+    void init(const QString filename, const QString currentpath, bool checkondisk);
   public:
     Song();
-    Song(QString filename, QString currentpath);
+    Song(QString filename, QString currentpath, bool checkondisk);
     bool obtainTitleAuthor(char * fulltitle);
-    void reread();
+    void reread(bool checkfileondisk);
+    void checkondisk();
     void setColor(QColor c);
     void invertColor(bool r, bool g, bool b);
     bool getDistance();
@@ -92,5 +98,9 @@ class Song:
     virtual void simpledump(int d);
     virtual void determine_color(float hue, float, int, int);
     virtual ~Song();
+    // void toStream(QDataStream & stream);
+    // void fromStream(QDataStream & stream);
+    bool modifiedOnDisk();
 };
+
 #endif

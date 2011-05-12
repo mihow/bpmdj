@@ -1,0 +1,147 @@
+<!DOCTYPE UI><UI version="3.1" stdsetdef="1">
+<class>ImpulseDialog</class>
+<widget class="QDialog">
+    <property name="name">
+        <cstring>ImpulseDialog</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>674</width>
+            <height>437</height>
+        </rect>
+    </property>
+    <property name="sizePolicy">
+        <sizepolicy>
+            <hsizetype>1</hsizetype>
+            <vsizetype>1</vsizetype>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+        </sizepolicy>
+    </property>
+    <property name="caption">
+        <string>Impulse Analyzer</string>
+    </property>
+    <property name="sizeGripEnabled">
+        <bool>true</bool>
+    </property>
+    <grid>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <property name="margin">
+            <number>11</number>
+        </property>
+        <property name="spacing">
+            <number>6</number>
+        </property>
+        <spacer row="1" column="1">
+            <property name="name">
+                <cstring>spacer1</cstring>
+            </property>
+            <property name="orientation">
+                <enum>Horizontal</enum>
+            </property>
+            <property name="sizeType">
+                <enum>Expanding</enum>
+            </property>
+            <property name="sizeHint">
+                <size>
+                    <width>110</width>
+                    <height>20</height>
+                </size>
+            </property>
+        </spacer>
+        <widget class="QLabel" row="0" column="0" rowspan="1" colspan="4">
+            <property name="name">
+                <cstring>impulse</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>5</hsizetype>
+                    <vsizetype>2</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="frameShape">
+                <enum>Panel</enum>
+            </property>
+            <property name="scaledContents">
+                <bool>true</bool>
+            </property>
+        </widget>
+        <widget class="QSlider" row="2" column="1" rowspan="1" colspan="3">
+            <property name="name">
+                <cstring>color</cstring>
+            </property>
+            <property name="maxValue">
+                <number>255</number>
+            </property>
+            <property name="pageStep">
+                <number>5</number>
+            </property>
+            <property name="orientation">
+                <enum>Horizontal</enum>
+            </property>
+        </widget>
+        <widget class="QLabel" row="2" column="0">
+            <property name="name">
+                <cstring>textLabel1_2</cstring>
+            </property>
+            <property name="text">
+                <string>Balance</string>
+            </property>
+        </widget>
+        <widget class="QPushButton" row="1" column="3">
+            <property name="name">
+                <cstring>pushButton2</cstring>
+            </property>
+            <property name="text">
+                <string>Ok</string>
+            </property>
+        </widget>
+        <widget class="QPushButton" row="1" column="2">
+            <property name="name">
+                <cstring>pushButton51</cstring>
+            </property>
+            <property name="text">
+                <string>Update</string>
+            </property>
+        </widget>
+    </grid>
+</widget>
+<connections>
+    <connection>
+        <sender>pushButton51</sender>
+        <signal>clicked()</signal>
+        <receiver>ImpulseDialog</receiver>
+        <slot>showPattern()</slot>
+    </connection>
+    <connection>
+        <sender>pushButton2</sender>
+        <signal>clicked()</signal>
+        <receiver>ImpulseDialog</receiver>
+        <slot>accept()</slot>
+    </connection>
+    <connection>
+        <sender>color</sender>
+        <signal>valueChanged(int)</signal>
+        <receiver>ImpulseDialog</receiver>
+        <slot>balanceChanged()</slot>
+    </connection>
+</connections>
+<slots>
+    <slot>slantChanged()</slot>
+    <slot>showPattern()</slot>
+    <slot>cancel()</slot>
+    <slot>finish()</slot>
+    <slot>startAutomaticCounter()</slot>
+    <slot>tap()</slot>
+    <slot>fixPhases()</slot>
+    <slot>setTempo()</slot>
+    <slot>balanceChanged()</slot>
+</slots>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

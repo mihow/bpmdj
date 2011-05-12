@@ -1,5 +1,5 @@
-CPP=g++ -O9 -Wall 
-CC=gcc -O9 -Wall
+CPP=ccache g++ -O9 -Wall 
+CC=ccache gcc -O9 -Wall
 #CPP=g++ -O9 -fbranch-probabilities
 #CC=gcc -O9 -fbranch-probabilities
 #CPP=g++ -O9 -fprofile-arcs

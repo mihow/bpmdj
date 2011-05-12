@@ -1,3 +1,9 @@
+2.0:
+  ksel  + improved analyzer code
+  ksel  + improved import scanner. very very fast now
+  ksel  - when tempo was zero the index_file was always rewritten
+  ksel  - fixed serious import bug.
+  ksel  + added better tag selection system
 1.9:
   ksel  - spectrumanalyzer was using fabsl (useles function)
   kplay + tempo updates are immediatelly stored on disk, makes error correcting tempos

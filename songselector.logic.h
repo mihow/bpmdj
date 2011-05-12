@@ -33,6 +33,7 @@
 #include "config.h"
 #include "database.h"
 
+class QProgressBar;
 class ProcessManager;
 class QSong;
 
@@ -67,13 +68,13 @@ class SongSelectorLogic:
     // display
     int nextTagLine;
     QLabel *tagLines[MAXTAGS];
-    QCheckBox *tagInclude[MAXTAGS];
+    QCheckBox *tagAndInclude[MAXTAGS];
+    QCheckBox *tagOrInclude[MAXTAGS];
     QCheckBox *tagExclude[MAXTAGS];
     SongSelectorLogic(QWidget*parent=0, const QString name=0);
     void findAllTags();
     void acceptNewSong(Song* song);
     void addTag(const QString tag);
-    bool lookfor(const QString w);
     // timer functions
     void resetCounter();
     // process functions
@@ -108,7 +109,7 @@ class SongSelectorLogic:
     virtual void fetchSelection();
     virtual void checkDisc();
     virtual void exportPlayList();
-    virtual void doSpectrumPca();
+    virtual void doSpectrumPca(bool fulldatabase = false);
     virtual void doSpectrumClustering();
     virtual void selectionAddTags();
     virtual void selectionPlayIn3th();
@@ -141,8 +142,7 @@ class SongSelectorLogic:
     virtual void findsimilarnames();
     virtual void findallsimilarnames();
     virtual void importSongs();
-    virtual void measureBpms();
-    virtual void measureSpectra();
+    virtual void batchAnalyzing();
     virtual void doOnlineHelp();
     virtual void doAutoMix();
     virtual void selectionMenu();

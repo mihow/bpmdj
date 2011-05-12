@@ -1,4 +1,4 @@
-VERSION = 1.9
+VERSION = 2.0
 include defines
 
 BIN = cbpm-play kbpm-play kbpm-dj merger bpmdj-raw rbpm-play xmms-play
@@ -41,12 +41,13 @@ all: $(BIN)
 # Cleanup section
 #############################################################################
 rc: 
+	killall mpg123
 	$(RM) *.raw
 
-clean: rc
+clean: 
 	$(RM) a.out core *.o *.log *.tex.dep *.toc *.dvi *.aux
 	$(RM) plot.ps gmon.out toplot.dat build sum.tmp fetchfiles.sh
-	$(RM) cbpm-count cbpm-play kbpm-play kbpm-dj kbpm-count
+	$(RM) cbpm-count cbpm-play kbpm-play kbpm-dj kbpm-count merger
 	$(RM) *.moc.cpp *.ui.cpp *.ui.h
 	$(RM) tagbox.h tagbox.cpp songplayer.h songplayer.cpp
 	$(RM) bpmcounter.h bpmcounter.cpp
@@ -54,11 +55,10 @@ clean: rc
 	$(RM) scanningprogress.h scanningprogress.cpp
 	$(RM) songselector.h songselector.cpp
 	$(RM) about.h about.cpp legende.h legende.cpp
-	$(RM) bpmbounds.h bpmbounds.cpp
 	$(RM) askinput.h askinput.cpp loader.h loader.cpp
 	$(RM) merger-dialog.h merger-dialog.cpp
 	$(RM) preferences.h preferences.cpp
-	$(RM) profile-clock process_bpm.sh process_spectrum.sh
+	$(RM) profile-clock process_bpm.sh process_spectrum.sh analyze.sh
 	$(RM) renamer.h renamer.cpp
 	$(RM) similars.h similars.cpp
 	$(RM) -r kbpmdj-$(VERSION)
@@ -84,6 +84,11 @@ uninstall:
 website: 
 	scp *.html *.png krubbens@bpmdj.sourceforge.net:/home/groups/b/bp/bpmdj/htdocs/
 
+nancy: nens
+nens:
+	tar -cvzf index.tgz index
+	scp index.tgz root@tnm:/home/nens/
+
 #############################################################################
 # Dependencies
 #############################################################################
@@ -103,54 +108,45 @@ KPLAY_OBJECTS = about.o about.moc.o\
 	songplayer.o songplayer.moc.o\
 	player-core.o\
 	cbpm-index.o\
-	kbpm-play.o\
+	kbpm-play.o analyzer.o\
 	songplayer.logic.o songplayer.logic.moc.o\
-	bpmcounter.o bpmcounter.moc.o\
-	kbpm-counter.o kbpm-counter.moc.o\
-	spectrumanalyzer.o spectrumanalyzer.moc.o\
-	spectrumanalyzer.logic.o spectrumanalyzer.logic.moc.o\
-	patternanalyzer.o patternanalyzer.moc.o\
-	patternanalyzer.logic.o patternanalyzer.logic.moc.o\
+	md5-analyzer.o\
+	bpmcounter.o       bpmcounter.moc.o       bpm-analyzer.logic.o     bpm-analyzer.logic.moc.o\
+	pattern-analyzer.o pattern-analyzer.moc.o pattern-analyzer.logic.o pattern-analyzer.logic.moc.o\
+	spectrumanalyzer.o spectrumanalyzer.moc.o spectrumanalyzer.logic.o spectrumanalyzer.logic.moc.o\
+	impulseanalyzer.o impulseanalyzer.moc.o\
+	tempolineanalyzer.o tempolineanalyzer.moc.o\
+	tempolineanalyzer.logic.o tempolineanalyzer.logic.moc.o\
+	impulseanalyzer.logic.o impulseanalyzer.logic.moc.o\
 	fourierd.o\
 	fftmisc.o\
 	common.o\
 	scripts.o
 
 KCOUNT_OBJECTS = bpmcounter.o bpmcounter.moc.o\
-	cbpm-index.o\
-	kbpm-count.o kbpm-count.moc.o\
-	scripts.o\
-	merger.o
+	cbpm-index.o kbpm-count.o kbpm-count.moc.o\
+	scripts.o merger.o
 
-KSEL_OBJECTS = qstring-factory.o spectrum.o\
+avltree-test:
+	g++ -pg -g avltree-test.cpp
+
+KSEL_OBJECTS = 	avltree.o songtree.o qstring-factory.o spectrum.o\
 	scripts.o cluster.o pca.o\
 	about.o about.moc.o\
 	loader.o loader.moc.o\
 	askinput.o askinput.moc.o\
 	tagbox.o tagbox.moc.o\
 	scanningprogress.o scanningprogress.moc.o\
-	bpmbounds.o bpmbounds.moc.o\
-	database.o\
-	dirscanner.o\
-	importscanner.o\
+	choose-analyzers.o choose-analyzers.moc.o\
+	database.o dirscanner.o importscanner.o\
 	songselector.o songselector.moc.o songselector.logic.o songselector.logic.moc.o\
 	process-manager.o\
-	preferences.o preferences.moc.o\
-	song.o\
-	qsong.o\
-	queuedsong.o\
-	index-reader.o\
-	cbpm-index.o\
-	kbpm-played.o\
-	setupwizard.moc.o\
-	setupwizard.o\
-	kbpm-dj.o\
-	edit-distance.o\
+	preferences.o preferences.moc.o song.o qsong.o queuedsong.o\
+	index-reader.o cbpm-index.o kbpm-played.o\
+	setupwizard.moc.o setupwizard.o kbpm-dj.o edit-distance.o\
 	renamer.o renamer.moc.o renamer.logic.o renamer.logic.moc.o\
 	similars.o similars.moc.o similarscanner.o similarscanner.moc.o\
-	config.o\
-	merger-dialog.o merger-dialog.moc.o\
-	common.o
+	config.o merger-dialog.o merger-dialog.moc.o common.o
 
 MERGER_OBJECTS = merger.o cbpm-index.o common.o scripts.o
 
@@ -188,6 +184,7 @@ source.tgz-dist: directories
 	$(CP) -fR debian bpmdj-$(VERSION); exit 0
 	$(RM) -fR bpmdj-$(VERSION)/debian/tmp; exit 0
 	$(RM) -fR bpmdj-$(VERSION)/*.listing
+	$(RM) -f depend
 	$(TAR) -cvzf bpmdj-$(VERSION).source.tgz bpmdj-$(VERSION)
 	$(MV) *.tgz ..
 	$(RM) -r bpmdj-$(VERSION); exit 0

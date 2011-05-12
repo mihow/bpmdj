@@ -18,10 +18,11 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
+#include "analyzer.h"
 #include "songplayer.h"
 #include "bpmcounter.h"
 
-class BpmCountDialog : public CountDialog
+class BpmAnalyzerDialog : public CountDialog, ThreadedAnalyzer
 {
    Q_OBJECT
  private:
@@ -33,31 +34,31 @@ class BpmCountDialog : public CountDialog
    long     int  bufsiz;
             int  reading_progress;
             int  processing_progress;
-            bool stop_signal;
    unsigned long phasefit(unsigned long i);
    int tapcount;
    int starttime;
  public:
-   volatile bool working;
    void          setPercentBounds(long startper, long stopper);
    void          setBpmBounds(long start, long stop);
    void          getMd5();     // retrieves MD5 sum
    void          writeAudio(); // writes audio to disk
    void          readAudio();  // reads the file in memory
-   void          doit(); // does everything at the moment... not good
-   void          doitwrapper();
+   void          run();
    void          rangeCheck();
    void          removeRaw();
-   void          stopWorking();
    SongPlayer *  player;
-   BpmCountDialog(SongPlayer*parent=0, const char * name=0, bool modal=FALSE, WFlags f=0);
+   BpmAnalyzerDialog(SongPlayer*parent=0, const char * name=0, bool modal=FALSE, WFlags f=0);
  public slots:
-   virtual void startAutomaticCounter();
+   virtual void startStopButton();
+   virtual void startAnalyzer();
+   virtual void stopAnalyzer();
+   virtual void stoppedAnalyzing();
    virtual void timerTick();
-   
+ 
    // call this if you want to stop the current process
    virtual void finish();
-   
+   virtual void store();
+ 
    // user interface responses
    virtual void tap();
    virtual void reset();

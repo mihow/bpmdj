@@ -22,6 +22,8 @@
 #include <assert.h>
 #include <math.h>
 #include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include "qstring-factory.h"
 #include "songselector.logic.h"
 #include "qsong.h"
@@ -56,7 +58,7 @@ SongMetriek SongMetriek::TEMPO(true,true,false);
 SongMetriek SongMetriek::ALL(true,true,true);
 SongMetriek SongMetriek::ALL_WITHOUT_TEMPO_WEIGHT(true,false,true);
 
-void Song::reread()
+void Song::reread(bool checkfileonline)
 {
   index_read((const char*)index);
   /* when the index changes immediately (new version and so on)
@@ -64,6 +66,10 @@ void Song::reread()
    */
   if (index_changed)
     index_write();
+  /* read last modification time */
+  struct stat status;
+  if (stat((const char*)index,&status)==0)
+    modification_time = status.st_mtime;
   /* copy everything to object */
   tempo = index_tempo;
   file = index_file;
@@ -76,14 +82,21 @@ void Song::reread()
   /* free all */
   index_free();
   /* try to open the song */
+  if (checkfileonline)
+    checkondisk();
+}
+
+void Song::checkondisk()
+{
   QString songfilename = MusicDir + "/" + file;
   ondisk = DirectoryScanner::exists(songfilename);
 }
 
-void Song::init(const QString filename, const QString currentpath) 
+void Song::init(const QString filename, const QString currentpath, bool checkondisk) 
 {
   char *fulltitle;
   int len = filename.length();
+  ondisk = false;
   /* check for .idx at the end */
   assert(filename.contains(".idx"));
   /* full index file */
@@ -101,7 +114,7 @@ void Song::init(const QString filename, const QString currentpath)
     }
   free(fulltitle);
   /* read the index file */
-  reread();
+  reread(checkondisk);
   /* set played flag */
   played=Played::IsPlayed(index);
   played_author_at_time = -100;
@@ -164,12 +177,13 @@ Song::Song()
   played = false;
   ondisk = true;
   has_cues = false;
-  played_author_at_time = 0;
+  played_author_at_time = -100;
+  modification_time = 0;
 }
 
-Song::Song(QString a, QString b)
+Song::Song(QString a, QString b, bool checkondisk)
 {
-  init(a,b);
+  init(a,b, checkondisk);
   newSpectrum(spectrum);
 }
 
@@ -348,10 +362,62 @@ bool Song::getDistance()
   if (color_distance==255)
     distance_string = QString::null;
   else
-    distance_string = tonumber(color_distance);
+    {
+      distance_string = tonumber(color_distance);
+    }
   return color_distance<255;
 }
 
 Song::~Song()
 {
+}
+
+/*
+void Song::toStream(QDataStream & stream)
+{
+  stream << title;
+  stream << author;
+  stream << version;
+  stream << tempo;
+  stream << index;
+  stream << tags;
+  stream << file;
+  stream << time;
+  stream << md5sum;
+  stream << spectrum;
+  stream << color;
+  stream << has_cues;
+  stream << modification_time;
+}
+
+void Song::fromStream(QDataStream & stream)
+{
+  stream >> title;
+  stream >> author;
+  stream >> version;
+  stream >> tempo;
+  stream >> index;
+  stream >> tags;
+  stream >> file;
+  stream >> time;
+  stream >> md5sum;
+  stream >> spectrum;
+  stream >> color;
+  stream >> has_cues;
+  stream >> modification_time;
+
+  newSpectrum(spectrum);
+}
+*/
+
+bool Song::modifiedOnDisk()
+{
+  time_t new_modification_time;
+  if (modification_time == 0)
+    return true;
+  struct stat status;
+  if (stat((const char*)index,&status)!=0)
+    return true;
+  new_modification_time = status.st_mtime;
+  return new_modification_time!=modification_time;
 }

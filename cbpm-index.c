@@ -404,9 +404,12 @@ void index_read(const char* indexn)
     }
   if (index_period <=0)
     {
-      index_period = -1;
-      index_tempo = strdup("/");
-      index_changed = 1;
+      if (!(index_period == -1 && index_tempo && strcmp(index_tempo,"/")==0))
+	{
+	  index_period = -1;
+	  index_tempo = strdup("/");
+	  index_changed = 1;
+	}
     }
   
   // the problem of duplicate tags..
