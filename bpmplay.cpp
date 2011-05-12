@@ -66,6 +66,7 @@ using namespace std;
 #include "bpmplay.h"
 #include "capacity-checker.h"
 #include "bpmplay-event.h"
+#include "clock-jack.h"
 
 /*-------------------------------------------
  *         Templates we need
@@ -78,35 +79,35 @@ template class histogram_property<32>;
 template class histogram_property<96>;
 
 // signals
-template double normalize_abs_max<double>(double*, long);
-template double find_abs_max<double>(double*, long);
+template float8 normalize_abs_max<float8>(float8*, long);
+template float8 find_abs_max<float8>(float8*, long);
 template class Fft<2>;
-template class Signal<double, 2>;
+template class Signal<float8, 2>;
 template class Signal<short, 2>;
-template class BasicSignal<double, 2>;
+template class BasicSignal<float8, 2>;
 template class BasicSignal<short, 2>;
-template class HalfComplex<double, 2>;
+template class HalfComplex<float8, 2>;
 
-template class Sample<double, 2>;
+template class Sample<float8, 2>;
 template class Sample<short,  2>;
-template       Sample<short,  2>::Sample(Sample<double, 2>);
-template       Sample<double, 2>::Sample(Sample<short, 2>);
+template       Sample<short,  2>::Sample(Sample<float8, 2>);
+template       Sample<float8, 2>::Sample(Sample<short, 2>);
 
 template class Shift<short, 2>;
-template class Shift<double,2>;
+template class Shift<float8,2>;
 
-template void BasicSignal<double, 2>::add<short>(BasicSignal<short, 2> const&);
-template void BasicSignal<double, 2>::add<double>(BasicSignal<double, 2> const&);
-template BasicSignal<double, 2>& BasicSignal<double, 2>::operator-=<double>(BasicSignal<double, 2> const&);
+template void BasicSignal<float8, 2>::add<short>(BasicSignal<short, 2> const&);
+template void BasicSignal<float8, 2>::add<float8>(BasicSignal<float8, 2> const&);
+template BasicSignal<float8, 2>& BasicSignal<float8, 2>::operator-=<float8>(BasicSignal<float8, 2> const&);
 template BasicSignal<short, 2>& BasicSignal<short, 2>::operator-=<short>(BasicSignal<short, 2> const&);
-template Signal<double, 2>::Signal(BasicSignal<short, 2> const&);
-template Signal<double, 2>::Signal(BasicSignal<double, 2> const&);
-template class Haar<double, double, 2>;
-template class Haar<short, double, 2>;
+template Signal<float8, 2>::Signal(BasicSignal<short, 2> const&);
+template Signal<float8, 2>::Signal(BasicSignal<float8, 2> const&);
+template class Haar<float8, float8, 2>;
+template class Haar<short, float8, 2>;
 
 template class SignalIO<signed2,2>;
-template void SignalIO<short, 2>::writeSamples(BasicSignal<double, 2> const&, unsigned4);
-template void SignalIO<short, 2>::readSamples(BasicSignal<double, 2>&, unsigned4);
+template void SignalIO<short, 2>::writeSamples(BasicSignal<float8, 2> const&, unsigned4);
+template void SignalIO<short, 2>::readSamples(BasicSignal<float8, 2>&, unsigned4);
 template void SignalIO<short, 2>::writeSamples(BasicSignal<signed2, 2> const&, unsigned4);
 template void SignalIO<short, 2>::readSamples(BasicSignal<signed2, 2>&, unsigned4);
 
@@ -279,7 +280,7 @@ void process_options(int argc, char* argv[])
       else
 	{
 	  dsp = dsp_driver::get_driver(config);
-	  if (dsp->is_none())
+	  if (is_none_driver())
 	    {
 	      if (!opt_check)
 		QMessageBox::information(NULL, "DSP Driver Selection",
@@ -287,6 +288,9 @@ void process_options(int argc, char* argv[])
 					 "options tab and select an appropriate one.",
 					 QMessageBox::Ok,QMessageBox::NoButton);
 	    }
+#ifdef JACK_TRANSPORT
+	  metronome = new clock_jack();
+#endif
 	}
       
       // initialize the dsp now
@@ -308,9 +312,7 @@ bool show_error(int err, int err2, const char*text)
 {
   if (err==err2)
     {
-      const QString a=QString("Error");
-      const QString b=QString(text);
-      QMessageBox::critical(NULL,a,b,QMessageBox::Ok,0,0);
+      Error(true,text);
       return true;
     }
   return false;

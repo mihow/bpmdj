@@ -65,6 +65,7 @@ using namespace std;
 #include "scripts.h"
 #include "memory.h"
 #include "signals.h"
+#include "clock-drivers.h"
 
 #define COLLAPSE 4
 const int maxslice = 8;
@@ -175,14 +176,14 @@ void BeatGraphAnalyzer::showEnergyPattern()
   QImage pm(window_xsize,window_ysize,QImage::Format_RGB32);
   QPainter p;
   p.begin(&pm);
-  float yscale = collapsed_period - 1 ;
+  float4 yscale = collapsed_period - 1 ;
   yscale /= window_ysize;
   for(int column = 0 ; column < window_xsize ; column++)
     {
       unsigned4 idx = column * collapsed_period;
       for(int row = 0 ; row < window_ysize ; row++)
 	{
-	  unsigned4 idx2 = (int)((float)row*yscale);
+	  unsigned4 idx2 = (int)((float4)row*yscale);
 	  assert(idx+idx2<collapsed_size);
 	  int val = data[idx+idx2];
 	  p.setPen(QColor(val,val,val));
@@ -196,25 +197,25 @@ void BeatGraphAnalyzer::showEnergyPattern()
   pattern->setImage(pm,samples_per_column);
 }
 
-void getBandColor(int band, QColor &color, float val)
+void getBandColor(int band, QColor &color, float4 val)
 {
   if (band<0)
     color.setRgb(0,0,0);
   else
     {
-      float p = 240.0*(float)band/(float)maxslice;
+      float4 p = 240.0*(float4)band/(float4)maxslice;
       color.setHsv((int)p,255, 255);
       int r,g,b;
       color.getRgb(&r,&g,&b);
-      float d;
+      float4 d;
       if (p<120)
 	d = r*r+g*g;
       else
 	d = g*g+b*b;
       d = 255.0*(val > 1.0 ? 1 : val) / sqrt(d);
-      r=(int)(((float)r)*d);
-      g=(int)(((float)g)*d);
-      b=(int)(((float)b)*d);
+      r=(int)(((float4)r)*d);
+      g=(int)(((float4)g)*d);
+      b=(int)(((float4)b)*d);
       color.setRgb(r,g,b);
     }
 }
@@ -227,15 +228,15 @@ void BeatGraphAnalyzer::calculateEnergy()
   data = bpmdj_allocate(collapsed_size,compressed);
   
   unsigned fs = 256;  //  fs = collapsed_period / 16;
-  double me = 0;
-  bpmdj_array(bt,collapsed_size,float);
+  float8 me = 0;
+  bpmdj_array(bt,collapsed_size,float4);
   for(unsigned4 i = 0 ; i < collapsed_size ; i++)
     bt[i]=0;
   // we take the mean of everything
-  bpmdj_array(rr,fs,float);
+  bpmdj_array(rr,fs,float4);
   for(unsigned4 i = 0 ; i < fs ; i++)
     rr[i]=0;
-  double S = 0;
+  float8 S = 0;
   // we measure energy content
   for(unsigned4 x = 0 ; x < collapsed_size ; x ++)
     {
@@ -251,7 +252,7 @@ void BeatGraphAnalyzer::calculateEnergy()
       S-=rr[x%fs];
       rr[x%fs]=bt[x];
       S+=bt[x];
-      double R = sqrt(S);
+      float8 R = sqrt(S);
       bt[x>=fs ? x - fs : 0 ] = R;
       if (R>me) me=R;
     }
@@ -266,13 +267,13 @@ void BeatGraphAnalyzer::calculateEnergy()
       for(unsigned4 x = 0 ; x < collapsed_size - cs ; x += cs)
       {
       int z = x+cs-1;
-      double m = bt[z];
+      float8 m = bt[z];
       for(int y = cs - 1 ; y >= 0 ; y--)
       if (bt[x+y]>=m) 
       m=bt[z=x+y];
       for(int y = 0 ; y < 100 ; y++)
       data[z+y]=(100-y)*255/100;
-      printf("%g\t%g\n",(double)z*((double)COLLAPSE*1000.0/(double)WAVRATE),bt[z]/me);
+      printf("%g\t%g\n",(float8)z*((float8)COLLAPSE*1000.0/(float8)WAVRATE),bt[z]/me);
       }*/
   bpmdj_deallocate(bt);
 }
@@ -284,35 +285,35 @@ void BeatGraphAnalyzer::calculateHaar()
   // First we calculate a number of layers, based on the audio-stream...
   // In every step we will modify the signed_data set by subtracting the
   // current mean...
-  bank = bpmdj_allocate(maxslice+1,float*);
-  bpmdj_array(bank_energy,maxslice+1,double);
+  bank = bpmdj_allocate(maxslice+1,float4*);
+  bpmdj_array(bank_energy,maxslice+1,float8);
   bool power = false;
   for(int filter = maxslice ; filter >= 0 ; filter --)
     {
       // calculate content of entry 'filter' of filterbank 'bank'
       int window_size = 1 << filter;
       int haar_size = collapsed_size / window_size;
-      float * filtered = NULL;
-      filtered = bank[filter] = bpmdj_allocate(haar_size+1, float);
+      float4 * filtered = NULL;
+      filtered = bank[filter] = bpmdj_allocate(haar_size+1, float4);
       if (!filter)
 	{
-	  filtered = bank[filter] = bpmdj_allocate(haar_size+1, float);
+	  filtered = bank[filter] = bpmdj_allocate(haar_size+1, float4);
 	  filtered[haar_size]=0;
 	  for(unsigned4 i = 0 ; i < collapsed_size ; i++)
 	    filtered[i]=signed_data[i];
 	}
       else
 	{
-	  filtered = bank[filter] = bpmdj_allocate(haar_size+1, float);
+	  filtered = bank[filter] = bpmdj_allocate(haar_size+1, float4);
 	  filtered[haar_size]=0;
 	  if (!power)
 	    for(int y = 0 ; y < haar_size ; y ++)
 	      {
 		int d = y * window_size;
-		float mean = 0;
+		float4 mean = 0;
 		for(int x = 0 ; x < window_size ; x++)
 		  mean += signed_data[x+d];
-		mean /= (float)window_size;
+		mean /= (float4)window_size;
 		filtered[y] = mean;
 		for(int x = 0 ; x < window_size ; x++)
 		  signed_data[x+d]-=mean;
@@ -321,16 +322,16 @@ void BeatGraphAnalyzer::calculateHaar()
 	    for(int y = 0 ; y < haar_size ; y ++)
 	      {
 		int d = y * window_size;
-		float mean = 0;
-		float power = 0;
+		float4 mean = 0;
+		float4 power = 0;
 		for(int x = 0 ; x < window_size ; x++)
 		  {
-		    float v = signed_data[x+d];
+		    float4 v = signed_data[x+d];
 		    mean += v;
 		    power += v*v;
 		  }
-		mean /= (float)window_size;
-		power /= (float)window_size;
+		mean /= (float4)window_size;
+		power /= (float4)window_size;
 		power = sqrt(power);
 		filtered[y] = power;
 		for(int x = 0 ; x < window_size ; x++)
@@ -343,12 +344,12 @@ void BeatGraphAnalyzer::calculateHaar()
       
       // find the mean of this bank entry
       // RMS power of this bank = square root of the mean of the squared amplitude
-      double mean=0;
-      double max =0;
-      double power = 0;
+      float8 mean=0;
+      float8 max =0;
+      float8 power = 0;
       for(int y = 0 ; y < haar_size ; y++)
 	{
-	  float v = filtered[y];
+	  float4 v = filtered[y];
 	  mean += v;
 	  power += v*v;
 	  if (v>max)
@@ -359,13 +360,13 @@ void BeatGraphAnalyzer::calculateHaar()
       // printf("power of bank %d is %g\n",filter,power);
       
       // find the std dev of this bank entry
-      double dev = 0;
+      float8 dev = 0;
       int devcnt = 0;
 
       bank_energy[filter] = 0;
       for(int row = 0 ; row < haar_size ; row++)
 	{
-	  float v = filtered[row];
+	  float4 v = filtered[row];
 	  bank_energy[filter]+=v;
 	  dev+=fabs(v-mean);
 	  devcnt++;
@@ -377,7 +378,7 @@ void BeatGraphAnalyzer::calculateHaar()
       if (dev>0)
 	for(int y = 0 ; y < haar_size ; y++)
 	  {
-	    float v = filtered[y];
+	    float4 v = filtered[y];
 	    v-=mean;
 	    v/=dev;
 	    v+=0.5;
@@ -388,7 +389,7 @@ void BeatGraphAnalyzer::calculateHaar()
     }
   
   // normalize bank_energy
-  double maxe=0;
+  float8 maxe=0;
   for(int i = 0 ; i <= maxslice ; i++)
     if (bank_energy[i]>maxe)
       maxe=bank_energy[i];
@@ -411,7 +412,7 @@ void BeatGraphAnalyzer::showHaarPattern()
   QPainter p;
   p.begin(&pm);
   // show
-  float yscale = collapsed_period - 1 ;
+  float4 yscale = collapsed_period - 1 ;
   yscale /= window_ysize;
   for(int column = 0 ; column < window_xsize ; column++)
     {
@@ -419,16 +420,16 @@ void BeatGraphAnalyzer::showHaarPattern()
       for(int row = 0 ; row < window_ysize ; row++)
 	{
 	  QColor c;
-	  int ro = co + (int)((float)row*yscale);
+	  int ro = co + (int)((float4)row*yscale);
 	  int r = 0, g = 0, b = 0;
 	  for(int slice = maxslice; slice>=0 ; slice --)
 	    {
 	      int x1 = ro >> slice;
 	      int x2 = (ro+1) >> slice;
-	      float value = 0;
+	      float4 value = 0;
 	      if (x2>x1)
 		for(int x = x1 ; x < x2 ; x ++)
-		  value += bank[slice][x] / (float)(x2 - x1);
+		  value += bank[slice][x] / (float4)(x2 - x1);
 	      else
 		value = bank[slice][x1];
 	      getBandColor(maxslice-slice,c,value);

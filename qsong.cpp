@@ -91,14 +91,14 @@ QSong::QSong() : QVectorViewData()
 {
 }
 
-static QColor * mixColor(QColor a, double d, QColor b)
+static QColor * mixColor(QColor a, float4 d, QColor b)
 {
-  double ar = a.red();
-  double br = b.red();
-  double ag = a.green();
-  double bg = b.green();
-  double ab = a.blue();
-  double bb = b.blue();
+  float4 ar = a.red();
+  float4 br = b.red();
+  float4 ag = a.green();
+  float4 bg = b.green();
+  float4 ab = a.blue();
+  float4 bb = b.blue();
   return new QColor((int)(ar+d*(br-ar)),
 		    (int)(ag+d*(bg-ag)),
 		    (int)(ab+d*(bb-ab)));
@@ -109,7 +109,7 @@ QColor * QSong::colorOfTempoCol(const Song* main, Song* song)
   if (!Config::color_range) return NULL;
   if (!main) return NULL;
   if (song->get_tempo().none()) return NULL;
-  double d = SongMetriek::std.tempo_diff(*main,*song);
+  float4 d = SongMetriek::std.tempo_diff(*main,*song);
   int harmonic = 0;
   d = SongMetriek::std.find_harmonic(d,harmonic);
   d = fabs(d);
@@ -127,14 +127,14 @@ QColor * QSong::colorOfAuthorCol(Song* song)
   if (!Config::color_authorplayed) return NULL;
   int played_author_songs_ago = History::get_songs_played() - song->get_played_author_at_time();
   if (played_author_songs_ago < Config::get_authorDecay())
-    return mixColor(Config::get_color_played_author(), (float)played_author_songs_ago/(float)Config::get_authorDecay() ,Qt::white);
+    return mixColor(Config::get_color_played_author(), (float4)played_author_songs_ago/(float4)Config::get_authorDecay() ,Qt::white);
   return NULL;
 }
 
 QColor * QSong::colorOfPlaycount(Song* song)
 {
-  float count = song->get_alltime_playcount();
-  float total = song->get_max_alltime_total();
+  float4 count = song->get_alltime_playcount();
+  float4 total = song->get_max_alltime_total();
   if (count)
     return mixColor(Qt::white, count/total, Config::get_color_alltime());
   return NULL;
@@ -371,8 +371,8 @@ void QSong::paintCell(QVectorView* vv, int i, QPainter *p,const QColorGroup &cg,
 		      for(int v = 0 ; v < wid ; v ++)
 			{
 			  int x = v*composition_prop_sx/wid;
-			  float c1 = (his_band.get_energy(x)-127.0)*his_band.scale;
-			  float c2 = (mis_band.get_energy(x)-127.0)*mis_band.scale;
+			  float4 c1 = (his_band.get_energy(x)-127.0)*his_band.scale;
+			  float4 c2 = (mis_band.get_energy(x)-127.0)*mis_band.scale;
 			  if (c1>c2)
 			    {
 			      int c = (int)((c1-c2)*10);

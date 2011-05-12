@@ -56,7 +56,7 @@ class SongHeap: set<Song*,SongDistComparator>
 {
   int maxsize;
  public:
-  float maximum;
+  float4 maximum;
   int size;
   /**
    * Initializes the heap to a maxmimum of nr songs.

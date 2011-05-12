@@ -107,7 +107,7 @@ public:
     return cmd; 
   };
   QString getPlayCommand(Index & matchto, Index & song) const;
-  QString getAnalCommand(bool tempo, int bpmtechnique, double from, double to, bool spectrum, bool energy, bool rythm, QString song) const;
+  QString getAnalCommand(bool tempo, int bpmtechnique, float8 from, float8 to, bool spectrum, bool energy, bool rythm, QString song) const;
   void    setAnalyzer() 
     {
       kind = analyzer;
@@ -138,7 +138,7 @@ public:
       return running_time; 
     };
   int     inc_running_time();
-  float   songs_per_second() const;
+  float4   songs_per_second() const;
   void    start(Song * song);
   /**
    * The stop routine is called by the process manager
@@ -185,7 +185,7 @@ class SongSelectorAnalView: public QCheckBox
    Q_OBJECT ;
    SongProcess * song_process;
    AnalyzersManager * anal_processes;
-   float   relative_running_time();
+   float4   relative_running_time();
  public:
    SongSelectorAnalView(QWidget * parent, AnalyzersManager * a, SongProcess & s);
  private slots:

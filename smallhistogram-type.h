@@ -40,7 +40,7 @@ extern Symbol key_scale;
 template <int smallhistogram_size> class smallhistogram_type
 {
  public:
-  double scale;
+  float8 scale;
   //  int    count;
   unsigned1 bin[smallhistogram_size];
   smallhistogram_type() 
@@ -61,7 +61,7 @@ template <int smallhistogram_size> class smallhistogram_type
     }
   Data get_data(int version) const;
   void set_data(Data& data);
-  void set_scale(double s)
+  void set_scale(float8 s)
     {
       scale = s;
       validate_scale();

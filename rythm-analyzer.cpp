@@ -61,8 +61,9 @@ using namespace std;
 #include "version.h"
 #include "scripts.h"
 #include "pca.h"
+#include "clock-drivers.h"
 
-void fft_to_bark(double * in_r, int window_size, spectrum_type &out)
+void fft_to_bark(float8 * in_r, int window_size, spectrum_type &out)
 {
   for(int b = 0 ; b < barksize ; b ++)
     {
@@ -78,7 +79,7 @@ void fft_to_bark(double * in_r, int window_size, spectrum_type &out)
 	  assert(c!=a);
 	}
       out.set_bark(b,0);
-      double r = 0;
+      float8 r = 0;
       for(int i = a ; i < c; i++)
 	r+=fabs(in_r[i]);
       out.set_bark(b,r/(c-a));
@@ -97,18 +98,18 @@ RythmAnalyzer::RythmAnalyzer(QWidget*parent) : QWidget(parent)
   rythm->setPixmap(*pm);
 }
 
-static double tovol(double a)
+static float8 tovol(float8 a)
 {
-  double r = 10.0*log(a)/log(10.0);
+  float8 r = 10.0*log(a)/log(10.0);
   if (isnan(r)) return 0;
   if (r<-30) return 0;
   return r+30;
 }
 
-double xy_dist(double x1, double y1, double x2, double y2)
+float8 xy_dist(float8 x1, float8 y1, float8 x2, float8 y2)
 {
-  double a = x1 - x2;
-  double b = y1 - y2;
+  float8 a = x1 - x2;
+  float8 b = y1 - y2;
   a *= a;
   b *= b;
   return sqrt(a+b);
@@ -119,7 +120,7 @@ void wavelet_subtraction_test(long slice_size, unsigned4* phases, int maximum_sl
   int window_size = higher_power_of_two(slice_size);
   maximum_slice--;
   Signal<signed2,2> slice(window_size);
-  Signal<double,2>  pattern(window_size);
+  Signal<float8,2>  pattern(window_size);
   pattern.clear();
   
   // read file, rotate and place in pattern array
@@ -128,8 +129,8 @@ void wavelet_subtraction_test(long slice_size, unsigned4* phases, int maximum_sl
     {
       i.readSamples(slice,x*slice_size);
       Shift<signed2,2> shifted(slice,phases[x]);
-      Signal<double,2> waved(window_size);
-      Haar<signed2,double,2> h(shifted,waved,true);
+      Signal<float8,2> waved(window_size);
+      Haar<signed2,float8,2> h(shifted,waved,true);
       h.execute();
       waved.absolute();
       pattern.add(waved);
@@ -139,8 +140,8 @@ void wavelet_subtraction_test(long slice_size, unsigned4* phases, int maximum_sl
   //  pattern.normalize_abs_max();
   //  pattern.multiply(32768);
   
-  Signal<double,2> wave_pattern(window_size);
-  Haar<double,double,2> forward1(pattern,wave_pattern,true);
+  Signal<float8,2> wave_pattern(window_size);
+  Haar<float8,float8,2> forward1(pattern,wave_pattern,true);
   forward1.execute();
   
   // read file, rotate and place in pattern array
@@ -150,25 +151,25 @@ void wavelet_subtraction_test(long slice_size, unsigned4* phases, int maximum_sl
       printf("%d/%d\n",x,maximum_slice);
       i.readSamples(slice,x*slice_size);
       Shift<signed2,2> shifted(slice,phases[x]);
-      Signal<double,2> new_wave(window_size);
-      Haar<signed2,double,2> forward(shifted,new_wave,true);
+      Signal<float8,2> new_wave(window_size);
+      Haar<signed2,float8,2> forward(shifted,new_wave,true);
       forward.execute();
       for(int k = 0 ; k < window_size ; k++)
 	for(int l = 0 ; l < 2 ; l++)
 	  {
-	    double T = new_wave.get(k,l);
-	    double W = fabs(wave_pattern.get(k,l));
+	    float8 T = new_wave.get(k,l);
+	    float8 W = fabs(wave_pattern.get(k,l));
 	    if (T > 0)
 	      new_wave.set(k,l,T-W > 0 ? T-W : 0);
 	    else
 	      new_wave.set(k,l,T+W < 0 ? T+W : 0);
 	  }
       //      new_wave-=wave_pattern;
-      Haar<double,double,2> backward(new_wave,new_wave,false);
+      Haar<float8,float8,2> backward(new_wave,new_wave,false);
       backward.execute();
       new_wave.normalize_abs_max();
       new_wave.multiply(32768);
-      Shift<double,2> S(new_wave,-phases[x]);
+      Shift<float8,2> S(new_wave,-phases[x]);
       o.writeSamples(S,slice_size);
     }
 }
@@ -178,7 +179,7 @@ void subtraction_test(long slice_size, unsigned4* phases, int maximum_slice, con
   int window_size = higher_power_of_two(slice_size);
   maximum_slice--;
   Signal<signed2,2> slice(window_size);
-  Signal<double,2>  pattern(window_size);
+  Signal<float8,2>  pattern(window_size);
   pattern.clear();
   
   // read file, rotate and place in pattern array
@@ -198,8 +199,8 @@ void subtraction_test(long slice_size, unsigned4* phases, int maximum_slice, con
   for(int x = 0 ; x < maximum_slice ; x++)
     {
       f.readSamples(slice,x*slice_size);
-      Signal<double,2> slice2(slice);
-      Shift<double,2> shifted(pattern,-phases[x]);
+      Signal<float8,2> slice2(slice);
+      Shift<float8,2> shifted(pattern,-phases[x]);
       slice2-=shifted;
       out.writeSamples(slice2,slice_size);
     }
@@ -209,7 +210,7 @@ void subtraction_test(long slice_size, unsigned4* phases, int maximum_slice, con
  * Calculates the raw overlay pattern and writes it out to disk after shaping
  * the spectrum to fit the perfect spectrum.
  */
-/*static double perfectspectrum[barksize] = 
+/*static float8 perfectspectrum[barksize] = 
   {
     7.48973,   8.60855,   7.30108,   6.08735,
     5.05958,   4.22398,   3.55564,   2.84894,
@@ -220,7 +221,7 @@ void subtraction_test(long slice_size, unsigned4* phases, int maximum_slice, con
   };
 */
 
-static double perfectspectrum[barksize] = 
+static float8 perfectspectrum[barksize] = 
   {
     9.9,   8.60855,   7.30108,   6.08735,
     5.05958,   4.22398,   3.55564,   2.84894,
@@ -230,23 +231,23 @@ static double perfectspectrum[barksize] =
     -6.09273,  -7.06462,  -8.35773,  -10.1641
   };
 
-void shape(Signal<double,2> &in)
+void shape(Signal<float8,2> &in)
 {
   in.normalize_abs_max();
-  HalfComplex<double,2> *freq = new HalfComplex<double,2>(in.length/2,in.length/2);
+  HalfComplex<float8,2> *freq = new HalfComplex<float8,2>(in.length/2,in.length/2);
   Fft<2> forward(in,*freq);
   forward.execute();
-  Signal<double,2> energy(in.length/2);
-  Signal<double,2> angle(in.length/2);
+  Signal<float8,2> energy(in.length/2);
+  Signal<float8,2> angle(in.length/2);
   freq->toPolar(energy,angle);
-  Sample<double,2> basis = 0;
+  Sample<float8,2> basis = 0;
   for(int b = 0 ; b < barksize ; b ++)
     {
-      double a = barkbounds[b];
-      double c = barkbounds[b+1];
+      float8 a = barkbounds[b];
+      float8 c = barkbounds[b+1];
       int l = (int)(a * in.length / 44100.0);
       int r = (int)(c * in.length / 44100.0);
-      Sample<double,2> e = 0;
+      Sample<float8,2> e = 0;
       for(int i = l ; i < r ; i ++)
 	{
 	  // this strange construction is due to the tovol function
@@ -256,7 +257,7 @@ void shape(Signal<double,2> &in)
       e/=r-l;
       if (b==0) basis=e;
       e-=basis;
-      double f = perfectspectrum[b];
+      float8 f = perfectspectrum[b];
       printf("%g\t%g\n",e[0],f);
       e[0]=exp10((f-e[0])/10);
       e[1]=exp10((f-e[1])/10);
@@ -265,8 +266,8 @@ void shape(Signal<double,2> &in)
 	energy.set(i,energy[i]*e);
     }
   
-  double a = barkbounds[barksize];
-  double c = 22050;
+  float8 a = barkbounds[barksize];
+  float8 c = 22050;
   int l = (int)(a * in.length / 44100.0);
   int r = (int)(c * in.length / 44100.0);
   for(int i = l ; i < r ; i ++)
@@ -283,7 +284,7 @@ void pattern_shaped_test(long slice_size, unsigned4* phases, int maximum_slice, 
   int window_size = higher_power_of_two(slice_size);
   maximum_slice--;
   Signal<signed2,2> slice(slice_size);
-  Signal<double,2>  pattern(window_size);
+  Signal<float8,2>  pattern(window_size);
   pattern.clear();
   
   // read file, rotate and place in pattern array
@@ -315,7 +316,7 @@ void pattern_test(long slice_size, unsigned4* phases, int maximum_slice, const c
   int window_size = higher_power_of_two(slice_size);
   maximum_slice--;
   Signal<signed2,2> slice(window_size);
-  Signal<double,2>  pattern(window_size);
+  Signal<float8,2>  pattern(window_size);
   pattern.clear();
   
   // read file, rotate and place in pattern array
@@ -345,20 +346,20 @@ void pattern_test(long slice_size, unsigned4* phases, int maximum_slice, const c
 void write_out_projection(long slice_size, unsigned4* phases, int maximum_slice, const char* target)
 {
   int frame_size = higher_power_of_two(2 * WAVRATE / 40);
-  Signal<double,2> curr_frame(frame_size);
-  Signal<double,2> prev_frame(frame_size);
-  HalfComplex<double,2> curr_spectr(frame_size/2,frame_size/2);
-  HalfComplex<double,2> prev_spectr(frame_size/2,frame_size/2);
+  Signal<float8,2> curr_frame(frame_size);
+  Signal<float8,2> prev_frame(frame_size);
+  HalfComplex<float8,2> curr_spectr(frame_size/2,frame_size/2);
+  HalfComplex<float8,2> prev_spectr(frame_size/2,frame_size/2);
   Fft<2> curr_forward(curr_frame,curr_spectr);
-  //  Signal<double,2> curr_energy(frame_size/2);
-  //  Signal<double,2> curr_angle(frame_size/2);
-  //  Signal<double,2> prev_energy(frame_size/2);
+  //  Signal<float8,2> curr_energy(frame_size/2);
+  //  Signal<float8,2> curr_angle(frame_size/2);
+  //  Signal<float8,2> prev_energy(frame_size/2);
   SignalIO<signed2,2> f(openCoreRawFile());
   unsigned4 l = f.samples();
   curr_frame.clear();
   // we allocate the matrix
   int count = l/frame_size;
-  float ** target_m = matrix(count,frame_size);
+  float4 ** target_m = matrix(count,frame_size);
   for(unsigned4 x = 0 ; x + frame_size < l ; x+=frame_size)
     {
       // read current frame
@@ -388,16 +389,16 @@ void write_out_projection(long slice_size, unsigned4* phases, int maximum_slice,
 void write_out_projection_hald_working(unsigned4 slice_size, unsigned4* phases, int maximum_slice, const char* target)
 {
   int frame_size = higher_power_of_two(2 * WAVRATE / 40);
-  Signal<double,2> curr_frame(frame_size);
-  Signal<double,2> prev_frame(frame_size);
-  HalfComplex<double,2> curr_spectr(frame_size/2,frame_size/2);
-  HalfComplex<double,2> prev_spectr(frame_size/2,frame_size/2);
+  Signal<float8,2> curr_frame(frame_size);
+  Signal<float8,2> prev_frame(frame_size);
+  HalfComplex<float8,2> curr_spectr(frame_size/2,frame_size/2);
+  HalfComplex<float8,2> prev_spectr(frame_size/2,frame_size/2);
   Fft<2> curr_forward(curr_frame,curr_spectr);
   Fft<2> prev_forward(prev_frame,prev_spectr);
   Fft<2> curr_backward(curr_spectr,curr_frame);
-  Signal<double,2> curr_energy(frame_size/2);
-  Signal<double,2> curr_angle(frame_size/2);
-  Signal<double,2> prev_energy(frame_size/2);
+  Signal<float8,2> curr_energy(frame_size/2);
+  Signal<float8,2> curr_angle(frame_size/2);
+  Signal<float8,2> prev_energy(frame_size/2);
   SignalIO<signed2,2> f(openCoreRawFile());
   SignalIO<signed2,2> out(target,"wb");
   unsigned4 l = f.samples();
@@ -452,7 +453,7 @@ void write_out_projection_old(long slice_size, unsigned4* phases, int maximum_sl
   int     window_size = higher_power_of_two(slice_size);
   maximum_slice--;
   Signal<signed2,2> slice(window_size);
-  Signal<double,2> pattern(window_size);
+  Signal<float8,2> pattern(window_size);
   pattern.clear();
   
   // read file, rotate and place in pattern array
@@ -468,15 +469,15 @@ void write_out_projection_old(long slice_size, unsigned4* phases, int maximum_sl
   pattern.normalize_abs_max();
 
   // convert to frequency domain
-  HalfComplex<double,2> spectrum(window_size/2,window_size/2);
+  HalfComplex<float8,2> spectrum(window_size/2,window_size/2);
   Fft<2> forward(pattern,spectrum);
   forward.execute();
   
   // we traverse the entire file
   int max_frames = f.samples();
   max_frames /=window_size;
-  Signal<double,2> frame(window_size);
-  HalfComplex<double,2> spec(window_size/2,window_size/2);
+  Signal<float8,2> frame(window_size);
+  HalfComplex<float8,2> spec(window_size/2,window_size/2);
   Fft<2> warp(frame,spec);
   Fft<2> back(spec,frame);
   SignalIO<signed2,2> out(target,"wb");
@@ -505,10 +506,10 @@ void write_out_projection_old(long slice_size, unsigned4* phases, int maximum_sl
     mean_r[i]=spectrum[i];
   for(int i = 1 ; i < window_size/2 ; i++)
     {
-      double lx = mean_l[i];
-      double ly = mean_l[window_size-i];
-      double rx = mean_r[i];
-      double ry = mean_r[window_size-i];
+      float8 lx = mean_l[i];
+      float8 ly = mean_l[window_size-i];
+      float8 rx = mean_r[i];
+      float8 ry = mean_r[window_size-i];
       angle_l[i]=atan2(ly,lx);
       angle_r[i]=atan2(ry,rx);
     }
@@ -535,9 +536,9 @@ void write_out_projection_old(long slice_size, unsigned4* phases, int maximum_sl
       fftw_execute(plan_l);
       for(int i = 1 ; i < window_size / 2 ; i++)
 	{
-	  double x1 = spectrum[i];
-	  double y1 = spectrum[window_size-i];
-	  double angle = atan2(y1,x1);
+	  float8 x1 = spectrum[i];
+	  float8 y1 = spectrum[window_size-i];
+	  float8 angle = atan2(y1,x1);
 	  angle-=angle_l[i];
 	  angle=fabs(angle);
 	  if (angle>M_PI) angle-=M_PI;
@@ -546,9 +547,9 @@ void write_out_projection_old(long slice_size, unsigned4* phases, int maximum_sl
       fftw_execute(plan_r);
       for(int i = 1 ; i < window_size / 2 ; i++)
 	{
-	  double x1 = spectrum[i];
-	  double y1 = spectrum[window_size-i];
-	  double angle = atan2(y1,x1);
+	  float8 x1 = spectrum[i];
+	  float8 y1 = spectrum[window_size-i];
+	  float8 angle = atan2(y1,x1);
 	  angle-=angle_r[i];
 	  angle=fabs(angle);
 	  if (angle>M_PI) angle-=M_PI;
@@ -560,7 +561,7 @@ void write_out_projection_old(long slice_size, unsigned4* phases, int maximum_sl
   // the final step is the noramlisation of the allowable
   // phase differences. We do this by finding the mean phase
   // then the deviation and scale everything from m-d to m+d
-  double ml=0,mr=0;
+  float8 ml=0,mr=0;
   for(int i = 0 ; i < window_size/2 ; i++)
     {
       var_l[i]/=maximum_slice; 
@@ -579,8 +580,8 @@ void write_out_projection_old(long slice_size, unsigned4* phases, int maximum_sl
   // variance. If it varies a lot then we remove it slightly
   for(int i = 1 ; i < window_size/2 ; i++)
     {
-      double vl = var_l[i];
-      double vr = var_r[i];
+      float8 vl = var_l[i];
+      float8 vr = var_r[i];
       vl*=vl;
       vr*=vr;
 
@@ -642,12 +643,12 @@ void write_out_projection_old(long slice_size, unsigned4* phases, int maximum_sl
 #endif
 
 static fftw_plan plan;
-static double *fft_out = NULL;
-static double *fft_in = NULL;
-static double *init_bark_fft2(int window_size)
+static float8 *fft_out = NULL;
+static float8 *fft_in = NULL;
+static float8 *init_bark_fft2(int window_size)
 {
-  fft_in  = bpmdj_allocate(window_size,double);
-  fft_out = bpmdj_allocate(window_size,double);
+  fft_in  = bpmdj_allocate(window_size,float8);
+  fft_out = bpmdj_allocate(window_size,float8);
   plan = fftw_plan_r2r_1d(window_size,fft_in,fft_out,FFTW_R2HC,FFTW_MEASURE);
   return fft_in;
 }
@@ -700,7 +701,7 @@ void RythmAnalyzer::calculateRythmPattern2()
 	slice_prot[i].set_bark(b,0);
 	last_measure[i].set_bark(b,0);
       }
-  double * buffer_fft = init_bark_fft2(window_size);
+  float8 * buffer_fft = init_bark_fft2(window_size);
   // open song
   FILE * raw = openCoreRawFile();
   long int audio_size = fsize(raw)/4;
@@ -734,7 +735,7 @@ void RythmAnalyzer::calculateRythmPattern2()
 	  bark_fft2(window_size,slice_freq[a]);
 	  for(int i = 0 ; i < 24 ; i ++)
 	    {
-	      double v;
+	      float8 v;
 	      v = slice_prot[a].get_bark(i);
 	      assert(!isinf(v));
 	      v = tovol(slice_freq[a].get_bark(i));
@@ -743,18 +744,18 @@ void RythmAnalyzer::calculateRythmPattern2()
 	    }
 	}
       // find best rotational fit towards prototype
-      double m = HUGE;
+      float8 m = HUGE;
       int a = 0;
       for(int p = 0 ; p < slice_frames ; p++)
 	{
-	  double d = 0;
+	  float8 d = 0;
 	  for(int y = 0 ; y < slice_frames ; y++)
 	    {
 	      int z = (y + p)%slice_frames;
 	      for(int b = 0 ; b < 24 && d < m; b ++)
 		{
-		  double v = slice_prot[y].get_bark(b) / slice;
-		  double w = slice_freq[z].get_bark(b);
+		  float8 v = slice_prot[y].get_bark(b) / slice;
+		  float8 w = slice_freq[z].get_bark(b);
 		  d += (v-w) * (v-w);
 		}
 	    }
@@ -778,11 +779,11 @@ void RythmAnalyzer::calculateRythmPattern2()
 	  // store last measure and remember change level
 	  for(int b = 0 ; b < 24 ; b++)
 	    {
-	      double d = 0;
+	      float8 d = 0;
 	      for(int y = 0 ; y < slice_frames; y++)
 		{
-		  // double v = last_measure[y].get_bark(b);
-		  double w = slice_freq[y].get_bark(b);
+		  // float8 v = last_measure[y].get_bark(b);
+		  float8 w = slice_freq[y].get_bark(b);
 		  d += /* v - */ w;
 		}
 	      // 	      d = log(d);
@@ -817,7 +818,7 @@ void RythmAnalyzer::calculateRythmPattern2()
   for(int f = 0 ; f < slice_frames ; f++)
     for(int b = 0 ; b < 24 ; b ++)
       {
-	double v = slice_prot[f].get_bark(b);
+	float8 v = slice_prot[f].get_bark(b);
 	mean.set_bark(b,mean.get_bark(b)+v);
 	if (fabs(v) > maxima.get_bark(b))
 	  maxima.set_bark(b,fabs(v));
@@ -825,8 +826,8 @@ void RythmAnalyzer::calculateRythmPattern2()
   for(int f = 0 ; f < slice_frames ; f++)
     for(int b = 0 ; b < 24 ; b ++)
       {
-	double v = slice_prot[f].get_bark(b);
-	double m = mean.get_bark(b) / slice_frames;
+	float8 v = slice_prot[f].get_bark(b);
+	float8 m = mean.get_bark(b) / slice_frames;
 	v -=m;
 	v /= maxima.get_bark(b) - m;
 	scale.set_bark(b,maxima.get_bark(b) - m);
@@ -838,12 +839,12 @@ void RythmAnalyzer::calculateRythmPattern2()
   // as well now as in the longer future. 
   // so we take 1/16the surface and add it with 1/8the and 1/4th and 1/2
   int startpos = 0;
-  double startenergy = 0;
+  float8 startenergy = 0;
   status_bar->setText("Locating start");
   app->processEvents();
   for(int a = 0 ; a < slice_frames ; a++)
     {
-      double total = 0;
+      float8 total = 0;
       for(int l = slice_frames/16 ; l < slice_frames ; l*=2)
 	{
 	  for(int f = 0 ; f < l ; f++)
@@ -851,7 +852,7 @@ void RythmAnalyzer::calculateRythmPattern2()
 	      int z = (a+f)%slice_frames;
 	      for(int b = 0 ; b < 24 ; b ++)
 		{
-		  double v = slice_prot[z].get_bark(b);
+		  float8 v = slice_prot[z].get_bark(b);
 		  total+=v;
 		}
 	    }
@@ -874,7 +875,7 @@ void RythmAnalyzer::calculateRythmPattern2()
 	  int z = x * slice_frames / rythm_prop_sx; 
 	  z += startpos;
 	  z %= slice_frames;
-	  double dB = slice_prot[z].get_bark(y);
+	  float8 dB = slice_prot[z].get_bark(y);
 	  dB*=127;
 	  dB+=127;
 	  if (dB<0) dB=0;
@@ -898,7 +899,7 @@ void RythmAnalyzer::calculateRythmPattern2()
 	  int z = x * (slice_frames - 1) / ( view_xs - 1 );
 	  z+=startpos;
 	  z%=slice_frames;
-	  double dB = slice_prot[z].get_bark(y);
+	  float8 dB = slice_prot[z].get_bark(y);
 	  QColor col;
 	  /* This is one way of coloring */
 	  dB*=192;
@@ -939,7 +940,7 @@ void RythmAnalyzer::calculateRythmPattern2()
     for(int f = 0 ; f < max_slices ; f++)
       for(int b = 0 ; b < 24 ; b ++)
 	{
-	  double v = changes[f].get_bark(b);
+	  float8 v = changes[f].get_bark(b);
 	  mean.set_bark(b,mean.get_bark(b)+v);
 	  if (fabs(v) > maxima.get_bark(b))
 	    maxima.set_bark(b,fabs(v));
@@ -947,8 +948,8 @@ void RythmAnalyzer::calculateRythmPattern2()
     for(int f = 0 ; f < max_slices ; f++)
       for(int b = 0 ; b < 24 ; b ++)
 	{
-	  double v = changes[f].get_bark(b);
-	  double m = mean.get_bark(b) / max_slices;
+	  float8 v = changes[f].get_bark(b);
+	  float8 m = mean.get_bark(b) / max_slices;
 	  v -=m;
 	  v /= maxima.get_bark(b) - m;
 	  // scale.set_bark(b,maxima.get_bark(b) - m);
@@ -965,7 +966,7 @@ void RythmAnalyzer::calculateRythmPattern2()
     {
       for(int y = 0 ; y < 24 ; y ++)
 	{
-	  double dB = changes[x].get_bark(y);
+	  float8 dB = changes[x].get_bark(y);
 	  QColor col;
 	  dB*=128;
 	  dB+=127;
@@ -983,10 +984,10 @@ void RythmAnalyzer::calculateRythmPattern2()
   int ws = higher_power_of_two(max_slices);
   if (ps>ws) 
     ws = higher_power_of_two(ps);
-  double * ain = bpmdj_allocate(ws,double);
-  double * aou = bpmdj_allocate(ws,double);
-  double * aio = bpmdj_allocate(ws,double);
-  double * periods = bpmdj_allocate(ps,double);
+  float8 * ain = bpmdj_allocate(ws,float8);
+  float8 * aou = bpmdj_allocate(ws,float8);
+  float8 * aio = bpmdj_allocate(ws,float8);
+  float8 * periods = bpmdj_allocate(ps,float8);
   // int *counts = bpmdj_allocate(ps,int);
   pm = new QPixmap(ps, 24);
   p.begin(pm);
@@ -1005,13 +1006,13 @@ void RythmAnalyzer::calculateRythmPattern2()
       for(int pml = 0 ; pml < ps ; pml++)
 	periods[pml]=ain[pml];
       periods[0]=0;
-      double maxed = normalize_abs_max(periods,ps);
+      float8 maxed = normalize_abs_max(periods,ps);
       // printf("%g\n",maxed);
       // assign the autocorrelation to the composition property
       cp.set_scale(y,maxed);
       for(int x = 1 ; x < ps ; x ++)
 	{
-	  double val = periods[x];
+	  float8 val = periods[x];
 	  val*=127;
 	  val+=127;
 	  if (val<0) val = 0;
@@ -1021,7 +1022,7 @@ void RythmAnalyzer::calculateRythmPattern2()
 
       for(int x = 0 ; x < ps ; x++)
 	{
-	  double dB = periods[x];
+	  float8 dB = periods[x];
 	  QColor col;
 	  if (dB<0) dB=-dB;
 	  dB*=255;

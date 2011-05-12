@@ -63,6 +63,7 @@ using namespace std;
 #include "scripts.h"
 #include "bpm.h"
 #include "memory.h"
+#include "clock-drivers.h"
 
 #define IMAGE_XS 320
 #define IMAGE_YS 240

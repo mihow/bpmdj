@@ -76,6 +76,7 @@ void PlayerConfig::init()
   init_jack_dev();
   init_jack_verbose();
   init_jack_latency();
+  init_jack_lowlatency();
 }
 
 /**
@@ -143,6 +144,7 @@ void PlayerConfig::save()
   s << get_jack_dev();
   s << (Q_UINT16)get_jack_latency();
   s << (Q_INT8)get_jack_verbose();
+  s << (Q_INT8)get_jack_lowlatency();
 }
 
 void PlayerConfig::load()
@@ -152,7 +154,7 @@ void PlayerConfig::load()
   Q_UINT16 magic;
   Q_UINT16 w;
   QString str;
-  float fl;
+  float4 fl;
   QFile f(get_meta_name());
   f.open(IO_ReadOnly);
   QDataStream s(&f);
@@ -266,7 +268,31 @@ void PlayerConfig::load()
 	s >> w;  set_jack_latency(w);
 	s >> b; set_jack_verbose(b);
      }
-  else
+   else if (magic == MAGIC_3_6)
+     {
+	s >> str; set_core_rawpath(str);
+	s >> w; set_player_dsp(w);
+	s >> w; set_alsa_latency(w);
+	s >> b; set_alsa_verbose(b);
+	s >> str; set_alsa_dev(str);
+	s >> str; set_oss_dsp(str);
+	s >> b; set_oss_init_fragments(b);
+	s >> w; set_oss_fragments(w);
+	s >> b; set_oss_verbose(b);
+	s >> b; set_oss_nolatencyaccounting(b);
+	s >> w; set_oss_latency(w);
+	s >> w; set_bpm_channel(w);
+	s >> b; set_player_rms(b);
+	s >> fl; set_player_rms_target(fl);
+	s >> w; set_disabled_capacities(w);
+	s >> w; set_ui_posx(w);
+	s >> w; set_ui_posy(w);
+	s >> str; set_jack_dev(str);
+	s >> w;  set_jack_latency(w);
+	s >> b; set_jack_verbose(b);
+	s >> b; set_jack_lowlatency(b);
+     }
+   else
     Error(true,"bpmplay wrong config file format\n");
 }
 #endif // __loaded__player_config_cpp__

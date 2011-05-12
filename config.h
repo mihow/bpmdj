@@ -94,9 +94,9 @@ class Config
   //   removed limit_inspectrum from version 1.7
   // version 1.9
  private:
-  singleton_accessors(float,distance_temposcale);
+  singleton_accessors(float4,distance_temposcale);
  public:
-  singleton_accessors(float,distance_spectrumweight);
+  singleton_accessors(float4,distance_spectrumweight);
   static ConfigState limit_authornonplayed;
   singleton_accessors(bool,shown_aboutbox);
   // version 2.1
@@ -140,18 +140,18 @@ class Config
   // singleton_accessors(QString,bpm_mixer_command);
   // static ConfigState open_bpmmixer;
   // 2.7
-  singleton_accessors(float,distance_tempoweight);
-  singleton_accessors(float,distance_echoweight);
-  singleton_accessors(float,distance_rythmweight);
-  singleton_accessors(float,distance_compositionweight);
+  singleton_accessors(float4,distance_tempoweight);
+  singleton_accessors(float4,distance_echoweight);
+  singleton_accessors(float4,distance_rythmweight);
+  singleton_accessors(float4,distance_compositionweight);
   singleton_accessors(int,  max_songs);
   // 2.8
   singleton_accessors(QColor,color_unchecked);
   // 2.9
   static SongProcess analyzers[8];
   // from here on the options are saved again
-  singleton_accessors(float, anal_bpm_from);
-  singleton_accessors(float, anal_bpm_to);
+  singleton_accessors(float4, anal_bpm_from);
+  singleton_accessors(float4, anal_bpm_to);
   singleton_accessors(int, anal_bpm_technique);
   // 3.0
   static ConfigState color_songs_based_on_history;

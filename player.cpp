@@ -57,6 +57,8 @@ using namespace std;
 #include "about.h"
 #include "bpmplay-event.h"
 #include "ao-som-beatgraph.h"
+#include "clock-drivers.h"
+#include "scripts.h"
 
 void fetch_config_from(PlayerConfig * target, const Player& song_player);
 void store_config_into(PlayerConfig * from,   Player* song_player);
@@ -89,7 +91,7 @@ void fetch_config_from(PlayerConfig * target, const Player& player)
   
   target->set_player_dsp(0);
   if (player.alsa->isChecked())
-     target->set_player_dsp(2);
+    target->set_player_dsp(2);
   if (player.oss->isChecked())
     target->set_player_dsp(1);
   if (player.bpm->isChecked())
@@ -113,6 +115,7 @@ void fetch_config_from(PlayerConfig * target, const Player& player)
    NR(bpm_channel);
    TEXT(jack_dev);
    NR(bpm_channel);
+   BOOL(jack_lowlatency);
 #undef TEXT
 #undef NR
 #undef BOOL
@@ -144,6 +147,7 @@ void store_config_into(PlayerConfig * from, Player* player)
   BOOL(jack_verbose);
   TEXT(jack_dev);     
   NR(bpm_channel);
+  BOOL(jack_lowlatency);
 #undef TEXT
 #undef NR
 #undef BOOL
@@ -209,8 +213,8 @@ Player::Player():
   wantedcurrentperiod=0;
   redrawCues();
   captionize_according_to_index();
-  TempoLd->display(100.0*(double)normalperiod/(double)currentperiod);
-
+  TempoLd->display(100.0*(float4)normalperiod/(float4)currentperiod);
+  
   // deactivate the non compiled in sections
 #ifndef COMPILE_OSS
   osstab->setDisabled(true);
@@ -225,7 +229,7 @@ Player::Player():
 
   // set colors of tempo change buttons
   init_tempo_switch_time();
-  normalReached(currentperiod==normalperiod);
+  updateTempoColors();
   startStopButton->setFocus();
   connect(tab, SIGNAL( currentChanged(QWidget*) ), this, SLOT( tabChanged() ) );
 }
@@ -348,16 +352,21 @@ void Player::setColor(QWidget *button, bool enabled)
    button->setPalette( pal );
 }
 
-void Player::setTempoColor(QWidget *button, int enabled)
+typedef enum {PlayingAtNormalTempo, 
+	      TempoIsChanging,
+	      PlayingAtTargetTempo,
+	      UnknownTempoState} tempoState;
+
+void setTempoColors(QWidget *button, tempoState state)
 {
   QColor a;
   QPalette pal;
   QColorGroup cg;
   
-  if (enabled==2)      a=QColor(0,255,0);
-  else if (enabled==1) a=QColor(255,255,0);
-  else if (enabled==0) a=QColor(255,0,0);
-  
+       if (state==PlayingAtNormalTempo) a=QColor(0,255,0);
+  else if (state==TempoIsChanging)      a=QColor(255,255,0);
+  else if (state==PlayingAtTargetTempo) a=QColor(255,0,0);
+       
   cg.setColor( QColorGroup::Foreground, a );
   cg.setColor( QColorGroup::Background, Qt::black );
   pal.setActive( cg );
@@ -367,6 +376,24 @@ void Player::setTempoColor(QWidget *button, int enabled)
   cg.setColor( QColorGroup::Foreground, a);
   cg.setColor( QColorGroup::Background, Qt::black );
   button->setPalette( pal );
+}
+
+void Player::updateTempoColors()
+{
+  tempoState state;
+  if (currentperiod==normalperiod)
+    state=PlayingAtNormalTempo;
+  else if (currentperiod==targetperiod)
+    state=PlayingAtTargetTempo;
+  else
+    state=TempoIsChanging;
+  static tempoState old=UnknownTempoState;
+  if (state!=old)
+    {
+      old=state;
+      setColor(switcherButton,state==PlayingAtNormalTempo);
+      setTempoColors(beatGraphAnalyzer->currentTempoLcd,state);
+    }
 }
 
 void Player::storeCue(int nr)
@@ -549,7 +576,7 @@ void Player::timerTick()
       if (no_raw_file_error_box==9) 
 	config->load_ui_position(this);
       // should we start playing ?
-      if (!autostarted && m>5*44100 && get_paused())
+      if (!autostarted && m>5*44100 && dsp->get_paused())
 	{
 	  autostarted=true;
 	  restart();
@@ -580,13 +607,15 @@ void Player::timerTick()
   // show current tempo
   if (playing)
     {
-      double  T0 = mperiod2bpm(currentperiod);
-      double  T1 = mperiod2bpm(normalperiod);
+      float8  T0 = mperiod2bpm(currentperiod);
+      float8  T1 = mperiod2bpm(normalperiod);
       if (currentperiod<-1) T0=0;
       if (normalperiod<-1) T1=0;
       CurrentTempoLCD -> display(T0);
       beatGraphAnalyzer->currentTempoLcd -> display(T0);
       NormalTempoLCD -> display(T1);
+      TempoLd->display(100.0*(float4)normalperiod/(float4)currentperiod);
+      updateTempoColors();
     }
   else
     {
@@ -612,7 +641,7 @@ void Player::restart()
 
 void Player::set_start_stop_text()
 {
-  if (get_paused())
+  if (dsp->get_paused())
     startStopButton->setText("Start");
   else
     {
@@ -624,7 +653,7 @@ void Player::set_start_stop_text()
 
 void Player::start_stop()
 {
-  if (!get_paused())
+  if (!dsp->get_paused())
     {
       bool cue_wasset = cue;
       if (!cue) 
@@ -728,33 +757,27 @@ void Player::changeTempo(int p)
   p*=100;
   p/=pos;
   changetempo(p);
-  TempoLd->display(100.0*(double)normalperiod/(double)currentperiod);
+  TempoLd->display(100.0*(float4)normalperiod/(float4)currentperiod);
 }
 
 void Player::targetTempo()
 {
   tempo_fade = fade_time;
   changeTempo(targetperiod);
-  normalReached(false);
+  updateTempoColors();
 }
 
 void Player::normalTempo()
 {
   tempo_fade = fade_time;
   changeTempo(normalperiod);
-  normalReached(true);
+  updateTempoColors();
 }
 
 void Player::mediumSwitch()
 {
   fade_time = tempoSwitchTime->value();
   tempo_fade=0;
-}
-
-void Player::normalReached(bool t)
-{
-  setColor(switcherButton,t);
-  setTempoColor(beatGraphAnalyzer->currentTempoLcd,t ? 2 : tempo_fade ? 1 : 0);
 }
 
 void Player::targetStep()
@@ -764,26 +787,27 @@ void Player::targetStep()
     {
       tempo_fade=0;
       fade_time=0;
-      normalReached(true);
+      updateTempoColors();
       switcherButton->setText("Fade");
       return;
     }
   if (tempo_fade==1)
     {
-      normalReached(false);
+      updateTempoColors();
     }
   if (tempo_fade>0)
     {
       switcherButton->setText(QString::number(fade_time-tempo_fade));
-      setTempoColor(beatGraphAnalyzer->currentTempoLcd,1);
+      updateTempoColors();
     }
   
   /**
    * We dont change the period lineary !
+   * See report 'Stepwiose Tempo Changes in BpmDj'
+   * at http://werner.yellowcouch.org/Papers/stepwise/index.html
    */
-  double result;
-  result = (double)targetperiod*pow((double)normalperiod/(double)targetperiod,(double)tempo_fade/(double)fade_time);
-  // result = targetperiod+((double)normalperiod-(double)targetperiod)*(double)tempo_fade/(double)fade_time;
+  float4 result = (float4)targetperiod*pow((float4)normalperiod/(float4)targetperiod,
+					   (float4)tempo_fade/(float4)fade_time);
   changeTempo((int)result);
 }
 
@@ -1023,16 +1047,16 @@ void Player::mapStart()
       // location
       mapcopy[i].take_from=map[i].take_from;
       // speed
-      float factor = pow(2,((float)map[i].speed_mult)/12.0);
+      float4 factor = pow(2,((float4)map[i].speed_mult)/12.0);
       assert(factor!=0);
       if (factor>=1)
 	{
 	  mapcopy[i].speed_mult=16000;
-	  mapcopy[i].speed_div=(signed2)((float)16000/factor);
+	  mapcopy[i].speed_div=(signed2)((float4)16000/factor);
 	}
       if (factor<1)
 	{
-	  mapcopy[i].speed_mult=(signed2)((float)16000*factor);
+	  mapcopy[i].speed_mult=(signed2)((float4)16000*factor);
 	  mapcopy[i].speed_div=16000;
 	}
       // volume
@@ -1307,7 +1331,7 @@ void Player::restartCore()
   fetch_config_from(config,*this);
   stopCore();
   dsp = dsp_driver::get_driver(config);
-  startCore();
+  startCore(0);
   config->save();
   store_config_into(config,this);
 }
@@ -1320,7 +1344,7 @@ void InitAndStart::run(Player * player)
 
 void PlayingStateChanged::run(Player * player)
 {
-  if (opt_check && get_paused())
+  if (opt_check && dsp->get_paused())
     player->accept();
   player->set_start_stop_text();
 }
@@ -1335,43 +1359,40 @@ void Player::customEvent(QEvent * e)
 }
 
 /**
- * here we assume that the core dsp device has been set to something usefull
+ * Here we assume that the core dsp device has been 
+ * set to something usefull
  */
-void Player::startCore()
+void Player::startCore(int opening_tries)
 {
-  int err = core_start();
+#ifdef DEBUG_WAIT_STATES
+  Debug("startCore try %d",opening_tries);
+#endif
+  int err=core_start(opt_check || opening_tries==0);
   if (opt_check)
-    {
-      if (show_error(err, err_dsp, "Unable to open dsp device"))
+    {	
+      if (err==err_dsp)
 	reject();
     }
   else
     {
       /**
-       * because of a concurrency problem in the kernel we try again until we succeed here.
+       * Because of a concurrency problem in the kernel we try again until we succeed here.
        * The problem is that between telling the kernel to close the dsp device and opening it from another 
        * application. Since neither the bpmdj selector nor the bpm player can know whether the device is
        * really closed or whether it has been hijacked by anoither program, we need to spend some time on
        * trying to access it. If it doesn't work, then we forget it completely and give an error message.
        */
-      static unsigned4 opening_tries=10;
       if (err==err_dsp)
 	{
-	  if (--opening_tries==0)
+	  if (opening_tries==0)
 	    {
-	      if (show_error(err, err_dsp, "Unable to open dsp device\n"
-			     "Swithcing back to zero DSP driver\n"))
-		{
-		  config->set_player_dsp(0);
-		  dsp = dsp_driver::get_driver(config);
-		  err = core_start();
-		  show_error(err, err_dsp, "Still unable to get anywhere\n");
-		};
+	      config->set_player_dsp(0);
+	      dsp = dsp_driver::get_driver(config);
 	    }
 	  else
 	    {
 	      sleep(1);
-	      startCore();
+	      startCore(opening_tries-1);
 	    }
 	}
     }
@@ -1416,9 +1437,9 @@ public:
     if (normalperiod.valid())
       {
 	if (sp->tab->currentIndex()==TAB_BEATGRAPH)
-	  // it didn't but it triggers an update 
+	  // it didn't change, but we want a recalcualtion anyway
 	  sp->tabChanged(); 
-	else
+	else if (sp->tab->currentIndex()==TAB_PLAYER)
 	  sp->tab->setCurrentIndex(TAB_BEATGRAPH);
       }
   }

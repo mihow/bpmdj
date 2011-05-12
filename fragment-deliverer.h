@@ -18,28 +18,43 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-#ifndef __loaded__dsp_none_h__
-#define __loaded__dsp_none_h__
+#ifndef __loaded__fragment_deliverer_h__
+#define __loaded__fragment_deliverer_h__
 using namespace std;
-#line 1 "dsp-none.h++"
-#include "version.h"
-#include "player-config.h"
+#line 1 "fragment-deliverer.h++"
+#include "fragment-cache.h"
 #include "dsp-drivers.h"
-#include "common.h"
 
-class dsp_none: public dsp_driver
+class FragmentDeliverer: public audio_source
 {
 public:
-  dsp_none(const PlayerConfig & config);
-  void    start(audio_source*);
-  void    stop();
-  void    internal_pause() {};
-  void    internal_unpause() {};
-  void    write(stereo_sample2 value);
-  signed8 latency();
-  int     open(bool ui);
-  void    close(bool);
+  FragmentInMemory playing;
+  unsigned4 curpos; // the current playing position in the waveform
+  stereo_sample2 * samples;
+  bool finished;
+  FragmentDeliverer()
+  {
+    finished=true;
+    curpos=0;
+    samples=NULL;
+  }
+  void reset(FragmentInMemory m)
+  {
+    finished=true;
+    playing = m;
+    curpos = 0;
+    samples = playing.get_samples();
+    if (samples) 
+      finished=false;
+  }
+  virtual stereo_sample2 read()
+  {
+    if (finished) return stereo_sample2();
+    stereo_sample2 value=samples[curpos++];
+    curpos%=playing.get_size();
+    if (curpos==0) 
+      finished=true;
+    return value;
+  }
 };
-
-bool is_none_driver();
-#endif // __loaded__dsp_none_h__
+#endif // __loaded__fragment_deliverer_h__

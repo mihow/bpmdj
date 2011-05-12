@@ -183,7 +183,7 @@ ITERATE_OVER(song)
 /* WVB -- the thing below can be further optimized
  * 1 - get all flags and pass them in one flag
  */
-bool DataBase::filter(SongSelectorLogic* selector, Song *item, Song* main, float limit)
+bool DataBase::filter(SongSelectorLogic* selector, Song *item, Song* main, float4 limit)
 {
   if (main!=NULL && main->get_author()==item->get_author() && !main->get_author().isEmpty())
     item->set_played_author_at_time(History::get_songs_played());
@@ -334,8 +334,8 @@ void DataBase::add(Song* song)
 };
 
 Song * * DataBase::closestSongs(SongSelectorLogic * selector,
-				Song * target1, float weight1,
-				Song * target2, float weight2,
+				Song * target1, float4 weight1,
+				Song * target2, float4 weight2,
 				SongMetriek * metriek, int maximum, int &count)
 {
   /*
@@ -348,7 +348,7 @@ Song * * DataBase::closestSongs(SongSelectorLogic * selector,
   */
 
   int i, j;
-  float * minima = bpmdj_allocate(maximum,float);
+  float4 * minima = bpmdj_allocate(maximum,float4);
   Song * * entries = bpmdj_allocate(maximum,Song*);
   count = 0;
   for(i = 0 ; i < maximum ; i++)
@@ -364,7 +364,7 @@ ITERATE_OVER(song)
     if (!song.val()->get_ondisk()) continue;
     if (!tagFilter(song.val())) continue;
     // measure distance, gegeven de metriek
-    double d = song.val()->distance(target1,weight1,target2,weight2,metriek);
+    float8 d = song.val()->distance(target1,weight1,target2,weight2,metriek);
     // find the best position to insert the item..
     for (j = 0 ; j < count ; j++)
       if (minima[j]>d) break;

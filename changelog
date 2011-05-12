@@ -1,3 +1,9 @@
+3.9:
+	+ added yet experimental jack synchronisation code. Use -DJACK_TRANSPORT to compile it in
+	+ low latency/asynchronous implementation of the jack driver
+	+ reorganized the dsp driver layout to be slightly faster
+	! removed a bug that has been pestering the startup checks for the past 10 versions
+	+ improved the buildprocess. Modifications to the cflags will trigger a full source rebuild
 3.8:
         + started with svn and seperate project directory
 	- Bug #975: unexpected process dies with a jackd driver

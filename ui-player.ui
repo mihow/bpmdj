@@ -2379,7 +2379,7 @@
           <attribute name="title" >
            <string>Jack</string>
           </attribute>
-          <layout class="QGridLayout">
+          <layout class="QGridLayout" name="gridLayout" >
            <item row="0" column="0" colspan="2" >
             <widget class="QCheckBox" name="jack" >
              <property name="enabled" >
@@ -2453,11 +2453,18 @@
               <bool>true</bool>
              </property>
              <property name="text" >
-              <string>verbose</string>
+              <string>Verbose</string>
              </property>
             </widget>
            </item>
            <item row="3" column="0" colspan="2" >
+            <widget class="QCheckBox" name="jack_lowlatency" >
+             <property name="text" >
+              <string>Low Latency mode. Please first read http://bpmdj.yellowcouch.org/jack.html</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0" colspan="2" >
             <spacer>
              <property name="orientation" >
               <enum>Qt::Vertical</enum>

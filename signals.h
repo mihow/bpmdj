@@ -173,8 +173,8 @@ template<int Channels> class Fft: public BasicConvertor
   private:
     fftw_plan fftw[Channels];
   public:
-    Fft(Signal<double,Channels> &in, HalfComplex<double,Channels> &out); // forward
-    Fft(HalfComplex<double,Channels> &in, Signal<double,Channels> &out); // backward
+    Fft(Signal<float8,Channels> &in, HalfComplex<float8,Channels> &out); // forward
+    Fft(HalfComplex<float8,Channels> &in, Signal<float8,Channels> &out); // backward
     void execute();
 };
 
@@ -199,61 +199,61 @@ template<class Input, class Output, int Channels> class Haar: public BasicConver
  */
 inline unsigned4 absolute(signed4 i) {return abs(i);};
 inline unsigned2 absolute(signed2 i) {return abs(i);};
-inline double    absolute(double  i) {return fabs(i);};
-inline float     absolute(float   i) {return fabs(i);};
+inline float8    absolute(float8  i) {return fabs(i);};
+inline float4     absolute(float4   i) {return fabs(i);};
 
 signed8 higher_power_of_two(signed8 a);
 signed8 lower_power_of_two(signed8 a);
-double find_max(double * data, long l);
+float8 find_max(float8 * data, long l);
 long   find_max_rpos(unsigned4 * data, long l);
-double find_mean(double * data, long l);
-float  find_mean(float * data, long l);
+float8 find_mean(float8 * data, long l);
+float4  find_mean(float4 * data, long l);
 
 // template <class type> type find_abs_max(type * data, long l);
 // template <class type> type normalize_abs_max(type * data, long l);
 void   vector_mul_div(signed4 * data, long l, signed4 mul, signed4 div);
-void   normalize_mean(double * data, long l);
-void   normalize_mean(float * data, long l);
-void   translate_mean(float * data, long l);
-double norm(double r, double e);
-void   differentiate(double *r, int size);
+void   normalize_mean(float8 * data, long l);
+void   normalize_mean(float4 * data, long l);
+void   translate_mean(float4 * data, long l);
+float8 norm(float8 r, float8 e);
+void   differentiate(float8 *r, int size);
 /* sets r[i]=r[i+1]-r[i] */
 
-void   absolute(double *r, int size);
+void   absolute(float8 *r, int size);
 /* sets r[i]=abs(r[i]) */
 
-void   biased_circular_autocorrelation(double *arr, int size);
+void   biased_circular_autocorrelation(float8 *arr, int size);
 /* The biased autocorrelation will return the circular autocorrelation, or
    out[i]=sum_j in[i]*in[(j+i)%size] */
 
-void   biased_autocorrelation(double *arr, int size);
+void   biased_autocorrelation(float8 *arr, int size);
 /* The biased autocorrelation will return the non-circular autocorrelation, or
    out[i]=sum_j in[i]*in[j+i] */
 
-void   unbiased_autocorrelation(double * arr, int size);
+void   unbiased_autocorrelation(float8 * arr, int size);
 /* The unbiased autocorrelation will return the non-circular autocorrelation 
    taking into account the amount of actual multiplications performed.
    out[i]=autocor[i]/(size-i) */
 
-double biased_abs_distance(double * a, double * b, int size);
-double unbiased_abs_distance(double * a, double * b, int size);
+float8 biased_abs_distance(float8 * a, float8 * b, int size);
+float8 unbiased_abs_distance(float8 * a, float8 * b, int size);
 /* returns |a[i]-b[i]| [ /size ] */
 
-double biased_l2_distance(double * a, double * b, int size);
+float8 biased_l2_distance(float8 * a, float8 * b, int size);
 /* returns (a[i]-b[i])^2 */
 
-double unbiased_l2_distance(double * a, double * b, int size);
+float8 unbiased_l2_distance(float8 * a, float8 * b, int size);
 /* returns biased_l2_distance / size */
 
-double biased_best_abs_circular_distance(double *a, double *b, int size);
-double biased_best_l2_circular_distance(double *a, double *b, int size);
+float8 biased_best_abs_circular_distance(float8 *a, float8 *b, int size);
+float8 biased_best_l2_circular_distance(float8 *a, float8 *b, int size);
 /* finds the best circular shift to give the lowest L2 distance */
 
-void energize(double*what, double length, unsigned4 ws);
+void energize(float8*what, float8 length, unsigned4 ws);
 /* will replace every element wioth the RMS value of 
  * the surrounding block of size ws */
 
-double Index_to_frequency ( unsigned NumSamples, unsigned Index );
+float8 Index_to_frequency ( unsigned NumSamples, unsigned Index );
 /* The following function returns an "abstract frequency" of a
  * given index into a buffer with a given number of frequency samples.
  * Multiply return value by sampling rate to get frequency expressed in Hz. */
@@ -676,7 +676,7 @@ DECLARE void SHIFT::set(unsigned4 pos, unsigned1 chan, Type c)
 /**
  * The FFT functionality
  */
-template <int Channels> Fft<Channels>::Fft(Signal<double,Channels> &in, HalfComplex<double,Channels> &out):
+template <int Channels> Fft<Channels>::Fft(Signal<float8,Channels> &in, HalfComplex<float8,Channels> &out):
   BasicConvertor(), fftw()
 {
   for(int i = 0 ; i < Channels ; i++)
@@ -688,7 +688,7 @@ template <int Channels> Fft<Channels>::Fft(Signal<double,Channels> &in, HalfComp
     }
 }
 
-template <int Channels> Fft<Channels>::Fft(HalfComplex<double,Channels> &in, Signal<double,Channels> &out):
+template <int Channels> Fft<Channels>::Fft(HalfComplex<float8,Channels> &in, Signal<float8,Channels> &out):
   BasicConvertor()
 {
   for(int i = 0 ; i < Channels ; i++)

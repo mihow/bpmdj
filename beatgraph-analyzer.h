@@ -27,7 +27,7 @@ using namespace std;
 #include "ui-beatgraph.h"
 
 typedef unsigned char compressed;
-typedef float uncompressed;
+typedef float4 uncompressed;
 
 class BeatGraphAnalyzer : public QWidget, public Ui::BeatGraph
 {
@@ -46,7 +46,7 @@ private:
   void calculateEnergy();
   void showEnergyPattern();
   // haar calculation, storage & visualisation
-  float * * bank;
+  float4 * * bank;
   void calculateHaar();
   void showHaarPattern();
 public:

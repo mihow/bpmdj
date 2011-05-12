@@ -49,13 +49,14 @@ class PlayerConfig
   accessors(int,oss_latency,150);
   accessors(int,bpm_channel,1);
   accessors(bool,player_rms,false);
-  accessors(float,player_rms_target,0.12);
+  accessors(float4,player_rms_target,0.12);
   accessors(unsigned2,disabled_capacities,0);
    // version 3.3
   accessors(QString, jack_dev,"");
   accessors(int,jack_latency,150);
   accessors(bool,jack_verbose,true);
-  
+  // versionh 3.9
+  accessors(bool,jack_lowlatency,false);
   PlayerConfig();
   PlayerConfig(QString configname);
   void load_ui_position(QDialog * dialog);

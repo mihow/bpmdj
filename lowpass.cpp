@@ -34,15 +34,15 @@ using namespace std;
 #include "lowpass.h"
 
 #define IzeroEPSILON 1E-21               /* Max error acceptable in Izero */
-static double Izero(double x)
+static float8 Izero(float8 x)
 {
-   double sum, u, halfx, temp;
+   float8 sum, u, halfx, temp;
    int n;
 
    sum = u = n = 1;
    halfx = x/2.0;
    do {
-      temp = halfx/(double)n;
+      temp = halfx/(float8)n;
       n += 1;
       temp *= temp;
       u *= temp;
@@ -51,16 +51,16 @@ static double Izero(double x)
    return(sum);
 }
 
-void LpFilter(double c[], int N, double frq, double Beta, int Num)
+void LpFilter(float8 c[], int N, float8 frq, float8 Beta, int Num)
 {
-   double IBeta, temp, inm1;
+   float8 IBeta, temp, inm1;
    int i;
 
    /* Calculate ideal lowpass filter impulse response coefficients: */
    c[0] = 2.0*frq;
    for (i=1; i<N; i++) 
      {
-       temp = M_PI*(double)i/(double)Num;
+       temp = M_PI*(float8)i/(float8)Num;
        c[i] = sin(2.0*temp*frq)/temp; /* Analog sinc function, cutoff = frq */
      }
    
@@ -71,10 +71,10 @@ void LpFilter(double c[], int N, double frq, double Beta, int Num)
     * it to zero. This helps reduce the first sidelobe. 
     */
    IBeta = 1.0/Izero(Beta);
-   inm1 = 1.0/((double)(N-1));
+   inm1 = 1.0/((float8)(N-1));
    for (i=1; i<N; i++) 
      {
-       temp = (double)i * inm1;
+       temp = (float8)i * inm1;
        c[i] *= Izero(Beta*sqrt(1.0-temp*temp)) * IBeta;
      }
 }

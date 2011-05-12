@@ -72,7 +72,7 @@ void dev_spectrum(spectrum_type *spectrum)
   if (spectrum==no_spectrum) return;
   for(int i = 0 ;i < spectrum_size; i ++ )
     {
-      float d = spectrum->band(i)-means[i];
+      float4 d = spectrum->band(i)-means[i];
       devs[i]+=d*d;
     }
 }
@@ -139,7 +139,7 @@ void dev_echo(echo_property echo)
       int k = echo.get_count(i);
       for(int j = 0 ; j < k ; j ++)
 	{
-	  float d = echo.get_freq_energy_probability(i,j)-echo_mean[i][j];
+	  float4 d = echo.get_freq_energy_probability(i,j)-echo_mean[i][j];
 	  echo_dev[i][j]+=d*d;
 	}
     }
@@ -263,8 +263,8 @@ void Statistics::update()
   spectrum_freq max_freq = -1000;
   for (int j = 0; j < spectrum_size ; j++)
     {
-      float energy_dev = stats_get_freq_dev(j) * 3.0;
-      float energy_fix = stats_get_freq(j);
+      float4 energy_dev = stats_get_freq_dev(j) * 3.0;
+      float4 energy_fix = stats_get_freq(j);
       if (energy_fix-energy_dev<min_freq) min_freq = energy_fix-energy_dev;
       if (energy_fix+energy_dev>max_freq) max_freq = energy_fix+energy_dev;
     }
@@ -272,8 +272,8 @@ void Statistics::update()
   QString data_text = "Band\tEnergy (dB)\tVariance (dB)\n";
   if (max_freq!=-1000)
     {
-      float dbf = 199.0/(max_freq-min_freq);  //pixels per dB
-      float y = 199.0;
+      float4 dbf = 199.0/(max_freq-min_freq);  //pixels per dB
+      float4 y = 199.0;
       p.setPen(Qt::green);
       do
 	{
@@ -284,7 +284,7 @@ void Statistics::update()
       p.setPen(Qt::black);
       for (int j = 0; j < spectrum_size ; j++)
 	{
-	  float energy_fix = stats_get_freq(j);
+	  float4 energy_fix = stats_get_freq(j);
 	  data_text += QString::number(stats_get_band_freq(j));
 	  data_text += "\t";
 	  data_text += QString::number(energy_fix);
@@ -294,12 +294,12 @@ void Statistics::update()
 	  energy_fix -= min_freq;
 	  
 	  // calculate the position of the upper side of the dev
-	  float up = energy_fix + stats_get_freq_dev(j)*3;
-	  float down = energy_fix - stats_get_freq_dev(j)*3;
+	  float4 up = energy_fix + stats_get_freq_dev(j)*3;
+	  float4 down = energy_fix - stats_get_freq_dev(j)*3;
 	  for(int k = (int)(down * dbf) ; k < (int)(up * dbf) ; k ++)
 	    {
-	      float l = (float)k/dbf;
-	      float v = fabs(l - energy_fix);
+	      float4 l = (float4)k/dbf;
+	      float4 v = fabs(l - energy_fix);
 	      v*=255.0/(stats_get_freq_dev(j)*3);
 	      if (v>255) v = 255;
 	      p.setPen(QColor((int)v,(int)v,(int)v));
@@ -321,7 +321,7 @@ void Statistics::update()
   status->setText("1- copying all data");
   app->processEvents();
 
-  float * * echo_stack = bpmdj_allocate(all.size(),float *);
+  float4 * * echo_stack = bpmdj_allocate(all.size(),float4 *);
   int vec_size = spectrum_size*echo_prop_sx;
   int nr = 0;
   constVectorIterator<Song*> song(all);
@@ -330,21 +330,21 @@ ITERATE_OVER(song)
     echo_property echo = song.val()->get_histogram();
     if (!echo.empty())
     {
-      echo_stack[nr] = bpmdj_allocate(vec_size,float);
+      echo_stack[nr] = bpmdj_allocate(vec_size,float4);
       for(int x = 0 ; x < echo_prop_sx ; x++)
 	for(int y = 0 ; y < spectrum_size ; y++)
 	  echo_stack[nr][x+y*echo_prop_sx]=echo.get_freq_energy_probability_scaled(y,x);
       nr++;
     }
   }
-  echo_stack = bpmdj_reallocate(echo_stack,nr,float*);
+  echo_stack = bpmdj_reallocate(echo_stack,nr,float4*);
   printf("   we have %d elements\n",nr);
 
   // 2 - normalize the mean value for every element
   status->setText("2- translating mean");
   app->processEvents();
 
-  float * mean = bpmdj_allocate(vec_size, float);
+  float4 * mean = bpmdj_allocate(vec_size, float4);
   for(int i = 0 ; i < vec_size ; i ++)
     mean[i]=0;
   for(int i = 0 ; i < nr ; i ++)
@@ -360,7 +360,7 @@ ITERATE_OVER(song)
   status->setText("3- normalizing standard deviation");
   app->processEvents();
 
-  float * stddev = bpmdj_allocate(vec_size, float);
+  float4 * stddev = bpmdj_allocate(vec_size, float4);
   for(int i = 0 ; i < vec_size ; i ++)
     stddev[i]=0;
   for(int i = 0 ; i < nr ; i ++)
@@ -377,10 +377,10 @@ ITERATE_OVER(song)
   app->processEvents();
 
   int nr_colors = 16 ;
-  float * * colors = bpmdj_allocate(nr_colors , float *);
+  float4 * * colors = bpmdj_allocate(nr_colors , float4 *);
   for(int i = 0 ; i < nr_colors ; i++)
     {
-      colors[i] = bpmdj_allocate(vec_size , float);
+      colors[i] = bpmdj_allocate(vec_size , float4);
       for(int j = 0 ; j < vec_size ; j++)
 	colors[i][j]=0.0;
     }
@@ -391,10 +391,10 @@ ITERATE_OVER(song)
     {
       // 5a - select a position with the lowest correlations
       int x = 0;
-      double v = 1.0;
+      float8 v = 1.0;
       for(int i = 0 ; i < vec_size ; i ++)
 	{
-	  double w = 0;
+	  float8 w = 0;
 	  for(int j = 0 ; j < nr_colors ; j ++)
 	    w+=colors[j][i];
 	  w/=nr_colors;
@@ -412,7 +412,7 @@ ITERATE_OVER(song)
       // 5b - fill in this color position with the new correlation analysis
       for(int i = 0 ; i < vec_size ; i++)
 	{
-	  double r = 0;
+	  float8 r = 0;
 	  for(int j = 0 ; j < nr ; j++)
 	    r+=echo_stack[j][i]*echo_stack[j][x];
 	  colors[c][i] = r;
@@ -428,7 +428,7 @@ ITERATE_OVER(song)
 	for (int x = 0; x < echo_prop_sx ; x++)
 	  {
 	    int idx = x+y*echo_prop_sx;
-	    double cv = colors[c][idx];
+	    float8 cv = colors[c][idx];
 	    QColor C;
 	    if (cv>0)
 	      C.setRgb(255-cv*255,255,255-cv*255);
@@ -446,7 +446,7 @@ ITERATE_OVER(song)
 
 
       // 5c - normalize the correlation result for this color slice
-      /*      double m = 1.0;
+      /*      float8 m = 1.0;
       for(int i = 0 ; i < vec_size ; i ++)
 	if (colors[c][i]<m) m=colors[c][i];
       for(int i = 0 ; i < vec_size ; i ++)
@@ -468,7 +468,7 @@ ITERATE_OVER(song)
   
   // 6a - copy data
   printf("Copying PCA data\n");
-  float ** pca_in_out = matrix(nr_colors,vec_size/8);
+  float4 ** pca_in_out = matrix(nr_colors,vec_size/8);
   for(int y = 0 ; y < nr_colors ; y ++)
     for(int x = 0 ; x < vec_size ; x ++)
       pca_in_out[y+1][x/8+1]=colors[y][x] > 0.1 ? colors[y][x] : 0;
@@ -481,7 +481,7 @@ ITERATE_OVER(song)
   
   // 6c - translate central position
   printf("Translateing mean\n");
-  double cx =0, cy=0;
+  float8 cx =0, cy=0;
   for(int y = 1 ; y <=nr_colors ; y++)
     {
       cx+=pca_in_out[y][1];
@@ -530,8 +530,8 @@ ITERATE_OVER(song)
   status->setText("Preparing Pixmap");
   app->processEvents();
   
-  /*  float * values =  bpmdj_allocate(vec_size, float);
-  float m = mean[0];
+  /*  float4 * values =  bpmdj_allocate(vec_size, float4);
+  float4 m = mean[0];
   for(int i = 1 ; i < vec_size ; i ++)
     if (mean[i]<m) m = mean[i];
   for(int i = 1 ; i < vec_size ; i ++)
@@ -542,7 +542,7 @@ ITERATE_OVER(song)
   for(int i = 1 ; i < vec_size ; i ++)
     values[i]/=m;
   // noramlisation of the stddev
-  double stddev_max = 0;
+  float8 stddev_max = 0;
   for(int j = 0 ; j < vec_size ; j++)
     if (stddev[j]>stddev_max) stddev_max=stddev[j];
   */
@@ -554,18 +554,18 @@ ITERATE_OVER(song)
       {
 	int idx = x+y*echo_prop_sx;
 	// int col = 0;
-	// double m = 0;
-	double r, g, b;
+	// float8 m = 0;
+	float8 r, g, b;
 	r = g = b= 0;
 	QColor C;
 	for(int c = 0 ; c < nr_colors ; c++)
 	  {
-	    float v = colors[c][idx];
+	    float4 v = colors[c][idx];
 	    v*=v;
 	    int cp = hue[c]; // we need to know the position in the sorting
 	    cp = bit_rev(cp,nr_colors);
 	    assert(cp<nr_colors);
-	    float color = 360.0 * (float)cp/ (float)nr_colors;
+	    float4 color = 360.0 * (float4)cp/ (float4)nr_colors;
 	    C.setHsv((int)color,255,(int)(v*255.0));
 	    int R,G,B;
 	    C.getRgb(&R,&G,&B);
@@ -574,7 +574,7 @@ ITERATE_OVER(song)
 	    b+=B;
 	  }
 	
-	float m = std::max(r,std::max(g,b));
+	float4 m = std::max(r,std::max(g,b));
 	r *= 255.0 / m;
 	g *= 255.0 / m;
 	b *= 255.0 / m;

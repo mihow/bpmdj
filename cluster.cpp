@@ -37,7 +37,7 @@ using namespace std;
 #include "cluster.h"
 #include "memory.h"
 
-float    ** Cluster::similarity = NULL;
+float4    ** Cluster::similarity = NULL;
 ClusterPosition ** Cluster::next;
 ClusterPosition ** Cluster::prev;
 Point    ** Cluster::realcontent;
@@ -53,7 +53,7 @@ Point::Point()
 {
 }
 
-void Point::prefix(int d)
+void Point::prefix(unsigned2 d)
 {
   while(d-->0)
     printf(" . ");
@@ -66,21 +66,21 @@ Couple::Couple(int a, int b) : Point()
   second = b;
 }
 
-float Couple::distance2point(int idx, Metriek * metriek)
+float4 Couple::distance2point(int idx, Metriek * metriek)
 {
   // the distance from this cluster to another point is determined
-  float max = Cluster::distance(first,idx,metriek);
-  float d = Cluster::distance(second,idx,metriek);
+  float4 max = Cluster::distance(first,idx,metriek);
+  float4 d = Cluster::distance(second,idx,metriek);
   if (d>max)
     return d;
   else
     return max;
 }
 
-float Couple::distance(Couple * other, Metriek * metriek)
+float4 Couple::distance(Couple * other, Metriek * metriek)
 {
-  float max = Cluster::distance(first,other->first, metriek);
-  float d = Cluster::distance(first,other->second, metriek);
+  float4 max = Cluster::distance(first,other->first, metriek);
+  float4 d = Cluster::distance(first,other->second, metriek);
   if (d>max) 
     max=d;
   d = Cluster::distance(second,other->first, metriek);
@@ -93,7 +93,7 @@ float Couple::distance(Couple * other, Metriek * metriek)
     return max;
 }
 
-void Couple::simpledump(int d)
+void Couple::simpledump(unsigned2 d)
 {
   prefix(d);
   printf("%d\n",d);
@@ -101,7 +101,7 @@ void Couple::simpledump(int d)
   Cluster::realcontent[second]->simpledump(d+2);
 }
 
-void Couple::determine_color(float hue_min, float hue_max, int depth, int stopat)
+void Couple::determine_color(float4 hue_min, float4 hue_max, int depth, int stopat)
 {
   if (depth>stopat)
     {
@@ -126,13 +126,13 @@ int Couple::cluster_elements()
     Cluster::realcontent[second]->cluster_elements();
 }
 
-int Couple::clusters_with_size(int min_size, int max_size, float &min_internal_distance, float& max_internal_distance)
+int Couple::clusters_with_size(int min_size, int max_size, float4 &min_internal_distance, float4& max_internal_distance)
 {
   int nr = cluster_elements();
   if (nr<min_size) return 0;
   if (nr>=min_size && nr<=max_size) 
     {
-      float d = Cluster::distance_memory(first,second);
+      float4 d = Cluster::distance_memory(first,second);
       if (d<min_internal_distance || min_internal_distance<0)
 	min_internal_distance = d;
       if (d>max_internal_distance || max_internal_distance<0)
@@ -144,7 +144,7 @@ int Couple::clusters_with_size(int min_size, int max_size, float &min_internal_d
     Cluster::realcontent[second]->clusters_with_size(min_size,max_size,min_internal_distance,max_internal_distance);
 }
 
-void Couple::color_sub_elements(int a, int b, float d)
+void Couple::color_sub_elements(int a, int b, float4 d)
 {
   Cluster::realcontent[first]->color_sub_elements(a,b,d);
   Cluster::realcontent[second]->color_sub_elements(a,b,d);
@@ -152,8 +152,8 @@ void Couple::color_sub_elements(int a, int b, float d)
 
 void Couple::color_clusters_with_size(int min_size, int max_size)
 {
-  float min_distance = -1;
-  float max_distance = -1;
+  float4 min_distance = -1;
+  float4 max_distance = -1;
   int nr_of_such_clusters = clusters_with_size(min_size,max_size,min_distance,max_distance);
   if (nr_of_such_clusters==0) 
     color_sub_elements(-1,-1,0);
@@ -161,7 +161,7 @@ void Couple::color_clusters_with_size(int min_size, int max_size)
     color_clusters_with_size(min_size,max_size,0,nr_of_such_clusters,min_distance,max_distance);
 }
 
-int Couple::color_clusters_with_size(int min_size, int max_size, int cluster_nr, int nr_of_such_clusters, float min_dist, float max_dist)
+int Couple::color_clusters_with_size(int min_size, int max_size, int cluster_nr, int nr_of_such_clusters, float4 min_dist, float4 max_dist)
 {
   int nr = cluster_elements();
   // if this cluster falls in range then we simply color it entirily and return the next cluster number
@@ -183,7 +183,7 @@ int Couple::color_clusters_with_size(int min_size, int max_size, int cluster_nr,
   return Cluster::realcontent[second]->color_clusters_with_size(min_size,max_size,cluster_nr,nr_of_such_clusters,min_dist,max_dist);
 }
 
-float Couple::intra_distance()
+float4 Couple::intra_distance()
 {
   return Cluster::distance_memory(first,second);
 }
@@ -193,31 +193,31 @@ void Couple::color_clusters_dw()
   color_clusters_dw(0.0,240.0,Cluster::distance_memory(first,second),Cluster::distance_memory(first,second));
 }
 
-void Couple::color_clusters_dw(float hue_min, float hue_max, float max_dist, float last_dist)
+void Couple::color_clusters_dw(float4 hue_min, float4 hue_max, float4 max_dist, float4 last_dist)
 {
-  float dc = intra_distance(); // this detmines the hue afterward
+  float4 dc = intra_distance(); // this detmines the hue afterward
   if (dc == 0) 
     {
       Point::color_clusters_dw(hue_min,hue_max,max_dist,last_dist);
       return;
     }
-  float da = Cluster::realcontent[first]->intra_distance();
-  float db = Cluster::realcontent[second]->intra_distance();
+  float4 da = Cluster::realcontent[first]->intra_distance();
+  float4 db = Cluster::realcontent[second]->intra_distance();
   // depending on the different distances, another color is given
-  float tc;
+  float4 tc;
   if (da+db>dc)
     tc = da+db;
   else 
     tc=dc;
-  float hal = hue_min;
-  float har = hue_min+(hue_max-hue_min)*da/tc;
-  float hbl = hue_min+(hue_max-hue_min)*(tc-db)/tc;
-  float hbr = hue_max;
+  float4 hal = hue_min;
+  float4 har = hue_min+(hue_max-hue_min)*da/tc;
+  float4 hbl = hue_min+(hue_max-hue_min)*(tc-db)/tc;
+  float4 hbr = hue_max;
   Cluster::realcontent[first]->color_clusters_dw(hal,har,max_dist,dc);
   Cluster::realcontent[second]->color_clusters_dw(hbl,hbr,max_dist,dc);
 }
 
-void Point::color_clusters_dw(float hue_min, float hue_max, float max_dist, float last_dist)
+void Point::color_clusters_dw(float4 hue_min, float4 hue_max, float4 max_dist, float4 last_dist)
 {
   color_sub_elements((int)hue_min,360,last_dist/max_dist);
 }
@@ -250,19 +250,19 @@ void Couple::color_clusters_dw2()
 }
 
 
-void Couple::color_clusters_dw2(float hue_min, float hue_max, int min_depth, int max_depth, int depth)
+void Couple::color_clusters_dw2(float4 hue_min, float4 hue_max, int min_depth, int max_depth, int depth)
 {
   // int nr = cluster_elements();
   int a = Cluster::realcontent[first]->cluster_elements();
   int b = Cluster::realcontent[second]->cluster_elements();
-  float h = hue_min+(hue_max-hue_min)*(float)a/(float)(a+b);
+  float4 h = hue_min+(hue_max-hue_min)*(float4)a/(float4)(a+b);
   Cluster::realcontent[first]->color_clusters_dw2(hue_min,h,min_depth,max_depth,depth+1);
   Cluster::realcontent[second]->color_clusters_dw2(h,hue_max,min_depth,max_depth,depth+1);
 }
 
-void Point::color_clusters_dw2(float hue_min, float hue_max, int min_depth, int max_depth, int depth)
+void Point::color_clusters_dw2(float4 hue_min, float4 hue_max, int min_depth, int max_depth, int depth)
 {
-  float d = ((float)(max_depth-depth)/(float)(1+max_depth-min_depth));
+  float4 d = ((float4)(max_depth-depth)/(float4)(1+max_depth-min_depth));
   assert(d>=0.0 && d <=1.0);
   color_sub_elements((int)hue_min,360,d);
 }
@@ -288,17 +288,17 @@ void Cluster::add(int t)
   pointstocluster[size-1]=t;
 }
 
-float Cluster::distance_calculate(int xidx, int yidx, Metriek * metriek)
+float4 Cluster::distance_calculate(int xidx, int yidx, Metriek * metriek)
 {
   assert(xidx>yidx);
   Point* x = realcontent[xidx];
   Point* y = realcontent[yidx];
-  float result = x->distance(y, metriek);
+  float4 result = x->distance(y, metriek);
   similarity[xidx][yidx]=result;
   return result;
 }
 
-float Cluster::distance_memory(int x, int y)
+float4 Cluster::distance_memory(int x, int y)
 {
   if (x<y)
     {
@@ -306,12 +306,12 @@ float Cluster::distance_memory(int x, int y)
       x = y;
       y = t;
     }
-  float result = similarity[x][y];
+  float4 result = similarity[x][y];
   assert(result>=0);
   return result;
 }
 
-float Cluster::distance(int xidx, int yidx, Metriek * metriek)
+float4 Cluster::distance(int xidx, int yidx, Metriek * metriek)
 {
   // assert(xidx!=yidx);
   // assert(xidx<realcontentsize);
@@ -324,7 +324,7 @@ float Cluster::distance(int xidx, int yidx, Metriek * metriek)
       yidx = tidx;
     }
   // is there a memory available 
-  float result;
+  float4 result;
   result = similarity[xidx][yidx];
   if (result>=0)
     return result;
@@ -543,7 +543,7 @@ Couple *Cluster::agglomerate(Metriek * metriek)
 	{
 	  int i = pointstocluster[j];
 	  if (i==z) continue;
-	  float d = distance(z,i,metriek);
+	  float4 d = distance(z,i,metriek);
 	  // nu bepalen we welke posities deruit gaat uit de gesorteerde lijst. 
 	  // en welke verhuist naar een andere locatie (z,i)
 	  ClusterPosition relocate;
@@ -622,7 +622,7 @@ void Cluster::reset()
   realcontenttotalsize = 1;
   realcontent=bpmdj_allocate(realcontenttotalsize,Point*);
   realcontentsize=0;
-  similarity=bpmdj_allocate(realcontenttotalsize,float*);
+  similarity=bpmdj_allocate(realcontenttotalsize,float4*);
   // the previous and next matrices
   prev = bpmdj_allocate(realcontenttotalsize,ClusterPosition*);
   next = bpmdj_allocate(realcontenttotalsize,ClusterPosition*);
@@ -635,7 +635,7 @@ int Cluster::addcontent(Point* p)
     {
       realcontenttotalsize*=2;
       realcontent = bpmdj_reallocate(realcontent,realcontenttotalsize, Point*);
-      similarity  = bpmdj_reallocate(similarity, realcontenttotalsize, float*);
+      similarity  = bpmdj_reallocate(similarity, realcontenttotalsize, float4*);
       prev        = bpmdj_reallocate(prev,       realcontenttotalsize, ClusterPosition *);
       next        = bpmdj_reallocate(next,       realcontenttotalsize, ClusterPosition *);
     }
@@ -654,7 +654,7 @@ int Cluster::addcontent(Point* p)
     }
   else
     {
-      similarity[id]=bpmdj_allocate(id,float);
+      similarity[id]=bpmdj_allocate(id,float4);
       prev[id]=bpmdj_allocate(id,ClusterPosition);
       next[id]=bpmdj_allocate(id,ClusterPosition);
       for(int j = 0 ; j < id ; j++)
@@ -700,17 +700,17 @@ public:
   {
     x=p;
   }
-  virtual float distance(Point* other)
+  virtual float4 distance(Point* other)
   {
     int d = ((TestPoint*)other) -> x - x;
     if (d>=0) return d;
     else return -d;
   }
-  virtual void determine_color(float hue_min, float hue_max, int depth, int stopat)
+  virtual void determine_color(float4 hue_min, float4 hue_max, int depth, int stopat)
   {
     printf("%d   %g\n",x,hue_min);
   }
-  virtual void simpledump(int d)
+  virtual void simpledump(unsigned2 d)
   {
     prefix(d);
     printf("INT %d\n",x);

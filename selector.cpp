@@ -809,7 +809,7 @@ void SongSelectorLogic::updateFrequencyMap()
     {
       if (a!=no_spectrum && b!=no_spectrum)
 	{
-	  float energy_fix = b->band(j)-a->band(j);
+	  float4 energy_fix = b->band(j)-a->band(j);
 	  if (energy_fix<min_freq) min_freq = energy_fix;
 	  if (energy_fix>max_freq) max_freq = energy_fix;
 	}
@@ -822,8 +822,8 @@ void SongSelectorLogic::updateFrequencyMap()
   
   if (max_freq!=-1000)
     {
-      float dbf = 199.0/(max_freq-min_freq);  //pixels per dB
-      float y = 199.0;
+      float4 dbf = 199.0/(max_freq-min_freq);  //pixels per dB
+      float4 y = 199.0;
       p.setPen(Qt::green);
       do
 	{
@@ -836,7 +836,7 @@ void SongSelectorLogic::updateFrequencyMap()
 	{
 	  if (a!=no_spectrum && b!=no_spectrum)
 	    {
-	      float energy_fix = b->band(j)-a->band(j);
+	      float4 energy_fix = b->band(j)-a->band(j);
 	      energy_fix -= min_freq;
 	      p.drawPoint(j,(int)(199.0-dbf*energy_fix));
 	    }
@@ -922,7 +922,7 @@ ITERATE_OVER(svi)
   SongMetriek metriek(*dialog.metrics);
   Couple * result = cluster.agglomerate(&metriek);
   // 3. Assign Colors
-  result->determine_color((float)0,(float)360,0,Config::get_color_cluster_depth() - 1);
+  result->determine_color((float4)0,(float4)360,0,Config::get_color_cluster_depth() - 1);
   // result->color_clusters_with_size(20,40);
   // result->color_clusters_dw2();
 
@@ -1099,14 +1099,14 @@ void SongSelectorLogic::startAnotherAnalyzer(Song * finished_analyzing, int on_s
     }
   
   // update the progress bar
-  float current_speed = 0.0;
+  float4 current_speed = 0.0;
   for(int i = 0 ; i < 8 ; i++)
     if (Config::analyzers[i].isEnabledOk())
       current_speed += Config::analyzers[i].songs_per_second();
   unsigned8 days = 0, hours = 0, minutes = 0, seconds = 0;
   if (current_speed != 0)
     {
-      unsigned8 expected_time = (unsigned8)((float)anal_queue->childCount()/current_speed);
+      unsigned8 expected_time = (unsigned8)((float4)anal_queue->childCount()/current_speed);
       days =  expected_time / (24L*60L*60L);
       expected_time -= days * (24L*60L*60L);
       hours = expected_time / (60L*60L);
@@ -1948,7 +1948,7 @@ ITERATE_OVER(entry)
       
       // we now see which songs are the two endpoints;
       Song *a = before ? before->getSong() : firstiflacking;
-      float A = before ? before->getPos()  : 0;
+      float4 A = before ? before->getPos()  : 0;
       if (!a)
 	{
 	  QMessageBox::warning(NULL,"Randomize",
@@ -1963,10 +1963,10 @@ ITERATE_OVER(entry)
 	  continue;
 	}
       Song *c = after->getSong();
-      float C = after->getPos();
+      float4 C = after->getPos();
       
       // find a small set of closest friends
-      float B = element->getPos();
+      float4 B = element->getPos();
       // we take the standard song metric
       
       metriek = &SongMetriek::std;

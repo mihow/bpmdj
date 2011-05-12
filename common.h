@@ -29,8 +29,8 @@ using namespace std;
 
 void   common_init();
 bool   exists(const char* fn);
-double minimum(double a, double b);
-double abs_minimum(double a, double b);
+float8 minimum(float8 a, float8 b);
+float8 abs_minimum(float8 a, float8 b);
 int    clip(int val);
 inline bool option(char* arg, const char* name) { return strcmp(arg,name)==0; };
 inline bool option(char* arg, const char* namea, const char* nameb) { return (strcmp(arg,namea)==0 || strcmp(arg,nameb)==0); };

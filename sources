@@ -3,13 +3,19 @@ SOURCES = ${shell ls *.c++ 2>/dev/null | grep -v .*\.L.c++ 2>/dev/null}
 B4      = ${shell ls *.b4  2>/dev/null | grep -v .*\.L.c++ 2>/dev/null}
 DO      = ${shell ls *.do  2>/dev/null | grep -v .*\.L.c++ 2>/dev/null}
 
-.PHONY:.sources 
+.PHONY:.sources .cflags
 .sources: version.h $(HEADERS:%.h++=%.h) $(SOURCES:%.c++=%.cpp) $(B4:%.b4=%.h) $(DO:%.do=%.h) \
-	data-lexer.cpp data-syntax.h data-syntax.cpp
-	@grep "#include\ *\"" *.h *.cpp >/tmp/t
-	@if test ! -e .sources; then cp /tmp/t .sources; fi
+	data-lexer.cpp data-syntax.h data-syntax.cpp .cflags
+	@cat .cflags >/tmp/t
+	@grep "#include\ *\"" *.h *.cpp >>/tmp/t
 	@if ! [ -e .sources ]; then cp /tmp/t .sources; fi
 	@if ! cmp /tmp/t .sources >/dev/null; then mv /tmp/t .sources; fi
+
+.cflags:
+	@echo $(CFLAGS) >/tmp/t
+	@echo $(CPP) >>/tmp/t
+	@if ! [ -e .cflags ]; then cp /tmp/t .cflags; touch *.h *.c; fi
+	@if ! cmp /tmp/t .cflags >/dev/null; then mv /tmp/t .cflags; touch *.h *.cpp; fi
 
 %.h: %.b4 aoc
 	@echo "  [aoc] "$@

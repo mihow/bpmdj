@@ -40,7 +40,7 @@ using namespace std;
 class ImpulseResponse
 {
   int *index;
-  double *value;
+  float8 *value;
 public:
   int length;
   ImpulseResponse() : length(0)
@@ -54,13 +54,13 @@ public:
   /**
    * Returns the gain of the filter
    */
-  double gain();
+  float8 gain();
   /**
    * divides the amplitude
    */
-  ImpulseResponse& operator /=(double val);
-  void set_amp(double val);
-  double & amp(int i )
+  ImpulseResponse& operator /=(float8 val);
+  void set_amp(float8 val);
+  float8 & amp(int i )
   {
     assert(i>=0);
     assert(i<length);

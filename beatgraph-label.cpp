@@ -27,6 +27,7 @@ using namespace std;
 #include <iostream>
 #include "beatgraph-label.h"
 #include "player-core.h"
+#include "clock-drivers.h"
 
 /*
 class AutoMessage

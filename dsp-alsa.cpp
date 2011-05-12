@@ -36,52 +36,48 @@ using namespace std;
 #include "version.h"
 #include "dsp-alsa.h"
 #include "memory.h"
+#include "scripts.h"
 
-/*-------------------------------------------
- *         Dsp operations
- *-------------------------------------------*/ 
-void dsp_alsa::start()
+void dsp_alsa::start(audio_source * a)
 {
   int err = 0;
   err = snd_pcm_prepare(dsp);
   if (err < 0)
-    {
-      printf("dsp: problem starting alsa device: %s\n",snd_strerror(err));
-    }
+    Error(true,"dsp: problem starting alsa device: %s",snd_strerror(err));
+  dsp_driver::start(a);
 }
 
-void dsp_alsa::pause()
+void dsp_alsa::internal_pause()
 {
-  int err;
-  err = snd_pcm_drop(dsp);
+  int err = snd_pcm_drop(dsp);
   filled = 0;
   if (err < 0)
-    printf("pause drop error: %s\n",snd_strerror(err));
-  // wait...
-  wait_for_unpause();
-  // simply continue
-  err = snd_pcm_prepare(dsp);
+    Warning("pause drop error: %s",snd_strerror(err));
+}
+
+void dsp_alsa::internal_unpause()
+{
+  int err = snd_pcm_prepare(dsp);
   if (err < 0)
-    printf("dsp: unpause error: %s\n",snd_strerror(err));
+    Warning("dsp: unpause error: %s",snd_strerror(err));
 }
 
 // the normal write routine without prebuffering...
 void dsp_alsa::wwrite(unsigned4 *value)
 {
   int err = 0;
-  do
+  while(!err)
     {
       err = snd_pcm_writei(dsp,value,1);
     }
-  while (err==0) ;
   assert(err!=-EAGAIN);
   assert(err!=-ESTRPIPE);
   if (err==-EPIPE)
     {
-      printf("underrun occured...\n");
+      Warning("underrun occured...");
       err = snd_pcm_prepare(dsp);
       if (err < 0)
-	printf("cant recover from underrun: %s\n",snd_strerror(err));
+	Error(true,"cant recover from underrun: %s",snd_strerror(err));
       return;
     }
 }
@@ -102,11 +98,11 @@ void dsp_alsa::write(stereo_sample2 value)
 	      assert(err!=-ESTRPIPE);
 	      if (err==-EPIPE)
 		{
-		  printf("underrun occured...\n");
+		  Warning("underrun occured...");
 		  filled = 0;
 		  err = snd_pcm_prepare(dsp);
 		  if (err < 0)
-		    printf("cant recover from underrun: %s\n",snd_strerror(err));
+		    Error(true,"cant recover from underrun: %s",snd_strerror(err));
 		  return;
 		}
 	    }
@@ -124,18 +120,21 @@ signed8 dsp_alsa::latency()
   int err = snd_pcm_delay(dsp,&delay);
   if (err<0)
     {
-      printf("error obtaining latency:%d %s\n",err,snd_strerror(err));
+      Warning("error obtaining latency:%d %s",err,snd_strerror(err));
       return 0;
     }
   assert(err==0);
   if (verbose)
-    printf("delay = %d\n",(int)delay);
+    Info("delay = %d",(int)delay);
   assert(delay >= 0 && (unsigned4)delay <= buffer_size);
   return delay + filled;
 }
 
 dsp_alsa::dsp_alsa(const PlayerConfig & config) : dsp_driver(config)
 {
+#ifdef DEBUG_WAIT_STATES
+  Debug("dsp_alsa::dsp_alsa<constructor>");
+#endif
   arg_dev = strdup(config.get_alsa_dev());
   dsp = NULL;
   filled = 0;
@@ -145,9 +144,8 @@ dsp_alsa::dsp_alsa(const PlayerConfig & config) : dsp_driver(config)
   verbose = config.get_alsa_verbose();
 }
 
-int dsp_alsa::open()
+int dsp_alsa::open(bool ui)
 {
-
   int err;
   unsigned int buffer_time, period_time;
   //  snd_pcm_hw_params_t *hparams;
@@ -160,14 +158,14 @@ int dsp_alsa::open()
   err = snd_output_stdio_attach(&output,stdout,0);
   if (err < 0 )
     {
-      printf("attaching to stdio didn't succeed: %s\n",snd_strerror(err));
+      Error(ui,"attaching to stdio didn't succeed: %s",snd_strerror(err));
       return err_dsp;
     }
   // open device
   err = snd_pcm_open(&dsp, arg_dev, SND_PCM_STREAM_PLAYBACK, 0);
   if (err < 0)
     {
-      printf("dsp: opening alsa device failed : %s\n",snd_strerror(err));
+      Error(ui,"dsp: opening alsa device failed : %s",snd_strerror(err));
       return err_dsp;
     }
   
@@ -178,7 +176,7 @@ int dsp_alsa::open()
   err = snd_pcm_hw_params_any(dsp, hparams);
   if (err<0)
     {
-      printf("Broken configuration file for pcm : %s\n",snd_strerror(err));
+      Error(ui,"Broken configuration file for pcm : %s",snd_strerror(err));
       return err_dsp;
     }
   
@@ -186,19 +184,19 @@ int dsp_alsa::open()
   err = snd_pcm_hw_params_set_access(dsp, hparams, SND_PCM_ACCESS_RW_INTERLEAVED);
   if (err<0)
     {
-      printf("Unable to set interleaved access to pcm device: %s\n",snd_strerror(err));
+      Error(ui,"Unable to set interleaved access to pcm device: %s",snd_strerror(err));
       return err_dsp;
     }
   err = snd_pcm_hw_params_set_format(dsp, hparams, SND_PCM_FORMAT_S16);
   if (err<0)
     {
-      printf("Unable to set sample format to standard 16 bit: %s\n",snd_strerror(err));
+      Error(ui,"Unable to set sample format to standard 16 bit: %s",snd_strerror(err));
       return err_dsp;
     }
   err = snd_pcm_hw_params_set_channels(dsp, hparams, 2);
   if (err < 0)
     {
-      printf("dsp: setting dsp to 2 channels failed : %s\n",snd_strerror(err));
+      Error(ui,"dsp: setting dsp to 2 channels failed : %s",snd_strerror(err));
       return err_dsp;
     }
   
@@ -206,13 +204,11 @@ int dsp_alsa::open()
   err = snd_pcm_hw_params_set_rate_near(dsp, hparams, &q, 0);
   if (err < 0)
     {
-      printf("dsp: setting dsp speed (%d) failed\n",q);
+      Error(ui,"dsp: setting dsp speed (%d) failed",q);
       return err_dsp;
     }
   if (q != WAVRATE)
-    {
-      printf("dsp: setting dsp speed (%d) failed, resulting rate = %d \n",WAVRATE, q);
-    }
+      Warning("dsp: setting dsp speed (%d) failed, resulting rate = %d ",WAVRATE, q);
 
   // playing latency instellen...
   period_time = arg_latency * 1000;
@@ -224,14 +220,14 @@ int dsp_alsa::open()
     err = snd_pcm_hw_params_set_buffer_time_near(dsp,hparams,&t,&dir);
     if (err<0)
       {
-	printf("     impossible to set pcm buffer time to %i (%i): %s\n", buffer_time,t,snd_strerror(err));
+	Error(ui,"dsp-alsa: Impossible to set pcm buffer time to %i (%i): %s", buffer_time,t,snd_strerror(err));
 	return err_dsp;
       }
     
     err = snd_pcm_hw_params_get_buffer_size(hparams,&buffer_size);
     if (err<0)
       {
-	printf("     impossible to obtain buffer size: %s\n",snd_strerror(err));
+	Error(ui,"     impossible to obtain buffer size: %s",snd_strerror(err));
 	return err_dsp;
       }
     
@@ -239,20 +235,20 @@ int dsp_alsa::open()
     err = snd_pcm_hw_params_set_period_time_near(dsp, hparams,&t,&dir);
     if (err<0)
       {
-	printf("     impossible to set pcm period time to %i (%i): %s\n", period_time,t,snd_strerror(err));
+	Error(ui,"     impossible to set pcm period time to %i (%i): %s", period_time,t,snd_strerror(err));
 	return err_dsp;
       }
     err = snd_pcm_hw_params_get_period_size(hparams,&period_size,&dir);
     if (err<0)
       {
-	printf("     ompossible to obtain period data size: %s\n",snd_strerror(err));
+	Error(ui,"     ompossible to obtain period data size: %s",snd_strerror(err));
 	return err_dsp;
       }
     if (period_size*2 - 1>buffer_size)
       {
-	printf("     impossible to allocate large enough buffers. Please decrease the latency\n");
-	printf("       playbuffer size = %li\n",period_size);
-	printf("       total buffer    = %li\n",buffer_size);
+	Error(ui,"The alsa driver cannot allocate sufficiently large buffers due to the "
+	      "large requested latency. (playbuffer size   = %li, "
+	      "total buffer size = %li). Try decreasing the latency.",period_size,buffer_size);
 	return err_dsp;
       }
     dir = 0;
@@ -260,7 +256,7 @@ int dsp_alsa::open()
   err = snd_pcm_hw_params(dsp,hparams);
   if (err < 0)
     {
-      printf("unable to set hw parameters for pcm: %s\n",snd_strerror(err));
+      Error(ui,"unable to set hw parameters for pcm: %s",snd_strerror(err));
       return err_dsp;
     }
   
@@ -268,65 +264,59 @@ int dsp_alsa::open()
   err = snd_pcm_sw_params_current(dsp,sparams);
   if (err < 0)
     {
-      printf("unable to determine sw parameters for pcm: %s\n",snd_strerror(err));
+      Error(ui,"unable to determine sw parameters for pcm: %s",snd_strerror(err));
       return err_dsp;
     }
   err = snd_pcm_sw_params_set_start_threshold(dsp,sparams,buffer_size);
   if (err < 0)
     {
-      printf("unable to set start to treshold mode: %s\n",snd_strerror(err));
+      Error(ui,"unable to set start to treshold mode: %s",snd_strerror(err));
       return err_dsp;
     }
   err = snd_pcm_sw_params_set_avail_min(dsp,sparams,period_size);
   if (err < 0 )
     {
-      printf("unable to set minimum start size: %s\n",snd_strerror(err));
+      Error(ui,"unable to set minimum start size: %s",snd_strerror(err));
       return err_dsp;
     }
-  /*
-  err = snd_pcm_sw_params_set_xfer_align(dsp,sparams,1);
-  if (err < 0 )
-    {
-      printf("unable to set transfer alignation: %s\n",snd_strerror(err));
-      return err_dsp;
-    }      
-  */
   err = snd_pcm_sw_params(dsp,sparams);
   if (err < 0)
     {
-      printf("unable to set software parameters: %s\n",snd_strerror(err));
+      Error(ui,"unable to set software parameters: %s",snd_strerror(err));
       return err_dsp;
     }
   if (verbose)
     snd_pcm_dump(dsp,output);
   buffer = bpmdj_allocate(period_size,unsigned4);
-  
-  start();
-  
-  //  snd_pcm_hw_params_free(hparams);
-  //  snd_pcm_sw_params_free(sparams);
   return err_none;
 }
 
 void dsp_alsa::close(bool flush_first)
 {
-  if (dsp)
+  if (!dsp) return;
+  // To flush the dsp we want to make sure that everyting that
+  // can be played is played. So we add a collection of zeros to
+  // make sure a flush occurs.
+#ifdef DEBUG_WAIT_STATES
+  Debug("dsp_alsa::close(%d) entered",flush_first);
+#endif
+  if (flush_first)
     {
-      // To flush the dsp we want to make sure that everyting that
-      // can be played is played. So we add a colleciton of zeros to
-      // make sure a flush occurs.
-      if (flush_first)
-	{
-	  stereo_sample2 zero(0,0);
-	  for(unsigned i = 0 ; i < period_size; i++)
-	    write(zero);
-	  snd_pcm_drain(dsp);
-	}
-      int err = snd_pcm_close(dsp);
-      if (err < 0)
-	printf("cant close pcm device: %s\n",snd_strerror(err));
-      dsp=0;
+      stereo_sample2 zero(0,0);
+      for(unsigned i = 0 ; i < period_size; i++)
+	write(zero);
+      snd_pcm_drain(dsp);
     }
+#ifdef DEBUG_WAIT_STATES
+  Debug("dsp_alsa::close() close call");
+#endif
+  int err = snd_pcm_close(dsp);
+  if (err < 0)
+    Warning("cant close pcm device: %s",snd_strerror(err));
+#ifdef DEBUG_WAIT_STATES
+  Debug("dsp_alsa::close() finished");
+#endif
+  dsp=0;
 }
 
 #endif

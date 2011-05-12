@@ -73,8 +73,11 @@ void Error(bool ui, const char* script,...);
 void Fatal(const char* script,...);
 void Remote(const char* script,...);
 
-// this function returns a new string with all characters escaped as
-// necessary, if passing through to a remote shell double escaping might
-// be necessary.
+/**
+ * This function returns a new string with all characters escaped as
+ * necessary, if passing through to a remote shell double escaping might
+ * be necessary. For instance when trying to pass a parameter through
+ * a secure shell command.
+ */
 char * escape(const char * in);
 #endif // __loaded__scripts_h__

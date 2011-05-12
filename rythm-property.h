@@ -36,7 +36,7 @@ class rythm_property: public histogram_property<rythm_prop_sx>
       for(int i=0; i<24;i++)
 	bark[i].init();
     }
-  void set_scale(int b, double s) 
+  void set_scale(int b, float8 s) 
     {
       bark[b].set_scale(s);
     }

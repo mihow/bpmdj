@@ -33,11 +33,11 @@ using namespace std;
 #include "index.h"
 
 class QSong;
-QString tonumber(const int b);
+QString tonumber(const signed4 b);
 
 class Song: public Point
 {
-  singleton_accessors(int, max_alltime_total);
+  singleton_accessors(signed4, max_alltime_total);
   // taken from the index file
   accessors(QString, title,"");
   accessors(QString, author,"");
@@ -60,17 +60,17 @@ class Song: public Point
   accessors(QColor,color,QColor(127,127,127));
   accessors(QString, spectrum_string, "");
   accessors(QString, distance_string, QString::null);
-  accessors(float,color_distance,0);
+  accessors(float4,color_distance,0);
   accessors(AlbumField**,albums,NULL);
   accessors(bool,played,false);
   accessors(bool,ondisk,true);
   accessors(bool,ondisk_checked,false);
-  accessors(int,has_cues,0);
-  accessors(int,played_author_at_time,-100);
-  accessors(int,alltime_playcount,0);
- private:
-  void  init(const QString fullname, bool checkondisk);
-  void  clearFloatingFields();
+  accessors(bool,has_cues,false);
+  accessors(signed2,played_author_at_time,-100);
+  accessors(unsigned4,alltime_playcount,0);
+private:
+  void init(const QString fullname, bool checkondisk);
+  void clearFloatingFields();
  public:
   QString  tempo_str();
  public:
@@ -83,18 +83,18 @@ class Song: public Point
   void checkondisk();
   void setColor(QColor c);
   QString getDisplayTitle();
-  bool get_distance_to_main(float limit=1.0);
+  bool get_distance_to_main(float4 limit=1.0);
   bool contains_tag(const tag_type which);
-  tempo_type tempo_between(Song*, float);
+  tempo_type tempo_between(Song*, float4);
   bool    tempo_show(const Song* main, bool uprange, bool downrange);
-  QColor  color_between(Song* song, float percent);
-  virtual float distance(Point* point, Metriek * dp, double limit);
-  virtual float distance(Point* point, Metriek* dp);
-  virtual float distance(Song* a, float wa, Song* b, float wb, Metriek * dp);
+  QColor  color_between(Song* song, float4 percent);
+  virtual float4 distance(Point* point, Metriek * dp, float8 limit);
+  virtual float4 distance(Point* point, Metriek* dp);
+  virtual float4 distance(Song* a, float4 wa, Song* b, float4 wb, Metriek * dp);
  public:
-  virtual void simpledump(int d);
-  virtual void determine_color(float hue, float, int, int);
-  virtual void color_sub_elements(int a, int b, float d);
+  virtual void simpledump(unsigned2 d);
+  virtual void determine_color(float4 hue, float4, int, int);
+  virtual void color_sub_elements(int a, int b, float4 d);
   virtual ~Song();
   bool    modifiedOnDisk();
 

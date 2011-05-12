@@ -31,7 +31,7 @@ using namespace std;
 
 typedef stereo_sample2 sample_type;
 
-void BpmCounter::init(unsigned4 slen, sample_type *blk, int inrate, double lower_boundary, double higher_boundary)
+void BpmCounter::init(unsigned4 slen, sample_type *blk, int inrate, float8 lower_boundary, float8 higher_boundary)
 {
   /** 
    * We calculate the length of an analysis block. We aim to include all frequencies starting from
@@ -46,7 +46,7 @@ void BpmCounter::init(unsigned4 slen, sample_type *blk, int inrate, double lower
   measured = 1;
   while(measured <= atmost) measured *=2;
   measured/=2;
-  audio = bpmdj_allocate(measured,double);
+  audio = bpmdj_allocate(measured,float8);
   
   /**
    * Preparation of the fourier windows, for every band we will have
@@ -67,9 +67,9 @@ void BpmCounter::init(unsigned4 slen, sample_type *blk, int inrate, double lower
 		    "due to calibration of the fftw lib\n");
     }
   
-  en = bpmdj_allocate(measured, double);
-  ts = bpmdj_allocate(measured, double);
-  co = bpmdj_allocate(measured, double);
+  en = bpmdj_allocate(measured, float8);
+  ts = bpmdj_allocate(measured, float8);
+  co = bpmdj_allocate(measured, float8);
   
   if (log) fprintf(log,"Preparing fourier transform (%d)\n",measured);
   forward = fftw_plan_r2r_1d(measured, &(audio[0]), en, FFTW_R2HC, FFTW_MEASURE);
@@ -83,7 +83,7 @@ void BpmCounter::init(unsigned4 slen, sample_type *blk, int inrate, double lower
       fclose(wisdom_file);
     }
   
-  double freq = higher_boundary/60.0;
+  float8 freq = higher_boundary/60.0;
   b1 = 4 * (int)(measure_rate / freq);
   freq = lower_boundary/60.0;
   b2 = 4 * (int)(measure_rate / freq);
@@ -97,7 +97,7 @@ BpmCounter::~BpmCounter()
   bpmdj_deallocate(ts);
 }
 
-double BpmCounter::measure()
+float8 BpmCounter::measure()
 {
   // 1. Copy & resample
   if (log) fprintf(log,"Reading Audio\n");
@@ -106,7 +106,7 @@ double BpmCounter::measure()
     {
       signed8 posa = i*input_rate/measure_rate;
       signed8 posb = (i+1)*input_rate/measure_rate;
-      double sum = 0;
+      float8 sum = 0;
       if (posb>=sample_length) posb=sample_length;
       for(unsigned4 j = posa; j< posb; j++)
 	sum += fabs(block[j].left)+fabs(block[j].right);
@@ -123,7 +123,7 @@ double BpmCounter::measure()
     }
   energize(audio,measured,blsi);
 
-  double * w = bpmdj_allocate(measured,double);
+  float8 * w = bpmdj_allocate(measured,float8);
   for(unsigned int x = 0 ; x < measured ; x ++)
     w[x]=audio[x];
   differentiate(w,measured);
@@ -136,7 +136,7 @@ double BpmCounter::measure()
   // 3. Mask
   if (log) fprintf(log,"Masking\n");
   for(unsigned4 x = 0 ; x < measured ; x ++)
-    audio[x]*= 0.5 - 0.5 * cos(M_PI*2.0*(double)x/(double)measured);
+    audio[x]*= 0.5 - 0.5 * cos(M_PI*2.0*(float8)x/(float8)measured);
   
   // 4. Forward transform
   if (log) fprintf(log,"Forward transform\n");
@@ -166,7 +166,7 @@ double BpmCounter::measure()
 
   // 9. Combine and find best match
   if (log) fprintf(log,"Find tempo\n");
-  double mf = en[0] = 0;
+  float8 mf = en[0] = 0;
   int pf = 0;
   normalize_abs_max(en,measured);
   normalize_abs_max(co,measured);
@@ -175,7 +175,7 @@ double BpmCounter::measure()
   /*  printf("\n");
   for(long x = measured/2 ; x > 1 ; x--)
     {
-      double freq = 44100.0/(double)x;
+      float8 freq = 44100.0/(float8)x;
       printf("%g %g\n",freq,en[x]);
       if (freq>4.0) break;
     }
@@ -187,7 +187,7 @@ double BpmCounter::measure()
   for(unsigned4 x = b1 ;  x < b2 ; x ++)
     {
       int m = 1;
-      double E = 0;
+      float8 E = 0;
       while (m<=2)
 	{
 	  E += co[x*m];
@@ -202,7 +202,7 @@ double BpmCounter::measure()
     }
   
   // 10. Return tempo
-  double t = 4.0 * measure_rate * 60.0 / (double) pf ;
+  float8 t = 4.0 * measure_rate * 60.0 / (float8) pf ;
   if (log) fprintf(log,"Tempo = %g\n",t);
   return t;
 }

@@ -38,5 +38,6 @@ using namespace std;
 #define MAGIC_3_3 0xBDED
 #define MAGIC_3_4 0xBDEE
 #define MAGIC_3_5 0xBDEF
-#define MAGIC_NOW MAGIC_3_5
+#define MAGIC_3_6 0xBDF0
+#define MAGIC_NOW MAGIC_3_6
 #endif // __loaded__magic_h__

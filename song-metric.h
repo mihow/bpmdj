@@ -41,52 +41,52 @@ class SongMetriek: public Metriek
 {
 public: 
   // weights
-  float tempo;
-  float spectrum;
-  float histogram;
-  float rythm;
-  float composition;
+  float4 tempo;
+  float4 spectrum;
+  float4 histogram;
+  float4 rythm;
+  float4 composition;
 
   // ranges
-  accessors(float,tempo_limits,0.05); // tempo_limits input from configuration
+  accessors(float4,tempo_limits,0.05); // tempo_limits input from configuration
 
 private:
-  float tempo_scale;     // thge tempo scale in the log range
-  float total;           // the total weight
+  float4 tempo_scale;     // thge tempo scale in the log range
+  float4 total;           // the total weight
   bool  harmonic545;     // which harmonics do we take into account
   bool  harmonic646;     
   bool  harmonic747;
   bool  harmonic848;
-  float harmonic54_term; 
-  float harmonic64_term;
-  float harmonic74_term;
-  float harmonic84_term;
-  float harmonic45_term;
-  float harmonic46_term;
-  float harmonic47_term;
-  float harmonic48_term;
+  float4 harmonic54_term; 
+  float4 harmonic64_term;
+  float4 harmonic74_term;
+  float4 harmonic84_term;
+  float4 harmonic45_term;
+  float4 harmonic46_term;
+  float4 harmonic47_term;
+  float4 harmonic48_term;
   bool  unknown_tempo_matches;
 
 public:
-  SongMetriek(float tw, float sw, float hw, float rw, float cw);
+  SongMetriek(float4 tw, float4 sw, float4 hw, float4 rw, float4 cw);
   SongMetriek(MetricWidget & take_from);
   void  set_show_harmonics(bool h5, bool h6,bool h7,bool h8);
   void  set_unknown_tempo_matches(bool v) {unknown_tempo_matches = v;};
-  void  set_tempo_weight(float val) {tempo = val;};
-  void  set_spectrum_weight(float val) {spectrum = val;};
-  void  set_echo_weight(float val) { histogram = val;};
-  void  set_rythm_weight(float val) { rythm = val; };
-  void  set_composition_weight(float val) { composition = val; };
+  void  set_tempo_weight(float4 val) {tempo = val;};
+  void  set_spectrum_weight(float4 val) {spectrum = val;};
+  void  set_echo_weight(float4 val) { histogram = val;};
+  void  set_rythm_weight(float4 val) { rythm = val; };
+  void  set_composition_weight(float4 val) { composition = val; };
   
   void  prepare(); 
-  float tempo_diff(const Song& a, const Song& b) const;
-  float tempo_dist(const Song& a, const Song& b) const {return fabs(tempo_diff(a,b));};
-  float spectrum_dist(const Song &, const Song & song) const;
-  float histogram_dist(const Song &, const Song & song, double breakat) const;
-  float rythm_dist(const Song &, const Song & song, double breakat) const;
-  float composition_dist(const Song & a, const Song & song, double breakat) const;
-  float find_harmonic(float td, int & which) const;
-  float distance(const Song &a, const Song &b, double limit) const;
+  float4 tempo_diff(const Song& a, const Song& b) const;
+  float4 tempo_dist(const Song& a, const Song& b) const {return fabs(tempo_diff(a,b));};
+  float4 spectrum_dist(const Song &, const Song & song) const;
+  float4 histogram_dist(const Song &, const Song & song, float8 breakat) const;
+  float4 rythm_dist(const Song &, const Song & song, float8 breakat) const;
+  float4 composition_dist(const Song & a, const Song & song, float8 breakat) const;
+  float4 find_harmonic(float4 td, int & which) const;
+  float4 distance(const Song &a, const Song &b, float8 limit) const;
 
  public:
   static SongMetriek std;

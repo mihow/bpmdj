@@ -75,15 +75,15 @@ SpectrumAnalyzer::SpectrumAnalyzer(QWidget*parent) : QWidget(parent)
   p.end();
 }
 
-static double tovol(double a)
+static float8 tovol(float8 a)
 {
-  double r = 10*log(a)/log(10);
+  float8 r = 10*log(a)/log(10);
   if (isnan(r)) return -1;
   if (r<-60) return -1;
   return r+60;
 }
 
-void fft_to_bark(double * in_r, int window_size, double * out)
+void fft_to_bark(float8 * in_r, int window_size, float8 * out)
 {
   for(int b = 0 ; b < barksize ; b ++)
     {
@@ -101,7 +101,7 @@ void fft_to_bark(double * in_r, int window_size, double * out)
       // bin * WAVRATE / window_size = freq; thus...
       // bin = freq * window_size / WAVRATE
       
-      double r = 0;
+      float8 r = 0;
       for(int i = a ; i < c; i++)
 	r+= fabs(in_r[i]); // the use of only the cosine compacts the energy
       r /= c-a;
@@ -110,13 +110,13 @@ void fft_to_bark(double * in_r, int window_size, double * out)
 }
 
 static fftw_plan plan;
-static double *fft_out = NULL;
-static double *fft_in = NULL;
+static float8 *fft_out = NULL;
+static float8 *fft_in = NULL;
 
-static double* init_bark_fft(int window_size)
+static float8* init_bark_fft(int window_size)
 {
-  fft_out = bpmdj_allocate(window_size,double);
-  fft_in = bpmdj_allocate(window_size,double);
+  fft_out = bpmdj_allocate(window_size,float8);
+  fft_in = bpmdj_allocate(window_size,float8);
   plan = fftw_plan_r2r_1d(window_size,fft_in,fft_out,FFTW_R2HC,FFTW_MEASURE);
   return fft_in;
 }
@@ -126,7 +126,7 @@ static void free_bark_fft()
   fftw_free(plan);
 }
 
-static void bark_fft(int window_size, double * bark_energy)
+static void bark_fft(int window_size, float8 * bark_energy)
 {
   fftw_execute(plan);
   fft_to_bark(fft_out,window_size,bark_energy);
@@ -149,8 +149,8 @@ void SpectrumAnalyzer::fetchSpectrum_normal()
   const int show_size_histo = 256;
   // const int barksize = window_size/2;
   // allocate empty arrays
-  double *  bark_energy = bpmdj_allocate(barksize,double);
-  double * fft_in = init_bark_fft(window_size);
+  float8 *  bark_energy = bpmdj_allocate(barksize,float8);
+  float8 * fft_in = init_bark_fft(window_size);
   // we need to go two times through the entire file 2 times. First to find the maxima
   // then to obtain the distribution
   FILE * raw = openCoreRawFile();
@@ -176,13 +176,13 @@ void SpectrumAnalyzer::fetchSpectrum_normal()
       assert(read>0);
       // convert it to the appropriate format
       for(int i = 0 ; i < window_size ; i ++)
-	fft_in[i]=(double)block[i].left/32768.0;
+	fft_in[i]=(float8)block[i].left/32768.0;
       bark_fft(window_size,bark_energy);
       for(int j = 0 ; j < barksize ; j++)
 	bark_energy_distri[j]->hit(bark_energy[j]);
       // do the same for right
       for(int i = 0 ; i < window_size ; i ++)
-	fft_in[i]=(double)block[i].right/32768.0;
+	fft_in[i]=(float8)block[i].right/32768.0;
       bark_fft(window_size,bark_energy);
       for(int j = 0 ; j < barksize ; j++)
 	bark_energy_distri[j]->hit(bark_energy[j]);
@@ -199,11 +199,11 @@ void SpectrumAnalyzer::fetchSpectrum_normal()
   // determination of dB range
   for(int i = 0 ; i < barksize ; i ++)
     bark_energy_distri[i]->normalize(255);
-  double dBmin = 0, dBmax = 0;
+  float8 dBmin = 0, dBmax = 0;
   for(int i = 0 ; i < barksize ; i++)
     {
       // printf("%d : %g\n",i,bark_energy_distri[i]->mean());
-      double d = bark_energy_distri[i]->dev() * 3;
+      float8 d = bark_energy_distri[i]->dev() * 3;
       if (- d < dBmin || i == 0) dBmin = - d;
       if (+ d > dBmax || i == 0) dBmax = + d;
     }
@@ -215,7 +215,7 @@ void SpectrumAnalyzer::fetchSpectrum_normal()
     {
       for(int y = 0 ; y < show_size_histo ; y++)
 	{
-	  double dB = y * (dBmax - dBmin) / show_size_histo;
+	  float8 dB = y * (dBmax - dBmin) / show_size_histo;
 	  dB+=dBmin;
 	  dB+=bark_energy_distri[x]->mean();
 	  int m = bark_energy_distri[x]->valat(dB);

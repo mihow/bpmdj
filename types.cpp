@@ -23,5 +23,5 @@
 using namespace std;
 #line 1 "types.c++"
 #include "tempo-type.h"
-const float tempo_type::no_tempo = -1;
+const float4 tempo_type::no_tempo = -1;
 #endif // __loaded__types_cpp__

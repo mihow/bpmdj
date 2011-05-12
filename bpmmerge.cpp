@@ -605,21 +605,21 @@ void rescanTempo()
   // 1 BPM lager gaan ????
   // hoe doen we dat ???
   // eerst terugrekenen naar
-  double T=4.0*(double)11025*60.0/(double)(period_a/4);
-  double S=T;
-  signed8 T1=(signed8)(4.0*(double)11025*60.0/(double)(T-1));
-  signed8 T2=(signed8)(4.0*(double)11025*60.0/(double)(T+1));
+  float8 T=4.0*(float8)11025*60.0/(float8)(period_a/4);
+  float8 S=T;
+  signed8 T1=(signed8)(4.0*(float8)11025*60.0/(float8)(T-1));
+  signed8 T2=(signed8)(4.0*(float8)11025*60.0/(float8)(T+1));
   printf("Rescanning frequency of tail ");
   period_a=rescanTempo(T1,T2,buffer_d,length_d)*4;
-  T=4.0*(double)11025*60.0/(double)(period_a/4);
+  T=4.0*(float8)11025*60.0/(float8)(period_a/4);
   printf("(%g adjustement)\n",T-S);
   
-  S=T=4.0*(double)11025*60.0/(double)(period_b/4);
-  T1=(signed8)(4.0*(double)11025*60.0/(double)(T-1));
-  T2=(signed8)(4.0*(double)11025*60.0/(double)(T+1));
+  S=T=4.0*(float8)11025*60.0/(float8)(period_b/4);
+  T1=(signed8)(4.0*(float8)11025*60.0/(float8)(T-1));
+  T2=(signed8)(4.0*(float8)11025*60.0/(float8)(T+1));
   printf("Rescanning frequency of head ");
   period_b=rescanTempo(T1,T2,buffer_f,length_f)*4;
-  T=4.0*(double)11025*60.0/(double)(period_b/4);
+  T=4.0*(float8)11025*60.0/(float8)(period_b/4);
   printf("(%g adjustement)\n",T-S);
 }
 

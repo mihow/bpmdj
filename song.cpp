@@ -67,7 +67,7 @@ void Song::refill(Index &reader, bool allowed_to_write)
   set_histogram(reader.get_histogram());
   set_rythm(reader.get_rythm());
   set_composition(reader.get_composition());
-  set_has_cues(reader.get_cue_z() + reader.get_cue_x() + reader.get_cue_c() + reader.get_cue_v());
+  set_has_cues(reader.get_cue_z() || reader.get_cue_x() || reader.get_cue_c() || reader.get_cue_v());
   int t = reader.get_playcount();
   set_alltime_playcount(t);
   if (t>get_max_alltime_total())
@@ -182,11 +182,11 @@ void Song::setColor(QColor transfer)
     }
 }
 
-void Song::simpledump(int d)
+void Song::simpledump(unsigned2 d)
 {
 }
 
-void Song::color_sub_elements(int a, int b, float d)
+void Song::color_sub_elements(int a, int b, float4 d)
 {
   // d equals 1 if it is the largest intra distance
   QColor c;
@@ -203,7 +203,7 @@ void Song::color_sub_elements(int a, int b, float d)
   set_color(c);
 }
 
-void Song::determine_color(float hue, float dummy, int dummy2, int dummy3)
+void Song::determine_color(float4 hue, float4 dummy, int dummy2, int dummy3)
 {
   QColor c;
   c.setHsv((int)hue,255,255);
@@ -213,7 +213,7 @@ void Song::determine_color(float hue, float dummy, int dummy2, int dummy3)
 
 bool Song::tempo_show(const Song* main, bool uprange, bool downrange)
 {
-  double d = SongMetriek::std.tempo_diff(*this,*main);
+  float8 d = SongMetriek::std.tempo_diff(*this,*main);
   int harmonic = 0;
   d = SongMetriek::std.find_harmonic(d,harmonic);
   if (uprange   && d >= 0 && d <= 1) return true;
@@ -221,12 +221,12 @@ bool Song::tempo_show(const Song* main, bool uprange, bool downrange)
   return false; // there is no reason to show the song with this tempo;
 }
 
-tempo_type Song::tempo_between(Song* song,  float percent)
+tempo_type Song::tempo_between(Song* song,  float4 percent)
 {
   return between_tempos(get_tempo(),song->get_tempo(),percent);
 }
 
-QColor Song::color_between(Song* song, float percent)
+QColor Song::color_between(Song* song, float4 percent)
 {
   QColor a = get_color();
   QColor b = song->get_color();
@@ -235,9 +235,9 @@ QColor Song::color_between(Song* song, float percent)
   int r2,g2,b2;
   a.rgb(&r1,&g1,&b1);
   b.rgb(&r2,&g2,&b2);
-  float R1,G1,B1;
-  float R2,G2,B2;
-  float R3,G3,B3;
+  float4 R1,G1,B1;
+  float4 R2,G2,B2;
+  float4 R3,G3,B3;
   R1=r1;
   G1=g1;
   B1=b1;
@@ -251,26 +251,26 @@ QColor Song::color_between(Song* song, float percent)
   return result;
 }
 
-float Song::distance(Point* point, Metriek* dp)
+float4 Song::distance(Point* point, Metriek* dp)
 {
   return distance(point,dp,1000);
 }
 
-float Song::distance(Point* point, Metriek* dp, double limit)
+float4 Song::distance(Point* point, Metriek* dp, float8 limit)
 {
   SongMetriek * sm = (SongMetriek*)dp;
   return sm->distance((const Song &)*this,(const Song &)*(Song*)point,limit);
 }
 
-float Song::distance(Song* a, float wa, Song* b, float wb, Metriek * dp)
+float4 Song::distance(Song* a, float4 wa, Song* b, float4 wb, Metriek * dp)
 {
-  double d1 = distance(a,dp,100000);
-  double d2 = distance(b,dp,100000);
-  double d  = (d1*wa+d2*wb)/(wa+wb);
+  float8 d1 = distance(a,dp,100000);
+  float8 d2 = distance(b,dp,100000);
+  float8 d  = (d1*wa+d2*wb)/(wa+wb);
   return d;
 }
 
-bool Song::get_distance_to_main(float limit)
+bool Song::get_distance_to_main(float4 limit)
 {
   set_color_distance(2);
   if (get_spectrum()!=no_spectrum)
@@ -279,7 +279,7 @@ bool Song::get_distance_to_main(float limit)
 	if (songs_to_avoid.size())
 	  {
 	    int s = songs_to_avoid.size();
-	    double d = SongMetriek::std.distance(*this, *::main_song,2);
+	    float8 d = SongMetriek::std.distance(*this, *::main_song,2);
 	    for(int i = 0 ; i < s ; i++)
 	      d+=1.0-SongMetriek::std.distance(*this, *songs_to_avoid[i],2);
 	    d/=s+1.0;

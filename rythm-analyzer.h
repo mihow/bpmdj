@@ -27,7 +27,7 @@ using namespace std;
 #include "types.h"
 #include "spectrum-type.h"
 
-void fft_to_bark(double * in_r, int window_size, spectrum_type &out);
+void fft_to_bark(float8 * in_r, int window_size, spectrum_type &out);
 
 class SongPlayer;
 class RythmAnalyzer : 

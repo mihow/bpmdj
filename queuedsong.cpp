@@ -217,7 +217,7 @@ QueuedAnalSong::QueuedAnalSong(Q3ListView* parent, Song * s) :
 {
 };
 
-void QueuedSong::setSong(Song* s, double d)
+void QueuedSong::setSong(Song* s, float8 d)
 {
   song=s;
   distance=d;

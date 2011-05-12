@@ -60,20 +60,21 @@ using namespace std;
 #include "scripts.h"
 #include "signals.h"
 #include "data.h"
+#include "clock-drivers.h"
 
-static float lineabsmax[1024];
+static float4 lineabsmax[1024];
 
 void normalize_draw_decompose(Array<1,float4>& block, QPainter &p, int y, int sx, int depth)
 {
    //  normalize(block);
    int w = block.size(0);
    QColor col;
-   float divisor = lineabsmax[y];
+   float4 divisor = lineabsmax[y];
    for(int x = 0 ; x < sx ; x ++)
      {
 	int a = x*w/sx;
-	float d = block[a];
-	float ad = fabs(d);
+	float4 d = block[a];
+	float4 ad = fabs(d);
 	if (ad>divisor)
 	  lineabsmax[y]=divisor=ad;
 	d/=divisor;
@@ -90,14 +91,14 @@ void normalize_draw_decompose(Array<1,float4>& block, QPainter &p, int y, int sx
    if(depth==0) return;
    // decompose the sucker in two pieces
    Array<1,float4> lo(w/2),hi(w/2);
-   float prev  = 0.0;
+   float4 prev  = 0.0;
    hi[0]=lo[0]=0;
    int target = 0;
    Array<1,float4>::values it(block);
-   float twoago = 0;
+   float4 twoago = 0;
    while(it.more())
      {
-	float here;
+	float4 here;
 	prev = *it;
 	it++;
 	here = *it;

@@ -27,6 +27,7 @@ using namespace std;
 #include "player-config.h"
 #include "dsp-drivers.h"
 #include "do-fragment.h"
+#include "fragment-deliverer.h"
 class FragmentPlayer;
 class ActiveFragmentPlayer;
 #ifdef TRACE_MESSAGES
@@ -69,8 +70,7 @@ class ActiveFragmentPlayer: public ActiveObject<Smart< ActiveFragmentPlayer_msg_
         if (cmd) return cmd->run(this);
         else return Done;
       };
-  FragmentInMemory playing;
-  unsigned4 curpos;
+  FragmentDeliverer delivery;
   bool finished;
   volatile dsp_driver_ptr dsp;
   int player_slot;
@@ -92,7 +92,6 @@ class ActiveFragmentPlayer: public ActiveObject<Smart< ActiveFragmentPlayer_msg_
     ActiveFragmentPlayer(FragmentPlayer* s, string name):
       ActiveObject<Smart< ActiveFragmentPlayer_msg_ > >(name), self(s)
       {
-      curpos =  0;
       dsp = NULL;
       finished = false;
       player_slot = -1;

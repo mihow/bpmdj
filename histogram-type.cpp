@@ -43,12 +43,12 @@ histogram_type::histogram_type()
   count = 0;
 }
 
-histogram_type::histogram_type(double l, double r, int c)
+histogram_type::histogram_type(float8 l, float8 r, int c)
 {
   init(l,r,c);
 }
 
-void histogram_type::init(double l, double r, int c)
+void histogram_type::init(float8 l, float8 r, int c)
 {
   left = l;
   right = r;
@@ -61,9 +61,9 @@ void histogram_type::init(double l, double r, int c)
   total = 0;
 }
 
-int histogram_type::bin(double val)
+int histogram_type::bin(float8 val)
 {
-  double x = (val - left) / (right - left);
+  float8 x = (val - left) / (right - left);
   x *= count;
   int b = (int)x;
   if (b>=0 && b <count)
@@ -71,7 +71,7 @@ int histogram_type::bin(double val)
   return -1;
 }
 
-void histogram_type::hit(double val)
+void histogram_type::hit(float8 val)
 {
   int b = bin(val);
   if (b>0)
@@ -104,8 +104,8 @@ void histogram_type::strip()
   int b = count - 1;
   while(bins[a]==0) a++;
   while(bins[b]==0) b--;
-  double new_left = left + a * (right-left) / count;
-  double new_right = left + (b+1) * (right-left) / count;
+  float8 new_left = left + a * (right-left) / count;
+  float8 new_right = left + (b+1) * (right-left) / count;
   int    new_count = b-a+1;
   if (new_count<=0) new_count=1;
   signed4 * new_bins = bpmdj_allocate(new_count,signed4);
@@ -119,15 +119,15 @@ void histogram_type::strip()
   count = new_count;
 }
 
-double histogram_type::dev()
+float8 histogram_type::dev()
 {
-  double m = mean();
-  double dev = 0;
+  float8 m = mean();
+  float8 dev = 0;
   unsigned8 hits = 0;
   for(int i = 0; i < count ; i++)
     {
       hits+=bins[i];
-      double d = (i*(right-left)/count) - m;
+      float8 d = (i*(right-left)/count) - m;
       dev+=d*d*bins[i];
     }
   dev/=hits;
@@ -135,7 +135,7 @@ double histogram_type::dev()
   return dev;
 }
 
-int histogram_type::valat(double v)
+int histogram_type::valat(float8 v)
 {
   int b = bin(v);
   if (b>=0)
@@ -143,43 +143,43 @@ int histogram_type::valat(double v)
   return 0;
 }
 
-/*double histogram_type::median_scaled(double mean)
+/*float8 histogram_type::median_scaled(float8 mean)
 {
-  double answer = left + (right-left)*((double)median+0)/(double)count;
+  float8 answer = left + (right-left)*((float8)median+0)/(float8)count;
   return mean;
 }*/
 
-double histogram_type::mean()
+float8 histogram_type::mean()
 {
   return sum/total;
 }
 
 void histogram_type::normalize_autocorrelation_diff(int val)
 {
-  // convert it to doubles
+  // convert it to float8s
   int ns = higher_power_of_two(count);
-  double *in = bpmdj_allocate(ns,double);
+  float8 *in = bpmdj_allocate(ns,float8);
   for(int i = 0; i < count ;i++)
     in[i]=bins[i];
   for(int i = count ; i < ns; i++)
     in[i]=0;
   unbiased_autocorrelation(in,ns);
-  ::normalize_abs_max<double>(in,ns);
+  ::normalize_abs_max<float8>(in,ns);
   for(int i = 0 ; i < ns ; i++)
     in[i]=sqrt(fabs(in[i]));
   differentiate(in,ns);
   scale = find_abs_max(in,ns);
   normalize_abs_max(in,ns);
   for(int i = 0 ; i < count ; i++)
-    bins[i]=(int)(in[i]*(double)val);
+    bins[i]=(int)(in[i]*(float8)val);
   bpmdj_deallocate(in);
 }
 
-double histogram_type::best_dist(histogram_type *a)
+float8 histogram_type::best_dist(histogram_type *a)
 {
   int m = count > a->count ? count : a->count;
-  double *A = bpmdj_allocate(m,double);
-  double *B = bpmdj_allocate(m,double);
+  float8 *A = bpmdj_allocate(m,float8);
+  float8 *B = bpmdj_allocate(m,float8);
   for(int i = 0 ; i < m; i++)
     B[i]=A[i]=0;
   for(int i = 0; i < m ;i++)
@@ -192,14 +192,14 @@ double histogram_type::best_dist(histogram_type *a)
   return biased_best_abs_circular_distance(A,B,m);
 }
 
-double histogram_type::cor_dist(histogram_type *a)
+float8 histogram_type::cor_dist(histogram_type *a)
 {
 
-  // convert it to doubles
+  // convert it to float8s
   int m = count > a->count ? count : a->count;
   int ns = higher_power_of_two(m);
-  double *A = bpmdj_allocate(ns,double);
-  double *B = bpmdj_allocate(ns,double);
+  float8 *A = bpmdj_allocate(ns,float8);
+  float8 *B = bpmdj_allocate(ns,float8);
   for(int i = 0 ; i < ns; i++)
     B[i]=A[i]=0;
   for(int i = 0; i < m ;i++)
@@ -223,7 +223,7 @@ double histogram_type::cor_dist(histogram_type *a)
   differentiate(A,ns);
   differentiate(B,ns);
 
-  double d = unbiased_abs_distance(A,B,ns);
+  float8 d = unbiased_abs_distance(A,B,ns);
   return d/2.0;
 }
 

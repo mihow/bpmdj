@@ -30,10 +30,10 @@ using namespace std;
 elementResult ActiveSpectrumPca::pcaThis(vector<Song*> *songs)
 {
   UserNotification * un = new UserNotification();
-  float minx=0,miny=0,minz=0;
-  float maxx=0,maxy=0,maxz=0;
+  float4 minx=0,miny=0,minz=0;
+  float4 maxx=0,maxy=0,maxz=0;
   int count = 0;
-  float ** data;
+  float4 ** data;
   vector<Song*>&all=*songs;
   vectorIterator<Song*> song(all);
 ITERATE_OVER(song)
@@ -66,7 +66,7 @@ ITERATE_OVER(svi)
       un->error+=text;
       goto clean_up;
     }
-  float dx,dy,dz;
+  float4 dx,dy,dz;
   for(int i = 1 ; i <= count; i ++)
     {
 #define MIN(A,B) if (B<A) A=B;
@@ -96,9 +96,9 @@ ITERATE_OVER(svi2)
       if (svi2.val()->get_spectrum() != no_spectrum)
 	{
 	  written++;
-	  float x = (data[written][1] - minx) / dx;
-	  float y = (data[written][2] - miny) / dy;
-	  float z = (data[written][3] - minz) / dz;
+	  float4 x = (data[written][1] - minx) / dx;
+	  float4 y = (data[written][2] - miny) / dy;
+	  float4 z = (data[written][3] - minz) / dz;
 	  QColor transfer;
 	  transfer.setRgb(127+(int)x,127+(int)y,127+(int)z);
 	  svi2.val()->setColor(transfer);

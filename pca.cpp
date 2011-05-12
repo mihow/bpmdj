@@ -56,18 +56,18 @@ using namespace std;
 #include "common.h"
 
 #define SIGN(a, b) ( (b) < 0 ? -fabs(a) : fabs(a) )
-static void corcol(float **data, int n, int m, float **symmat);
-static float *pca_vector(int n);
-static void tred2(float **a, int n, float *d, float *e);
-static void tqli(float d[], float e[], int n, float ** z, const char* &error_msg);
-static void free_pca_vector(float *v, int n);
+static void corcol(float4 **data, int n, int m, float4 **symmat);
+static float4 *pca_vector(int n);
+static void tred2(float4 **a, int n, float4 *d, float4 *e);
+static void tqli(float4 d[], float4 e[], int n, float4 ** z, const char* &error_msg);
+static void free_pca_vector(float4 *v, int n);
 
 // WVB -- this function is a modified version of the original code
 // !!! data will be modified !!!
-void do_pca(int n, int m, float** data, const char* &error_msg)
+void do_pca(int n, int m, float4** data, const char* &error_msg)
 {
   int  i, j, k, k2;
-  float **symmat, **symmat2, *evals, *interm;
+  float4 **symmat, **symmat2, *evals, *interm;
   assert(!error_msg);
   
   symmat = matrix(m, m);  /* Allocation of correlation (etc.) matrix */
@@ -152,9 +152,9 @@ void do_pca(int n, int m, float** data, const char* &error_msg)
 #ifdef TEST_PCA
 /**  Variance-covariance matrix: creation  *****************************/
 /* Create m * m covariance matrix from given n * m data matrix. */
-static void covcol(float **data, int n, int m, float **symmat)
+static void covcol(float4 **data, int n, int m, float4 **symmat)
 {
-  float *mean;
+  float4 *mean;
   int i, j, j1, j2;
   /* Allocate storage for mean pca_vector */
   mean = pca_vector(m);
@@ -164,7 +164,7 @@ static void covcol(float **data, int n, int m, float **symmat)
       mean[j] = 0.0;
       for (i = 1; i <= n; i++)
 	mean[j] += data[i][j];
-      mean[j] /= (float)n;
+      mean[j] /= (float4)n;
     }
   
   // printf("\nMeans of column pca_vectors:\n");
@@ -189,7 +189,7 @@ static void covcol(float **data, int n, int m, float **symmat)
 }
 
 /* Create m * m sums-of-cross-products matrix from n * m data matrix. */
-void scpcol(float **data, int n, int m, float **symmat)
+void scpcol(float4 **data, int n, int m, float4 **symmat)
 {
   int i, j1, j2;
   /* Calculate the m * m sums-of-squares-and-cross-products matrix. */
@@ -208,8 +208,8 @@ int old_main(int argc, char *argv[])
 {
   FILE *stream;
   int  n, m,  i, j, k, k2;
-  float **data, **symmat, **symmat2, *evals, *interm;
-  float in_value;
+  float4 **data, **symmat, **symmat2, *evals, *interm;
+  float4 in_value;
   char option;
   char * error_msg = NULL;
   
@@ -412,10 +412,10 @@ int old_main(int argc, char *argv[])
 /**  Correlation matrix: creation  ***********************************/
 
 /* Create m * m correlation matrix from given n * m data matrix. */
-static void corcol(float **data, int n, int m, float **symmat)
+static void corcol(float4 **data, int n, int m, float4 **symmat)
 {
-  float eps = 0.005;
-  float x, *mean, *stddev;
+  float4 eps = 0.005;
+  float4 x, *mean, *stddev;
   int i, j, j1, j2;
   /* Allocate storage for mean and std. dev. pca_vectors */
   mean = pca_vector(m);
@@ -426,7 +426,7 @@ static void corcol(float **data, int n, int m, float **symmat)
       mean[j] = 0.0;
       for (i = 1; i <= n; i++)
 	mean[j] += data[i][j];
-      mean[j] /= (float)n;
+      mean[j] /= (float4)n;
     }
   // printf("\nMeans of column pca_vectors:\n");
   // for (j = 1; j <= m; j++)  {
@@ -438,7 +438,7 @@ static void corcol(float **data, int n, int m, float **symmat)
       for (i = 1; i <= n; i++)
 	stddev[j] += (   ( data[i][j] - mean[j] ) *
 			 ( data[i][j] - mean[j] )  );
-      stddev[j] /= (float)n;
+      stddev[j] /= (float4)n;
       stddev[j] = sqrt(stddev[j]);
       /* The following in an inelegant but usual way to handle
 	 near-zero std. dev. values, which below would cause a zero-
@@ -455,7 +455,7 @@ static void corcol(float **data, int n, int m, float **symmat)
     for (j = 1; j <= m; j++)
       {
 	data[i][j] -= mean[j];
-	x = sqrt((float)n);
+	x = sqrt((float4)n);
 	x *= stddev[j];
 	data[i][j] /= x;
       }
@@ -478,25 +478,25 @@ static void corcol(float **data, int n, int m, float **symmat)
 /**  Sums-of-squares-and-cross-products matrix: creation  **************/
 
 
-/* Allocates a float pca_vector with range [1..n]. */
-float *pca_vector(int n)
+/* Allocates a float4 pca_vector with range [1..n]. */
+float4 *pca_vector(int n)
 {
-  float * v = bpmdj_allocate(n,float);
+  float4 * v = bpmdj_allocate(n,float4);
   return v-1;
 }
 
-/* Allocate a float matrix with range [1..n][1..m]. */
-float **matrix(int n,int m)
+/* Allocate a float4 matrix with range [1..n][1..m]. */
+float4 **matrix(int n,int m)
 {
   int i;
-  float **mat;
+  float4 **mat;
   /* Allocate pointers to rows. */
-  mat = bpmdj_allocate(n, float*);
+  mat = bpmdj_allocate(n, float4*);
   mat -= 1;
   /* Allocate rows and set pointers to them. */
   for (i = 1; i <= n; i++)
     {
-      mat[i] = bpmdj_allocate(m,float);
+      mat[i] = bpmdj_allocate(m,float4);
       mat[i] -= 1;
     }
   /* Return pointer to array of pointers to rows. */
@@ -504,15 +504,15 @@ float **matrix(int n,int m)
 }
 
 /**  Deallocate pca_vector storage  *********************************/
-/* Free a float pca_vector allocated by pca_vector(). */
-static void free_pca_vector(float *v, int n)
+/* Free a float4 pca_vector allocated by pca_vector(). */
+static void free_pca_vector(float4 *v, int n)
 {
   bpmdj_deallocate((char*) (v+1));
 }
 
-/**  Deallocate float matrix storage  ***************************/
-/* Free a float matrix allocated by matrix(). */
-void free_matrix(float ** mat, int n, int m)
+/**  Deallocate float4 matrix storage  ***************************/
+/* Free a float4 matrix allocated by matrix(). */
+void free_matrix(float4 ** mat, int n, int m)
 {
   int i;
   for (i = n; i >= 1; i--)
@@ -528,10 +528,10 @@ void free_matrix(float ** mat, int n, int m)
    Springer-Verlag, 1976, pp. 489-494.
    W H Press et al., Numerical Recipes in C, Cambridge U P,
    1988, pp. 373-374.  */
-static void tred2(float **a, int n, float *d, float *e)
+static void tred2(float4 **a, int n, float4 *d, float4 *e)
 {
   int l, k, j, i;
-  float scale, hh, h, g, f;
+  float4 scale, hh, h, g, f;
   
   for (i = n; i >= 2; i--)
     {
@@ -605,10 +605,10 @@ static void tred2(float **a, int n, float *d, float *e)
 }
 
 /**  Tridiagonal QL algorithm -- Implicit  **********************/
-static void tqli(float d[], float e[], int n, float ** z, const char* &error_occured)
+static void tqli(float4 d[], float4 e[], int n, float4 ** z, const char* &error_occured)
 {
   int m, l, iter, i, k;
-  float s, r, p, g, f, dd, c, b;
+  float4 s, r, p, g, f, dd, c, b;
   
   for (i = 2; i <= n; i++)
     e[i-1] = e[i];

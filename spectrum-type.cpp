@@ -52,7 +52,7 @@ void spectrum_type::set_data(Data &data)
     }
 }
 
-double barkbounds[barksize+1] =
+float8 barkbounds[barksize+1] =
   {
     0,100,200,300,
     400,510,630,770,

@@ -26,11 +26,12 @@ using namespace std;
 #include "player-core.h"
 #include "ao-som-beatgraph.h"
 #include <qimage.h>
+#include "clock-drivers.h"
 
 /**
  * This function is used to find the best matching unit, so we skip the sqrt
  */
-bool min_dist(signed1* A, signed1* B, double&mindist, int size)
+bool min_dist(signed1* A, signed1* B, float8&mindist, int size)
 {
   unsigned4 curdist=0;
   for(int i = 0 ; i < size && curdist<mindist; i++)
@@ -55,7 +56,7 @@ int gauss(int pos, int zeroat)
 {
   if (pos<0) return gauss(-pos,zeroat);
   if (pos>=zeroat) return 0;
-  // return (int)(cos((3.141592/2.0)*(float)pos/(float)zeroat)*255.0);
+  // return (int)(cos((3.141592/2.0)*(float4)pos/(float4)zeroat)*255.0);
   return 255-pos*255/zeroat;
 }
 
@@ -96,7 +97,7 @@ elementResult ActiveSomBeatGraph::start()
   if (vectors*period>size) vectors--;
   if (vectors<1) return Done;
   dimensions = period / 4; // 11025 Hz is quite fine insterad of 44100
-
+  
   //---------------------------
   // Allocation of the mapping & vectors
   printf("This song has %d beats (each beat is a vector we need to place)\n"
@@ -120,7 +121,7 @@ elementResult ActiveSomBeatGraph::start()
   for(unsigned4 v = 0 ; v < vectors; v++)
     points[v]=bpmdj_allocate(dimensions,signed1);
   pointcolors=bpmdj_allocate(vectors,unsigned1);
-
+  
   //---------------------------
   // Initialisation with random values
 #ifndef SAMPLED_INIT
@@ -220,7 +221,7 @@ elementResult ActiveSomBeatGraph::start()
 	{
 	  signed1 *V = points[v];
 	  // A- find the best matching neuron
-	  double mindist=dimensions*256.0*256.0;
+	  float8 mindist=dimensions*256.0*256.0;
 	  int bmu=-1;
 	  for(int c = 0 ; c < colors ; c++)
 	    if (min_dist(V,mapping[c],mindist,dimensions))
@@ -272,7 +273,7 @@ elementResult ActiveSomBeatGraph::start()
 	    }
 	}
       // C - dump the map to show the current layout
-      double total_residue=0;
+      float8 total_residue=0;
 #ifdef BEATS
       QImage im(vectors/4,400,QImage::Format_RGB32);
       int ch = 100;
@@ -291,7 +292,7 @@ elementResult ActiveSomBeatGraph::start()
 #endif
 	  signed1 *V = points[v];
 	  // A- find the best matching unit
-	  double mindist=dimensions*256.0*256.0;
+	  float8 mindist=dimensions*256.0*256.0;
 	  int bmu=-1;
 	  for(int c = 0 ; c < colors ; c++)
 	    if (min_dist(V,mapping[c],mindist,dimensions))

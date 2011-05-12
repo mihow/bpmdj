@@ -52,11 +52,11 @@ void SongProcess::init()
   kind = player;
 }
 
-float SongProcess::songs_per_second() const
+float4 SongProcess::songs_per_second() const
 {
-  float t = total_running_time;
+  float4 t = total_running_time;
   if (t==0) return 0;
-  float s = songs_finished;
+  float4 s = songs_finished;
   return s/t;
 }
 
@@ -228,7 +228,7 @@ QString SongProcess::getPlayCommand(Index& match_with_index, Index & to_play_son
   assert(0);
 }
 
-QString SongProcess::getAnalCommand(bool tempo, int technique, double from, double to, bool spectrum, bool energy, bool rythm, QString  song) const
+QString SongProcess::getAnalCommand(bool tempo, int technique, float8 from, float8 to, bool spectrum, bool energy, bool rythm, QString  song) const
 {
   assert(cmd==standard);
   QString tempoLine = "";
@@ -526,10 +526,10 @@ void SongSelectorAnalView::processChange()
   colorChange();
 }
 
-float SongSelectorAnalView::relative_running_time()
+float4 SongSelectorAnalView::relative_running_time()
 {
-  float r = song_process->get_running_time();
-  float report_time = song_process->songs_per_second();
+  float4 r = song_process->get_running_time();
+  float4 report_time = song_process->songs_per_second();
   if (report_time==0) report_time=60;
   else report_time=60/report_time;
   r/=report_time;
@@ -546,7 +546,7 @@ void SongSelectorAnalView::colorChange()
    * the related analyzer tab
    */
   QColor c;
-  float f = relative_running_time();
+  float4 f = relative_running_time();
   c.setHsv(song_process->getId()*240/7,
 	   255-(int)(f*255.0),
 	   255-(int)(f*127.0));

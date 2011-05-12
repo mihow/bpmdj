@@ -32,12 +32,12 @@ class QueuedSong:
   private:
     Song * song;
     int    pos;
-    double distance;
+    float8 distance;
     bool anker;
   public:
     bool mark;
   public:
-    void setSong(Song* s, double d);
+    void setSong(Song* s, float8 d);
     Song* getSong() {return song;};
     void setPos(int p) {pos=p;};
     int getPos() {return pos;};
@@ -72,7 +72,6 @@ class QueuedAnalSong:
     bool needs_rythm() const { return song->needs_rythm();};
     bool needs_composition() const { return song->needs_composition();};
   public:
-    //    void setSong(Song* s, double d);
     Song* getSong() { return song; };
     QString getDisplayTitle() {return song->getDisplayTitle();};
     QueuedAnalSong(Q3ListView* parent,Song *song);

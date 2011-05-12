@@ -28,27 +28,27 @@ using namespace std;
 class histogram_type
 {
  public:
-  double left;
-  double right;
-  double sum;
-  double scale;
+  float8 left;
+  float8 right;
+  float8 sum;
+  float8 scale;
   int    total;
   int    median;
   signed4 * bins;
   int    count;
   histogram_type();
-  histogram_type(double left, double right, int c);
-  void init(double left, double right, int c);
-  int bin(double val);
-  void hit(double val);
+  histogram_type(float8 left, float8 right, int c);
+  void init(float8 left, float8 right, int c);
+  int bin(float8 val);
+  void hit(float8 val);
   void normalize(int val);
   void normalize_autocorrelation_diff(int val);
   void strip();
-  int valat(double v);
-  double mean();
-  double dev();
-  double best_dist(histogram_type *a);
-  double cor_dist(histogram_type *a);
+  int valat(float8 v);
+  float8 mean();
+  float8 dev();
+  float8 best_dist(histogram_type *a);
+  float8 cor_dist(histogram_type *a);
   void halve();
 };
 #endif // __loaded__histogram_type_h__

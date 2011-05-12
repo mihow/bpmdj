@@ -66,5 +66,5 @@ using namespace std;
  *               8.960   5.7     0.000275  -90
  *               10.056  6.4     0.000087  -100
  */
-void LpFilter(double c[], int N, double frq, double Beta, int Num);
+void LpFilter(float8 c[], int N, float8 frq, float8 Beta, int Num);
 #endif // __loaded__lowpass_h__

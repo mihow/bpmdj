@@ -51,13 +51,13 @@ bool exists(const char* fn)
   return false;
 }
 
-double minimum(double a, double b)
+float8 minimum(float8 a, float8 b)
 {
   if ( a < b ) return a;
   else return b;
 }
 
-double abs_minimum(double a, double b)
+float8 abs_minimum(float8 a, float8 b)
 {
   if ( fabs(a) < fabs(b) ) return a;
   else return b;

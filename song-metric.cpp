@@ -42,7 +42,7 @@ using namespace std;
 #include "song-metric.h"
 #include "metric-widget.h"
 
-SongMetriek::SongMetriek(float tw, float sw, float hw, float rw, float cw)
+SongMetriek::SongMetriek(float4 tw, float4 sw, float4 hw, float4 rw, float4 cw)
 {
   tempo = tw;
   spectrum = sw;
@@ -59,18 +59,18 @@ SongMetriek::SongMetriek(MetricWidget & take_from)
   set_show_harmonics(std.harmonic54_term, std.harmonic64_term, std.harmonic74_term, std.harmonic84_term);
   unknown_tempo_matches = false;
   
-  set_tempo_weight(    (float)(take_from.tempoDistanceSpin->value())/100.0 );
-  set_spectrum_weight( (float)(take_from.spectrumSpin->value())/100.0);
-  set_echo_weight(     (float)(take_from.echoSpin->value())/100.0);
-  set_rythm_weight(    (float)(take_from.rythmSpin->value())/100.0);
-  std.set_composition_weight( (float)(take_from.compositionSpin->value())/100.0);
+  set_tempo_weight(    (float4)(take_from.tempoDistanceSpin->value())/100.0 );
+  set_spectrum_weight( (float4)(take_from.spectrumSpin->value())/100.0);
+  set_echo_weight(     (float4)(take_from.echoSpin->value())/100.0);
+  set_rythm_weight(    (float4)(take_from.rythmSpin->value())/100.0);
+  std.set_composition_weight( (float4)(take_from.compositionSpin->value())/100.0);
   
   prepare();
 }
 
-float SongMetriek::find_harmonic(float td, int & which) const
+float4 SongMetriek::find_harmonic(float4 td, int & which) const
 {
-  float d;
+  float4 d;
   which = 0;
   if (fabs(td) <= 1.0) return td;
   which = 1;
@@ -89,23 +89,23 @@ float SongMetriek::find_harmonic(float td, int & which) const
   return no_distance;
 }
 
-float SongMetriek::tempo_diff(const Song& a, const Song& b) const
+float4 SongMetriek::tempo_diff(const Song& a, const Song& b) const
 {
   tempo_type fa = a.get_tempo();
   tempo_type fb = b.get_tempo();
   if (fa.none() || fb.none()) return unknown_tempo_matches ? 1.0 : no_distance;
-  float ffa = fa.tempo;
-  float ffb = fb.tempo;
+  float4 ffa = fa.tempo;
+  float4 ffb = fb.tempo;
   if (ffa>0 && ffb>0)
     {
       ffa = log(ffa);
       ffb = log(ffb);
     }
-  float d = ffa - ffb;
+  float4 d = ffa - ffb;
   return d / tempo_scale;
 }
 
-float SongMetriek::spectrum_dist(const Song & self, const Song & song) const 
+float4 SongMetriek::spectrum_dist(const Song & self, const Song & song) const 
 {
   if (self.get_spectrum()==no_spectrum || song.get_spectrum()==no_spectrum)
     return 1000000;
@@ -124,13 +124,13 @@ float SongMetriek::spectrum_dist(const Song & self, const Song & song) const
   return distance;
 }
 
-float SongMetriek::histogram_dist(const Song& self, const Song & song, double breakat) const
+float4 SongMetriek::histogram_dist(const Song& self, const Song & song, float8 breakat) const
 {
   echo_property b = song.get_histogram();
   echo_property a = self.get_histogram();
   if (a.empty() || b.empty())
     return 1000000;
-  float distance=0;
+  float4 distance=0;
   /* recalculate breakat */
   breakat *= (spectrum_size*echo_prop_sx)/100;
   breakat *= breakat;
@@ -145,11 +145,11 @@ float SongMetriek::histogram_dist(const Song& self, const Song & song, double br
       else cs=bs;
       for(int y = 0 ; y < cs ; y++)
 	{
-	  float c = a.get_freq_energy_probability(x,y)/255.0;
+	  float4 c = a.get_freq_energy_probability(x,y)/255.0;
 	  // c = normalize_echo(c,x,y);
-	  float d = b.get_freq_energy_probability(x,y)/255.0;
+	  float4 d = b.get_freq_energy_probability(x,y)/255.0;
 	  // d = normalize_echo(d,x,y);
-	  float e = c - d;
+	  float4 e = c - d;
 	  e *= e;
 	  distance+=e;
 	}
@@ -157,14 +157,14 @@ float SongMetriek::histogram_dist(const Song& self, const Song & song, double br
       if (as>cs)
 	for(int y = cs ; y < as ; y++)
 	  {
-	    float c = a.get_freq_energy_probability(x,y)/255.0;
+	    float4 c = a.get_freq_energy_probability(x,y)/255.0;
 	    c *= c;
 	    distance+=c;
 	  }
       if (bs>cs)
 	for(int y = cs ; y < bs ; y++)
 	  {
-	    float d = b.get_freq_energy_probability(x,y)/255.0;
+	    float4 d = b.get_freq_energy_probability(x,y)/255.0;
 	    d *= d;
 	    distance+=d;
 	  }
@@ -176,23 +176,23 @@ float SongMetriek::histogram_dist(const Song& self, const Song & song, double br
   return distance;
 }
 
-float SongMetriek::rythm_dist(const Song& self, const Song & song, double breakat) const
+float4 SongMetriek::rythm_dist(const Song& self, const Song & song, float8 breakat) const
 {
   rythm_property b = song.get_rythm();
   rythm_property a = self.get_rythm();
   if (a.empty() || b.empty()) return 1000000;
-  float distance=0;
+  float4 distance=0;
   // recalculate the breakat argument
   breakat *= (spectrum_size*rythm_prop_sx)/100;
   breakat *= breakat;
   for (int x = 0; x < spectrum_size && distance < breakat; x ++ )
     for(int y = 0 ; y < rythm_prop_sx; y++)
       {
-	float c = a.get_energy(x,y)/255.0;
+	float4 c = a.get_energy(x,y)/255.0;
 	if (c<0.5) c=0.5;
-	float d = b.get_energy(x,y)/255.0;
+	float4 d = b.get_energy(x,y)/255.0;
 	if (d<0.5) d=0.5;
-	float e = c-d;
+	float4 e = c-d;
 	e *= e;
 	e *= e;
 	distance+=e;
@@ -203,12 +203,12 @@ float SongMetriek::rythm_dist(const Song& self, const Song & song, double breaka
   return distance /* * Config::get_distance_spectrumscale() */;
 }
 
-float SongMetriek::composition_dist(const Song & self, const Song & song, double breakat) const
+float4 SongMetriek::composition_dist(const Song & self, const Song & song, float8 breakat) const
 {
   composition_property b = song.get_composition();
   composition_property a = self.get_composition();
   if (a.empty() || b.empty()) return 1000000;
-  float distance=0;
+  float4 distance=0;
   // recalculate the breakat argument
   breakat *= (24.0*32.0)/1000.0;
   breakat *= breakat;
@@ -216,9 +216,9 @@ float SongMetriek::composition_dist(const Song & self, const Song & song, double
     {
       for(int y = 0 ; y < 32; y++)
 	{
-	  float c = a.get_energy_scaled(x,y);
-	  float d = b.get_energy_scaled(x,y);
- 	  float e = (c-d);
+	  float4 c = a.get_energy_scaled(x,y);
+	  float4 d = b.get_energy_scaled(x,y);
+ 	  float4 e = (c-d);
 	  e*=e;
 	  e/=(y+16.0);
 	  distance+=e;
@@ -235,12 +235,12 @@ float SongMetriek::composition_dist(const Song & self, const Song & song, double
  * impact should be measured first. Currenlty we only do this for the intensive 
  * histogram and ryhtm matchings.
  */
-float SongMetriek::distance(const Song &a, const Song &b, double limit) const
+float4 SongMetriek::distance(const Song &a, const Song &b, float8 limit) const
 {
   if (total == 0) return no_distance;
-  float sum = 0;
+  float4 sum = 0;
   limit*=total;
-  float breakat=limit;
+  float4 breakat=limit;
   if (tempo > 0  && (breakat = limit/tempo) > 0)
     sum+=tempo_dist(a,b) * tempo;
   
@@ -278,7 +278,7 @@ float SongMetriek::distance(const Song &a, const Song &b, double limit) const
 SongMetriek SongMetriek::std(0.0,0.3,1.0,2.0,1.0);
 //static SongMetriek stddcolor_distance(0.0,0.0,0.0,0.0,1.0);
 
-static float calculate_harmonic_term(float harmonic, float limits)
+static float4 calculate_harmonic_term(float4 harmonic, float4 limits)
 {
   return log(harmonic)/log(1+limits);
 }

@@ -44,7 +44,7 @@ using namespace std;
 #include "version.h"
 #include "scripts.h"
 #include "dsp-oss.h"
-
+#include "scripts.h"
 
 /*-------------------------------------------
  *         Clock operations
@@ -67,7 +67,6 @@ signed8 clock_ticks()
 /*-------------------------------------------
  *         Dsp operations
  *-------------------------------------------*/ 
-
 dsp_oss::dsp_oss(const PlayerConfig & config) : dsp_driver(config)
 {
   opt_fragments = config.get_oss_init_fragments();
@@ -79,9 +78,10 @@ dsp_oss::dsp_oss(const PlayerConfig & config) : dsp_driver(config)
   verbose = config.get_oss_verbose();
 }
 
-void dsp_oss::start()
+void dsp_oss::start(audio_source*a)
 {
   dsp_writecount=0;
+  dsp_driver::start(a);
 }
 
 signed8 dsp_oss::playcount()
@@ -98,11 +98,14 @@ signed8 dsp_oss::playcount()
   return cnt.bytes/4;
 }
 
-void dsp_oss::pause()
+void dsp_oss::internal_pause()
 {
   //  dsp_flush();
   ioctl(dsp,SNDCTL_DSP_RESET);
-  wait_for_unpause();
+}
+
+void dsp_oss::internal_unpause()
+{
   clock_start();
   dsp_writecount=0;
 }
@@ -123,12 +126,10 @@ signed8 dsp_oss::latency()
 
 void oss_catch(int ignore)
 {
-  printf("Failed to open (alarm timeout) oss dsp device");
-  fflush(stdout);
-  _exit(0);
+  Fatal("Failed to open (alarm timeout) oss dsp device");
 }
 
-int dsp_oss::open()
+int dsp_oss::open(bool ui)
 {
   int p;
   // start alarm before opening...
@@ -136,9 +137,7 @@ int dsp_oss::open()
   signal(SIGALRM,oss_catch);
   alarm(1);
   if (verbose)
-    {
-      printf("dsp: opening %s\n",arg_dsp);
-    }
+    Info("dsp: opening %s",arg_dsp);
   dsp = ::open(arg_dsp,O_WRONLY);
   if (dsp==-1)
     {
@@ -150,20 +149,20 @@ int dsp_oss::open()
   // set dsp parameters
   p=AFMT_S16_LE;
   if (ioctl(dsp,SNDCTL_DSP_SETFMT,&p)==-1)
-    printf("dsp: setting dsp to standard 16 bit failed\n");
+    Error(ui,"Setting Oss driver to standard 16 bit failed");
   p=2;
   if (ioctl(dsp,SNDCTL_DSP_CHANNELS,&p)==-1)
-    printf("dsp: setting dsp to 2 channels failed\n");
+    Error(ui,"Setting Oss driver to 2 channels failed");
   p=WAVRATE;
   if (ioctl(dsp,SNDCTL_DSP_SPEED,&p)==-1)
     {
-      printf("dsp: setting dsp speed (%d) failed\n",p++);
+      Error(ui,"Setting Oss driver speed (%d) failed",p++);
       if (ioctl(dsp,SNDCTL_DSP_SPEED,&p)==-1)
 	{
-	  printf("dsp: setting dsp speed (%d) failed\n",p);
+	  Error(ui,"Setting Oss dsp speed (%d) failed",p);
 	  p+=2;
 	  if (ioctl(dsp,SNDCTL_DSP_SPEED,&p)==-1)
-	    printf("dsp: setting dsp speed (%d) failed\n",p);
+	    Error(ui,"Setting Oss dsp speed (%d) failed\n",p);
 	}
     }
   
@@ -171,7 +170,6 @@ int dsp_oss::open()
   // opt_latency bevat de gevraagde latency. Dus dit omzetten naar
   // hiervan moeten we natuurlijk het logaritme nemen..
   // zie OSS manual
-
   {
     int latency_setter;
     int latency_checker;
@@ -180,41 +178,38 @@ int dsp_oss::open()
     latency_setter /= arg_fragments;
     latency_checker = arg_fragments;
     if (verbose)
-      printf("dsp: setting latency to %d ms\n",arg_latency);
+      Info("Setting Oss latency to %d ms",arg_latency);
     while(latency_setter>=1)
       {
 	latency_setter/=2;
 	latency_checker*=2;
 	p++;
-	// printf("  setter = %d , checker = %d, p == %x\n",latency_setter, latency_checker, p);
       }
     ioctl(dsp,SNDCTL_DSP_SETFRAGMENT,&p);
     ioctl(dsp,SNDCTL_DSP_GETOSPACE,&dsp_latency);
     latency_setter = bytes2ms(dsp_latency.bytes);
     if (verbose) 
-      printf("     actually latency will be %d ms\n",latency_setter);
+      Info("actually latency will be %d ms",latency_setter);
     if (dsp_latency.bytes != latency_checker)
-      printf("dsp: impossible to set the required latency\n");
+      Error(ui,"Impossible to set Oss to the requested latency");
     if (verbose)
-      {
-	printf("     fragments = %d\n", dsp_latency.fragments);
-	printf("     fragsize = %d ms\n", bytes2ms(dsp_latency.fragsize));
-	printf("     bytes = %d ms\n", bytes2ms(dsp_latency.bytes));
-      }
+      Info(" fragments = %d\n"
+	   " fragsize = %d ms\n"
+	   " bytes = %d ms",
+	   dsp_latency.fragments, bytes2ms(dsp_latency.fragsize),bytes2ms(dsp_latency.bytes));
     
     // now get the capacities
     ioctl(dsp,SNDCTL_DSP_GETCAPS,&p);
     if (verbose)
-      printf("dsp: realtime capability = %s\n"
-	     "     batch limitation = %s\n"
-	     "     mmap capability = %s\n",
-	     (p & DSP_CAP_REALTIME) ? "yes" : "no",
-	     (p & DSP_CAP_BATCH) ? "yes" : "no",
-	     (p & DSP_CAP_MMAP) ? "yes" : "no");
+      Info(" realtime capability = %s\n"
+	   " batch limitation = %s\n"
+	   " mmap capability = %s",
+	   (p & DSP_CAP_REALTIME) ? "yes" : "no",
+	   (p & DSP_CAP_BATCH) ? "yes" : "no",
+	   (p & DSP_CAP_MMAP) ? "yes" : "no");
   }
   
   // here we go
-  start();
   clock_start();
   return err_none;
 }
@@ -230,8 +225,8 @@ void dsp_oss::close(bool fl)
   latencycheck=clock_ticks();
   if (fl) flush();
   if (verbose)
-    printf("dsp: fluffy-measured playing latency = %d ms\n",
-	   samples2ms(clock_ticks()-latencycheck));
+    Info("Fluffy-measured playing latency when closing = %d ms",
+	 samples2ms(clock_ticks()-latencycheck));
   ::close(dsp);
 }
 #endif

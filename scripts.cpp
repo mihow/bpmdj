@@ -222,7 +222,7 @@ void Error(bool ui, const char* script, ...)
   va_end(ap);
   Log("Error: ", toexecute);
   if (ui)
-    QMessageBox::critical(NULL,"Error",toexecute,QMessageBox::Ok, QMessageBox::NoButton);
+    QMessageBox::critical(NULL,"Error",toexecute,QMessageBox::Ok, 0, 0);
 };
 
 void Remote(const char* script, ...)

@@ -40,7 +40,7 @@ inline tempo_type period_to_tempo(period_type a)
 {
   tempo_type b;
   if (a.period > 0)
-    b.tempo = 4.0*11025.0*60.0/(double)a.period;
+    b.tempo = 4.0*11025.0*60.0/(float8)a.period;
   return b;
 }
 
@@ -48,7 +48,7 @@ inline period_type tempo_to_period(tempo_type a)
 {
   period_type b;
   if (a.tempo > 0)
-    b.period = (signed4)(4.0*11025.0*60.0/(double)a.tempo);
+    b.period = (signed4)(4.0*11025.0*60.0/(float8)a.tempo);
   return b;
 }
 
@@ -57,12 +57,12 @@ inline quad_period_type period_to_quad(period_type a)
   return quad_period_type(a.period * 4);
 }
 
-inline tempo_type between_tempos(tempo_type a, tempo_type b, float percent)
+inline tempo_type between_tempos(tempo_type a, tempo_type b, float4 percent)
 {
   return tempo_type((b.tempo-a.tempo)*percent+a.tempo);
 }
 
-inline spectrum_type * between_spectra(spectrum_type *a, spectrum_type *b, float percent)
+inline spectrum_type * between_spectra(spectrum_type *a, spectrum_type *b, float4 percent)
 {
   if (a==no_spectrum) return no_spectrum;
   if (b==no_spectrum) return no_spectrum;

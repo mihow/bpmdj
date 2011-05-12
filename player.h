@@ -54,7 +54,12 @@ private:
   int fade_time;
   signed8 wantedcurrentperiod;
   void setColor(QWidget *button, bool enabled);
-  void setTempoColor(QWidget *button, int s);
+  /**
+   * Will update the colors of the beatgraph LCD. Red when the song is playing 
+   * at the target tempo. Yellow when the tempo is changing and green when 
+   * the song is playing at its normal tempo
+   */
+  void updateTempoColors();
   void redrawCues();
   void normalReached(bool yes);
   // BpmAnalyzerDialog * bpmcounter;
@@ -150,7 +155,7 @@ public slots:
   virtual void setBpmMixingDesk();
   virtual void restartCore();
   virtual void customEvent(QEvent * e);
-  virtual void startCore();
+  virtual void startCore(int tries=5);
   virtual void stopCore();
   virtual void initCore();
 };

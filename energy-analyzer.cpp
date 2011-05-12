@@ -63,9 +63,9 @@ void EnergyAnalyzer::readAudio()
 
 float4 normalization_factor(signed2 min, signed2 max, signed2 mean)
 {
-  float a = fabs(min - mean);
-  float b = fabs(max - mean);
-  float c = a > b ? a : b;
+  float4 a = fabs(min - mean);
+  float4 b = fabs(max - mean);
+  float4 c = a > b ? a : b;
   if (c==0) return 32767;
   return 32767.0 / c;
 }

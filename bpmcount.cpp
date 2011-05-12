@@ -49,8 +49,8 @@ using namespace std;
 #include "files.h"
 #include "signals.h"
 
-template double normalize_abs_max<double>(double*, long);
-template double find_abs_max<double>(double*, long);
+template float8 normalize_abs_max<float8>(float8*, long);
+template float8 find_abs_max<float8>(float8*, long);
 
 int main(int argc, char *argv[])
 {

@@ -25,13 +25,13 @@ using namespace std;
 #include <math.h>
 #include "om-data.h"
 
-const float no_power = -1.0;
+const float4 no_power = -1.0;
 
 class power_type
 {
  public:
-  float left;
-  float right;
+  float4 left;
+  float4 right;
   bool fully_defined() 
     {
       return 
@@ -49,7 +49,7 @@ class power_type
     {
       right = left = no_power;
     }
-  power_type(float l, float r)
+  power_type(float4 l, float4 r)
     {
       left = l;
       right = r;

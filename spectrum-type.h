@@ -30,14 +30,14 @@ using namespace std;
 
 #define spectrum_size 24
 #define barksize spectrum_size
-extern double barkbounds[barksize+1];
+extern float8 barkbounds[barksize+1];
 
 /**
  * Versions <2.7 used a lineair scale
  * Versions >=2.7 use a logartihmic scale in dB normalized to 1
  */
-typedef float spectrum_freq;
-extern double barkbounds[barksize+1];
+typedef float4 spectrum_freq;
+extern float8 barkbounds[barksize+1];
 #define no_spectrum NULL
 
 class spectrum_type

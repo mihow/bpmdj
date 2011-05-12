@@ -40,26 +40,26 @@ stereo_sample2 ImpulseResponse::convolve_with(stereo_sample2 * at)
 {
   // figure out the length;
   assert(length<640);
-  double L = 0;
-  double R = 0;
+  float8 L = 0;
+  float8 R = 0;
   for(int i = 0 ; i < length ; i++)
     {
       int j = index[i];
-      L+=((double)(at[j].left))*value[i];
-      R+=((double)(at[j].right))*value[i];
+      L+=((float8)(at[j].left))*value[i];
+      R+=((float8)(at[j].right))*value[i];
     }
   return stereo_sample2((signed2)L,(signed2)R);
 }
 
-double ImpulseResponse::gain()
+float8 ImpulseResponse::gain()
 {
-  double r = 0;
+  float8 r = 0;
   for(int i = 0 ; i < length ; i++)
     r+=value[i];
   return r;
 }
 
-ImpulseResponse& ImpulseResponse::operator /=(double v)
+ImpulseResponse& ImpulseResponse::operator /=(float8 v)
 {
   for(int i = 0 ; i < length ; i++)
     value[i]/=v;
@@ -74,7 +74,7 @@ ImpulseResponse ImpulseResponse::shrink()
   for(int i = 0 ; i < length ; i++)
     {
       int I = index[i];
-      double V = value[i];
+      float8 V = value[i];
       if (V!=0)
 	{
 	  if (I<mi) mi=I;
@@ -88,7 +88,7 @@ ImpulseResponse ImpulseResponse::shrink()
   for(int i = 0 ; i < length ; i++)
     {
       int I = index[i];
-      double V = value[i];
+      float8 V = value[i];
       if (V!=0)
 	result.amp(I-mi)+=V;
     }
@@ -98,7 +98,7 @@ ImpulseResponse ImpulseResponse::shrink()
 ImpulseResponse::ImpulseResponse(int l) : length(l)
 {
   index = bpmdj_allocate(length,int);
-  value = bpmdj_allocate(length,double);
+  value = bpmdj_allocate(length,float8);
   for (int i = 0 ; i < length ; i++)
     {
       index[i]=0;
@@ -112,21 +112,21 @@ void ImpulseResponse::print()
     printf("%d\t%g\n",index[i],value[i]);
 }
 
-void ImpulseResponse::set_amp(double a)
+void ImpulseResponse::set_amp(float8 a)
 {
   for (int i = 0 ; i < length ; i++)
     value[i]=a;
 }
 
-void create_lowpass(ImpulseResponse & target, double cutoff, int Num)
+void create_lowpass(ImpulseResponse & target, float8 cutoff, int Num)
 {
   printf("create_lowpass called with length = %d and cutoff %g\n",target.length,cutoff);
-  double c[target.length/2];
+  float8 c[target.length/2];
   LpFilter(c,target.length/2,cutoff,100,Num);
-  /*  double sum = 0;
+  /*  float8 sum = 0;
   for(int i = 0 ; i < target.length/2; i++)
     sum+=c[i];
-  double ma= 0;
+  float8 ma= 0;
   
   for(int i = 0 ; i < target.length/2 ; i++)
     if (c[i]>ma) ma=c[i];
@@ -186,7 +186,7 @@ ImpulseResponse Resampler::generate_table(int playpos)
       FS = M;
       length = 5*FS*FS;
     }
-  double cutoff = 0.5/(double)FS;
+  float8 cutoff = 0.5/(float8)FS;
   
   // create a lowpass filter
   ImpulseResponse lowpass(length);
@@ -219,7 +219,7 @@ ImpulseResponse Resampler::generate_table(int playpos)
 //#define TEST_ALONE
 #ifdef TEST_ALONE
 
-double minimum(double a, double b)
+float8 minimum(float8 a, float8 b)
 {
   if (a<b) return a;
   return b;

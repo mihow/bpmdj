@@ -36,7 +36,7 @@ class composition_property: public histogram_property<composition_prop_sx>
       for(int i = 0 ; i < 24 ; i++)
 	bark[i].init();
     }
-  void set_scale(int b, double s) 
+  void set_scale(int b, float8 s) 
     {
       bark[b].set_scale(s);
     }
@@ -44,7 +44,7 @@ class composition_property: public histogram_property<composition_prop_sx>
     {
       return bark[b].get_energy(x);
     }
-  float get_energy_scaled(int b, int x)
+  float4 get_energy_scaled(int b, int x)
     {
       return (get_energy(b,x)-127.0)*bark[b].scale/255.0;
     }

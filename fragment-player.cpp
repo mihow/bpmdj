@@ -34,20 +34,8 @@ elementResult ActiveFragmentPlayer::playChunk(int t)
   // in our situation is known by its expected timestamp
   if (t!=expected_playchunk) return Done;
   checkValidDsp();
-  if (!playing || !dsp || finished || stopped) return Done;
-  static const int check_every = 44100/3;
-  stereo_sample2 * samples = playing.get_samples();
-  if (!samples) return Done;
-  for(int i = check_every; i ; i--)
-    {
-      dsp->write(samples[curpos++]);
-      curpos%=playing.get_size();
-      if (curpos==0) 
-	{
-	  finished=true;
-	  return Done;
-	}
-    }
+  if (!delivery.playing || !dsp || delivery.finished || stopped) return Done;
+  usleep(333);
   return RevisitAfterIncoming;
 };
 
@@ -70,25 +58,24 @@ elementResult ActiveFragmentPlayer::playWave(FragmentInMemory fragment)
 	return Done;
       PlayerConfig player_config(free_slot->getName());
       dsp = dsp_driver::get_driver(&player_config);
-      if (dsp->open()!=err_none)
+      if (dsp->open(false)!=err_none)
 	{
 	  delete dsp;
 	  dsp=NULL;
 	}
       else
 	{
-	  dsp->start();
+	  dsp->start(&delivery);
 	  just_opened=true;
 	}
     }
   if (!dsp) return Done;
-  playing = fragment;
-  curpos = 0;
-  finished = false;
+  delivery.reset(fragment);
+  
   // this pause will drop any pending samples, and continue
   // immediatelly since our wait_for_unpause returns immediatelly.
-  if (!just_opened) dsp->pause();
-  if (curpos==0) queue_playChunk(++expected_playchunk);
+  //if (!just_opened) dsp->pause();
+  queue_playChunk(++expected_playchunk);
   return Done;
 };
 
@@ -110,12 +97,10 @@ void ActiveFragmentPlayer::closeDsp()
 {
   if (dsp)
     {
-      dsp->close(false);
+      dsp->stop();
       delete dsp;
       dsp = NULL;
-      playing = FragmentInMemory();
-      curpos = 0;
-      finished = false;
+      delivery.reset(FragmentInMemory());
     }
   player_slot = -1;
 }
@@ -141,18 +126,6 @@ void FragmentPlayer::waitForStop()
 void FragmentPlayer::waitForStart()
 {
   while(object.stopped) ;
-}
-
-/**
- * The DSP Drivers can be paused and will then call wait_for_unpause
- * which should return when the pause has finished.
- * In our case we dont't want to use the pause capabilities. So 
- * we return immediatelly
- */
-signed8 x;
-quad_period_type normalperiod;
-void wait_for_unpause()
-{
 }
 
 FragmentPlayer fragmentPlayer;

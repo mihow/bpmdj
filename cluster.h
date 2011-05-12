@@ -38,24 +38,24 @@ class Point
   public:
     Point();
     virtual ~Point() {};
-    virtual float  distance(Point * other, Metriek * dp) {return 0;};
-    virtual Point* percentToward(Point * other, Metriek * dp, float percent) {return NULL;};
-    virtual void   simpledump(int d) {};
-    virtual void   determine_color(float hue_min, float hue_max, int depth, int stopat) {};
+    virtual float4  distance(Point * other, Metriek * dp) {return 0;};
+    virtual Point* percentToward(Point * other, Metriek * dp, float4 percent) {return NULL;};
+    virtual void   simpledump(unsigned2 d) {};
+    virtual void   determine_color(float4 hue_min, float4 hue_max, int depth, int stopat) {};
     virtual int    cluster_elements() { return 1; };
-    virtual int    clusters_with_size(int min_size, int max_size,float &min_internal_distance, float& max_internal_distance) {assert(0); return 0;};
-    virtual int    color_clusters_with_size(int min, int max, int nr, int count, float min_dist, float max_dist) {assert(0);  return 0;};
-    virtual void   color_sub_elements(int, int, float) {assert(0);};
-    virtual void   color_clusters_dw(float hue_min, float hue_max, float max_dist, float last_dist);
-    virtual void   color_clusters_dw2(float hue_min, float hue_max, int min_depth, int max_depth, int depth);
+    virtual int    clusters_with_size(int min_size, int max_size,float4 &min_internal_distance, float4& max_internal_distance) {assert(0); return 0;};
+    virtual int    color_clusters_with_size(int min, int max, int nr, int count, float4 min_dist, float4 max_dist) {assert(0);  return 0;};
+    virtual void   color_sub_elements(int, int, float4) {assert(0);};
+    virtual void   color_clusters_dw(float4 hue_min, float4 hue_max, float4 max_dist, float4 last_dist);
+    virtual void   color_clusters_dw2(float4 hue_min, float4 hue_max, int min_depth, int max_depth, int depth);
     virtual int    get_min_maxdepth(int &min, int &max,int depth);
-    virtual float  intra_distance() {return 0;};
-    void prefix(int d);
+    virtual float4  intra_distance() {return 0;};
+    void prefix(unsigned2 d);
 };
 
 struct ClusterPosition
 {
-  float distance;
+  float4 distance;
   signed2 x;
   signed2 y;
   bool operator == (ClusterPosition & other)
@@ -71,21 +71,21 @@ class Couple: public Point
  public:
   Couple(int a, int b);
   virtual ~Couple() {};
-  float distance2point(int idx, Metriek* metriek);
-  virtual void simpledump(int d);
-  virtual void determine_color(float hue_min, float hue_max, int depth, int stopat);
-  virtual int  clusters_with_size(int min_size, int max_size,float &min_internal_distance, float& max_internal_distance);
+  float4 distance2point(int idx, Metriek* metriek);
+  virtual void simpledump(unsigned2 d);
+  virtual void determine_color(float4 hue_min, float4 hue_max, int depth, int stopat);
+  virtual int  clusters_with_size(int min_size, int max_size,float4 &min_internal_distance, float4& max_internal_distance);
   virtual int  cluster_elements();
   virtual void color_clusters_with_size(int min_size, int max_size);
-  virtual int  color_clusters_with_size(int min, int max, int nr, int count, float min_dist, float max_dist);
-  virtual void color_sub_elements(int, int, float);
+  virtual int  color_clusters_with_size(int min, int max, int nr, int count, float4 min_dist, float4 max_dist);
+  virtual void color_sub_elements(int, int, float4);
   virtual void color_clusters_dw();
-  virtual void color_clusters_dw(float hue_min, float hue_max, float max_dist, float last_dist);
-  virtual float intra_distance();
+  virtual void color_clusters_dw(float4 hue_min, float4 hue_max, float4 max_dist, float4 last_dist);
+  virtual float4 intra_distance();
   virtual int   get_min_maxdepth(int &min, int &max,int depth);
   virtual void color_clusters_dw2();
-  virtual void color_clusters_dw2(float hue_min, float hue_max, int min_depth, int max_depth, int depth);
-  float distance(Couple * other, Metriek * metriek);
+  virtual void color_clusters_dw2(float4 hue_min, float4 hue_max, int min_depth, int max_depth, int depth);
+  float4 distance(Couple * other, Metriek * metriek);
 };
 
 class Cluster
@@ -103,14 +103,14 @@ class Cluster
     static int       totalsize;
     static inline bool isPoint(int xidx);
     
-    static float * * similarity;
+    static float4 * * similarity;
     static ClusterPosition * * prev;
     static ClusterPosition * * next;
     // the similarity matrix
     Cluster();
-    static float distance(int x, int y, Metriek * metriek);
-    static float distance_calculate(int x, int y, Metriek * metriek);
-    static float distance_memory(int x, int y);
+    static float4 distance(int x, int y, Metriek * metriek);
+    static float4 distance_calculate(int x, int y, Metriek * metriek);
+    static float4 distance_memory(int x, int y);
     // adds an index or a point to this cluster
     void add(int idx);
     void addPoint(Point* p);

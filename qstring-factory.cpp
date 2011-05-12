@@ -37,7 +37,7 @@ QString tonumber(const int b)
 	     QString::number(b)));
 }
 
-QString tonumber(const float f)
+QString tonumber(const float4 f)
 {
   return QString::number(f);
 }

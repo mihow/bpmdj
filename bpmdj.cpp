@@ -65,8 +65,8 @@ template class smallhistogram_type<32>;
 template class smallhistogram_type<96>;
 template class histogram_property<32>;
 template class histogram_property<96>;
-template double normalize_abs_max<double>(double*, long);
-template double find_abs_max<double>(double*, long);
+template float8 normalize_abs_max<float8>(float8*, long);
+template float8 find_abs_max<float8>(float8*, long);
 
 /*-------------------------------------------
  *         BpmDj Main Startup
@@ -201,16 +201,7 @@ int main(int argc, char* argv[])
 			     "There are some left over fragment files.",
 			     "Remove", "Ignore", 0, 0, 1)==0)
       start_rm("./fragments/*.wav");
-  
-  // 4. Some extra version dependent blurb...
-  /*  if (!Config::get_shown_aboutbox())
-    if (MAGIC_NOW == MAGIC_3_8)
-      QMessageBox::message(NULL,"Qt3 -> Qt4 bump:\n"
-			   "From this version on the source code has been ported to "
-			   "Qt4. This has been a non trivial port so I expect that "
-			   "some bugs will show up. Don't hesitate to post detailed "
-			   "bug reports at http://bpmdj.yellowcouch.org/bugzilla/");
-  */
+   
   BpmDjSplash splash;
   application.setMainWidget(&main_window);
   main_window.show();
@@ -256,9 +247,13 @@ int main(int argc, char* argv[])
  * how many bytes that type takes. For instance unsigned8 is an unsigned long integer of 8 bytes (=64 bits)
  * unsigned4 is an unsigned byte of 4 bytes loing (=16 bit). There exists signed1, signed2, signed4, signed8,
  * unsigned1, unisnged2, unsigned4, unsigned8 and float4 and float8. When writing source please use these 
- * types since it makes porting BpmDj to different architectures much easier. 
+ * types since it makes porting BpmDj to different architectures much easier. To get access to these
+ * basic types you can include "types.h"
  *
  * <b>Code style</b>
  * The coding style for block is that each { or } is placed on an individual line.
+ *
+ * <b>Includes</b>
+ * Includes in headers should be as minimal as possible
  */
 #endif // __loaded__bpmdj_cpp__

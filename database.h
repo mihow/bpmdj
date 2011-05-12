@@ -50,7 +50,7 @@ private:
   bool cacheValid(SongSelectorLogic * selector);
   void copyTags(SongSelectorLogic * selector);
   bool tagFilter(Song*);
-  bool filter(SongSelectorLogic* selector, Song* song, Song* main, float limit);
+  bool filter(SongSelectorLogic* selector, Song* song, Song* main, float4 limit);
 protected: 
   vector<Song*> all;
   map<QString,Song*> file2song;
@@ -104,8 +104,8 @@ public:
 		   QVectorView* target,          // necessary to schedule a repaint
 		   vector<Song*> *collection);
   Song * * closestSongs(SongSelectorLogic * selector,
-			Song * target1, float weight1, 
-			Song * target2, float weight2, 
+			Song * target1, float4 weight1, 
+			Song * target2, float4 weight2, 
 			SongMetriek * metriek, 
 			int maximum, int &count);
 };

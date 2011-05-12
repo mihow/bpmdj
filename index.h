@@ -500,23 +500,23 @@ class Index
   // disabled capacities
   //--------------------------
  public:
-  capacity_type    get_disabled_capacities() 
-    {
-      return index_disabled_capacities; 
-    };
-  void             set_disabled_capacities(capacity_type c) 
-    {
-      index_disabled_capacities = c; 
-      meta_changed = true; 
-    };
-
+  capacity_type get_disabled_capacities() 
+  {
+    return index_disabled_capacities; 
+  };
+  void set_disabled_capacities(capacity_type c) 
+  {
+    index_disabled_capacities = c; 
+    meta_changed = true; 
+  };
+  
   //--------------------------
   // other stuff
   //--------------------------
- public:
+public:
   void executeInfoDialog();
-  // total useful playcount of this song (before or after a mix)
-  int              get_playcount();
+  // total playcount of this song (before or after a mix)
+  unsigned4 get_playcount();
 };
 
 

@@ -33,51 +33,65 @@ using namespace std;
 #include "player-core.h"
 #include "version.h"
 #include "dsp-none.h"
+#include "scripts.h"
 
-void dsp_none::start()
+dsp_none::dsp_none(const PlayerConfig & config) : dsp_driver(config) 
 {
-  samples_to_wait=0;
+#ifdef DEBUG_WAIT_STATES
+  Debug("dsp_none::dsp_none<constructor>");
+#endif
+  paused=true;
+};
+
+/**
+ * This function overrides the standard behavior such 
+ * that we do not start an unnecessary thread
+ */
+void dsp_none::start(audio_source* a)
+{
+#ifdef DEBUG_WAIT_STATES
+  Debug("dsp_none::start()");
+#endif
 }
 
-void dsp_none::pause()
+/**
+ * This function overrides the standard behavior
+ * such that it does not stop a thread that was not started
+ */
+void dsp_none::stop()
 {
-  wait_for_unpause();
+#ifdef DEBUG_WAIT_STATES
+  Debug("dsp_none::stop()");
+#endif
 }
 
 void dsp_none::write(stereo_sample2 value)
 {
   /**
-   * The usleep routine does not always work properly
-   * Since this is a less useful driver, we simply
-   * gather dat for up to a second and then wait
-   * one second.
-   * usleep(1000000/44100);
+   * This should not happen.
    */
-  samples_to_wait++;
-  if (samples_to_wait>44100)
-    {
-      samples_to_wait-=44100;
-      sleep(1);
-    }
+  assert(0);
 }
 
 signed8 dsp_none::latency()
 {
-  return samples_to_wait;
+  return 0;
 }
 
-int dsp_none::open()
+int dsp_none::open(bool ui)
 {
   return err_none;
 }
 
 void dsp_none::close(bool flushfirst)
 {
-  if (flushfirst)
-    while (samples_to_wait>44100)
-      {
-	samples_to_wait-=44100;
-	sleep(1);
-      }
+#ifdef DEBUG_WAIT_STATES
+  Debug("dsp_none::close()");
+#endif
+}
+
+bool is_none_driver()
+{
+  return typeid(*dsp) == typeid(dsp_none);
 }
 #endif // __loaded__dsp_none_cpp__

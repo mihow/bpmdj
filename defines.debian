@@ -1,11 +1,12 @@
+DISTCC_HOSTS    = localhost/2 cubical/2 tnm/2
 CPP             = g++ -O3 -Wall
 UIC3            = uic3
 RCC             = rcc
 UIC             = uic-qt4
 MOC             = moc-qt4
-CFLAGS         += -D COMPILE_OSS -D COMPILE_ALSA -D COMPILE_JACK -D QT_THREAD_SUPPORT -D QT3_SUPPORT
+CFLAGS         += -D COMPILE_ALSA -D COMPILE_JACK -D COMPILE_OSS -DQT_THREAD_SUPPORT -DQT3_SUPPORT
 LDFLAGS        += -lpthread -lm -lasound -lrt -lfftw3 -ljack
 QT_INCLUDE_PATH = -I/usr/include/qt4/ -I/usr/include/qt4/Qt/
 QT_LIBRARY_PATH =
-QT_LIBS         = -lQt3Support -lQtGui 
+QT_LIBS         = -lQt3Support -lQtGui
 BITS		= 32

@@ -85,9 +85,9 @@ KPLAY_OBJECTS = ao-tracker.o about.moc.o memory.o power-type.o files.o \
  	song-information.o song-information.moc.o \
 	pca.o capacity.o index.o bpmplay.o signals.o \
 	player-config.o data.a capacity-checker.o types.o dsp.a \
-	embedded.a efence.o page.o rc-player.o \
+	embedded.a efence.o page.o rc-player.o clock-drivers.o \
 	efence-print.o analyzers.a histogram-type.o \
-	common.o bpm.o ao-som-beatgraph.o ao-pool.o 
+	common.o bpm.o ao-som-beatgraph.o ao-pool.o clock-jack.o
 
 BPM_LIB = bpm.o memory.o	
 BPMCOUNT_OBJECTS = bpmcount.o files.o signals.o bpm.a data.a
@@ -117,7 +117,7 @@ KSEL_OBJECTS = ao-tracker.o qstring-factory.o tags.o about.moc.o capacity.o \
 	config.o common.o song-copier.o \
 	statistics.o statistics.moc.o song-metric.o \
 	cluster-dialog.o cluster-dialog.moc.o \
-	log-viewer.o log-viewer.moc.o data.a embedded.a ao-pool.o 
+	log-viewer.o log-viewer.moc.o data.a embedded.a ao-pool.o
 
 MERGER_OBJECTS = bpmmerge.o index.o common.o scripts.o song-information.o \
 	song-information.moc.o capacity.o \

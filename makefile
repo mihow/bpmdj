@@ -1,4 +1,4 @@
-VERSION = 3.8
+VERSION = 3.9
 BIN = bpmplay bpmdj bpmmerge bpmcount 
 .EXPORT_ALL_VARIABLES:
 all: .link-targets .ui-forms .rc-files .source-creator .depend .compile 
@@ -11,6 +11,7 @@ ifeq (${shell if test ! -f defines; then echo "N"; else echo "Y"; fi},N)
 $(error "Please read 'compile.txt'")
 endif
 CFLAGS=-DLINUX -DSHORT_ONE
+JOBS=1
 include defines
 LINK =  $(CPP) $(LDFLAGS) $(QT_INCLUDE_PATH) $(QT_LIBRARY_PATH) $(QT_LIBS)
 
@@ -42,8 +43,8 @@ LINK =  $(CPP) $(LDFLAGS) $(QT_INCLUDE_PATH) $(QT_LIBRARY_PATH) $(QT_LIBS)
 
 # Compilation of all source files
 .compile: compile .depend
-	@echo "Compiling:"
-	@make -j 3 -s --no-print-directory -f compile 
+	@echo "Compiling: "$(JOBS)" at a time"
+	@make -j $(JOBS) -s --no-print-directory -f compile 
 
 # Packaging of the distribution
 packages: packager all

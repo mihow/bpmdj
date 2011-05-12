@@ -31,6 +31,7 @@ using namespace std;
 #include "dsp-none.h"
 #include "dsp-jack.h"
 #include "scripts.h"
+#include "player-core.h"
 
 #ifndef COMPILE_OSS
 #ifndef COMPILE_ALSA
@@ -74,4 +75,102 @@ dsp_driver * dsp_driver::get_driver(PlayerConfig * cfg)
     }
   return new dsp_none( * cfg );
 }
+
+static void * go2(void* d)
+{
+  dsp_driver* dsp=(dsp_driver*)d;
+  assert(dsp);
+  dsp->run_pusher_thread();
+  return NULL;
+}
+
+void dsp_driver::run_pusher_thread()
+{
+  stop_request=false;
+  stopped=false;
+  paused=false;
+  starting=false;
+  while(!stop_request)
+    {
+      // if a pause request came in we inform the dsp driver through a double callback
+      // the pause function waits until unpaused with wait_for_unpause.
+      if (paused) 
+	{
+	  internal_pause();
+	  wait_for_unpause();
+	  internal_unpause();
+	}
+      write(audio->read());
+    }
+  stopped=true;
+}
+
+void dsp_driver::start(audio_source* from)
+{
+#ifdef DEBUG_WAIT_STATES
+  Debug("dsp_driver::start()");
+#endif
+  assert(from);
+  audio=from;
+  pthread_t *y = bpmdj_allocate(1,pthread_t);
+  starting=true;
+  pthread_create(y,NULL,go2,(void*)this);
+  while(starting) usleep(10);
+}
+
+void dsp_driver::stop()
+{
+#ifdef DEBUG_WAIT_STATES
+  Debug("dsp_driver_stop(): entered");
+#endif
+  if (!stopped)
+    {
+      stop_request=true;
+      // enables the release of the internal transfer thread
+      unpause();
+      // wait until the stop is understood by the producer
+      while (!stopped) usleep(10);
+    }
+  stop_request=false;
+  // close the dsp device immediatelly
+  close(true);
+#ifdef DEBUG_WAIT_STATES
+  Debug("dsp_driver_stop(): finished");
+#endif
+}
+
+void dsp_driver::pause()
+{
+  paused = true;
+#ifdef DEBUG_WAIT_STATES
+  Debug("dsp_driver::pause()");
+#endif
+}
+
+void dsp_driver::unpause()
+{
+  paused = false;
+#ifdef DEBUG_WAIT_STATES
+  Debug("dsp_driver::unpause()");
+#endif
+}
+
+/**
+ * This function is called from within the dsp driver itself and only when using the
+ * synchronous pusher. It should return only when the pause got unpaused.
+ */
+void dsp_driver::wait_for_unpause()
+{
+#ifdef DEBUG_WAIT_STATES
+  Debug("wait_for_unpause(): entered");
+  fflush(stdout);
+#endif
+  while(paused) usleep(10);
+#ifdef DEBUG_WAIT_STATES
+  Debug("wait_for_unpause(): finished");
+  fflush(stdout);
+#endif
+}
+
+dsp_driver *dsp = NULL;
 #endif // __loaded__dsp_drivers_cpp__

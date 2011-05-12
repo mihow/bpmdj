@@ -25,9 +25,7 @@ using namespace std;
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
-#include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <sys/ioctl.h>
@@ -47,31 +45,21 @@ using namespace std;
 #include "energy-analyzer.h"
 #include "player-config.h"
 #include "capacity.h"
+#include "clock-drivers.h"
 //#include "resampler.h"
-
-using namespace std;
-
-//#define DEBUG_WAIT_STATES
 
 /*-------------------------------------------
  *         Constants & Variables
  *-------------------------------------------*/
 #define  wave_bufsize (32L*1024L)
 
-volatile int stop = 0;
 volatile int finished = 1;
-static volatile bool paused = true;
 
-quad_period_type targetperiod;
-quad_period_type currentperiod;
-quad_period_type normalperiod;
-signed8 y,x=0;
 int     opt_quiet = 0;
 int     opt_match = 0;
 char*   arg_match = 0;
 char*   argument;
 Index*  playing = NULL;
-dsp_driver *dsp = NULL;
 
 extern PlayerConfig * config;
 
@@ -105,12 +93,13 @@ static int writing = false;
 /**
  * Bug# 975: the jackd daemon seems to spawn its own processes
  * To make sure that we retrieve the proper signal from the 
- * process _we_ wanted to spawn, we retrieve the signal info
+ * process we spawned, we retrieve the signal info and compare 
+ * it against what we expect.
  */
 void writer_died(int sig, siginfo_t *info, void* hu)
 {
   if (!info) 
-    printf("No info available for signal %d\nAssuming writer process\n",sig);
+    Debug("No info available for signal %d\nAssuming something else but the writer process died",sig);
   else
     {
       int blah;
@@ -146,6 +135,7 @@ int wave_open(Index * playing, bool synchronous)
   
   // start decoding the file; this means: fork bpmdjraw process
   // wait 1 second and start reading the file
+
   if (synchronous)
     {
       writing = true;
@@ -292,7 +282,7 @@ void lfo_set(const char* name, _lfo_ l, unsigned8 freq, unsigned8 phase)
   /* if paused, unpause and set phase */
   lfo_period=currentperiod.muldiv(4,freq);
   lfo_do=l;
-  if (paused)
+  if (dsp->get_paused())
     {
       jumpto(0,0);
       lfo_phase=y;
@@ -310,19 +300,21 @@ stereo_sample2 lfo_no(stereo_sample2 lt)
   return lt.muldiv(volume,100);
 }
 
-stereo_sample2 lfo_volume(stereo_sample2 x, signed4 multiplierleft, signed4 divisorleft, signed4 multiplierright,signed4 divisorright)
+stereo_sample2 lfo_volume(stereo_sample2 x, 
+			  signed4 multiplierleft, signed4 divisorleft, 
+			  signed4 multiplierright,signed4 divisorright)
 {
   return x.muldiv2(multiplierleft,divisorleft,multiplierright,divisorright);
 }
 
 stereo_sample2 lfo_metronome(stereo_sample2 x)
 {
-   double val;
+   float8 val;
    signed8 diff;
    diff=(signed8)y-(signed8)lfo_phase;
    diff=diff%lfo_period;
    /* say ping */
-   val=sin(6.28*diff*(double)(WAVRATE)/440.0)*4096.0*(1.0-(double)diff/(double)lfo_period);
+   val=sin(6.28*diff*(float8)(WAVRATE)/440.0)*4096.0*(1.0-(float8)diff/(float8)lfo_period);
    /* mix them */
    stereo_sample2 a =  x.muldiv(7,8);
    return a.add((signed4)val,(signed4)val);
@@ -388,7 +380,6 @@ void lfo_init()
   lfo_do=lfo_no;
 }
 
-
 /*-------------------------------------------
  *         Mapping Synth operations
  *-------------------------------------------*/
@@ -436,7 +427,7 @@ unsigned8 map_active(unsigned8 a)
 	  return x;
 	}
     }
-
+  
   // determine fine grained relative position of 'wants to play'
   unsigned8 dx = a - map_start_pos;
   // determine segment of 'wants to play'
@@ -446,7 +437,7 @@ unsigned8 map_active(unsigned8 a)
   if (segment!=last_segment)
     {
       last_segment=segment;
-      printf("segment = %d\n",segment);
+      Debug("segment = %d",segment);
     }
   assert(segment<map_size);
 #endif
@@ -487,7 +478,7 @@ void map_set(signed2 size, map_data inmap, unsigned8 msize, signed8 mexit, bool 
   // if paused we start at the last cue position
   unsigned8 mstart;
   unsigned8 mstop;
-  if (size > 0  && paused)
+  if (size > 0  && dsp->get_paused())
     mstart = cue;
   else
     mstart = x_normalise(::y - dsp->latency());
@@ -518,7 +509,7 @@ void map_set(signed2 size, map_data inmap, unsigned8 msize, signed8 mexit, bool 
   // free old map ?
   if (old_map) bpmdj_deallocate(old_map);
   // unpause ?
-  if (paused)
+  if (dsp->get_paused())
     {
       jumpto(0,0);
       unpause_playing();
@@ -531,22 +522,8 @@ void map_init()
 }
 
 /*-------------------------------------------
- *         Cue points
- *-------------------------------------------*
- * these are expressed in sampleticks in the 
- * real (non-stretched) song
- */
-
-signed8 x_normalise(signed8 y)
-{
-  return y*normalperiod/currentperiod;
-}
-
-signed8 y_normalise(signed8 x)
-{
-  return x*currentperiod/normalperiod;
-}
-
+ *         Cues
+ *-------------------------------------------*/
 static cue_info cue_before = 0;
 cue_info cue = 0;
 cue_info cues[4] = {0,0,0,0};
@@ -560,15 +537,24 @@ void cue_shift(signed8 whence)
 {
   if (whence < 0 && (unsigned8)(-whence) > cue) cue=0;
   else cue+=whence;
-  if (!paused) 
+  if (!dsp->get_paused())
     pause_playing();
 }
 
+/**
+ * Will write the current position into one of the cue points
+ */
 void cue_store(int nr)
 {
   cues[nr]=cue;
 }
 
+/**
+ * Will retrieve the cue from memory and place it in ::cue
+ * It will effectively be used later in the jumpto function
+ * which will also try to stay in syunc with the current
+ * position in the phrase.
+ */
 void cue_retrieve(int nr)
 {
   cue=cues[nr];
@@ -616,7 +602,7 @@ void rms_init()
 {
   assert(config);
   opt_rms = config->get_player_rms();
-  float arg_rms = config->get_player_rms_target();
+  float4 arg_rms = config->get_player_rms_target();
   
   sample4_type min = playing->get_min();
   sample4_type max = playing->get_max();
@@ -631,7 +617,7 @@ void rms_init()
       opt_rms=0;
       return;
     }
-
+  
   // obtain amplitude maximisation factor factor 
   left_sub = mean.left;
   left_fact = normalization_factor(min.left,max.left,mean.left);
@@ -646,13 +632,12 @@ void rms_init()
   right_fact *= arg_rms;
   right_fact /= pow.right;
   if (arg_rms > pow.right) right_fact = 1.0;
-
 }
 
 void rms_normalize(stereo_sample2 *l)
 {
   // left
-  float v = l->left;
+  float4 v = l->left;
   v -= left_sub;
   v *= left_fact;
   l->left=(signed2)v;
@@ -672,7 +657,7 @@ const signed8 loop_off = 0x7FFFFFFFFFFFFFFFLL;
 
 int loop_set(unsigned8 jumpback)
 {
-  if (paused)
+  if (dsp->get_paused())
     {
       loop_at = cue;
       if (loop_at<0) 
@@ -702,22 +687,13 @@ void loop_jump()
 /*-------------------------------------------
  *         Program logic
  *-------------------------------------------*/
-void changetempo(signed8 period)
-{
-  /* change tempo to period
-   * - the current x should remain the same
-   * x = y * normalperiod / currentperiod
-   * y = x * currentperiod / normalperiod
-   */
-  currentperiod = period;
-  y = x * currentperiod / normalperiod; 
-}
-
 void jumpto(signed8 mes, int txt)
 {
-  if (paused)
+  if (dsp->get_paused())
     {
       unpause_playing();
+      if (metronome) 
+	metronome->cue_start();
       y=y_normalise(cue);
       if (txt) printf("Restarted at cue ");
     }
@@ -746,116 +722,50 @@ void jumpto(signed8 mes, int txt)
     }
 }
 
-void read_write_bare_loop()
+template<bool RMS>
+class source_template: public audio_source
 {
-  stereo_sample2 value[1];
+  stereo_sample2 value;
   unsigned8 m;
-  lfo_init();
-  map_init();
-  dsp->start();
-  while(!stop)
-    {
-      if (paused)
-	// wait for pause
-	dsp->pause();
-      x = y * normalperiod/currentperiod;
-      if (x>loop_at)
-	loop_jump();
-      if (map_do)
-	m = map_active( x );
-      else
-	m = x;
-      if (wave_read(m,value)<0)
-	{
-	  pause_playing();
-	  value[0] = stereo_sample2();
-	};
-      value[0]=lfo_do(value[0]);
-      y=y+1;
-      dsp->write(value[0]);
-    }
-}
+  virtual stereo_sample2 read()
+  {
+    x = y * normalperiod/currentperiod;
+    if (x>loop_at)
+      loop_jump();
+    if (map_do)
+      m = map_active( x );
+    else
+      m = x;
+    if (wave_read(m,&value)<0)
+      {
+	pause_playing();
+	value.left=value.right= 0;
+      };
+    if (RMS)
+      rms_normalize(&value);
+    value=lfo_do(value);
+    y++;
+    return value;
+  }
+};
 
-void read_write_normalize_loop()
-{
-  stereo_sample2 value[1];
-  unsigned8 m;
-  if (!opt_rms)
-    {
-      read_write_bare_loop();
-      return;
-    }
-  lfo_init();
-  map_init();
-  dsp->start();
-  while(!stop)
-    {
-      // wait for pause
-      if (paused)
-	dsp->pause();
-      // calculate value
-      x = y * normalperiod/currentperiod;
-      if (x>loop_at)
-	loop_jump();
-      if (map_do)
-	m = map_active( x );
-      else
-	m = x;
-      if (wave_read(m,value)<0)
-	{
-	  // printf("End of song, pausing\n");
-	  pause_playing();
-	  value[0] = stereo_sample2();
-	};
-      rms_normalize(value);
-      value[0]=lfo_do(value[0]);
-      y=y+1;
-      
-      // write value
-      dsp->write(value[0]);
-    }
-}
-
-void read_write_loop()
-{
-  if (opt_rms)
-    read_write_normalize_loop();
-  else
-    read_write_bare_loop();
-}  
-
-void wait_for_unpause()
-{
-#ifdef DEBUG_WAIT_STATES
-  Debug("wait_for_unpause(): entered\n");
-  fflush(stdout);
-#endif
-  while(paused) usleep(10);
-#ifdef DEBUG_WAIT_STATES
-  Debug("wait_for_unpause(): finished\n");
-  fflush(stdout);
-#endif
-}
-
-bool get_paused()
-{
-  return ::paused;
-}
+typedef source_template<false> bare_source;
+typedef source_template<true> normalized_source;
 
 void pause_playing()
 {
-  if (!paused)
+  if (!dsp->get_paused())
     {
-      paused = true;
+      dsp->pause();
       msg_playing_state_changed();
     }
 }
 
 void unpause_playing()
 {
-  if (paused)
+  if (dsp->get_paused())
     {
-      paused=false;
+      dsp->unpause();
       msg_playing_state_changed();
     }
 }
@@ -899,35 +809,6 @@ int core_object_init(bool sync)
   return wave_open(playing, sync);
 }
 
-int core_open()
-{
-  return dsp->open();
-}
-
-void core_play()
-{
-  if (playing)
-    {
-      stop = false;
-      finished = false;
-      unpause_playing();
-      rms_init();
-      read_write_loop();
-    }
-  else
-    {
-      stop = true;
-      finished = 1;
-      pause_playing();
-    }
-}
-
-void core_close()
-{
-  dsp->close(true);
-  finished = 1;
-}
-
 void core_done()
 {
   wave_close();
@@ -947,36 +828,45 @@ void core_done()
   finished = 2;
 }
 
-static void * go2(void* neglect)
+int core_start(bool ui)
 {
-  core_play();
-  core_close();
-  return neglect;
-}
-
-int core_start()
-{
-  int err = core_open();
+  int err = dsp->open(ui);
   if (err==err_dsp) 
     {
-      core_close();
+      dsp->close(false);
+      finished = 1;
       return err;
     }
-  pthread_t *y = bpmdj_allocate(1,pthread_t);
-  pthread_create(y,NULL,go2,NULL);
+  if (!playing)
+    {
+      finished = 1;
+      pause_playing();
+      dsp->close(false);
+      return err_none;
+    }
+  
+  assert(playing);
+  finished = false;
+  
+  rms_init();
+  lfo_init();
+  map_init();
+  
+  if (opt_rms)
+    dsp->start(new normalized_source());
+  else
+    dsp->start(new bare_source());
+  if (metronome) metronome->init();
+  
+  msg_playing_state_changed();
+  
   return err_none;
 }
 
 void core_stop()
 {
-#ifdef DEBUG_WAIT_STATES
-  Debug("core_stop(): entered\n");
-#endif
-  ::stop=1;
-  unpause_playing();
-  while(!finished) ;
-#ifdef DEBUG_WAIT_STATES
-  Debug("core_stop(): finished\n");
-#endif
+  if(!finished)
+    dsp->stop();
+  finished = 1;
 }
 #endif // __loaded__player_core_cpp__

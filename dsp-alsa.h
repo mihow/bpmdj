@@ -40,11 +40,12 @@ class dsp_alsa: public dsp_driver
   char *     arg_dev;
  public:
   dsp_alsa(const PlayerConfig & config);
-  void    start();
-  void    pause();
+  void    start(audio_source *);
+  void    internal_pause();
+  void    internal_unpause();
   void    write(stereo_sample2 value);
   signed8 latency();
-  int     open();
+  int     open(bool ui);
   void    close(bool flush);
 };
 

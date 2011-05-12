@@ -641,7 +641,7 @@ int Index::get_time_in_seconds()
   return minutes*60+seconds;
 }
 
-int Index::get_playcount()
+unsigned4 Index::get_playcount()
 {
   int total = 0;
   if (prev)

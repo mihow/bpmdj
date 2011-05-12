@@ -18,24 +18,29 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-#ifndef __loaded__qstring_factory_h__
-#define __loaded__qstring_factory_h__
+#ifndef __loaded__clock_jack_h__
+#define __loaded__clock_jack_h__
 using namespace std;
-#line 1 "qstring-factory.h++"
-#include <qstring.h>
-#include <set>
+#line 1 "clock-jack.h++"
+#ifdef COMPILE_JACK
+#ifdef JACK_TRANSPORT
+#include "clock-drivers.h"
+#include <jack/jack.h>
 #include "types.h"
 
-QString tonumber(const int b);
-QString tonumber(const float4 f);
-
-class QStringFactory
+class clock_jack: public clock_driver
 {
-private:
-  static bool killed;
-  static set<QString> tree;
-public:
-  static QString create(QString str);
-  static void kill();
+  virtual void init();
+  virtual void cue_start();
+  virtual void tempo_will_change(signed8);
 };
-#endif // __loaded__qstring_factory_h__
+
+void update_first_beat();
+void timebase(jack_transport_state_t state, jack_nframes_t nframes, jack_position_t *pos, int new_pos, void *arg);
+void * sync_with_jack(void* neglect);
+void request_sync(int retries);
+void become_master(int cond);
+
+#endif
+#endif
+#endif // __loaded__clock_jack_h__

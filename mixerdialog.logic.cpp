@@ -82,10 +82,10 @@ void balance(int &a, int &b)
 void log_mapping(int a)
   {
     if (a==0) return;
-    double b = a;
-    double c = log((double)dspmixmaxmult)/log(2);
-    double d = b * c / (double)dspmixmaxmult;
-    double e = pow(2.0,d);
+    float8 b = a;
+    float8 c = log((float8)dspmixmaxmult)/log(2);
+    float8 d = b * c / (float8)dspmixmaxmult;
+    float8 e = pow(2.0,d);
     // printf("%d -> %d\n",a,(int)e);
     a = (int)e;
   }

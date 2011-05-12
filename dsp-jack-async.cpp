@@ -18,24 +18,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-#ifndef __loaded__qstring_factory_h__
-#define __loaded__qstring_factory_h__
+#ifndef __loaded__dsp_jack_async_cpp__
+#define __loaded__dsp_jack_async_cpp__
 using namespace std;
-#line 1 "qstring-factory.h++"
-#include <qstring.h>
-#include <set>
-#include "types.h"
-
-QString tonumber(const int b);
-QString tonumber(const float4 f);
-
-class QStringFactory
-{
-private:
-  static bool killed;
-  static set<QString> tree;
-public:
-  static QString create(QString str);
-  static void kill();
-};
-#endif // __loaded__qstring_factory_h__
+#line 1 "dsp-jack-async.c++"
+#endif // __loaded__dsp_jack_async_cpp__
