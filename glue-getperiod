@@ -1,0 +1,2 @@
+#!/bin/bash
+grep " - "  index/`basename $1 .mp3`.idx | awk '{print $2}'

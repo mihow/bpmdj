@@ -1,0 +1,2 @@
+#!/bin/bash
+./divine-period $1 $2 $3>`basename $1 .mp3.raw`.idx

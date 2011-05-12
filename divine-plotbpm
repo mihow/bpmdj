@@ -1,0 +1,10 @@
+#!/bin/bash 
+echo -n $1
+grep TEMPO $1
+echo plot \'toplot.dat\' >/tmp/toplot
+echo pause -1 >>/tmp/toplot
+echo set terminal postscript >>/tmp/toplot
+echo set output \'plot.ps\' >>/tmp/toplot
+echo replot >>/tmp/toplot
+cp $1 toplot.dat
+gnuplot /tmp/toplot
