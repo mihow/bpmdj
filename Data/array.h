@@ -106,6 +106,15 @@ template <int D, class T> class Array: public DataClass
       content->incref();
     }
   
+  /**
+   * this constructor will refer to the same data but assume the array has a different dimensionality
+   * remaining dimensions will be padded with size 1. O must be smaller than T;
+   */
+  template <int O> Array(const Array<O,T> &m);
+  /**
+   * this constructor can be used when O is larger than T. In that case only the selected dimensions
+   * will remain.
+   */
   template<int O> Array(const Array<O,T>& other, const Select<D>& selected);
   Array<D,T> &operator =(const Array<D,T> &m);
   Array<D,T> &operator =(const T &m);
@@ -114,7 +123,10 @@ template <int D, class T> class Array: public DataClass
   Array<D,T> &operator -=(const T &m);
   Array<D,T> &operator /=(const T &m);
   Array<D,T> &operator *=(const T &m);
-   
+  Array<D,T> operator *(const T m) const;
+  Array<D,T> operator /(const T m) const;
+  Array<D,T> operator +(const Array<D,T> &m) const;
+  
   ~Array() 
     { 
       deref(); 
@@ -145,7 +157,7 @@ template <int D, class T> class Array: public DataClass
     {
       return Array<O,T>(*this,keep); 
     };
-
+  
   // the sizes of the matrix. Once set this cannot be changed
   void setSize(const Size<D>& s);
   void setAddress(T* start) 
@@ -277,14 +289,14 @@ void Array<D,T>::copyFrom(const Array<D,T> &source)
 
 template <int D, class T> Array<D,T> &Array<D,T>::operator +=(const T &m)
 {
-  for(values value(this); value.more() ; value++)
+  for(values value(*this); value.more() ; value++)
     value+=m;
   return *this;
 }
 
 template <int D, class T> Array<D,T> &Array<D,T>::operator +=(const Array<D,T> &m)
 {
-  for(values v(*this); v.more() ; ++v)
+  for(positions v(*this); v.more() ; ++v)
     v+=m[v];
   return *this;
 }
@@ -326,6 +338,13 @@ Array<D,T>::Array(const Array<O,T> &m, const Select<D>& selected)
   content = new ArrayMeta<D,T>(*m.content,selected);
 }
 
+template <int D, class T> 
+template <int O> 
+Array<D,T>::Array(const Array<O,T> &m)
+{
+  content = new ArrayMeta<D,T>(*m.content);
+}
+
 template <int D, class T> Array<D,T>& Array<D,T>::operator =(const Array<D,T> &m)
 {
   m.content->incref();
@@ -334,14 +353,44 @@ template <int D, class T> Array<D,T>& Array<D,T>::operator =(const Array<D,T> &m
   return *this;
 }
 
-template <int D, class T> void Array<D,T>::setSize(const Size<D> & s)
+template <int D, class T> 
+void Array<D,T>::setSize(const Size<D> & s)
 {
   content->setSize(s);
 };
 
-template <int D, class T> void Array<D,T>::printMetaInfo() const
+template <int D, class T> 
+void Array<D,T>::printMetaInfo() const
 {
   content->printMetaInfo();
 };
+
+template <int D, class T>
+Array<D,T> Array<D,T>::operator *(const T val) const
+{
+  Array<D,T> out(size());
+  out.copyFrom(*this);
+  out*=val;
+  return out;
+}
+
+template <int D, class T>
+Array<D,T> Array<D,T>::operator /(const T val) const
+{
+  Array<D,T> out(size());
+  out.copyFrom(*this);
+  out/=val;
+  return out;
+}
+
+template <int D, class T>
+Array<D,T> Array<D,T>::operator +(const Array<D,T>& in2) const
+{
+  assert(size()==in2.size());
+  Array<D,T> out(size());
+  out.copyFrom(*this);
+  out+=in2;
+  return out;
+}
 
 #endif

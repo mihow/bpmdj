@@ -17,31 +17,29 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#ifndef ARRAY_STORAGE_H
-#define ARRAY_STORAGE_H
-//---------------------------------------------------------------
-//                          Array storage
-//---------------------------------------------------------------
-template <class T> class ArrayStorage
-{
- public:
-  int  refcount;            // the number of times this data chunk is accessed
-  T   *data;                // the actual data
-  ArrayStorage()
-    {
-      refcount = 1;
-      data = NULL;
-    }
-  ~ArrayStorage()
-    {
-      delete[] data;
-      data = NULL;
-    }
-  void allocate(int size)
-    {
-      assert(!data);
-      data = new T[size];
-    }
-};
-#endif
+#include "set.h"
+#include "array-iterator.h"
+#include "symbol.h"
+#include "numbers.h"
+#include "data-io.h"
 
+//---------------------------------------------------------------
+//             The set interpretation of a 1D array
+//---------------------------------------------------------------
+void Set::ensure_size(int s)
+{
+   if (s<=allocated_size()) return;
+   int newsize = allocated_size();
+   if (newsize==0) newsize=8;
+   while(s>newsize) newsize*=2;
+   Content newcontent(newsize);
+   newcontent.copyFrom(content,0);
+   content = newcontent;
+};
+
+void Set::add(const Data& val)
+{
+   ensure_size(next_element+1);
+   content[next_element]=val;
+   next_element++;
+}

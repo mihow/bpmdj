@@ -1,0 +1,7 @@
+QT_INCLUDE_PATH =-I/usr/include/qt3/
+QT_LIBRARY_PATH =
+QT_LIBS = -lqt-mt
+DEFINES = -DLINUX
+
+#CPP = g++ -g -O0 -Wall -W
+CPP = g++ $(DEFINES) -O3 -Wall -W

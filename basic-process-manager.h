@@ -35,7 +35,6 @@ class BasicProcessManager
     BasicProcessManager(int count);
     virtual ~BasicProcessManager() {};
     virtual void checkSignals();
-    virtual void start(int id, const char* command) {assert(0);};
     virtual void start(int id, const char* command, QString logname, bool append);
 };
 

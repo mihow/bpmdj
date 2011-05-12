@@ -1,0 +1,4 @@
+For Linux:
+  - bison is required as parser generator
+  - flex is required as token parser
+  

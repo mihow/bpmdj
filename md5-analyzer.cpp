@@ -29,11 +29,12 @@
 
 void Md5Analyzer::run()
 {
-  FILE * kloink;
   char * a = escape(argument);
   if (!vexecute("md5sum %s | awk '{printf $1}' >sum.tmp",a))
     _exit(101);
   bpmdj_deallocate(a);
+  
+  FILE * kloink;
   kloink=fopen("sum.tmp","r");
   char s[40];
   int i=0;

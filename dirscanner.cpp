@@ -73,6 +73,10 @@ void DirectoryScanner::scandir(const QString dirname, const QString prefix)
   DIR * dir=opendir(dirname);
   if (!dir) return;
   recursing(dirname);
+  /**
+   * Todo: sort the directory according to the inode numbers and then read them 
+   * in one by one
+   */
   while ( (entry=readdir(dir)) )
     {
       if (strcmp(entry->d_name,".")==0 ||

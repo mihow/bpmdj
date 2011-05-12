@@ -17,31 +17,31 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#ifndef ARRAY_STORAGE_H
-#define ARRAY_STORAGE_H
-//---------------------------------------------------------------
-//                          Array storage
-//---------------------------------------------------------------
-template <class T> class ArrayStorage
-{
- public:
-  int  refcount;            // the number of times this data chunk is accessed
-  T   *data;                // the actual data
-  ArrayStorage()
-    {
-      refcount = 1;
-      data = NULL;
-    }
-  ~ArrayStorage()
-    {
-      delete[] data;
-      data = NULL;
-    }
-  void allocate(int size)
-    {
-      assert(!data);
-      data = new T[size];
-    }
-};
-#endif
+#include "om-data.h"
+
+#define ZERO_TYPES \
+ARRAY_TYPE(0,signed1)  \
+ARRAY_TYPE(0,signed2)  \
+ARRAY_TYPE(0,signed4)  \
+ARRAY_TYPE(0,signed8)  \
+ARRAY_TYPE(0,unsigned1)\
+ARRAY_TYPE(0,unsigned2)\
+ARRAY_TYPE(0,unsigned4)\
+ARRAY_TYPE(0,unsigned8)\
+ARRAY_TYPE(0,float4)   \
+ARRAY_TYPE(0,float8)   \
+ARRAY_TYPE(0,Data)     
+
+#define ARRAY_TYPE(NR,TYPE) template class ArrayMeta<NR,TYPE>;
+ARRAY_TYPES
+ZERO_TYPES
+#undef ARRAY_TYPE
+
+#define ARRAY_TYPE(NR,TYPE) template class Array<NR,TYPE>;
+ARRAY_TYPES
+ZERO_TYPES
+#undef ARRAY_TYPE
+
+template class ArrayIteratorBacking<Data, false>;
+template class ArrayIteratorBacking<Data, true>;
 

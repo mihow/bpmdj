@@ -36,11 +36,26 @@ public:
 
   ArrayMeta();
   ArrayMeta(ArrayMeta<D,T> *other, const From<D> &from);
+  /**
+   * this function will return a meta description based on other but with a reduced size
+   */
   ArrayMeta(ArrayMeta<D,T> *other, const Size<D> &sized_to);
   ArrayMeta(ArrayMeta<D,T> *other, const To<D>   &to);
   ArrayMeta(ArrayMeta<D,T> *other, const From<D> & from, const Size<D> &sized_to);
   ArrayMeta(ArrayMeta<D,T> *other, const From<D> & from, const To<D> &to);
-  ArrayMeta(const ArrayMeta&) {assert(0);};
+  ArrayMeta(const ArrayMeta&) 
+    {
+      assert(0);
+    };
+  /**
+   * this function will return a meta description based on other
+   * but with a new larger dimensionality
+   */
+  template <int O> ArrayMeta(const ArrayMeta<O,T>& o);
+  /**
+   * this function returns a meta description based on o
+   * but with only the selected dimensions remaining
+   */
   template <int O> ArrayMeta(const ArrayMeta<O,T>& o, const Select<D> & selected);
   ArrayMeta &operator = (const ArrayMeta&) 
     {
@@ -176,7 +191,7 @@ ArrayMeta<D,T>::ArrayMeta(ArrayMeta<D,T> * other, const From<D> &from, const To<
   offset = address(from);
 }
 
-template <int D, class T> 
+template <int D, class T>
 template <int O>
 ArrayMeta<D,T>::ArrayMeta(const ArrayMeta<O,T>& o, const Select<D> & selected)
 {
@@ -191,6 +206,29 @@ ArrayMeta<D,T>::ArrayMeta(const ArrayMeta<O,T>& o, const Select<D> & selected)
       assert(d<O);
       delta[i] = o.delta[d];
       size[i]  = o.size[d];
+    }
+}
+
+template <int D, class T>
+template <int O>
+ArrayMeta<D,T>::ArrayMeta(const ArrayMeta<O,T>& o)
+{
+  assert(O<D);
+  refcount = 1;
+  o.storage->refcount++;
+  storage = o.storage;
+  offset = o.offset;
+  int stride=1;
+  for(int i = 0 ; i < O ; i ++)
+    {
+      delta[i+D-O] = o.delta[i];
+      size[i+D-O]  = o.size[i];
+      stride*=o.delta[i];
+    }
+  for(int i = 0 ; i < D-O ; i++)
+    {
+      size[i]=1;
+      delta[i]=stride;
     }
 }
 

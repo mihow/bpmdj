@@ -310,7 +310,7 @@ void SongPlayerLogic::setColor(QButton *button, bool enabled)
 
 void SongPlayerLogic::nudgePlus()
 {
-  ::y-=::currentperiod/(4*32);
+  ::y-=::currentperiod/(4*64);
   if (::y<0)
     {
       printf("y underflow, setting to zero\n");
@@ -320,7 +320,7 @@ void SongPlayerLogic::nudgePlus()
 
 void SongPlayerLogic::nudgeMinus()
 {
-  ::y+=currentperiod/(4*32);
+  ::y+=currentperiod/(4*64);
 }
 
 void SongPlayerLogic::nudgePlusB()

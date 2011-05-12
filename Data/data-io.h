@@ -90,6 +90,10 @@ class DataTexter: public DataIo
   virtual void visitSignedNumber(signed long long a, char sig); 
  protected:
   virtual void write_fileformat_versionnr();
+  /**
+   * returns the fileformat version of the compiled version that saved
+   * the data. Returns 0 if it could not be read.
+   */
   virtual int  read_fileformat_versionnr();
  protected:
   virtual void visit(Symbol & symbol);
@@ -149,6 +153,7 @@ class DataBinner: public DataIo
   char * mapped_region;
   char * cur_ptr;
   unsigned4 mapped_size;
+  unsigned4 file_size;
   void mmap_textfile();
   void munmap_textfile();
   void write_internal(const char* ptr, int size);

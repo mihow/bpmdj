@@ -157,7 +157,6 @@ class CheckersManager: public BasicProcessManager
     CheckersManager();
     virtual ~CheckersManager() {};
     virtual void start(SongProcess *sp, QString command, QString log);
-
 };
 
 extern CheckersManager checkers;

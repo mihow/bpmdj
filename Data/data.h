@@ -70,11 +70,13 @@ class DataClass
    * As soon as a memory_copy is realized the allocation_count will increase. 
    */
   int allocation_count;
+
   /**
-   * returns a copy to the dataclass object, by either making a shallowcopy (when going from allocation count 0 to 1) 
-   * or by returning the this pointer. In all cases the allocation_count will be increased.
-   * The memory_copy  and memory_release functions are only available from within the Data class, ensuring that
-   * a proper pointer management is possible.
+   * returns a copy to the dataclass object, by either making a shallowcopy 
+   * (when going from allocation count 0 to 1) or by returning the this pointer. 
+   * In all cases the allocation_count will be increased. The memory_copy and 
+   * memory_release functions are only available from within the Data class, 
+   * ensuring that a proper pointer management is possible.
    */
   DataClass* memory_copy() const;
   
@@ -86,8 +88,8 @@ class DataClass
   void       memory_release();
  protected:
   /**
-   * The shallow_copy function should be overridden to return a shallow copy of the own object, but allocated with
-   * new.
+   * The shallow_copy function should be overridden to return a 
+   * shallow copy of the own object, but allocated with new.
    */
   virtual DataClass* shallow_copy() const = 0;
   virtual QString    type_name()    const = 0;
@@ -138,7 +140,7 @@ class DataClass
  */
 class Data
 {
- private:
+ protected:
   friend class DataClass;
 
   /**

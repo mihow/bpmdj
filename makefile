@@ -1,4 +1,4 @@
-VERSION = 3.1
+VERSION = 3.2
 DESTDIR = /usr/local/
 #TIME = /usr/bin/time -f ' '\[%e\]
 #ECHO = echo -n 
@@ -128,7 +128,7 @@ mrproper: clean temp_files
 files:
 	@echo " [file] list"
 	@rm -r tmp 2>/dev/null; exit 0
-	@find ./* -iname "*" | grep -v ^\./index | grep -v ^\./music > existing_files # list of existing files
+	@find -H ./* -iname "*" | grep -v ^\./index | grep -v ^\./music > existing_files # list of existing files
 	@grep \  existing_files > problem_files; exit 0 # problematic files
 	@test ! -s problem_files
 	@gawk '{print $$1}' files >known_files # list of known files
@@ -194,7 +194,7 @@ check-doc: bpmdj-doc.tgz
 	@cd tmp/documentation; for a in *.png; do echo -n $$a "  :::"; grep -c $$a all; done  >../../count
 	@grep :::0 count >bpmdj-doc-errors.txt; exit 0
 	@echo " [test] widowed links"
-	@linklint -root tmp/documentation /@ 2>>bpmdj-doc-errors.txt
+	@linklint -error -root tmp/documentation /@ 2>>bpmdj-doc-errors.txt
 	@echo "[clean] reactor"
 	@rm -r tmp
 	@test -s bpmdj-doc-errors.txt
@@ -259,6 +259,11 @@ tuuster: kbpm-dj kbpm-play
 #############################################################################
 # Dependencies
 #############################################################################
+Data/om-data.a:
+	@echo "  [-->] om-data.a"
+	@cd Data; make
+	@echo "  [<--] om-data.a"
+
 version.h: profile-clock
 	@echo " [test] clock"
 	@echo "#define VERSION \""$(VERSION)"\"" >version.h

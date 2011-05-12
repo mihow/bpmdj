@@ -17,31 +17,12 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#ifndef ARRAY_STORAGE_H
-#define ARRAY_STORAGE_H
+#include "null.h"
 //---------------------------------------------------------------
-//                          Array storage
+//                            Null
 //---------------------------------------------------------------
-template <class T> class ArrayStorage
+void Null::crash() const
 {
- public:
-  int  refcount;            // the number of times this data chunk is accessed
-  T   *data;                // the actual data
-  ArrayStorage()
-    {
-      refcount = 1;
-      data = NULL;
-    }
-  ~ArrayStorage()
-    {
-      delete[] data;
-      data = NULL;
-    }
-  void allocate(int size)
-    {
-      assert(!data);
-      data = new T[size];
-    }
-};
-#endif
-
+  printf("Action called upon Null\n");
+  assert(0);
+}

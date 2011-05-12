@@ -17,31 +17,49 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#ifndef ARRAY_STORAGE_H
-#define ARRAY_STORAGE_H
-//---------------------------------------------------------------
-//                          Array storage
-//---------------------------------------------------------------
-template <class T> class ArrayStorage
-{
- public:
-  int  refcount;            // the number of times this data chunk is accessed
-  T   *data;                // the actual data
-  ArrayStorage()
-    {
-      refcount = 1;
-      data = NULL;
-    }
-  ~ArrayStorage()
-    {
-      delete[] data;
-      data = NULL;
-    }
-  void allocate(int size)
-    {
-      assert(!data);
-      data = new T[size];
-    }
-};
-#endif
+#include "symbol.h"
+#include "data-visitor.h"
+#include <set>
+using namespace std;
 
+//---------------------------------------------------------------
+//                            Symbol
+//---------------------------------------------------------------
+struct QStringLesser
+{
+  bool operator()(QString *s1, QString *s2) const {return (*s1)<(*s2);};
+};
+
+static set<QString*, QStringLesser> symbol_table;
+
+bool Symbol::operator < (const Symbol & other)
+{
+  return text < other.text;
+}
+
+bool Symbol::operator == (const Symbol & other)
+{
+  return text == other.text;
+}
+
+Symbol::Symbol(QString s)
+{
+  init(s);
+}
+
+void Symbol::init(QString s)
+{
+  set<QString*,QStringLesser>::iterator pos = symbol_table.find(&s);
+  if (pos==symbol_table.end())
+    {
+      text = new QString(s);
+      symbol_table.insert(text);
+    }
+  else 
+    text = *pos;
+}
+
+void Symbol::visit(DataVisitor& v)
+{
+  v.visit(*this);
+};

@@ -9,8 +9,8 @@
 #  - make
 #  - alsa-headers (for alsa support)
 
-CPP = distcc g++ -g -O3 -Wall
-CC  = distcc gcc -g -O3 -Wall
+CPP = distcc g++ -g -O0 -Wall
+CC  = distcc gcc -g -O0 -Wall
 
 UIC = uic
 MOC = moc

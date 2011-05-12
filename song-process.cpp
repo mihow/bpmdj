@@ -441,6 +441,7 @@ void CheckersManager::start(SongProcess *sp, QString command, QString log)
 	BasicProcessManager::start(i,command, log, false);
 	return;
       }
+  Fatal("Cannot start a new process since process table is full\n");
 }
 
 //----------------------------------------------------------

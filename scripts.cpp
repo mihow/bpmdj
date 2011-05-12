@@ -73,7 +73,7 @@ void dumpAudio(const char* fname, unsigned4 *buffer, long length)
 
 void spawn(const char* script)
 {
-  if (!fork())
+  if (!bpmdj_fork())
     {
       execute(script);
       /**
@@ -120,6 +120,18 @@ int vexecute(const char* script, ...)
   vsprintf(toexecute,script,ap);
   va_end(ap);
   return execute(toexecute);
+}
+
+int bpmdj_fork()
+{
+  int fork_thread;
+  while((fork_thread=fork())==-1)
+    {
+      Debug("Could not fork process. Trying again in 10 seconds...");
+      fflush(stdout);
+      sleep(10);
+    }
+  return fork_thread;
 }
 
 FILE* openScriptFile(const char* name)

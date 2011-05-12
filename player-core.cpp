@@ -125,9 +125,10 @@ int wave_open(Index * playing, bool synchronous)
   if (synchronous)
     {
       writing = true;
-      if (!start_bpmdj_raw(get_rawpath(),fname))
-	return err_nospawn;
+      int result = start_bpmdj_raw(get_rawpath(),fname);
       writing = false;
+      if (!result)
+	return err_nospawn;
     }
   else 
     {
@@ -135,13 +136,14 @@ int wave_open(Index * playing, bool synchronous)
       struct sigaction *act = bpmdj_allocate(1,struct sigaction);
       act->sa_sigaction = writer_died;
       act->sa_flags = SA_SIGINFO;
-      sigaction(SIGUSR1,act,NULL);
+      sigaction(SIGCHLD,act,NULL);
       // fork and execute, send back signal when done 
       writing = true;
-      if (!(writer = fork()))
+      writer = bpmdj_fork();
+      if (!writer)
 	{
 	  start_bpmdj_raw(get_rawpath(),fname);
-	  kill(getppid(),SIGUSR1);
+	  // kill(getppid(),SIGUSR1);
 	  /**
 	   * If we use exit instead of _exit our own static data structures
 	   * will be destroyed !
@@ -172,6 +174,7 @@ void wave_close()
   if (writing)
     {
       // send terminate (the insisting variant) signal
+      assert(writer!=-1);
       kill(writer,SIGKILL);
       writing = false;
     }

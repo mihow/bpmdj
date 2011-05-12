@@ -107,7 +107,8 @@ void DiedProcesses::init(BasicProcessManager * l)
       act=bpmdj_allocate(1,struct sigaction);
       act->sa_sigaction=ToSwitchOrNotToSwitchSignal;
       act->sa_flags=SA_SIGINFO;
-      sigaction(SIGUSR1,act,NULL);
+      // sigaction(SIGUSR1,act,NULL);
+      sigaction(SIGCHLD,act,NULL);
       // ignore sigchlds
       // signal(SIGCHLD,SIG_IGN);
     };
@@ -162,11 +163,11 @@ void BasicProcessManager::start(int id,const char* command, QString logname, boo
   
   const char * tostart(final_command);
   // fork the command and once it exits stop immediatelly 
-  if (!(active_pids[id]=fork()))
+  if (!(active_pids[id]=bpmdj_fork()))
     { 
       // we first 
       execute(tostart);
-      kill(getppid(),SIGUSR1);
+      //      kill(getppid(),SIGUSR1);
       /**
        * If we use exit instead of _exit our own static data structures
        * will be destroyed !

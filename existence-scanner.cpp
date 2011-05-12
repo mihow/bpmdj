@@ -34,6 +34,8 @@ void ExistenceScanner::run()
 
 void ExistenceScanner::stoppedAnalyzing()
 {
+  // the receiver of this event will delete this object.
+  // so we cannot do anything after sending this
   app->postEvent(song_selector_window, new ExistenceScannerFinished(this));
 }
 

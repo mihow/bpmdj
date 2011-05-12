@@ -37,14 +37,14 @@ extension=${songname##*.}
 && (! (test -f "$songlocation") ) && exit 2;
 
 #____________________________________________________________
-# DECODER 1: mplayer 1.0pre6-3.3.5 decoder
+# DECODER 1: mpg123 decoder
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if test $DECODER = "1"; then
     echo "Information: decoder is mpg123"
     mpg123 -s "$songlocation" >"$rawname" ;
  
 #____________________________________________________________
-# DECODER 2: mplayer 1.0pre6-3.3.5 decoder
+# DECODER 2: mpg321 decoder
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 elif test $DECODER = "2"; then
     echo "Information: decoder is mpg321"
