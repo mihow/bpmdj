@@ -18,28 +18,25 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "player-core.h"
-#include "md5-analyzer.h"
-#include "scripts.h"
+#include "config.h"
+#include "cluster.h"
 
-void Md5Analyzer::run()
+#define ALBUM_NR 0
+#define ALBUM_TITLE 1
+#define ALBUM_AUTHOR 2
+#define ALBUM_TIME 3
+#define ALBUM_INDEX 4
+#define ALBUM_FILE 5
+
+class AlbumItem: 
+  public QListViewItem
 {
-  FILE * kloink;
-  if (!vexecute("md5sum \"%s\" | awk '{printf $1}' >sum.tmp\n",argument))
-    exit(101);
-  kloink=fopen("sum.tmp","r");
-  char s[40];
-  int i=0;
-  while(i<32)
-    {
-      int c = getc(kloink);
-      s[i]=c;
-      i++;
-    }
-  s[32]=0;
-  fclose(kloink);
-  playing->set_md5sum(s);
-}
+ public:
+  Song * song;
+ public:
+  AlbumItem(const char* name, QListView * parent);
+  AlbumItem(int nr, Song *song, QListViewItem * parent);
+  //    virtual void paintCell(QPainter *p, const QColorGroup &cg, int col, int wid, int align);
+  // virtual QString text(int i) const;
+  void fixNr();
+};

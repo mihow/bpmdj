@@ -38,7 +38,6 @@
 #include "tempolineanalyzer.logic.h"
 #include <assert.h>
 #include "about.h"
-#include "index.h"
 
 static int test=0;
 void SongPlayerLogic::done(int r)
@@ -47,11 +46,8 @@ void SongPlayerLogic::done(int r)
   assert(test<2);
   // signal any active counter to stop working
   bpmcounter->finish();
-  // if the song has been stopped, simply start and stop again.
   ::stop=1;
   ::paused=0;
-  // wait until finished: if this thread/function returns, the application is deleted
-  // so we must make sure that the player has stopped
   while(!finished) ;
   // now finish
   SongPlayer::done(r);
@@ -71,14 +67,14 @@ SongPlayerLogic::SongPlayerLogic(QWidget*parent,const char*name, bool modal,WFla
   redrawCues();
   
   // set caption
-  if (Index::index->valid_tar_info())
+  if (playing->valid_tar_info())
     {
-      QString blah = Index::index->encoded_tar();
+      QString blah = playing->encoded_tar();
       setCaption(blah);
     }
-  else if (Index::index->meta_readfrom())
+  else if (playing->get_storedin())
     {
-      QString blah = Index::index->meta_readfrom();
+      QString blah = playing->get_storedin();
       blah.replace("./index/","");
       setCaption(blah);
     }
@@ -90,6 +86,9 @@ SongPlayerLogic::SongPlayerLogic(QWidget*parent,const char*name, bool modal,WFla
   // set volume sliders
   //  Slider3->setValue(100-mixer_get_main());
   //  Slider4->setValue(100-mixer_get_pcm());
+
+  // set backgroundimage(for the fun of it ...
+  //  setPaletteBackgroundPixmap(QPixmap("BpmDjLogo.v"VERSION".png"));
 }
 
 
@@ -575,7 +574,7 @@ void SongPlayerLogic::openBpmCounter()
 
 void SongPlayerLogic::openInfo()
 {
-  Index::index->executeInfoDialog();
+  playing->executeInfoDialog();
 }
 
 void SongPlayerLogic::openSpectrumAnalyzer()

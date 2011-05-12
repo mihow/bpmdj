@@ -1,5 +1,5 @@
-CPP=distcc ccache g++ -O3 -Wall 
-CC=distcc ccache gcc -O3 -Wall
+CPP = g++ -O3 -Wall
+CC = gcc -O3 -Wall
 
 CFLAGS += -D COMPILE_OSS -D COMPILE_ALSA
 LDFLAGS+= -lpthread -lm -lasound

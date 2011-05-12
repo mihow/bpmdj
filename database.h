@@ -52,15 +52,20 @@ class DataBase
     void updateCache(SongSelectorLogic * selector);
     bool filter(SongSelectorLogic* selector, Song* song, Song* main);
     AvlTree<QString>* file_tree;
+    void     init();
+    void     clear();
  public:
     DataBase();
+    virtual ~DataBase();
+    void     reset();
     void     add(Song*);
     void     del(Song*);
+    Song *   find(QString song_filename);
     // bool     lookfor(const QString z);
     int      getSelection(SongSelectorLogic* selector, Song* main, QListView* target);
     Song * * getAllSongs(int &cnt) {cnt=all_count; return all;};
-    AvlTree<QString> * getCachedFileTree();
-    AvlTree<QString> * getFileTree();
+    AvlTree<QString> * getFileTreeRef();
+    AvlTree<QString> * getFileTreeCopy();
     Song * * closestSongs(SongSelectorLogic * selector, Song * target, SongMetriek * metriek, int maximum, int &count);
 };
 

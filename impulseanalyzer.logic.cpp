@@ -54,7 +54,6 @@
 #include "sys/times.h"
 #include "fourier.h"
 #include "kbpm-play.h"
-#include "index.h"
 #include "version.h"
 #include "scripts.h"
 
@@ -63,7 +62,7 @@ ImpulseAnalyzerLogic::ImpulseAnalyzerLogic(SongPlayer*parent, const char*name, b
 {
   long int bufsize = 65536;
   // read in memory and shrink it 
-  FILE * raw=openRawFile(arg_rawpath);
+  FILE * raw=openRawFile(playing,arg_rawpath);
   audiosize=fsize(raw)/4;
   signed4 pos = 0;
   fseek(raw,pos,SEEK_SET);
@@ -147,7 +146,7 @@ void ImpulseAnalyzerLogic::showImpulse()
       printf("%g\n",cor);
       cor/=2;
       cor*=Y;
-      p.drawPoint(x,Y/2-cor);
+      p.drawPoint(x,(int)(Y/2-cor));
     }
 
   /*  for(int x = 0 ; x < X && cor > 0; x++)

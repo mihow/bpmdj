@@ -1,8 +1,8 @@
 /****************************************************************************
 ** Form interface generated from reading ui file 'pattern-analyzer.ui'
 **
-** Created: Sun Sep 14 13:38:46 2003
-**      by: The User Interface Compiler ($Id: pattern-analyzer.h,v 1.1 2003/10/10 08:50:55 krubbens Exp $)
+** Created: Mon Nov 17 09:50:05 2003
+**      by: The User Interface Compiler ($Id: pattern-analyzer.h,v 1.2 2003/11/23 11:17:02 krubbens Exp $)
 **
 ** WARNING! All changes made in this file will be lost!
 ****************************************************************************/
@@ -11,15 +11,20 @@
 #define PATTERNDIALOG_H
 
 #include <qvariant.h>
+#include <qpixmap.h>
 #include <qdialog.h>
 
 class QVBoxLayout;
 class QHBoxLayout;
 class QGridLayout;
+class QTabWidget;
+class QWidget;
 class QSlider;
 class QLabel;
 class QPushButton;
 class QSpinBox;
+class QComboBox;
+class QLineEdit;
 
 class PatternDialog : public QDialog
 {
@@ -29,18 +34,30 @@ public:
     PatternDialog( QWidget* parent = 0, const char* name = 0, bool modal = FALSE, WFlags fl = 0 );
     ~PatternDialog();
 
+    QTabWidget* tabWidget2;
+    QWidget* tab;
     QSlider* periodDelta;
     QSlider* periodDelta10;
     QLabel* textLabel1;
-    QLabel* pattern;
     QSlider* color;
     QLabel* textLabel1_2;
     QPushButton* pushButton4;
     QPushButton* pushButton2;
-    QLabel* projection;
     QPushButton* updateButton;
     QSpinBox* beats;
     QLabel* textLabel1_3;
+    QLabel* pattern;
+    QLabel* projection;
+    QWidget* tab_2;
+    QLabel* filterImage;
+    QLabel* textLabel1_4;
+    QLabel* textLabel2;
+    QLabel* textLabel4;
+    QLabel* textLabel3;
+    QComboBox* hicut;
+    QComboBox* locut;
+    QLineEdit* order;
+    QSpinBox* stacking;
 
 public slots:
     virtual void slantChanged();
@@ -53,12 +70,18 @@ public slots:
     virtual void setTempo();
     virtual void balanceChanged();
     virtual void dumpPatternToIdx();
+    virtual void filterChanged();
 
 protected:
     QGridLayout* PatternDialogLayout;
+    QGridLayout* tabLayout;
+    QGridLayout* tabLayout_2;
 
 protected slots:
     virtual void languageChange();
+
+private:
+    QPixmap image0;
 
 };
 

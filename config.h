@@ -25,9 +25,6 @@
 const QString MusicDir = "./music";
 const QString IndexDir = "./index";
 
-#define MAXTAGSPERCOL 17
-#define MAXTAGS (MAXTAGSPERCOL*5)
-
 #define MAGIC_1_6 0xBDE0
 #define MAGIC_1_7 0xBDE1
 #define MAGIC_1_8 0xBDE2

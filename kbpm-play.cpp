@@ -47,7 +47,6 @@
 #include "pattern-analyzer.logic.h"
 #include "md5-analyzer.h"
 #include "dsp-drivers.h"
-#include "index.h"
 #include "player-core.h"
 #include "scripts.h"
 
@@ -67,9 +66,12 @@ static int   arg_high = 160;
  *         Parsing arguments 
  *-------------------------------------------*/
 QApplication *app;
+SongPlayerLogic *player_window;
+
 void * go(void* neglect)
 {
   app->exec();
+  delete(player_window);
   delete(app);
   return neglect;
 }
@@ -85,11 +87,11 @@ void msg_speedup(int change)
 void terminal_start()
 {
   pthread_t *y = allocate(1,pthread_t);
-  SongPlayerLogic *test=new SongPlayerLogic();
+  player_window = new SongPlayerLogic();
   if (arg_posx && arg_posy)
-    test->move(atoi(arg_posx),atoi(arg_posy));
-  app->setMainWidget(test);
-  test->show();
+    player_window->move(atoi(arg_posx),atoi(arg_posy));
+  app->setMainWidget(player_window);
+  player_window->show();
   pthread_create(y,NULL,go,NULL);
 }
 
@@ -290,7 +292,7 @@ void normal_start()
   show_error(err, err_needidx, "Please enter the index file, not the "SONG_EXT" file\nAn index file can be made with 'kbpm-play -c'\n");
   show_error(err, err_noraw, "No raw file to be read. Probably the .mp3 is broken.\n");
   show_error(err, err_nospawn, "Unable to spawn decoding process.\nPlease check your PATH environment variable\n");
-
+  
   err = core_open();
   show_error(err, err_dsp, "Unable to open dsp device\n");
   //  show_error(err, err_mixer, "Unable to open mixer device\n");
@@ -307,13 +309,13 @@ void batch_start()
   int nr=0;
   // 0. core init: synchronous without opening dsp
   core_init(1);
-  printf("%d. Wave written: %s\n",nr++,Index::index->readable_description());
+  printf("%d. Wave written: %s\n",nr++,playing->readable_description());
   // 1. md5sum
-  if (!Index::index->index_md5sum || strcmp(Index::index->index_md5sum,"")==0)
+  if (!playing->get_md5sum() || strcmp(playing->get_md5sum(),"")==0)
     {
       Md5Analyzer * md5_analyzer = new Md5Analyzer();
       md5_analyzer->run();
-      printf("%d. Md5 sum: %s\n",nr++,Index::index->index_md5sum);
+      printf("%d. Md5 sum: %s\n",nr++,playing->get_md5sum());
     }
   // 2. bpm
   if (opt_bpm)
@@ -322,7 +324,7 @@ void batch_start()
       counter->setBpmBounds(arg_low,arg_high);
       counter->run();
       counter->finish();
-      printf("%d. Bpm count: %s\n",nr++,Index::index->get_tempo_str());
+      printf("%d. Bpm count: %s\n",nr++,playing->get_tempo_str());
     }
   // 3. spectrum
   if (opt_color)
@@ -360,12 +362,12 @@ int main(int argc, char *argv[])
 	options_failure("Sorry, song must end on either " SONG_EXT);
       // create index and write it..
       Index *index = new Index();
-      index->index_file = strdup(argument);
-      index->index_tags=strdup("New");
+      index->set_filename(strdup(argument));
+      index->set_tags(strdup("New"));
       index->set_period(-1);
-      index->index_changed = 1;
+      index->set_changed();
       index->write_idx(newname);
-      delete index;
+      delete(index);
       argument = strdup(newname);
     }
   

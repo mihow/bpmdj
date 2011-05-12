@@ -54,7 +54,6 @@
 #include "sys/times.h"
 #include "fourier.h"
 #include "kbpm-play.h"
-#include "index.h"
 #include "version.h"
 #include "scripts.h"
 
@@ -63,7 +62,7 @@ TempoLineAnalyzerLogic::TempoLineAnalyzerLogic(SongPlayer*parent, const char*nam
 {
   long int bufsize = 65536;
   // read in memory and shrink it 
-  FILE * raw=openRawFile(arg_rawpath);
+  FILE * raw=openRawFile(playing,arg_rawpath);
   audiosize=fsize(raw)/4;
   signed4 pos = 0;
   fseek(raw,pos,SEEK_SET);
@@ -205,10 +204,10 @@ void TempoLineAnalyzerLogic::showTempoLine_1()
       int max = 0;
       for (int y = 0 ; y < Y; y++)
 	if (content[x][y]>max)
-	  max=content[x][y];
+	  max=(int)content[x][y];
       for (int y = 0 ; y < Y; y ++)
 	{
-	  int c = content[x][y];
+	  int c = (int)content[x][y];
 	  if (c==max)
 	    p.setPen(QColor(0,c,0));
 	  else
@@ -346,10 +345,10 @@ void TempoLineAnalyzerLogic::showTempoLine_2()
       int max = 0;
       for (int y = 0 ; y < Y; y++)
 	if (content[x][y]>max)
-	  max=content[x][y];
+	  max=(int)content[x][y];
       for (int y = 0 ; y < Y; y ++)
 	{
-	  int c = content[x][y];
+	  int c = (int)content[x][y];
 	  if (c==max)
 	    p.setPen(QColor(0,c,0));
 	  else
@@ -479,10 +478,10 @@ void TempoLineAnalyzerLogic::showTempoLine_3()
       int max = 0;
       for (int y = 0 ; y < Y; y++)
 	if (content[x][y]>max)
-	  max=content[x][y];
+	  max=(int)content[x][y];
       for (int y = 0 ; y < Y; y ++)
 	{
-	  int c = content[x][y];
+	  int c = (int)content[x][y];
 	  if (c==max)
 	    p.setPen(QColor(0,c,0));
 	  else
@@ -612,10 +611,10 @@ void TempoLineAnalyzerLogic::showTempoLine_4()
       int max = 0;
       for (int y = 0 ; y < Y; y++)
 	if (content[x][y]>max)
-	  max=content[x][y];
+	  max=(int)content[x][y];
       for (int y = 0 ; y < Y; y ++)
 	{
-	  int c = content[x][y];
+	  int c = (int)content[x][y];
 	  if (c==max)
 	    p.setPen(QColor(0,c,0));
 	  else

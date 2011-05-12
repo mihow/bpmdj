@@ -53,11 +53,10 @@
 #include "sys/times.h"
 #include "fourier.h"
 #include "kbpm-play.h"
-#include "index.h"
 #include "version.h"
 #include "scripts.h"
 
-static double barkbounds[barksize+1] =
+double barkbounds[barksize+1] =
   {
     0,100,200,300,
     400,510,630,770,
@@ -65,7 +64,7 @@ static double barkbounds[barksize+1] =
     1720,2000,2380,2700,
     3150,3700,4400,5300,
     6400,7700,9500,12000,
-    15500	
+    15500
   };
 
 SpectrumDialogLogic::SpectrumDialogLogic(SongPlayer*parent, const char*name, bool modal, WFlags f) :
@@ -127,7 +126,7 @@ void SpectrumDialogLogic::fetchSpectrum_normal()
   fftfreqi = allocate(blocksize,double);
   // hieronder x 2 omdat we zowel links als rechts binnen krijgen
   data=allocate((blocksize+slidesize)*2 ,signed short);
-  FILE * raw = openRawFile(arg_rawpath);
+  FILE * raw = openRawFile(playing, arg_rawpath);
   // reset the fftfreq
   long pos;
   for(pos=0;pos<blocksize/2;pos++)
@@ -210,8 +209,7 @@ void SpectrumDialogLogic::fetchSpectrum_normal()
       for(pos=0;pos<barksize;pos++)
 	spectrum[pos]='a'+(char)(barkscale[pos]/4);
       spectrum[barksize]=0;
-      Index::index->index_spectrum=strdup(spectrum);
-      Index::index->index_changed=1;
+      playing->set_spectrum(strdup(spectrum));
     }
   else
     {

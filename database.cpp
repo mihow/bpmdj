@@ -29,6 +29,22 @@
 
 DataBase::DataBase()
 {
+  init();
+}
+
+DataBase::~DataBase()
+{
+  clear();
+}
+
+void DataBase::reset()
+{
+  clear();
+  init();
+}
+
+void DataBase::init()
+{
   all_size = 1;
   all_count = 0;
   all = allocate(all_size,Song*);
@@ -39,7 +55,20 @@ DataBase::DataBase()
   exclude = NULL;
   tag = NULL;
   tag_size = 0;
-  file_tree = NULL;
+  file_tree = new AvlTree<QString>();
+}
+
+void DataBase::clear()
+{
+  for(int i = 0 ; i < all_count ; i ++)
+    delete all[i];
+  free(all);
+  free(cache);
+  free(and_include);
+  free(or_include);
+  free(exclude);
+  delete[] tag;
+  delete file_tree;
 }
 
 void DataBase::add(Song* song)
@@ -50,6 +79,22 @@ void DataBase::add(Song* song)
       all = reallocate(all,all_size,Song*);
     }
   all[all_count++]=song;
+  if (file_tree->search(song->file))
+    {
+      printf("Fatal: The song %s occurs at least two times in different index files\n",(const char*)song->file);
+      printf("The first index file is %s\n",(const char*)song->storedin);
+      song = ((SongSortedByFile*)(file_tree->search(song->file)))->song;
+      printf("The second index file is %s\n",(const char*)song->storedin);
+      exit(0);
+    }
+  file_tree->add(new SongSortedByFile(song));
+}
+
+Song * DataBase::find(QString song_filename)
+{
+  SongSortedByFile* ssbf = (SongSortedByFile*)file_tree->search(song_filename);
+  if (!ssbf) return NULL;
+  return ssbf->song;
 }
 
 void DataBase::addToCache(Song * song)
@@ -73,14 +118,20 @@ void DataBase::clearCache()
 
 bool DataBase::cacheValid(SongSelectorLogic * selector)
 {
-  if (selector->nextTagLine != tag_size)
+  if (selector->tagList->childCount() != tag_size)
     return false;
-  for (int i=0; i < tag_size; i++)
-    if (selector->tagLines[i]->text()!=*(tag[i]) ||
-	selector->tagAndInclude[i]->isChecked()!=and_include[i] ||
-	selector->tagOrInclude[i]->isChecked()!=or_include[i] ||
-	selector->tagExclude[i]->isChecked()!=exclude[i])
-      return false;
+  QListViewItemIterator it(selector->tagList);
+  int i = 0;
+  while(it.current())
+    {
+      QListViewItem *t = it.current();
+      if ( (t->text(TAGS_TEXT) != tag[i]) ||
+	   (t->text(TAGS_AND) == TAG_TRUE) != and_include[i] ||
+	   (t->text(TAGS_OR)  == TAG_TRUE) != or_include[i] ||
+	   (t->text(TAGS_NOT) == TAG_TRUE) != exclude[i])
+	return false;
+      i++;
+    }
   return true;
 }
 
@@ -90,19 +141,24 @@ void DataBase::copyTags(SongSelectorLogic * selector)
   if (or_include) free(or_include);
   if (exclude) free(exclude);
   if (tag) delete[](tag);
-  tag_size = selector->nextTagLine;
+  tag_size    = selector->tagList->childCount();
   and_include = allocate(tag_size,bool);
-  or_include = allocate(tag_size,bool);
-  exclude = allocate(tag_size,bool);
-  tag = new QString[tag_size]();
+  or_include  = allocate(tag_size,bool);
+  exclude     = allocate(tag_size,bool);
+  tag         = new QString[tag_size];
   and_includes_checked = false;
   excludes_checked = false;
-  for (int i=0; i < tag_size; i++)
+  QListViewItemIterator it(selector->tagList);
+  int i = 0;
+  while(it.current())
     {
-      tag[i] = selector->tagLines[i]->text();
-      or_include[i] = selector->tagOrInclude[i]->isChecked();
-      and_includes_checked |= and_include[i] = selector->tagAndInclude[i]->isChecked();
-      excludes_checked     |= exclude[i] = selector->tagExclude[i]->isChecked();
+      QListViewItem * t = it.current();
+      tag[i] = t->text(TAGS_TEXT);
+      or_include[i] = t->text(TAGS_OR) == TAG_TRUE;
+      and_includes_checked |= and_include[i] = t->text(TAGS_AND) == TAG_TRUE;
+      excludes_checked     |= exclude[i] = t->text(TAGS_NOT) == TAG_TRUE;
+      i++;
+      it++;
     }
 }
 
@@ -193,7 +249,7 @@ bool DataBase::filter(SongSelectorLogic* selector, Song *item, Song* main)
   return true;
 }
 
-AvlTree<QString>* DataBase::getFileTree()
+AvlTree<QString>* DataBase::getFileTreeCopy()
 {
   AvlTree<QString> * file_tree = new AvlTree<QString>();
   for(int i = 0 ; i < all_count ; i ++)
@@ -202,12 +258,9 @@ AvlTree<QString>* DataBase::getFileTree()
   return file_tree;
 }
 
-AvlTree<QString>* DataBase::getCachedFileTree()
+AvlTree<QString>* DataBase::getFileTreeRef()
 {
-  if (file_tree)
-    return file_tree;
-  else 
-    return getFileTree();
+  return file_tree;
 }
 
 int DataBase::getSelection(SongSelectorLogic* selector, Song* main, QListView* target)
@@ -296,4 +349,5 @@ void DataBase::del(Song* which)
 	  break;
 	}
     }
+  file_tree->del(which->title);
 }

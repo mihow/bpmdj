@@ -360,9 +360,34 @@ template <class Key> Node<Key>* Node<Key>::DeleteAvlNode(Key wie, int& heightcha
 //---------------------------------------------------------
 //   Constructor and Wrappers
 //---------------------------------------------------------
+
+template <class Key> Node<Key>::Node()
+{
+  left = NULL;
+  right = NULL;
+}
+
 template <class Key> AvlTree<Key>::AvlTree()
 {
   root = Node<Key>::Null; 
+};
+
+
+
+template <class Key> void AvlTree<Key>::PurgeAll(Node<Key>* root)
+{
+  if (root && !root->isNull())
+    {
+      PurgeAll(root->left);
+      PurgeAll(root->right);
+      delete(root);
+    }
+}
+
+template <class Key> AvlTree<Key>::~AvlTree()
+{
+  PurgeAll(root);
+  root = NULL;
 };
 
 template <class Key> Node<Key>* AvlTree<Key>::AddAvlNode(Node<Key>* root, Node<Key>* who)

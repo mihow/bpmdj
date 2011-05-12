@@ -368,22 +368,21 @@ void normalize_file()
 
 bool createFiles(char* a, char* b)
 {
-  Index::read(b);
-  filename_b = strdup(Index::index->index_file);
-  period_b = Index::index->get_period()*4;
+  Index idx_b(b);
+  filename_b = strdup(idx_b.get_filename());
+  period_b = idx_b.get_period()*4;
   printf("Decoding %s\n",b);
   if (!vexecute(CREATERAW_CMD,"./",filename_b))
     exit(100);
   
-  file_b=openRawFileForWriting("./");
-  delete Index::index;
+  file_b=openRawFileForWriting(&idx_b, "./");
   
   if (normalize)
     normalize_file();
-  
-  Index::read(a);
-  period_a = Index::index->get_period()*4;
-  delete Index::index;
+
+  Index idx_a(a);
+
+  period_a = idx_a.get_period()*4;
   
   file_a=fopen(BPMMIXED_NAME,"r+b");
   if (file_a)

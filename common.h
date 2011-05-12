@@ -49,4 +49,6 @@ long  fsize(FILE * f);
 long  readsamples(void* target, int count, FILE* file);
 long  writesamples(void* target, int count, FILE* file);
 bool  strxeq(const char* a, const char* b); // also works when a or b or NULL
+char* findUniqueName(const char* filename); // will prefix the extention of filename with a number until a unique filename is found
+bool exists(const char* fn);
 #endif

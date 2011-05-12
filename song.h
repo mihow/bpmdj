@@ -26,6 +26,21 @@
 #include <qpixmap.h>
 #include "config.h"
 #include "cluster.h"
+#include "index.h"
+
+#define LIST_DCOLOR 2
+#define LIST_TITLE 5
+#define LIST_AUTHOR 6
+#define LIST_TEMPO 0
+#define LIST_TIME 3
+#define LIST_CUES 4
+#define LIST_VERSION 7
+#define LIST_TAGS 8
+#define LIST_ONDISK 9
+#define LIST_SPECTRUM 1
+#define LIST_INDEX 10
+#define LIST_MD5SUM 11
+#define LIST_FILE 12
 
 QString tonumber(const int b);
 
@@ -54,8 +69,7 @@ class SongMetriek:
       };
 };
 
-class Song:
-public Point
+class Song: public Point
 {
   public:
     // stored in the index files
@@ -63,35 +77,34 @@ public Point
     QString author;
     QString version;
     QString tempo;
-    QString index;
+    QString storedin;
     QString tags;
     QString file;
     QString time;
     QString md5sum;
     QString spectrum;
-    // unsigned char* pattern;
-    // int            pattern_size;
-    // necessary for the cache invalidation
-    time_t  modification_time;
     // calculated as necessary
     QColor  color;
     QString spectrum_string;
     QString distance_string;
+    AlbumField ** albums;
     int     color_distance;
     bool    played;
     bool    ondisk;
     int     has_cues;
     int     played_author_at_time;
   private:
-    void init(const QString filename, const QString currentpath, bool checkondisk);
+    void init(const QString fullname, bool checkondisk);
+    void clearFloatingFields();
   public:
     Song();
-    Song(QString filename, QString currentpath, bool checkondisk);
-    void reread(bool checkfileondisk);
+    Song(Index* idx, bool allow_write, bool checkondisk, bool account_spectrum);
+    // WVB -- need to add delete operation here...
+    void refill(Index &read);
+    void reread();
+    void realize();
     void checkondisk();
     void setColor(QColor c);
-    void invertColor(bool r, bool g, bool b);
-    // QPixmap *getPixmap(int width, int height, const QColorGroup &cg);
     bool getDistance();
     bool containsTag(const QString which);
     QString tempo_between(Song*, float);
@@ -99,14 +112,11 @@ public Point
     QString spectrum_between(Song*, float);
     QColor  color_between(Song* song, float percent);
     float   spectrum_distance(Song* song);
-    // float   pattern_distance(Song* song);
     virtual float   distance(Point* point, Metriek* dp);
     virtual Point* percentToward(Point * other, Metriek * dp, float percent);
     virtual void simpledump(int d);
     virtual void determine_color(float hue, float, int, int);
     virtual ~Song();
-    // void toStream(QDataStream & stream);
-    // void fromStream(QDataStream & stream);
     bool modifiedOnDisk();
 };
 

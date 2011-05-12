@@ -38,7 +38,7 @@ class QSong:
     QString tags() const {return song->tags;};
     QString md5sum() const {return song->md5sum;};
     QString spectrum() const {return song->spectrum;};
-    QString index() const {return song->index;};
+    QString stored_in() const {return song->storedin;};
     QString title() const {return song->title;};
     QString author() const {return song->author;};
     bool    ondisk() const {return song->ondisk;};
@@ -52,9 +52,7 @@ class QSong:
     void    playedAuthorAtTime(int t) const {song->played_author_at_time = t;};
     // Inherited
     void reread() 
-      { song->reread(true); };
-    void invertColor(bool r, bool g, bool b) 
-      { song->invertColor(r,g,b); };
+      { song->reread(); };
     void setColor(QColor transfer) 
       { song->setColor(transfer); };
     bool getDistance() 

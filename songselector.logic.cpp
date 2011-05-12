@@ -31,15 +31,19 @@
 #include <qfiledialog.h>
 #include <qmultilineedit.h>
 #include <qlineedit.h>
+#include <qbuttongroup.h>
 #include <qcheckbox.h>
 #include <qcursor.h>
 #include <qtabwidget.h>
 #include <assert.h>
 #include <stdlib.h>
 #include <qspinbox.h>
+#include <qradiobutton.h>
+#include <qprogressbar.h>
 #include <stdio.h>
 #include <signal.h>
 #include <unistd.h>
+#include <qcombobox.h>
 #include <errno.h>
 #include <sys/mount.h>
 #include <sys/types.h>
@@ -49,6 +53,7 @@
 #include "renamer.logic.h"
 #include "about.h"
 #include "tagbox.h"
+#include "albumbox.h"
 #include "qsong.h"
 #include "kbpm-played.h"
 #include "askinput.h"
@@ -64,9 +69,17 @@
 #include "pca.h"
 #include "songtree.h"
 #include "avltree.cpp"
-#include "index.h"
 #include "edit-distance.h"
+#include "compacter.h"
+#include "index-reader.h"
 #include "scripts.h"
+
+SongSelectorLogic::~SongSelectorLogic()
+{
+  delete processManager;
+  delete database;
+  // timer=new QTimer(this); ???
+}
 
 SongSelectorLogic::SongSelectorLogic(QWidget * parent, const QString name) :
   SongSelector(parent,name)
@@ -79,7 +92,8 @@ SongSelectorLogic::SongSelectorLogic(QWidget * parent, const QString name) :
   timer=new QTimer(this);
   connect(timer,SIGNAL(timeout()), SLOT(timerTick()));
   timer->start(1000);
-  nextTagLine=0;
+  albumList->installEventFilter(this);
+  queue->installEventFilter(this);
   
   // create menu structure
   QMenuBar *main = new QMenuBar(this);
@@ -111,6 +125,7 @@ SongSelectorLogic::SongSelectorLogic(QWidget * parent, const QString name) :
   before->insertItem("&Check/import cdrom content",this,SLOT(checkDisc())); // checks wether the songs on a disk can be found somewhere in the indices
   before->insertItem("Mark duplicates (experimental)",this,SLOT(doMarkDups())); // searches the current list and marks all MD5sum duplicates
   before->insertItem("Find wrong index file names...",this,SLOT(findWrongIdxNames()));
+  before->insertItem("Compact index directory...",this,SLOT(compactIdxDirectory()));
 
   // view color menu
   view->insertSeparator();
@@ -161,6 +176,7 @@ SongSelectorLogic::SongSelectorLogic(QWidget * parent, const QString name) :
   selection->insertItem("&Add tag...",this,SLOT(selectionAddTags()));
   selection->insertItem("&Delete tag...",this,SLOT(selectionDelTags()));
   selection->insertItem("&Edit info...",this,SLOT(selectionEditInfo()));
+  selection->insertItem("&Insert in album...",this,SLOT(selectionInsertInAlbum()));
   selection->insertItem("&Analyze Bpm/Spectrum ...",this,SLOT(batchAnalyzing()));
   selection->insertItem("Pca Analysis Sound Color",this,SLOT(doSpectrumPca()));
   // selection->insertItem("Cluster Analysis Sound Color",this,SLOT(doSpectrumClustering()));
@@ -194,7 +210,7 @@ SongSelectorLogic::SongSelectorLogic(QWidget * parent, const QString name) :
 
   main->insertItem("&Selection",selection);
   main->insertItem("&Queue",queuemenu);
-  main->insertItem("&Song Management",before);
+  main->insertItem("&Management",before);
   main->insertItem("&Help",help);
   
   // nog een aantal items toevoegen
@@ -314,18 +330,16 @@ void SongSelectorLogic::doOnlineHelp()
 
 void SongSelectorLogic::findAllTags()
 {
-  // add 'all' tag and enable it
-  addTag("");
-  tagOrInclude[0] -> setChecked(true);
+  // 1. The Tags...
+  // ---------------
   // first put all tags in tree, without duplicates
   int count;
-  Song ** songs=database->getAllSongs(count);
+  Song ** songs = database->getAllSongs(count);
   AvlTree<QString> *tree = new AvlTree<QString>();
   for(int i = 0 ; i < count ; i ++)
     {
       QString tags = songs[i]->tags;
-      if (tree->search(tags))
-	continue;
+      if (tree->search(tags)) continue;
       tree->add(new QStringNode(tags));
     }
   // then parse all the tags
@@ -340,6 +354,22 @@ void SongSelectorLogic::findAllTags()
   updateItemList();
   // do a pca on all the data
   doSpectrumPca(true);
+
+  // 2. The Albums
+  // -------------
+  albumList->clear();
+  for(int i = 0 ; i < count ; i ++)
+    {
+      Song * song = songs[i];
+      AlbumField ** albums = song -> albums;
+      while(*albums)
+	{
+	  AlbumField * album = *albums++;
+	  AlbumItem  * ai = (AlbumItem*)albumList->findItem(album->name,0);
+	  if (!ai) ai = new AlbumItem(album->name,albumList);
+	  new AlbumItem(album->nr,song,ai);
+	}
+    }
 }
 
 void SongSelectorLogic::parseTags(QString tagz)
@@ -415,9 +445,10 @@ void SongSelectorLogic::updateItemList()
   historyList->clear();
   if (main)
     {
-      Index* main_index = new Index(main->index);
-      AvlTree<QString> *file2song = database->getCachedFileTree();
-      HistoryField ** after = main_index -> get_prev_songs();
+      main->realize();
+      Index main_index(main->storedin);
+      AvlTree<QString> *file2song = database->getFileTreeRef();
+      HistoryField ** after = main_index . get_prev_songs();
       while(after && *after)
 	{
 	  char* file = (*after)->file;
@@ -428,7 +459,7 @@ void SongSelectorLogic::updateItemList()
 	  s->song->getDistance();
 	  after++;
 	}
-      HistoryField ** before = main_index -> get_next_songs();
+      HistoryField ** before = main_index . get_next_songs();
       while (before && *before)
 	{
 	  char* file = (*before)->file;
@@ -439,7 +470,6 @@ void SongSelectorLogic::updateItemList()
 	  new HistorySong(s->song,count,comment,historyList);
 	  before++;
 	}
-      delete main_index;
     }
 }
 
@@ -620,6 +650,7 @@ void SongSelectorLogic::doSpectrumPca(bool fulldatabase)
     {
       all=database->getAllSongs(count);
       data = matrix(count,24);
+      if (count == 0 ) return;
       for(int i = 0, written = 0 ; i < count ; i ++)
 	{
 	  Song *svi= all[i];
@@ -647,6 +678,9 @@ void SongSelectorLogic::doSpectrumPca(bool fulldatabase)
 	      count++;
 	}
       
+      if (count == 0 ) 
+	return;
+
       // 1. fill matrix
       data = matrix(count,24);
       QListViewItemIterator it2(songList);
@@ -988,10 +1022,11 @@ void SongSelectorLogic::batchAnalyzing()
       QSong *svi=(QSong*)it1.current();
       if (svi->isSelected()  && svi->isVisible()) 
 	{
+	  svi->songEssence()->realize();
 	  fprintf(script,"echo ======= %d / %d ==============\n",nr++,count-1);
 	  fprintf(script,"kbpm-play -q --batch %s %s \"%s\"\n",
 		  tempoLine,spectrumLine,
-		  (const char*)svi->index());
+		  (const char*)svi->stored_in());
 	}
     }
   fclose(script);
@@ -1033,12 +1068,13 @@ void SongSelectorLogic::doPreferences()
 void SongSelectorLogic::songAddTag(QListViewItem * S, const QString & tag)
 {
   QSong * song = (QSong*)S;
-  QString index = song->index();
+  song->songEssence()->realize();
+  QString index = song->stored_in();
   // read the index file
   Index * idx = new Index(index);
   // modify taglines
   QString newtags = song->tags()+" "+tag;
-  idx->index_tags = strdup(newtags);
+  idx->set_tags(strdup(newtags));
   // write the indfex file
   idx->write_idx();
   // free the bastard
@@ -1047,13 +1083,33 @@ void SongSelectorLogic::songAddTag(QListViewItem * S, const QString & tag)
   ((QSong*)song)->reread();
 }
 
+void SongSelectorLogic::insertSongInAlbum(QListViewItem * S, const QString & album, int nr)
+{
+  QSong * song = (QSong*)S;
+  song->songEssence()->realize();
+  QString index = song->stored_in();
+  // read the index file
+  Index * idx = new Index(index);
+  if (!idx -> find_album(album))
+    {
+      idx -> add_album(new AlbumField(nr,album));
+      idx -> write_idx();
+      // update album view
+      AlbumItem * ai = (AlbumItem*)albumList->findItem(album,0);
+      if (!ai) ai = new AlbumItem(album,albumList);
+      new AlbumItem(nr,song->songEssence(),ai);
+    }
+  delete idx;
+}
+
 void SongSelectorLogic::songEditInfo(QListViewItem * S)
 {
   QSong * song = (QSong*)S;
-  QString index = song->index();
+  song->songEssence()->realize();
+  QString index = song->stored_in();
   Index * idx = new Index(index);
   idx->executeInfoDialog();
-  if (idx->index_changed)
+  if (idx->changed())
     {
       idx->write_idx();
       delete idx;
@@ -1066,18 +1122,19 @@ void SongSelectorLogic::songEditInfo(QListViewItem * S)
 void SongSelectorLogic::songDelTag(QListViewItem *S, const QString & tag)
 {
   QSong * song = (QSong*)S;
+  song->songEssence()->realize();
   char* newtags;
   // read the index file
-  Index * index = new Index(song->index());
-  newtags=strdup(index->index_tags);
+  Index * index = new Index(song->stored_in());
+  newtags=strdup(index->get_tags());
   // modify taglines
-  char* pos = strstr(index->index_tags,(const char*)tag);
+  char* pos = strstr(index->get_tags(),(const char*)tag);
   if (pos)
     {
       // simply clear the sucker
-      newtags[pos-index->index_tags]=' ';
-      strcpy(newtags+(pos-index->index_tags)+1, pos+strlen(tag));
-      index->index_tags = strdup(newtags);
+      newtags[pos-index->get_tags()]=' ';
+      strcpy(newtags+(pos-index->get_tags())+1, pos+strlen(tag));
+      index->set_tags(strdup(newtags));
     }
   // write the index file
   index->write_idx();
@@ -1102,6 +1159,27 @@ void SongSelectorLogic::selectionAddTags()
 	    songAddTag(svi,songdata.newTags->text());
 	}
       parseTags(songdata.newTags->text());
+    }
+}
+
+void SongSelectorLogic::selectionInsertInAlbum()
+{
+  static QString last = "";
+  static int lastnr = 0;
+  AlbumBox albumbox(NULL,NULL,TRUE);
+  albumbox.album->insertItem(last);
+  albumbox.number->setValue(++lastnr);
+  if (albumbox.exec()==QDialog::Accepted)
+    {
+      QListViewItemIterator it(songList);
+      last = albumbox.album->currentText();
+      lastnr = albumbox.number->value();
+      for(;it.current();++it)
+	{
+	  QSong * s = (QSong*)it.current();
+	  if (s->isSelected() && s->isVisible())
+	    insertSongInAlbum(s,last,albumbox.number->value());
+	}
     }
 }
 
@@ -1203,7 +1281,8 @@ void SongSelectorLogic::doAutoMix()
     {
       QueuedSong *song = (QueuedSong*)it.current();
       Song * s = song->getSong();
-      QString n = s->index;
+      s->realize();
+      QString n = s->storedin;
       if (old=="")
 	fprintf(out,"merger %s \"%s\"\n",arguments,(const char*)n);
       else
@@ -1316,6 +1395,15 @@ void SongSelectorLogic::doAbout()
   doAbout(0);
 }
 
+void SongSelectorLogic::searchLineEntered()
+{
+  doFilterChanged();
+  QListViewItem * item = songList->firstChild();
+  if (item) 
+    item->setSelected(true);
+  songList->setFocus();
+}
+
 void SongSelectorLogic::doFilterChanged()
 {
   Config::color_range = view->isItemChecked(colorinrange_item);
@@ -1347,63 +1435,21 @@ void SongSelectorLogic::quitButton()
 {
    close();
 }
-			
+
+extern const QString TAG_TRUE("Yes");
+extern const QString TAG_FALSE("___");
+
 void SongSelectorLogic::selectAllButTagged()
 {
-   int i = 1;
-   while(i<nextTagLine)
-     tagExclude[i++] -> setChecked(true);
+  QListViewItemIterator it(tagList);
+  while(it.current())
+    (it++).current()->setText(TAGS_NOT,TAG_TRUE);
 }
 
 void SongSelectorLogic::addTag(const QString tag)
 {
-  int baseline=40;
-  int col=0, row=0;
-  int xbox=140;
-  int i=0;
-  /* does the tag already exist */
-  for(i=0;i<nextTagLine;i++)
-    if (tagLines[i]->text()==tag) 
-      return;
-  /* no, add it */
-  if (nextTagLine>=MAXTAGS) return;
-  assert(nextTagLine<MAXTAGS);
-  col=nextTagLine/MAXTAGSPERCOL;
-  row=nextTagLine-col*MAXTAGSPERCOL;
-  tagLines[nextTagLine]   =  new QLabel( GroupBox2, "" );
-  tagLines[nextTagLine]   -> setGeometry( QRect( 70+col*xbox, baseline+30*row, 110, 30 ) );
-  tagLines[nextTagLine]   -> setText( tag );
-  tagLines[nextTagLine]   -> show();
-  tagAndInclude[nextTagLine] =  new QCheckBox( GroupBox2, "" );
-  tagAndInclude[nextTagLine] -> setGeometry( QRect( 10+col*xbox, baseline+30*row, 20, 30 ) );
-  tagAndInclude[nextTagLine] -> setText( tr( "" ) );
-  tagAndInclude[nextTagLine] -> show();
-  tagOrInclude[nextTagLine] =  new QCheckBox( GroupBox2, "" );
-  tagOrInclude[nextTagLine] -> setGeometry( QRect( 30+col*xbox, baseline+30*row, 20, 30 ) );
-  tagOrInclude[nextTagLine] -> setText( tr( "" ) );
-  tagOrInclude[nextTagLine] -> show();
-  tagExclude[nextTagLine] =  new QCheckBox( GroupBox2, "" );
-  tagExclude[nextTagLine] -> setGeometry( QRect( 50+col*xbox, baseline+30*row, 20, 30 ) );
-  tagExclude[nextTagLine] -> setText( tr( "" ) );
-  tagExclude[nextTagLine] -> show();
-  connect( tagAndInclude[nextTagLine], SIGNAL( stateChanged(int) ), this, SLOT( doFilterChanged() ) );
-  connect( tagOrInclude[nextTagLine], SIGNAL( stateChanged(int) ), this, SLOT( doFilterChanged() ) );
-  connect( tagExclude[nextTagLine], SIGNAL( stateChanged(int) ), this, SLOT( doFilterChanged() ) );
-  nextTagLine++;
-  /* and now sort it */
-  i=0;
-  while(i<nextTagLine-1)
-    {
-      if ( tagLines[i]->text() > tagLines[i+1]->text() )
-	{
-	  QString txt = tagLines[i]->text();
-	  tagLines[i]->setText(tagLines[i+1]->text());
-	  tagLines[i+1]->setText(txt);
-	  i=0;
-	}
-      else
-	i++;
-    }
+  if (tagList->findItem(tag,TAGS_TEXT)) return;
+  new QListViewItem(tagList,tag,TAG_FALSE,TAG_FALSE,TAG_FALSE);
 }
 
 void SongSelectorLogic::findallsimilarnames()
@@ -1448,7 +1494,9 @@ void SongSelectorLogic::importSongs()
 void SongSelectorLogic::selectionMenu()
 {
   selection->exec(QCursor::pos());
+  searchLine->setFocus();
 }
+
 
 void SongSelectorLogic::openQueueMenu()
 {
@@ -1809,4 +1857,274 @@ void SongSelectorLogic::queueRandom(bool userChoice)
 	}
     }
   queueOrder();
+}
+
+void SongSelectorLogic::selectAlbumItem(QListViewItem* i)
+{
+  AlbumItem *album = (AlbumItem*)i;
+  if(!album) return;
+  if (album->song) return;
+  songList->clearSelection();
+  // traverse through all children and find them in the songlist...
+  AlbumItem *child = (AlbumItem*)album->firstChild();
+  bool alreadygiven = false;
+  while(child)
+    {
+      QString file = child->text(ALBUM_FILE);
+      QSong *toadd = (QSong*)songList->findItem(file,LIST_FILE);
+      if (!toadd)
+	{
+	  if (!alreadygiven)
+	    {
+	      QMessageBox::warning(this,"Selection problem","Unable to select\nbecause it is not available in the song list.");
+	      alreadygiven=true;
+	    }
+	}
+      else new QueuedSong(toadd,queue);
+      child = (AlbumItem*)child->nextSibling();
+    }
+}
+
+void SongSelectorLogic::renameAlbumItem(QListViewItem* i)
+{
+  if (!i) return;
+  AlbumItem *item = (AlbumItem*)i;
+  if (!item->song) return;
+  item->startRename(0);
+}
+
+void SongSelectorLogic::albumItemChanged(QListViewItem* i, int col)
+{
+  AlbumItem *item = (AlbumItem*)i;
+  if (!item) return;
+  Song *song = item->song;
+  if (!song) return;
+  song->realize();
+  QString file = song->storedin;
+  if (!file) return;
+  Index index(file);
+  AlbumField *album = index.find_album(i->parent()->text(0));
+  if (!album) 
+    {
+      printf("Error: album entry %s that is unknown in index file\n",(const char*)i->text(1));
+      return;
+    }
+  album -> nr = atoi(i->text(0));
+  index . write_idx();
+  item -> fixNr();
+}
+
+void SongSelectorLogic::changeTagList(QListViewItem* item, const QPoint & pos, int col)
+{
+  if (col < TAGS_OR || col > TAGS_NOT) return;
+  if (!item) return;
+  QString c = item -> text(col);
+  item -> setText(col,c == TAG_TRUE ? TAG_FALSE : TAG_TRUE);
+  doFilterChanged();
+}
+
+void SongSelectorLogic::deleteSongFromAlbum(AlbumItem * item)
+{
+  if (!item) return;
+  Song *song = item->song;
+  if (!song) return;
+  song->realize();
+  QString file = song->storedin;
+  if (!file) return;
+  AlbumItem * album = (AlbumItem*)(item->parent());
+  if (!album) return;
+  QString name = album->text(0);
+  Index index(file);
+  index . delete_album(name);
+  index . write_idx();
+  delete(item);
+}
+
+#define TABS_ALBUMS 1
+#define TABS_QUEUE 3
+
+bool SongSelectorLogic::eventFilter(QObject *o, QEvent *e)
+{
+  if ( e->type() == QEvent::KeyPress )
+    {
+      QKeyEvent *k=(QKeyEvent*)e;
+      switch (tabs->currentPageIndex())
+	{
+	case TABS_ALBUMS:
+	  if (k->key() == Qt::Key_Delete) 
+	    {
+	      deleteSongFromAlbum((AlbumItem*)(albumList->currentItem()));
+	      return TRUE;
+	    }
+	case TABS_QUEUE:
+	  if (k->key() == Qt::Key_Delete) 
+	    {
+	      queueDelete();
+	      return TRUE;
+	    }
+	  if (k->key() == Qt::Key_Insert)
+	    {
+	      queueInsert();
+	      return TRUE;
+	    }
+	}
+    }
+  return FALSE;
+}
+
+void SongSelectorLogic::keyPressEvent(QKeyEvent* e)
+{
+  if (e->key() == Qt::Key_Escape) return;
+  SongSelector::keyPressEvent(e);
+}
+
+#define SPLIT_ONEFILE 0
+#define SPLIT_ARTIST 1
+#define SPLIT_TAGS 2
+
+void SongSelectorLogic::compactIdxDirectory()
+{
+  // obtain information how to split all information
+  int type = -1;
+  CompactDialog compacter(NULL,NULL,TRUE);
+  if (compacter.exec()==compacter.Rejected) return;
+  if (compacter.onebigfile->isChecked()) type = SPLIT_ONEFILE;
+  else if (compacter.artist->isChecked()) type = SPLIT_ARTIST;
+  else if (compacter.tags->isChecked()) type = SPLIT_TAGS;
+  else assert(0);
+  // check existense of new_index...
+  if (exists("./new_index"))
+    {
+      if (QMessageBox::question(this,"New Index Directory Exists","The new index directory ./new_index/ already exists.\nRemove ?",
+				QMessageBox::Yes, QMessageBox::Abort) != QMessageBox::Yes) return;
+      if (!execute("rm -fr ./new_index/"))
+	{
+	  QMessageBox::critical(this,"Delete Failed","Could not delete the directory ./new_index/",QMessageBox::Abort,0);
+	  return;
+	}
+    }
+  execute("mkdir ./new_index/");
+  // fetch all songs
+  int nr;
+  Song * * all = database->getAllSongs(nr);
+  assert(nr>=0);
+  // create a tree containing the different filenames
+  AvlTree<QString> * tree = new AvlTree<QString>();
+  if (type == SPLIT_ONEFILE)
+    tree->add(new QStringNode(compacter.filename->text()));
+  else
+    for (int i = 0 ; i < nr ; i ++)
+      {
+	Song * song = all[i];
+	switch(type)
+	  {
+	  case SPLIT_ARTIST:
+	    if (!tree->search(song->author))
+	      tree->add(new QStringNode(song->author));
+	    break;
+	  case SPLIT_TAGS:
+	    if (!tree->search(song->tags))
+	      tree->add(new QStringNode(song->tags));
+	    break;
+	  }
+      }
+  // dump everything to the ./new_index/ directory..
+  compacter.ok->setEnabled(false);
+  compacter.cancel->setEnabled(false);
+  compacter.buttons->setEnabled(false);
+  compacter.show();
+  QStringNode * filetocreate;
+  int progress = 0;
+  while ( (filetocreate = (QStringNode*)tree->top()) )
+    {
+      QString key =  filetocreate->content;
+      tree->del(key);
+      QString qfilename = QString("new_index/")+key+".bib";
+      if (key.isEmpty()) 
+	qfilename = QString("new_index/_empty_.bib");
+      const char* filename = qfilename;
+      compacter.fileinfo->setText(qfilename);
+      FILE * target = fopen(filename,"wb");
+      if (!target)
+	{
+	  QMessageBox::critical(this,QString("Compaction failed"),
+				QString("The file\n") +QString(filename)+ QString("\ncould not be written !"),
+				QMessageBox::Abort,0);
+	  return;
+	}
+      app->processEvents();
+      assert(target);
+      for(int i = 0 ; i < nr ; i ++)
+	{
+	  Song * song = all[i];
+	  bool handlethisone = false;
+	  switch (type)
+	    {
+	    case SPLIT_ARTIST:
+	      handlethisone = song->author == key;
+	      break;
+	    case SPLIT_TAGS:
+	      handlethisone = song->tags == key;
+	      break;
+	    case SPLIT_ONEFILE:
+	      handlethisone=true;
+	    }
+	  if (handlethisone)
+	    {
+	      QString indexfilename = song->storedin;
+	      Index index(indexfilename);
+	      if (index.can_be_stored_in_bib())
+		{
+		  index.write_bib_field(target);
+		}
+	      else
+		{
+		  QString withoutindexprefix = indexfilename.remove("./index");
+		  QString withnewprefix = QString("./new_index")+withoutindexprefix;
+		  QString targetdirectory = withnewprefix.left(withnewprefix.findRev("/"));
+		  vexecute(MKDIR"\"%s\"",(const char*)targetdirectory);
+		  index.write_idx((const char*)withnewprefix);
+		}
+	      if (nr>0 && (++progress)%(nr/100) == 0)
+		{
+		  compacter.progress->setProgress(progress,nr);
+		  app->processEvents();
+		}
+	    }
+	}
+      fclose(target);
+    }
+  if (progress!=nr)
+    {
+      QMessageBox::critical(this,QString("Compaction failed"),
+			    QString("From the ")+QString::number(nr)+" filesn\nonly "+QString::number(progress)+" have been written !",
+			    QMessageBox::Abort,0);
+      return;
+    }
+  if (!execute("rm -fr ./index/"))
+    {
+      QMessageBox::critical(this,"Delete Failed",
+			    "Could not delete the directory ./index\n"
+			    "Make sure to delete it MANUALLY and\n"
+			    "rename the ./new_index directory to ./index",QMessageBox::Abort,0);
+      return;
+    }
+  
+  if (!execute(MV" ./new_index ./index"))
+    {
+      QMessageBox::critical(this,"Move failed",
+			    "The ./new_index directory contains all your data.\n"
+			    "However, somehow I could not rename it to ./index\n"
+			    "Please do this manually.",QMessageBox::Abort,0);
+      return;
+    }
+  // rereading. The index-reader will automatically update all existing Song* pointers..
+  // wo we don't care about them
+  compacter.prompt->setText("Rereading");
+  app->processEvents();
+  IndexReader * indexReader = new IndexReader(compacter.progress,compacter.fileinfo,database);
+  delete indexReader;
+  compacter.prompt->setText("Finishing");
+  app->processEvents();
+  findAllTags(); // necessary to update the album pointers and the view itself...
 }

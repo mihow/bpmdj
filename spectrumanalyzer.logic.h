@@ -22,6 +22,7 @@
 #include "spectrumanalyzer.h"
 
 #define barksize 24
+extern double barkbounds[barksize+1];
 
 class SpectrumDialogLogic : public SpectrumDialog
 {

@@ -2,7 +2,7 @@
 ** Form interface generated from reading ui file 'mixinformation.ui'
 **
 ** Created: Tue Oct 21 14:25:37 2003
-**      by: The User Interface Compiler ($Id: qt/main.cpp   3.2.1   edited May 19 14:22 $)
+**      by: The User Interface Compiler ($Id: mixinformation.h,v 1.1 2003/11/14 07:04:09 krubbens Exp $)
 **
 ** WARNING! All changes made in this file will be lost!
 ****************************************************************************/

@@ -35,6 +35,7 @@ class ProcessManager
     static inline Song* playingInMain() {return playing_songs[0];};
     static inline bool monitorFree() {return playing_songs[1]==NULL;};
     ProcessManager(SongSelectorLogic *sel);
+    virtual ~ProcessManager();
     void clearPlayer(int id, bool update=true);
     void switchMonitorToMain();
     void setMainSong(Song * song);

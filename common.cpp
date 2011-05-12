@@ -21,8 +21,9 @@
 #include <assert.h>
 #include <errno.h>
 #include <string.h>
-#include "common.h"
 #include "malloc.h"
+#include "dirscanner.h"
+#include "common.h"
 
 void* myalloc(int length, char* file, int line)
 {
@@ -108,3 +109,33 @@ bool strxeq(const char* a, const char* b)
     return false;
   return strcmp(a,b)==0;
 }
+
+char* findUniqueName(const char* filename)
+{
+  char indexname[500];
+  char *temp;
+  char halfindexname[500];
+  temp=strdup(basename(strdup(filename)));
+  temp[strlen(temp)-4]=0;
+  sprintf(halfindexname,"%s.idx",temp);
+  sprintf(indexname,"./index/%s.idx",temp);
+  int nr=2;
+  while(exists(indexname))
+    {
+      sprintf(halfindexname,"%s%d.idx",temp,nr);
+      sprintf(indexname,"./index/%s%d.idx",temp,nr++);
+    }
+  return strdup(indexname);
+}
+
+bool exists(const char* fn)
+{
+  FILE * f = fopen(fn,"rb");
+  if (f)
+    {
+      fclose(f);
+      return true;
+    }
+  return false;
+}
+

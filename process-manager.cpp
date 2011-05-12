@@ -35,6 +35,7 @@
 #include <errno.h>
 #include <sys/mount.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <sys/stat.h>
 #include <libgen.h>
 #include "preferences.h"
@@ -57,8 +58,10 @@ Song* ProcessManager::playing_songs[4] = {NULL,NULL,NULL,NULL};
 // normally it will immidatelly invoke the one and
 // only process manager.
 
-void ToSwitchOrNotToSwitchSignal(int sig,siginfo_t *info, void* hu)
+void ToSwitchOrNotToSwitchSignal(int sig, siginfo_t *info, void* hu)
 {
+  int blah;
+  waitpid(info->si_pid,&blah,0);
   for(int i = 0 ; i < 4 ; i ++)
     if (processManager->died_pids[i]==-1)
       {
@@ -66,6 +69,10 @@ void ToSwitchOrNotToSwitchSignal(int sig,siginfo_t *info, void* hu)
 	return;
       }
   assert(0);
+}
+
+ProcessManager::~ProcessManager()
+{
 }
 
 ProcessManager::ProcessManager(SongSelectorLogic * sel)
@@ -90,11 +97,12 @@ ProcessManager::ProcessManager(SongSelectorLogic * sel)
   act->sa_flags=SA_SIGINFO;
   sigaction(SIGUSR1,act,NULL);
   // ignore sigchlds
-  signal(SIGCHLD,SIG_IGN);
+  // signal(SIGCHLD,SIG_IGN);
 };
 
 void ProcessManager::setMainSong(Song* song)
 {
+  song->realize();
   playing_songs[0]=song;
   selector->updateProcessView();
 }
@@ -128,10 +136,8 @@ void ProcessManager::checkSignals()
 
 void ProcessManager::clearPlayer(int id, bool update)
 {
-  if(!playing_songs[id])
-    return;
-  // reread the song that was playing
-  playing_songs[id]->reread(false);
+  if(!playing_songs[id]) return;
+  playing_songs[id]->reread();
   // WVB - this should be done automatically
   selector->parseTags(playing_songs[id]->tags);
   player_pids[id] = 0;
@@ -161,6 +167,7 @@ void ProcessManager::startExtraSong(int id, Song *song)
 {
   char playercommand[500];
   // create suitable start command
+  song->realize();
   Song *matchWith=playingInMain();
   if (!matchWith) 
     matchWith=song;
@@ -169,8 +176,8 @@ void ProcessManager::startExtraSong(int id, Song *song)
 	  (const char*)(id == 3 ? Config::playCommand3
 			: Config::playCommand4),
 	  (const char*)Config::tmp_directory,
-	  (const char*)matchWith->index, 
-	  (const char*)song->index);
+	  (const char*)matchWith->storedin, 
+	  (const char*)song->storedin);
   // fork the command and once the player exists immediatelly stop
   if (!(player_pids[id]=fork()))
     { 
@@ -185,6 +192,7 @@ void ProcessManager::startSong(Song *song)
 {
   assert(song);
   QString player;
+  song->realize();
   Song *matchWith;
   char playercommand[500];
   // if there is still a song playing in the monitor, don't go
@@ -203,8 +211,8 @@ void ProcessManager::startSong(Song *song)
   sprintf(playercommand, 
 	  (const char*)player, 
 	  (const char*)Config::tmp_directory,
-	  (const char*)matchWith->index, 
-	  (const char*)playing_songs[1]->index);
+	  (const char*)matchWith->storedin, 
+	  (const char*)playing_songs[1]->storedin);
   // fork the command and once the player exists immediatelly stop
   if (!(player_pids[1]=fork()))
     { 

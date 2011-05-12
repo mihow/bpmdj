@@ -31,7 +31,6 @@
 #include "dirscanner.h"
 #include "spectrum.h"
 #include "historysong.h"
-#include "index.h"
 
 #define HISTORY_MAINRELATION 0
 #define HISTORY_COMMENT 1

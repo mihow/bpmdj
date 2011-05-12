@@ -33,7 +33,6 @@
 #include <stdio.h>
 #include "kbpm-played.h"
 #include "common.h"
-#include "index.h"
 #include "mixinformation.h"
 
 int Played::songs_played = 0;
@@ -82,10 +81,10 @@ Played::Played(const QString filename)
   f=fopen(filename,"ab");
 }
 
-bool Played::IsPlayed(const QString indexname)
+bool Played::IsPlayed(Song * which)
 {
   for(int i = 0 ; i < next ; i++)
-    if (*(names[i])==indexname) 
+    if (*(names[i])==which->file) 
       return true;
   return false;
 }
@@ -95,8 +94,8 @@ void Played::Play(Song * main_now)
   if (main_now)
     {
       // write to disk..
-      const QString indexname = main_now->index;
-      fprintf(f,"%s\n",(const char*)indexname);
+      const QString name = main_now->file;
+      fprintf(f,"%s\n",(const char*)name);
       fflush(f);
       // increase counter
       songs_played++;
@@ -110,12 +109,12 @@ void Played::Play(Song * main_now)
   t_0 = main_now;
   if (t_1)
     {
-      Index * i = new Index(t_1->index);
+      Index i(t_1->storedin);
       QString info;
       HistoryField * f;
       if (t_0) 
 	{
-	  f = i->add_next_song(t_0->file);
+	  f = i.add_next_song(t_0->file);
 	  info = f -> comment;
 	  if (Config::ask_mix)
 	    {
@@ -129,11 +128,10 @@ void Played::Play(Song * main_now)
 	}
       if (t_2) 
 	{
-	  f = i->add_prev_song(t_2->file);
+	  f = i.add_prev_song(t_2->file);
 	  // if (info.isNull()) f -> comment = strdup("");
 	  // else f -> comment = strdup(info);
 	}
-      i->write_idx();
-      delete i;
+      i.write_idx();
     }
 }

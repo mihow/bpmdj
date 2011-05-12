@@ -34,10 +34,10 @@ char *getRawFilename(const char * rawpath, const char * n)
   return (char*)strdup(d);
 }
 
-FILE * openRawFile(const char * rawpath)
+FILE * openRawFile(Index* index, const char * rawpath)
 {
   FILE * raw;
-  char * name = getRawFilename(rawpath, Index::index->index_file);
+  char * name = getRawFilename(rawpath, index->get_filename());
   assert(name);
   raw = fopen(name,"rb");
   if (!raw)
@@ -49,10 +49,10 @@ FILE * openRawFile(const char * rawpath)
   return raw;
 }
 
-FILE * openRawFileForWriting(const char *d)
+FILE * openRawFileForWriting(Index* index, const char *d)
 {
   FILE * raw;
-  char * name = getRawFilename(d,Index::index->index_file);
+  char * name = getRawFilename(d,index->get_filename());
   assert(name);
   raw = fopen(name,"r+b");
   if (!raw)
@@ -64,9 +64,9 @@ FILE * openRawFileForWriting(const char *d)
   return raw;
 }
 
-void removeRaw(char* d)
+void removeRaw(Index* index, char* d)
 {
-  char * name = getRawFilename(d,Index::index->index_file);
+  char * name = getRawFilename(d,index->get_filename());
   remove(name);
   free(name);
 }

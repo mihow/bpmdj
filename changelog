@@ -1,15 +1,34 @@
+2.3:
+  ksel  - removed ***ing bug from PCA analysis... If you don't write it yourself... You're fucked..	
+  ksel  + modified the shortcut of Song Management
+  ksel  - added some 'free' and 'delete' code.. It seems XLib wastes memory with regard to pixmaps
+  ksel  - removed useless ondisk check when a kbpm-play returns	 
+  kplay + to avoid version confusion, the player follows the splash screen color
+  ksel  + added compaction of the index directory. (+/- 33 % faster when everything 
+	  in memory, otherwise this issues an even better improvement)
+  ksel  - removed modification time information	
+  kplay - fixed the QThread after QThreadStorage QT warning	
+  ksel  - fixed zombie bug	 
+  ksel	+ ignore escape key in main window, add del/ins key in queue
+  kplay - removed signed/unsigned bug in bpm scanner !!!
+  ksel  + replaced tag-buttons by taglist	
+  ksel  + removed search line again because it seems no longer necessary
+  ksel  + added album information
+  ksel  + moved playing song display to top of selector
+  ksel  + compiles again under gentoo
+  ksel  + added splash screen	
 2.2:
-  kplay - normal tempo known, target tempo unknown -> player didn't play	 
-  kplay - normal tempo unknown, target tempo known -> player didn't play	
+  kplay - normal tempo known, target tempo unknown -> player didn't play
+  kplay - normal tempo unknown, target tempo known -> player didn't play
   kplay - break lfo didn't work, because ui not connected to program
   kplay + all tempo updates are written immediatelly to disk
   kplay - no raw data on disk, beat graph crashes... 	 
   ksel  + added 'how did the mix go' question
-  ksel  + turned brightness button up for all spectrumcolor and removed inversion of pca color
+  ksel  + turned brightness button up for all spectrumcolor and removed invertion of pca color
   ksel  + added persistent history view
-  kplay - bug removed in batch analyzer	 
+  kplay - bug removed in batch analyzer
   kplay + improved bpm-detection algorithm substantially
-  kplay + modified layout (again), added pixmaps for LFO's	
+  kplay + modified layout (again), added pixmaps for LFO's
   kplay + double race condition in application cleanup (destructors and stop signalling)
   cplay - removed console player from compilation
   idx   + .idx files are always upgraded to the latest version every time they are written out	

@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "dirscanner.h"
+#include "common.h"
 
 bool DirectoryScanner::songExtension(QString ext)
 {
@@ -74,17 +75,6 @@ DirectoryScanner::DirectoryScanner(QString  extension)
 { 
   required_extension=extension; 
 };
-
-bool DirectoryScanner::exists(const QString  fn)
-{
-   FILE * f = fopen(fn,"rb");
-   if (f)
-     {
-	fclose(f);
-	return true;
-     }
-   return false;
-}
 
 void DirectoryScanner::recursing(const QString dirname)
 {

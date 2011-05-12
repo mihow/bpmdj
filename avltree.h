@@ -70,8 +70,8 @@ template <class Key> class Node
    static Sentinel<Key> * Null;
    Node<Key> * left;
    Node<Key> * right;
-  int       flag;
-   Node<Key>() {};
+   int       flag;
+   Node<Key>();
    virtual int compareAddData(Node<Key>* w2) = 0; // compares this with w2
    virtual int compareSearchData(Key key) = 0;    // compares this with key
    virtual void print() {assert(0);};
@@ -99,8 +99,10 @@ template <class Key> class AvlTree
   Node<Key>* root;
   Node<Key>* AddAvlNode(Node<Key>* root, Node<Key>* who);
   Node<Key>* DeleteAvlNode(Node<Key>* root, Key wie);
+  void PurgeAll(Node<Key>* root);
  public:
   AvlTree();
+  virtual ~AvlTree();
   void add(Node<Key>* who)     { root = AddAvlNode(root,who); };
   Node<Key>* search(Key watte) { return root->search(watte)->toAnswer();};
   void del(Key watte)          { root = DeleteAvlNode(root,watte); };

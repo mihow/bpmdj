@@ -38,108 +38,81 @@
 #include "songtree.h"
 #include "avltree.cpp"
 
-IndexReader::IndexReader(Loader *l, DataBase * db) : 
-  DirectoryScanner(".idx"),
-  tree()
+static int songs_already_in_database = 0;
+
+IndexReader::IndexReader(QProgressBar * b, QLabel *l, DataBase * db) : 
+  DirectoryScanner(".bib"),tree()
 { 
   database = db;
-  loader = l;
+  progress = b;
+  reading = l;
   total_files = 0;
-  readCache();
-  validateCache();
-  writeCache();
-  lastSpectrum();
-}
-
-void IndexReader::validateCache()
-{
-  // first we check all existing filenames
-  loader->progressBar1->setTotalSteps(Config::file_count);
+  reading_bib = true;
+  progress->setTotalSteps(Config::file_count);
+  songs_already_in_database = 0;
   scan(IndexDir,IndexDir);
-  loader->progressBar1 -> setProgress(total_files);
-  // then we remove all the filenames found in the tree but no longer on disk
-  SongSortedByIndex * top;
-  while( (top = (SongSortedByIndex*)tree.top()) )
-    {
-      database->del(top->song);
-      tree.del(top->getKey());
-    }
-};
+  printf("Debug: %d songs already in database when scanning .bib files\n",songs_already_in_database);
+  required_extension = ".idx";
+  reading_bib = false;
+  songs_already_in_database = 0;
+  scan(IndexDir,IndexDir);
+  printf("Debug: %d songs already in database when scanning .idx files\n",songs_already_in_database);
+  progress -> setProgress(total_files);
+  lastSpectrum();
+  
+}
 
 void IndexReader::recursing(const QString dirname)
 {
-  loader->readingDir->setText(dirname);
+  reading -> setText(dirname);
+}
+
+void IndexReader::add(Song * song)
+{
+  database->add(song);
+  song->checkondisk();
+  if ( ++ total_files % (Config::file_count > 0 ? Config::file_count / 100 : 10) == 0)
+    {
+      progress -> setProgress(total_files);
+      app -> processEvents();
+    }
 }
 
 void IndexReader::checkfile(const QString prefix, const QString  filename)
 {
-  // If the index does not exist remove the song from the database
   QString fullname = prefix + "/" + filename;
-  SongSortedByIndex * songintree = (SongSortedByIndex*)tree.search(fullname);
-  Song * song;
-  if (!songintree)
+  if (reading_bib)
     {
-      song = new Song(filename,prefix,false);
-      database->add(song);
-      // printf("%s has been added\n",(const char*)fullname);
+      Index::init_bib_batchread(fullname);
+      QString shortname = fullname.left(fullname.findRev(".bib"));
+      long position = 0;
+      while(!Index::batch_has_ended())
+	{
+	  Index index;
+	  // printf("position = %ld\n",position);
+	  position = index.read_bib_field(position,shortname);
+	  Song * song = database->find(index.get_filename());
+	  if (song)
+	    {
+	      song->refill(index);
+	      songs_already_in_database++;
+	    }
+	  else
+	    add(new Song(&index,false,false,true));
+	}
+      Index::done_bib_batchread();
     }
-  else 
+  else
     {
-      song = songintree->song;
+      Index index(fullname);
+      Song * song = database->find(index.get_filename());
+      if (song)
+	{
+	  song->refill(index);
+	  songs_already_in_database++;
+	}
+      else
+	add(new Song(&index,true,false,true));
     }
-  tree.del(fullname);
   
-  if (song->modifiedOnDisk())
-    {
-      song->reread(false);
-      // printf("%s has been modified\n",(const char*)fullname);
-    }
-  song->checkondisk();
-  
-  if (++total_files%10 == 0)
-    {
-      loader->readingFile -> setText(filename);
-      loader->progressBar1 -> setProgress(total_files);
-      app->processEvents();
-    }
-}
-
-void IndexReader::writeCache()
-{
-  /*  QFile f("bpmdj-cache.tmp");
-  f.open(IO_WriteOnly);
-  QDataStream s(&f);
-  int count;
-  Song ** all = database->getAllSongs(count);
-  s << MAGIC_NOW;
-  s << count;
-  for(int i = 0 ; i < count ; i ++)
-    all[i]->toStream(s);
-  */
-}
-
-void IndexReader::readCache()
-{
-  /* int magic;
-  int count;
-  if (!QFile::exists("bpmdj-cache.tmp")) return;
-  QFile f("bpmdj-cache.tmp");
-  printf("If the program aborts, please remove the file bpmdj-cache.tmp\n");
-  f.open(IO_ReadOnly);
-  QDataStream s(&f);
-  s >> magic;
-  if (magic != MAGIC_NOW) return;
-  s >> count;
-  for(int i = 0 ; i < count ; i ++)
-    {
-      Song * song = new Song();
-      song->fromStream(s);
-      database->add(song);
-      tree.add(new SongSortedByIndex(song));
-    }
-  */
-
-  // tree.print();
-  // if( !tree.valid() )
-  // printf("TREE IS NOT VALID !!!\n");
 }

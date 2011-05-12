@@ -32,10 +32,9 @@
 #include <sys/times.h>
 #include <math.h>
 #include "player-core.h"
-#include "index.h"
+#include "scripts.h"
 #include "version.h"
 #include "dsp-drivers.h"
-#include "scripts.h"
 
 // WVB -- testing variable for the impulse characeteristic
 //#define IMPULSE_PANNING
@@ -60,6 +59,7 @@ char*   arg_latency = "300";
 //char*   arg_mixer = "/dev/mixer";
 char*   arg_rawpath = "./";
 char*   argument;
+Index*  playing = NULL;
 
 /*-------------------------------------------
  *         File input oprations
@@ -85,11 +85,7 @@ void writer_died(int sig, siginfo_t *info, void* hu)
   min = sec/60;
   sec = sec%60;
   sprintf(newstr,"%02d:%02d",(int)min,(int)sec);
-  if (!Index::index->index_time || (strcmp(newstr,Index::index->index_time)!=0))
-    {
-      Index::index->index_time=strdup(newstr);
-      Index::index->index_changed=1;
-    }
+  playing->set_time(newstr);
 }
 
 int wave_open(char* fname, int synchronous)
@@ -466,63 +462,37 @@ void cue_retrieve(char* text,int nr)
 
 void cue_write()
 {
-   if (cue!=cue_before)
-     {
-	Index::index->index_cue=cue;
-	Index::index->index_changed=1;
-	printf("Index has been changed\n");
-     }
-   if (Index::index->index_cue_z!=(unsigned4)cues[0])
-     {
-	printf("Z cue has been changed\n");
-	Index::index->index_changed=1;
-	Index::index->index_cue_z=cues[0];
-     }
-   if (Index::index->index_cue_x!=(unsigned4)cues[1])
-     {
-	printf("X cue has been changed\n");
-	Index::index->index_changed=1;
-	Index::index->index_cue_x=cues[1];
-     }
-   if (Index::index->index_cue_c!=(unsigned4)cues[2])
-     {
-	printf("C cue has been changed\n");
-	Index::index->index_changed=1;
-	Index::index->index_cue_c=cues[2];
-     }
-   if (Index::index->index_cue_v!=(unsigned4)cues[3])
-     {
-	printf("V cue has been changed\n");
-	Index::index->index_changed=1;
-	Index::index->index_cue_v=cues[3];
-     }
+  playing->set_cue(cue);
+  playing->set_cue_z(cues[0]);
+  playing->set_cue_x(cues[1]);
+  playing->set_cue_c(cues[2]);
+  playing->set_cue_v(cues[3]);
 }
 
 void cue_read()
 {
-   cue_before=cue=Index::index->index_cue;
-   cues[0]=Index::index->index_cue_z;
-   cues[1]=Index::index->index_cue_x;
-   cues[2]=Index::index->index_cue_c;
-   cues[3]=Index::index->index_cue_v;
-   if (!opt_quiet)
-     {
-	printf("Available cue's: ");
-	if (cues[0]) printf("Z ");
-	if (cues[1]) printf("X ");
-	if (cues[2]) printf("C ");
-	if (cues[3]) printf("V ");
-	printf("\n");
-     }
-   
+  cue_before=cue=playing->get_cue();
+  cues[0]=playing->get_cue_z();
+  cues[1]=playing->get_cue_x();
+  cues[2]=playing->get_cue_c();
+  cues[3]=playing->get_cue_v();
+  if (!opt_quiet)
+    {
+      printf("Available cue's: ");
+      if (cues[0]) printf("Z ");
+      if (cues[1]) printf("X ");
+      if (cues[2]) printf("C ");
+      if (cues[3]) printf("V ");
+      printf("\n");
+    }
 }
 
 /*-------------------------------------------
  *         Loop operations
  *-------------------------------------------*/
-#define   loop_off  ((unsigned8)-1)
-unsigned8 loop_at = loop_off;
-unsigned8 loop_restart = 0;
+const signed8 loop_off = 0x7FFFFFFFFFFFFFFFLL;
+      signed8 loop_at = loop_off;
+      signed8 loop_restart = 0;
 
 int loop_set(unsigned8 jumpback)
 {
@@ -534,14 +504,14 @@ int loop_set(unsigned8 jumpback)
 	loop_at = loop_off;
       paused = 0;
     }
-  if (loop_at==loop_off)
+  if (loop_at == loop_off)
     {
       loop_at=x;
     }
   if (jumpback==0)
     loop_at=loop_off;
   else
-    if (jumpback<=loop_at)
+    if ((signed8)jumpback<=loop_at)
       loop_restart=loop_at-jumpback;
     else
       loop_at=loop_off;
@@ -562,12 +532,12 @@ void help();
 
 void doubleperiod()
 {
-  Index::index->set_period(Index::index->get_period()*2);
+  playing->set_period(playing->get_period()*2);
 }
 
 void halveperiod()
 {
-  Index::index->set_period(Index::index->get_period()/2);
+  playing->set_period(playing->get_period()/2);
 }
 
 void changetempo(signed8 period)
@@ -672,15 +642,14 @@ int core_init(int sync)
   // Parsing the arguments
   if (opt_match)
     {
-      Index::read(arg_match);
-      targetperiod=Index::index->get_period()*4;
-      delete Index::index;
+      Index target(arg_match);
+      targetperiod=target.get_period()*4;
     }
   if ( strstr(argument,".idx")==NULL || strcmp(strstr(argument,".idx"),".idx")!=0)
     return err_needidx;
-  Index::read(argument);
+  playing = new Index(argument);
   
-  normalperiod=Index::index->get_period()*4;
+  normalperiod=playing->get_period()*4;
   if (!opt_match) targetperiod=normalperiod;
   if (normalperiod<=0 && targetperiod>0) normalperiod=targetperiod;
   else if (normalperiod>0 && targetperiod<=0) targetperiod=normalperiod;
@@ -711,7 +680,7 @@ int core_init(int sync)
 #ifdef IMPULSE_PANNING
   pan_init();
 #endif
-  err = wave_open(Index::index->index_file,sync);
+  err = wave_open(playing->get_filename(),sync);
   return err;
 }
 
@@ -739,12 +708,11 @@ void core_done()
 {
   wave_close();
   cue_write();
-  if (Index::index->index_changed)
+  if (playing->changed())
     {
-      if (!opt_quiet)
-	printf("Updating index file\n");
-      Index::index->write_idx();
+      if (!opt_quiet) printf("Updating index file\n");
+      playing->write_idx();
     }
-  delete Index::index;
+  delete playing;
   finished = 1;
 }

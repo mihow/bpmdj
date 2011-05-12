@@ -20,7 +20,7 @@
 
 #ifndef PLAYER_CORE_H
 #define PLAYER_CORE_H
-#include "common.h"
+#include "index.h"
 
 /*-------------------------------------------
  *         Wavrate conversion routines
@@ -48,10 +48,10 @@ volatile extern  int stop;
 volatile extern  int finished;
 volatile extern  int paused;
 typedef unsigned8 cue_info;
-extern   cue_info cue;
-extern   cue_info cues[4];
-extern   char* wave_name;
-
+extern  cue_info cue;
+extern  cue_info cues[4];
+extern  char* wave_name;
+extern  Index* playing;
 unsigned4 wave_max();
 unsigned8 x_normalise(unsigned8 y);
 unsigned8 y_normalise(unsigned8 x);

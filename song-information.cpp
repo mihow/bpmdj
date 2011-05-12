@@ -1,8 +1,8 @@
 /****************************************************************************
 ** Form implementation generated from reading ui file 'song-information.ui'
 **
-** Created: Tue Oct 21 22:48:51 2003
-**      by: The User Interface Compiler ($Id: qt/main.cpp   3.2.1   edited May 19 14:22 $)
+** Created: Sun Dec 28 19:04:24 2003
+**      by: The User Interface Compiler ($Id: song-information.cpp,v 1.2 2003/12/28 18:25:30 krubbens Exp $)
 **
 ** WARNING! All changes made in this file will be lost!
 ****************************************************************************/
@@ -122,7 +122,7 @@ SongInformation::SongInformation( QWidget* parent, const char* name, bool modal,
 
     SongInformationLayout->addWidget( pushButton13, 3, 2 );
     languageChange();
-    resize( QSize(460, 278).expandedTo(minimumSizeHint()) );
+    resize( QSize(460, 281).expandedTo(minimumSizeHint()) );
     clearWState( WState_Polished );
 
     // signals and slots connections
@@ -130,12 +130,12 @@ SongInformation::SongInformation( QWidget* parent, const char* name, bool modal,
     connect( pushButton10, SIGNAL( clicked() ), this, SLOT( reject() ) );
 
     // tab order
-    setTabOrder( titleEdit, tagEdit );
-    setTabOrder( tagEdit, pushButton13 );
-    setTabOrder( pushButton13, authorEdit );
+    setTabOrder( titleEdit, authorEdit );
     setTabOrder( authorEdit, remixEdit );
     setTabOrder( remixEdit, versionEdit );
-    setTabOrder( versionEdit, pushButton10 );
+    setTabOrder( versionEdit, tagEdit );
+    setTabOrder( tagEdit, pushButton13 );
+    setTabOrder( pushButton13, pushButton10 );
 }
 
 /*

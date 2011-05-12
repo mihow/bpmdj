@@ -32,22 +32,6 @@
 #include "kbpm-played.h"
 #include "dirscanner.h"
 #include "spectrum.h"
-#include "index.h"
-
-#define LIST_DCOLOR 2
-#define LIST_TITLE 5
-#define LIST_AUTHOR 6
-#define LIST_TEMPO 0
-#define LIST_TIME 3
-#define LIST_CUES 4
-#define LIST_VERSION 7
-#define LIST_TAGS 8
-#define LIST_ONDISK 9
-#define LIST_SPECTRUM 1
-#define LIST_INDEX 10
-#define LIST_MD5SUM 11
-#define LIST_FILE 12
-
 
 //float SongMetriek::tempo_scale = 0.06; 
 //float SongMetriek::spectrum_scale = 1.0/512.0;
@@ -57,68 +41,33 @@ SongMetriek SongMetriek::ALL(true,true,true,false);
 SongMetriek SongMetriek::ALL_WITHOUT_TEMPO_WEIGHT(true,false,true,false);
 SongMetriek SongMetriek::PATTERN(false,false,false,true);
 
-void Song::reread(bool checkfileonline)
+void Song::refill(Index &reader)
 {
-  Index::read((const char*)index);
-  /* when the index changes immediately (new version and so on)
-   * write it out again
-   */
-  if (Index::index->index_changed)
-    Index::index->write_idx();
-  /* read last modification time */
-  struct stat status;
-  if (stat((const char*)index,&status)==0)
-    modification_time = status.st_mtime;
   /* copy everything to object */
-  tempo = Index::index->get_tempo_str();
-  file = Index::index->index_file;
-  tags = Index::index->index_tags;
-  time = Index::index->index_time;
-  md5sum = Index::index->index_md5sum;
-  spectrum = Index::index->index_spectrum;
-  title = Index::index->get_display_title();
-  author = Index::index->get_display_author();
-  version = Index::index->get_display_version();
-  // pattern_size = Index::index->index_pattern_size;
-  // pattern = NULL;
-  // if (pattern_size > 0)
-  //{
-  //pattern = allocate(pattern_size,unsigned char);
-  // memcpy(pattern,Index::index->index_pattern,pattern_size);
-  //}
+  storedin = reader.get_storedin();
+  tempo = reader.get_tempo_str();
+  file = reader.get_filename();
+  tags = reader.get_tags();
+  time = reader.get_time();
+  md5sum = reader.get_md5sum();
+  spectrum = reader.get_spectrum();
+  title = reader.get_display_title();
+  author = reader.get_display_author();
+  version = reader.get_display_version();
+  albums = reader.copy_albums();
   /* are there any cues stored */
-  has_cues = Index::index->index_cue_z + Index::index->index_cue_x + Index::index->index_cue_c + Index::index->index_cue_v;
-  /* free all */
-  delete Index::index;
-  /* try to open the song */
-  if (checkfileonline)
-    checkondisk();
+  has_cues = reader.get_cue_z() + reader.get_cue_x() + reader.get_cue_c() + reader.get_cue_v();
 }
 
 void Song::checkondisk()
 {
   QString songfilename = MusicDir + "/" + file;
-  ondisk = DirectoryScanner::exists(songfilename);
+  ondisk = exists(songfilename);
 }
 
-void Song::init(const QString filename, const QString currentpath, bool checkondisk) 
+void Song::clearFloatingFields()
 {
-  char *fulltitle;
-  int len = filename.length();
-  ondisk = false;
-  /* check for .idx at the end */
-  assert(filename.contains(".idx"));
-  /* full index file */
-  index = currentpath+"/"+filename;
-  /* retrieve fullname without .idx */
-  fulltitle=strdup(filename);
-  assert(fulltitle);
-  fulltitle[len-4]=0;
-  free(fulltitle);
-  /* read the index file */
-  reread(checkondisk);
-  /* set played flag */
-  played=Played::IsPlayed(index);
+  played=Played::IsPlayed(this);
   played_author_at_time = -100;
   color_distance = 0;
   spectrum_string = "";
@@ -139,7 +88,7 @@ Song::Song()
   author = "";
   version = "";
   tempo = "";
-  index = "";
+  storedin = "";
   tags = "";
   file = "";
   time = "";
@@ -152,13 +101,46 @@ Song::Song()
   ondisk = true;
   has_cues = false;
   played_author_at_time = -100;
-  modification_time = 0;
 }
 
-Song::Song(QString a, QString b, bool checkondisk)
+Song::Song(Index * idx, bool allowwrite, bool check_ondisk, bool accountspectrum)
 {
-  init(a,b, checkondisk);
-  newSpectrum(spectrum);
+  ondisk = false;
+  if (allowwrite && idx->changed())
+    idx->write_idx();
+  refill(*idx);
+  clearFloatingFields();
+  if (accountspectrum)
+    newSpectrum(spectrum);
+  if (check_ondisk)
+    checkondisk();
+}
+
+void Song::reread()
+{
+  Index reader((const char*)storedin);
+  // if (reader.changed()) reader.write_idx();
+  refill(reader);
+}
+ 
+
+void Song::realize()
+{
+  // wat we hier doen is een nieuwe index file creeeren en deze op disk schrijven. Dit vereist natuurlijk een unieke naam :)
+  if (storedin.endsWith(".bib"))
+    {
+      Index transfer(storedin);
+      char * proposal = transfer.readable_description();
+      char fullprop[500];
+      sprintf(fullprop,"%s.idx",proposal);
+      char * uniquename = findUniqueName(fullprop);
+      printf("Debug: realizing song %s as %s\n",proposal, uniquename);
+      storedin = uniquename;
+      transfer.nolonger_inbib();
+      transfer.write_idx(storedin);
+      free(uniquename);
+      free(proposal);
+    }
 }
 
 QString tonumber(const int b)
@@ -173,15 +155,6 @@ QString tonumber(const int b)
 QString tonumber(const float f)
 {
   return QString::number(f);
-}
-
-void Song::invertColor(bool r, bool g, bool b)
-{
-  QColor c;
-  c.setRgb(r ? 255-color.red(): color.red(),
-	   g ? 255-color.green() : color.green(),
-	   b ? 255-color.blue() : color.blue());
-  setColor(c);
 }
 
 void Song::setColor(QColor transfer)
@@ -387,56 +360,6 @@ bool Song::getDistance()
 
 Song::~Song()
 {
-}
-
-/*
-void Song::toStream(QDataStream & stream)
-{
-  stream << title;
-  stream << author;
-  stream << version;
-  stream << tempo;
-  stream << index;
-  stream << tags;
-  stream << file;
-  stream << time;
-  stream << md5sum;
-  stream << spectrum;
-  stream << color;
-  stream << has_cues;
-  stream << modification_time;
-}
-
-void Song::fromStream(QDataStream & stream)
-{
-  stream >> title;
-  stream >> author;
-  stream >> version;
-  stream >> tempo;
-  stream >> index;
-  stream >> tags;
-  stream >> file;
-  stream >> time;
-  stream >> md5sum;
-  stream >> spectrum;
-  stream >> color;
-  stream >> has_cues;
-  stream >> modification_time;
-
-  newSpectrum(spectrum);
-}
-*/
-
-bool Song::modifiedOnDisk()
-{
-  time_t new_modification_time;
-  if (modification_time == 0)
-    return true;
-  struct stat status;
-  if (stat((const char*)index,&status)!=0)
-    return true;
-  new_modification_time = status.st_mtime;
-  return new_modification_time!=modification_time;
 }
 
 /*

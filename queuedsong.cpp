@@ -31,7 +31,6 @@
 #include "dirscanner.h"
 #include "spectrum.h"
 #include "queuedsong.h"
-#include "index.h"
 
 #define QUEUED_ANKER 0
 #define QUEUED_DLINE 1
@@ -164,7 +163,7 @@ QString QueuedSong::text(int i) const
     case QUEUED_TITLE : return song->title;
     case QUEUED_AUTHOR : return song->author;
     case QUEUED_TEMPO : return song->tempo;
-    case QUEUED_INDEX : return song->index;
+    case QUEUED_INDEX : return song->storedin;
     case QUEUED_TAGS : return song->tags;
     case QUEUED_TIME : return song->time;
     case QUEUED_MD5SUM : return song->md5sum;

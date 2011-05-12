@@ -46,8 +46,6 @@
 #define LIST_MD5SUM 11
 #define LIST_FILE 12
 
-#include "index.h"
-
 QSong::QSong(Song * s, QListView* parent) :
   QListViewItem(parent)
 {
@@ -176,7 +174,7 @@ QString QSong::text(int i) const
     case LIST_TITLE : return song->title;
     case LIST_AUTHOR : return song->author;
     case LIST_TEMPO : return song->tempo;
-    case LIST_INDEX : return song->index;
+    case LIST_INDEX : return song->storedin;
     case LIST_TAGS : return song->tags;
     case LIST_TIME : return song->time;
     case LIST_MD5SUM : return song->md5sum;

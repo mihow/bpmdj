@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>752</width>
-            <height>328</height>
+            <width>700</width>
+            <height>318</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -19,6 +19,256 @@
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
         </sizepolicy>
+    </property>
+    <property name="palette">
+        <palette>
+            <active>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+                <color>
+                    <red>117</red>
+                    <green>152</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>244</red>
+                    <green>247</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>180</red>
+                    <green>199</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>58</red>
+                    <green>75</green>
+                    <blue>127</blue>
+                </color>
+                <color>
+                    <red>78</red>
+                    <green>101</green>
+                    <blue>170</blue>
+                </color>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+                <color>
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+                <color>
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>115</red>
+                    <green>172</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>128</blue>
+                </color>
+                <color>
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+            </active>
+            <disabled>
+                <color>
+                    <red>128</red>
+                    <green>128</green>
+                    <blue>128</blue>
+                </color>
+                <color>
+                    <red>117</red>
+                    <green>152</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>244</red>
+                    <green>247</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>155</red>
+                    <green>180</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>58</red>
+                    <green>75</green>
+                    <blue>127</blue>
+                </color>
+                <color>
+                    <red>78</red>
+                    <green>101</green>
+                    <blue>170</blue>
+                </color>
+                <color>
+                    <red>128</red>
+                    <green>128</green>
+                    <blue>128</blue>
+                </color>
+                <color>
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>128</red>
+                    <green>128</green>
+                    <blue>128</blue>
+                </color>
+                <color>
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>115</red>
+                    <green>172</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>128</blue>
+                </color>
+                <color>
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>192</blue>
+                </color>
+                <color>
+                    <red>128</red>
+                    <green>0</green>
+                    <blue>128</blue>
+                </color>
+            </disabled>
+            <inactive>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+                <color>
+                    <red>117</red>
+                    <green>152</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>244</red>
+                    <green>247</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>155</red>
+                    <green>180</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>58</red>
+                    <green>75</green>
+                    <blue>127</blue>
+                </color>
+                <color>
+                    <red>78</red>
+                    <green>101</green>
+                    <blue>170</blue>
+                </color>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+                <color>
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+                <color>
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>115</red>
+                    <green>172</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                </color>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>128</blue>
+                </color>
+                <color>
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                </color>
+                <color>
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>192</blue>
+                </color>
+                <color>
+                    <red>128</red>
+                    <green>0</green>
+                    <blue>128</blue>
+                </color>
+            </inactive>
+        </palette>
     </property>
     <property name="caption">
         <string>kBpmPlayer</string>
@@ -39,6 +289,9 @@
         <widget class="QButtonGroup" row="1" column="0" rowspan="1" colspan="2">
             <property name="name">
                 <cstring>ButtonGroup4</cstring>
+            </property>
+            <property name="backgroundOrigin">
+                <enum>AncestorOrigin</enum>
             </property>
             <property name="title">
                 <string>Playing</string>
@@ -69,6 +322,9 @@
                             <verstretch>0</verstretch>
                         </sizepolicy>
                     </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
+                    </property>
                     <property name="text">
                         <string>-8M</string>
                     </property>
@@ -90,6 +346,9 @@
                             <horstretch>0</horstretch>
                             <verstretch>0</verstretch>
                         </sizepolicy>
+                    </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
                     </property>
                     <property name="text">
                         <string>+8M</string>
@@ -113,6 +372,9 @@
                             <verstretch>0</verstretch>
                         </sizepolicy>
                     </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
+                    </property>
                     <property name="text">
                         <string>+4M</string>
                     </property>
@@ -134,6 +396,9 @@
                             <horstretch>0</horstretch>
                             <verstretch>0</verstretch>
                         </sizepolicy>
+                    </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
                     </property>
                     <property name="text">
                         <string>+</string>
@@ -157,6 +422,9 @@
                             <verstretch>0</verstretch>
                         </sizepolicy>
                     </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
+                    </property>
                     <property name="text">
                         <string>+1M</string>
                     </property>
@@ -178,6 +446,9 @@
                             <horstretch>0</horstretch>
                             <verstretch>0</verstretch>
                         </sizepolicy>
+                    </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
                     </property>
                     <property name="text">
                         <string>-1/2B</string>
@@ -201,6 +472,9 @@
                             <verstretch>0</verstretch>
                         </sizepolicy>
                     </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
+                    </property>
                     <property name="text">
                         <string>Stop</string>
                     </property>
@@ -222,6 +496,9 @@
                             <horstretch>0</horstretch>
                             <verstretch>0</verstretch>
                         </sizepolicy>
+                    </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
                     </property>
                     <property name="text">
                         <string>+1B</string>
@@ -245,6 +522,9 @@
                             <verstretch>0</verstretch>
                         </sizepolicy>
                     </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
+                    </property>
                     <property name="text">
                         <string>Restart</string>
                     </property>
@@ -266,6 +546,9 @@
                             <horstretch>0</horstretch>
                             <verstretch>0</verstretch>
                         </sizepolicy>
+                    </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
                     </property>
                     <property name="text">
                         <string>-4M</string>
@@ -289,6 +572,9 @@
                             <verstretch>0</verstretch>
                         </sizepolicy>
                     </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
+                    </property>
                     <property name="text">
                         <string>-1M</string>
                     </property>
@@ -310,6 +596,9 @@
                             <horstretch>0</horstretch>
                             <verstretch>0</verstretch>
                         </sizepolicy>
+                    </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
                     </property>
                     <property name="text">
                         <string>-</string>
@@ -334,6 +623,9 @@
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                 </sizepolicy>
+            </property>
+            <property name="backgroundOrigin">
+                <enum>AncestorOrigin</enum>
             </property>
             <property name="title">
                 <string>Position/Size</string>
@@ -370,6 +662,9 @@
                             <height>0</height>
                         </size>
                     </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
+                    </property>
                     <property name="numDigits">
                         <number>6</number>
                     </property>
@@ -395,6 +690,9 @@
                             <height>0</height>
                         </size>
                     </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
+                    </property>
                     <property name="numDigits">
                         <number>6</number>
                     </property>
@@ -415,6 +713,9 @@
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                 </sizepolicy>
+            </property>
+            <property name="backgroundOrigin">
+                <enum>AncestorOrigin</enum>
             </property>
             <property name="title">
                 <string>Cue</string>
@@ -445,6 +746,9 @@
                             <verstretch>0</verstretch>
                         </sizepolicy>
                     </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
+                    </property>
                     <property name="text">
                         <string>Set Cue</string>
                     </property>
@@ -466,6 +770,9 @@
                             <horstretch>0</horstretch>
                             <verstretch>0</verstretch>
                         </sizepolicy>
+                    </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
                     </property>
                     <property name="text">
                         <string>- 1/32</string>
@@ -489,6 +796,9 @@
                             <verstretch>0</verstretch>
                         </sizepolicy>
                     </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
+                    </property>
                     <property name="text">
                         <string>+1/32</string>
                     </property>
@@ -510,6 +820,9 @@
                             <horstretch>0</horstretch>
                             <verstretch>0</verstretch>
                         </sizepolicy>
+                    </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
                     </property>
                     <property name="text">
                         <string>-8M</string>
@@ -533,6 +846,9 @@
                             <verstretch>0</verstretch>
                         </sizepolicy>
                     </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
+                    </property>
                     <property name="text">
                         <string>+8M</string>
                     </property>
@@ -554,6 +870,9 @@
                             <horstretch>0</horstretch>
                             <verstretch>0</verstretch>
                         </sizepolicy>
+                    </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
                     </property>
                     <property name="text">
                         <string>Retrieve X</string>
@@ -577,6 +896,9 @@
                             <verstretch>0</verstretch>
                         </sizepolicy>
                     </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
+                    </property>
                     <property name="text">
                         <string>Retrieve C</string>
                     </property>
@@ -598,6 +920,9 @@
                             <horstretch>0</horstretch>
                             <verstretch>0</verstretch>
                         </sizepolicy>
+                    </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
                     </property>
                     <property name="text">
                         <string>Retrieve V</string>
@@ -871,6 +1196,9 @@
                             </inactive>
                         </palette>
                     </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
+                    </property>
                     <property name="text">
                         <string>Retrieve Z</string>
                     </property>
@@ -896,6 +1224,9 @@
                             <verstretch>0</verstretch>
                         </sizepolicy>
                     </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
+                    </property>
                     <property name="text">
                         <string>Store V</string>
                     </property>
@@ -917,6 +1248,9 @@
                             <horstretch>0</horstretch>
                             <verstretch>0</verstretch>
                         </sizepolicy>
+                    </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
                     </property>
                     <property name="text">
                         <string>Store C</string>
@@ -940,6 +1274,9 @@
                             <verstretch>0</verstretch>
                         </sizepolicy>
                     </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
+                    </property>
                     <property name="text">
                         <string>Store X</string>
                     </property>
@@ -961,6 +1298,9 @@
                             <horstretch>0</horstretch>
                             <verstretch>0</verstretch>
                         </sizepolicy>
+                    </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
                     </property>
                     <property name="text">
                         <string>Store Z</string>
@@ -984,6 +1324,9 @@
                             <verstretch>0</verstretch>
                         </sizepolicy>
                     </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
+                    </property>
                     <property name="text">
                         <string>Metronome</string>
                     </property>
@@ -1006,6 +1349,9 @@
                             <verstretch>0</verstretch>
                         </sizepolicy>
                     </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
+                    </property>
                     <property name="text">
                         <string>Quit</string>
                     </property>
@@ -1024,6 +1370,9 @@
         <widget class="QButtonGroup" row="0" column="1">
             <property name="name">
                 <cstring>buttonGroup6</cstring>
+            </property>
+            <property name="backgroundOrigin">
+                <enum>AncestorOrigin</enum>
             </property>
             <property name="title">
                 <string>Loops</string>
@@ -1048,6 +1397,16 @@
                     <property name="enabled">
                         <bool>true</bool>
                     </property>
+                    <property name="paletteBackgroundColor">
+                        <color>
+                            <red>117</red>
+                            <green>152</green>
+                            <blue>255</blue>
+                        </color>
+                    </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
+                    </property>
                     <property name="text">
                         <string>No</string>
                     </property>
@@ -1070,6 +1429,9 @@
                             <verstretch>0</verstretch>
                         </sizepolicy>
                     </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
+                    </property>
                     <property name="text">
                         <string>1B</string>
                     </property>
@@ -1088,6 +1450,9 @@
                             <horstretch>0</horstretch>
                             <verstretch>0</verstretch>
                         </sizepolicy>
+                    </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
                     </property>
                     <property name="text">
                         <string>1M</string>
@@ -1108,6 +1473,9 @@
                             <verstretch>0</verstretch>
                         </sizepolicy>
                     </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
+                    </property>
                     <property name="text">
                         <string>4M</string>
                     </property>
@@ -1123,6 +1491,9 @@
         <widget class="QButtonGroup" row="0" column="2" rowspan="1" colspan="2">
             <property name="name">
                 <cstring>ButtonGroup3</cstring>
+            </property>
+            <property name="backgroundOrigin">
+                <enum>AncestorOrigin</enum>
             </property>
             <property name="title">
                 <string>Tempo</string>
@@ -1155,6 +1526,9 @@
                             <height>30</height>
                         </size>
                     </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
+                    </property>
                     <property name="minValue">
                         <number>-100</number>
                     </property>
@@ -1186,6 +1560,9 @@
                             <verstretch>0</verstretch>
                         </sizepolicy>
                     </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
+                    </property>
                     <property name="text">
                         <string>Normal Switch</string>
                     </property>
@@ -1208,6 +1585,9 @@
                             <verstretch>0</verstretch>
                         </sizepolicy>
                     </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
+                    </property>
                     <property name="text">
                         <string>Slow Switch</string>
                     </property>
@@ -1223,6 +1603,9 @@
                             <horstretch>0</horstretch>
                             <verstretch>0</verstretch>
                         </sizepolicy>
+                    </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
                     </property>
                     <property name="text">
                         <string>Fast Switch</string>
@@ -1243,6 +1626,9 @@
                             <verstretch>0</verstretch>
                         </sizepolicy>
                     </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
+                    </property>
                     <property name="text">
                         <string>Normal</string>
                     </property>
@@ -1262,6 +1648,9 @@
                             <verstretch>0</verstretch>
                         </sizepolicy>
                     </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
+                    </property>
                     <property name="text">
                         <string>Target</string>
                     </property>
@@ -1272,6 +1661,9 @@
                 <widget class="QLayoutWidget" row="2" column="0" rowspan="1" colspan="3">
                     <property name="name">
                         <cstring>layout8</cstring>
+                    </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
                     </property>
                     <hbox>
                         <property name="name">
@@ -1289,6 +1681,9 @@
                                     <verstretch>0</verstretch>
                                 </sizepolicy>
                             </property>
+                            <property name="backgroundOrigin">
+                                <enum>AncestorOrigin</enum>
+                            </property>
                             <property name="numDigits">
                                 <number>6</number>
                             </property>
@@ -1304,6 +1699,9 @@
                                     <horstretch>0</horstretch>
                                     <verstretch>0</verstretch>
                                 </sizepolicy>
+                            </property>
+                            <property name="backgroundOrigin">
+                                <enum>AncestorOrigin</enum>
                             </property>
                             <property name="numDigits">
                                 <number>6</number>
@@ -1321,6 +1719,9 @@
                                     <verstretch>0</verstretch>
                                 </sizepolicy>
                             </property>
+                            <property name="backgroundOrigin">
+                                <enum>AncestorOrigin</enum>
+                            </property>
                         </widget>
                     </hbox>
                 </widget>
@@ -1337,6 +1738,9 @@
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                 </sizepolicy>
+            </property>
+            <property name="backgroundOrigin">
+                <enum>AncestorOrigin</enum>
             </property>
             <property name="title">
                 <string>Info</string>
@@ -1363,6 +1767,9 @@
                             <verstretch>0</verstretch>
                         </sizepolicy>
                     </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
+                    </property>
                     <property name="text">
                         <string>Song</string>
                     </property>
@@ -1381,6 +1788,9 @@
                             <horstretch>0</horstretch>
                             <verstretch>0</verstretch>
                         </sizepolicy>
+                    </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
                     </property>
                     <property name="text">
                         <string>Be&amp;at Graph</string>
@@ -1404,6 +1814,9 @@
                             <verstretch>0</verstretch>
                         </sizepolicy>
                     </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
+                    </property>
                     <property name="text">
                         <string>Spectrum</string>
                     </property>
@@ -1422,6 +1835,9 @@
                             <horstretch>0</horstretch>
                             <verstretch>0</verstretch>
                         </sizepolicy>
+                    </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
                     </property>
                     <property name="text">
                         <string>&amp;Bpm Counter</string>
@@ -1442,6 +1858,9 @@
                             <verstretch>0</verstretch>
                         </sizepolicy>
                     </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
+                    </property>
                     <property name="text">
                         <string>About</string>
                     </property>
@@ -1451,6 +1870,9 @@
         <widget class="QButtonGroup" row="1" column="2">
             <property name="name">
                 <cstring>ButtonGroup1</cstring>
+            </property>
+            <property name="backgroundOrigin">
+                <enum>AncestorOrigin</enum>
             </property>
             <property name="title">
                 <string>LFO</string>
@@ -1481,6 +1903,9 @@
                             <verstretch>0</verstretch>
                         </sizepolicy>
                     </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
+                    </property>
                     <property name="text">
                         <string></string>
                     </property>
@@ -1508,6 +1933,9 @@
                             <horstretch>0</horstretch>
                             <verstretch>0</verstretch>
                         </sizepolicy>
+                    </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
                     </property>
                     <property name="text">
                         <string></string>
@@ -1537,6 +1965,9 @@
                             <verstretch>0</verstretch>
                         </sizepolicy>
                     </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
+                    </property>
                     <property name="text">
                         <string></string>
                     </property>
@@ -1565,6 +1996,9 @@
                             <verstretch>0</verstretch>
                         </sizepolicy>
                     </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
+                    </property>
                     <property name="text">
                         <string></string>
                     </property>
@@ -1592,6 +2026,9 @@
                             <horstretch>0</horstretch>
                             <verstretch>0</verstretch>
                         </sizepolicy>
+                    </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
                     </property>
                     <property name="text">
                         <string></string>
@@ -1624,6 +2061,9 @@
                             <verstretch>0</verstretch>
                         </sizepolicy>
                     </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
+                    </property>
                     <property name="text">
                         <string></string>
                     </property>
@@ -1652,6 +2092,9 @@
                             <verstretch>0</verstretch>
                         </sizepolicy>
                     </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
+                    </property>
                     <property name="text">
                         <string></string>
                     </property>
@@ -1679,6 +2122,9 @@
                             <horstretch>0</horstretch>
                             <verstretch>0</verstretch>
                         </sizepolicy>
+                    </property>
+                    <property name="backgroundOrigin">
+                        <enum>AncestorOrigin</enum>
                     </property>
                     <property name="text">
                         <string></string>

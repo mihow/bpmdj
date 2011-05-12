@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>460</width>
-            <height>278</height>
+            <height>281</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -319,11 +319,11 @@
 </connections>
 <tabstops>
     <tabstop>titleEdit</tabstop>
-    <tabstop>tagEdit</tabstop>
-    <tabstop>pushButton13</tabstop>
     <tabstop>authorEdit</tabstop>
     <tabstop>remixEdit</tabstop>
     <tabstop>versionEdit</tabstop>
+    <tabstop>tagEdit</tabstop>
+    <tabstop>pushButton13</tabstop>
     <tabstop>pushButton10</tabstop>
 </tabstops>
 <layoutdefaults spacing="6" margin="11"/>

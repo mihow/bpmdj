@@ -19,11 +19,12 @@
 ****/
 
 #include "dirscanner.h"
-#include "loader.h"
 #include "avltree.h"
 
 class SongSelectorLogic;
-class QSong;
+class Song;
+class QProgressBar;
+class QLabel;
 class DataBase;
 
 class IndexReader:
@@ -32,15 +33,14 @@ class IndexReader:
  public: 
   int total_files;
  protected:
-  Loader * loader;
+  bool reading_bib;
+  QProgressBar * progress;
+  QLabel * reading;
   virtual void checkfile(const QString prefix, const QString filename);
   virtual void recursing(const QString dirname);
+  void add(Song * song);
   DataBase * database;
   AvlTree<QString> tree;
  public:
-  IndexReader(Loader * l, DataBase*);
-  void add(QSong* newsong);
-  void writeCache();
-  void readCache();
-  void validateCache();
+  IndexReader(QProgressBar * b, QLabel * l, DataBase*);
 };

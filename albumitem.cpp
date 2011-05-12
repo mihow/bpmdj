@@ -19,27 +19,34 @@
 ****/
 
 #include <stdio.h>
+#include <assert.h>
+#include <math.h>
 #include <stdlib.h>
-#include <string.h>
-#include "player-core.h"
-#include "md5-analyzer.h"
-#include "scripts.h"
+#include <qlistview.h>
+#include "qstring-factory.h"
+#include "songselector.logic.h"
+#include "qsong.h"
+#include "process-manager.h"
+#include "kbpm-played.h"
+#include "dirscanner.h"
+#include "spectrum.h"
 
-void Md5Analyzer::run()
+AlbumItem::AlbumItem(const char* name, QListView* parent) :
+  QListViewItem(parent,name)
 {
-  FILE * kloink;
-  if (!vexecute("md5sum \"%s\" | awk '{printf $1}' >sum.tmp\n",argument))
-    exit(101);
-  kloink=fopen("sum.tmp","r");
-  char s[40];
-  int i=0;
-  while(i<32)
-    {
-      int c = getc(kloink);
-      s[i]=c;
-      i++;
-    }
-  s[32]=0;
-  fclose(kloink);
-  playing->set_md5sum(s);
+  song = NULL;
+}
+
+AlbumItem::AlbumItem(int nr, Song * s, QListViewItem* parent) :
+  QListViewItem(parent,QString::number(nr),s->title,s->author,s->time,s->storedin,s->file)
+{
+  song = s;
+  setRenameEnabled(0,true);
+  fixNr();
+}
+
+void AlbumItem::fixNr()
+{
+  if (text(0).length()<2)
+    setText(0,"0"+text(0));
 }

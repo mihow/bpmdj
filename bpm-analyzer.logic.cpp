@@ -50,7 +50,6 @@
 #include <math.h>
 #include "bpm-analyzer.logic.h"
 #include "sys/times.h"
-#include "index.h"
 #include "version.h"
 #include "player-core.h"
 #include "fourier.h"
@@ -73,8 +72,8 @@ BpmAnalyzerDialog::BpmAnalyzerDialog(SongPlayer*parent, const char*name, bool mo
   stopbpm = 160;
   startshift = 0;
   stopshift = 0;
-  Index::index->index_bpmcount_from = 0;
-  Index::index->index_bpmcount_to = 100;
+  playing->set_bpmcount_from(0);
+  playing->set_bpmcount_to(100);
   bufsiz = 32 * 1024;
   freq = NULL;
   // internal communicative variables
@@ -130,11 +129,11 @@ void BpmAnalyzerDialog::setPercentBounds(long startper, long stopper)
    char tmp2[500];
    // de bpmcount_from en bpm_count_to fields moeten 
    // ingevuld worden
-   Index::index->index_bpmcount_from=startper;
-   Index::index->index_bpmcount_to=stopper;
-   sprintf(tmp,"%d",Index::index->index_bpmcount_from);
+   playing->set_bpmcount_from(startper);
+   playing->set_bpmcount_to(stopper);
+   sprintf(tmp,"%d",playing->get_bpmcount_from());
    FromPercentEdit->setText(tmp);
-   sprintf(tmp2,"%d",Index::index->index_bpmcount_to);
+   sprintf(tmp2,"%d",playing->get_bpmcount_to());
    ToPercentEdit->setText(tmp2);
 }
 
@@ -146,13 +145,13 @@ void BpmAnalyzerDialog::timerTick()
 
 void BpmAnalyzerDialog::readAudio()
 {
-  FILE * raw = openRawFile(arg_rawpath);
+  FILE * raw = openRawFile(playing,arg_rawpath);
   
   // read complete file shrunken down into memory
   audiosize=fsize(raw);
-  long startpercent=(long)((long long)audiosize*(long long)Index::index->index_bpmcount_from/(long long)100);
+  long startpercent=(long)((long long)audiosize*(long long)playing->get_bpmcount_from()/(long long)100);
   startpercent-=startpercent%4;
-  long stoppercent=(long)((long long)audiosize*(long long)Index::index->index_bpmcount_to/(long long)100);
+  long stoppercent=(long)((long long)audiosize*(long long)playing->get_bpmcount_to()/(long long)100);
   stoppercent-=stoppercent%4;
   audiosize=stoppercent-startpercent;
   audiosize/=(4*(WAVRATE/audiorate));
@@ -197,13 +196,13 @@ void BpmAnalyzerDialog::readAudio()
 
 void BpmAnalyzerDialog::readAudioBlock(int blocksize)
 {
-  FILE * raw = openRawFile(arg_rawpath);
+  FILE * raw = openRawFile(playing,arg_rawpath);
   
   // read complete file shrunken down into memory
   audiosize=fsize(raw);  // uitgedrukt in bytes...
-  long startpercent=(long)((long long)audiosize*(long long)Index::index->index_bpmcount_from/(long long)100);
+  long startpercent=(long)((long long)audiosize*(long long)playing->get_bpmcount_from()/(long long)100);
   startpercent/=4;       // uitgedrukt in sample dus...
-  long stoppercent=(long)((long long)audiosize*(long long)Index::index->index_bpmcount_to/(long long)100);
+  long stoppercent=(long)((long long)audiosize*(long long)playing->get_bpmcount_to()/(long long)100);
   stoppercent/=4;        // uitgedrukt in samples
   audiosize = stoppercent-startpercent;  // uitgedrukt in samples
   audiosize /= blocksize;        // uitgedrukt in blokken
@@ -255,11 +254,11 @@ void BpmAnalyzerDialog::rangeCheck()
     unsigned long int val;
     bool changed = false;
     val = atoi(FromPercentEdit->text());
-    if (changed |= (unsigned)Index::index->index_bpmcount_from != val) 
-      Index::index->index_bpmcount_from=val;
+    if (changed |= (unsigned)playing->get_bpmcount_from() != val) 
+      playing->set_bpmcount_from(val);
     val = atoi(ToPercentEdit->text());
-    if (changed |= (unsigned)Index::index->index_bpmcount_to != val) 
-      Index::index->index_bpmcount_to=val;
+    if (changed |= (unsigned)playing->get_bpmcount_to() != val) 
+      playing->set_bpmcount_to(val);
     val = atoi(FromBpmEdit->text());
     if (startbpm != val)
       startbpm=val;
@@ -312,7 +311,7 @@ void BpmAnalyzerDialog::fft()
 {
   // first we need to read all data in memory en scale it down
   signed8 audiosize;
-  FILE * raw = openRawFile(arg_rawpath);
+  FILE * raw = openRawFile(playing,arg_rawpath);
   fseek(raw,0,SEEK_END);
   audiosize = ftell(raw) / 4;
   fseek(raw,0,SEEK_SET);
@@ -458,13 +457,13 @@ void BpmAnalyzerDialog::run()
 
 void BpmAnalyzerDialog::block_scan()
 {
-  const int blockshifter_max = 8;  // this is a good start, goes fast and is accurately enough to skip no import points
-  int blockshifter = blockshifter_max;
+  const unsigned blockshifter_max = 8;  // this is a good start, goes fast and is accurately enough to skip no import points
+  unsigned blockshifter = blockshifter_max;
   signed* mismatch_array[blockshifter_max+1];
   unsigned mean[blockshifter_max+1];
-  unsigned minimum_at;
+  unsigned minimum_at = 0;
   unsigned minima[blockshifter_max+1];
-  for (int i = 0 ; i <= blockshifter_max; i++) mean[i]=0;
+  for (unsigned i = 0 ; i <= blockshifter_max; i++) mean[i]=0;
   unsigned maxima[blockshifter_max+1];
 #ifdef PROFILER
   clock_t start = times(NULL);
@@ -472,17 +471,17 @@ void BpmAnalyzerDialog::block_scan()
   for (int i = 0 ; i <= blockshifter_max; i++) rays_shot[i]=0;
 #endif
   // depending on the audiorate we should stop at a certain blockshift minimum...
-  int blockshifter_min; 
+  unsigned blockshifter_min; 
   if (audiorate == 44100) blockshifter_min = 0;
   else if (audiorate == 22050) blockshifter_min = 1;
   else if (audiorate == 11025) blockshifter_min = 2;
   else assert(0);
-  stopshift=44100*60*4/startbpm;
-  startshift=44100*60*4/stopbpm;
-  for( int i = 0; i <= blockshifter_max ; i ++)
+  stopshift = 44100 * 60 * 4 / startbpm ;
+  startshift = 44100 * 60 * 4 / stopbpm ;
+  for( unsigned4 i = 0; i <= blockshifter_max ; i ++)
     {
       mismatch_array[i] = allocate(stopshift-startshift, signed);
-      for(int j = 0 ; j < stopshift-startshift ; j ++)
+      for(unsigned4 j = 0 ; j < stopshift-startshift ; j ++)
 	mismatch_array[i][j] = -1;
     }
   while(blockshifter>=blockshifter_min && ! stop_signal)
@@ -493,7 +492,7 @@ void BpmAnalyzerDialog::block_scan()
       // calculate all mismatches
       signed * mismatch = mismatch_array[blockshifter] - startshift;
       signed * prev_mismatch = NULL;
-      unsigned prev_maximum;
+      unsigned prev_maximum = 0;
       if (blockshifter < blockshifter_max)
 	{
 	  prev_mismatch = mismatch_array[blockshifter+1] - startshift;
@@ -502,10 +501,10 @@ void BpmAnalyzerDialog::block_scan()
       StatusLabel->setText("Scanning "+QString::number(blockshifter_max-blockshifter)
 			   +"/" + QString::number(blockshifter_max-blockshifter_min));
       if (!prev_mismatch)
-	for (int i = startshift ; i < stopshift && ! stop_signal; i ++ )
+	for (unsigned i = startshift ; i < stopshift && ! stop_signal; i ++ )
 	  {
-	    int phase = i >> blockshifter;
-	    int store = phase << blockshifter;
+	    unsigned phase = i >> blockshifter;
+	    unsigned store = phase << blockshifter;
 	    processing_progress = (i - startshift) *100 / (stopshift - startshift);
 	    if (store!=i) continue;
 	    unsigned m = phasefit(phase);
@@ -519,10 +518,10 @@ void BpmAnalyzerDialog::block_scan()
 	  // first a dry run to see how many times we would execute the phasefit;
 	  int phasefit_called = 0;
 	  int phasefit_total = 0;
-	  for (int i = startshift ; i < stopshift && ! stop_signal; i++ )
+	  for (unsigned i = startshift ; i < stopshift && ! stop_signal; i++ )
 	    {
-	      int phase = i >> blockshifter;
-	      int store = phase << blockshifter;
+	      unsigned phase = i >> blockshifter;
+	      unsigned store = phase << blockshifter;
 	      if (store!=i) continue;
 	      unsigned prev_store = ((phase / 2) * 2) << blockshifter;
 	      unsigned next_store = (((phase / 2) + 1 ) * 2) << blockshifter;
@@ -535,10 +534,10 @@ void BpmAnalyzerDialog::block_scan()
 	  rays_shot[blockshifter]=phasefit_total;
 #endif
 	  // now wet run..
-	  for (int i = startshift ; i < stopshift && ! stop_signal; i++ )
+	  for (unsigned i = startshift ; i < stopshift && ! stop_signal; i++ )
 	    {
-	      int phase = i >> blockshifter;
-	      int store = phase << blockshifter;
+	      unsigned phase = i >> blockshifter;
+	      unsigned store = phase << blockshifter;
 	      processing_progress = phasefit_called*100/phasefit_total;
 	      if (store!=i) continue;
 	      // we hebben een positie die een macht van 2 is...
@@ -557,22 +556,22 @@ void BpmAnalyzerDialog::block_scan()
 	}
       processing_progress = 100;
       // find minimum, translate, maximum, mean
-      unsigned minimum=mismatch[startshift];
+      signed minimum = mismatch[startshift];
       minimum_at = startshift;
-      for (int i = startshift ; i < stopshift ; i ++)
-	if (mismatch[i] >= 0 && mismatch[i] < minimum) 
+      for (unsigned i = startshift ; i < stopshift ; i ++)
+	if (minimum == -1 || (mismatch[i] >= 0 && mismatch[i] < minimum))
 	  minimum = mismatch[ minimum_at = i ];
-      minima[blockshifter]=minimum_at;
-      for (int i = startshift ; i < stopshift ; i ++)
+      minima[blockshifter] = minimum_at;
+      for (unsigned i = startshift ; i < stopshift ; i ++)
 	if (mismatch[i] >= 0)
 	  mismatch[i]-=minimum;
       signed maximum = -1;
-      for (int i = startshift ; i < stopshift ; i ++)
+      for (unsigned i = startshift ; i < stopshift ; i ++)
 	if (mismatch[i] >= 0 && (mismatch [i] > maximum || maximum < 0)) 
 	  maximum = mismatch[i];
       long long total = 0;
       int count = 0;
-      for (int i = startshift ; i < stopshift ; i ++)
+      for (unsigned i = startshift ; i < stopshift ; i ++)
 	if (mismatch[i]>=0)
 	  {
 	    count++;
@@ -592,7 +591,7 @@ void BpmAnalyzerDialog::block_scan()
       p.drawLine(IMAGE_XS*3/4,0,IMAGE_XS*3/4,IMAGE_YS);
       
       // draw points
-      for (int i = blockshifter_max ; i >= blockshifter ; i --)
+      for (unsigned i = blockshifter_max ; i >= blockshifter ; i --)
 	{
 	  unsigned slice_maximum = maxima[i];
 	  unsigned pos = r.height() - ((long long)mean[i] * (long long) r.height() / (long long)slice_maximum);
@@ -605,7 +604,7 @@ void BpmAnalyzerDialog::block_scan()
 	  pos = (int)((double)r.width()*(bpm-startbpm)/(stopbpm-startbpm));
 	  p.drawLine(pos,0,pos,r.height());
 	  	  
-	  for( int j = startshift ; j < stopshift ; j ++ )
+	  for( unsigned j = startshift ; j < stopshift ; j ++ )
 	    {
 	      signed long long y = mismatch_array[i][j-startshift];
 	      if (y > 0)
@@ -646,19 +645,19 @@ void BpmAnalyzerDialog::block_scan()
   unsigned diff = (stop-start)/CLOCK_FREQ;
   printf("Q: %g\nactual period: %d  measured period: %d  calctime: %d  songtime: %s  title: %s[%s]%s\n",
 	 q,
-	 Index::index->index_period, 
+	 playing->index_period, 
 	 minimum_at/4,
 	 diff,
-	 Index::index->index_time,
-	 (const char*)(Index::index->get_display_title()),
-	 (const char*)(Index::index->get_display_author()),
-	 (const char*)(Index::index->get_display_version())
+	 playing->index_time,
+	 (const char*)(playing->get_display_title()),
+	 (const char*)(playing->get_display_author()),
+	 (const char*)(playing->get_display_version())
 	 );
 #endif
   
 #ifndef PROFILER
-  Index::index->set_period(minimum_at/4);
-  normalperiod=Index::index->get_period()*4;
+  playing->set_period(minimum_at/4);
+  normalperiod=playing->get_period()*4;
   currentperiod=normalperiod;
 #endif
 }
@@ -669,13 +668,13 @@ void BpmAnalyzerDialog::peak_scan()
   stopshift=audiorate*60*4/startbpm;
   startshift=audiorate*60*4/stopbpm;
   unsigned long match[stopshift-startshift];
-  for (int i = 0 ; i < stopshift - startshift ; i ++)
+  for (unsigned i = 0 ; i < stopshift - startshift ; i ++)
     match[i]=0;
   peak_fit = allocate(peaks, int);
   for (int i = 0 ; i < peaks ; i ++)
     peak_fit[i]=0;
   
-  unsigned long int maximum;
+  unsigned long int maximum = 0;
   unsigned long int global_minimum = 0;
   int global_minimum_at = -1;
   int fits = 0;
@@ -770,8 +769,8 @@ void BpmAnalyzerDialog::peak_scan()
   processing_progress = 100;
   StatusLabel->setText("Ready");
   
-  Index::index->set_period(global_minimum_at);
-  normalperiod=Index::index->get_period()*4;
+  playing->set_period(global_minimum_at);
+  normalperiod=playing->get_period()*4;
   currentperiod=normalperiod;
   if (WAVRATE==22050)
     {
@@ -799,7 +798,7 @@ void BpmAnalyzerDialog::peak_scan()
   
   // draw points
   p.setPen(Qt::blue);
-  for(int i = startshift ; i < stopshift ; i++ )
+  for(unsigned i = startshift ; i < stopshift ; i++ )
     {
       unsigned long fout=match[i-startshift];
       if (fout)
@@ -862,7 +861,6 @@ void BpmAnalyzerDialog::reset()
 
 void BpmAnalyzerDialog::tap()
 {
-  char d[500];
   // increase tapcount
   tapcount++;
   if (tapcount==1)
@@ -877,15 +875,15 @@ void BpmAnalyzerDialog::tap()
       p /= SkipBox->value();
       p *= 11025*4;
       p /= CLOCK_FREQ;
-      Index::index->set_period(p,false);
-      normalperiod=Index::index->get_period()*4;
+      playing->set_period(p,false);
+      normalperiod=playing->get_period()*4;
       currentperiod=normalperiod;
       if (WAVRATE==22050)
 	{
 	  currentperiod/=2;
 	  normalperiod/=2;
 	}
-      double tempo = Index::index->get_tempo();
+      double tempo = playing->get_tempo();
       setBpmBounds((long)(tempo-10.0),(long)(tempo+10.0));
     }
   TapLcd->display(tapcount);
@@ -893,10 +891,10 @@ void BpmAnalyzerDialog::tap()
 
 void BpmAnalyzerDialog::incBpm()
 {
-  int p = Index::index->get_period()-10;
+  int p = playing->get_period()-10;
   if(p < 100) p=100;
-  Index::index->set_period(p);
-  normalperiod=Index::index->get_period() * 4;
+  playing->set_period(p);
+  normalperiod=playing->get_period() * 4;
   currentperiod=normalperiod;
   if (WAVRATE==22050)
     {
@@ -907,9 +905,9 @@ void BpmAnalyzerDialog::incBpm()
 
 void BpmAnalyzerDialog::decBpm()
 {
-  int p = Index::index->get_period()+10;
-  Index::index->set_period(p);
-  normalperiod=Index::index->get_period() * 4;
+  int p = playing->get_period()+10;
+  playing->set_period(p);
+  normalperiod=playing->get_period() * 4;
   currentperiod=normalperiod;
   if (WAVRATE==22050)
     {

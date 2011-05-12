@@ -27,8 +27,8 @@
 // the checkname below is the prefix that is placed before directories when passed back to the caller
 class DirectoryScanner
 {
-    QString required_extension;
  protected:
+    QString required_extension;
     virtual void recursing(const QString  dirname);
     virtual void scanfile(const QString  fullname, const QString  filename);
     virtual void checkfile(const QString  fullname, const QString  filename) = 0;
@@ -37,7 +37,6 @@ class DirectoryScanner
     virtual ~DirectoryScanner() {};
  public:
     DirectoryScanner(QString  extension);
-    static bool exists(const QString  filename);
     static bool goodName(QString name);
     static bool songExtension(QString extension);
     static bool goodExtension(QString extension);

@@ -32,6 +32,15 @@
 #include "song.h"
 #include "config.h"
 #include "database.h"
+#include "albumitem.h"
+			
+#define TAGS_TEXT 0
+#define TAGS_OR 1
+#define TAGS_AND 2
+#define TAGS_NOT 3
+
+extern const QString TAG_TRUE;
+extern const QString TAG_FALSE;
 
 class QProgressBar;
 class ProcessManager;
@@ -70,12 +79,8 @@ class SongSelectorLogic:
   public:
     DataBase *database;
     // display
-    int nextTagLine;
-    QLabel *tagLines[MAXTAGS];
-    QCheckBox *tagAndInclude[MAXTAGS];
-    QCheckBox *tagOrInclude[MAXTAGS];
-    QCheckBox *tagExclude[MAXTAGS];
     SongSelectorLogic(QWidget*parent=0, const QString name=0);
+    virtual ~SongSelectorLogic();
     void findAllTags();
     void acceptNewSong(Song* song);
     void addTag(const QString tag);
@@ -87,6 +92,8 @@ class SongSelectorLogic:
     void parseTags(QString tags);
     void findsimilarnames(const QString & name, const QString & fullname);
   private:
+    void insertSongInAlbum(QListViewItem *, const QString & a, int nr);
+    void deleteSongFromAlbum(AlbumItem *);
     void doAbout(int pg);
     void updateItemList();
     void toggleItem(int which);
@@ -112,6 +119,7 @@ class SongSelectorLogic:
     virtual void doLegende();
     virtual void doLicense();
     virtual void doFilterChanged();
+    virtual void searchLineEntered();
     virtual void doAutoFilterChanged();
     virtual void fetchSelection();
     virtual void checkDisc();
@@ -125,9 +133,11 @@ class SongSelectorLogic:
     virtual void selectionDelTags();
     virtual void selectionAddQueue();
     virtual void selectionEditInfo();
+    virtual void selectionInsertInAlbum();
     virtual void doMarkDups();
     virtual void quitButton();
     virtual void playersChanged();
+    virtual void compactIdxDirectory();
     
     // color toggles...
     virtual void toggle_coloralreadyplayed();
@@ -178,6 +188,16 @@ class SongSelectorLogic:
 
     // history actions
     virtual void playHistorySong(QListViewItem *);
+
+    // album actions
+    virtual void albumItemChanged(QListViewItem*, int col);
+    virtual void renameAlbumItem(QListViewItem*);
+    virtual void selectAlbumItem(QListViewItem*);
+    virtual void keyPressEvent(QKeyEvent*);
+    virtual bool eventFilter(QObject*, QEvent*);
+
+    // taglist things
+    virtual void changeTagList(QListViewItem* item, const QPoint & pos, int col);
 };
 
 #endif

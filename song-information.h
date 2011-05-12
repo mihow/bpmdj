@@ -1,8 +1,8 @@
 /****************************************************************************
 ** Form interface generated from reading ui file 'song-information.ui'
 **
-** Created: Tue Oct 21 22:48:50 2003
-**      by: The User Interface Compiler ($Id: qt/main.cpp   3.2.1   edited May 19 14:22 $)
+** Created: Sun Dec 28 19:04:24 2003
+**      by: The User Interface Compiler ($Id: song-information.h,v 1.2 2003/12/28 18:25:30 krubbens Exp $)
 **
 ** WARNING! All changes made in this file will be lost!
 ****************************************************************************/

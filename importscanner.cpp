@@ -24,7 +24,6 @@
 #include "qsong.h"
 #include "kbpm-dj.h"
 #include "avltree.cpp"
-#include "index.h"
 
 void ImportScanner::recursing(const QString  dirname)
 {
@@ -38,7 +37,7 @@ ImportScanner::ImportScanner(SongSelectorLogic* root) :
   ScanningProgress()
 {
   selector = root;
-  database = selector->database->getFileTree();
+  database = selector->database->getFileTreeCopy();
 }
 
 bool ImportScanner::matchextension(const QString filename)
@@ -66,36 +65,23 @@ void ImportScanner::checkfile(const QString pathname, const QString filen)
     }
   else
     {    
-      char *temp;
-      char indexname[500];
-      char halfindexname[500];
-      temp=strdup(basename(strdup(filename)));
-      temp[strlen(temp)-4]=0;
-      sprintf(halfindexname,"%s.idx",temp);
-      sprintf(indexname,"./index/%s.idx",temp);
-      int nr=2;
-      while(exists(indexname))
-	{
-	  sprintf(halfindexname,"%s%d.idx",temp,nr);
-	  sprintf(indexname,"./index/%s%d.idx",temp,nr++);
-	}
-      
+      char * indexname = findUniqueName(filename);
       Index *index = new Index();
-      index->meta_writeto(indexname);
+      index->set_storedin(indexname);
+      free(indexname);
       
       char log[500];
-      sprintf(log,"Writing %s",index->meta_readfrom());
+      sprintf(log,"Writing %s",index->get_storedin());
       Created->insertLine(log);
       Created->setCursorPosition(Created->numLines(),1);
       
       app->processEvents();
       
-      index->index_file=strdup(filename);
-      index->index_changed=true;
-      index->index_tags=strdup("New");
+      index->set_filename(strdup(filename));
+      index->set_tags(strdup("New"));
       index->set_period(-1);  // writes immediatelly to disk
+      Song * song = new Song(index,true,true,true);
       delete index;
-      
-      selector -> acceptNewSong( new Song( ( const QString ) halfindexname, IndexDir, true ) );
+      selector -> acceptNewSong( song );
     }
 }

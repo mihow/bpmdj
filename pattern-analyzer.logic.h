@@ -25,6 +25,18 @@ typedef unsigned char compressed;
 class PatternAnalyzerLogic : public PatternDialog
 {
   Q_OBJECT
+private:
+  int     filtersize;
+  double *filter;
+  double  lo;
+  double  hi;
+  double  g_frequency_response(double freq);
+  double  db_frequency_response(double freq, double clip);
+  void    showFilter();
+  double  getGain(double freq);
+  double  inverseDtft(double, double);
+  double *doubleFilter(double *, int&);
+  void    createFilter();
 public:
   long period;
   long audiosize;
@@ -37,6 +49,7 @@ public slots:
   virtual void balanceChanged();
   virtual void slantChanged();
   virtual void setTempo();
+  virtual void filterChanged();
   // virtual void dumpPatternToIdx();
   // run will calculate the projection of the pattern and dump it into the index file...
 };

@@ -111,7 +111,7 @@ void alsa_wwrite(unsigned4 *value)
 }
 
 static unsigned4 *buffer;
-static int       filled = 0;
+static unsigned4  filled = 0;
 void alsa_write(unsigned4 *value)
 {
   buffer[filled]=*value;
@@ -154,14 +154,14 @@ signed8 alsa_latency()
       return 0;
     }
   assert(err==0);
-  printf("delay = %d\n",delay);
-  assert(delay>=0 && delay <=buffer_size);
+  printf("delay = %d\n",(int)delay);
+  assert(delay >= 0 && (unsigned4)delay <= buffer_size);
   return delay + filled;
 }
 
 int alsa_open()
 {
-  int err, p;
+  int err;
   unsigned int buffer_time, period_time;
   //  snd_pcm_hw_params_t *hparams;
   snd_pcm_hw_params_t *hparams;

@@ -42,6 +42,6 @@ class Played
   public:
     static int songs_played;
     Played(const QString filename);
-    static bool IsPlayed(const QString indexname);
+    static bool IsPlayed(Song * which);
     static void Play(Song * main_now);
 };

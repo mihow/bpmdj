@@ -58,5 +58,5 @@ class SongSortedByIndex: public SongNode
 {
  public:
   SongSortedByIndex(Song* s) : SongNode(s) {};
-  QString getKey() {return song->index;}
+  QString getKey() {return song->storedin;}
 };

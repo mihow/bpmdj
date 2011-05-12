@@ -17,6 +17,7 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
+#include <assert.h>
 #include "dsp-oss.h"
 #include "dsp-alsa.h"
 
@@ -71,6 +72,8 @@ signed8 dsp_latency()
 {
   OSS( return oss_latency());
   ALSA( return alsa_latency());
+  assert(0);
+  return 0;
 }
 
 int dsp_open()

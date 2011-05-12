@@ -1,4 +1,5 @@
-VERSION = 2.2
+VERSION = 2.3
+
 include defines
 BIN = kbpm-play kbpm-dj merger bpmdj-raw rbpm-play xmms-play alsamixerguis
 DOC = authors changelog copyright todo readme ${shell ls *.html *.png *.css *.pdf}
@@ -49,12 +50,14 @@ clean:
 	$(RM) cbpm-count cbpm-play kbpm-play kbpm-dj kbpm-count merger
 	$(RM) *.moc.cpp *.ui.cpp *.ui.h 
 	$(RM) tagbox.h tagbox.cpp songplayer.h songplayer.cpp
+	$(RM) albumbox.h albumbox.cpp
 	$(RM) bpmcounter.h bpmcounter.cpp
 	$(RM) setupwizard.h setupwizard.cpp
 	$(RM) scanningprogress.h scanningprogress.cpp
 	$(RM) songselector.h songselector.cpp
 	$(RM) about.h about.cpp legende.h legende.cpp
 	$(RM) askinput.h askinput.cpp loader.h loader.cpp
+	$(RM) compacter.h compacter.cpp
 	$(RM) merger-dialog.h merger-dialog.cpp
 	$(RM) preferences.h preferences.cpp
 	$(RM) profile-clock process_bpm.sh process_spectrum.sh analyze.sh
@@ -134,10 +137,10 @@ avltree-test:
 KSEL_OBJECTS = 	avltree.o songtree.o qstring-factory.o spectrum.o\
 	scripts.o cluster.o pca.o\
 	about.o about.moc.o\
-	loader.o loader.moc.o\
+	loader.o loader.moc.o compacter.o compacter.moc.o\
 	mixinformation.o mixinformation.moc.o\
-	askinput.o askinput.moc.o\
-	tagbox.o tagbox.moc.o\
+	askinput.o askinput.moc.o \
+	tagbox.o tagbox.moc.o albumbox.o albumbox.moc.o\
 	song-information.o song-information.moc.o\
 	scanningprogress.o scanningprogress.moc.o\
 	choose-analyzers.o choose-analyzers.moc.o\
@@ -146,7 +149,7 @@ KSEL_OBJECTS = 	avltree.o songtree.o qstring-factory.o spectrum.o\
 	process-manager.o playercommandwizard.o playercommandwizard.moc.o\
 	preferences.o preferences.moc.o preferences.logic.o preferences.logic.moc.o\
 	song.o qsong.o queuedsong.o historysong.o\
-	index-reader.o index.o kbpm-played.o\
+	index-reader.o index.o kbpm-played.o albumitem.o\
 	setupwizard.moc.o setupwizard.o kbpm-dj.o edit-distance.o\
 	renamer.o renamer.moc.o renamer.logic.o renamer.logic.moc.o\
 	similars.o similars.moc.o similarscanner.o similarscanner.moc.o\

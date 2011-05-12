@@ -1,4 +1,4 @@
-<!DOCTYPE UI><UI version="3.1" stdsetdef="1">
+<!DOCTYPE UI><UI version="3.2" stdsetdef="1">
 <class>ScanningProgress</class>
 <widget class="QDialog">
     <property name="name">
@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>615</width>
-            <height>654</height>
+            <width>700</width>
+            <height>600</height>
         </rect>
     </property>
     <property name="caption">
@@ -42,22 +42,6 @@
                 <enum>Horizontal</enum>
             </property>
         </widget>
-        <widget class="QLabel" row="4" column="0">
-            <property name="name">
-                <cstring>TextLabel1</cstring>
-            </property>
-            <property name="text">
-                <string>Scanning :</string>
-            </property>
-        </widget>
-        <widget class="QLabel" row="6" column="0">
-            <property name="name">
-                <cstring>TextLabel2</cstring>
-            </property>
-            <property name="text">
-                <string>Created index files :</string>
-            </property>
-        </widget>
         <widget class="QLabel" row="2" column="0" rowspan="1" colspan="2">
             <property name="name">
                 <cstring>TextLabel6</cstring>
@@ -77,6 +61,34 @@ Eg: LandOfFreedom{HappyPeopleRemix}[Transwave]3.idx</string>
             <property name="wordwrap" stdset="0">
             </property>
         </widget>
+        <widget class="QLabel" row="0" column="0" rowspan="1" colspan="2">
+            <property name="name">
+                <cstring>TextLabel5</cstring>
+            </property>
+            <property name="font">
+                <font>
+                    <bold>1</bold>
+                </font>
+            </property>
+            <property name="text">
+                <string>After importing mp3's, a set of relatively empty index files is created, tagged as 'New'. Before they are usefull, you should select them in the selector and choose Selection|MeasureBpm...</string>
+            </property>
+            <property name="alignment">
+                <set>WordBreak|AlignTop|AlignLeft</set>
+            </property>
+            <property name="vAlign" stdset="0">
+            </property>
+            <property name="wordwrap" stdset="0">
+            </property>
+        </widget>
+        <widget class="QLabel" row="4" column="0">
+            <property name="name">
+                <cstring>TextLabel1</cstring>
+            </property>
+            <property name="text">
+                <string>Scanning :</string>
+            </property>
+        </widget>
         <widget class="Line" row="3" column="0" rowspan="1" colspan="2">
             <property name="name">
                 <cstring>Line1_2</cstring>
@@ -91,26 +103,6 @@ Eg: LandOfFreedom{HappyPeopleRemix}[Transwave]3.idx</string>
                 <enum>Horizontal</enum>
             </property>
         </widget>
-        <widget class="QLabel" row="0" column="0" rowspan="1" colspan="2">
-            <property name="name">
-                <cstring>TextLabel5</cstring>
-            </property>
-            <property name="font">
-                <font>
-                    <bold>1</bold>
-                </font>
-            </property>
-            <property name="text">
-                <string>After importing mp3's, a set of empty index files is created, tagged as 'New'. Before they are usefull, you should select them in the selector and choose Selection|MeasureBpm...</string>
-            </property>
-            <property name="alignment">
-                <set>WordBreak|AlignTop|AlignLeft</set>
-            </property>
-            <property name="vAlign" stdset="0">
-            </property>
-            <property name="wordwrap" stdset="0">
-            </property>
-        </widget>
         <widget class="QMultiLineEdit" row="5" column="0" rowspan="1" colspan="2">
             <property name="name">
                 <cstring>Log</cstring>
@@ -122,6 +114,14 @@ Eg: LandOfFreedom{HappyPeopleRemix}[Transwave]3.idx</string>
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                 </sizepolicy>
+            </property>
+        </widget>
+        <widget class="QLabel" row="6" column="0">
+            <property name="name">
+                <cstring>TextLabel2</cstring>
+            </property>
+            <property name="text">
+                <string>Created index files :</string>
             </property>
         </widget>
         <widget class="QMultiLineEdit" row="7" column="0" rowspan="1" colspan="2">
@@ -144,8 +144,32 @@ Eg: LandOfFreedom{HappyPeopleRemix}[Transwave]3.idx</string>
             <property name="enabled">
                 <bool>false</bool>
             </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>4</hsizetype>
+                    <vsizetype>0</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
             <property name="text">
                 <string>Okay</string>
+            </property>
+        </widget>
+        <widget class="QLabel" row="8" column="0">
+            <property name="name">
+                <cstring>textLabel1</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>5</hsizetype>
+                    <vsizetype>5</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="text">
+                <string>Note: If you have a large amount of songs to import, which have correct meta-information, you might have a look at the two scripts &lt;font color="#ff0505"&gt;bpmdj-import-mp3.pl&lt;/font&gt; and &lt;font color="#ff0000"&gt;bpmdj-import-ogg.pl&lt;/font&gt;.</string>
             </property>
         </widget>
     </grid>

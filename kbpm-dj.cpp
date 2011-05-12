@@ -35,6 +35,7 @@
 #include "version.h"
 #include "dirscanner.h"
 #include "scripts.h"
+#include "loader.h"
 
 QApplication *app;
 
@@ -73,73 +74,77 @@ public:
 
 int main(int argc, char* argv[])
 {
-  app = new QApplication(argc,argv);
-  Loader * loader = new Loader();
-  loader -> show();
-  
-  // 1.a first check the availability of a number of directories...
-  loader->programs->setEnabled(true);
-  app->processEvents();
-  DIR * mdir;
-  DIR * idir;
-  do
-    {
-      mdir = opendir(MusicDir);
-      idir = opendir(IndexDir);
-      if (mdir == NULL || idir == NULL)
-	{
-	  SetupWizard *sw = new SetupWizard(0,0,true);
-	  sw->setFinishEnabled(sw->lastpage,true);
-	  int res = sw->exec();
-	  if (res == QDialog::Rejected)
-	    exit(0);
-	}
-    }
-  while (mdir==NULL || idir==NULL);
-  // 1.b check the availability of programs/the PATH evironment variabe...
-  //     we only check the existence of kbpm-play to guide the user. 
-  if(!(execute("kbpm-play 2>/dev/null >/dev/null")))
-    {
-      QMessageBox::warning(NULL,"Missing kbpm-play",
-			   "Could not start kbpm-play.\n" 
-			   "Make sure the correct version of the\n"
-			   "program is installed in your PATH");
-      exit(0);
-    }
+  QApplication application(argc,argv);
+  SongSelectorLogic main_window;
+  app = &application;
 
-  // 2. read the configuration
-  loader->config->setEnabled(true);
-  app->processEvents();
-  Config::load();
-
-  // 1.c checking left over raw files (deze komt laatst omdat tmp_directory het kuiste pad bevat)
-  RawScanner raw;
-  raw.scan();
-  if (!raw.result.isNull())
-    if (QMessageBox::warning(NULL,RAW_EXT " files check",
-			     "There are some left over "RAW_EXT" files. These are:\n"+raw.result,
-			     "Remove", "Ignore", 0, 0, 1)==0)
-      removeAllRaw(Config::tmp_directory);  
+  {
+    Loader loader(NULL,NULL,true,Qt::WStyle_Customize | Qt::WStyle_NoBorder);
+    loader.show();
   
-  // 3. read all the files in memory
-  IndexReader *indexReader;
-  SongSelectorLogic test;
-  app->setMainWidget(&test);
-  // read already played indices
-  new Played("played.log");
-  // create the index in memory
-  loader->loading->setEnabled(true);
-  loader->progressBar1->setEnabled(true);
-  loader->readingFile->setEnabled(true);
-  indexReader=new IndexReader(loader,test.database);
-  Config::file_count=indexReader->total_files;
-  delete(indexReader);
-  
-  // 4. Retrieve tags and spectra
-  loader->scanning->setEnabled(true);
-  app->processEvents();
-  test.findAllTags();
-  delete loader;
+    // 1.a first check the availability of a number of directories...
+    loader.programs->setEnabled(true);
+    application.processEvents();
+    DIR * mdir;
+    DIR * idir;
+    do
+      {
+	mdir = opendir(MusicDir);
+	idir = opendir(IndexDir);
+	if (mdir == NULL || idir == NULL)
+	  {
+	    SetupWizard *sw = new SetupWizard(0,0,true);
+	    sw->setFinishEnabled(sw->lastpage,true);
+	    int res = sw->exec();
+	    if (res == QDialog::Rejected)
+	      exit(0);
+	  }
+      }
+    
+    while (mdir==NULL || idir==NULL);
+    // 1.b check the availability of programs/the PATH evironment variabe...
+    //     we only check the existence of kbpm-play to guide the user. 
+    if(!(execute("kbpm-play 2>/dev/null >/dev/null")))
+      {
+	QMessageBox::warning(NULL,"Missing kbpm-play",
+			     "Could not start kbpm-play.\n" 
+			     "Make sure the correct version of the\n"
+			     "program is installed in your PATH");
+	exit(0);
+      }
+    
+    // 2. read the configuration
+    loader.config->setEnabled(true);
+    application.processEvents();
+    Config::load();
+    
+    // 1.c checking left over raw files (deze komt laatst omdat tmp_directory het kuiste pad bevat)
+    RawScanner raw;
+    raw.scan();
+    if (!raw.result.isNull())
+      if (QMessageBox::warning(NULL,RAW_EXT " files check",
+			       "There are some left over "RAW_EXT" files. These are:\n"+raw.result,
+			       "Remove", "Ignore", 0, 0, 1)==0)
+	removeAllRaw(Config::tmp_directory);  
+    
+    // 3. read all the files in memory
+    application.setMainWidget(&main_window);
+    // read already played indices
+    new Played("played.log");
+    
+    // create the index in memory
+    loader.progressBar1->setEnabled(true);
+    loader.directory->setEnabled(true);
+    {
+      IndexReader indexReader(loader.progressBar1, loader.readingDir ,main_window.database);
+      Config::file_count=indexReader.total_files;
+    }
+    
+    // 4. Retrieve tags and spectra
+    loader.scanning->setEnabled(true);
+    application.processEvents();
+    main_window.findAllTags();
+  }
   
   // 5. Some extra version dependent blurb...
   if (!Config::shown_aboutbox)
@@ -155,11 +160,11 @@ int main(int argc, char* argv[])
   
   // 5b. startup mixers ?
   if (Config::open_mixer)
-    test.openMixer();
+    main_window.openMixer();
   
   // 6. start the application
-  test.show();
-  int result = app->exec();
+  main_window.show();
+  int result = application.exec();
   if (!Config::shown_aboutbox)
     {
       Config::shown_aboutbox=true;

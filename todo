@@ -1,5 +1,21 @@
-LATER
+- update alsa settings on webpage
 - Q: dubbel klikken als de monitor nog aan het spelen is brengt het nieuwe nummer in de queue
+- add xmms --queue in creation command
+- add extra version information in this release
+- cvs commit
+- compile under gentoo
+- logfile doc schrijven
+  history documentation
+- centralizeren van een aantal funxties:
+  - song.cpp: tonumber serie
+  - index.cpp: toint & tohex
+- create full command line counter using the same codebase 
+
+- alles representeren met QStrings ? ? ? 
+- selection menu hotkeys toevoegen... 
+  hotkeys toevoegen...
+
+LATER
 - BUG: fetch spectrum crashed op "102_AllYouNeedIsLove[Beatles].mp3"
 - ervoor zorgen dat de bpm-analyzer min of meer correcte info weergeeft...
 - zrogen dat hem rapper van disk leest (blokje per blokje kan wel wat traag zijn op het einde)
@@ -8,26 +24,7 @@ LATER
 - de renamerbox is eigenlijk nog een probleem dan... Hoewel eigenlijk ook niet..
   als we renamen moeten we eigenlijk ook gewoon de inhoud van de files up to date
   brengen (hebben we een speciale button voor nodig ???
-- albums toevoegen
-- een mix van .idx files en .bun files... DE .bun files bevatten alle data. 
-  terwijl .idx files manueel geediteerd kunnen worden...
-  a- zorgen dat fields _uniek geidentificeerd kunenn worden... Niet langer
-     enkel op de filename... Daarom moeten we somehow de filename eveneens 
-     in de .idx files brengen. Dan kunnen we typos eveneens ook oplossen in de
-     filename... Het probleem zijn dan natuurlijk conflicten bij het laden...
-     filenames die niet meer overeen komen met hun huidige versie... 
-     aargle... En het probleem van meerdere files met dezelfde inhoud...
-  b- album informatie der aan toevoegen... Misschien kunnen we hier de tags voor 
-     gebruiken ? Uiteindelijk houd dat reeds deze informatie bij. Het probleem 
-     is dan wel dat we teveel tags gaan krijgen, wat niet de bedoeling kan zijn. 
-     dus daarom kunnen we beter
-  c- zorgen dat er een versie nummer op elk field plakt, dat we tenminste weten
-     welke versie nu precies de nieuwe is...
 - remote adding of queue laten marcheren...
-- converting bpmdj to only a file selector while xmms keeps the playlist
-  mainplayer om te monitoren
-  xmms --queue om toe te voegen
-  morgen eens proberen...
 
 2.0:
   Q: als de queue leeg is nemen we natuurlijk de huidige main-song.
@@ -63,7 +60,7 @@ LATER
   - de toggle troep centraliseren door ze in een kanon van een define te proppen..
   - fetch brol from disk...
   - qsong uitbreiden met een extra kolom die de cluster beschrijft..
-  - opkuisen code 
+  - opkuisen code
     - tonumber centraliseren
     - min/max operators centraliseren
     - inlezen van files in een buffer...
@@ -77,8 +74,6 @@ LATER
   - automatisch scannen van spectrum en tags afzetten en de boel cachen in de index files
   - Misschien beter een optie maken van het cdrom device ???
   - een eenvoudige tool malken die de code pretty-fied op basis van de tokens...
-  - FAQ: Why the access through disk ???
-  - FAQ: Why not using channels ?
   - multi-language support...
   - pause veld verwijderen als variable en als functie toevoegen..
   - player zou eigen thread moeten starten...
@@ -86,8 +81,6 @@ LATER
   - automatisch opstellen van playlist aan de hand van een aantal maten: tempo, spectrum, dcolor
   - impulse response meten... volgens mij kan dat gebruikt worden om het 'soort muziek te meten', net zoals het gebruikt moet kunnen worden om in 
     hogere frequenties de rest te meten... 
-  - Path tag toevoegen. This box should contain ' a number of entries. Every entry is either 
-    het volledig automatisch laten gebeuren is nog niet voor vandaag... 
   - beter resample filter der in steken (blijft nog een beetje een uitdaging natuurlijk...)
   - MERGER: progressbar zou weer eens verschrikkelijk handig zijn...
   - SELECTOR: als de .raw file al bestaat voordat we hem gaan creeeren moet hier ook iets mee aangevangen worden
@@ -115,22 +108,19 @@ kbpm-play:
   - when changing an lfo the current phase should remain the same.
 
 documentation:
-  - logfile doc schrijven
   - documentation for the browser
 
 kbpm-dj:
-  - nog eens een memorycheck erop los laten...
   - setup on a remote machine should be possible.
   - downloaden van mp3's automatically
   - nfs-mounten ? Copying the same data ??
+  - setup on other machine, by copying index file, or by copying index and mp3 files
   - multiple players (asus, cubical, tnm etc ...) & automatically setup player on other machine
   - play songs at fixed given tempo instead of the tempo of the next song
   - setup - wizard
        - DSP-parameters verzamelen wanneer gestart wordt
-       - Directories maken als het enigzins mogelijk is
+       - Directories maken als het enigzins mogelijk is. Dit moet niet veranderen. Momenteel is dit namelijk perfect, ze moeten lezen wat er staat anders werkt het niet
        - Laten selecteren van de directory waar de interesante file steken
   - Memory stuff:
-    - remove duplicate strings (see qstring-factory.h/.cpp
-    - automatic removal of duplicate tags in taglines / song
-    - automatic sorting of tags in tagline / song
-    - importing mp3's can faster by copying the list and removing every item we found to match
+    - remove duplicate strings (see qstring-factory.h/.cpp)
+
