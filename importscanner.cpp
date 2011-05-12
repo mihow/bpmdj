@@ -26,7 +26,7 @@ using namespace std;
 #include "memory.h"
 #include "capacity.h"
 
-void ImportScanner::recursing(const QString  dirname)
+void ImportScanner::recursing(const QString dirname)
 {
   Log->setText("Importing songs from "+dirname);
   app->processEvents();
@@ -42,7 +42,13 @@ ImportScanner::ImportScanner(SongSelectorLogic* root) :
 
 bool ImportScanner::matchextension(const QString filename)
 {
-  return goodExtension(filename);
+  bool res = goodExtension(filename);
+  if (!res)
+    {
+      Created->insertLine("Ignore: "+filename);
+      Created->setCursorPosition(Created->numLines(),1);
+    }
+  return res;
 }
 
 void ImportScanner::scan(const QString dirname, const QString checkname)
@@ -58,8 +64,10 @@ void ImportScanner::checkfile(const QString pathname, const QString filen)
     filename = pathname + "/" + filen;
   else
     filename = filen;
-  if (database.find(filename)!=database.end())
+  map<QString,Song*>::iterator it = database.find(filename);
+  if (it!=database.end())
     {
+      it->second->set_ondisk(true);
       database.erase(filename);
     }
   else

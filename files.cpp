@@ -37,24 +37,6 @@ long fsize(FILE * f)
   return answer;
 }
 
-long readsamples(void* target, int count, FILE* file)
-{
-  int result;
-  assert(target);
-  assert(file);
-  assert(count>0);
-  result = fread(target,sizeof(unsigned4),count,file);
-  if (result<=0)
-    {
-      int err = ferror(file);
-      if (feof(file)) 
-	return 0;
-      printf("file: Could not read %d samples, errno = %d (%s)\n",count,err,strerror(err));
-      assert(0);
-    }
-  return result;
-}
-
 long readsamples(Array<1,float4>& signal, FILE* file)
 {
   int count = signal.size(0);

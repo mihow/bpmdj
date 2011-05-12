@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>514</width>
-            <height>353</height>
+            <width>518</width>
+            <height>420</height>
         </rect>
     </property>
     <property name="paletteBackgroundColor">
@@ -537,7 +537,7 @@
                                             <enum>AncestorOrigin</enum>
                                         </property>
                                         <property name="text">
-                                            <string>Retrieve X</string>
+                                            <string>Jump to X</string>
                                         </property>
                                         <property name="accel">
                                             <string>X</string>
@@ -562,7 +562,7 @@
                                             <enum>AncestorOrigin</enum>
                                         </property>
                                         <property name="text">
-                                            <string>Retrieve C</string>
+                                            <string>Jump to C</string>
                                         </property>
                                         <property name="accel">
                                             <string>C</string>
@@ -587,7 +587,7 @@
                                             <enum>AncestorOrigin</enum>
                                         </property>
                                         <property name="text">
-                                            <string>Retrieve V</string>
+                                            <string>Jump to V</string>
                                         </property>
                                         <property name="accel">
                                             <string>V</string>
@@ -612,7 +612,7 @@
                                             <enum>AncestorOrigin</enum>
                                         </property>
                                         <property name="text">
-                                            <string>Retrieve Z</string>
+                                            <string>Jump to Z</string>
                                         </property>
                                         <property name="accel">
                                             <string>Z</string>
@@ -621,7 +621,7 @@
                                             <bool>false</bool>
                                         </property>
                                         <property name="toolTip" stdset="0">
-                                            <string>Key: 'Z'</string>
+                                            <string>Key 'z'</string>
                                         </property>
                                     </widget>
                                     <widget class="QPushButton" row="3" column="1">
@@ -3016,18 +3016,6 @@
         <slot>mapLoopChange()</slot>
     </connection>
     <connection>
-        <sender>beatGraphAnalyzer</sender>
-        <signal>normalTempo()</signal>
-        <receiver>SongPlayer</receiver>
-        <slot>normalTempo()</slot>
-    </connection>
-    <connection>
-        <sender>beatGraphAnalyzer</sender>
-        <signal>targetTempo()</signal>
-        <receiver>SongPlayer</receiver>
-        <slot>targetTempo()</slot>
-    </connection>
-    <connection>
         <sender>bpm</sender>
         <signal>pressed()</signal>
         <receiver>SongPlayer</receiver>
@@ -3146,6 +3134,18 @@
         <signal>clicked()</signal>
         <receiver>SongPlayer</receiver>
         <slot>setJack()</slot>
+    </connection>
+    <connection>
+        <sender>beatGraphAnalyzer</sender>
+        <signal>normalTempo()</signal>
+        <receiver>SongPlayer</receiver>
+        <slot>normalTempo()</slot>
+    </connection>
+    <connection>
+        <sender>beatGraphAnalyzer</sender>
+        <signal>targetTempo()</signal>
+        <receiver>SongPlayer</receiver>
+        <slot>targetTempo()</slot>
     </connection>
 </connections>
 <tabstops>

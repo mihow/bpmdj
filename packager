@@ -10,7 +10,7 @@ tgz: source.tgz-dist doc.tgz-dist bin.tgz-dist bpmdj-support.tgz
 files:
 	@echo " [file] list"
 	@rm -rf tmp 2>/dev/null; exit 0
-	@find -H ./* -iname "*" | grep -v ^\./index | grep -v ^\./music > existing_files # list of existing files
+	@find -H ./* -iname "*" | grep -v ^\./index | grep -v ^\./music | grep -v ^\./fragments > existing_files
 	@grep \  existing_files > problem_files; exit 0 # problematic files
 	@test ! -s problem_files
 	@gawk '{print $$1}' files >known_files # list of known files

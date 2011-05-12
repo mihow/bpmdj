@@ -20,10 +20,9 @@
 #define __BPMDJ___PLAYER_CONFIG_H__
 using namespace std;
 #line 1 "player-config.h++"
+#include <qdialog.h>
 #include "types.h"
 #include "accessors.h"
-
-class SongPlayerLogic;
 
 class PlayerConfig
 {

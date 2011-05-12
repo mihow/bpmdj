@@ -25,7 +25,7 @@ using namespace std;
 
 /**
  * since the clock_freq is wrong on some machines we need to test this
- * at compile time.
+ * at compile time. 
  */
 int main(int argc, char**argv)
 {

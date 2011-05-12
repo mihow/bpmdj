@@ -18,6 +18,7 @@
 ****/
 using namespace std;
 #line 1 "song-process.c++"
+#include <iostream>
 #include <qlabel.h>
 #include <qsizepolicy.h>
 #include <qmessagebox.h>
@@ -265,6 +266,7 @@ void SongProcess::start(Song * s)
   running_time=0;
   started_at=time(NULL);
   setSong(s);
+  cerr << "SongProcess::start()\n";
 }
 
 void SongProcess::stop()
@@ -280,12 +282,10 @@ void SongProcess::setup()
   if (cmd==standard)
     spawn(getBasicCommand()+ " --setup");
   else
-    {
-      QMessageBox::information(NULL,
-			       "Non standard player",
-			       "A non standard player cannot be configured",
-			       QMessageBox::Ok);
-    }
+    QMessageBox::information(NULL,
+			     "Non standard player",
+			     "A non standard player cannot be configured",
+			     QMessageBox::Ok);
 }
 
 void SongProcess::setText(QString t)
@@ -347,8 +347,8 @@ void SongProcess::startChecking()
       return;
     }
 
-  int written = fwrite(noise_ogg,1,noise_ogg_size,f);
-  assert(written==noise_ogg_size);
+  int written = fwrite(bpmdj_ogg,1,bpmdj_ogg_size,f);
+  assert(written==bpmdj_ogg_size);
   fclose(f);
 
   // create an appropriate index file

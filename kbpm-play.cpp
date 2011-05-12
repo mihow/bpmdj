@@ -122,7 +122,7 @@ static int    arg_low = 80;
 static int    arg_high = 160;
 static bool   opt_remote = false;
 static char * arg_remote = "";
-static bool   opt_setup = false;
+       bool   opt_setup = false;
        char * arg_config = "";
        bool   opt_check = false;
 PlayerConfig* config;
@@ -381,11 +381,10 @@ void check_start()
   player_window->showMinimized();
   app->postEvent(player_window,new InitAndStart());
   app->exec();
-  err = player_window->result()==QDialog::Rejected;
+  err = player_window->result() == QDialog::Rejected;
   delete(player_window);
   if (err)
-    _exit(10);
-
+    _exit(10); 
 }
 
 void batch_start()
@@ -513,7 +512,6 @@ int remote(int argc, char* argv[])
 int main(int argc, char *argv[])
 {
   init_embedded_files();
-
   app = new QApplication(argc,argv);
   process_options(argc,argv);
   if (opt_remote)

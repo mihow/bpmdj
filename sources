@@ -1,12 +1,17 @@
 HEADERS = ${shell ls *.h++ 2>/dev/null | grep -v .*\.L.h++ 2>/dev/null}
 SOURCES = ${shell ls *.c++ 2>/dev/null | grep -v .*\.L.c++ 2>/dev/null}
+B4      = ${shell ls *.b4  2>/dev/null | grep -v .*\.L.c++ 2>/dev/null}
 
 .PHONY:.sources
-.sources: version.h $(HEADERS:%.h++=%.h) $(SOURCES:%.c++=%.cpp) data-lexer.cpp \
-	data-syntax.h data-syntax.cpp
+.sources: version.h $(HEADERS:%.h++=%.h) $(SOURCES:%.c++=%.cpp) $(B4:%.b4=%.h) \
+	data-lexer.cpp data-syntax.h data-syntax.cpp
 	@grep "#include\ *\"" *.h *.cpp >/tmp/t
 	@if test ! -e .sources; then cp /tmp/t .sources; fi
 	@if ! cmp /tmp/t .sources >/dev/null; then mv /tmp/t .sources; fi
+
+%.h: %.b4 aoc
+	@echo "  [aoc] "$@
+	@./aoc $< $@
 
 # The .h and .cpp sources are generated from corresponding .h++ and .c++ 
 # sources. This allows us to automatically prefix a copyright header, 
@@ -48,7 +53,7 @@ version.h: profile-clock
 
 data-lexer.cpp: data-lexer.l data-syntax.h
 	@echo " [flex] data-lexer.cpp"
-	@flex -o data-lexer.cpp data-lexer.l
+	@flex -odata-lexer.cpp data-lexer.l
 
 data-syntax.h: data-syntax.y
 	@echo "[bison] data-syntax.h data-syntax.cpp"

@@ -50,7 +50,6 @@ using namespace std;
 #include <math.h>
 #include <assert.h>
 #include <math.h>
-#include <pthread.h>
 #include "memory.h"
 #include "rythm-analyzer.logic.h"
 #include "rythm-property.h"

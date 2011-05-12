@@ -31,7 +31,10 @@ class DirectoryScanner
     virtual void recursing(const QString  dirname);
     virtual void scanfile(const QString  fullname, const QString  filename);
     virtual void checkfile(const QString  fullname, const QString  filename) = 0;
-    virtual void scandir(const QString  dirname, const QString  checkname);
+    /**
+     * returns true when the directory was indeed a directory
+     */
+    virtual bool scandir(const QString  dirname, const QString  checkname);
     virtual bool matchextension(const QString  filename);
     virtual ~DirectoryScanner() {};
  public:

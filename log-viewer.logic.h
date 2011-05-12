@@ -30,7 +30,7 @@ public LogViewer, protected DirectoryScanner
  protected:
    bool started;
    virtual void checkfile(const QString fullname, const QString filename);
-   virtual void scandir(const QString dirname, const QString checkname);
+   virtual bool scandir(const QString dirname, const QString checkname);
  public:
    LogViewerLogic(QWidget*parent=0);
    void addLog(const char* name, const char* file);

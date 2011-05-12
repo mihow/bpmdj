@@ -27,13 +27,21 @@ using namespace std;
 #include <qlabel.h>
 #include <qstatusbar.h>
 #include <qmutex.h>
-
-#include "data.h"
+#include "data-version.h"
+#include "fragment-player.h"
+#include "spectrum-pca.h"
+#include "existence-scanner.h"
 #if (DATA_VERSION_MAJOR != 0) || (DATA_VERSION_MINOR != 2)
-#error "OM-DATA has wrong version number"
+#error "DATA has wrong version number"
 #endif
 
-extern QApplication *app;
-extern const char*   programname;
-extern QStatusBar*   status;
+extern QApplication * app;
+extern const char*    programname;
+extern QStatusBar*    status;
+// The active object that will play fragments
+extern FragmentPlayer fragmentPlayer;
+// The active object that will run a spectrum principal component analysis
+extern SpectrumPca    spectrumPca; 
+// The active object that scans the existence of files
+extern ExistenceScanner existenceScanner;
 #endif

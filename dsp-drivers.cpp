@@ -21,6 +21,7 @@ using namespace std;
 #include <assert.h>
 #include <qdialog.h>
 #include <qstring.h>
+#include "player-config.h"
 #include "dsp-oss.h"
 #include "dsp-alsa.h"
 #include "dsp-none.h"
@@ -32,7 +33,7 @@ using namespace std;
 #ifndef COMPILE_JACK
 #error -------------------------------------------
 #error Should at least compile one dsp driver !!! 
-#error Try using -D COMPILE_OSS or -D COMPILE_ALSA
+#error Use -D COMPILE_OSS or -D COMPILE_ALSA or
 #error or -D COMPILE_JACK
 #error -------------------------------------------
 #endif
@@ -41,18 +42,18 @@ using namespace std;
 
 dsp_driver * dsp_driver::get_driver(PlayerConfig * cfg)
 {
-   switch (cfg->get_player_dsp())
-     {
-      case 0 : return new dsp_none ( * cfg ) ;
-      case 1 : return new dsp_oss  ( * cfg ) ;
-      case 2 : return new dsp_alsa ( * cfg ) ;
-      case 3 : return new dsp_mixed( * cfg ) ;
+  switch (cfg->get_player_dsp())
+    {
+    case 0 : return new dsp_none ( * cfg ) ;
+    case 1 : return new dsp_oss  ( * cfg ) ;
+    case 2 : return new dsp_alsa ( * cfg ) ;
+    case 3 : return new dsp_mixed( * cfg ) ;
 #ifdef INCOMPLETE_FEATURES
 #ifdef COMPILE_JACK
-      case 4 : return new dsp_jack ( * cfg ) ;
+    case 4 : return new dsp_jack ( * cfg ) ;
 #endif
 #endif
-      default: return new dsp_none ( * cfg ) ;
-     }
-   return new dsp_none( * cfg );
+    }
+  return new dsp_none( * cfg );
 }
+ 

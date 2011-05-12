@@ -29,18 +29,12 @@
             <property name="name">
                 <cstring>unnamed</cstring>
             </property>
-            <property name="margin">
-                <number>11</number>
-            </property>
-            <property name="spacing">
-                <number>6</number>
-            </property>
             <widget class="QLabel" row="0" column="0" rowspan="1" colspan="3">
                 <property name="name">
                     <cstring>TextLabel5</cstring>
                 </property>
                 <property name="text">
-                    <string>kbpm-dj requires the existence of two directories:</string>
+                    <string>kbpm-dj requires the existence of three directories:</string>
                 </property>
             </widget>
             <spacer row="1" column="1">
@@ -95,7 +89,7 @@
                     </font>
                 </property>
                 <property name="text">
-                    <string>Make sure you create those two directories (if they already exist, make sure you start the program from the right directory)</string>
+                    <string>Make sure you create those three directories (if they already exist, make sure you start the program from the right directory)</string>
                 </property>
                 <property name="alignment">
                     <set>WordBreak|AlignTop|AlignLeft</set>
@@ -122,88 +116,12 @@
                     </size>
                 </property>
             </spacer>
-            <widget class="QLayoutWidget" row="2" column="1">
-                <property name="name">
-                    <cstring>Layout1</cstring>
-                </property>
-                <grid>
-                    <property name="name">
-                        <cstring>unnamed</cstring>
-                    </property>
-                    <property name="margin">
-                        <number>0</number>
-                    </property>
-                    <property name="spacing">
-                        <number>6</number>
-                    </property>
-                    <widget class="QLabel" row="0" column="0">
-                        <property name="name">
-                            <cstring>TextLabel2</cstring>
-                        </property>
-                        <property name="font">
-                            <font>
-                                <bold>1</bold>
-                            </font>
-                        </property>
-                        <property name="text">
-                            <string>./music</string>
-                        </property>
-                    </widget>
-                    <widget class="QLabel" row="1" column="0">
-                        <property name="name">
-                            <cstring>TextLabel3</cstring>
-                        </property>
-                        <property name="font">
-                            <font>
-                                <bold>1</bold>
-                            </font>
-                        </property>
-                        <property name="text">
-                            <string>./index</string>
-                        </property>
-                    </widget>
-                </grid>
-            </widget>
-            <spacer row="3" column="1">
-                <property name="name">
-                    <cstring>Spacer2</cstring>
-                </property>
-                <property name="orientation">
-                    <enum>Vertical</enum>
-                </property>
-                <property name="sizeType">
-                    <enum>Expanding</enum>
-                </property>
-                <property name="sizeHint">
-                    <size>
-                        <width>20</width>
-                        <height>20</height>
-                    </size>
-                </property>
-            </spacer>
-            <spacer row="2" column="2">
-                <property name="name">
-                    <cstring>Spacer8</cstring>
-                </property>
-                <property name="orientation">
-                    <enum>Horizontal</enum>
-                </property>
-                <property name="sizeType">
-                    <enum>Expanding</enum>
-                </property>
-                <property name="sizeHint">
-                    <size>
-                        <width>20</width>
-                        <height>20</height>
-                    </size>
-                </property>
-            </spacer>
             <widget class="QLabel" row="4" column="0" rowspan="1" colspan="3">
                 <property name="name">
                     <cstring>TextLabel1</cstring>
                 </property>
                 <property name="text">
-                    <string>The music directory should contain all the .mp3 files you have. The index directory will contain all meta information kbpmdj needs about the .mp3 files. (such as tempo, cue points and so on)</string>
+                    <string>The music directory should contain all the .mp3 files you have. The index directory will contain all meta information kbpmdj needs about the .mp3 files. (such as tempo, cue points and so on). The fragments directory will be used as a temporary storage for small audio fragments.</string>
                 </property>
                 <property name="textFormat">
                     <enum>AutoText</enum>
@@ -217,6 +135,89 @@
                 </property>
                 <property name="wordwrap" stdset="0">
                 </property>
+            </widget>
+            <spacer row="2" column="2">
+                <property name="name">
+                    <cstring>Spacer8</cstring>
+                </property>
+                <property name="orientation">
+                    <enum>Horizontal</enum>
+                </property>
+                <property name="sizeType">
+                    <enum>Expanding</enum>
+                </property>
+                <property name="sizeHint">
+                    <size>
+                        <width>190</width>
+                        <height>20</height>
+                    </size>
+                </property>
+            </spacer>
+            <spacer row="3" column="1">
+                <property name="name">
+                    <cstring>Spacer2</cstring>
+                </property>
+                <property name="orientation">
+                    <enum>Vertical</enum>
+                </property>
+                <property name="sizeType">
+                    <enum>Expanding</enum>
+                </property>
+                <property name="sizeHint">
+                    <size>
+                        <width>20</width>
+                        <height>30</height>
+                    </size>
+                </property>
+            </spacer>
+            <widget class="QLayoutWidget" row="2" column="1">
+                <property name="name">
+                    <cstring>layout2</cstring>
+                </property>
+                <vbox>
+                    <property name="name">
+                        <cstring>unnamed</cstring>
+                    </property>
+                    <widget class="QLabel">
+                        <property name="name">
+                            <cstring>TextLabel2</cstring>
+                        </property>
+                        <property name="font">
+                            <font>
+                                <bold>1</bold>
+                            </font>
+                        </property>
+                        <property name="text">
+                            <string>./music</string>
+                        </property>
+                    </widget>
+                    <widget class="QLabel">
+                        <property name="name">
+                            <cstring>TextLabel3</cstring>
+                        </property>
+                        <property name="font">
+                            <font>
+                                <bold>1</bold>
+                            </font>
+                        </property>
+                        <property name="text">
+                            <string>./index</string>
+                        </property>
+                    </widget>
+                    <widget class="QLabel">
+                        <property name="name">
+                            <cstring>TextLabel3_2</cstring>
+                        </property>
+                        <property name="font">
+                            <font>
+                                <bold>1</bold>
+                            </font>
+                        </property>
+                        <property name="text">
+                            <string>./fragments</string>
+                        </property>
+                    </widget>
+                </vbox>
             </widget>
         </grid>
     </widget>

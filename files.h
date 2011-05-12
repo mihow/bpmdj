@@ -22,9 +22,29 @@ using namespace std;
 #line 1 "files.h++"
 #include <stdio.h>
 #include "array.h"
+#include "stereo-sample2.h"
 
-long   fsize(FILE * f);
-long   readsamples(void* target, int count, FILE* file);
+long fsize(FILE * f);
+
+template <class sample_type>
+long readsamples(sample_type* target, int count, FILE* file)
+{
+  int result;
+  assert(target);
+  assert(file);
+  assert(count>0);
+  result = fread(target,sizeof(sample_type),count,file);
+  if (result<=0)
+    {
+      int err = ferror(file);
+      if (feof(file)) 
+	return 0;
+      printf("file: Could not read %d samples, errno = %d (%s)\n",count,err,strerror(err));
+      assert(0);
+    }
+  return result;
+}
+
 long   readsamples(Array<1,float4>& target, FILE* file);
 long   writesamples(void* target, int count, FILE* file);
 #endif

@@ -30,35 +30,37 @@ typedef float uncompressed;
 
 class BeatGraphAnalyzer : public BeatGraphWidget
 {
-    Q_OBJECT
- private: 
-    // the signed data is used as input into the energy and haar calculations
-    long audiosize;
-    uncompressed * signed_data;
-    void readFileSigned();
-    // the period under which the beatgraph is being visualized
-    long period;
-    void getTempo();
-    bool check_visualisation_conditions(bool file_read=true);
-    // energy calculation, storage & visualisation
-    compressed   * data;
-    void calculateEnergy();
-    void showEnergyPattern();
-    // haar calculation, storage & visualisation
-    float * * bank;
-    void calculateHaar();
-    void showHaarPattern();
- public:
-    BeatGraphAnalyzer(QWidget * parent = 0, const char * name=0);
-    void readFileSigned(bool showreaderprogress);
- signals:
-    void targetTempo();
-    void normalTempo();
- public slots:
-    virtual void activate();
-    virtual void showPattern();
-    virtual void slantChanged();
-    virtual void setTempo();
-    virtual void changeVisualisation();
+  Q_OBJECT
+private: 
+  // the signed data is used as input into the energy and haar calculations
+  long audiosize;
+  uncompressed * signed_data;
+  void readFileSigned();
+  // the period under which the beatgraph is being visualized
+  long period;
+  void getTempo();
+  bool check_visualisation_conditions(bool file_read=true);
+  // energy calculation, storage & visualisation
+  compressed   * data;
+  void calculateEnergy();
+  void showEnergyPattern();
+  // haar calculation, storage & visualisation
+  float * * bank;
+  void calculateHaar();
+  void showHaarPattern();
+public:
+  BeatGraphAnalyzer(QWidget * parent = 0, const char * name=0);
+  void readFileSigned(bool showreaderprogress);
+signals:
+  void targetTempo();
+  void normalTempo();
+public slots:
+  virtual void activate();
+  virtual void deactivate();
+  virtual void showPattern();
+  virtual void slantChanged();
+  virtual void setTempo();
+  virtual void changeVisualisation();
+  virtual void cuesChanged();
 };
 #endif

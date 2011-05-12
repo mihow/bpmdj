@@ -21,37 +21,12 @@ using namespace std;
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
-#include <stdlib.h>
 #include <string.h>
-#include <qapplication.h>
-#include <qmessagebox.h>
-#include <qlistview.h>
-#include <qlcdnumber.h>
-#include <qheader.h>
-#include <qgroupbox.h>
-#include <stdlib.h>
 #include <errno.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <assert.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
-#include <qradiobutton.h>
-#include <libgen.h>
-#include <time.h>
-#include <sys/times.h>
-#include <assert.h>
-#include <math.h>
-#include <pthread.h>
-#include <sys/types.h>
-#include <sys/mman.h>
-#include <sys/types.h>
-#include <sys/mman.h>
 #include "player-core.h"
 #include "version.h"
 #include "dsp-mixed.h"
@@ -91,7 +66,7 @@ int dsp_mixed::open()
   assert(0);
 }
 
-void dsp_mixed::close()
+void dsp_mixed::close(bool flush)
 {
   assert(0);
 }

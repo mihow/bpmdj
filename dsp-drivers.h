@@ -25,11 +25,13 @@ using namespace std;
 #include "player-config.h"
 #ifndef COMPILE_OSS
 #ifndef COMPILE_ALSA
+#ifndef COMPILE_JACK
 #error -------------------------------------------
 #error Should at least compile one dsp driver !!!
-#error Try using -D COMPILE_OSS, -D COMPILE_ALSA
+#error Use Try -D COMPILE_OSS, -D COMPILE_ALSA or
 #error -D COMPILE_JACK
 #error -------------------------------------------
+#endif
 #endif
 #endif
 
@@ -53,7 +55,7 @@ class dsp_driver
   virtual void write(stereo_sample2 value) = 0;
   virtual signed8 latency() = 0;
   virtual int  open() = 0;
-  virtual void close() = 0;
+  virtual void close(bool flush_first) = 0;
   virtual bool is_none() {return false; };
   virtual ~dsp_driver() {};
   static dsp_driver * get_driver(PlayerConfig * cfg);

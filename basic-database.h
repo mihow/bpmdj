@@ -42,7 +42,7 @@ public:
   void     add(Song*);
   Song *   find(QString song_filename);
   const vector<Song*>& getAllSongs() 
-  { 
+  {
     return all;
   };
   map<QString,Song*> *getFileTreeRef()

@@ -28,6 +28,7 @@ using namespace std;
 #include <signal.h>
 #include <unistd.h>
 #include <errno.h>
+#include <set>
 #include <sys/mount.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -38,6 +39,8 @@ using namespace std;
 #include "scripts.h"
 #include "memory.h"
 #include "vector-iterator.h"
+#include "set-iterator.h"
+#include "lock.h"
 
 /**
  * The died processes class keeps track of all processes which returned
@@ -45,11 +48,10 @@ using namespace std;
  * can be cleared only by a process manager. This ensures no concurrency
  * problems.
  */
-#define MAX_PROCESSES (50)
-class DiedProcesses
+class DiedProcesses: public Lock
 {
 public:
-  int died_pids[MAX_PROCESSES];
+  set<int> died_pids;
   vector<BasicProcessManager*> *listeners;
   bool sigs_installed;
   void init(BasicProcessManager * l);
@@ -58,38 +60,31 @@ public:
   ~DiedProcesses() {};
 };
 
+static DiedProcesses dead_processes;
 void DiedProcesses::check()
 {
-  if (!sigs_installed) 
-    return;
-  int tmp;
-  for(int i = 0 ; i < MAX_PROCESSES ; i ++)
+  if (!sigs_installed) return;
+  set<int> died;
+  {
+    Synchronized(dead_processes);
+    died = died_pids;
+    died_pids.clear();
+  }
+  simpleSetIterator<int> dead(died); ITERATE_OVER(dead)
     {
-      tmp=died_pids[i];
-      if (tmp!=-1)
-	{
-	  died_pids[i]=-1;
-	  vectorIterator<BasicProcessManager*> listener(listeners); ITERATE_OVER(listener)
-	    listener.val()->processDied(tmp);
-	  }
-	}
+      vectorIterator<BasicProcessManager*> listener(listeners); ITERATE_OVER(listener)
+	listener.val()->processDied(dead.val());
+      }
     }
+  }
 }
-
-static DiedProcesses dead_processes;
-
+ 
 void ToSwitchOrNotToSwitchSignal(int sig, siginfo_t *info, void* hu)
 {
+  Synchronized(dead_processes);
   int blah;
   waitpid(info->si_pid,&blah,0);
-  // grmpf ! error here !!!
-  for(int i = 0 ; i < MAX_PROCESSES ; i ++)
-    if (dead_processes.died_pids[i] == -1)
-      {
-	dead_processes.died_pids[i] = info->si_pid;
-	return;
-      }
-  printf("Warning: not enough place to store died pids\n");
+  dead_processes.died_pids.insert(info->si_pid);
 }
 
 void DiedProcesses::init(BasicProcessManager * l)
@@ -99,9 +94,6 @@ void DiedProcesses::init(BasicProcessManager * l)
       sigs_installed = true;
       listeners = new vector<BasicProcessManager*>();
       listeners->reserve(10);
-      // clear the dead array
-      for(int i = 0 ; i < MAX_PROCESSES ; i ++)
-	died_pids[i]=-1;
       // catch signals
       struct sigaction *act;
       act=bpmdj_allocate(1,struct sigaction);

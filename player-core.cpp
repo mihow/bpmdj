@@ -153,9 +153,7 @@ int wave_open(Index * playing, bool synchronous)
 	}
     }
   wave_name=getRawFilename(get_rawpath(),fname);
-
   wave_file=fopen(wave_name,"rb");
-      
   if (synchronous)
     {
       writer_died(0,NULL,NULL);
@@ -734,10 +732,9 @@ void read_write_bare_loop()
   dsp->start();
   while(!stop)
     {
-      // wait for pause
       if (paused)
+	// wait for pause
 	dsp->pause();
-      // calculate value
       x = y * normalperiod/currentperiod;
       if (x>loop_at)
 	loop_jump();
@@ -747,14 +744,11 @@ void read_write_bare_loop()
 	m = x;
       if (wave_read(m,value)<0)
 	{
-	  // printf("End of song, pausing\n");
 	  pause_playing();
 	  value[0] = stereo_sample2();
 	};
       value[0]=lfo_do(value[0]);
       y=y+1;
-      
-      // write value
       dsp->write(value[0]);
     }
 }
@@ -859,37 +853,23 @@ int core_meta_init()
 {
   copyright();
   common_init();
-  // Parsing the arguments
   if (opt_match)
     {
       Index target(arg_match);
       targetperiod=period_to_quad(target.get_period());
     }
-
   int L = strlen(argument);
-  
   if (L<4 || strcmp(argument+L-4,".idx")!=0)
-    //if ( strstr(argument,".idx")==NULL || strcmp(strstr(argument,".idx"),".idx")!=0)
     return err_needidx;
   playing = new Index(argument);
-  
   normalperiod=period_to_quad(playing->get_period());
   if (!opt_match) targetperiod=normalperiod;
   if (normalperiod<=0 && targetperiod>0) normalperiod=targetperiod;
   else if (normalperiod>0 && targetperiod<=0) targetperiod=normalperiod;
   currentperiod=targetperiod;
-  
-  if (WAVRATE==22050)
-    {
-      currentperiod=currentperiod.halved();
-      normalperiod=normalperiod.halved();
-      targetperiod=targetperiod.halved();
-    }
-
   cue_read();
   return err_none;
 }
-
 
 int core_object_init(bool sync)
 {
@@ -905,8 +885,8 @@ void core_play()
 {
   if (playing)
     {
-      stop = 0;
-      finished = 0;
+      stop = false;
+      finished = false;
       unpause_playing();
       rms_init();
       read_write_loop();
@@ -921,7 +901,7 @@ void core_play()
 
 void core_close()
 {
-  dsp->close();
+  dsp->close(true);
   finished = 1;
 }
 

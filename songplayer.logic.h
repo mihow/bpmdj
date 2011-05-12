@@ -46,11 +46,16 @@ class SongPlayerLogic :
    int tempo_fade;
    int fade_time;
    signed8 wantedcurrentperiod;
-   void setColor(QButton *button, bool enabled);
+   void setColor(QWidget *button, bool enabled);
    void redrawCues();
    void normalReached(bool yes);
    BpmAnalyzerDialog * bpmcounter;
    void init_tempo_switch_time();
+   bool cueKey(QKeyEvent*,int);
+   void storeCue(int nr);
+   void retrieveCue(int nr);
+   void retrieveNextCue();
+   void cueShift(signed8 dir);
  protected:
    virtual void done(int r);
    void checkCueNonZero();
@@ -61,6 +66,7 @@ class SongPlayerLogic :
    void update_map_scale_box();
    void set_start_stop_text();
    void captionize_according_to_index();
+   virtual void keyPressEvent ( QKeyEvent * e );
  public:
    SongPlayerLogic(QWidget*parent=0,const char*name=0, bool modal=FALSE,WFlags f=0);
  public slots:
@@ -69,7 +75,7 @@ class SongPlayerLogic :
    virtual void mouseMoveEvent(QMouseEvent * e);
    // screen update and tempo slides
    virtual void timerTick();
-   // phase shifts
+   // change the playing position
    virtual void nudgePlus();
    virtual void nudgeMinus();
    virtual void nudgeMinusHalfB();
@@ -80,7 +86,7 @@ class SongPlayerLogic :
    virtual void nudgePlus8M();
    virtual void nudgeMinus8M();
    virtual void nudgePlusB();
-   virtual void shiftBack();
+  // virtual void shiftBack();
    virtual void restart();
    // cues
    virtual void setCue();

@@ -52,6 +52,7 @@ using namespace std;
 #include <math.h>
 #include <sys/mman.h>
 #include <qmessagebox.h>
+#include "beatgraph-label.h"
 #include "beatgraph-analyzer.logic.h"
 #include "rythm-analyzer.logic.h"
 #include "sys/times.h"
@@ -80,6 +81,12 @@ void BeatGraphAnalyzer::activate()
 {
   getTempo();
   changeVisualisation();
+  pattern->activate();
+}
+
+void BeatGraphAnalyzer::deactivate()
+{
+  pattern->deactivate();
 }
 
 /**
@@ -122,8 +129,7 @@ void BeatGraphAnalyzer::readFileSigned()
     {
       long toread = audiosize - pos;
       if (toread>bufsize) toread = bufsize;
-      long count=readsamples((unsigned4*)buffer,toread,raw);
-      
+      long count=readsamples(buffer,toread,raw);
       for(int i = 0 ; i < count/COLLAPSE; i++)
 	{
 	  uncompressed sum=0;
@@ -153,14 +159,12 @@ void BeatGraphAnalyzer::readFileSigned()
     signed_data[i]/=maximum;
 }
 
-/**
- * This function shows the energy pattern stored in the data field.
- */
 void BeatGraphAnalyzer::showEnergyPattern()
 { 
   unsigned4 collapsed_period = period  / COLLAPSE ;
   unsigned4 collapsed_size = audiosize / COLLAPSE ;
   int window_xsize = collapsed_size / collapsed_period - 1 ;
+  int samples_per_column = collapsed_period * COLLAPSE;
   int window_ysize = pattern->contentsRect().height();
   assert(window_ysize>0);
   QPixmap *pm = new QPixmap(window_xsize,window_ysize);
@@ -171,7 +175,7 @@ void BeatGraphAnalyzer::showEnergyPattern()
   for(int column = 0 ; column < window_xsize ; column++)
     {
       unsigned4 idx = column * collapsed_period;
-      if (::x/(normalperiod) == column)
+      /*if (::x/(normalperiod) == column)
 	for(int row = 0 ; row < window_ysize ; row++)
 	  {
 	    unsigned4 idx2 = (int)((float)row*yscale);
@@ -180,7 +184,7 @@ void BeatGraphAnalyzer::showEnergyPattern()
 	    p.setPen(QColor(val,0,0));
 	    p.drawPoint(column,row);
 	  }
-      else
+	  else*/
 	for(int row = 0 ; row < window_ysize ; row++)
 	  {
 	    unsigned4 idx2 = (int)((float)row*yscale);
@@ -194,7 +198,7 @@ void BeatGraphAnalyzer::showEnergyPattern()
   for(int row = 0 ; row < window_ysize ; row+=window_ysize/8)
     p.drawLine(0,row,window_xsize-1,row);
   p.end(); 
-  pattern->setPixmap(*pm);
+  pattern->setPixmap(*pm,samples_per_column);
 }
 
 void getBandColor(int band, QColor &color, float val)
@@ -405,6 +409,7 @@ void BeatGraphAnalyzer::showHaarPattern()
   unsigned4 collapsed_period = period  / COLLAPSE ;
   unsigned4 collapsed_size = audiosize / COLLAPSE ;
   int window_xsize = collapsed_size / collapsed_period - 1 ;
+  int samples_per_column = collapsed_period * COLLAPSE;
   int window_ysize = pattern->contentsRect().height();
   assert(window_ysize>0);
   QPixmap *pm = new QPixmap(window_xsize,window_ysize);
@@ -455,16 +460,13 @@ void BeatGraphAnalyzer::showHaarPattern()
   for(int row = 0 ; row < window_ysize ; row+=window_ysize/8)
     p.drawLine(0,row,window_xsize-1,row);
   p.end(); 
-  pattern->setPixmap(*pm);
+  pattern->setPixmap(*pm,samples_per_column);
   QPixmap *sm = new QPixmap(1,window_ysize);
   QPainter l;
   l.begin(sm);
   l.end();
 }
 
-/**
- * Checks whether a descent visualisation is possible
- */
 bool BeatGraphAnalyzer::check_visualisation_conditions(bool file_read)
 {
   if (!period)
@@ -474,7 +476,6 @@ bool BeatGraphAnalyzer::check_visualisation_conditions(bool file_read)
 			   "Please go to the bpm counter and measure the tempo first");
       return false;
     }
-  
   if (!audiosize && file_read)
     {
       QMessageBox::warning(this,"Fragment too small",
@@ -485,9 +486,6 @@ bool BeatGraphAnalyzer::check_visualisation_conditions(bool file_read)
   return true;
 }
 
-/**
- * This function will update the pattern picture shown.
- */
 void BeatGraphAnalyzer::showPattern()
 {
   if (!check_visualisation_conditions()) return;
@@ -495,8 +493,8 @@ void BeatGraphAnalyzer::showPattern()
     showHaarPattern();
   else
     showEnergyPattern();
+  update();
 }
-
 
 /**
  * This function must be called when the visualisation modus changes
@@ -512,7 +510,6 @@ void BeatGraphAnalyzer::changeVisualisation()
     calculateEnergy();
   showPattern();
 }
-
 
 void BeatGraphAnalyzer::getTempo()
 {
@@ -540,4 +537,11 @@ void BeatGraphAnalyzer::setTempo()
   playing->set_period(normalperiod/4);
   if (was_target) emit targetTempo();
   if (was_normal) emit normalTempo();
+  pattern->setFocus();
 }
+
+void BeatGraphAnalyzer::cuesChanged()
+{
+  pattern->update();
+}
+

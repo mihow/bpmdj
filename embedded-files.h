@@ -28,8 +28,8 @@ void init_embedded_files();
 
 #define EMBEDDED_FILES \
 FILE(logo_png)  \
-FILE(noise_ogg) \
-FILE(noise_mp3)
+FILE(bpmdj_ogg) \
+FILE(bpmdj_mp3)
 
 #define FILE(name) \
   extern         int name## _size; \

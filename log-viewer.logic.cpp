@@ -110,11 +110,11 @@ void LogViewerLogic::checkfile(const QString fullname, const QString filename)
   new LogItem(list,fullname,filename);
 }
 
-void LogViewerLogic::scandir(const QString dirname, const QString checkname)
+bool LogViewerLogic::scandir(const QString dirname, const QString checkname)
 {
-  if (started) return;
+  if (started) return false;
   started=true;
-  DirectoryScanner::scandir(dirname,checkname);
+  return DirectoryScanner::scandir(dirname,checkname);
 }
 
 void LogViewerLogic::changeLogView(QListViewItem * i)

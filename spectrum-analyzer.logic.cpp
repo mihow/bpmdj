@@ -49,7 +49,6 @@ using namespace std;
 #include <math.h>
 #include <assert.h>
 #include <math.h>
-#include <pthread.h>
 #include "memory.h"
 #include "spectrum-analyzer.logic.h"
 #include "sys/times.h"

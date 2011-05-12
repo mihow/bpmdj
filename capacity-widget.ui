@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>241</width>
-            <height>142</height>
+            <width>268</width>
+            <height>112</height>
         </rect>
     </property>
     <property name="caption">
@@ -38,7 +38,7 @@
                 <cstring>mplayer1pre7</cstring>
             </property>
             <property name="text">
-                <string>mplayer 1.0pre7-3.3.5</string>
+                <string>mplayer 1.0pre7-3.3.5 or 1.0rc1-4.1.2</string>
             </property>
         </widget>
         <widget class="QCheckBox" row="2" column="0">

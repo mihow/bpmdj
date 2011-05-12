@@ -32,6 +32,7 @@ using namespace std;
 #include "tags.h"
 #include "memory.h"
 #include "pixmap-cache.h"
+#include "fragment-cache.h"
 
 //-----------------------------------------------------------
 //            qsong
@@ -624,3 +625,10 @@ Song * QSong::songEssence(int i)
   if (i<0 || i >=get_song_count()) return NULL; 
   else return get_songs(i);
 };
+
+void QSong::preparePaint(QVectorView * vv, int i)
+{
+//  Song * song = songEssence(i);
+//  if (!song) return;
+//  fragmentCache.get(song);
+}

@@ -64,6 +64,7 @@ class QSong: public QVectorViewData
     virtual bool isSelected(int i) const { assert(i>=0); return get_selected(i); };
     virtual void setSelected(int i, bool val=true) {get_selected()[i]=val;};
     virtual void sort(int col, bool ascending);
+    virtual void preparePaint(QVectorView* vv, int i);
     virtual void paintCell(QVectorView* vv, int i, QPainter *p, const QColorGroup &cg, int col, int wid, int align);
     virtual QString text(int j, int i) const { return Text(get_songs(j),i); };
     

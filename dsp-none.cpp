@@ -30,12 +30,9 @@ using namespace std;
 #include "version.h"
 #include "dsp-none.h"
 
-/*-------------------------------------------
- *         Dsp operations
- *-------------------------------------------*/ 
-
 void dsp_none::start()
 {
+  samples_to_wait=0;
 }
 
 void dsp_none::pause()
@@ -45,12 +42,24 @@ void dsp_none::pause()
 
 void dsp_none::write(stereo_sample2 value)
 {
-  usleep(1000000/44100);
+  /**
+   * The usleep routine does not always work properly
+   * Since this is a less useful driver, we simply
+   * gather dat for up to a second and then wait
+   * one second.
+   * usleep(1000000/44100);
+   */
+  samples_to_wait++;
+  if (samples_to_wait>44100)
+    {
+      samples_to_wait-=44100;
+      sleep(1);
+    }
 }
 
 signed8 dsp_none::latency()
 {
-  return 0;
+  return samples_to_wait;
 }
 
 int dsp_none::open()
@@ -58,6 +67,12 @@ int dsp_none::open()
   return err_none;
 }
 
-void dsp_none::close()
+void dsp_none::close(bool flushfirst)
 {
+  if (flushfirst)
+    while (samples_to_wait>44100)
+      {
+	samples_to_wait-=44100;
+	sleep(1);
+      }
 }

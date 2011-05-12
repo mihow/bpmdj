@@ -21,7 +21,6 @@ using namespace std;
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
-#include <stdlib.h>
 #include <string.h>
 #include <qapplication.h>
 #include <qmessagebox.h>
@@ -29,14 +28,7 @@ using namespace std;
 #include <qlcdnumber.h>
 #include <qheader.h>
 #include <qgroupbox.h>
-#include <stdlib.h>
 #include <errno.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <assert.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <sys/ioctl.h>
@@ -45,7 +37,6 @@ using namespace std;
 #include <libgen.h>
 #include <time.h>
 #include <sys/times.h>
-#include <assert.h>
 #include <math.h>
 #include <pthread.h>
 #include <sys/types.h>
@@ -150,7 +141,7 @@ int dsp_mixed::open()
   return err_none;
 }
 
-void dsp_mixed::close()
+void dsp_mixed::close(bool flush)
 {
   char devname[500];
   sprintf(devname,"/kbpm-mix%d\n",mix_dev);
@@ -161,4 +152,3 @@ void dsp_mixed::close()
   mapsize = 0;
   shm_unlink(devname);
 }
- 

@@ -167,3 +167,21 @@ int yywrap()
   {
   return 1;
   }
+
+/**
+ * According to "Majc _" <majci888@gmail.com> the slackware lexer
+ * does not produce file that have a yyset_in/yyset_out function
+ * Therefore we insert them ourselves
+ */
+#ifdef LEXER_FIX1
+void yyset_in (FILE *  in_str )
+{
+ yyin = in_str ;
+}
+
+void yyset_out (FILE *  out_str )
+{
+ yyout = out_str ;
+}
+
+#endif

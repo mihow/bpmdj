@@ -1,7 +1,4 @@
-# This top level makefile will run through a set of phases to compile the sofware
-# The first phase involvse linking all the links into the cvs, thereby checking the 
-# possible conflicts that might arise due to cvs updates
-VERSION = 3.3
+VERSION = 3.4
 .EXPORT_ALL_VARIABLES:
 all: .link-targets .ui-forms .source .depend .compile 
 
@@ -40,19 +37,52 @@ LINK =  $(CPP) $(LDFLAGS) $(QT_INCLUDE_PATH) $(QT_LIBRARY_PATH) $(QT_LIBS)
 # Compilation of all source files
 .compile: compile .depend
 	@echo "Compiling:"
-	@make -s --no-print-directory -f compile
+	@make -j 3 -s --no-print-directory -f compile
 
 # Packaging of the distribution
 packages: packager all
 	@echo "Packaging:"
 	@make -s --no-print-directory -f packager
 
+check-bin: 
+	@make -s --no-print-directory -f packager bpmdj-source.tgz
+	@echo =========== Entering Compilation Reactor ===================
+	@mkdir tmp
+	@echo [unzip]
+	@cd tmp; tar -xzf ../bpmdj-source.tgz
+	@cp -L defines tmp/
+	@cd tmp; make -s
+	@echo [clean] reactor
+	@rm -rf tmp
+	@echo ============================================================
+
+check-doc: 
+	@make -s --no-print-directory -f packager bpmdj-doc.tgz
+	@echo =========== Entering Documentation Reactor =================
+	@echo [unzip]
+	@mkdir tmp
+	@cd tmp; tar -xzf ../bpmdj-doc.tgz
+	@echo " [test] widowed files"
+	@cd tmp/documentation; for a in *.html; do cat $$a >>all; done
+	@cd tmp/documentation; for a in *.png; do echo -n $$a "  :::"; grep -c $$a all; done  >../../count
+	@grep :::0 count >bpmdj-doc-errors.txt; exit 0
+	@echo " [test] widowed links"
+	@linklint -error -root tmp/documentation /@ 2>>bpmdj-doc-errors.txt
+	@echo "[clean] reactor"
+	@rm -rf tmp
+	@test -s bpmdj-doc-errors.txt
+	@echo "Report is in bpmdj-doc-errors.txt"
+	@echo ============================================================
+
+check: check-bin check-doc
+
 # Varia
 nens:
 	@~/Administration/bpmdj-to-nens
 
-tuuster: kbpm-dj kbpm-play
-	@scp kbpm-dj kbpm-play bpmdj@tuuster:bpmdj/
+tuuster: 
+	@scp kbpm-play bpmdj@tuuster:bpmdj/
+	@scp kbpm-dj   bpmdj@tuuster:bpmdj/
 
 website:
 	rsync -e ssh -xavz documentation/* krubbens@bpmdj.sourceforge.net:/home/groups/b/bp/bpmdj/htdocs/

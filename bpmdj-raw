@@ -23,14 +23,14 @@ songlocation=$songname
 rawname=$1"`basename "$2"`.raw"
 extension=${songname##*.}
 
-#echo "BPMDJ-RAW arguments"
-#echo LOCATION = $songlocation
-#echo RAWNAME = $rawname
-#echo EXTENSION = $extension
-#echo DECODER = $DECODER
+echo "BPMDJ-RAW arguments"
+echo LOCATION = $songlocation
+echo RAWNAME = $rawname
+echo EXTENSION = $extension
+echo DECODER = $DECODER
 
 # if the raw filename already exists, don't write it
-(test -f "$rawname") && exit 1;
+(test -f "$rawname") && exit 0;
 
 # the song must exist
 (! (test -f "$songlocation") ) && songlocation=music/"$songlocation" \
@@ -75,3 +75,6 @@ elif test $DECODER = "5"; then
     (test -f "$rawname") && exit 0;
     mplayer "$songlocation" -ao pcm:file="$rawname" -vo null -quiet;
 fi
+
+(test -f "$rawname") && exit 0;
+exit 1

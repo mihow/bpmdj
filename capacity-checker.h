@@ -54,8 +54,8 @@ class Ogg123Decoder: public DecoderChecker
 protected:
   virtual const char *getCodedData(int & size)
   {
-    size = noise_ogg_size;
-    return noise_ogg;
+    size = bpmdj_ogg_size;
+    return bpmdj_ogg;
   }
 public:
   Ogg123Decoder() : DecoderChecker(CAPACITY_OGG123,"ogg")
@@ -69,8 +69,8 @@ class Mp3Decoder: public DecoderChecker
  protected:
   virtual const char *getCodedData(int & size)
     {
-      size = noise_mp3_size;
-      return noise_mp3;
+      size = bpmdj_mp3_size;
+      return bpmdj_mp3;
     }
  public:
   Mp3Decoder(int decoder) : DecoderChecker(decoder,"mp3")

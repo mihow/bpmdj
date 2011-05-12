@@ -28,8 +28,11 @@ class BpmDjEvent: public BpmEvent
 {
  public:
   BpmDjEvent() : BpmEvent(BpmDjCustom)
-    {
-    }
+  {
+  }
   virtual void run(SongSelectorLogic * song_selector_window) = 0;
+  virtual ~BpmDjEvent()
+  {
+  }
 };
 #endif

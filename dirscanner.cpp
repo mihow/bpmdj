@@ -68,11 +68,11 @@ void DirectoryScanner::recursing(const QString dirname)
   printf("Recursing into %s\n",(const char*)dirname);
 }
 
-void DirectoryScanner::scandir(const QString dirname, const QString prefix)
+bool DirectoryScanner::scandir(const QString dirname, const QString prefix)
 {
   struct dirent * entry;
   DIR * dir=opendir(dirname);
-  if (!dir) return;
+  if (!dir) return false;
   recursing(dirname);
   /**
    * Todo: sort the directory according to the inode numbers and then read them 
@@ -88,10 +88,11 @@ void DirectoryScanner::scandir(const QString dirname, const QString prefix)
       else
 	newprefix=prefix+"/"+entry->d_name;
       QString newdir = dirname +"/"+entry->d_name;
-      scandir(newdir,newprefix);
-      scanfile(prefix,entry->d_name);
+      if (!scandir(newdir,newprefix))
+	scanfile(prefix,entry->d_name);
     }
   closedir(dir);
+  return true;
 }
 
 bool DirectoryScanner::matchextension(const QString filename)

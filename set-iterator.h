@@ -24,6 +24,48 @@ using namespace std;
 #include <assert.h>
 #include "iterator.h"
 
+template<class K>
+class simpleSetIterator
+{
+  typename set<K>::iterator it,end;
+  bool once;
+public:
+  inline K key()
+  {
+    assert(0);
+  }
+  inline K val()
+  {
+    return *it;
+  }
+  inline bool valid()
+  {
+    return it!=end;
+  }
+  inline void step()
+  {
+    it++;
+  }
+  inline bool prepare_block()
+  {
+    if (once) return false;
+    return once=true;
+  }
+  inline void need_fields()
+  {
+  }
+  inline void start()
+  {
+  }
+  simpleSetIterator(set<K> &m): it(m.begin()), end(m.end()), once(false)
+  {
+  };
+  simpleSetIterator(set<K> *m): it(m->begin()), end(m->end()), once(false)
+  {
+  };
+};
+
+
 template<class K, class C>
 class setIterator
 {

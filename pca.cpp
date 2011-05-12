@@ -54,10 +54,10 @@ using namespace std;
 #define SIGN(a, b) ( (b) < 0 ? -fabs(a) : fabs(a) )
 static void corcol(float **data, int n, int m, float **symmat);
 static void covcol(float **data, int n, int m, float **symmat);
-static float *vector(int n);
+static float *pca_vector(int n);
 static void tred2(float **a, int n, float *d, float *e);
 static void tqli(float d[], float e[], int n, float ** z, char* &error_msg);
-static void free_vector(float *v, int n);
+static void free_pca_vector(float *v, int n);
 static void scpcol(float **data, int n, int m, float **symmat);
 
 
@@ -78,9 +78,9 @@ void do_pca(int n, int m, float** data, char* &error_msg)
   /*********************************************************************
     Eigen-reduction
   **********************************************************************/
-  /* Allocate storage for dummy and new vectors. */
-  evals = vector(m);     /* Storage alloc. for vector of eigenvalues */
-  interm = vector(m);    /* Storage alloc. for 'intermediate' vector */
+  /* Allocate storage for dummy and new pca_vectors. */
+  evals = pca_vector(m);     /* Storage alloc. for pca_vector of eigenvalues */
+  interm = pca_vector(m);    /* Storage alloc. for 'intermediate' pca_vector */
   symmat2 = matrix(m, m);  /* Duplicate of correlation (etc.) matrix */
   for (i = 1; i <= m; i++) {
     for (j = 1; j <= m; j++) {
@@ -92,7 +92,7 @@ void do_pca(int n, int m, float** data, char* &error_msg)
   if (error_msg) return;
   
   /* evals now contains the eigenvalues,
-     columns of symmat now contain the associated eigenvectors. */
+     columns of symmat now contain the associated eigenpca_vectors. */
 
 #ifdef PRINT_PCA_RESULTS
   printf("\nEigenvalues:\n");
@@ -104,7 +104,7 @@ void do_pca(int n, int m, float** data, char* &error_msg)
   printf("percentages, representing the 'percentage variance\n");
   printf("explained' by the associated axis or principal component.)\n");
   
-  printf("\nEigenvectors:\n");
+  printf("\nEigenpca_vectors:\n");
   printf("(First three; their definition in terms of original vbes.)\n");
   for (j = 1; j <= m; j++) {
     for (i = 1; i <= m; i++)  {
@@ -143,8 +143,8 @@ void do_pca(int n, int m, float** data, char* &error_msg)
 
   free_matrix(symmat, m, m);
   free_matrix(symmat2, m, m);
-  free_vector(evals, m);
-  free_vector(interm, m);
+  free_pca_vector(evals, m);
+  free_pca_vector(interm, m);
   
 }
 
@@ -273,9 +273,9 @@ int old_main(int argc, char *argv[])
     Eigen-reduction
   **********************************************************************/
   
-  /* Allocate storage for dummy and new vectors. */
-  evals = vector(m);     /* Storage alloc. for vector of eigenvalues */
-  interm = vector(m);    /* Storage alloc. for 'intermediate' vector */
+  /* Allocate storage for dummy and new pca_vectors. */
+  evals = pca_vector(m);     /* Storage alloc. for pca_vector of eigenvalues */
+  interm = pca_vector(m);    /* Storage alloc. for 'intermediate' pca_vector */
   symmat2 = matrix(m, m);  /* Duplicate of correlation (etc.) matrix */
   for (i = 1; i <= m; i++) {
     for (j = 1; j <= m; j++) {
@@ -286,7 +286,7 @@ int old_main(int argc, char *argv[])
   tqli(evals, interm, m, symmat, error_msg);   /* Reduction of sym. trid. matrix */
   assert(!error_msg);
   /* evals now contains the eigenvalues,
-     columns of symmat now contain the associated eigenvectors. */
+     columns of symmat now contain the associated eigenpca_vectors. */
   
   printf("\nEigenvalues:\n");
   for (j = m; j >= 1; j--) {
@@ -297,7 +297,7 @@ int old_main(int argc, char *argv[])
   printf("percentages, representing the 'percentage variance\n");
   printf("explained' by the associated axis or principal component.)\n");
   
-  printf("\nEigenvectors:\n");
+  printf("\nEigenpca_vectors:\n");
   printf("(First three; their definition in terms of original vbes.)\n");
   for (j = 1; j <= m; j++) {
     for (i = 1; i <= 3; i++)  {
@@ -347,8 +347,8 @@ int old_main(int argc, char *argv[])
   free_matrix(data, n, m);
   free_matrix(symmat, m, m);
   free_matrix(symmat2, m, m);
-  free_vector(evals, m);
-  free_vector(interm, m);
+  free_pca_vector(evals, m);
+  free_pca_vector(interm, m);
 
   return 0; // WVB -- the main must return something to avoid a warning
 }
@@ -361,10 +361,10 @@ static void corcol(float **data, int n, int m, float **symmat)
   float eps = 0.005;
   float x, *mean, *stddev;
   int i, j, j1, j2;
-  /* Allocate storage for mean and std. dev. vectors */
-  mean = vector(m);
-  stddev = vector(m);
-  /* Determine mean of column vectors of input data matrix */
+  /* Allocate storage for mean and std. dev. pca_vectors */
+  mean = pca_vector(m);
+  stddev = pca_vector(m);
+  /* Determine mean of column pca_vectors of input data matrix */
   for (j = 1; j <= m; j++)
     {
       mean[j] = 0.0;
@@ -372,10 +372,10 @@ static void corcol(float **data, int n, int m, float **symmat)
 	mean[j] += data[i][j];
       mean[j] /= (float)n;
     }
-  // printf("\nMeans of column vectors:\n");
+  // printf("\nMeans of column pca_vectors:\n");
   // for (j = 1; j <= m; j++)  {
   //  printf("%7.1f",mean[j]);  }   printf("\n");
-  /* Determine standard deviations of column vectors of data matrix. */
+  /* Determine standard deviations of column pca_vectors of data matrix. */
   for (j = 1; j <= m; j++)
     {
       stddev[j] = 0.0;
@@ -394,7 +394,7 @@ static void corcol(float **data, int n, int m, float **symmat)
   // for (j = 1; j <= m; j++) { printf("%7.1f", stddev[j]); }
   // printf("\n");
   
-  /* Center and reduce the column vectors. */
+  /* Center and reduce the column pca_vectors. */
   for (i = 1; i <= n; i++)
     for (j = 1; j <= m; j++)
       {
@@ -425,9 +425,9 @@ static void covcol(float **data, int n, int m, float **symmat)
 {
   float *mean;
   int i, j, j1, j2;
-  /* Allocate storage for mean vector */
-  mean = vector(m);
-  /* Determine mean of column vectors of input data matrix */
+  /* Allocate storage for mean pca_vector */
+  mean = pca_vector(m);
+  /* Determine mean of column pca_vectors of input data matrix */
   for (j = 1; j <= m; j++)
     {
       mean[j] = 0.0;
@@ -436,11 +436,11 @@ static void covcol(float **data, int n, int m, float **symmat)
       mean[j] /= (float)n;
     }
   
-  // printf("\nMeans of column vectors:\n");
+  // printf("\nMeans of column pca_vectors:\n");
   // for (j = 1; j <= m; j++)  {
   //    printf("%7.1f",mean[j]);  }   printf("\n");
   
-  /* Center the column vectors. */
+  /* Center the column pca_vectors. */
   
   for (i = 1; i <= n; i++)
     for (j = 1; j <= m; j++)
@@ -474,8 +474,8 @@ void scpcol(float **data, int n, int m, float **symmat)
       }
 }
 
-/* Allocates a float vector with range [1..n]. */
-float *vector(int n)
+/* Allocates a float pca_vector with range [1..n]. */
+float *pca_vector(int n)
 {
   float * v = bpmdj_allocate(n,float);
   return v-1;
@@ -499,9 +499,9 @@ float **matrix(int n,int m)
   return mat;
 }
 
-/**  Deallocate vector storage  *********************************/
-/* Free a float vector allocated by vector(). */
-static void free_vector(float *v, int n)
+/**  Deallocate pca_vector storage  *********************************/
+/* Free a float pca_vector allocated by pca_vector(). */
+static void free_pca_vector(float *v, int n)
 {
   bpmdj_deallocate((char*) (v+1));
 }

@@ -66,7 +66,7 @@ bool DecoderChecker::works()
 	{
 	  fseek(raw_file,0,SEEK_END);
 	  unsigned8 L = ftell(raw_file);
-	  if (L>350*1024) success = true;
+	  if (L>320*1024) success = true; // 340K is the size of the sound logo
 	  fclose(raw_file);
 	}
       // remove the .raw file
@@ -101,6 +101,7 @@ bool Mpg123Decoder::checkProgram(QString filename)
       if (line.find("0.59r")>=0) check1=true;
       if (line.find("0.60")>=0) check1=true;
       if (line.find("0.61")>=0) check1=true;
+      if (line.find("0.65")>=0) check1=true;
       if (line.find("Michael Hipp")>=0) check2=true;
     }
   logfile.close();

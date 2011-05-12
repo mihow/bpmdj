@@ -30,27 +30,28 @@ PixmapCache::PixmapCache() : QIntCache<QPixmap>()
 
 QPixmap * PixmapCache::insert(Song* a, QPixmap * pm)
 {
-  QIntCache<QPixmap>::insert((int)(void*)a,pm);
+  QIntCache<QPixmap>::insert((intptr_t)(void*)a,pm);
   return pm;
 }
 
 void PixmapCache::remove(Song * a)
 {
-  QIntCache<QPixmap>::remove((int)a);
+  QIntCache<QPixmap>::remove((intptr_t)a);
 }
 
 QPixmap *PixmapCache::find(Song* a, Song* m, int w, int h)
 {
   if (w!=width || h!=height || m!=main)
     {
-      QIntCacheIterator<QPixmap> it(*this);
-      while (!it.isEmpty())
-      	QIntCache<QPixmap>::remove(it.currentKey());
+      QIntCache<QPixmap>::clear();
+      //      QIntCacheIterator<QPixmap> it(*this);
+      //      while (!it.isEmpty())
+      //      	QIntCache<QPixmap>::remove(it.currentKey());
       main = m;
       width = w;
       height = h;
     }
-  QPixmap * answer = QIntCache<QPixmap>::find((int)a);
+  QPixmap * answer = QIntCache<QPixmap>::find((intptr_t)a);
   if (answer) return answer;
   return insert(a,new QPixmap());
 }

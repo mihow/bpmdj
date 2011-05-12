@@ -81,7 +81,6 @@ using namespace std;
 #include "queuedsong.h"
 #include "historysong.h"
 #include "merger-dialog.h"
-#include "pca.h"
 #include "edit-distance.h"
 #include "index-reader.h"
 #include "scripts.h"
@@ -100,6 +99,7 @@ using namespace std;
 #include "vector-iterator.h"
 #include "song-iterator.h"
 #include "listview-iterator.h"
+#include "fragment-cache.h"
 
 SongSelectorLogic * song_selector_window = NULL;
 
@@ -158,6 +158,7 @@ SongSelectorLogic::SongSelectorLogic(QWidget * parent, const QString name) :
   connect( songList, SIGNAL( ctrlReturnPressed(int) ), this, SLOT( selectSong(int) ) );
   connect( songList, SIGNAL( returnPressed(int) ), this, SLOT( selectionMenu() ) );
   connect( songList, SIGNAL( rightButtonPressed(int,const QPoint&,int) ), this, SLOT( selectionMenu() ) );
+  connect( songList, SIGNAL( clicked(int) ), this, SLOT( playFragment(int) ) );
   
   // link with the processmanager
   processManager = new ProcessManager(this);
@@ -189,10 +190,6 @@ SongSelectorLogic::SongSelectorLogic(QWidget * parent, const QString name) :
   file->insertItem("Bpm Mixing Desk", this, SLOT (openBpmMixer()));
   file->insertItem("Play &Mixers", this, SLOT (openMixer()));
   file->insertSeparator();
-  file->insertItem("Record", this, SLOT (openRecorder()));
-  file->insertItem("Replay", this, SLOT (openReplay()));
-  file->insertItem("Record Mixers", this, SLOT (openRecordMixer()));
-  file->insertSeparator();
   file->insertItem("Inspect log files",this, SLOT(openLogDialog()));
   file->insertItem("Statistics",this, SLOT(openStatistics()));
   file->insertItem("&Quit",this,SLOT(quitButton()));
@@ -203,8 +200,9 @@ SongSelectorLogic::SongSelectorLogic(QWidget * parent, const QString name) :
   help->insertItem("L&icense",this,SLOT(doLicense()));
   
   // before menu
-  before->insertItem("&Import songs ("SONG_EXT")",this,SLOT(importSongs())); // retrieves from ./music all songs
-
+  before->insertItem("&Import songs ("SONG_EXT")",this,SLOT(importSongs()));
+  before->insertItem("Check song availability",this,SLOT(startExistenceCheck()));
+  
   before->insertItem("Rename songs with wrong title...",this,SLOT(startRenamer()));
   before->insertSeparator();
   before->insertItem("&Check/import cdrom content",this,SLOT(checkDisc())); // checks wether the songs on a disk can be found somewhere in the indices
@@ -244,6 +242,7 @@ SongSelectorLogic::SongSelectorLogic(QWidget * parent, const QString name) :
   linkAutoProp(Config::auto_popqueue  ,autom,"Pop queue when monitor empty");
   linkAutoProp(Config::ask_mix        ,autom,"Ask 'how did the mix go'");
   linkAutoProp(Config::open_bpmmixer  ,autom,"Open Bpm Mixer when starting program");
+  linkAutoProp(Config::play_fragments ,autom,"Play fragments within selector");
   //  autom->setCheckable(true);
   
   // selection menu
@@ -287,7 +286,7 @@ SongSelectorLogic::SongSelectorLogic(QWidget * parent, const QString name) :
   main->insertItem("&Auto",autom);
   main->insertItem("&Selection",selection);
   main->insertItem("&Queue",queuemenu);
-  main->insertItem("&Management",before);
+  main->insertItem("&Library",before);
   main->insertItem("&Help",help);
   
   // create player views
@@ -380,31 +379,17 @@ void SongSelectorLogic::doBackup()
   vexecute("tar -cvzf bpmdj-index-backup-%d-%d-%d-%d-%d.tgz index",t->tm_mday,t->tm_mon,1900+t->tm_year,t->tm_hour,t->tm_min);
 }
 
-void* goSpectrumPca(void * whatever)
-{
-  SongSelectorLogic* ss = (SongSelectorLogic*)whatever;
-  ss -> doSpectrumPca(true,false);
-  status->message("Spectrum PCA finished",2000);
-  return whatever;
-}
-
-void SongSelectorLogic::start_spectrum_pca()
-{
-  QMutexLocker _ml(&lock);
-  pthread_t *checker = bpmdj_allocate(1,pthread_t);
-  pthread_create(checker,NULL,goSpectrumPca,this); 
-}
-
-void SongSelectorLogic::start_existence_check()
+void SongSelectorLogic::startExistenceCheck()
 { 
   QMutexLocker _ml(&lock);
-  database->start_existence_check();
+  if (database)
+    existenceScanner.start(new vector<Song*>(database->getAllSongs()));
 }
 
 void SongSelectorLogic::initialize_extras()
 { 
   QMutexLocker _ml(&lock);
- // first parse all the tags...
+  // first parse all the tags...
   parse_tags();
   bool ok = false;
   QListViewItem * e = NULL;
@@ -493,7 +478,6 @@ void SongSelectorLogic::acceptNewSong(Song* song)
 }
 
 static bool alreadygavefilterwarning = false;
-
 void SongSelectorLogic::reread_and_repaint(Song* song)
 {
   QMutexLocker _ml(&lock);
@@ -819,171 +803,22 @@ void SongSelectorLogic::openBpmMixer()
     spawn(Config::get_bpm_mixer_command());
 }
 
-void SongSelectorLogic::openRecorder()
-{
-  QMutexLocker _ml(&lock);
-  if (Config::get_record_command().isEmpty())
-    QMessageBox::message(NULL,"Please create an appropriate record command in the preferences dialog\n");
-  else
-    {
-      bool ok;
-      QString trackname = QInputDialog::getText("Record track"
-						,"Please enter the trackname to record"
-						,QLineEdit::Normal,QString::null,&ok,this);
-      if (ok && !trackname.isEmpty())
-	{
-	  char command[1024];
-	  sprintf(command,(const char*)Config::get_record_command(),(const char*)trackname);
-	  spawn(command);
-	}
-    }
-}
-
-void SongSelectorLogic::openReplay()
-{
-  QMutexLocker _ml(&lock);
-  if (Config::get_record_command().isEmpty())
-    QMessageBox::message(NULL,"Please create an appropriate replay command in the preferences dialog\n");
-  else
-    {
-      bool ok;
-      QString trackname = QInputDialog::getText("Replay track"
-						,"Please enter the trackname to play"
-						,QLineEdit::Normal,QString::null,&ok,this);
-      if (ok && !trackname.isEmpty())
-	{
-	  char command[1024];
-	  sprintf(command,(const char*)Config::get_replay_command(),(const char*)trackname);
-	  spawn(command);
-	}
-    }
-}
-
-void SongSelectorLogic::openRecordMixer()
-{
-  QMutexLocker _ml(&lock);
-  if (Config::get_record_command().isNull())
-    QMessageBox::message(NULL,"Please create an appropriate record_mixer command in the preferences dialog\n");
-  else
-    spawn((const char*)Config::get_record_mixer_command());
-}
-
 void SongSelectorLogic::doSpectrumPca(bool fulldatabase, bool update_process_view)
 {
   QMutexLocker _ml(&lock);
-  int count = 0;
-  float ** data;
-  const vector<Song*> &all = database->getAllSongs();
+  vector<Song*> *all;
   if (fulldatabase)
-    {
-      {
-	constVectorIterator<Song*> song(all); ITERATE_OVER(song)
-	  if (song.val()->get_spectrum() != no_spectrum) count++;
-	}
-      }
-      if ( count == 0 ) return;
-      data = matrix(count,spectrum_size);
-      int written = 0;
-      constVectorIterator<Song*> svi(all); ITERATE_OVER(svi)
-	if (svi.val()->get_spectrum() != no_spectrum)
-	{
-	  assert(written<count);
-	  ++ written; 
-	  for (int j = 0 ; j < spectrum_size ; j++)
-	  data [ written ] [ j + 1 ] = svi.val() -> get_spectrum() -> band ( j ) ;
-	}
-      }
-    }
+    all=new vector<Song*>(database->getAllSongs());
   else
     {
+      all = new vector<Song*>;
       selectedSongIterator svic; ITERATE_OVER(svic)
-	if (svic.val()->get_spectrum()!=no_spectrum) count++;
-      };
-      if ( count == 0 ) return;
-      data = matrix(count,spectrum_size);
-      int written = 0;
-      selectedSongIterator svi; ITERATE_OVER(svi)
-	if (svi.val()->get_spectrum()!=no_spectrum)
-	{
-	  ++ written;
-	  for (int i = 0 ; i < spectrum_size ; i++)
-	  data[written][i+1]=svi.val()->get_spectrum()->band(i);
-	}
+	if (svic.val()->get_spectrum()!=no_spectrum) 
+	  all->push_back(svic.val());
       };
     }
-
-  // 2. do principal component analysis
-  char * error_msg = NULL;
-  do_pca(count,spectrum_size,data,error_msg);
-  if (error_msg)
-    {
-      QMessageBox::warning(this,"Principal Component Analysis", "An error occured, aborting pca");
-      printf("Error messages is %s\n",error_msg);
-      return;
-    }
-  
-  float minx=0,miny=0,minz=0;
-  float maxx=0,maxy=0,maxz=0;
-  float dx,dy,dz;
-  for(int i = 1 ; i <= count; i ++)
-    {
-#define MIN(A,B) if (B<A) A=B;
-#define MAX(A,B) if (B>A) A=B;
-      MIN(minx,data[i][1]);
-      MIN(miny,data[i][2]);
-      MIN(minz,data[i][3]);
-      MAX(maxx,data[i][1]);
-      MAX(maxy,data[i][2]);
-      MAX(maxz,data[i][3]);
-    }
-  dx=maxx-minx;
-  dy=maxy-miny;
-  dz=maxz-minz;
-  if (dx==0) dx=1;
-  if (dy==0) dy=1;
-  if (dz==0) dz=1;
-  dx/=128.0;
-  dy/=128.0;
-  dz/=128.0;
-
-  // 3. modify colors of the selected items
-  if (fulldatabase)
-    {
-      int written = 0;
-      constVectorIterator<Song*> svi(all); ITERATE_OVER(svi)
-	if (svi.val()->get_spectrum() != no_spectrum)
-	{
-	  written++;
-	  float x = (data[written][1] - minx) / dx;
-	  float y = (data[written][2] - miny) / dy;
-	  float z = (data[written][3] - minz) / dz;
-	  QColor transfer;
-	  transfer.setRgb(127+(int)x,127+(int)y,127+(int)z);
-	  svi.val()->setColor(transfer);
-	}
-      }
-    }
-  else
-    {
-      int written = 0;
-      selectedSongIterator svi; ITERATE_OVER(svi)
-        if (svi.val()->get_spectrum() != no_spectrum)
-	{
-	  written++;
-	  float x = (data[written][1] - minx) / dx;
-	  float y = (data[written][2] - miny) / dy;
-	  float z = (data[written][3] - minz) / dz;
-	  QColor transfer;
-	  transfer.setRgb(127+(int)x,127+(int)y,127+(int)z);
-	  svi.val()->setColor(transfer);
-	}
-      };
-    }
-  
-  // 4. clean up
-  free_matrix(data, count, spectrum_size);
-  if (update_process_view) 
-    updateProcessView(true);
+  assert(all);
+  spectrumPca.pcaThis(all);
 }
 
 void SongSelectorLogic::doClustering()
@@ -2133,7 +1968,6 @@ bool SongSelectorLogic::eventFilter(QObject *o, QEvent *e)
 void SongSelectorLogic::keyPressEvent(QKeyEvent* e)
 {
   QMutexLocker _ml(&lock);
-  ;
   if (e->key() == Qt::Key_Escape) return;
   SongSelector::keyPressEvent(e);
 }
@@ -2151,4 +1985,23 @@ void SongSelectorLogic::openLogDialog()
 {  
   QMutexLocker _ml(&lock);
   LogViewerLogic(this).exec();
+}
+
+static Song* last_fragment_play_request = NULL;
+void SongSelectorLogic::playFragment(int i)
+{
+  if (!Config::play_fragments) return;
+  QMutexLocker _ml(&lock);
+  Song * song = QSong::songEssence(i);
+  if (!song) return;
+  fragmentCache.get(song);
+  last_fragment_play_request = song;
+}
+
+void SongSelectorLogic::fragmentCreated(FragmentCreated* fc)
+{
+  if (!Config::play_fragments) return;
+  if (last_fragment_play_request != fc->song) return;
+  fragmentPlayer.playWave(fc->getFragment());
+  last_fragment_play_request = NULL;
 }

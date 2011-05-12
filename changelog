@@ -1,3 +1,21 @@
+3.4:
+  ksel  + removed the recording options. This can normally be done by a surrounding script or so	
+  ksel  + improved the subprocess termination handling	
+  ksel  + when importing songs, the ondisk information is updated on the fly and strange songfilenames
+	  are reported
+  ksel  + the existence scanner is an active object as well	
+  ksel  + the pca analyzer runs as an active object	 
+  ksel  + the active objects pool now quits properly	
+  kplay + support for mpg123 0.65 & mplayer 1.0rc1-4.1.2
+  g++   - gcc suddenly no longe nows how to handle the vectors in pca.c++, so I renamed them
+  slack - removed some bugs that prohibited proper slackware compilation
+  alsa  - removed a small bug that would shift cues over at most period_size-1 and introduced
+	  garbage when restarting a cue.
+  kplay - kbpm-play --check would stop also if the playinstate included 'started to play'	 
+  ksel  + added the possibility to decode small parts of the song as prelistening
+  kplay + automatically switch to beatgraph if song is enterily loaded
+  kplay + beatgraph analyzer shows a moving cursor
+  kplay + the +/- keys still work in the beatgraphanalyzer view
 3.3:
   kplay + started on a resampler
   kplay + added possibility for a jack implementation.	
@@ -7,8 +25,8 @@
   code  + removed AvlTree and GrowingArray and replaced them with map and vector instead
 3.2:
   ksel  + graceful resolve/wait when we cannot fork
-  ksel  + no longer require SIGUSR to signal a dead process. We use SIGCHLD now	
-  kplay - the player crashed the Xserver when the decoder failed.	
+  ksel  + no longer require SIGUSR to signal a dead process. We use SIGCHLD now
+  kplay - the player crashed the Xserver when the decoder failed.
 3.1: linux+ magazine release
   ksel  - fixed import scanner box to not mention the no longer working scripts	 
 3.0

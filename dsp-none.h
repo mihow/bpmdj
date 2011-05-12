@@ -27,6 +27,7 @@ using namespace std;
 
 class dsp_none: public dsp_driver
 {
+    signed4 samples_to_wait;
   public:
     dsp_none(const PlayerConfig & config) : dsp_driver(config) {};
     void    start();
@@ -34,7 +35,7 @@ class dsp_none: public dsp_driver
     void    write(stereo_sample2 value);
     signed8 latency();
     int     open();
-    void    close();
+    void    close(bool);
     virtual bool is_none() { return true;};
 };
 #endif

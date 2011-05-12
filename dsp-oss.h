@@ -44,7 +44,7 @@ class dsp_oss: public dsp_driver
   void    write(stereo_sample2 value);
   signed8 latency();
   int     open();
-  void    close();
+  void    close(bool flush);
 };
 #endif
 #endif

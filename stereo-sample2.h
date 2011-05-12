@@ -24,55 +24,55 @@ using namespace std;
 
 class stereo_sample2 
 {
- public:
+public:
   signed2 left;
   signed2 right;
   stereo_sample2()
-    {
-      left = 0;
-      right = 0;
-    }
+  {
+    left = 0;
+    right = 0;
+  }
   stereo_sample2(signed short int l, signed short int r)
-    {
-      left = l;
-      right = r;
-    }
+  {
+    left = l;
+    right = r;
+  }
   signed4 summed()
-    {
-      return (signed4)left+(signed4)right;
-    }
+  {
+    return (signed4)left+(signed4)right;
+  }
   unsigned4 & value()
-    {
-      return *((unsigned4*)((void*)&left));
-    }
+  {
+    return *((unsigned4*)((void*)&left));
+  }
   void value(unsigned4 v)
+  {
+    union 
     {
-      union 
+      struct
       {
-	struct
-	{
-	  signed2 left;
-	  signed2 right;
-	} split;
-	unsigned4 combined;
+	signed2 left;
+	signed2 right;
+      } split;
+      unsigned4 combined;
       } trick;
-      trick.combined = v;
-      left = trick.split.left;
-      right = trick.split.right;
-    }
+    trick.combined = v;
+    left = trick.split.left;
+    right = trick.split.right;
+  }
   inline stereo_sample2 muldiv(signed4 mul, signed4 div)
-    {
-      return stereo_sample2(((signed4)left)*mul/div,
-			    ((signed4)right)*mul/div);
-    }
+  {
+    return stereo_sample2(((signed4)left)*mul/div,
+			  ((signed4)right)*mul/div);
+  }
   inline stereo_sample2 muldiv2(signed4 mull, signed4 divl, signed4 mulr, signed4 divr)
-    {
-      return stereo_sample2(((signed4)left)*mull/divl,
-			    ((signed4)right)*mulr/divr);
-    }
+  {
+    return stereo_sample2(((signed4)left)*mull/divl,
+			  ((signed4)right)*mulr/divr);
+  }
   inline stereo_sample2 add(signed4 l, signed4 r)
-    {
-      return stereo_sample2(left+l,right+r);
-    }
+  {
+    return stereo_sample2(left+l,right+r);
+  }
 };
 #endif

@@ -251,60 +251,17 @@
                     <property name="name">
                         <cstring>unnamed</cstring>
                     </property>
-                    <widget class="QLabel" row="0" column="0" rowspan="1" colspan="2">
+                    <widget class="QLabel" row="0" column="0">
                         <property name="name">
-                            <cstring>textLabel2</cstring>
+                            <cstring>textLabel1_3</cstring>
                         </property>
                         <property name="text">
-                            <string>The record command must have one "%s" placeholder. This will be filled in with the session name.</string>
+                            <string>The recorder commands have been removed. If you really want an automatic starting recording, then create a small script around bpmdj that will start the recorder before starting bpmdj.</string>
                         </property>
                         <property name="alignment">
                             <set>WordBreak|AlignVCenter</set>
                         </property>
                     </widget>
-                    <widget class="QLabel" row="2" column="0">
-                        <property name="name">
-                            <cstring>TextLabel1_2_3</cstring>
-                        </property>
-                        <property name="text">
-                            <string>Replay</string>
-                        </property>
-                    </widget>
-                    <widget class="QLineEdit" row="1" column="1">
-                        <property name="name">
-                            <cstring>record</cstring>
-                        </property>
-                    </widget>
-                    <widget class="QLabel" row="1" column="0">
-                        <property name="name">
-                            <cstring>TextLabel1_2_2</cstring>
-                        </property>
-                        <property name="text">
-                            <string>Record</string>
-                        </property>
-                    </widget>
-                    <widget class="QLineEdit" row="2" column="1">
-                        <property name="name">
-                            <cstring>replay</cstring>
-                        </property>
-                    </widget>
-                    <spacer row="4" column="1">
-                        <property name="name">
-                            <cstring>spacer6</cstring>
-                        </property>
-                        <property name="orientation">
-                            <enum>Vertical</enum>
-                        </property>
-                        <property name="sizeType">
-                            <enum>Expanding</enum>
-                        </property>
-                        <property name="sizeHint">
-                            <size>
-                                <width>20</width>
-                                <height>40</height>
-                            </size>
-                        </property>
-                    </spacer>
                 </grid>
             </widget>
             <widget class="QWidget">
@@ -1716,4 +1673,7 @@
     <slot>modifyAlltimeColor()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
+<includehints>
+    <includehint>metric-widget.h</includehint>
+</includehints>
 </UI>

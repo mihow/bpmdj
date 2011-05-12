@@ -25,6 +25,8 @@ using namespace std;
 #include <qmessagebox.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <sys/time.h>
+#include <sys/resource.h>
 #include "index.h"
 #include "scripts.h"
 #include "stdarg.h"
@@ -85,7 +87,7 @@ void spawn(const char* script)
     }
 }
 
-int execute(const char* script)
+bool execute(const char* script)
 {
   Debug("Started %s",script);
   int status = system(script);
@@ -104,7 +106,7 @@ int execute(const char* script)
       Error(false,"couldn't execute [signal] %s",script);
       return false;
     }
-  if ( WCOREDUMP(status))
+  if (WCOREDUMP(status))
     {
       Error(false,"couldn't execute [core dumped] %s",script);
       return false;
@@ -113,7 +115,7 @@ int execute(const char* script)
   return false;
 }
 
-int vexecute(const char* script, ...)
+bool vexecute(const char* script, ...)
 {
   char toexecute[1024];
   va_list ap;
@@ -278,7 +280,6 @@ int start_mv(const char* from, const char* to)
   bpmdj_deallocate(b);
   return err;
 }
-
 
 void start_rm(const char* what)
 {

@@ -21,16 +21,19 @@
 using namespace std;
 #line 1 "kbpm-play.h++"
 #include <qapplication.h>
+#include "songplayer.logic.h"
 #include "player-core.h"
 
 #include "data.h"
 #if (DATA_VERSION_MAJOR != 0) || (DATA_VERSION_MINOR != 2)
-#error "OM-DATA has wrong version number"
+#error "DATA library has wrong version number"
 #endif
 
 extern QApplication    * app;
 extern PlayerConfig    * config;
 extern SongPlayerLogic * player_window;
+extern bool opt_setup;
+extern bool opt_check;
 extern char * arg_config;
 
 QString get_rawpath();

@@ -49,43 +49,17 @@ void dsp_alsa::start()
 
 void dsp_alsa::pause()
 {
-  // can the device pause if yes... we pause it
-  // otherwise we simply drop frames and restart it afterward
   int err;
-
-  /*
-    if (can_pause)
-    {
-    printf("using 'pause' functionality\n");
-    err = snd_pcm_pause(dsp,1);
-    if (err < 0)
-    printf("pause error: %s\n",snd_strerror(err));
-    }
-    else
-    {
-  */
   err = snd_pcm_drop(dsp);
+  filled = 0;
   if (err < 0)
     printf("pause drop error: %s\n",snd_strerror(err));
-  //}
   // wait...
   wait_for_unpause();
   // simply continue
-  /*
-    if (can_pause)
-    {
-    err = snd_pcm_pause(dsp,0);
-    if (err < 0)
-    printf("pause error: %s\n",snd_strerror(err));
-    }
-    else
-    {
-  */
-  
   err = snd_pcm_prepare(dsp);
   if (err < 0)
     printf("dsp: unpause error: %s\n",snd_strerror(err));
-  //}
 }
 
 // the normal write routine without prebuffering...
@@ -180,7 +154,6 @@ int dsp_alsa::open()
 
   // attach to something ???? 
   // I don't have a clue why this is necessary, but all demo programs do this
-  
   err = snd_output_stdio_attach(&output,stdout,0);
   if (err < 0 )
     {
@@ -245,21 +218,20 @@ int dsp_alsa::open()
   {
     unsigned int t = buffer_time;
     int dir = 1;
-
     err = snd_pcm_hw_params_set_buffer_time_near(dsp,hparams,&t,&dir);
     if (err<0)
       {
 	printf("     impossible to set pcm buffer time to %i (%i): %s\n", buffer_time,t,snd_strerror(err));
 	return err_dsp;
       }
-
+    
     err = snd_pcm_hw_params_get_buffer_size(hparams,&buffer_size);
     if (err<0)
       {
 	printf("     impossible to obtain buffer size: %s\n",snd_strerror(err));
 	return err_dsp;
       }
-
+    
     t = period_time;
     err = snd_pcm_hw_params_set_period_time_near(dsp, hparams,&t,&dir);
     if (err<0)
@@ -281,17 +253,7 @@ int dsp_alsa::open()
 	return err_dsp;
       }
     dir = 0;
-    /*
-    err = snd_pcm_hw_params_set_periods(dsp,hparams,2,0);
-    if (err < 0)
-      {
-	printf("    impossible to set periods to 4: %s\n",snd_strerror(err));
-	return err_dsp;
-      }
-    */
   }
-
-  // set the hardware parameters
   err = snd_pcm_hw_params(dsp,hparams);
   if (err < 0)
     {
@@ -330,28 +292,35 @@ int dsp_alsa::open()
       printf("unable to set software parameters: %s\n",snd_strerror(err));
       return err_dsp;
     }
-
-  // check possibility to pause 
-  // this is still experimental... if the drop functioanlity works well
-  // then we might remove this feature
-  //  can_pause = snd_pcm_hw_params_can_pause(hparams);
-  
   if (verbose)
     snd_pcm_dump(dsp,output);
-
-  // allocate buffer of correct size
   buffer = bpmdj_allocate(period_size,unsigned4);
   
   start();
+  
+  //  snd_pcm_hw_params_free(hparams);
+  //  snd_pcm_sw_params_free(sparams);
   return err_none;
 }
 
-void dsp_alsa::close()
+void dsp_alsa::close(bool flush_first)
 {
   if (dsp)
     {
-      snd_pcm_drain(dsp);
-      snd_pcm_close(dsp);
+      // To flush the dsp we want to make sure that everyting that
+      // can be played is played. So we add a colleciton of zeros to
+      // make sure a flush occurs.
+      if (flush_first)
+	{
+	  stereo_sample2 zero(0,0);
+	  for(unsigned i = 0 ; i < period_size; i++)
+	    write(zero);
+	  snd_pcm_drain(dsp);
+	}
+      int err = snd_pcm_close(dsp);
+      if (err < 0)
+	printf("cant close pcm device: %s\n",snd_strerror(err));
+      dsp=0;
     }
 }
 

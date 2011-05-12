@@ -204,7 +204,6 @@ SongPlayerLogic::SongPlayerLogic(QWidget*parent,const char*name, bool modal,WFla
   fade_time=0;
   wantedcurrentperiod=0;
   redrawCues();
-  // set caption
   captionize_according_to_index();
   TempoLd->display(100.0*(double)normalperiod/(double)currentperiod);
   // set colors of tempo change buttons
@@ -237,19 +236,22 @@ void SongPlayerLogic::tabChanged()
 {
   if (tab->currentPageIndex() == TAB_BEATGRAPH)
     beatGraphAnalyzer->activate();
+  else 
+    beatGraphAnalyzer->deactivate();
   if (tab->currentPageIndex() == TAB_OPTIONS)
     store_config_into(config,this);
 }
 
 void SongPlayerLogic::redrawCues()
 {
-   setColor(PushButton11,cues[0]>0);
-   setColor(PushButton12,cues[1]>0);
-   setColor(PushButton13,cues[2]>0);
-   setColor(PushButton14,cues[3]>0);
+  setColor(PushButton11,cues[0]>0);
+  setColor(PushButton12,cues[1]>0);
+  setColor(PushButton13,cues[2]>0);
+  setColor(PushButton14,cues[3]>0);
+  beatGraphAnalyzer->cuesChanged();
 }
 
-void SongPlayerLogic::setColor(QButton *button, bool enabled)
+void SongPlayerLogic::setColor(QWidget *button, bool enabled)
 {
    QColor a, ad, am, aml, al;
    QPalette pal;
@@ -282,7 +284,7 @@ void SongPlayerLogic::setColor(QButton *button, bool enabled)
    cg.setColor( QColorGroup::BrightText, white );
    cg.setColor( QColorGroup::ButtonText, black );
    cg.setColor( QColorGroup::Base, white );
-   cg.setColor( QColorGroup::Background, QColor( 192, 192, 192) );
+   cg.setColor( QColorGroup::Background, a ); //QColor( 192, 192, 192) );
    cg.setColor( QColorGroup::Shadow, black );
    cg.setColor( QColorGroup::Highlight, QColor( 0, 0, 128) );
    cg.setColor( QColorGroup::HighlightedText, white );
@@ -298,7 +300,7 @@ void SongPlayerLogic::setColor(QButton *button, bool enabled)
    cg.setColor( QColorGroup::BrightText, white );
    cg.setColor( QColorGroup::ButtonText, black );
    cg.setColor( QColorGroup::Base, white );
-   cg.setColor( QColorGroup::Background, QColor( 192, 192, 192) );
+   cg.setColor( QColorGroup::Background, a); // QColor( 192, 192, 192) );
    cg.setColor( QColorGroup::Shadow, black );
    cg.setColor( QColorGroup::Highlight, QColor( 0, 0, 128) );
    cg.setColor( QColorGroup::HighlightedText, white );
@@ -314,19 +316,99 @@ void SongPlayerLogic::setColor(QButton *button, bool enabled)
    cg.setColor( QColorGroup::BrightText, white );
    cg.setColor( QColorGroup::ButtonText, QColor( 128, 128, 128) );
    cg.setColor( QColorGroup::Base, white );
-   cg.setColor( QColorGroup::Background, QColor( 192, 192, 192) );
+   cg.setColor( QColorGroup::Background, a); // QColor( 192, 192, 192) );
    cg.setColor( QColorGroup::Shadow, black );
    cg.setColor( QColorGroup::Highlight, QColor( 0, 0, 128) );
    cg.setColor( QColorGroup::HighlightedText, white );
    pal.setDisabled( cg );
    
    button->setPalette( pal );
-   
 }
 
-void SongPlayerLogic::nudgePlus()
+void SongPlayerLogic::storeCue(int nr)
 {
-  ::y-=::currentperiod/(4*64);
+  checkCueNonZero();
+  cue_store(nr);
+  redrawCues();
+}
+
+void SongPlayerLogic::retrieveCue(int nr)
+{
+  cue_retrieve(nr);
+  jumpto(0,0);
+}
+
+void SongPlayerLogic::retrieveNextCue()
+{
+  static int cue_nr=0;
+  for(int i = 0 ; i < 4 ; i++)
+    {
+      int j = (cue_nr+i)%4;
+      if (::cues[j])
+	{
+	  retrieveCue(j);
+	  cue_nr=j+1;
+	  return;
+	}
+    }
+}
+
+bool SongPlayerLogic::cueKey(QKeyEvent* e, int p)
+{
+  int bs = e->state() & Qt::KeyButtonMask;
+  if (bs==0) 
+    {
+      retrieveCue(p);
+      return true;
+    }
+  else if (bs==Qt::AltButton)
+    {
+      storeCue(p);
+      return true;
+    }
+  return false;
+}
+
+void SongPlayerLogic::keyPressEvent(QKeyEvent * e)
+{
+  if (tab->currentPageIndex() == TAB_BEATGRAPH)
+    {
+#define ACCEPT e->accept(); return;
+      switch (e->key())
+	{
+	case Qt::Key_0: mediumSwitch(); ACCEPT;
+	case Qt::Key_1: nudgeMinus1M(); ACCEPT;
+	case Qt::Key_2: nudgePlus1M(); ACCEPT;
+	case Qt::Key_4: nudgeMinus4M(); ACCEPT;
+	case Qt::Key_5: nudgePlus4M(); ACCEPT;
+	case Qt::Key_7: nudgeMinus8M(); ACCEPT;	
+	case Qt::Key_8: nudgePlus8M(); ACCEPT;
+	case Qt::Key_Slash: setCue(); ACCEPT;
+	case Qt::Key_Z: if (cueKey(e,0)) ACCEPT;
+	case Qt::Key_X: if (cueKey(e,1)) ACCEPT;
+	case Qt::Key_C: if (cueKey(e,2)) ACCEPT;
+	case Qt::Key_V: if (cueKey(e,3)) ACCEPT;
+	case Qt::Key_Minus: nudgeMinus(); ACCEPT;
+	case Qt::Key_Plus: nudgePlus(); ACCEPT;
+	case Qt::Key_R: slowRevSaw(); ACCEPT;
+	case Qt::Key_N: normalLfo(); ACCEPT;
+	case Qt::Key_9: 
+	case Qt::Key_ParenLeft: nudgeCueBack(); ACCEPT;
+	case Qt::Key_6:
+	case Qt::Key_ParenRight: nudgeCueForward(); ACCEPT;
+	case Qt::Key_Period:
+	case Qt::Key_Comma:
+	case Qt::Key_Space: start_stop(); ACCEPT;
+	case Qt::Key_Enter: retrieveNextCue(); ACCEPT;
+	case Qt::Key_I: if (e->state() & Qt::AltButton) { openInfo(); ACCEPT; }
+	}
+    }
+  SongPlayer::keyPressEvent(e);
+}
+
+void shift_playpos(signed4 direction)
+{
+  ::y+=direction;
   if (::y<0)
     {
       printf("y underflow, setting to zero\n");
@@ -334,73 +416,64 @@ void SongPlayerLogic::nudgePlus()
     }
 }
 
+void SongPlayerLogic::nudgePlus()
+{
+  shift_playpos(-::currentperiod/(4*128));
+}
+
 void SongPlayerLogic::nudgeMinus()
 {
-  ::y+=currentperiod/(4*64);
+  shift_playpos(+::currentperiod/(4*128));
 }
 
 void SongPlayerLogic::nudgePlusB()
 {
-  ::y+=currentperiod/4;
+  shift_playpos(+::currentperiod/4);
 }
 
 void SongPlayerLogic::nudgeMinusHalfB()
 {
-  ::y-=currentperiod/8;
+  shift_playpos(-::currentperiod/8);
 }
 
 void SongPlayerLogic::nudgePlus1M()
 {
-  ::y+=currentperiod;
+  shift_playpos(+::currentperiod);
 }
 
 void SongPlayerLogic::nudgeMinus1M()
 {
-   ::y-=currentperiod;
-   if (::y<0)
-     {
-	printf("y underflow, setting to zero\n");
-	::y=0;
-     }
+  shift_playpos(-::currentperiod);
 }
 
 void SongPlayerLogic::nudgePlus4M()
 {
-   ::y+=currentperiod*4;
+  shift_playpos(+::currentperiod*4);
 }
 
 void SongPlayerLogic::nudgeMinus4M()
 {
-   ::y-=currentperiod*4;
-   if (::y<0)
-     {
-	printf("y underflow, setting to zero\n");
-	::y=0;
-     }
+  shift_playpos(-::currentperiod*4);
 }
 
 void SongPlayerLogic::nudgePlus8M()
 {
-   ::y+=currentperiod*8;
+  shift_playpos(+::currentperiod*8);
 }
 
 void SongPlayerLogic::nudgeMinus8M()
 {
-   ::y-=currentperiod*8;
-   if (::y<0)
-     {
-	printf("y underflow, setting to zero\n");
-	::y=0;
-     }
+  shift_playpos(-::currentperiod*8);
 }
 
 void SongPlayerLogic::accept()
 {
+  timer->stop();
+  beatGraphAnalyzer->deactivate();
   done(Accepted);
 }
 
 static bool autostarted = false;
-
 void SongPlayerLogic::timerTick()
 {
   static int no_raw_file_error_box = 10;
@@ -427,10 +500,6 @@ void SongPlayerLogic::timerTick()
 	}
     }
   
-  // the position in kB
-  // LcdLeft->display((double)((int)(x_normalise(::y)*1000/m))/(double)10);
-  // LcdRight->display((int)(m/1024));
-  // times are displayed with respect to the current tempo
   unsigned4 m2;
   if (currentperiod<0)
     m2 = m;
@@ -458,7 +527,6 @@ void SongPlayerLogic::timerTick()
       CurrentTempoLCD -> display(0);
       NormalTempoLCD -> display(0);
     }
-  // change tempo when necesarry
   if (fade_time>0)
     targetStep();
 }
@@ -466,12 +534,16 @@ void SongPlayerLogic::timerTick()
 void SongPlayerLogic::setCue()
 {
   cue_set();
+  beatGraphAnalyzer->cuesChanged();
 }
+
+/*
 
 void SongPlayerLogic::shiftBack()
 {
   ::y=y_normalise(cue)+dsp->latency();
 }
+*/
 
 void SongPlayerLogic::restart()
 {
@@ -494,62 +566,54 @@ void SongPlayerLogic::start_stop()
 {
   if (!get_paused())
     {
-      if (!cue) cue_set();
+      bool cue_wasset = cue;
+      if (!cue) 
+	cue_set();
       pause_playing();
+      if (!cue_wasset)
+	beatGraphAnalyzer->cuesChanged();
     }
   else jumpto(0,0);
 }
 
 void SongPlayerLogic::retrieveZ()
 {
-  cue_retrieve(0);
-  jumpto(0,0);
+  retrieveCue(0);
 }
 
 void SongPlayerLogic::retrieveX()
 {
-  cue_retrieve(1);
-  jumpto(0,0);
+  retrieveCue(1);
 }
 
 void SongPlayerLogic::retrieveC()
 {
-  cue_retrieve(2);
-  jumpto(0,0);
+  retrieveCue(2);
 }
 
 void SongPlayerLogic::retrieveV()
 {
-  cue_retrieve(3);
-  jumpto(0,0);
+  retrieveCue(3);
 }
 
 void SongPlayerLogic::storeZ()
 {
-  checkCueNonZero();
-  cue_store(0);
-  redrawCues();
+  storeCue(0);
 }
 
 void SongPlayerLogic::storeX()
 {
-  checkCueNonZero();
-  cue_store(1);
-  redrawCues();
+  storeCue(1);
 }
 
 void SongPlayerLogic::storeC()
 {
-  checkCueNonZero();
-  cue_store(2);
-  redrawCues();
+  storeCue(2);
 }
 
 void SongPlayerLogic::storeV()
 {
-  checkCueNonZero();
-  cue_store(3);
-  redrawCues();
+  storeCue(3);;
 }
 
 void SongPlayerLogic::checkCueNonZero()
@@ -630,6 +694,7 @@ void SongPlayerLogic::mediumSwitch()
 void SongPlayerLogic::normalReached(bool t)
 {
   setColor(switcherButton,t);
+  setColor(beatGraphAnalyzer->switcherLabel,t);
 }
 
 void SongPlayerLogic::targetStep()
@@ -641,6 +706,7 @@ void SongPlayerLogic::targetStep()
       fade_time=0;
       normalReached(true);
       switcherButton->setText("Fade");
+      beatGraphAnalyzer->switcherLabel->setText("Tempo");
       return;
     }
   if (tempo_fade==1)
@@ -650,6 +716,7 @@ void SongPlayerLogic::targetStep()
   if (tempo_fade>0)
     {
       switcherButton->setText(QString::number(fade_time-tempo_fade));
+      beatGraphAnalyzer->switcherLabel->setText("Tempo: ok-"+QString::number(fade_time-tempo_fade));
     }
   
   /**
@@ -668,25 +735,30 @@ void SongPlayerLogic::tempoChanged()
   changeTempo(wantedcurrentperiod);
 }
 
+void SongPlayerLogic::cueShift(signed8 dir)
+{
+  cue_shift(dir);
+  beatGraphAnalyzer->cuesChanged();
+}
+
 void SongPlayerLogic::nudgeCueBack()
 {
-  cue_shift(-WAVRATE/80);
+  cueShift(-WAVRATE/80);
 }
 
 void SongPlayerLogic::nudgeCueForward()
 {
-  cue_shift(+WAVRATE/80); 
+  cueShift(+WAVRATE/80); 
 }
 
 void SongPlayerLogic::nudgeCueBack8M()
 {
-   // Shifting cue 8 measure backward
-   cue_shift(-8*normalperiod); 
+  cueShift(-8*normalperiod); 
 }
 
 void SongPlayerLogic::nudgeCueForward8M()
 {
-   cue_shift(8*normalperiod);
+  cueShift(8*normalperiod);
 }
 
 void SongPlayerLogic::fastSaw()
@@ -1250,13 +1322,16 @@ void SongPlayerLogic::restartCore()
 
 void InitAndStart::run(SongPlayerLogic * player)
 {
+ printf("Init core\n"); fflush(stdout);
   player->initCore();
+ printf("Start core\n"); fflush(stdout);
   player->startCore();
 }
 
 void PlayingStateChanged::run(SongPlayerLogic * player)
 {
-  if (opt_check) 
+ printf("Player state changed [paused = %d]\n",get_paused()); fflush(stdout);
+  if (opt_check && get_paused())
     player->accept();
   player->set_start_stop_text();
 }
@@ -1311,7 +1386,7 @@ void SongPlayerLogic::initCore()
   int err = core_object_init(opt_check);
   if (show_error(err, err_noraw, "No raw file to be read. Probably the .mp3 is broken.\n")
       || show_error(err, err_nospawn, "Unable to spawn decoding process.\nPlease check your PATH environment variable\n"))
-    if (opt_check) 
+    if (opt_check)
       reject();
 };
 
@@ -1320,11 +1395,19 @@ void msg_playing_state_changed()
   app->postEvent(player_window,new PlayingStateChanged());
 }
 
+class WritingFinished: public BpmPlayEvent
+{
+public:
+  virtual void run(SongPlayerLogic* sp)
+  {
+    if (normalperiod.valid())
+      sp->tab->setCurrentPage(TAB_BEATGRAPH);
+  }
+};
+
 void msg_writing_finished()
 {
-  /*  if (player_window)
-    app->postEvent(player_window,new QCustomEvent(WritingFinished));
-  */
+  if (opt_check || opt_setup) return;
+  if (player_window)
+    app->postEvent(player_window,new WritingFinished());
 }
-
-

@@ -51,8 +51,8 @@ void   removeAllRaw(const char* dir);
 void   removeAllLog();
 void   dumpAudio(const char* fname, unsigned4 * buffer, long length);
 void   spawn(const char* script);
-int    execute(const char* script);
-int    vexecute(const char* script,...);
+bool   execute(const char* script);
+bool   vexecute(const char* script,...);
 int    bpmdj_fork();
 
 // external programs

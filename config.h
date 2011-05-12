@@ -31,6 +31,7 @@ using namespace std;
 // constants that should not be modified
 const QString MusicDir = "./music";
 const QString IndexDir = "./index";
+const QString FragmentsDir = "./fragments";
 
 void realize_mapping(QHeader * h, int column, int location, int size);
 void copy_header(QHeader * in, QHeader * out);
@@ -103,9 +104,9 @@ class Config
   static ConfigState ask_mix;
   static ConfigState auto_popqueue;
   // version 2.4
-  singleton_accessors(QString,record_command);
-  singleton_accessors(QString,replay_command);
-  singleton_accessors(QString,record_mixer_command);
+  // singleton_accessors(QString,record_command);
+  // singleton_accessors(QString,replay_command);
+  // singleton_accessors(QString,record_mixer_command);
   // version 2.5
   singleton_accessors(QColor,color_tempo44);
   singleton_accessors(QColor,color_tempo54);
@@ -152,6 +153,8 @@ class Config
   // 3.0
   static ConfigState color_songs_based_on_history;
   singleton_accessors(QColor, color_alltime);
+  // 3.4
+  static ConfigState play_fragments;
  private:
   static void calc_and_cache();
   static void set_playCommand1(QString s) 

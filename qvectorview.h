@@ -39,23 +39,17 @@ class QVectorView;
 class Q_EXPORT QVectorViewData : public Qt
 {
  public:
-  // Fields
-  int totalHeight;   
   int ownHeight;
-  // Accessors, Getters & Setters
   int height() const;
-  virtual void setHeight( int );
-  // Constructor, Initialisation & Destruction
   QVectorViewData( );
   virtual void setup(QVectorView *v);
   virtual ~QVectorViewData();
-  // Abstract functions
   virtual void setSelected( int i, bool ) = 0;
   virtual bool isSelected(int row) const = 0;
   virtual int  vectorSize() const = 0;
   virtual QString text( int row, int col) const = 0;
   virtual void sort(int col, bool ascending) = 0;
-  // Might require overriding
+  virtual void preparePaint( QVectorView* , int number) = 0;
   virtual void paintCell( QVectorView*, int number, QPainter *, const QColorGroup & cg, int column, int width, int alignment );
  private:
   void init();
@@ -77,10 +71,11 @@ class Q_EXPORT QVectorView: public QScrollView
   Q_PROPERTY( bool rootIsDecorated READ rootIsDecorated WRITE setRootIsDecorated ) ;
   Q_PROPERTY( ResizeMode resizeMode READ resizeMode WRITE setResizeMode ) ;
   QVectorViewData *item_container;
+  int totalHeight;
  public:
   // Constructor
   QVectorView( QWidget* parent, QVectorViewData * container, WFlags f = 0 );
-  // Linkage with vector
+  void setupItemContainer();
   void vectorChanged();
  signals:
   void doubleClicked( int i );
@@ -154,6 +149,7 @@ class Q_EXPORT QVectorView: public QScrollView
   void rightButtonClicked( int, const QPoint&, int );
   void mouseButtonPressed( int, int, const QPoint& , int );
   void mouseButtonClicked( int, int,  const QPoint&, int );
+  void mouseHover(int);
   void onItem( int item );
   void onViewport();
  protected:

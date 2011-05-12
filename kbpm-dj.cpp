@@ -48,11 +48,15 @@ using namespace std;
 #include "histogram-property.h"
 #include "smallhistogram-type.h"
 #include "signals.h"
+#include "fragment-player.h"
+#include "fragment-creator.h"
+
+extern FragmentPlayer fragmentPlayer;
+extern FragmentCreator fragmentCreator;
 
 /*-------------------------------------------
  *         Templates we need
  *-------------------------------------------*/
-
 // types
 template class smallhistogram_type<32>;
 template class smallhistogram_type<96>;
@@ -79,11 +83,11 @@ protected:
   virtual void recursing(const QString dirname)
   {
   }
-  virtual void scandir(const QString dirname, const QString  checkname)
+  virtual bool scandir(const QString dirname, const QString  checkname)
   {
-    if (entered) return;
+    if (entered) return false;
     entered=true;
-    DirectoryScanner::scandir(dirname,checkname);
+    return DirectoryScanner::scandir(dirname,checkname);
   }
   virtual void checkfile(const QString  fullname, const QString  filename)
   {
@@ -103,6 +107,39 @@ public:
   virtual void scan()
   { 
     DirectoryScanner::scan("./",NULL); 
+  };
+};
+
+class FragScanner: public DirectoryScanner
+{
+protected:
+  virtual void recursing(const QString dirname)
+  {
+  }
+  virtual bool scandir(const QString dirname, const QString  checkname)
+  {
+    if (entered) return false;
+    entered=true;
+    return DirectoryScanner::scandir(dirname,checkname);
+  }
+  virtual void checkfile(const QString  fullname, const QString  filename)
+  {
+    result+=QString::number(number)+". "+filename+"\n";
+    number++;
+  }
+public:
+  QString result;
+  bool entered;
+  int number;
+  FragScanner() : DirectoryScanner(".wav")
+  {
+    result = QString::null;
+    entered=false;
+    number = 0;
+  };
+  virtual void scan()
+  { 
+    DirectoryScanner::scan("./fragments/",NULL); 
   };
 };
 
@@ -166,11 +203,13 @@ int main(int argc, char* argv[])
   // 1.a first check the availability of a number of directories...
   DIR * mdir;
   DIR * idir;
+  DIR * fdir;
   do
     {
       mdir = opendir(MusicDir);
       idir = opendir(IndexDir);
-      if (mdir == NULL || idir == NULL)
+      fdir = opendir(FragmentsDir);
+      if (mdir == NULL || idir == NULL || fdir == NULL)
 	{
 	  SetupWizard *sw = new SetupWizard(0,0,true);
 	  sw->setFinishEnabled(sw->lastpage,true);
@@ -179,16 +218,24 @@ int main(int argc, char* argv[])
 	    exit(0);
 	}
     }
-  while (mdir==NULL || idir==NULL);
+  while (mdir==NULL || idir==NULL || fdir == NULL);
   
   // 1.c checking left over raw files (deze komt laatst omdat tmp_directory het kuiste pad bevat)
   RawScanner raw;
   raw.scan();
   if (!raw.result.isNull())
     if (QMessageBox::warning(NULL,RAW_EXT " files check",
-			     "There are some left over "RAW_EXT" files. These are:\n"+raw.result,
+			     "There are some left over "RAW_EXT" files. These are:\n\n"+raw.result,
 			     "Remove", "Ignore", 0, 0, 1)==0)
       removeAllRaw("./");
+  
+  FragScanner frag;
+  frag.scan();
+  if (!frag.result.isNull())
+    if (QMessageBox::warning(NULL,"Fragment files check",
+			     "There are some left over fragment files.",
+			     "Remove", "Ignore", 0, 0, 1)==0)
+      start_rm("./fragments/*.wav");
   
   // 3. read all the files in memory
   main_window.initialize_using_config();
@@ -196,7 +243,10 @@ int main(int argc, char* argv[])
   
   // create the index in memory
   splash->progress->setEnabled(true);
-  IndexReader * indexReader = new IndexReader(splash->progress, splash->reading ,main_window.database, Config::get_file_count());
+  IndexReader * indexReader = new IndexReader(splash->progress, 
+					      splash->reading ,
+					      main_window.database, 
+					      Config::get_file_count());
   Config::set_file_count(indexReader->total_files);
   if (indexReader->total_files == 0)
     QMessageBox::message(NULL,
@@ -211,9 +261,14 @@ int main(int argc, char* argv[])
   main_window.initialize_extras();
   // 5. Some extra version dependent blurb...
   if (!Config::get_shown_aboutbox())
-    if (MAGIC_NOW == MAGIC_2_8)
-      QMessageBox::message(NULL,"BpmDj now depends on mplayer instead of mpg123 & ogg123\n"
-			   "make sure you have mplayer installed properly.\n");
+    if (MAGIC_NOW == MAGIC_3_4)
+      QMessageBox::message(NULL,"Important improvements:\n"
+			   "- BpmDj allows you to prelisten songs before starting them.\n"
+			   "  make sure you have mplayer installed properly.\n"
+			   "- The player has been improved with an animated beatgraph.\n"
+			   "Configuration problem\n"
+			   "- In a previous version the metric values could be substantially of\n"
+			   "  check the Preferences|Metrics value to be sure.\n");
   
   // show the window immediatelly
   main_window.show();
@@ -228,8 +283,8 @@ int main(int argc, char* argv[])
     main_window.openBpmMixer();
   
   // 6. start the application
-  main_window.start_spectrum_pca();
-  main_window.start_existence_check();
+  main_window.doSpectrumPca(true);
+  main_window.startExistenceCheck();
   int result = application.exec();
   if (!Config::get_shown_aboutbox())
     {
@@ -239,5 +294,10 @@ int main(int argc, char* argv[])
 			        "(together with some nice words of course :)");
     }
   Config::save();
+  existenceScanner.terminate();
+  fragmentPlayer.terminate();
+  fragmentCreator.terminate();
+  spectrumPca.terminate();
+  while(true) sleep(1000);
   return result;
 }

@@ -37,7 +37,9 @@ using namespace std;
 #include "qvectorview.h"
 #include "freq-mapping.h"
 #include "process-manager.h"
+#include "spectrum-pca.h"
 #include "analyzers-manager.h"
+#include "fragment.h"
 
 #define TAGS_TEXT 0
 #define TAGS_OR 1
@@ -50,8 +52,9 @@ extern const QString TAG_FALSE;
 class QProgressBar;
 class QSong;
 class ConfigState;
+class FragmentCreated;
 
-class SongSelectorLogic: 
+class SongSelectorLogic:
 public SongSelector, public ProcessChanged, public AnalyzerChanged
 {
     Q_OBJECT
@@ -107,8 +110,7 @@ public SongSelector, public ProcessChanged, public AnalyzerChanged
 #endif
   public slots:
     void updateItemList();
-    void start_spectrum_pca();
-    void start_existence_check();
+    virtual void startExistenceCheck();
     virtual void selectAllButTagged();
     virtual void selectAllTags();
     // a signal from the UI to notify a forced switch
@@ -120,9 +122,7 @@ public SongSelector, public ProcessChanged, public AnalyzerChanged
     virtual void openMixer();
     virtual void openLogDialog();
     virtual void openBpmMixer();
-    virtual void openRecorder();
-    virtual void openRecordMixer();
-    virtual void openReplay();
+  // virtual void openRecorder();
     virtual void doAbout();
     virtual void doLicense();
     virtual void searchLineEntered();
@@ -186,6 +186,10 @@ public SongSelector, public ProcessChanged, public AnalyzerChanged
 
     // taglist things
     virtual void changeTagList(QListViewItem* item, const QPoint & pos, int col);
+
+    // fragment playing
+    virtual void playFragment(int);
+    void fragmentCreated(FragmentCreated* fc);
 
     // other
     void customEvent(QCustomEvent * e);

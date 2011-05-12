@@ -7,8 +7,11 @@ Probably, you will need to compile the package yourself. To do so, read
 compile.txt. If you encounter any difficulties please contact me.
 
 There is a complete manual online at http://bpmdj.sourceforge.net/
-In case you don't have internet access, download the documentation package
-and unzip it.
+In case you don't have internet access, download the documentation package,
+carry it with you home, and unzip it.
+
+Suse pacakges are available at http://packman.links2linux.de/ 
+and maintained by oc2pus@arcor.de
 
 --
 author: werner.van.belle@gmail.com, werner@onlinux.be

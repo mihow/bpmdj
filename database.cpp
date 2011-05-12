@@ -67,11 +67,6 @@ void DataBase::clear()
   delete[] tag;
 }
 
-void DataBase::start_existence_check()
-{
-  (new ExistenceScanner(all))->start(true);
-}
-
 bool DataBase::cacheValid(SongSelectorLogic * selector)
 {
   if (rebuild_cache || selector->tagList->childCount() != tag_size)

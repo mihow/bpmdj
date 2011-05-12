@@ -220,15 +220,13 @@ void dsp_oss::flush()
   ioctl(dsp,SNDCTL_DSP_SYNC);
 }
 
-void dsp_oss::close()
+void dsp_oss::close(bool fl)
 {
   signed8   latencycheck;
   latencycheck=clock_ticks();
-  flush();
+  if (fl) flush();
   if (verbose)
     printf("dsp: fluffy-measured playing latency = %d ms\n",samples2ms(clock_ticks()-latencycheck));
-  
   ::close(dsp);
 }
-
 #endif

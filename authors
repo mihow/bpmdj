@@ -1,19 +1,20 @@
-$Id: authors,v 1.9 2007/04/08 13:14:48 wernervb Exp $
-
 BpmDj: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
- BPM-code          : Werner Van Belle <werner.van.belle@gmail.com>
- PCA-code          : F. Murtagh <murtagh@scivax.stsci.edu>
- defines.mandrake  : Romanin Gianluca <contact@openjay.org>
- defines.slackware : Erik <erik@cpuhookup.com>
- defines.redhat    : Ray B. Morris <support@webmastersguide.com>
- defines.redhat9   : Peter Lawler <yaluser@pacific.net.au>
- defines.suse.8.1  : Johan Fabry <johan.fabry@vub.ac.be>
- defines.fc3_x86_64: Harrison L. Rommel <rommel@u.washington.edu>
- defines.fc5_x86_32: Stefan Wanja <wanja@informatik.hu-berlin.de>
- minor patches     : James Gerken <phlegm@mib.org>
- windows port      : Luciano Genero <luciano.genero@softway.it>
- pre-1.0 buildenv  : Thomas Steudten <thomas@steudten.com>
- suse-packages     : oc2pus@arcor.de
- Low pass filter   : Julius O. Smith <http://www-ccrma.stanford.edu/~jos/>
+ BPM-code           : Werner Van Belle <werner.van.belle@gmail.com>
+ PCA-code           : F. Murtagh <murtagh@scivax.stsci.edu>
+ suse-packages      : oc2pus@arcor.de
+ defines.mandrake   : Romanin Gianluca <contact@openjay.org>
+ defines.slackware  : Erik <erik@cpuhookup.com>
+ slackware patches  : Majc_ <majci888@gmail.com>
+ defines.redhat     : Ray B. Morris <support@webmastersguide.com>
+ defines.redhat9    : Peter Lawler <yaluser@pacific.net.au>
+ defines.suse.8.1   : Johan Fabry <johan.fabry@vub.ac.be>
+ defines.fc3_x86_64 : Harrison L. Rommel <rommel@u.washington.edu>
+ defines.fc5_x86_32 : Stefan Wanja <wanja@informatik.hu-berlin.de>
+ minor patches      : James Gerken <phlegm@mib.org>
+ windows port       : Luciano Genero <luciano.genero@softway.it>
+ Low pass filter    : Julius O. Smith <http://www-ccrma.stanford.edu/~jos/>
+ 64bit support      : Detlef
+ Electric Fence     : Bruce Perens (bruce@pixar.com)
+ Meta import filter : Tom Vogt (tom@lemuria.org)

@@ -21,6 +21,7 @@ using namespace std;
 // A QVectorView suitable for BpmDj.
 // This is a huge stripdown from trolltechs QListView class.
 // TODO: move totalheight from QVectorViewData to QVectorView
+#include <iostream>
 #include <qtimer.h>
 #include <qheader.h>
 #include <qscrollview.h>
@@ -82,21 +83,15 @@ QVectorViewData::~QVectorViewData()
 {
 }
 
-void QVectorViewData::setHeight( int height )
-{
-  ownHeight = height;
-  totalHeight = ownHeight * vectorSize();
-}
-
 void QVectorViewData::setup(QVectorView * v)
 {
   configured = true;
   int ph = 0;
   int h;
-  h = QMAX( v->d_fontMetricsHeight, ph ) + 2*v->itemMargin();
+  h = QMAX( v->d_fontMetricsHeight, ph ) + 2 * v->itemMargin();
   h = QMAX( h, QApplication::globalStrut().height());
   if ( h % 2 > 0 ) h++;
-  setHeight( h );
+  ownHeight = h;
 }
 
 void QVectorViewData::paintCell(QVectorView* lv, int number, QPainter * p, const QColorGroup & cg, int column, int width, int align )
@@ -130,12 +125,18 @@ QVectorView::QVectorView( QWidget * parent, QVectorViewData * container, WFlags 
 {
   item_container = container;
   init();
+  setupItemContainer();
+}
+
+void QVectorView::setupItemContainer()
+{
   item_container->setup(this);
+  totalHeight = item_container->ownHeight * item_container->vectorSize();
 }
 
 void QVectorView::vectorChanged()
 {
-  item_container->setup(this);
+  setupItemContainer();
   updateGeometries();
   triggerUpdate();
 }
@@ -274,7 +275,6 @@ void QVectorView::drawContentsOffset( QPainter * p, int ox, int oy,
   int fx = -1, x, fc = 0, lc = 0;
   int tx = -1;
   int ih = item_container->height();
-  //  int ith = item_container->totalHeight;
   if (ih>0)
     for(int current = top_line_number ; current <=bottom_line_number ; current++)
       {
@@ -283,6 +283,7 @@ void QVectorView::drawContentsOffset( QPainter * p, int ox, int oy,
 	int y = itemPos(current);
 	if ( y < cy+ch && y+ih >= cy )  // need to paint current?
 	  {
+	    item_container->preparePaint(this, current);
 	    if ( fx < 0 ) 
 	      {
 		// find first interesting column, once
@@ -311,7 +312,6 @@ void QVectorView::drawContentsOffset( QPainter * p, int ox, int oy,
 	    x = fx;
 	    c = fc;
 	    // draw to last interesting column
-      
 	    bool drawActiveSelection = hasFocus() || d_inMenuMode ||
 	      !style().styleHint( QStyle::SH_ItemView_ChangeHighlightOnFocus, this );
 	    const QColorGroup &cg = ( drawActiveSelection ? colorGroup() : palette().inactive() );
@@ -343,8 +343,8 @@ void QVectorView::drawContentsOffset( QPainter * p, int ox, int oy,
 	if ( tx < 0 )
 	  tx = d_h->cellPos( cell );
       }
-  if ( item_container->totalHeight < cy + ch )
-    paintEmptyArea( p, QRect( cx - ox, item_container->totalHeight - oy, cw, cy + ch - item_container->totalHeight ) );
+  if ( totalHeight < cy + ch )
+    paintEmptyArea( p, QRect( cx - ox, totalHeight - oy, cw, cy + ch - totalHeight ) );
   int c = d_h->count()-1;
   if ( c >= 0 &&
        d_h->cellPos( c ) + d_h->cellSize( c ) < cx + cw ) {
@@ -528,7 +528,7 @@ void QVectorView::updateContents()
 
 void QVectorView::updateGeometries()
 {
-  int th = item_container-> totalHeight; 
+  int th = totalHeight; 
   int tw = d_h->headerWidth();
   if ( d_h->offset() &&
        tw < d_h->offset() + d_h->width() )
@@ -621,11 +621,7 @@ void QVectorView::viewportResizeEvent( QResizeEvent *e )
 
 void QVectorView::triggerUpdate()
 {
-  if ( !isVisible() || !isUpdatesEnabled() ) 
-    {
-      // Not in response to a setText/setPixmap any more.
-      return; // it will update when shown, or something.
-    }
+  if ( !isVisible() || !isUpdatesEnabled() ) return; 
   d_timer->start( 0, TRUE );
 }
 
@@ -657,7 +653,7 @@ bool QVectorView::eventFilter( QObject * o, QEvent * e )
 	  break;
 	}
     } 
-  else if ( o == viewport() ) 
+  else if ( o == viewport() )
     {
       QFocusEvent * fe = (QFocusEvent *)e;
       switch( e->type() ) 
@@ -884,13 +880,9 @@ void QVectorView::contentsMouseMoveEvent( QMouseEvent * e )
   if ( i != d_highlighted ) 
     {
       if ( i>=0 ) 
-	{
-	  emit onItem( i );
-	} 
+	emit onItem( i );
       else 
-	{
-	  emit onViewport();
-	}
+	emit onViewport();
       d_highlighted = i;
     }
   
@@ -1260,7 +1252,7 @@ void QVectorView::setSelectionAnchor( int item )
 
 void QVectorView::clearSelection()
 {
-    selectAll( FALSE );
+  selectAll( FALSE );
 }
 
 void QVectorView::selectAll( bool select )
@@ -1280,7 +1272,7 @@ void QVectorView::selectAll( bool select )
       emit selectionChanged();
       triggerUpdate();
     }
-} 
+}
 
 void QVectorView::invertSelection()
 {
@@ -1463,7 +1455,7 @@ void QVectorView::ensureItemVisible( int i )
 
 QHeader * QVectorView::header() const
 {
-    return d_h;
+  return d_h;
 }
 
 void QVectorView::showEvent( QShowEvent * )
@@ -1473,7 +1465,6 @@ void QVectorView::showEvent( QShowEvent * )
   d_fullRepaintOnComlumnChange = TRUE;
   updateGeometries();
 }
-
 
 void QVectorView::handleItemChange( int old, bool shift, bool control )
 {

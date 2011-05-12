@@ -22,27 +22,46 @@ using namespace std;
 #include "songselector.logic.h"
 #include "kbpm-dj.h"
 #include "vector-iterator.h"
-
-void ExistenceScanner::analyze()
+#include "user-notification.h"
+              
+elementResult ActiveExistenceScanner::start(vector<Song*> *all)
 {
-  vectorIterator<Song*> song(all); ITERATE_OVER(song) 
-    song.val() -> checkondisk();
-  }
+  if (songs) 
+    delete songs;
+  songs=all;
+  current=0;
+  queue_thunk();
+  return Done;
 }
 
-void ExistenceScanner::stopped()
+elementResult ActiveExistenceScanner::thunk()
 {
-  Analyzer::stopped();
-  // the receiver of this event will delete this object.
-  // so we cannot do anything after sending this event since
-  // QT might decide to handle it immediatelly or concurrently
-  // but in any case not necessarily after exiting this method
-  app->postEvent(song_selector_window, new ExistenceScannerFinished(this));
+  const static int chunksize = 100;
+  if (!songs) return Done;
+  unsigned int stopat = songs->size();
+  if (stopat>current+chunksize) stopat=current+chunksize;
+  for(unsigned int i = current ; i < stopat ;  i++)
+    songs[0][i]->checkondisk();
+  if (stopat==songs->size())
+    {
+      UserNotification * ui = new UserNotification();
+      ui->status="Finished checking availability of songs";
+      ui->update_item_list = true;
+      ui->send();
+      delete songs;
+      songs=NULL;
+      return Done;
+    }
+  current = stopat;
+  return RevisitAfterIncoming;
 }
 
-void ExistenceScannerFinished::run(SongSelectorLogic * song_selector_window)
+elementResult ActiveExistenceScanner::terminate()
 {
-  status->message("Finished checking availability of songs",10000);
-  song_selector_window->updateItemList();
-  delete thread;
+  if (songs)
+    delete songs;
+  deactivate();
+  return Done;
 }
+
+ExistenceScanner existenceScanner;

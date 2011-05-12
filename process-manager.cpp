@@ -22,6 +22,7 @@ using namespace std;
 #include "process-manager.h"
 #include "scripts.h"
 #include "history.h"
+#include "kbpm-dj.h"
 
 Song* main_song = NULL;
 Song* monitor_song = NULL;
@@ -80,10 +81,14 @@ void ProcessManager::start(int id, Song *song)
   Index a(matchWith->get_storedin());
   Index b(song->get_storedin());
   QString playercommand = Config::players[id].getPlayCommand(a,b);
+  fragmentPlayer.stopOutput();
+  fragmentPlayer.waitForStop();
   BasicProcessManager::start(id, playercommand,
 			     Config::players[id].getLogName(),
 			     false);
   Config::players[id].start(song);
+  fragmentPlayer.startOutput();
+  fragmentPlayer.waitForStart();
 }
 
 #ifdef INCOMPLETE_FEATURES

@@ -30,7 +30,7 @@ After creating such a file be sure to send it to me
 Creating the defines file can be done by copying one of the examples to
 the file name defines (thereby overwriting the current defines). Furthermore you 
 need lame, oggenc, libasound2-dev, fftw3-dev and maybe some other libraries
-I forgoet to mention.
+I forgot to mention.
 
 Some compile time flags:
  
@@ -46,25 +46,15 @@ Some compile time flags:
     add to the CFLAGS '-D COMPILE_JACK' to include native support for jackd.
 
   EFENCE 
-    links in tghe efence code to debug bpmdj memory allocations
+    links in the efence code to debug bpmdj memory allocations
 
   NDEBUG 
     removes assert statements, which could lead to faster code. But if it crashes
     we have no idea where it happened.
 
-These defines files probably include distcc. This programs is of course not strictly
-necessary. Removing the word distcc will resolve the problem. Also remember to create
-a suitable defines file in the Data directory.
+The defines files probably include distcc. This programs is of course not strictly
+necessary. Removing the word distcc will resolve the problem.
 
-
-
-
-       	   	    	       DEVELOPERS
-
-For developers wanting to join the BpmDj party: You will need a cvs login for the
-Data modules. You can ask access for these to werner.van.belle@gmail.com (or provide 
-me with your public ssh key). These modules are not part of the standard BpmDj CVS 
-since I use them at various places.
-
--- Werner Van Belle (werner.van.belle@gmail.com)
+-- 
+Werner Van Belle (werner.van.belle@gmail.com)
 
