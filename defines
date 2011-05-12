@@ -1,21 +1,22 @@
-CPP=g++ -O9
 CC=gcc -O9
-
-CP = cp
-MV = mv
-TAR = tar
-UIC = uic
-MOC = moc
-LYX = lyx
-LATEX = latex
-DVIPS = dvips
-MKDIR = mkdir
-STRIP = strip
+# -pg
+CPP=g++ -O9
+# -pg
 
 CFLAGS+=
 LDFLAGS+= -lpthread -lm
 
-QT_INCLUDE_PATH=-I/usr/include/qt/
-QT_LIBRARY_PATH=
-QT_LIBS= -lqt
+CP = cp
+MV = mv
+TAR = tar
+LYX = lyx
+LATEX = latex
+DVIPS = dvips
+MKDIR = mkdir
+UIC = /usr/qt/2/bin/uic
+MOC = /usr/qt/2/bin/moc
+STRIP = strip
 
+QT_INCLUDE_PATH= -I /usr/qt/2/include/
+QT_LIBRARY_PATH= -L /usr/qt/2/lib/
+QT_LIBS= -lqt

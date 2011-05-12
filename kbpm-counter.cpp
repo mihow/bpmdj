@@ -70,7 +70,7 @@ static   int  opt_stop=0;
 static char * arg_write;
 */
 
-BpmCountDialog::BpmCountDialog(SongPlayer*parent=0,const char*name=0, bool modal=FALSE, WFlags f =0) :
+BpmCountDialog::BpmCountDialog(SongPlayer*parent, const char*name, bool modal, WFlags f) :
 CountDialog(0,name,modal,f)
 {
    player=parent;
@@ -542,7 +542,7 @@ void BpmCountDialog::doitwrapper()
 {
    doit();
    working=false;
-   StartButton->setText("Start");
+   StartButton->setText("&Start");
    BusyToggle->toggle();
 }
 
@@ -559,7 +559,7 @@ void BpmCountDialog::startAutomaticCounter()
      }
    else
      {
-	StartButton->setText("Stop");
+	StartButton->setText("&Stop");
 	BusyToggle->toggle();
 	working=true;
 	stop_signal=false;

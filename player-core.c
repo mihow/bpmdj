@@ -15,7 +15,9 @@
 
  You should have received a copy of the GNU General Public License
  along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  U****/
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+****/
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
@@ -151,16 +153,16 @@ void dsp_open()
    latency*=1000.0;
    dsp_start();
    clock_start();
-   sleep(1);
-     {
-	signed8 l = clock_ticks();
-	if (l-WAVRATE>100) 
-	  {
-	     printf("Dsp device has %d bytes: latency = %g ms\n",ab.bytes,latency);
-	     printf("CLOCK_FREQ is wrong (again!) please inform the author !!!\n(werner.van.belle@vub.ac.be)\n");
-	     printf("Clock gives %d ticks (should be around %d)\n",(long)l,WAVRATE);
-	  }
-     }
+//    sleep(1);
+//     {
+//	signed8 l = clock_ticks();
+//	if (l-WAVRATE>100) 
+//	  {
+//	     printf("Dsp device has %d bytes: latency = %g ms\n",ab.bytes,latency);
+//	     printf("LOCK_FREQ is wrong (again!) please inform the author !!!\n(werner.van.belle@vub.ac.be)\n");
+//	     printf("Clock gives %d ticks (should be around %d)\n",(long)l,WAVRATE);
+//	  }
+//    }
 }
 
 void dsp_flush()

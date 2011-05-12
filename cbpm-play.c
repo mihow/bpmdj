@@ -127,7 +127,6 @@ void useraction(int neglect)
       case '?' :
       case 'h' :  help(); break;
       case 'q' :  stop=1; paused=0; break;
-      default  :
      }
    
    if (y<0)

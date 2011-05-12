@@ -38,7 +38,7 @@ extern "C"
 #include "cbpm-index.h"
 }
 
-SongPlayerLogic::SongPlayerLogic(QWidget*parent=0,const char*name=0, bool modal=FALSE,WFlags f=0) :
+SongPlayerLogic::SongPlayerLogic(QWidget*parent,const char*name, bool modal,WFlags f) :
   SongPlayer(parent,name,modal,f)
 {
    bpmcounter  = new BpmCountDialog(this);

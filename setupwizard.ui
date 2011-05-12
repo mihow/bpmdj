@@ -11,13 +11,17 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>476</width>
-            <height>480</height>
+            <width>580</width>
+            <height>544</height>
         </rect>
     </property>
     <property stdset="1">
         <name>caption</name>
         <string>Setup kbpm-dj</string>
+    </property>
+    <property stdset="1">
+        <name>sizeGripEnabled</name>
+        <bool>true</bool>
     </property>
     <widget>
         <class>QWidget</class>
@@ -29,254 +33,238 @@
             <name>title</name>
             <string>Setting up directories</string>
         </attribute>
-        <widget>
-            <class>QLayoutWidget</class>
+        <grid>
             <property stdset="1">
-                <name>name</name>
-                <cstring>Layout5</cstring>
+                <name>margin</name>
+                <number>11</number>
             </property>
             <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>5</x>
-                    <y>5</y>
-                    <width>460</width>
-                    <height>370</height>
-                </rect>
+                <name>spacing</name>
+                <number>6</number>
             </property>
-            <grid>
+            <widget row="0"  column="0"  rowspan="1"  colspan="3" >
+                <class>QLabel</class>
                 <property stdset="1">
-                    <name>margin</name>
-                    <number>0</number>
+                    <name>name</name>
+                    <cstring>TextLabel5</cstring>
                 </property>
                 <property stdset="1">
-                    <name>spacing</name>
-                    <number>6</number>
+                    <name>text</name>
+                    <string>kbpm-dj requires the existence of two directories:</string>
                 </property>
-                <widget row="0"  column="0"  rowspan="1"  colspan="3" >
-                    <class>QLabel</class>
+            </widget>
+            <spacer row="1"  column="1" >
+                <property>
+                    <name>name</name>
+                    <cstring>Spacer1</cstring>
+                </property>
+                <property stdset="1">
+                    <name>orientation</name>
+                    <enum>Vertical</enum>
+                </property>
+                <property stdset="1">
+                    <name>sizeType</name>
+                    <enum>Expanding</enum>
+                </property>
+                <property>
+                    <name>sizeHint</name>
+                    <size>
+                        <width>20</width>
+                        <height>20</height>
+                    </size>
+                </property>
+            </spacer>
+            <spacer row="5"  column="1" >
+                <property>
+                    <name>name</name>
+                    <cstring>Spacer4</cstring>
+                </property>
+                <property stdset="1">
+                    <name>orientation</name>
+                    <enum>Vertical</enum>
+                </property>
+                <property stdset="1">
+                    <name>sizeType</name>
+                    <enum>Expanding</enum>
+                </property>
+                <property>
+                    <name>sizeHint</name>
+                    <size>
+                        <width>20</width>
+                        <height>20</height>
+                    </size>
+                </property>
+            </spacer>
+            <widget row="6"  column="0"  rowspan="1"  colspan="3" >
+                <class>QLabel</class>
+                <property stdset="1">
+                    <name>name</name>
+                    <cstring>TextLabel7</cstring>
+                </property>
+                <property stdset="1">
+                    <name>font</name>
+                    <font>
+                        <italic>1</italic>
+                    </font>
+                </property>
+                <property stdset="1">
+                    <name>text</name>
+                    <string>Make sure you create those two directories (if they already exist, make sure you start the program from the right directory)</string>
+                </property>
+                <property stdset="1">
+                    <name>alignment</name>
+                    <set>WordBreak|AlignTop|AlignLeft</set>
+                </property>
+                <property>
+                    <name>vAlign</name>
+                </property>
+                <property>
+                    <name>wordwrap</name>
+                </property>
+            </widget>
+            <spacer row="2"  column="0" >
+                <property>
+                    <name>name</name>
+                    <cstring>Spacer7</cstring>
+                </property>
+                <property stdset="1">
+                    <name>orientation</name>
+                    <enum>Horizontal</enum>
+                </property>
+                <property stdset="1">
+                    <name>sizeType</name>
+                    <enum>Expanding</enum>
+                </property>
+                <property>
+                    <name>sizeHint</name>
+                    <size>
+                        <width>20</width>
+                        <height>20</height>
+                    </size>
+                </property>
+            </spacer>
+            <widget row="2"  column="1" >
+                <class>QLayoutWidget</class>
+                <property stdset="1">
+                    <name>name</name>
+                    <cstring>Layout1</cstring>
+                </property>
+                <grid>
                     <property stdset="1">
-                        <name>name</name>
-                        <cstring>TextLabel5</cstring>
+                        <name>margin</name>
+                        <number>0</number>
                     </property>
                     <property stdset="1">
-                        <name>text</name>
-                        <string>kbpm-dj requires the existence of two directories:</string>
+                        <name>spacing</name>
+                        <number>6</number>
                     </property>
-                </widget>
-                <spacer row="1"  column="1" >
-                    <property>
-                        <name>name</name>
-                        <cstring>Spacer1</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>orientation</name>
-                        <enum>Vertical</enum>
-                    </property>
-                    <property stdset="1">
-                        <name>sizeType</name>
-                        <enum>Expanding</enum>
-                    </property>
-                    <property>
-                        <name>sizeHint</name>
-                        <size>
-                            <width>20</width>
-                            <height>20</height>
-                        </size>
-                    </property>
-                </spacer>
-                <spacer row="7"  column="1" >
-                    <property>
-                        <name>name</name>
-                        <cstring>Spacer4</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>orientation</name>
-                        <enum>Vertical</enum>
-                    </property>
-                    <property stdset="1">
-                        <name>sizeType</name>
-                        <enum>Expanding</enum>
-                    </property>
-                    <property>
-                        <name>sizeHint</name>
-                        <size>
-                            <width>20</width>
-                            <height>20</height>
-                        </size>
-                    </property>
-                </spacer>
-                <widget row="8"  column="0"  rowspan="1"  colspan="3" >
-                    <class>QLabel</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>TextLabel7</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>font</name>
-                        <font>
-                            <italic>1</italic>
-                        </font>
-                    </property>
-                    <property stdset="1">
-                        <name>text</name>
-                        <string>Make sure you create those two directories (if they already exist, make sure you start the program from the right directory)</string>
-                    </property>
-                    <property stdset="1">
-                        <name>alignment</name>
-                        <set>WordBreak|AlignTop|AlignLeft</set>
-                    </property>
-                    <property>
-                        <name>vAlign</name>
-                    </property>
-                    <property>
-                        <name>wordwrap</name>
-                    </property>
-                </widget>
-                <spacer row="2"  column="0" >
-                    <property>
-                        <name>name</name>
-                        <cstring>Spacer7</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>orientation</name>
-                        <enum>Horizontal</enum>
-                    </property>
-                    <property stdset="1">
-                        <name>sizeType</name>
-                        <enum>Expanding</enum>
-                    </property>
-                    <property>
-                        <name>sizeHint</name>
-                        <size>
-                            <width>20</width>
-                            <height>20</height>
-                        </size>
-                    </property>
-                </spacer>
-                <widget row="2"  column="1" >
-                    <class>QLayoutWidget</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>Layout1</cstring>
-                    </property>
-                    <grid>
+                    <widget row="0"  column="0" >
+                        <class>QLabel</class>
                         <property stdset="1">
-                            <name>margin</name>
-                            <number>0</number>
+                            <name>name</name>
+                            <cstring>TextLabel2</cstring>
                         </property>
                         <property stdset="1">
-                            <name>spacing</name>
-                            <number>6</number>
+                            <name>font</name>
+                            <font>
+                                <bold>1</bold>
+                            </font>
                         </property>
-                        <widget row="0"  column="0" >
-                            <class>QLabel</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>TextLabel2</cstring>
-                            </property>
-                            <property stdset="1">
-                                <name>font</name>
-                                <font>
-                                    <bold>1</bold>
-                                </font>
-                            </property>
-                            <property stdset="1">
-                                <name>text</name>
-                                <string>./music</string>
-                            </property>
-                        </widget>
-                        <widget row="1"  column="0" >
-                            <class>QLabel</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>TextLabel3</cstring>
-                            </property>
-                            <property stdset="1">
-                                <name>font</name>
-                                <font>
-                                    <bold>1</bold>
-                                </font>
-                            </property>
-                            <property stdset="1">
-                                <name>text</name>
-                                <string>./index</string>
-                            </property>
-                        </widget>
-                    </grid>
-                </widget>
-                <spacer row="3"  column="1" >
-                    <property>
-                        <name>name</name>
-                        <cstring>Spacer2</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>orientation</name>
-                        <enum>Vertical</enum>
-                    </property>
-                    <property stdset="1">
-                        <name>sizeType</name>
-                        <enum>Expanding</enum>
-                    </property>
-                    <property>
-                        <name>sizeHint</name>
-                        <size>
-                            <width>20</width>
-                            <height>20</height>
-                        </size>
-                    </property>
-                </spacer>
-                <spacer row="2"  column="2" >
-                    <property>
-                        <name>name</name>
-                        <cstring>Spacer8</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>orientation</name>
-                        <enum>Horizontal</enum>
-                    </property>
-                    <property stdset="1">
-                        <name>sizeType</name>
-                        <enum>Expanding</enum>
-                    </property>
-                    <property>
-                        <name>sizeHint</name>
-                        <size>
-                            <width>20</width>
-                            <height>20</height>
-                        </size>
-                    </property>
-                </spacer>
-                <widget row="4"  column="0"  rowspan="1"  colspan="3" >
-                    <class>QLabel</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>TextLabel1</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>text</name>
-                        <string>The music directory should contain all the .mp3 files you have. The index directory will contain all meta information kbpmdj needs about the .mp3 files. (such as tempo, cue points and so on)</string>
-                    </property>
-                    <property stdset="1">
-                        <name>textFormat</name>
-                        <enum>AutoText</enum>
-                    </property>
-                    <property stdset="1">
-                        <name>alignment</name>
-                        <set>WordBreak|AlignTop|AlignLeft</set>
-                    </property>
-                    <property>
-                        <name>hAlign</name>
-                    </property>
-                    <property>
-                        <name>vAlign</name>
-                    </property>
-                    <property>
-                        <name>wordwrap</name>
-                    </property>
-                </widget>
-            </grid>
-        </widget>
+                        <property stdset="1">
+                            <name>text</name>
+                            <string>./music</string>
+                        </property>
+                    </widget>
+                    <widget row="1"  column="0" >
+                        <class>QLabel</class>
+                        <property stdset="1">
+                            <name>name</name>
+                            <cstring>TextLabel3</cstring>
+                        </property>
+                        <property stdset="1">
+                            <name>font</name>
+                            <font>
+                                <bold>1</bold>
+                            </font>
+                        </property>
+                        <property stdset="1">
+                            <name>text</name>
+                            <string>./index</string>
+                        </property>
+                    </widget>
+                </grid>
+            </widget>
+            <spacer row="3"  column="1" >
+                <property>
+                    <name>name</name>
+                    <cstring>Spacer2</cstring>
+                </property>
+                <property stdset="1">
+                    <name>orientation</name>
+                    <enum>Vertical</enum>
+                </property>
+                <property stdset="1">
+                    <name>sizeType</name>
+                    <enum>Expanding</enum>
+                </property>
+                <property>
+                    <name>sizeHint</name>
+                    <size>
+                        <width>20</width>
+                        <height>20</height>
+                    </size>
+                </property>
+            </spacer>
+            <spacer row="2"  column="2" >
+                <property>
+                    <name>name</name>
+                    <cstring>Spacer8</cstring>
+                </property>
+                <property stdset="1">
+                    <name>orientation</name>
+                    <enum>Horizontal</enum>
+                </property>
+                <property stdset="1">
+                    <name>sizeType</name>
+                    <enum>Expanding</enum>
+                </property>
+                <property>
+                    <name>sizeHint</name>
+                    <size>
+                        <width>20</width>
+                        <height>20</height>
+                    </size>
+                </property>
+            </spacer>
+            <widget row="4"  column="0"  rowspan="1"  colspan="3" >
+                <class>QLabel</class>
+                <property stdset="1">
+                    <name>name</name>
+                    <cstring>TextLabel1</cstring>
+                </property>
+                <property stdset="1">
+                    <name>text</name>
+                    <string>The music directory should contain all the .mp3 files you have. The index directory will contain all meta information kbpmdj needs about the .mp3 files. (such as tempo, cue points and so on)</string>
+                </property>
+                <property stdset="1">
+                    <name>textFormat</name>
+                    <enum>AutoText</enum>
+                </property>
+                <property stdset="1">
+                    <name>alignment</name>
+                    <set>WordBreak|AlignTop|AlignLeft</set>
+                </property>
+                <property>
+                    <name>hAlign</name>
+                </property>
+                <property>
+                    <name>vAlign</name>
+                </property>
+                <property>
+                    <name>wordwrap</name>
+                </property>
+            </widget>
+        </grid>
     </widget>
     <widget>
         <class>QWidget</class>
@@ -288,192 +276,176 @@
             <name>title</name>
             <string>Positioning of .mp3's</string>
         </attribute>
-        <widget>
-            <class>QLayoutWidget</class>
+        <grid>
             <property stdset="1">
-                <name>name</name>
-                <cstring>Layout8</cstring>
+                <name>margin</name>
+                <number>11</number>
             </property>
             <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>10</x>
-                    <y>10</y>
-                    <width>450</width>
-                    <height>370</height>
-                </rect>
+                <name>spacing</name>
+                <number>6</number>
             </property>
-            <grid>
-                <property stdset="1">
-                    <name>margin</name>
-                    <number>0</number>
+            <spacer row="3"  column="1" >
+                <property>
+                    <name>name</name>
+                    <cstring>Spacer38</cstring>
                 </property>
                 <property stdset="1">
-                    <name>spacing</name>
-                    <number>6</number>
+                    <name>orientation</name>
+                    <enum>Vertical</enum>
                 </property>
-                <spacer row="3"  column="1" >
-                    <property>
-                        <name>name</name>
-                        <cstring>Spacer38</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>orientation</name>
-                        <enum>Vertical</enum>
-                    </property>
-                    <property stdset="1">
-                        <name>sizeType</name>
-                        <enum>Expanding</enum>
-                    </property>
-                    <property>
-                        <name>sizeHint</name>
-                        <size>
-                            <width>20</width>
-                            <height>20</height>
-                        </size>
-                    </property>
-                </spacer>
-                <widget row="6"  column="0"  rowspan="1"  colspan="2" >
-                    <class>QLabel</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>TextLabel12</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>font</name>
-                        <font>
-                            <italic>1</italic>
-                        </font>
-                    </property>
-                    <property stdset="1">
-                        <name>text</name>
-                        <string>Now, move some .mp3 files to the ./music directory. (Or copy an .mp3 cdrom to ./music/cd001)</string>
-                    </property>
-                    <property stdset="1">
-                        <name>alignment</name>
-                        <set>WordBreak|AlignTop|AlignLeft</set>
-                    </property>
-                    <property>
-                        <name>vAlign</name>
-                    </property>
-                    <property>
-                        <name>wordwrap</name>
-                    </property>
-                </widget>
-                <spacer row="1"  column="0" >
-                    <property>
-                        <name>name</name>
-                        <cstring>Spacer37</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>orientation</name>
-                        <enum>Vertical</enum>
-                    </property>
-                    <property stdset="1">
-                        <name>sizeType</name>
-                        <enum>Expanding</enum>
-                    </property>
-                    <property>
-                        <name>sizeHint</name>
-                        <size>
-                            <width>20</width>
-                            <height>20</height>
-                        </size>
-                    </property>
-                </spacer>
-                <widget row="2"  column="0"  rowspan="1"  colspan="2" >
-                    <class>QLabel</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>TextLabel8</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>font</name>
-                        <font>
-                            <bold>1</bold>
-                        </font>
-                    </property>
-                    <property stdset="1">
-                        <name>text</name>
-                        <string>Beware: Once an .mp3 file is indexed (imported in kbpm-dj) it should not be renamed anymore nor should it be moved to other locations of the filesystem !</string>
-                    </property>
-                    <property stdset="1">
-                        <name>alignment</name>
-                        <set>WordBreak|AlignVCenter|AlignLeft</set>
-                    </property>
-                    <property>
-                        <name>vAlign</name>
-                    </property>
-                    <property>
-                        <name>wordwrap</name>
-                    </property>
-                </widget>
-                <widget row="0"  column="0"  rowspan="1"  colspan="2" >
-                    <class>QLabel</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>TextLabel1_2</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>text</name>
-                        <string>The ./music directory should contain all the .mp3 files you will use.  You can use symbolic links to refer to other parts of the filesystem.</string>
-                    </property>
-                    <property stdset="1">
-                        <name>textFormat</name>
-                        <enum>AutoText</enum>
-                    </property>
-                    <property stdset="1">
-                        <name>alignment</name>
-                        <set>WordBreak|AlignVCenter|AlignLeft</set>
-                    </property>
-                    <property>
-                        <name>hAlign</name>
-                    </property>
-                    <property>
-                        <name>wordwrap</name>
-                    </property>
-                </widget>
-                <widget row="4"  column="0"  rowspan="1"  colspan="2" >
-                    <class>QLabel</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>TextLabel10</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>text</name>
-                        <string>When a file is indexed but not on disk it can be fetched from cdrom only when the .mp3 was stored in a directory ./music/cd&lt;xxx&gt; (e.g: ./music/cd001/).</string>
-                    </property>
-                    <property stdset="1">
-                        <name>alignment</name>
-                        <set>WordBreak|AlignVCenter|AlignLeft</set>
-                    </property>
-                    <property>
-                        <name>wordwrap</name>
-                    </property>
-                </widget>
-                <spacer row="5"  column="1" >
-                    <property>
-                        <name>name</name>
-                        <cstring>Spacer38_2</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>orientation</name>
-                        <enum>Vertical</enum>
-                    </property>
-                    <property stdset="1">
-                        <name>sizeType</name>
-                        <enum>Expanding</enum>
-                    </property>
-                    <property>
-                        <name>sizeHint</name>
-                        <size>
-                            <width>20</width>
-                            <height>20</height>
-                        </size>
-                    </property>
-                </spacer>
-            </grid>
-        </widget>
+                <property stdset="1">
+                    <name>sizeType</name>
+                    <enum>Expanding</enum>
+                </property>
+                <property>
+                    <name>sizeHint</name>
+                    <size>
+                        <width>20</width>
+                        <height>20</height>
+                    </size>
+                </property>
+            </spacer>
+            <widget row="6"  column="0"  rowspan="1"  colspan="2" >
+                <class>QLabel</class>
+                <property stdset="1">
+                    <name>name</name>
+                    <cstring>TextLabel12</cstring>
+                </property>
+                <property stdset="1">
+                    <name>font</name>
+                    <font>
+                        <italic>1</italic>
+                    </font>
+                </property>
+                <property stdset="1">
+                    <name>text</name>
+                    <string>Now, move some .mp3 files to the ./music directory. (Or copy an .mp3 cdrom to ./music/cd001)</string>
+                </property>
+                <property stdset="1">
+                    <name>alignment</name>
+                    <set>WordBreak|AlignTop|AlignLeft</set>
+                </property>
+                <property>
+                    <name>vAlign</name>
+                </property>
+                <property>
+                    <name>wordwrap</name>
+                </property>
+            </widget>
+            <spacer row="1"  column="0" >
+                <property>
+                    <name>name</name>
+                    <cstring>Spacer37</cstring>
+                </property>
+                <property stdset="1">
+                    <name>orientation</name>
+                    <enum>Vertical</enum>
+                </property>
+                <property stdset="1">
+                    <name>sizeType</name>
+                    <enum>Expanding</enum>
+                </property>
+                <property>
+                    <name>sizeHint</name>
+                    <size>
+                        <width>20</width>
+                        <height>20</height>
+                    </size>
+                </property>
+            </spacer>
+            <widget row="2"  column="0"  rowspan="1"  colspan="2" >
+                <class>QLabel</class>
+                <property stdset="1">
+                    <name>name</name>
+                    <cstring>TextLabel8</cstring>
+                </property>
+                <property stdset="1">
+                    <name>font</name>
+                    <font>
+                        <bold>1</bold>
+                    </font>
+                </property>
+                <property stdset="1">
+                    <name>text</name>
+                    <string>Beware: Once an .mp3 file is indexed (imported in kbpm-dj) it should not be renamed anymore nor should it be moved to other locations of the filesystem !</string>
+                </property>
+                <property stdset="1">
+                    <name>alignment</name>
+                    <set>WordBreak|AlignVCenter|AlignLeft</set>
+                </property>
+                <property>
+                    <name>vAlign</name>
+                </property>
+                <property>
+                    <name>wordwrap</name>
+                </property>
+            </widget>
+            <widget row="0"  column="0"  rowspan="1"  colspan="2" >
+                <class>QLabel</class>
+                <property stdset="1">
+                    <name>name</name>
+                    <cstring>TextLabel1_2</cstring>
+                </property>
+                <property stdset="1">
+                    <name>text</name>
+                    <string>The ./music directory should contain all the .mp3 files you will use.  You can use symbolic links to refer to other parts of the filesystem.</string>
+                </property>
+                <property stdset="1">
+                    <name>textFormat</name>
+                    <enum>AutoText</enum>
+                </property>
+                <property stdset="1">
+                    <name>alignment</name>
+                    <set>WordBreak|AlignVCenter|AlignLeft</set>
+                </property>
+                <property>
+                    <name>hAlign</name>
+                </property>
+                <property>
+                    <name>wordwrap</name>
+                </property>
+            </widget>
+            <widget row="4"  column="0"  rowspan="1"  colspan="2" >
+                <class>QLabel</class>
+                <property stdset="1">
+                    <name>name</name>
+                    <cstring>TextLabel10</cstring>
+                </property>
+                <property stdset="1">
+                    <name>text</name>
+                    <string>When a file has been indexed in the past but is unavailable on disk, it can be automatically fetched from cdrom only when the .mp3 was stored in a directory  ./music/cd&lt;xxx&gt; (e.g: ./music/cd001/).</string>
+                </property>
+                <property stdset="1">
+                    <name>alignment</name>
+                    <set>WordBreak|AlignVCenter|AlignLeft</set>
+                </property>
+                <property>
+                    <name>wordwrap</name>
+                </property>
+            </widget>
+            <spacer row="5"  column="1" >
+                <property>
+                    <name>name</name>
+                    <cstring>Spacer38_2</cstring>
+                </property>
+                <property stdset="1">
+                    <name>orientation</name>
+                    <enum>Vertical</enum>
+                </property>
+                <property stdset="1">
+                    <name>sizeType</name>
+                    <enum>Expanding</enum>
+                </property>
+                <property>
+                    <name>sizeHint</name>
+                    <size>
+                        <width>20</width>
+                        <height>20</height>
+                    </size>
+                </property>
+            </spacer>
+        </grid>
     </widget>
     <widget>
         <class>QWidget</class>
@@ -485,195 +457,179 @@
             <name>title</name>
             <string>Index files</string>
         </attribute>
-        <widget>
-            <class>QLayoutWidget</class>
+        <grid>
             <property stdset="1">
-                <name>name</name>
-                <cstring>Layout10</cstring>
+                <name>margin</name>
+                <number>11</number>
             </property>
             <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>10</x>
-                    <y>10</y>
-                    <width>450</width>
-                    <height>370</height>
-                </rect>
+                <name>spacing</name>
+                <number>6</number>
             </property>
-            <grid>
-                <property stdset="1">
-                    <name>margin</name>
-                    <number>0</number>
+            <spacer row="2"  column="0" >
+                <property>
+                    <name>name</name>
+                    <cstring>Spacer74</cstring>
                 </property>
                 <property stdset="1">
-                    <name>spacing</name>
-                    <number>6</number>
+                    <name>orientation</name>
+                    <enum>Horizontal</enum>
                 </property>
-                <spacer row="2"  column="0" >
-                    <property>
-                        <name>name</name>
-                        <cstring>Spacer74</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>orientation</name>
-                        <enum>Horizontal</enum>
-                    </property>
-                    <property stdset="1">
-                        <name>sizeType</name>
-                        <enum>Expanding</enum>
-                    </property>
-                    <property>
-                        <name>sizeHint</name>
-                        <size>
-                            <width>20</width>
-                            <height>20</height>
-                        </size>
-                    </property>
-                </spacer>
-                <spacer row="1"  column="2" >
-                    <property>
-                        <name>name</name>
-                        <cstring>Spacer75</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>orientation</name>
-                        <enum>Vertical</enum>
-                    </property>
-                    <property stdset="1">
-                        <name>sizeType</name>
-                        <enum>Expanding</enum>
-                    </property>
-                    <property>
-                        <name>sizeHint</name>
-                        <size>
-                            <width>20</width>
-                            <height>20</height>
-                        </size>
-                    </property>
-                </spacer>
-                <widget row="5"  column="0"  rowspan="1"  colspan="4" >
-                    <class>QLabel</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>TextLabel16</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>font</name>
-                        <font>
-                            <italic>1</italic>
-                        </font>
-                    </property>
-                    <property stdset="1">
-                        <name>text</name>
-                        <string>Now the program will open, you can create the necessary index files by selecting Tools/Import</string>
-                    </property>
-                    <property stdset="1">
-                        <name>alignment</name>
-                        <set>WordBreak|AlignTop|AlignLeft</set>
-                    </property>
-                    <property>
-                        <name>vAlign</name>
-                    </property>
-                    <property>
-                        <name>wordwrap</name>
-                    </property>
-                </widget>
-                <widget row="0"  column="0"  rowspan="1"  colspan="4" >
-                    <class>QLabel</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>TextLabel14</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>text</name>
-                        <string>The index directory contains files with all necessarry meta information such as</string>
-                    </property>
-                    <property stdset="1">
-                        <name>alignment</name>
-                        <set>WordBreak|AlignTop|AlignLeft</set>
-                    </property>
-                    <property>
-                        <name>vAlign</name>
-                    </property>
-                    <property>
-                        <name>wordwrap</name>
-                    </property>
-                </widget>
-                <widget row="2"  column="1"  rowspan="2"  colspan="1" >
-                    <class>QLabel</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>TextLabel15</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>font</name>
-                        <font>
-                            <bold>1</bold>
-                        </font>
-                    </property>
-                    <property stdset="1">
-                        <name>text</name>
-                        <string>- mp3 location
+                <property stdset="1">
+                    <name>sizeType</name>
+                    <enum>Expanding</enum>
+                </property>
+                <property>
+                    <name>sizeHint</name>
+                    <size>
+                        <width>20</width>
+                        <height>20</height>
+                    </size>
+                </property>
+            </spacer>
+            <spacer row="1"  column="2" >
+                <property>
+                    <name>name</name>
+                    <cstring>Spacer75</cstring>
+                </property>
+                <property stdset="1">
+                    <name>orientation</name>
+                    <enum>Vertical</enum>
+                </property>
+                <property stdset="1">
+                    <name>sizeType</name>
+                    <enum>Expanding</enum>
+                </property>
+                <property>
+                    <name>sizeHint</name>
+                    <size>
+                        <width>20</width>
+                        <height>20</height>
+                    </size>
+                </property>
+            </spacer>
+            <widget row="5"  column="0"  rowspan="1"  colspan="4" >
+                <class>QLabel</class>
+                <property stdset="1">
+                    <name>name</name>
+                    <cstring>TextLabel16</cstring>
+                </property>
+                <property stdset="1">
+                    <name>font</name>
+                    <font>
+                        <italic>1</italic>
+                    </font>
+                </property>
+                <property stdset="1">
+                    <name>text</name>
+                    <string>Now the program will open, you can create the necessary index files by selecting Tools/Import</string>
+                </property>
+                <property stdset="1">
+                    <name>alignment</name>
+                    <set>WordBreak|AlignTop|AlignLeft</set>
+                </property>
+                <property>
+                    <name>vAlign</name>
+                </property>
+                <property>
+                    <name>wordwrap</name>
+                </property>
+            </widget>
+            <widget row="0"  column="0"  rowspan="1"  colspan="4" >
+                <class>QLabel</class>
+                <property stdset="1">
+                    <name>name</name>
+                    <cstring>TextLabel14</cstring>
+                </property>
+                <property stdset="1">
+                    <name>text</name>
+                    <string>The index directory contains files with all necessarry meta information such as</string>
+                </property>
+                <property stdset="1">
+                    <name>alignment</name>
+                    <set>WordBreak|AlignTop|AlignLeft</set>
+                </property>
+                <property>
+                    <name>vAlign</name>
+                </property>
+                <property>
+                    <name>wordwrap</name>
+                </property>
+            </widget>
+            <widget row="2"  column="1"  rowspan="2"  colspan="1" >
+                <class>QLabel</class>
+                <property stdset="1">
+                    <name>name</name>
+                    <cstring>TextLabel15</cstring>
+                </property>
+                <property stdset="1">
+                    <name>font</name>
+                    <font>
+                        <bold>1</bold>
+                    </font>
+                </property>
+                <property stdset="1">
+                    <name>text</name>
+                    <string>- mp3 location
 - tempo
 - cue points
 - md5sum
 - style-tags</string>
-                    </property>
-                    <property stdset="1">
-                        <name>alignment</name>
-                        <set>AlignVCenter|AlignLeft</set>
-                    </property>
-                    <property>
-                        <name>vAlign</name>
-                    </property>
-                    <property>
-                        <name>wordwrap</name>
-                    </property>
-                </widget>
-                <spacer row="4"  column="1" >
-                    <property>
-                        <name>name</name>
-                        <cstring>Spacer73</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>orientation</name>
-                        <enum>Vertical</enum>
-                    </property>
-                    <property stdset="1">
-                        <name>sizeType</name>
-                        <enum>Expanding</enum>
-                    </property>
-                    <property>
-                        <name>sizeHint</name>
-                        <size>
-                            <width>20</width>
-                            <height>20</height>
-                        </size>
-                    </property>
-                </spacer>
-                <spacer row="3"  column="3" >
-                    <property>
-                        <name>name</name>
-                        <cstring>Spacer74_2</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>orientation</name>
-                        <enum>Horizontal</enum>
-                    </property>
-                    <property stdset="1">
-                        <name>sizeType</name>
-                        <enum>Expanding</enum>
-                    </property>
-                    <property>
-                        <name>sizeHint</name>
-                        <size>
-                            <width>20</width>
-                            <height>20</height>
-                        </size>
-                    </property>
-                </spacer>
-            </grid>
-        </widget>
+                </property>
+                <property stdset="1">
+                    <name>alignment</name>
+                    <set>AlignVCenter|AlignLeft</set>
+                </property>
+                <property>
+                    <name>vAlign</name>
+                </property>
+                <property>
+                    <name>wordwrap</name>
+                </property>
+            </widget>
+            <spacer row="4"  column="1" >
+                <property>
+                    <name>name</name>
+                    <cstring>Spacer73</cstring>
+                </property>
+                <property stdset="1">
+                    <name>orientation</name>
+                    <enum>Vertical</enum>
+                </property>
+                <property stdset="1">
+                    <name>sizeType</name>
+                    <enum>Expanding</enum>
+                </property>
+                <property>
+                    <name>sizeHint</name>
+                    <size>
+                        <width>20</width>
+                        <height>20</height>
+                    </size>
+                </property>
+            </spacer>
+            <spacer row="3"  column="3" >
+                <property>
+                    <name>name</name>
+                    <cstring>Spacer74_2</cstring>
+                </property>
+                <property stdset="1">
+                    <name>orientation</name>
+                    <enum>Horizontal</enum>
+                </property>
+                <property stdset="1">
+                    <name>sizeType</name>
+                    <enum>Expanding</enum>
+                </property>
+                <property>
+                    <name>sizeHint</name>
+                    <size>
+                        <width>20</width>
+                        <height>20</height>
+                    </size>
+                </property>
+            </spacer>
+        </grid>
     </widget>
 </widget>
 </UI>

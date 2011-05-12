@@ -1,4 +1,4 @@
-VERSION = 1.2
+VERSION = 1.3
 include defines
 
 all: cbpm-count cbpm-play kbpm-play kbpm-dj beatmixing.ps
@@ -54,6 +54,7 @@ clean:
 	$(RM) askinput.h askinput.cpp
 	$(RM) preferences.h preferences.cpp
 	$(RM) profile-clock process_bpm.sh
+	$(RM) renamer.h renamer.cpp
 	$(RM) -r kbpmdj-$(VERSION)
 	$(RM) -r beatmixing beatmixing.ps version.h
 	
@@ -139,11 +140,18 @@ KSEL_OBJECTS = about.o\
 	setupwizard.o\
 	kbpm-dj.o\
 	kbpm-md5.o\
-	edit-distance.o
-
+	edit-distance.o\
+	renamer.o\
+	renamer.moc.o\
+	renamer.logic.o\
+	renamer.logic.moc.o
+	
+renamer.logic.h: renamer.h
+renamer.logic.cpp: renamer.logic.h
+renamer.cpp: renamer.h
 kbpm-play.cpp: bpmcounter.h version.h
 bpmcounter.cpp: bpmcounter.h version.h
-songselector.cpp: songselector.h version.h
+songselector.cpp: songselector.h version.h renamer.logic.h
 tagbox.cpp: tagbox.h
 songselector.logic.h: songselector.h version.h
 songselector.logic.cpp: songselector.logic.h about.h tagbox.h askinput.h\

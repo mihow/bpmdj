@@ -39,4 +39,5 @@ class QSongViewItem: public QListViewItem
    Song* getSong() {return song;};
    virtual void paintCell(QPainter *p,const QColorGroup &cg, int col, int wid, int align);
    virtual QString text(int i) const;
+   void reread() {song->reread();};
 };

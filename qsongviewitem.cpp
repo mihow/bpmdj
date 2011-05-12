@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 #include <assert.h>
+#include <math.h>
 #include <stdlib.h>
 #include "songselector.logic.h"
 #include "qsongviewitem.h"

@@ -11,1323 +11,1414 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>924</width>
-            <height>383</height>
+            <width>1046</width>
+            <height>393</height>
         </rect>
+    </property>
+    <property stdset="1">
+        <name>sizePolicy</name>
+        <sizepolicy>
+            <hsizetype>1</hsizetype>
+            <vsizetype>1</vsizetype>
+        </sizepolicy>
     </property>
     <property stdset="1">
         <name>caption</name>
         <string>kBpmPlayer</string>
     </property>
-    <widget>
-        <class>QButtonGroup</class>
+    <property stdset="1">
+        <name>sizeGripEnabled</name>
+        <bool>true</bool>
+    </property>
+    <grid>
         <property stdset="1">
-            <name>name</name>
-            <cstring>ButtonGroup4</cstring>
+            <name>margin</name>
+            <number>11</number>
         </property>
         <property stdset="1">
-            <name>geometry</name>
-            <rect>
-                <x>10</x>
-                <y>170</y>
-                <width>230</width>
-                <height>200</height>
-            </rect>
+            <name>spacing</name>
+            <number>6</number>
         </property>
-        <property stdset="1">
-            <name>title</name>
-            <string>Playing</string>
-        </property>
-        <widget>
-            <class>QPushButton</class>
+        <widget row="1"  column="0"  rowspan="1"  colspan="3" >
+            <class>QLabel</class>
             <property stdset="1">
                 <name>name</name>
-                <cstring>PushButton24</cstring>
+                <cstring>PlayingText</cstring>
             </property>
             <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>110</x>
-                    <y>20</y>
-                    <width>110</width>
-                    <height>38</height>
-                </rect>
+                <name>font</name>
+                <font>
+                    <pointsize>18</pointsize>
+                </font>
+            </property>
+            <property stdset="1">
+                <name>frameShape</name>
+                <enum>NoFrame</enum>
+            </property>
+            <property stdset="1">
+                <name>margin</name>
+                <number>0</number>
             </property>
             <property stdset="1">
                 <name>text</name>
-                <string>Shift back</string>
+                <string>SongName</string>
             </property>
             <property stdset="1">
-                <name>accel</name>
-                <number>268435549</number>
+                <name>scaledContents</name>
+                <bool>false</bool>
+            </property>
+            <property stdset="1">
+                <name>alignment</name>
+                <set>AlignCenter</set>
             </property>
             <property>
-                <name>toolTip</name>
-                <string>Key: ']'</string>
+                <name>hAlign</name>
             </property>
         </widget>
-        <widget>
-            <class>QPushButton</class>
+        <widget row="2"  column="0" >
+            <class>QButtonGroup</class>
             <property stdset="1">
                 <name>name</name>
-                <cstring>PushButton25</cstring>
+                <cstring>ButtonGroup4</cstring>
             </property>
             <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>110</x>
-                    <y>60</y>
-                    <width>110</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>Stop</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435488</number>
+                <name>title</name>
+                <string>Playing</string>
             </property>
             <property>
-                <name>toolTip</name>
-                <string>Key: ' '</string>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>KeyMinus</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>10</x>
-                    <y>20</y>
-                    <width>50</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>-</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435501</number>
+                <name>layoutMargin</name>
             </property>
             <property>
-                <name>toolTip</name>
-                <string>Key: '-'</string>
+                <name>layoutSpacing</name>
             </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>KeyPlus</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>60</x>
-                    <y>20</y>
-                    <width>50</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>+</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435499</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string>Key: '+' </string>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton4</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>10</x>
-                    <y>60</y>
-                    <width>50</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>-1M</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435505</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string>Key: '1'</string>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton3</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>60</x>
-                    <y>60</y>
-                    <width>50</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>+1M</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435506</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string>Key: '2'</string>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton6</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>10</x>
-                    <y>100</y>
-                    <width>50</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>-4M</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435508</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string>Key: '4'</string>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton5</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>60</x>
-                    <y>100</y>
-                    <width>50</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>+4M</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435509</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string>Key: '5'</string>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton8</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>10</x>
-                    <y>140</y>
-                    <width>50</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>-8M</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435511</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string>Key: '6'</string>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton7</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>60</x>
-                    <y>140</y>
-                    <width>50</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>+8M</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435512</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string>Key: '8'</string>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton19</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>170</x>
-                    <y>100</y>
-                    <width>50</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>+1B</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435513</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string>Key: '9'</string>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton9</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>110</x>
-                    <y>100</y>
-                    <width>60</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>-1/2B</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435498</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string>Key: '*'</string>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton32</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>110</x>
-                    <y>140</y>
-                    <width>110</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>Quit</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435569</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string>Key: 'q'</string>
-            </property>
-            <property>
-                <name>whatsThis</name>
-                <string></string>
-            </property>
-        </widget>
-    </widget>
-    <widget>
-        <class>QButtonGroup</class>
-        <property stdset="1">
-            <name>name</name>
-            <cstring>cueGroup</cstring>
-        </property>
-        <property stdset="1">
-            <name>geometry</name>
-            <rect>
-                <x>500</x>
-                <y>170</y>
-                <width>320</width>
-                <height>200</height>
-            </rect>
-        </property>
-        <property stdset="1">
-            <name>title</name>
-            <string>Cue</string>
-        </property>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton10</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>190</x>
-                    <y>20</y>
-                    <width>120</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>Set Cue</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435503</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string>Key: '/'</string>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton34</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>190</x>
-                    <y>60</y>
-                    <width>60</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>- 1/32</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435496</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string>Key: '('</string>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton33</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>250</x>
-                    <y>60</y>
-                    <width>60</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>+1/32</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435497</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string>Key: ')'</string>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton35</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>190</x>
-                    <y>100</y>
-                    <width>60</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>-8M</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435579</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string>Key: '{'</string>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton36</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>250</x>
-                    <y>100</y>
-                    <width>60</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>+8M</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435581</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string>Key: '}'</string>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton41</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>190</x>
-                    <y>140</y>
-                    <width>120</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>Metronome</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435565</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string>Key: 'm'</string>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton12</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>10</x>
-                    <y>60</y>
-                    <width>100</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>Retrieve X</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435576</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string>Key: 'x'</string>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton13</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>10</x>
-                    <y>100</y>
-                    <width>100</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>Retrieve C</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435555</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string>Key: 'c'</string>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton14</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>10</x>
-                    <y>140</y>
-                    <width>100</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>Retrieve V</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435574</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string>Key: 'v'</string>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton11</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>10</x>
-                    <y>20</y>
-                    <width>100</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>palette</name>
-                <palette>
-                    <active>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>0</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>0</green>
-                            <blue>127</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>127</green>
-                            <blue>191</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>63</green>
-                            <blue>159</blue>
-                        </color>
-                        <color>
-                            <red>127</red>
-                            <green>0</green>
-                            <blue>64</blue>
-                        </color>
-                        <color>
-                            <red>170</red>
-                            <green>0</green>
-                            <blue>85</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>0</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>255</green>
-                            <blue>255</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>0</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>255</green>
-                            <blue>255</blue>
-                        </color>
-                        <color>
-                            <red>192</red>
-                            <green>192</green>
-                            <blue>192</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>0</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>128</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>255</green>
-                            <blue>255</blue>
-                        </color>
-                    </active>
-                    <disabled>
-                        <color>
-                            <red>128</red>
-                            <green>128</green>
-                            <blue>128</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>0</green>
-                            <blue>127</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>127</green>
-                            <blue>191</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>38</green>
-                            <blue>147</blue>
-                        </color>
-                        <color>
-                            <red>127</red>
-                            <green>0</green>
-                            <blue>64</blue>
-                        </color>
-                        <color>
-                            <red>170</red>
-                            <green>0</green>
-                            <blue>85</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>0</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>255</green>
-                            <blue>255</blue>
-                        </color>
-                        <color>
-                            <red>128</red>
-                            <green>128</green>
-                            <blue>128</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>255</green>
-                            <blue>255</blue>
-                        </color>
-                        <color>
-                            <red>192</red>
-                            <green>192</green>
-                            <blue>192</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>0</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>128</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>255</green>
-                            <blue>255</blue>
-                        </color>
-                    </disabled>
-                    <inactive>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>0</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>0</green>
-                            <blue>127</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>127</green>
-                            <blue>191</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>38</green>
-                            <blue>147</blue>
-                        </color>
-                        <color>
-                            <red>127</red>
-                            <green>0</green>
-                            <blue>64</blue>
-                        </color>
-                        <color>
-                            <red>170</red>
-                            <green>0</green>
-                            <blue>85</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>0</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>255</green>
-                            <blue>255</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>0</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>255</green>
-                            <blue>255</blue>
-                        </color>
-                        <color>
-                            <red>192</red>
-                            <green>192</green>
-                            <blue>192</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>0</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>128</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>255</green>
-                            <blue>255</blue>
-                        </color>
-                    </inactive>
-                </palette>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>Retrieve Z</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435578</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string>Key: 'z'</string>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton18</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>110</x>
-                    <y>140</y>
-                    <width>80</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>Store V</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435542</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string>Key: 'V'</string>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton17</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>110</x>
-                    <y>100</y>
-                    <width>80</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>Store C</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435523</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string>Key: 'C'</string>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton16</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>110</x>
-                    <y>60</y>
-                    <width>80</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>Store X</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435544</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string>Key: 'X'</string>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton15</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>110</x>
-                    <y>20</y>
-                    <width>80</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>Store Z</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435546</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string>Key: 'Z'</string>
-            </property>
-        </widget>
-    </widget>
-    <widget>
-        <class>QButtonGroup</class>
-        <property stdset="1">
-            <name>name</name>
-            <cstring>ButtonGroup1</cstring>
-        </property>
-        <property stdset="1">
-            <name>geometry</name>
-            <rect>
-                <x>250</x>
-                <y>170</y>
-                <width>240</width>
-                <height>200</height>
-            </rect>
-        </property>
-        <property stdset="1">
-            <name>title</name>
-            <string>LFO</string>
-        </property>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton27</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>120</x>
-                    <y>20</y>
-                    <width>110</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>Fast Pan</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435536</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string>Key: 'P'</string>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton26</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>10</x>
-                    <y>20</y>
-                    <width>110</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>Slow Pan</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435568</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string>Key: 'p'</string>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton28</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>10</x>
-                    <y>60</y>
-                    <width>110</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>Slow Saw</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435571</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string>Key:'s'</string>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton29</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>120</x>
-                    <y>60</y>
-                    <width>110</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>Fast Saw</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435539</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string>Key: 'S'</string>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton30</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>10</x>
-                    <y>100</y>
-                    <width>110</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>Slow rSaw</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435570</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string>Key: 'r'</string>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton31</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>120</x>
-                    <y>100</y>
-                    <width>110</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>Fast rSaw</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435538</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string>Key: 'R'</string>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton39</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>120</x>
-                    <y>140</y>
-                    <width>110</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>Normal</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435566</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string>Key: 'n'</string>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton42</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>10</x>
-                    <y>140</y>
-                    <width>110</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>Break</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435554</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string>Key: 'b'</string>
-            </property>
-        </widget>
-    </widget>
-    <widget>
-        <class>QGroupBox</class>
-        <property stdset="1">
-            <name>name</name>
-            <cstring>GroupBox1</cstring>
-        </property>
-        <property stdset="1">
-            <name>geometry</name>
-            <rect>
-                <x>830</x>
-                <y>0</y>
-                <width>100</width>
-                <height>370</height>
-            </rect>
-        </property>
-        <property stdset="1">
-            <name>title</name>
-            <string>Volumes</string>
-        </property>
-        <widget>
-            <class>QLayoutWidget</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>Layout1</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>10</x>
-                    <y>20</y>
-                    <width>30</width>
-                    <height>340</height>
-                </rect>
-            </property>
-            <vbox>
+            <grid>
                 <property stdset="1">
                     <name>margin</name>
-                    <number>0</number>
+                    <number>5</number>
+                </property>
+                <property stdset="1">
+                    <name>spacing</name>
+                    <number>1</number>
+                </property>
+                <widget row="3"  column="0" >
+                    <class>QPushButton</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>PushButton8</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>-8M</string>
+                    </property>
+                    <property stdset="1">
+                        <name>accel</name>
+                        <number>268435511</number>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string>Key: '6'</string>
+                    </property>
+                </widget>
+                <widget row="3"  column="1" >
+                    <class>QPushButton</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>PushButton7</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>+8M</string>
+                    </property>
+                    <property stdset="1">
+                        <name>accel</name>
+                        <number>268435512</number>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string>Key: '8'</string>
+                    </property>
+                </widget>
+                <widget row="2"  column="1" >
+                    <class>QPushButton</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>PushButton5</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>+4M</string>
+                    </property>
+                    <property stdset="1">
+                        <name>accel</name>
+                        <number>268435509</number>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string>Key: '5'</string>
+                    </property>
+                </widget>
+                <widget row="2"  column="0" >
+                    <class>QPushButton</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>PushButton6</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>-4M</string>
+                    </property>
+                    <property stdset="1">
+                        <name>accel</name>
+                        <number>268435508</number>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string>Key: '4'</string>
+                    </property>
+                </widget>
+                <widget row="1"  column="0" >
+                    <class>QPushButton</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>PushButton4</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>-1M</string>
+                    </property>
+                    <property stdset="1">
+                        <name>accel</name>
+                        <number>268435505</number>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string>Key: '1'</string>
+                    </property>
+                </widget>
+                <widget row="0"  column="0" >
+                    <class>QPushButton</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>KeyMinus</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>-</string>
+                    </property>
+                    <property stdset="1">
+                        <name>accel</name>
+                        <number>268435501</number>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string>Key: '-'</string>
+                    </property>
+                </widget>
+                <widget row="0"  column="1" >
+                    <class>QPushButton</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>KeyPlus</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>+</string>
+                    </property>
+                    <property stdset="1">
+                        <name>accel</name>
+                        <number>268435499</number>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string>Key: '+' </string>
+                    </property>
+                </widget>
+                <widget row="1"  column="1" >
+                    <class>QPushButton</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>PushButton3</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>+1M</string>
+                    </property>
+                    <property stdset="1">
+                        <name>accel</name>
+                        <number>268435506</number>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string>Key: '2'</string>
+                    </property>
+                </widget>
+                <widget row="2"  column="2" >
+                    <class>QPushButton</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>PushButton9</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>-1/2B</string>
+                    </property>
+                    <property stdset="1">
+                        <name>accel</name>
+                        <number>268435498</number>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string>Key: '*'</string>
+                    </property>
+                </widget>
+                <widget row="1"  column="2" >
+                    <class>QPushButton</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>PushButton25</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>Stop</string>
+                    </property>
+                    <property stdset="1">
+                        <name>accel</name>
+                        <number>268435488</number>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string>Key: ' '</string>
+                    </property>
+                </widget>
+                <widget row="3"  column="2" >
+                    <class>QPushButton</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>PushButton19</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>+1B</string>
+                    </property>
+                    <property stdset="1">
+                        <name>accel</name>
+                        <number>268435513</number>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string>Key: '9'</string>
+                    </property>
+                </widget>
+                <widget row="0"  column="2" >
+                    <class>QPushButton</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>PushButton24</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>Back</string>
+                    </property>
+                    <property stdset="1">
+                        <name>accel</name>
+                        <number>0</number>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string>Key: ']'</string>
+                    </property>
+                </widget>
+            </grid>
+        </widget>
+        <widget row="2"  column="1" >
+            <class>QButtonGroup</class>
+            <property stdset="1">
+                <name>name</name>
+                <cstring>ButtonGroup1</cstring>
+            </property>
+            <property stdset="1">
+                <name>title</name>
+                <string>LFO</string>
+            </property>
+            <property>
+                <name>layoutMargin</name>
+            </property>
+            <property>
+                <name>layoutSpacing</name>
+            </property>
+            <grid>
+                <property stdset="1">
+                    <name>margin</name>
+                    <number>5</number>
+                </property>
+                <property stdset="1">
+                    <name>spacing</name>
+                    <number>1</number>
+                </property>
+                <widget row="1"  column="0" >
+                    <class>QPushButton</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>PushButton28</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>Slow Saw</string>
+                    </property>
+                    <property stdset="1">
+                        <name>accel</name>
+                        <number>268435571</number>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string>Key:'s'</string>
+                    </property>
+                </widget>
+                <widget row="1"  column="1" >
+                    <class>QPushButton</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>PushButton29</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>Fast Saw</string>
+                    </property>
+                    <property stdset="1">
+                        <name>accel</name>
+                        <number>268435539</number>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string>Key: 'S'</string>
+                    </property>
+                </widget>
+                <widget row="2"  column="0" >
+                    <class>QPushButton</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>PushButton30</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>Slow rSaw</string>
+                    </property>
+                    <property stdset="1">
+                        <name>accel</name>
+                        <number>268435570</number>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string>Key: 'r'</string>
+                    </property>
+                </widget>
+                <widget row="2"  column="1" >
+                    <class>QPushButton</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>PushButton31</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>Fast rSaw</string>
+                    </property>
+                    <property stdset="1">
+                        <name>accel</name>
+                        <number>268435538</number>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string>Key: 'R'</string>
+                    </property>
+                </widget>
+                <widget row="3"  column="1" >
+                    <class>QPushButton</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>PushButton39</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>Normal</string>
+                    </property>
+                    <property stdset="1">
+                        <name>accel</name>
+                        <number>268435566</number>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string>Key: 'n'</string>
+                    </property>
+                </widget>
+                <widget row="3"  column="0" >
+                    <class>QPushButton</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>PushButton42</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>Break</string>
+                    </property>
+                    <property stdset="1">
+                        <name>accel</name>
+                        <number>268435554</number>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string>Key: 'b'</string>
+                    </property>
+                </widget>
+                <widget row="0"  column="1" >
+                    <class>QPushButton</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>PushButton27</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>Fast Pan</string>
+                    </property>
+                    <property stdset="1">
+                        <name>accel</name>
+                        <number>268435536</number>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string>Key: 'P'</string>
+                    </property>
+                </widget>
+                <widget row="0"  column="0" >
+                    <class>QPushButton</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>PushButton26</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>Slow Pan</string>
+                    </property>
+                    <property stdset="1">
+                        <name>accel</name>
+                        <number>268435568</number>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string>Key: 'p'</string>
+                    </property>
+                </widget>
+            </grid>
+        </widget>
+        <widget row="2"  column="2" >
+            <class>QButtonGroup</class>
+            <property stdset="1">
+                <name>name</name>
+                <cstring>cueGroup</cstring>
+            </property>
+            <property stdset="1">
+                <name>title</name>
+                <string>Cue</string>
+            </property>
+            <property>
+                <name>layoutMargin</name>
+            </property>
+            <property>
+                <name>layoutSpacing</name>
+            </property>
+            <grid>
+                <property stdset="1">
+                    <name>margin</name>
+                    <number>5</number>
+                </property>
+                <property stdset="1">
+                    <name>spacing</name>
+                    <number>1</number>
+                </property>
+                <widget row="0"  column="2"  rowspan="1"  colspan="2" >
+                    <class>QPushButton</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>PushButton10</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>Set Cue</string>
+                    </property>
+                    <property stdset="1">
+                        <name>accel</name>
+                        <number>268435503</number>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string>Key: '/'</string>
+                    </property>
+                </widget>
+                <widget row="1"  column="2" >
+                    <class>QPushButton</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>PushButton34</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>- 1/32</string>
+                    </property>
+                    <property stdset="1">
+                        <name>accel</name>
+                        <number>268435496</number>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string>Key: '('</string>
+                    </property>
+                </widget>
+                <widget row="1"  column="3" >
+                    <class>QPushButton</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>PushButton33</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>+1/32</string>
+                    </property>
+                    <property stdset="1">
+                        <name>accel</name>
+                        <number>268435497</number>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string>Key: ')'</string>
+                    </property>
+                </widget>
+                <widget row="2"  column="2" >
+                    <class>QPushButton</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>PushButton35</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>-8M</string>
+                    </property>
+                    <property stdset="1">
+                        <name>accel</name>
+                        <number>268435579</number>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string>Key: '{'</string>
+                    </property>
+                </widget>
+                <widget row="2"  column="3" >
+                    <class>QPushButton</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>PushButton36</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>+8M</string>
+                    </property>
+                    <property stdset="1">
+                        <name>accel</name>
+                        <number>268435581</number>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string>Key: '}'</string>
+                    </property>
+                </widget>
+                <widget row="3"  column="2"  rowspan="1"  colspan="2" >
+                    <class>QPushButton</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>PushButton41</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>Metronome</string>
+                    </property>
+                    <property stdset="1">
+                        <name>accel</name>
+                        <number>268435565</number>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string>Key: 'm'</string>
+                    </property>
+                </widget>
+                <widget row="1"  column="0" >
+                    <class>QPushButton</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>PushButton12</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>Retrieve X</string>
+                    </property>
+                    <property stdset="1">
+                        <name>accel</name>
+                        <number>268435576</number>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string>Key: 'x'</string>
+                    </property>
+                </widget>
+                <widget row="2"  column="0" >
+                    <class>QPushButton</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>PushButton13</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>Retrieve C</string>
+                    </property>
+                    <property stdset="1">
+                        <name>accel</name>
+                        <number>268435555</number>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string>Key: 'c'</string>
+                    </property>
+                </widget>
+                <widget row="3"  column="0" >
+                    <class>QPushButton</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>PushButton14</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>Retrieve V</string>
+                    </property>
+                    <property stdset="1">
+                        <name>accel</name>
+                        <number>268435574</number>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string>Key: 'v'</string>
+                    </property>
+                </widget>
+                <widget row="0"  column="0" >
+                    <class>QPushButton</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>PushButton11</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>palette</name>
+                        <palette>
+                            <active>
+                                <color>
+                                    <red>0</red>
+                                    <green>0</green>
+                                    <blue>0</blue>
+                                </color>
+                                <color>
+                                    <red>255</red>
+                                    <green>0</green>
+                                    <blue>127</blue>
+                                </color>
+                                <color>
+                                    <red>255</red>
+                                    <green>127</green>
+                                    <blue>191</blue>
+                                </color>
+                                <color>
+                                    <red>255</red>
+                                    <green>63</green>
+                                    <blue>159</blue>
+                                </color>
+                                <color>
+                                    <red>127</red>
+                                    <green>0</green>
+                                    <blue>64</blue>
+                                </color>
+                                <color>
+                                    <red>170</red>
+                                    <green>0</green>
+                                    <blue>85</blue>
+                                </color>
+                                <color>
+                                    <red>0</red>
+                                    <green>0</green>
+                                    <blue>0</blue>
+                                </color>
+                                <color>
+                                    <red>255</red>
+                                    <green>255</green>
+                                    <blue>255</blue>
+                                </color>
+                                <color>
+                                    <red>0</red>
+                                    <green>0</green>
+                                    <blue>0</blue>
+                                </color>
+                                <color>
+                                    <red>255</red>
+                                    <green>255</green>
+                                    <blue>255</blue>
+                                </color>
+                                <color>
+                                    <red>192</red>
+                                    <green>192</green>
+                                    <blue>192</blue>
+                                </color>
+                                <color>
+                                    <red>0</red>
+                                    <green>0</green>
+                                    <blue>0</blue>
+                                </color>
+                                <color>
+                                    <red>0</red>
+                                    <green>0</green>
+                                    <blue>128</blue>
+                                </color>
+                                <color>
+                                    <red>255</red>
+                                    <green>255</green>
+                                    <blue>255</blue>
+                                </color>
+                            </active>
+                            <disabled>
+                                <color>
+                                    <red>128</red>
+                                    <green>128</green>
+                                    <blue>128</blue>
+                                </color>
+                                <color>
+                                    <red>255</red>
+                                    <green>0</green>
+                                    <blue>127</blue>
+                                </color>
+                                <color>
+                                    <red>255</red>
+                                    <green>127</green>
+                                    <blue>191</blue>
+                                </color>
+                                <color>
+                                    <red>255</red>
+                                    <green>38</green>
+                                    <blue>147</blue>
+                                </color>
+                                <color>
+                                    <red>127</red>
+                                    <green>0</green>
+                                    <blue>64</blue>
+                                </color>
+                                <color>
+                                    <red>170</red>
+                                    <green>0</green>
+                                    <blue>85</blue>
+                                </color>
+                                <color>
+                                    <red>0</red>
+                                    <green>0</green>
+                                    <blue>0</blue>
+                                </color>
+                                <color>
+                                    <red>255</red>
+                                    <green>255</green>
+                                    <blue>255</blue>
+                                </color>
+                                <color>
+                                    <red>128</red>
+                                    <green>128</green>
+                                    <blue>128</blue>
+                                </color>
+                                <color>
+                                    <red>255</red>
+                                    <green>255</green>
+                                    <blue>255</blue>
+                                </color>
+                                <color>
+                                    <red>192</red>
+                                    <green>192</green>
+                                    <blue>192</blue>
+                                </color>
+                                <color>
+                                    <red>0</red>
+                                    <green>0</green>
+                                    <blue>0</blue>
+                                </color>
+                                <color>
+                                    <red>0</red>
+                                    <green>0</green>
+                                    <blue>128</blue>
+                                </color>
+                                <color>
+                                    <red>255</red>
+                                    <green>255</green>
+                                    <blue>255</blue>
+                                </color>
+                            </disabled>
+                            <inactive>
+                                <color>
+                                    <red>0</red>
+                                    <green>0</green>
+                                    <blue>0</blue>
+                                </color>
+                                <color>
+                                    <red>255</red>
+                                    <green>0</green>
+                                    <blue>127</blue>
+                                </color>
+                                <color>
+                                    <red>255</red>
+                                    <green>127</green>
+                                    <blue>191</blue>
+                                </color>
+                                <color>
+                                    <red>255</red>
+                                    <green>38</green>
+                                    <blue>147</blue>
+                                </color>
+                                <color>
+                                    <red>127</red>
+                                    <green>0</green>
+                                    <blue>64</blue>
+                                </color>
+                                <color>
+                                    <red>170</red>
+                                    <green>0</green>
+                                    <blue>85</blue>
+                                </color>
+                                <color>
+                                    <red>0</red>
+                                    <green>0</green>
+                                    <blue>0</blue>
+                                </color>
+                                <color>
+                                    <red>255</red>
+                                    <green>255</green>
+                                    <blue>255</blue>
+                                </color>
+                                <color>
+                                    <red>0</red>
+                                    <green>0</green>
+                                    <blue>0</blue>
+                                </color>
+                                <color>
+                                    <red>255</red>
+                                    <green>255</green>
+                                    <blue>255</blue>
+                                </color>
+                                <color>
+                                    <red>192</red>
+                                    <green>192</green>
+                                    <blue>192</blue>
+                                </color>
+                                <color>
+                                    <red>0</red>
+                                    <green>0</green>
+                                    <blue>0</blue>
+                                </color>
+                                <color>
+                                    <red>0</red>
+                                    <green>0</green>
+                                    <blue>128</blue>
+                                </color>
+                                <color>
+                                    <red>255</red>
+                                    <green>255</green>
+                                    <blue>255</blue>
+                                </color>
+                            </inactive>
+                        </palette>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>Retrieve Z</string>
+                    </property>
+                    <property stdset="1">
+                        <name>accel</name>
+                        <number>268435578</number>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string>Key: 'z'</string>
+                    </property>
+                </widget>
+                <widget row="3"  column="1" >
+                    <class>QPushButton</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>PushButton18</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>Store V</string>
+                    </property>
+                    <property stdset="1">
+                        <name>accel</name>
+                        <number>268435542</number>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string>Key: 'V'</string>
+                    </property>
+                </widget>
+                <widget row="2"  column="1" >
+                    <class>QPushButton</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>PushButton17</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>Store C</string>
+                    </property>
+                    <property stdset="1">
+                        <name>accel</name>
+                        <number>268435523</number>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string>Key: 'C'</string>
+                    </property>
+                </widget>
+                <widget row="1"  column="1" >
+                    <class>QPushButton</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>PushButton16</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>Store X</string>
+                    </property>
+                    <property stdset="1">
+                        <name>accel</name>
+                        <number>268435544</number>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string>Key: 'X'</string>
+                    </property>
+                </widget>
+                <widget row="0"  column="1" >
+                    <class>QPushButton</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>PushButton15</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>Store Z</string>
+                    </property>
+                    <property stdset="1">
+                        <name>accel</name>
+                        <number>268435546</number>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string>Key: 'Z'</string>
+                    </property>
+                </widget>
+            </grid>
+        </widget>
+        <widget row="0"  column="1"  rowspan="1"  colspan="2" >
+            <class>QButtonGroup</class>
+            <property stdset="1">
+                <name>name</name>
+                <cstring>ButtonGroup3</cstring>
+            </property>
+            <property stdset="1">
+                <name>title</name>
+                <string>Tempo</string>
+            </property>
+            <grid>
+                <property stdset="1">
+                    <name>margin</name>
+                    <number>11</number>
                 </property>
                 <property stdset="1">
                     <name>spacing</name>
                     <number>6</number>
                 </property>
-                <widget>
+                <widget row="0"  column="0" >
+                    <class>QLayoutWidget</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>Layout8</cstring>
+                    </property>
+                    <property>
+                        <name>layoutSpacing</name>
+                    </property>
+                    <grid>
+                        <property stdset="1">
+                            <name>margin</name>
+                            <number>0</number>
+                        </property>
+                        <property stdset="1">
+                            <name>spacing</name>
+                            <number>5</number>
+                        </property>
+                        <widget row="1"  column="2"  rowspan="1"  colspan="3" >
+                            <class>QLCDNumber</class>
+                            <property stdset="1">
+                                <name>name</name>
+                                <cstring>NormalTempoLCD</cstring>
+                            </property>
+                            <property stdset="1">
+                                <name>numDigits</name>
+                                <number>6</number>
+                            </property>
+                        </widget>
+                        <widget row="0"  column="4"  rowspan="1"  colspan="2" >
+                            <class>QPushButton</class>
+                            <property stdset="1">
+                                <name>name</name>
+                                <cstring>PushButton37</cstring>
+                            </property>
+                            <property stdset="1">
+                                <name>text</name>
+                                <string>&gt;</string>
+                            </property>
+                        </widget>
+                        <widget row="0"  column="3" >
+                            <class>QPushButton</class>
+                            <property stdset="1">
+                                <name>name</name>
+                                <cstring>PushButton36_2</cstring>
+                            </property>
+                            <property stdset="1">
+                                <name>text</name>
+                                <string>&gt;&gt;</string>
+                            </property>
+                            <property stdset="1">
+                                <name>accel</name>
+                                <number>268435504</number>
+                            </property>
+                            <property>
+                                <name>toolTip</name>
+                                <string>Key: '0'</string>
+                            </property>
+                        </widget>
+                        <widget row="0"  column="1"  rowspan="1"  colspan="2" >
+                            <class>QPushButton</class>
+                            <property stdset="1">
+                                <name>name</name>
+                                <cstring>PushButton22</cstring>
+                            </property>
+                            <property stdset="1">
+                                <name>text</name>
+                                <string>&gt;&gt;&gt;</string>
+                            </property>
+                            <property stdset="1">
+                                <name>accel</name>
+                                <number>0</number>
+                            </property>
+                        </widget>
+                        <widget row="1"  column="0"  rowspan="1"  colspan="2" >
+                            <class>QLCDNumber</class>
+                            <property stdset="1">
+                                <name>name</name>
+                                <cstring>CurrentTempoLCD</cstring>
+                            </property>
+                            <property stdset="1">
+                                <name>numDigits</name>
+                                <number>6</number>
+                            </property>
+                        </widget>
+                        <widget row="1"  column="5"  rowspan="1"  colspan="2" >
+                            <class>QLCDNumber</class>
+                            <property stdset="1">
+                                <name>name</name>
+                                <cstring>TempoLd</cstring>
+                            </property>
+                            <property stdset="1">
+                                <name>numDigits</name>
+                                <number>6</number>
+                            </property>
+                        </widget>
+                        <widget row="0"  column="0" >
+                            <class>QPushButton</class>
+                            <property stdset="1">
+                                <name>name</name>
+                                <cstring>PushButton20</cstring>
+                            </property>
+                            <property stdset="1">
+                                <name>text</name>
+                                <string>Target</string>
+                            </property>
+                            <property stdset="1">
+                                <name>accel</name>
+                                <number>268435500</number>
+                            </property>
+                        </widget>
+                        <widget row="0"  column="6" >
+                            <class>QPushButton</class>
+                            <property stdset="1">
+                                <name>name</name>
+                                <cstring>PushButton21</cstring>
+                            </property>
+                            <property stdset="1">
+                                <name>text</name>
+                                <string>Normal</string>
+                            </property>
+                            <property stdset="1">
+                                <name>accel</name>
+                                <number>268435502</number>
+                            </property>
+                        </widget>
+                    </grid>
+                </widget>
+                <widget row="0"  column="2" >
+                    <class>QLayoutWidget</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>Layout9</cstring>
+                    </property>
+                    <property>
+                        <name>layoutSpacing</name>
+                    </property>
+                    <grid>
+                        <property stdset="1">
+                            <name>margin</name>
+                            <number>0</number>
+                        </property>
+                        <property stdset="1">
+                            <name>spacing</name>
+                            <number>1</number>
+                        </property>
+                        <widget row="1"  column="0" >
+                            <class>QPushButton</class>
+                            <property stdset="1">
+                                <name>name</name>
+                                <cstring>PushButton32</cstring>
+                            </property>
+                            <property stdset="1">
+                                <name>text</name>
+                                <string>Quit</string>
+                            </property>
+                            <property stdset="1">
+                                <name>accel</name>
+                                <number>268435569</number>
+                            </property>
+                            <property>
+                                <name>toolTip</name>
+                                <string>Key: 'q'</string>
+                            </property>
+                            <property>
+                                <name>whatsThis</name>
+                                <string></string>
+                            </property>
+                        </widget>
+                        <widget row="0"  column="0" >
+                            <class>QPushButton</class>
+                            <property stdset="1">
+                                <name>name</name>
+                                <cstring>BpmCounter</cstring>
+                            </property>
+                            <property stdset="1">
+                                <name>text</name>
+                                <string>&amp;Bpm Counter</string>
+                            </property>
+                            <property stdset="1">
+                                <name>accel</name>
+                                <number>276824130</number>
+                            </property>
+                        </widget>
+                    </grid>
+                </widget>
+                <widget row="0"  column="1" >
+                    <class>Line</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>Line1</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>orientation</name>
+                        <enum>Vertical</enum>
+                    </property>
+                </widget>
+            </grid>
+        </widget>
+        <widget row="0"  column="0" >
+            <class>QGroupBox</class>
+            <property stdset="1">
+                <name>name</name>
+                <cstring>Position</cstring>
+            </property>
+            <property stdset="1">
+                <name>title</name>
+                <string>Position/Size</string>
+            </property>
+            <property>
+                <name>layoutMargin</name>
+            </property>
+            <property>
+                <name>layoutSpacing</name>
+            </property>
+            <grid>
+                <property stdset="1">
+                    <name>margin</name>
+                    <number>11</number>
+                </property>
+                <property stdset="1">
+                    <name>spacing</name>
+                    <number>5</number>
+                </property>
+                <widget row="1"  column="1" >
+                    <class>QLCDNumber</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>TotalTimeLCD</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>sizePolicy</name>
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>5</vsizetype>
+                        </sizepolicy>
+                    </property>
+                    <property stdset="1">
+                        <name>minimumSize</name>
+                        <size>
+                            <width>0</width>
+                            <height>40</height>
+                        </size>
+                    </property>
+                    <property stdset="1">
+                        <name>numDigits</name>
+                        <number>6</number>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string></string>
+                    </property>
+                </widget>
+                <widget row="1"  column="0" >
+                    <class>QLCDNumber</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>CurrentTimeLCD</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>numDigits</name>
+                        <number>6</number>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string></string>
+                    </property>
+                </widget>
+                <widget row="0"  column="0" >
+                    <class>QLCDNumber</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>LcdLeft</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>numDigits</name>
+                        <number>6</number>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string></string>
+                    </property>
+                </widget>
+                <widget row="0"  column="1" >
+                    <class>QLCDNumber</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>LcdRight</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>sizePolicy</name>
+                        <sizepolicy>
+                            <hsizetype>1</hsizetype>
+                            <vsizetype>1</vsizetype>
+                        </sizepolicy>
+                    </property>
+                    <property stdset="1">
+                        <name>minimumSize</name>
+                        <size>
+                            <width>0</width>
+                            <height>40</height>
+                        </size>
+                    </property>
+                    <property stdset="1">
+                        <name>numDigits</name>
+                        <number>6</number>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string></string>
+                    </property>
+                </widget>
+            </grid>
+        </widget>
+        <widget row="0"  column="3"  rowspan="3"  colspan="1" >
+            <class>QGroupBox</class>
+            <property stdset="1">
+                <name>name</name>
+                <cstring>GroupBox1</cstring>
+            </property>
+            <property stdset="1">
+                <name>sizePolicy</name>
+                <sizepolicy>
+                    <hsizetype>5</hsizetype>
+                    <vsizetype>5</vsizetype>
+                </sizepolicy>
+            </property>
+            <property stdset="1">
+                <name>title</name>
+                <string>Volumes</string>
+            </property>
+            <property>
+                <name>layoutMargin</name>
+            </property>
+            <property>
+                <name>layoutSpacing</name>
+            </property>
+            <grid>
+                <property stdset="1">
+                    <name>margin</name>
+                    <number>5</number>
+                </property>
+                <property stdset="1">
+                    <name>spacing</name>
+                    <number>2</number>
+                </property>
+                <widget row="0"  column="1" >
+                    <class>QLabel</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>TextLabel2</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>PCM</string>
+                    </property>
+                </widget>
+                <widget row="1"  column="1" >
+                    <class>QSlider</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>Slider4</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>orientation</name>
+                        <enum>Vertical</enum>
+                    </property>
+                    <property stdset="1">
+                        <name>tickmarks</name>
+                        <enum>Both</enum>
+                    </property>
+                    <property stdset="1">
+                        <name>tickInterval</name>
+                        <number>5</number>
+                    </property>
+                </widget>
+                <widget row="0"  column="0" >
                     <class>QLabel</class>
                     <property stdset="1">
                         <name>name</name>
@@ -1338,7 +1429,7 @@
                         <string>Main</string>
                     </property>
                 </widget>
-                <widget>
+                <widget row="1"  column="0" >
                     <class>QSlider</class>
                     <property stdset="1">
                         <name>name</name>
@@ -1365,470 +1456,9 @@
                         <number>5</number>
                     </property>
                 </widget>
-            </vbox>
+            </grid>
         </widget>
-        <widget>
-            <class>QLayoutWidget</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>Layout2</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>60</x>
-                    <y>20</y>
-                    <width>30</width>
-                    <height>340</height>
-                </rect>
-            </property>
-            <vbox>
-                <property stdset="1">
-                    <name>margin</name>
-                    <number>0</number>
-                </property>
-                <property stdset="1">
-                    <name>spacing</name>
-                    <number>6</number>
-                </property>
-                <widget>
-                    <class>QLabel</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>TextLabel2</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>text</name>
-                        <string>PCM</string>
-                    </property>
-                </widget>
-                <widget>
-                    <class>QSlider</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>Slider4</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>orientation</name>
-                        <enum>Vertical</enum>
-                    </property>
-                    <property stdset="1">
-                        <name>tickmarks</name>
-                        <enum>Both</enum>
-                    </property>
-                    <property stdset="1">
-                        <name>tickInterval</name>
-                        <number>5</number>
-                    </property>
-                </widget>
-            </vbox>
-        </widget>
-    </widget>
-    <widget>
-        <class>QLabel</class>
-        <property stdset="1">
-            <name>name</name>
-            <cstring>PlayingText</cstring>
-        </property>
-        <property stdset="1">
-            <name>geometry</name>
-            <rect>
-                <x>10</x>
-                <y>130</y>
-                <width>810</width>
-                <height>30</height>
-            </rect>
-        </property>
-        <property stdset="1">
-            <name>font</name>
-            <font>
-                <pointsize>18</pointsize>
-            </font>
-        </property>
-        <property stdset="1">
-            <name>frameShape</name>
-            <enum>NoFrame</enum>
-        </property>
-        <property stdset="1">
-            <name>margin</name>
-            <number>0</number>
-        </property>
-        <property stdset="1">
-            <name>text</name>
-            <string>SongName</string>
-        </property>
-        <property stdset="1">
-            <name>scaledContents</name>
-            <bool>false</bool>
-        </property>
-        <property stdset="1">
-            <name>alignment</name>
-            <set>AlignCenter</set>
-        </property>
-        <property>
-            <name>hAlign</name>
-        </property>
-    </widget>
-    <widget>
-        <class>QGroupBox</class>
-        <property stdset="1">
-            <name>name</name>
-            <cstring>Position</cstring>
-        </property>
-        <property stdset="1">
-            <name>geometry</name>
-            <rect>
-                <x>10</x>
-                <y>0</y>
-                <width>280</width>
-                <height>120</height>
-            </rect>
-        </property>
-        <property stdset="1">
-            <name>title</name>
-            <string>Position/Size</string>
-        </property>
-        <widget>
-            <class>QLCDNumber</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>TotalTimeLCD</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>150</x>
-                    <y>70</y>
-                    <width>120</width>
-                    <height>40</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>numDigits</name>
-                <number>6</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string></string>
-            </property>
-        </widget>
-        <widget>
-            <class>QLCDNumber</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>CurrentTimeLCD</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>10</x>
-                    <y>70</y>
-                    <width>130</width>
-                    <height>40</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>numDigits</name>
-                <number>6</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string></string>
-            </property>
-        </widget>
-        <widget>
-            <class>QLCDNumber</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>LcdLeft</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>10</x>
-                    <y>20</y>
-                    <width>130</width>
-                    <height>40</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>numDigits</name>
-                <number>6</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string></string>
-            </property>
-        </widget>
-        <widget>
-            <class>QLCDNumber</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>LcdRight</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>150</x>
-                    <y>20</y>
-                    <width>120</width>
-                    <height>40</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>numDigits</name>
-                <number>6</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string></string>
-            </property>
-        </widget>
-    </widget>
-    <widget>
-        <class>QButtonGroup</class>
-        <property stdset="1">
-            <name>name</name>
-            <cstring>ButtonGroup3</cstring>
-        </property>
-        <property stdset="1">
-            <name>geometry</name>
-            <rect>
-                <x>300</x>
-                <y>0</y>
-                <width>520</width>
-                <height>120</height>
-            </rect>
-        </property>
-        <property stdset="1">
-            <name>title</name>
-            <string>Tempo</string>
-        </property>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton20</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>10</x>
-                    <y>20</y>
-                    <width>70</width>
-                    <height>40</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>Target</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435500</number>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton22</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>80</x>
-                    <y>20</y>
-                    <width>60</width>
-                    <height>40</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>&gt;&gt;&gt;</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>0</number>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton37</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>190</x>
-                    <y>20</y>
-                    <width>50</width>
-                    <height>40</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>&gt;</string>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton21</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>240</x>
-                    <y>20</y>
-                    <width>70</width>
-                    <height>40</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>Normal</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435502</number>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>PushButton36_2</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>140</x>
-                    <y>20</y>
-                    <width>50</width>
-                    <height>40</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>&gt;&gt;</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>268435504</number>
-            </property>
-            <property>
-                <name>toolTip</name>
-                <string>Key: '0'</string>
-            </property>
-        </widget>
-        <widget>
-            <class>Line</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>Line1</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>320</x>
-                    <y>20</y>
-                    <width>20</width>
-                    <height>90</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>orientation</name>
-                <enum>Vertical</enum>
-            </property>
-        </widget>
-        <widget>
-            <class>QPushButton</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>BpmCounter</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>350</x>
-                    <y>20</y>
-                    <width>147</width>
-                    <height>38</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>text</name>
-                <string>&amp;Bpm Counter</string>
-            </property>
-            <property stdset="1">
-                <name>accel</name>
-                <number>276824130</number>
-            </property>
-        </widget>
-        <widget>
-            <class>QLCDNumber</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>NormalTempoLCD</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>110</x>
-                    <y>70</y>
-                    <width>90</width>
-                    <height>40</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>numDigits</name>
-                <number>6</number>
-            </property>
-        </widget>
-        <widget>
-            <class>QLCDNumber</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>CurrentTempoLCD</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>10</x>
-                    <y>70</y>
-                    <width>90</width>
-                    <height>40</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>numDigits</name>
-                <number>6</number>
-            </property>
-        </widget>
-        <widget>
-            <class>QLCDNumber</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>TempoLd</cstring>
-            </property>
-            <property stdset="1">
-                <name>geometry</name>
-                <rect>
-                    <x>210</x>
-                    <y>70</y>
-                    <width>90</width>
-                    <height>40</height>
-                </rect>
-            </property>
-            <property stdset="1">
-                <name>numDigits</name>
-                <number>6</number>
-            </property>
-        </widget>
-    </widget>
+    </grid>
 </widget>
 <connections>
     <connection>
@@ -1872,12 +1502,6 @@
         <signal>clicked()</signal>
         <receiver>SongPlayer</receiver>
         <slot>nudgeMinus8M()</slot>
-    </connection>
-    <connection>
-        <sender>PushButton32</sender>
-        <signal>clicked()</signal>
-        <receiver>SongPlayer</receiver>
-        <slot>accept()</slot>
     </connection>
     <connection>
         <sender>PushButton24</sender>
@@ -2082,6 +1706,12 @@
         <signal>clicked()</signal>
         <receiver>SongPlayer</receiver>
         <slot>openBpmCounter()</slot>
+    </connection>
+    <connection>
+        <sender>PushButton32</sender>
+        <signal>clicked()</signal>
+        <receiver>SongPlayer</receiver>
+        <slot>accept()</slot>
     </connection>
     <slot access="public">breakLfo()</slot>
     <slot access="public">fastPan()</slot>

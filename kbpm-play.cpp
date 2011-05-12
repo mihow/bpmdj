@@ -100,7 +100,7 @@ void options_failure(char* err)
 {
    // print options
    printf("Usage:  kbpm-play <options> argument\n\n"
-	  "   -w          --debuglatency      debugs latency of the player\n"
+//	  "   -w          --debuglatency      debugs latency of the player\n"
 	  "   -q          --quiet             be quiet\n"
 	  "   -d arg      --dsp arg           dsp device to use (default = /dev/dsp)\n"
 	  "   -x arg      --mixer arg         mixer device to use (default = /dev/mixer)\n"

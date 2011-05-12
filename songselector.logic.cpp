@@ -75,7 +75,7 @@ void ToSwitchOrNotToSwitchSignal(int sig,siginfo_t *info, void* hu)
      mainWindow->clearMonitor();
 }
 
-SongSelectorLogic::SongSelectorLogic(QWidget*parent=0,const char*name=0) :
+SongSelectorLogic::SongSelectorLogic(QWidget*parent,const char*name) :
   SongSelector(parent,name)
 {
    mainTicks=0;
@@ -109,24 +109,28 @@ SongSelectorLogic::SongSelectorLogic(QWidget*parent=0,const char*name=0) :
    // create menu structure
    QMenuBar *main = new QMenuBar(this);
    QPopupMenu *help = new QPopupMenu(this);
+   QPopupMenu *before = new QPopupMenu(this);
+   QPopupMenu *after = new QPopupMenu(this);
    QPopupMenu *tools = new QPopupMenu(this);
    QPopupMenu *file = new QPopupMenu(this);
-   QPopupMenu *selection = new QPopupMenu(this);
+          selection = new QPopupMenu(this);
                view = new QPopupMenu(this);
    file->insertItem("&Quit",this,SLOT(quitButton()));
    help->insertItem("&About",this,SLOT(doAbout()));
    help->insertItem("&Read Manual",this,SLOT(doHelp()));
    // retrieves from ./music all mp3's and creates index files for them
-   tools->insertItem("&Import mp3's",this,SLOT(importMp3s()));
+   before->insertItem("&Import mp3's",this,SLOT(importMp3s()));
    // checks wether the songs on a disk can be found somewhere in the indices
-   tools->insertItem("&Check cdrom content",this,SLOT(checkDisc()));
+   after->insertItem("&Check cdrom content",this,SLOT(checkDisc()));
    // searches the current list and marks all MD5sum duplicates
-   tools->insertItem("Mark duplicates (experimental)",this,SLOT(doMarkDups()));
-   tools->insertItem("Find similar song names... (experimental)",this,SLOT(findsimilarnames()));
-   tools->insertItem("Find all similar song names... (experimental)",this,SLOT(findallsimilarnames()));
-   tools->insertSeparator();
+   after->insertItem("Mark duplicates (experimental)",this,SLOT(doMarkDups()));
+   before->insertItem("Find similar song names... (experimental)",this,SLOT(findsimilarnames()));
+   before->insertItem("Find all similar song names... (experimental)",this,SLOT(findallsimilarnames()));
+   after->insertItem("Find wrong index file names...",this,SLOT(findWrongIdxNames()));
+   before->insertItem("Find wrong mp3 file names...",this,SLOT(findWrongMp3Names()));
    tools->insertItem("&Preferences",this,SLOT(doPreferences()));
    neglectdirstruct_item = view->insertItem("&Neglect index directory structure",this,SLOT(toggle_neglectdirstruct()));
+   view->insertItem("Select all b&ut tagged",this,SLOT(selectAllButTagged()));
    view->insertSeparator();
    notyetplayed_item = view->insertItem("&Show only not yet played songs",this,SLOT(toggle_notyetplayed()));
    coloralreadyplayed_item = view->insertItem("&Color already played songs",this,SLOT(toggle_coloralreadyplayed()));
@@ -142,6 +146,7 @@ SongSelectorLogic::SongSelectorLogic(QWidget*parent=0,const char*name=0) :
    view->setItemChecked(colorinrange_item,true);
    view->setItemChecked(onlyondisk_item,true);
    selection->insertItem("&Add tag...",this,SLOT(selectionAddTags()));
+   selection->insertItem("&Delete tag...",this,SLOT(selectionDelTags()));
    selection->insertItem("&Measure Bpm ...",this,SLOT(measureBpms()));
    selection->insertSeparator();
    selection->insertItem("&Fetch selection from cdrom...",this,SLOT(fetchSelection()));
@@ -149,8 +154,19 @@ SongSelectorLogic::SongSelectorLogic(QWidget*parent=0,const char*name=0) :
    main->insertItem("&File",file);
    main->insertItem("&View",view);
    main->insertItem("&Selection",selection);
+   main->insertItem("&Before",before);
+   main->insertItem("&After",after);
    main->insertItem("&Tools",tools);
    main->insertItem("&Help",help);
+   // nog een aantal items toevoegen
+   //   create remote/local script pair
+   //   R- copy index files to other side
+   //   R- position of binaries
+   //   R- start player
+   //   R- position to start player
+   //   R- copy files back
+   //   L- give shell to start here
+   // mounten van music directory
 };
 
 void SongSelectorLogic::toggle_neglectdirstruct()
@@ -467,8 +483,9 @@ bool SongSelectorLogic::lookfor(const char* filename,Song* cur)
    if (!cur) return false;
    else if (cur->isIndex())
      {
-	return lookfor(filename,((SongIndex*)cur)->list) 
-	  || lookfor(filename,cur->next);
+	if (lookfor(filename,((SongIndex*)cur)->list))
+	  return true;
+	return lookfor(filename,cur->next);
      }
    else if (cur->song_file)
      {
@@ -529,13 +546,13 @@ void SongSelectorLogic::checkfile(const char* filename, ScanningProgress * progr
 	     index_period=20000;
 	     index_write();
 	     index_free();
+	     
 	     // inform dataroot of new file
 	     Song * ns = new Song(halfindexname,INDEX_DIR);
 	     assert(ns);
 	     assert(dataRoot);
 	     dataRoot->add(ns);
 	     parseTags(ns->song_tags);
-	     updateItemList();
 	  }
      }
 }
@@ -582,6 +599,7 @@ void SongSelectorLogic::checkDisc()
    progress->show();
    scandir("/cdrom",strdup(whichCd.LineEdit->text()),progress);
    progress->Okay->setEnabled(true);
+   updateItemList();
    // 3 - umount cdrom
    system("umount /cdrom");
    system("eject /cdrom");
@@ -905,8 +923,32 @@ void SongSelectorLogic::songAddTag(QListViewItem *song, const char* tag)
    // free the bastard
    index_free();
    // now update the local songdata
-   Song *s=((QSongViewItem*)song)->getSong();
-   s->song_tags=strdup(newtags);
+   ((QSongViewItem*)song)->reread();
+   free(index);
+}
+
+void SongSelectorLogic::songDelTag(QListViewItem *song, const char* tag)
+{
+   char* newtags;
+   char* index=strdup(song->text(LIST_INDEX));
+   // read the index file
+   index_read(index);
+   newtags=strdup(index_tags);
+   // modify taglines
+   char* pos = strstr(index_tags,tag);
+   if (pos)
+     {
+	// simply clear the sucker
+	newtags[pos-index_tags]=' ';
+	strcpy(newtags+(pos-index_tags)+1, pos+strlen(tag));
+	index_tags = strdup(newtags);
+     }
+   // write the index file
+   index_write();
+   // free the bastard
+   index_free();
+   // now update the local songdata
+   ((QSongViewItem*)song)->reread();
    free(index);
 }
 
@@ -923,6 +965,24 @@ void SongSelectorLogic::selectionAddTags()
 	     QSongViewItem *svi=(QSongViewItem*)it1.current();
 	     if (svi->isSelected()) 
 	       songAddTag(svi,songdata.newTags->text());
+	  }
+	parseTags(strdup(songdata.newTags->text()));
+     }
+}
+
+void SongSelectorLogic::selectionDelTags()
+{
+   // ask user the tag to add
+   TagBox songdata(NULL,NULL,TRUE);
+   songdata.newTags->setText("");
+   if (songdata.exec()==QDialog::Accepted)
+     {
+	QListViewItemIterator it1(songList);
+	for(;it1.current();++it1)
+	  {
+	     QSongViewItem *svi=(QSongViewItem*)it1.current();
+	     if (svi->isSelected()) 
+	       songDelTag(svi,songdata.newTags->text());
 	  }
 	parseTags(strdup(songdata.newTags->text()));
      }
@@ -987,7 +1047,14 @@ void SongSelectorLogic::quitButton()
 {
    close();
 }
-				    
+			
+void SongSelectorLogic::selectAllButTagged()
+{
+   int i = 1;
+   while(i<nextTagLine)
+     tagExclude[i++] -> setChecked(true);
+}
+
 void SongSelectorLogic::addTag(const char* tag)
 {
    int baseline=40;
@@ -1035,10 +1102,9 @@ void SongSelectorLogic::addTag(const char* tag)
 
 void SongSelectorLogic::findallsimilarnames()
 {
-   bool ok;
+   QString text = QFileDialog::getExistingDirectory(NULL,this,NULL,"Specify directory to compare with database");
    // ask the name to start with
-   QString text = QInputDialog::getText("Input name to compare with","label","insert name",&ok);
-   if (ok && !text.isEmpty())
+   if (!text.isEmpty())
      {
 	dist_init();
 	findallsimilarnamesindir(text);
@@ -1144,18 +1210,61 @@ const char* SongSelectorLogic::askDir()
 
 void SongSelectorLogic::importMp3s()
 {
-//   const char * dir = askDir();
-//   if (dir==NULL) return;
-   // scandir requires two arguments. The first is the absolute position to scan
-   // the second is how the entries should be named relatively to the music dir
-   // therefore dirname should point to a location relatively to music
-//   printf("Direcotry to scan = %s\n",dir);
-   
-   // gdvdmme..
-   // het probleem hier is onmiddelijk dat we niet weten hoe de gegeven directory zich verhoud tot de
-   // music directory.
    ScanningProgress * progress = new ScanningProgress();
    progress->show();
    scandir(MUSIC_DIR,NULL,progress);
    progress->Okay->setEnabled(true);
+   updateItemList();
+}
+
+void SongSelectorLogic::selectionMenu()
+{
+   selection->exec(QCursor::pos());
+}
+
+void SongSelectorLogic::findWrongMp3Names()
+{
+   QString text = QFileDialog::getExistingDirectory(NULL,this,NULL,"Specify directory to look for wrong mp3 names");
+   if (!text.isEmpty())
+     {
+	if (text.right(1)=="/")
+	  text = text.left(text.length()-1);
+	RenamerLogic *renamer = new RenamerLogic(this);
+	findWrongNames(text,renamer);
+	renamer->show();
+     }
+}
+
+void SongSelectorLogic::findWrongIdxNames()
+{
+   RenamerLogic *renamer = new RenamerLogic(this);
+   findWrongNames("./index",renamer);
+   renamer->show();
+}
+
+void SongSelectorLogic::findWrongNames(const char* dirname, RenamerLogic *renamer)
+{
+   DIR *dir;
+   struct dirent*entry;
+   printf("scanning directory %s\n",dirname);
+   dir=opendir(dirname);
+   assert(dir);
+   while (entry=readdir(dir))
+     {
+	char txt[500];
+	sprintf(txt,"%s/%s",dirname,entry->d_name);
+	if (entry->d_type==DT_DIR)
+	  {
+	     if (strcmp(entry->d_name,".")==0 ||
+		 strcmp(entry->d_name,"..")==0) continue;
+	     findWrongNames(txt,renamer);
+	  }
+	else if (entry->d_type==DT_REG)
+	  {
+	     char txt2[500];
+	     strcpy(txt2,entry->d_name);
+	     renamer->add(txt2,txt);
+	  }
+     }
+   closedir(dir);
 }

@@ -1,30 +1,5 @@
-  D - selector aanpassen dat hij index file opnieuw leest
-      als player eindigt
-    
-  
-  - importeer fase ziet er meestal hetzelfde uit: 
-    a) voor de boel op cd staat
-       1. geven van goed namen
-          + .MP3 -> .mp3
-	  + alle spaties verwijderen, de eerste letters na de spaties
-            hoofdletters van maken
-       2. opzoeken van gelijknamige songs
-       dit moet eigenlijk een volledig nieuwe app zijn... of niet ?
-       
-    ... dit zou eigenlijk voor later moeten zijn...
-    ... als we nu eens zouden beginnen met correct te werken met non uniforme
-        filenames... nadien kunnen we deze nog steeds hernoemen naar de
-	correcte versie met eens systeem zoals hierboven beschreven.
-  - der is nog een serieus probleem met allerhande integratie.
-    het importeren van nieuwe lijsten is niet zo gemakkelijk als het zou
-    moeten zijn. Het probleem komt voornamelijk voort uit het feit
-    dat al die nummers gerenamed moeten worden. Als we hier een snel systeem
-    voor zouden kunnen hebben zou het al gemakkelijk zijn.. Hoewel het
-    natuurlijk ook wel zo is dat ik er mij de ballen van aantrek.
-    Misschien iets dat al kan helpen is het omzetten naar grote en kleiner
-    letters automatisch laten gebeuren.
-  - make deb-install is owkee. maar moet eerst de directories nog maken !
-     (nodig voor gentoo)
+all
+  - next time compile for a lower libc
   - sourceforge logo is er precies ergens afgevallen ??
 
 cbpm-play:
@@ -32,7 +7,8 @@ cbpm-play:
 
 cbpm-count:
   - eens testen of een kwadratische fout nog betere resultaten geeft of niet.
-
+    => is normala niet nodig gezien het feit dat we eigenlijk een lineair
+       digitale filter gemaakt hebben op deze manier. 
   
 kbpm-play:
   - als de file al bestaat en we moeten correleren onmiddelijk 
@@ -43,7 +19,7 @@ kbpm-play:
   - target tempo zetten laat de percent indicator niet volgen
   - kernel scheduling latency in acht nemen bij het meten
   - als tempo = inf deftige errormelding geven
-  - shifting beyond zero should lock down to zero (or produce somthing 'okay')
+  - cue shifting beyond zero should lock down to zero (or produce somthing 'okay')
   - tempo changer in player
   - tempo down en upscalen
   - should show remaining time instead of total time
@@ -60,15 +36,28 @@ documentation:
   - aanpassen van de lyx file met automatische insertie correct versienummer
 
 kbpm-dj:
+  - een player moet geindiceerd worden in een kleur
+    - blue: playing
+    - yellow: this is the main playing song
+    - green: free
+  - when starting and wizarding, dsp parameters should be obtained
+  - setup on a remote machine should be possible.
+  - nfs-mounten ? Copying the same data ??
+  - before importing:
+    + select directory
+    + fix filenames
+      - .MP3 -> .mp3
+      - alle spaties verwijderen, de eerste letters na de spaties hoofdletters van maken
+    + find similar songs
+    + remove trash
+    + group one cd
+    + burn to disk
+    + import trash
   - selector should show the filesize
   - selector should show available cues
-  - resizability !
   - multiple players (asus, cubical, tnm etc ...) & automatically setup player on other machine
-  - multi selection del tags (gelijk de add)
   - automatic sorting of tags in tagline / song
   - automatic removal of duplicate tags in taglines / song
-  - add all button; del all button (to select tags easily)
   - focus houden binnen bepaalde directory
   - marking similar songs as 'played'
   - keep focus on certain songs after reorganizing the thing
-  - automatic scanning of new CD

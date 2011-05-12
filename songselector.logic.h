@@ -39,6 +39,7 @@
 #include <qmenubar.h>
 #include "songselector.h"
 #include "scanningprogress.h"
+#include "renamer.logic.h"
 #include "kbpm-index.h"
 
 #define PLAYCOMMAND1  "kbpm-play -d /dev/dsp2 -x /dev/mixer1 -p 640 0   -m \"%s\" \"%s\""
@@ -73,7 +74,7 @@ class SongSelectorLogic: public SongSelector
    QCheckBox *tagInclude[MAXTAGS];
    QCheckBox *tagExclude[MAXTAGS];
    QPopupMenu *view;
-   QPopupMenu *songedit;
+   QPopupMenu *selection;
    int neglectdirstruct_item;
    int notyetplayed_item;
    int coloralreadyplayed_item;
@@ -103,6 +104,7 @@ class SongSelectorLogic: public SongSelector
    bool doFilter(Song * item);
    void setColor(QColor color);
    void songAddTag(QListViewItem * song, const char* tag);
+   void songDelTag(QListViewItem * song, const char* tag);
    bool lookfor(const char*filename, Song*cur);
    void checkfile(const char* filename, ScanningProgress * progress);
    void scandir(const char* filename,const char* checkname, ScanningProgress * progress);
@@ -113,6 +115,7 @@ class SongSelectorLogic: public SongSelector
  protected:
    bool filter(Song * item);
  public slots:
+   virtual void selectAllButTagged();
    virtual void clearMonitor();
    virtual void switchMonitorToMain();
    virtual void timerTick();
@@ -124,6 +127,7 @@ class SongSelectorLogic: public SongSelector
    virtual void checkDisc();
    virtual void exportPlayList();
    virtual void selectionAddTags();
+   virtual void selectionDelTags();
    virtual void doMarkDups();
    virtual void quitButton();
    virtual void toggle_neglectdirstruct();
@@ -140,4 +144,8 @@ class SongSelectorLogic: public SongSelector
    virtual void importMp3s();
    virtual void measureBpms();
    virtual void doHelp();
+   virtual void selectionMenu();
+   virtual void findWrongIdxNames();
+   virtual void findWrongMp3Names();
+   virtual void findWrongNames(const char* dir, RenamerLogic *renamer);
 };
