@@ -13,6 +13,8 @@
 #include <QtGui/QGridLayout>
 #include <QtGui/QLabel>
 
+QT_BEGIN_NAMESPACE
+
 class Ui_FrequencyDialog
 {
 public:
@@ -24,9 +26,7 @@ public:
     {
     if (FrequencyDialog->objectName().isEmpty())
         FrequencyDialog->setObjectName(QString::fromUtf8("FrequencyDialog"));
-    QSize size(420, 426);
-    size = size.expandedTo(FrequencyDialog->minimumSizeHint());
-    FrequencyDialog->resize(size);
+    FrequencyDialog->resize(420, 426);
     gridLayout = new QGridLayout(FrequencyDialog);
     gridLayout->setSpacing(6);
     gridLayout->setMargin(11);
@@ -76,6 +76,8 @@ public:
 namespace Ui {
     class FrequencyDialog: public Ui_FrequencyDialog {};
 } // namespace Ui
+
+QT_END_NAMESPACE
 
 class FrequencyDialog : public QDialog, public Ui::FrequencyDialog
 {

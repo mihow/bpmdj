@@ -35,7 +35,20 @@ DO      = ${shell ls *.do  2>/dev/null | grep -v .*\.L.c++ 2>/dev/null}
 	@echo "  [cpp] "$@
 	@$(CPP) -c $< $(CFLAGS) -o $@ $(QT_INCLUDE_PATH)
 
+aoc: ao-syntax.o ao-lexer.o aoc.o sao-printer.o
+	@echo " [link] "$@
+	@$(LINK) $(CFLAGS) $^ -o $@
+
+
+doc: do-syntax.o do-lexer.o doc.o do-printer.o doc.o
+	@echo " [link] "$@
+	@$(LINK) $(CFLAGS) $^ -o $@		
+
 fixname: fixname.o
+	@echo " [link] "$@
+	@$(LINK) $(CFLAGS) $< -o $@
+
+profile-clock: profile-clock.o
 	@echo " [link] "$@
 	@$(LINK) $(CFLAGS) $< -o $@
 

@@ -17,6 +17,8 @@
 #include <QtGui/QRadioButton>
 #include <QtGui/QSpacerItem>
 
+QT_BEGIN_NAMESPACE
+
 class Ui_RenamerStart
 {
 public:
@@ -27,9 +29,9 @@ public:
     QRadioButton *not_yet_indexed;
     QLabel *textLabel2_2;
     QLabel *textLabel2;
-    QSpacerItem *spacerItem;
-    QSpacerItem *spacerItem1;
-    QSpacerItem *spacerItem2;
+    QSpacerItem *spacer16_2;
+    QSpacerItem *spacer16;
+    QSpacerItem *spacer1;
     QPushButton *pushButton22;
     QPushButton *pushButton23;
 
@@ -37,9 +39,7 @@ public:
     {
     if (RenamerStart->objectName().isEmpty())
         RenamerStart->setObjectName(QString::fromUtf8("RenamerStart"));
-    QSize size(483, 384);
-    size = size.expandedTo(RenamerStart->minimumSizeHint());
-    RenamerStart->resize(size);
+    RenamerStart->resize(483, 384);
     gridLayout = new QGridLayout(RenamerStart);
     gridLayout->setSpacing(6);
     gridLayout->setMargin(11);
@@ -78,20 +78,20 @@ public:
 
     gridLayout1->addWidget(textLabel2, 3, 1, 1, 1);
 
-    spacerItem = new QSpacerItem(20, 20, QSizePolicy::Maximum, QSizePolicy::Minimum);
+    spacer16_2 = new QSpacerItem(20, 20, QSizePolicy::Maximum, QSizePolicy::Minimum);
 
-    gridLayout1->addItem(spacerItem, 3, 0, 1, 1);
+    gridLayout1->addItem(spacer16_2, 3, 0, 1, 1);
 
-    spacerItem1 = new QSpacerItem(20, 20, QSizePolicy::Maximum, QSizePolicy::Minimum);
+    spacer16 = new QSpacerItem(20, 20, QSizePolicy::Maximum, QSizePolicy::Minimum);
 
-    gridLayout1->addItem(spacerItem1, 1, 0, 1, 1);
+    gridLayout1->addItem(spacer16, 1, 0, 1, 1);
 
 
     gridLayout->addWidget(buttonGroup1, 0, 0, 1, 3);
 
-    spacerItem2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    spacer1 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-    gridLayout->addItem(spacerItem2, 1, 0, 1, 1);
+    gridLayout->addItem(spacer1, 1, 0, 1, 1);
 
     pushButton22 = new QPushButton(RenamerStart);
     pushButton22->setObjectName(QString::fromUtf8("pushButton22"));
@@ -140,6 +140,8 @@ public:
 namespace Ui {
     class RenamerStart: public Ui_RenamerStart {};
 } // namespace Ui
+
+QT_END_NAMESPACE
 
 class RenamerStart : public QDialog, public Ui::RenamerStart
 {

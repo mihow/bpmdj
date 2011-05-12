@@ -1,5 +1,5 @@
 /****
- Borg 4 Active Objects
+ Active Objects
  Copyright (C) 2006-2009 Werner Van Belle
 
  http://werner.yellowcouch.org/Borg4/group__ao.html

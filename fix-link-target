@@ -1,10 +1,10 @@
 #!/bin/bash
 # this small script fixes all the link targets if they require updating
 # conflicts will be reported and stopped
-if ls *.L.* >/dev/null 2>/dev/null; then 
-  for a in *.L.*; do 
+if ls *.L >/dev/null 2>/dev/null; then 
+  for a in *.L; do 
     link=$a
-    target=`echo $a | sed 's/\.L\././'`
+    target=`echo $a | sed 's/\.L$//'`
     # if the target already exists without a copy file then we 
     # report a possible unwanted overwrite
     if test -e $target -a ! -e .$target; then

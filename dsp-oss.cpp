@@ -1,5 +1,5 @@
 /****
- BpmDj v3.6: Free Dj Tools
+ BpmDj v3.8: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -230,7 +230,8 @@ void dsp_oss::close(bool fl)
   latencycheck=clock_ticks();
   if (fl) flush();
   if (verbose)
-    printf("dsp: fluffy-measured playing latency = %d ms\n",samples2ms(clock_ticks()-latencycheck));
+    printf("dsp: fluffy-measured playing latency = %d ms\n",
+	   samples2ms(clock_ticks()-latencycheck));
   ::close(dsp);
 }
 #endif

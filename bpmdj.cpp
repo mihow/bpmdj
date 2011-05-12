@@ -1,5 +1,5 @@
 /****
- BpmDj v3.6: Free Dj Tools
+ BpmDj v3.8: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -203,13 +203,14 @@ int main(int argc, char* argv[])
       start_rm("./fragments/*.wav");
   
   // 4. Some extra version dependent blurb...
-  if (!Config::get_shown_aboutbox())
-    if (MAGIC_NOW == MAGIC_3_5)
+  /*  if (!Config::get_shown_aboutbox())
+    if (MAGIC_NOW == MAGIC_3_8)
       QMessageBox::message(NULL,"Qt3 -> Qt4 bump:\n"
 			   "From this version on the source code has been ported to "
 			   "Qt4. This has been a non trivial port so I expect that "
 			   "some bugs will show up. Don't hesitate to post detailed "
 			   "bug reports at http://bpmdj.yellowcouch.org/bugzilla/");
+  */
   BpmDjSplash splash;
   application.setMainWidget(&main_window);
   main_window.show();
@@ -233,4 +234,31 @@ int main(int argc, char* argv[])
   aoPool->wait_for_finish();
   return result;
 }
+
+/**
+ * @mainpage BpmDj
+ *
+ * This page documents some aspects of the BpmDj code that are worth knowing. First and foremost is the fact
+ * that there exists a svn repository at svn+ssh//user@yellowcouch.org/repositories/BpmDj/
+ * Of course you need an ssh account which can be provided if necessary. 
+ *
+ * <b>The development tree</b><br>
+ * The development tree 
+ * of BpmDj is somewhat different from the pubished (tar.gz) one. In essence, all the sources are written
+ * in c++ and h++ files (as opposed to .cpp and .h files). However, each c++ and h++ file is automatically
+ * converted to a cpp and h file which includes the copyright header and opens the proper namespace. So in
+ * essence, if you want to edit things, you should edit the c++ and .h++ files. If you want to include 
+ * something, you should alwyas use the .cpp or .h file. The development tree should be kept private since
+ * it doesn't contain the proper copytight headers.
+ *
+ * <b>Types</b><br>
+ * BpmDj relies on typoes of a specific size. These are directly reflected with a number such that we know 
+ * how many bytes that type takes. For instance unsigned8 is an unsigned long integer of 8 bytes (=64 bits)
+ * unsigned4 is an unsigned byte of 4 bytes loing (=16 bit). There exists signed1, signed2, signed4, signed8,
+ * unsigned1, unisnged2, unsigned4, unsigned8 and float4 and float8. When writing source please use these 
+ * types since it makes porting BpmDj to different architectures much easier. 
+ *
+ * <b>Code style</b>
+ * The coding style for block is that each { or } is placed on an individual line.
+ */
 #endif // __loaded__bpmdj_cpp__

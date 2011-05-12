@@ -1,5 +1,5 @@
 /****
- BpmDj v3.6: Free Dj Tools
+ BpmDj v3.8: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -81,22 +81,22 @@ void fetch_config_from(PlayerConfig * target, const Player& player)
   if (target->get_disabled_capacities()!=cap)
     {
       QMessageBox::information(NULL,"Decoder option",
-			       "Specification of the new capacities will only be in effect the next\n"
+			       "The new decoding capacities will only be in effect the next\n"
 			       "time you start bpm-play with this configuration\n",
 			       QMessageBox::Ok,QMessageBox::NoButton);
       target->set_disabled_capacities(cap);
     }
-   
-   target->set_player_dsp(0);
-   if (player.alsa->isChecked())
+  
+  target->set_player_dsp(0);
+  if (player.alsa->isChecked())
      target->set_player_dsp(2);
-   if (player.oss->isChecked())
-     target->set_player_dsp(1);
-   if (player.bpm->isChecked())
-     target->set_player_dsp(3);
-   if (player.jack->isChecked())
+  if (player.oss->isChecked())
+    target->set_player_dsp(1);
+  if (player.bpm->isChecked())
+    target->set_player_dsp(3);
+  if (player.jack->isChecked())
     target->set_player_dsp(4);
- 
+  
 #define BOOL(a) target->set_##a(player.a->isChecked());
 #define NR(a) target->set_##a(player.a->value());
 #define TEXT(a) target->set_##a(player.a->text());
@@ -109,7 +109,6 @@ void fetch_config_from(PlayerConfig * target, const Player& player)
    BOOL(oss_verbose); 
    BOOL(oss_nolatencyaccounting); 
    NR(oss_latency);
-   NR(jack_latency);
    BOOL(jack_verbose);
    NR(bpm_channel);
    TEXT(jack_dev);
@@ -129,7 +128,7 @@ void store_config_into(PlayerConfig * from, Player* player)
   player->oss->setChecked(from->get_player_dsp()==1);
   player->bpm->setChecked(from->get_player_dsp()==3);
   player->jack->setChecked(from->get_player_dsp()==4);
-
+  
 #define BOOL(a) player->a->setChecked(from->get_##a())
 #define NR(a) player->a->setValue(from->get_##a())
 #define TEXT(a) player->a->setText(from->get_##a())
@@ -142,7 +141,6 @@ void store_config_into(PlayerConfig * from, Player* player)
   BOOL(oss_verbose); 
   BOOL(oss_nolatencyaccounting);
   NR(oss_latency);
-  NR(jack_latency);
   BOOL(jack_verbose);
   TEXT(jack_dev);     
   NR(bpm_channel);
@@ -212,6 +210,19 @@ Player::Player():
   redrawCues();
   captionize_according_to_index();
   TempoLd->display(100.0*(double)normalperiod/(double)currentperiod);
+
+  // deactivate the non compiled in sections
+#ifndef COMPILE_OSS
+  osstab->setDisabled(true);
+#endif
+#ifndef COMPILE_ALSA
+  alsatab->setDisabled(true);
+#endif
+#ifndef COMPILE_JACK
+  jacktab->setDisabled(true);
+#endif  
+  smallmixertab->setDisabled(true);
+
   // set colors of tempo change buttons
   init_tempo_switch_time();
   normalReached(currentperiod==normalperiod);
@@ -335,6 +346,27 @@ void Player::setColor(QWidget *button, bool enabled)
    pal.setDisabled( cg );
    
    button->setPalette( pal );
+}
+
+void Player::setTempoColor(QWidget *button, int enabled)
+{
+  QColor a;
+  QPalette pal;
+  QColorGroup cg;
+  
+  if (enabled==2)      a=QColor(0,255,0);
+  else if (enabled==1) a=QColor(255,255,0);
+  else if (enabled==0) a=QColor(255,0,0);
+  
+  cg.setColor( QColorGroup::Foreground, a );
+  cg.setColor( QColorGroup::Background, Qt::black );
+  pal.setActive( cg );
+  cg.setColor( QColorGroup::Foreground, a);
+  cg.setColor( QColorGroup::Background, Qt::black );
+  pal.setInactive( cg );
+  cg.setColor( QColorGroup::Foreground, a);
+  cg.setColor( QColorGroup::Background, Qt::black );
+  button->setPalette( pal );
 }
 
 void Player::storeCue(int nr)
@@ -526,9 +558,9 @@ void Player::timerTick()
       if (m==0 && no_raw_file_error_box==0 && playing)
 	{
 	  QMessageBox::information(NULL,"No .raw file",
-				   "it seems like there is no .raw file on disk\n"
-				   "check whether the bpmdjraw script behaves properly (look at the console output)\n"
-				   "or check whether the target direcotry is valid and accessable (in the options tab)\n",
+				   "It seems like there is no .raw file on disk. "
+				   "Check whether the bpmdjraw script behaves properly (look at the console output) "
+				   "or check whether the target direcotry is valid and accessable (in the options tab)",
 				   QMessageBox::Ok,QMessageBox::NoButton);
 	}
     }
@@ -553,11 +585,13 @@ void Player::timerTick()
       if (currentperiod<-1) T0=0;
       if (normalperiod<-1) T1=0;
       CurrentTempoLCD -> display(T0);
+      beatGraphAnalyzer->currentTempoLcd -> display(T0);
       NormalTempoLCD -> display(T1);
     }
   else
     {
       CurrentTempoLCD -> display(0);
+      beatGraphAnalyzer->currentTempoLcd -> display(0);
       NormalTempoLCD -> display(0);
     }
   if (fade_time>0)
@@ -569,14 +603,6 @@ void Player::setCue()
   cue_set();
   beatGraphAnalyzer->cuesChanged();
 }
-
-/*
-
-void Player::shiftBack()
-{
-  ::y=y_normalise(cue)+dsp->latency();
-}
-*/
 
 void Player::restart()
 {
@@ -728,7 +754,7 @@ void Player::mediumSwitch()
 void Player::normalReached(bool t)
 {
   setColor(switcherButton,t);
-  setColor(beatGraphAnalyzer->switcherLabel,t);
+  setTempoColor(beatGraphAnalyzer->currentTempoLcd,t ? 2 : tempo_fade ? 1 : 0);
 }
 
 void Player::targetStep()
@@ -740,7 +766,6 @@ void Player::targetStep()
       fade_time=0;
       normalReached(true);
       switcherButton->setText("Fade");
-      beatGraphAnalyzer->switcherLabel->setText("Tempo");
       return;
     }
   if (tempo_fade==1)
@@ -750,7 +775,7 @@ void Player::targetStep()
   if (tempo_fade>0)
     {
       switcherButton->setText(QString::number(fade_time-tempo_fade));
-      beatGraphAnalyzer->switcherLabel->setText("Tempo: ok-"+QString::number(fade_time-tempo_fade));
+      setTempoColor(beatGraphAnalyzer->currentTempoLcd,1);
     }
   
   /**
@@ -1383,15 +1408,18 @@ void msg_playing_state_changed()
 class WritingFinished: public BpmPlayEvent
 {
 public:
+  WritingFinished(): BpmPlayEvent()
+  {
+  }
   virtual void run(Player* sp)
   {
     if (normalperiod.valid())
       {
 	if (sp->tab->currentIndex()==TAB_BEATGRAPH)
-	  sp->tabChanged(); // it didn't but it triggers an update 
+	  // it didn't but it triggers an update 
+	  sp->tabChanged(); 
 	else
 	  sp->tab->setCurrentIndex(TAB_BEATGRAPH);
-	// (new SomBeatGraph())->start();
       }
   }
 };

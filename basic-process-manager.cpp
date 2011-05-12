@@ -1,5 +1,5 @@
 /****
- BpmDj v3.6: Free Dj Tools
+ BpmDj v3.8: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -89,21 +89,22 @@ ITERATE_OVER(listener)
 }
 
 /**
- * The signaling stuff rmeains a mess. How many times I have to had
- * to revise this code is unbeieveable. In any case. With Qt4, it seems that
- * the QtCore support grabs the signal and then calls us thereby 
+ * The signaling stuff remains a mess. How many times I have to had
+ * to revise this code is unbelieveable. In any case. With Qt4, it seems 
+ * that the QtCore support grabs the signal and then calls us thereby 
  * completely ignoring our info parameter. As such, I throw the 
  * fucker out, and install it myself by manually initialising it 
- * after the application is allocated
+ * after the application is allocated. What effect this will have in the
+ * long run with new Qt releases is of course a question.
  */ 
 void ToSwitchOrNotToSwitchSignal(int sig, siginfo_t *info, void* hu)
 {
   Synchronized(dead_processes);
-  int blah;
   if (!info) 
     printf("No info available for signal %d\n",sig);
   else
     {
+      int blah;
       waitpid(info->si_pid,&blah,0);
       dead_processes.died_pids.insert(info->si_pid);
     }
@@ -128,11 +129,7 @@ void DiedProcesses::setup_signals()
   act=bpmdj_allocate(1,struct sigaction);
   act->sa_sigaction=ToSwitchOrNotToSwitchSignal;
   act->sa_flags=SA_SIGINFO;
-  // WVB -- this could be useful | SA_NOCLDWAIT;
-  // sigaction(SIGUSR1,act,NULL);
   sigaction(SIGCHLD,act,NULL);
-  // ignore sigchlds
-  // signal(SIGCHLD,SIG_IGN);
 }
 
 void setup_signals()
@@ -159,8 +156,6 @@ void BasicProcessManager::processDied(int pid)
 	clearId(i);
 	return;
       }
-  //  printf("Warning: a process died which I didn't know\n");
-  // assert(0);
 }
 
 void BasicProcessManager::checkSignals()

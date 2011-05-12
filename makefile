@@ -1,4 +1,4 @@
-VERSION = 3.7
+VERSION = 3.8
 BIN = bpmplay bpmdj bpmmerge bpmcount 
 .EXPORT_ALL_VARIABLES:
 all: .link-targets .ui-forms .rc-files .source-creator .depend .compile 
@@ -21,7 +21,7 @@ LINK =  $(CPP) $(LDFLAGS) $(QT_INCLUDE_PATH) $(QT_LIBRARY_PATH) $(QT_LIBS)
 
 # Generate all the necessary user interface files
 .ui-forms: ui-forms
-	@echo "User Interface Forms:"
+	@echo "User Interface Resources:"
 	@make -s --no-print-directory -f ui-forms $@
 .rc-files: rc-files
 	@echo "Resource files:"
@@ -95,6 +95,6 @@ tuuster:
 	@scp bpmplay  bpmdj@tuuster:.bin/
 	@scp bpmdj    bpmdj@tuuster:.bin/bpmdj.real
 
-website:
-	rsync -e ssh -xavz redirect_documentation/* krubbens@bpmdj.sourceforge.net:/home/groups/b/bp/bpmdj/htdocs/
-	ssh krubbens@bpmdj.sourceforge.net chmod +rX -R /home/groups/b/bp/bpmdj/htdocs/*
+website: documentation
+	@echo "  [web] uploading website"
+	@rsync -xrlptoDvz --delete-excluded --exclude .svn --exclude "*~" documentation/* werner@yellowcouch.org:/home/bpmdj/public_html/

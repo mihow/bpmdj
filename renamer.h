@@ -20,6 +20,8 @@
 #include <QtGui/QPushButton>
 #include <QtGui/QSpacerItem>
 
+QT_BEGIN_NAMESPACE
+
 class Ui_Renamer
 {
 public:
@@ -43,7 +45,7 @@ public:
     QPushButton *PushButton13;
     QPushButton *PushButton37;
     QPushButton *pushButton20;
-    QSpacerItem *spacerItem;
+    QSpacerItem *spacer1;
     QPushButton *PushButton34;
     QPushButton *PushButton16;
     QPushButton *PushButton35;
@@ -61,9 +63,7 @@ public:
     {
     if (Renamer->objectName().isEmpty())
         Renamer->setObjectName(QString::fromUtf8("Renamer"));
-    QSize size(667, 471);
-    size = size.expandedTo(Renamer->minimumSizeHint());
-    Renamer->resize(size);
+    Renamer->resize(667, 471);
     gridLayout = new QGridLayout(Renamer);
     gridLayout->setSpacing(6);
     gridLayout->setMargin(11);
@@ -220,9 +220,9 @@ public:
 
     gridLayout->addWidget(GroupBox2, 3, 2, 1, 1);
 
-    spacerItem = new QSpacerItem(240, 21, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    spacer1 = new QSpacerItem(240, 21, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-    gridLayout->addItem(spacerItem, 5, 2, 1, 1);
+    gridLayout->addItem(spacer1, 5, 2, 1, 1);
 
     PushButton34 = new QPushButton(Renamer);
     PushButton34->setObjectName(QString::fromUtf8("PushButton34"));
@@ -348,17 +348,29 @@ public:
     GroupBox1->setTitle(QApplication::translate("Renamer", "Fix", 0, QApplication::UnicodeUTF8));
     PushButton5->setText(QApplication::translate("Renamer", "SmallCapsIn&Words", 0, QApplication::UnicodeUTF8));
     PushButton5->setShortcut(QApplication::translate("Renamer", "Alt+W", 0, QApplication::UnicodeUTF8));
+
+#ifndef QT_NO_TOOLTIP
     PushButton5->setProperty("toolTip", QVariant(QApplication::translate("Renamer", "Decapitalizes all letters in words", 0, QApplication::UnicodeUTF8)));
+#endif // QT_NO_TOOLTIP
+
     PushButton101->setText(QApplication::translate("Renamer", "Extention (.MP3, .IDX)", 0, QApplication::UnicodeUTF8));
     PushButton3->setText(QApplication::translate("Renamer", "&CapitalizeAfterSpace", 0, QApplication::UnicodeUTF8));
     PushButton3->setShortcut(QApplication::translate("Renamer", "Alt+C", 0, QApplication::UnicodeUTF8));
+
+#ifndef QT_NO_TOOLTIP
     PushButton3->setProperty("toolTip", QVariant(QApplication::translate("Renamer", "Capitalizes all letters after spaces", 0, QApplication::UnicodeUTF8)));
+#endif // QT_NO_TOOLTIP
+
     betwseenBracesIsMixButtonbrace->setText(QApplication::translate("Renamer", "'(..)' is Mix", 0, QApplication::UnicodeUTF8));
     GroupBox2->setTitle(QApplication::translate("Renamer", "Remove", 0, QApplication::UnicodeUTF8));
     PushButton6->setText(QApplication::translate("Renamer", "S&pecials", 0, QApplication::UnicodeUTF8));
     PushButton2->setText(QApplication::translate("Renamer", "&Space", 0, QApplication::UnicodeUTF8));
     PushButton2->setShortcut(QApplication::translate("Renamer", "Alt+S", 0, QApplication::UnicodeUTF8));
+
+#ifndef QT_NO_TOOLTIP
     PushButton2->setProperty("toolTip", QVariant(QApplication::translate("Renamer", "Removes All Spaces", 0, QApplication::UnicodeUTF8)));
+#endif // QT_NO_TOOLTIP
+
     PushButton13->setText(QApplication::translate("Renamer", "^C&har", 0, QApplication::UnicodeUTF8));
     PushButton37->setText(QApplication::translate("Renamer", "^Specials", 0, QApplication::UnicodeUTF8));
     pushButton20->setText(QApplication::translate("Renamer", "'(...)' ", 0, QApplication::UnicodeUTF8));
@@ -384,6 +396,8 @@ public:
 namespace Ui {
     class Renamer: public Ui_Renamer {};
 } // namespace Ui
+
+QT_END_NAMESPACE
 
 class Renamer : public QDialog, public Ui::Renamer
 {

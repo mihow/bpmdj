@@ -20,6 +20,8 @@
 #include <QtGui/QSpacerItem>
 #include <QtGui/QVBoxLayout>
 
+QT_BEGIN_NAMESPACE
+
 class Ui_MixerDialog
 {
 public:
@@ -69,15 +71,13 @@ public:
     QLabel *latency_buffer;
     QLabel *latency_difference;
     QLabel *synchronisation;
-    QSpacerItem *spacerItem;
+    QSpacerItem *spacer6;
 
     void setupUi(QDialog *MixerDialog)
     {
     if (MixerDialog->objectName().isEmpty())
         MixerDialog->setObjectName(QString::fromUtf8("MixerDialog"));
-    QSize size(466, 241);
-    size = size.expandedTo(MixerDialog->minimumSizeHint());
-    MixerDialog->resize(size);
+    MixerDialog->resize(466, 241);
     gridLayout = new QGridLayout(MixerDialog);
     gridLayout->setSpacing(6);
     gridLayout->setMargin(11);
@@ -302,6 +302,7 @@ public:
     syncbutton->setObjectName(QString::fromUtf8("syncbutton"));
     syncbutton->setEnabled(true);
     syncbutton->setCheckable(true);
+    syncbutton->setChecked(true);
 
     hboxLayout5->addWidget(syncbutton);
 
@@ -380,9 +381,9 @@ public:
 
     gridLayout->addLayout(hboxLayout6, 0, 3, 1, 1);
 
-    spacerItem = new QSpacerItem(80, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    spacer6 = new QSpacerItem(80, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-    gridLayout->addItem(spacerItem, 0, 4, 1, 1);
+    gridLayout->addItem(spacer6, 0, 4, 1, 1);
 
     QWidget::setTabOrder(Ch1Main, Ch2Main);
     QWidget::setTabOrder(Ch2Main, Ch1Monitor);
@@ -439,6 +440,8 @@ public:
 namespace Ui {
     class MixerDialog: public Ui_MixerDialog {};
 } // namespace Ui
+
+QT_END_NAMESPACE
 
 class MixerDialog : public QDialog, public Ui::MixerDialog
 {

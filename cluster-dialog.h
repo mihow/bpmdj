@@ -16,12 +16,14 @@
 #include <QtGui/QSpacerItem>
 #include "metric-widget.h"
 
+QT_BEGIN_NAMESPACE
+
 class Ui_ClusterDialog
 {
 public:
     QGridLayout *gridLayout;
     QFrame *line4;
-    QSpacerItem *spacerItem;
+    QSpacerItem *spacer13;
     QPushButton *pushButton27;
     QPushButton *pushButton28;
     MetricWidget *metrics;
@@ -31,9 +33,7 @@ public:
     {
     if (ClusterDialog->objectName().isEmpty())
         ClusterDialog->setObjectName(QString::fromUtf8("ClusterDialog"));
-    QSize size(382, 400);
-    size = size.expandedTo(ClusterDialog->minimumSizeHint());
-    ClusterDialog->resize(size);
+    ClusterDialog->resize(382, 400);
     gridLayout = new QGridLayout(ClusterDialog);
     gridLayout->setSpacing(6);
     gridLayout->setMargin(11);
@@ -45,9 +45,9 @@ public:
 
     gridLayout->addWidget(line4, 2, 0, 2, 3);
 
-    spacerItem = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    spacer13 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-    gridLayout->addItem(spacerItem, 4, 0, 1, 1);
+    gridLayout->addItem(spacer13, 4, 0, 1, 1);
 
     pushButton27 = new QPushButton(ClusterDialog);
     pushButton27->setObjectName(QString::fromUtf8("pushButton27"));
@@ -100,7 +100,7 @@ protected:
         image0_ID,
         unknown_ID
     };
-    static QPixmap icon(IconID id)
+    static QPixmap qt_get_icon(IconID id)
     {
     static const unsigned char image0_data[] = { 
     0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
@@ -200,6 +200,8 @@ protected:
 namespace Ui {
     class ClusterDialog: public Ui_ClusterDialog {};
 } // namespace Ui
+
+QT_END_NAMESPACE
 
 class ClusterDialog : public QDialog, public Ui::ClusterDialog
 {

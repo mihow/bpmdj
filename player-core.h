@@ -1,5 +1,5 @@
 /****
- BpmDj v3.6: Free Dj Tools
+ BpmDj v3.8: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -125,6 +125,10 @@ extern bool  opt_check;
 extern int app_init(int argc, char *argv[]);
 extern void process_options(int argc,char *argv[]);
 extern void msg_playing_state_changed();
+/**
+ * This function is called by the player core when 
+ * the writing process finished its execution.
+ */
 extern void msg_writing_finished();
 
 // exported functions

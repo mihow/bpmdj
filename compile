@@ -57,7 +57,7 @@ data.a : $(DATA_OBJECTS)
 	@echo "   [ar] data.a"
 	@$(AR) r $@ $(DATA_OBJECTS) 2>.ignore
 
-DSP_OBJECTS = dsp-drivers.o dsp-oss.o dsp-alsa.o dsp-none.o dsp-jack.o
+DSP_OBJECTS = dsp-drivers.o dsp-oss.o dsp-alsa.o dsp-none.o dsp-jack.o scripts.o
 dsp.a : $(DSP_OBJECTS)
 	@echo "   [ar] dsp.a"
 	@$(AR) r $@ $(DSP_OBJECTS) 2>.ignore
@@ -87,7 +87,7 @@ KPLAY_OBJECTS = ao-tracker.o about.moc.o memory.o power-type.o files.o \
 	player-config.o data.a capacity-checker.o types.o dsp.a \
 	embedded.a efence.o page.o rc-player.o \
 	efence-print.o analyzers.a histogram-type.o \
-	common.o scripts.o bpm.o ao-som-beatgraph.o ao-pool.o 
+	common.o bpm.o ao-som-beatgraph.o ao-pool.o 
 
 BPM_LIB = bpm.o memory.o	
 BPMCOUNT_OBJECTS = bpmcount.o files.o signals.o bpm.a data.a

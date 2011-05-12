@@ -1,5 +1,5 @@
 /****
- BpmDj v3.6: Free Dj Tools
+ BpmDj v3.8: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -139,8 +139,7 @@ void BeatGraphLabel::drawCueText()
 
 void BeatGraphLabel::paintEvent(QPaintEvent *e)
 {
-  // AutoMessage("paintEvent");
-  
+  // AutoMessage("paintEvent");  
   QMutexLocker _ml(&lock);
   if (resized.isNull())
     {

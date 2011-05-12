@@ -1,5 +1,5 @@
 /****
- BpmDj v3.6: Free Dj Tools
+ BpmDj v3.8: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -23,7 +23,6 @@
 using namespace std;
 #line 1 "dsp-alsa.c++"
 #ifdef COMPILE_ALSA
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
@@ -283,13 +282,15 @@ int dsp_alsa::open()
     {
       printf("unable to set minimum start size: %s\n",snd_strerror(err));
       return err_dsp;
-    }      
+    }
+  /*
   err = snd_pcm_sw_params_set_xfer_align(dsp,sparams,1);
   if (err < 0 )
     {
       printf("unable to set transfer alignation: %s\n",snd_strerror(err));
       return err_dsp;
     }      
+  */
   err = snd_pcm_sw_params(dsp,sparams);
   if (err < 0)
     {

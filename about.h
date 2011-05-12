@@ -1,5 +1,5 @@
 /****
- BpmDj v3.6: Free Dj Tools
+ BpmDj v3.8: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -29,7 +29,7 @@ void doAbout(int pg);
 
 class About: 
   public QDialog,
-  public Ui::About
+  public Ui_About
 {
   Q_OBJECT
 public:

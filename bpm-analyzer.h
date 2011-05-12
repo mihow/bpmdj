@@ -1,5 +1,5 @@
 /****
- BpmDj v3.6: Free Dj Tools
+ BpmDj v3.8: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -30,7 +30,7 @@ using namespace std;
 typedef float8 fft_type;
 class Player;
 
-class BpmAnalyzerDialog : public QWidget, public Ui::CountDialog, public Analyzer
+class BpmAnalyzerDialog : public QWidget, public Ui_CountDialog, public Analyzer
 {
   Q_OBJECT
 private:

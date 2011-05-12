@@ -1,5 +1,5 @@
 /****
- BpmDj v3.6: Free Dj Tools
+ BpmDj v3.8: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -25,19 +25,19 @@ using namespace std;
 #include "ui-bpmdj-pref.h"
 #include "ui-installremotes.h"
 
-class Ui::InstallRemotes;
+class Ui_InstallRemotes;
 
 class BpmDjPreferences : 
   public QDialog,
-  public Ui::BpmDjPreferences
+  public Ui_BpmDjPreferences
 {
    Q_OBJECT
  private:
    void fixColorOf(QWidget *p);
    QString getHostFor(QString command);
-   void  installRemotes(Ui::InstallRemotes * dialog);
+   void  installRemotes(Ui_InstallRemotes * dialog);
    void  installRemotes();
-   void  copyProgramTo(QString program, QString host, Ui::InstallRemotes * dialog);
+   void  copyProgramTo(QString program, QString host, Ui_InstallRemotes * dialog);
  public:
    BpmDjPreferences(QWidget*parent=0,const char*name=0, bool modal=FALSE, Qt::WindowFlags f=0);
  public slots:

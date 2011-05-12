@@ -1,5 +1,5 @@
 /****
- BpmDj v3.6: Free Dj Tools
+ BpmDj v3.8: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -40,10 +40,10 @@ class SongProcess: public QObject
   Q_OBJECT ;
  public:
   enum command_type { empty, standard, xmms };
-  enum enabled_type { disabled, enabling, ok };
+  enum enabled_type { disabled, enabling, ok, disabling };
   enum state_type   { unchecked, checking, usefull, useless };
   enum kind_type    { player, analyzer };
- private:
+private:
   kind_type kind;             // player or analyzer ?
   /**
    * the player or analyzer ID
@@ -56,7 +56,7 @@ class SongProcess: public QObject
   QString text;               // thename of the playing / analyzing song
   Song  * song;               // the song being analyzed/played;
   /**
-   * the current running time
+   * The current running time
    */
   signed4 running_time;   
   /**
@@ -64,7 +64,7 @@ class SongProcess: public QObject
    */
   signed4 total_running_time;
   /**
-   * the amount of stopped songs
+   * The amount of stopped songs
    */
   signed4 songs_finished; 
   time_t  started_at;         // start_time when running
@@ -75,37 +75,37 @@ class SongProcess: public QObject
   void setEstate(enabled_type state);
   void setUsefullState();
   void setUselessState();
- public:
+public:
   SongProcess();
   // accessors
   enabled_type enabledState() const 
-    {
-      return estate;
-    };
+  {
+    return estate;
+  };
   void setEnabled(bool enabled = true);
   bool isEnabledOk() const 
-    {
-      return estate==ok;
-    };
+  {
+    return estate==ok;
+  };
   QString getText() const 
-    {
-      return text;
-    };
+  {
+    return text;
+  };
   bool canRun() const 
-    {
-      return estate==ok && song==NULL;
-    };
+  {
+    return estate==ok && song==NULL;
+  };
   bool isAnalyzer() const 
-    {
-      return kind == analyzer; 
-    };
- private: 
+  {
+    return kind == analyzer; 
+  };
+private: 
   QString getBasicCommand() const;
- public:
+public:
   command_type getCmd() const 
-    {
-      return cmd; 
-    };
+  {
+    return cmd; 
+  };
   QString getPlayCommand(Index & matchto, Index & song) const;
   QString getAnalCommand(bool tempo, int bpmtechnique, double from, double to, bool spectrum, bool energy, bool rythm, QString song) const;
   void    setAnalyzer() 
@@ -140,6 +140,10 @@ class SongProcess: public QObject
   int     inc_running_time();
   float   songs_per_second() const;
   void    start(Song * song);
+  /**
+   * The stop routine is called by the process manager
+   * whenever the underlying process finished.
+   */
   void    stop();
   void    setNameId(QString name,int id);
   void    setName(QString name);
@@ -181,7 +185,6 @@ class SongSelectorAnalView: public QCheckBox
    Q_OBJECT ;
    SongProcess * song_process;
    AnalyzersManager * anal_processes;
-   float   report_time;             // the color die out time
    float   relative_running_time();
  public:
    SongSelectorAnalView(QWidget * parent, AnalyzersManager * a, SongProcess & s);

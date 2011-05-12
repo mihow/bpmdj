@@ -1,5 +1,5 @@
 /****
- BpmDj v3.6: Free Dj Tools
+ BpmDj v3.8: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -38,7 +38,7 @@ class BpmAnalyzerDialog;
 
 class Player: 
   public QDialog,
-  public Ui::SongPlayer
+  public Ui_SongPlayer
 {
   Q_OBJECT
 public:
@@ -54,6 +54,7 @@ private:
   int fade_time;
   signed8 wantedcurrentperiod;
   void setColor(QWidget *button, bool enabled);
+  void setTempoColor(QWidget *button, int s);
   void redrawCues();
   void normalReached(bool yes);
   // BpmAnalyzerDialog * bpmcounter;

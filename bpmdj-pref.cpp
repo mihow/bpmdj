@@ -1,5 +1,5 @@
 /****
- BpmDj v3.6: Free Dj Tools
+ BpmDj v3.8: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -130,7 +130,7 @@ void BpmDjPreferences::on_colordColorCol_clicked()
   fixColorOf(colordColorCol);
 }
 
-void BpmDjPreferences::copyProgramTo(QString program, QString host, Ui::InstallRemotes * dialog)
+void BpmDjPreferences::copyProgramTo(QString program, QString host, Ui_InstallRemotes * dialog)
 {
   QString command = QString("scp -B ")+program+" "+host+":";
   QString makeexec = QString("ssh ")+host+" chmod +rx bpmplay bpmdjraw";
@@ -169,7 +169,7 @@ void BpmDjPreferences::copyProgramTo(QString program, QString host, Ui::InstallR
   log.close();
 }
 
-void BpmDjPreferences::installRemotes(Ui::InstallRemotes * dialog)
+void BpmDjPreferences::installRemotes(Ui_InstallRemotes * dialog)
 {
   /** 
    * find the positions of the programs
@@ -216,7 +216,7 @@ void BpmDjPreferences::installRemotes()
 {
   QDialog container;
   container.setModal(true);
-  Ui::InstallRemotes dialog;
+  Ui_InstallRemotes dialog;
   dialog.setupUi(&container);
   container.show();
   QString remote;

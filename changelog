@@ -1,3 +1,10 @@
+3.8:
+        + started with svn and seperate project directory
+	- Bug #975: unexpected process dies with a jackd driver
+	- disable non-compiled modules in user interface
+	+ Bernard Fortz added jack support to bpmdj
+	- Bug #969: removed Ui::* namespace warnings
+	+ Bug #971: Tempo information added to beatgraph
 3.7:
 	+ made sure that we try somewhat longer to open the DSP device
 	+ moved the analyzers to the analyzer tab.

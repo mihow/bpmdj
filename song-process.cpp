@@ -1,5 +1,5 @@
 /****
- BpmDj v3.6: Free Dj Tools
+ BpmDj v3.8: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -77,6 +77,9 @@ void SongProcess::setEstate(enabled_type val)
 
 void SongProcess::setEnabled(bool val)
 {
+  /**
+   * Enabling of this player
+   */
   if (val)
     {
       if (estate==disabled)
@@ -102,12 +105,28 @@ void SongProcess::setEnabled(bool val)
 	}
     }
   else 
-    if (estate!=disabled)
-      {
-	setEstate(disabled);
-	if (song)
-	  stop();
-      }
+    /**
+     * Disabling of this player
+     */
+    {
+      if (estate==disabled) 
+	return;
+      else if (estate==ok)
+	{
+	  // is there still a command running somewhere ?
+	  if (isBusy())
+	    {
+	      setEstate(disabling);
+	    }
+	  else
+	    {
+	      setEstate(disabled);
+	      assert(!song);
+	    }
+	}
+      else
+	assert(0);
+    }
 }
 
 void SongProcess::setRemote(QString r)
@@ -274,12 +293,18 @@ void SongProcess::start(Song * s)
   cerr << "SongProcess::start()\n";
 }
 
+/**
+ * When the process finished we also disable
+ * the process whenever we were in a disabling mood.
+ */
 void SongProcess::stop()
 {
   songs_finished++;
   running_time = - 1;
   total_running_time+=time(NULL)-started_at;
   setSong(NULL);
+  if (estate==disabling)
+    setEstate(disabled);
 }
 
 void SongProcess::setup()
@@ -460,7 +485,6 @@ SongSelectorAnalView::SongSelectorAnalView(QWidget * parent, AnalyzersManager * 
   QSizePolicy policy = sizePolicy();
   policy.setHorData(QSizePolicy::Expanding);
   setSizePolicy(policy);
-  report_time = 60;
   processChange();
   connect(song_process,SIGNAL(viewChanged()),this,SLOT(processChange()));
   connect(song_process,SIGNAL(timeChanged()),this,SLOT(colorChange()));
@@ -483,16 +507,21 @@ void SongSelectorAnalView::updateBacking()
 
 void SongSelectorAnalView::processChange()
 {
+  QString text="";
   switch(song_process->enabledState())
     {
-    case SongProcess::disabled: QCheckBox::setState(QCheckBox::Off); break;
-    case SongProcess::enabling: QCheckBox::setState(QCheckBox::NoChange); break;
-    case SongProcess::ok: QCheckBox::setState(QCheckBox::On); break;
+    case SongProcess::disabled:  QCheckBox::setState(QCheckBox::Off);      break;
+    case SongProcess::enabling:  text="Turning on ";
+                                 QCheckBox::setState(QCheckBox::NoChange); break;
+    case SongProcess::disabling: text="Turning off ";
+                                 QCheckBox::setState(QCheckBox::NoChange); break;
+    case SongProcess::ok:        QCheckBox::setState(QCheckBox::On);       break;
     default: assert(0);
     }
-  QString text = song_process->getText();
-  if (text.isEmpty())
-    text=song_process->getName();
+  if (song_process->getText().isEmpty())
+    text+=song_process->getName();
+  else
+    text+=song_process->getText();
   QCheckBox::setText(text);
   colorChange();
 }
@@ -500,6 +529,9 @@ void SongSelectorAnalView::processChange()
 float SongSelectorAnalView::relative_running_time()
 {
   float r = song_process->get_running_time();
+  float report_time = song_process->songs_per_second();
+  if (report_time==0) report_time=60;
+  else report_time=60/report_time;
   r/=report_time;
   if (r>1.0) r = 1.0;
   if (r<0) r = 1.0;
@@ -547,19 +579,27 @@ void SongSelectorPlayView::updateBacking()
 
 void SongSelectorPlayView::processChange()
 {
+  QString text="";
   switch(song_process->enabledState())
     {
-    case SongProcess::disabled: QCheckBox::setState(QCheckBox::Off);      break;
-    case SongProcess::enabling: QCheckBox::setState(QCheckBox::NoChange); break;
-    case SongProcess::ok:       QCheckBox::setState(QCheckBox::On);       break;
-    default:
-      assert(0);
+    case SongProcess::disabled:  QCheckBox::setState(QCheckBox::Off);      break;
+    case SongProcess::enabling:  text="Turning on ";
+                                 QCheckBox::setState(QCheckBox::NoChange); break;
+    case SongProcess::disabling: text="Turning off ";
+                                 QCheckBox::setState(QCheckBox::NoChange); break;
+    case SongProcess::ok:        QCheckBox::setState(QCheckBox::On);       break;
+    default: assert(0);
     }
-  QString text = song_process->getText();
-  if (text.isEmpty())
-    text=song_process->getName();
-  QCheckBox::setText(text);
   Song * song = song_process->getSong();
+  if (song_process->getText().isEmpty())
+    text+=song_process->getName();
+  else
+    {
+      if (song && song->get_tempo().valid())
+	text+=QString::number(((int)(song->get_tempo().tempo*100))/100.0)+" ";
+      text+=song_process->getText();
+    }
+  QCheckBox::setText(text);
   QColor color;
   if (song) color = song->get_color();
   else color.setHsv(0,0,128);

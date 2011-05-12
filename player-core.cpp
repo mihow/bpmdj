@@ -1,5 +1,5 @@
 /****
- BpmDj v3.6: Free Dj Tools
+ BpmDj v3.8: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -37,6 +37,8 @@ using namespace std;
 #include <sys/times.h>
 #include <math.h>
 #include <qdialog.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include "player-core.h"
 #include "memory.h"
 #include "scripts.h"
@@ -99,8 +101,25 @@ unsigned4 wave_bufferpos=wave_bufsize;
 
 static int writer = -1;
 static int writing = false;
+
+/**
+ * Bug# 975: the jackd daemon seems to spawn its own processes
+ * To make sure that we retrieve the proper signal from the 
+ * process _we_ wanted to spawn, we retrieve the signal info
+ */
 void writer_died(int sig, siginfo_t *info, void* hu)
 {
+  if (!info) 
+    printf("No info available for signal %d\nAssuming writer process\n",sig);
+  else
+    {
+      int blah;
+      waitpid(info->si_pid,&blah,0);
+      // if the process id is different then 
+      // we want to ignore the current state
+      if (info->si_pid!=writer) return;
+    }
+  
   char newstr[80];
   // now we have the complete length of the file...
   // if it differs from the length in the .ini file we update it

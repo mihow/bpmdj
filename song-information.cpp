@@ -1,5 +1,5 @@
 /****
- BpmDj v3.6: Free Dj Tools
+ BpmDj v3.8: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -48,7 +48,7 @@ void SongInformation::on_save_clicked()
     showing->meta_changed = true; }
 
   if (!showing) return;
-  printf("Savind an index file\n");
+  // printf("Saving an index file\n");
   field2this(title, title);
   field2this(author, author);
   field2this(remix, remix);

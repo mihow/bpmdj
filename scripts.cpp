@@ -1,5 +1,5 @@
 /****
- BpmDj v3.6: Free Dj Tools
+ BpmDj v3.8: Free Dj Tools
  Copyright (C) 2001-2009 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -180,6 +180,16 @@ void Info(const char* script, ...)
   vsprintf(toexecute,script,ap);
   va_end(ap);
   Log("Information: ", toexecute);
+};
+
+void Warning(const char* script, ...)
+{
+  char toexecute[1024];
+  va_list ap;
+  va_start(ap,script);
+  vsprintf(toexecute,script,ap);
+  va_end(ap);
+  Log("Warning: ", toexecute);
 };
 
 void Debug(const char* script, ...)
