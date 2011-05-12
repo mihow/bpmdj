@@ -1,4 +1,4 @@
-VERSION = 2.8
+VERSION = 2.9
 DESTDIR = /usr/local/
 #TIME = /usr/bin/time -f ' '\[%e\]
 #ECHO = echo -n 
@@ -10,13 +10,15 @@ CP = cp
 MV = mv
 TAR = tar
 MKDIR = mkdir
+AR = ar
 
 include defines
 
 UIS = ${shell ls *.ui}
 LINK = $(TIME) $(CPP) $(LDFLAGS) $(QT_INCLUDE_PATH) $(QT_LIBRARY_PATH) $(QT_LIBS)
+LINKQ0 = $(TIME) $(CPP) $(LDFLAGS) 
 
-bin: kbpm-play kbpm-dj kbpm-merge kbpm-mix kbpm-batch 
+bin: kbpm-play kbpm-dj kbpm-merge kbpm-mix bpmcount
 
 #############################################################################
 # Rules
@@ -24,6 +26,18 @@ bin: kbpm-play kbpm-dj kbpm-merge kbpm-mix kbpm-batch
 %.o: %.c
 	@$(ECHO) "   [cc] "$@
 	@$(TIME) $(CC) -c $< $(CFLAGS) -o $@
+
+%-ogg.o: %.ogg
+	@$(ECHO) "  [obj] "$@
+	@$(TIME) objcopy -I binary -B i386 -O elf32-i386 \
+		--rename-section .data=.rodata,alloc,load,readonly,data,contents \
+		 $< $@
+
+%-png.o: %.png
+	@$(ECHO) "  [obj] "$@
+	@$(TIME) objcopy -I binary -B i386 -O elf32-i386 \
+		--rename-section .data=.rodata,alloc,load,readonly,data,contents \
+		 $< $@
 
 %.dvi: %.tex
 	$(LATEX) $<
@@ -43,7 +57,7 @@ bin: kbpm-play kbpm-dj kbpm-merge kbpm-mix kbpm-batch
 
 %.o: %.cpp
 	@$(ECHO) "  [c++] "$@
-	@$(TIME) $(CPP) -c $< $(CFLAGS) -o $@ $(QT_INCLUDE_PATH)
+	@$(TIME) $(CPP) -c $< $(CFLAGS) -fno-implicit-templates -o $@ $(QT_INCLUDE_PATH)
 
 %.cpp: %.ui
 	@$(ECHO) "  [uic] "$@
@@ -74,15 +88,15 @@ clean:
 	@$(RM) scanningprogress.h scanningprogress.cpp kbpm-merge
 	@$(RM) songselector.h songselector.cpp edit.cpp
 	@$(RM) about.h about.cpp legende.h legende.cpp duploc-dialog.h
-	@$(RM) loader.h loader.cpp choose-analyzers.cpp duploc-dialog.cpp
+	@$(RM) loader.h loader.cpp duploc-dialog.cpp
 	@$(RM) compacter.h compacter.cpp spectrumanalyzer.cpp
 	@$(RM) merger-dialog.h merger-dialog.cpp songproperties.h
 	@$(RM) preferences.h preferences.cpp tempolineanalyzer.cpp
 	@$(RM) profile-clock process_bpm.sh process_spectrum.sh analyze.sh
-	@$(RM) renamer.h renamer.cpp choose-analyzers.h spectrumanalyzer.h
+	@$(RM) renamer.h renamer.cpp spectrumanalyzer.h
 	@$(RM) similars.h similars.cpp song-information.h edit.h
 	@$(RM) playercommandwizard.h pattern-analyzer.h impulseanalyzer.h 
-	@$(RM) choose-analyers.h tempolineanalyzer.h
+	@$(RM) tempolineanalyzer.h
 	@$(RM) -r kbpmdj-$(VERSION) kbpm-mix
 	@$(RM) -r beatmixing version.h
 
@@ -95,16 +109,16 @@ mrproper: clean temp_files
 .PHONY: website all clean files
 
 files:
-	echo " [file] list"
-	rm -r tmp 2>/dev/null; exit 0
-	find . -iname "*" | grep -v ^\./index | grep -v ^\./music > existing_files # list of existing files
-	grep \  existing_files > problem_files; exit 0 # problematic files
-	test ! -s problem_files
-	gawk '{print $$1}' files >known_files # list of known files
-	grep -vxFf known_files existing_files >unknown_files; exit 0 # unknown files
-	gawk '{print $$1"  ---"}' unknown_files >>files # attach these to the files
-	gawk '{if ($$2=="---") print $1}' files >untagged_files; exit 0 # find files missing tags
-	if test -s untagged_files; then cat untagged_files; exit 1; fi
+	@echo " [file] list"
+	@rm -r tmp 2>/dev/null; exit 0
+	@find . -iname "*" | grep -v ^\./index | grep -v ^\./music > existing_files # list of existing files
+	@grep \  existing_files > problem_files; exit 0 # problematic files
+	@test ! -s problem_files
+	@gawk '{print $$1}' files >known_files # list of known files
+	@grep -vxFf known_files existing_files >unknown_files; exit 0 # unknown files
+	@gawk '{print $$1"  ---"}' unknown_files >>files # attach these to the files
+	@gawk '{if ($$2=="---") print $1}' files >untagged_files; exit 0 # find files missing tags
+	@if test -s untagged_files; then cat untagged_files; exit 1; fi
 
 source_files: files
 	@echo " [file] source"
@@ -163,11 +177,10 @@ check-doc: bpmdj-doc.tgz
 	@cd tmp/documentation; for a in *.png; do echo -n $$a "  :::"; grep -c $$a all; done  >../../count
 	@grep :::0 count >bpmdj-doc-errors.txt; exit 0
 	@echo " [test] widowed links"
-	@linkchecker -s -r -1 tmp/documentation/index.html -ohtml >bpmdj-doc-errors.html
-	@sed 's/\/tmp\//\//' bpmdj-doc-errors.html >bpmdj-doc-errors2.html
+	@linklint -root tmp/documentation /@ 2>>bpmdj-doc-errors.txt
 	@echo "[clean] reactor"
 	@rm -r tmp
-	@test ! -s bpmdj-doc-errors.txt
+	@test -s bpmdj-doc-errors.txt
 	@echo ============================================================
 
 check: check-bin check-doc
@@ -214,11 +227,14 @@ tgz: source.tgz-dist doc.tgz-dist bin.tgz-dist bpmdj-support.tgz
 website: 
 	rsync -e ssh -xavz documentation/* krubbens@bpmdj.sourceforge.net:/home/groups/b/bp/bpmdj/htdocs/
 
-nancy: nens
+test_others: kbpm-play
+	scp kbpm-play root@tnm:
+	scp kbpm-play werner@orbit:
+	scp bpmdj-raw root@tnm:	     
+	scp bpmdj-raw werner@orbit:
+
 nens:	
-	tar -cvzf index.tgz index
-	scp index.tgz root@orbit:/home/nens/; exit 0
-	mv index.tgz ..
+	@~/Administration/bpmdj-to-nens
 
 #############################################################################
 # Dependencies
@@ -243,25 +259,25 @@ KPLAY_OBJECTS = avltree.o about.o aboutbox.o about.moc.o power-type.o\
 	songplayer.o songplayer.moc.o memory.o sample4-type.o\
 	player-core.o dsp-oss.o dsp-alsa.o dsp-none.o dsp-mixed.o\
 	dsp-drivers.o spectrum-type.o files.o smallhistogram-type.o\
-	song-information.o song-information.moc.o\
-	index.o kbpm-play.o analyzer.o signals.o echo-property.o\
-	composition-property.o rythm-property.o \
-	songplayer.logic.o songplayer.logic.moc.o\
+	song-information.o song-information.moc.o pca.o capacity.o\
+	index.o kbpm-play.o analyzer.o signals.o player-config.o\
+	types.o signals-template.o\
+	songplayer.logic.o songplayer.logic.moc.o capacity-widget.o capacity-widget.moc.o \
 	md5-analyzer.o efence.o page.o efence-print.o energy-analyzer.o\
 	bpmcounter.o bpmcounter.moc.o bpm-analyzer.logic.o bpm-analyzer.logic.moc.o\
 	spectrum-analyzer.o  spectrum-analyzer.moc.o  spectrum-analyzer.logic.o  spectrum-analyzer.logic.moc.o\
 	beatgraph-widget.o beatgraph-widget.moc.o beatgraph-analyzer.logic.o beatgraph-analyzer.logic.moc.o\
 	rythm-analyzer.o     rythm-analyzer.moc.o     rythm-analyzer.logic.o     rythm-analyzer.logic.moc.o\
 	fourierd.o histogram-type.o histogram-property.o fftmisc.o common.o\
-	scripts.o
+	scripts.o bpm.o
+
+BPM_LIB = bpm.o memory.o	
+BPMCOUNT_OBJECTS = bpmcount.o files.o signals.o fourierd.o fftmisc.o bpm.a
 
 KMIX_OBJECTS = mixerdialog.o mixerdialog.moc.o mixerdialog.logic.o mixerdialog.logic.moc.o\
-	kbpm-mix.o dsp-oss.o dsp-alsa.o dsp-none.o memory.o dsp-drivers.o files.o\
-	efence.o page.o efence-print.o fourierd.o signals.o spectrum-type.o fftmisc.o 
-
-KLIFE_OBJECTS = kbpm-life.o bpm-life.o bpm-life.moc.o\
-	memory.o files.o\
-	efence.o page.o efence-print.o fourierd.o signals.o spectrum-type.o fftmisc.o 
+	kbpm-mix.o dsp-oss.o dsp-alsa.o dsp-none.o memory.o dsp-drivers.o files.o \
+	efence.o page.o efence-print.o fourierd.o signals.o spectrum-type.o fftmisc.o \
+	types.o dsp-mixed-none.o player-config.o scripts.o
 
 KCOUNT_OBJECTS = bpmcounter.o bpmcounter.moc.o\
 	index.o kbpm-count.o kbpm-count.moc.o\
@@ -278,16 +294,17 @@ UNPHASER_OBJECTS = unphaser.o common.o fourierd.o fftmisc.o
 avltree-test:
 	g++ -pg -g avltree-test.cpp
 
-KSEL_OBJECTS = 	avltree.o songtree.o qstring-factory.o tags.o aboutbox.o\
-	renamerstart.o renamerstart.moc.o heap.o echo-property.o pixmap-cache.o \
+KSEL_OBJECTS = 	avltree.o songtree.o qstring-factory.o tags.o aboutbox.o \
+	logo-png.o capacity.o capacity-widget.o capacity-widget.moc.o\
+	renamerstart.o renamerstart.moc.o heap.o pixmap-cache.o \
 	spectrum-type.o scripts.o cluster.o pca.o about.o about.moc.o\
 	loader.o loader.moc.o compacter.o compacter.moc.o histogram-type.o\
 	qvectorview.o qvectorview.moc.o freq-mapping.o freq-mapping.moc.o\
 	albumbox.o albumbox.moc.o compact-idx.o memory.o histogram-property.o\
-	smallhistogram-type.o composition-property.o rythm-property.o \
-	song-information.o song-information.moc.o sample4-type.o\
-	scanningprogress.o scanningprogress.moc.o power-type.o\
-	choose-analyzers.o choose-analyzers.moc.o basic-process-manager.o\
+	smallhistogram-type.o types.o\
+	song-information.o song-information.moc.o sample4-type.o embedded-files.o\
+	scanningprogress.o scanningprogress.moc.o power-type.o analyzers-manager.o\
+	basic-process-manager.o analcommandwizard.o analcommandwizard.moc.o\
 	database.o dirscanner.o importscanner.o efence.o page.o efence-print.o\
 	songselector.o songselector.moc.o songselector.logic.o songselector.logic.moc.o\
 	process-manager.o playercommandwizard.o playercommandwizard.moc.o\
@@ -297,20 +314,13 @@ KSEL_OBJECTS = 	avltree.o songtree.o qstring-factory.o tags.o aboutbox.o\
 	setupwizard.moc.o setupwizard.o kbpm-dj.o edit-distance.o\
 	renamer.o renamer.moc.o renamer.logic.o renamer.logic.moc.o\
 	similars.o similars.moc.o similarscanner.o similarscanner.moc.o\
-	config.o merger-dialog.o merger-dialog.moc.o common.o\
+	config.o merger-dialog.o merger-dialog.moc.o common.o installbpmplay.o installbpmplay.moc.o\
 	song-statistics.o statistics.o statistics.moc.o song-metric.o \
-	metric-widget.o metric-widget.moc.o cluster-dialog.o cluster-dialog.moc.o
-
-KBATCH_OBJECTS = scripts.o memory.o \
-	analyzers-manager.o analyzers-progress.o analyzers-progress.logic.o\
-	analyzers-progress.moc.o analyzers-progress.logic.moc.o\
-	sample4-type.o histogram-property.o histogram-type.o\
-	power-type.o files.o signals.o index.o fourierd.o spectrum-type.o\
-	basic-process-manager.o song-information.o song-information.moc.o \
-	efence.o page.o efence-print.o fftmisc.o\
-	kbpm-batch.o common.o
+	metric-widget.o metric-widget.moc.o cluster-dialog.o cluster-dialog.moc.o \
+	log-viewer.o log-viewer.moc.o log-viewer.logic.o log-viewer.logic.moc.o
 
 MERGER_OBJECTS = merger.o index.o common.o scripts.o song-information.o song-information.moc.o\
+	capacity.o capacity-widget.o capacity-widget.moc.o types.o player-config.o\
 	efence.o page.o efence-print.o memory.o sample4-type.o power-type.o spectrum-type.o \
 	signals.o fourierd.o fftmisc.o files.o histogram-property.o histogram-type.o
 
@@ -332,17 +342,17 @@ kbpm-play: $(KPLAY_OBJECTS)
 	@$(ECHO) " [link] "$@
 	@$(LINK) $(KPLAY_OBJECTS) -o kbpm-play
 
+bpmcount: $(BPMCOUNT_OBJECTS)
+	@$(ECHO) " [link] "$@
+	@$(LINKQ0) $(BPMCOUNT_OBJECTS) -o bpmcount
+
 kbpm-mix: $(KMIX_OBJECTS)
 	@$(ECHO) " [link] "$@
 	@$(LINK) $(KMIX_OBJECTS) -o kbpm-mix
 
-kbpm-life: $(KLIFE_OBJECTS)
-	@$(ECHO) " [link] "$@
-	@$(LINK) $(KLIFE_OBJECTS) -o kbpm-life
-
-kbpm-batch: $(KBATCH_OBJECTS)
-	@$(ECHO) " [link] "$@
-	@$(LINK) $(KBATCH_OBJECTS) -o kbpm-batch
+bpm.a:  $(BPM_LIB)
+	@$(ECHO) "   [ar] "$@
+	@$(AR) r $@ $(BPM_LIB) >/dev/null 2>/dev/null 
 
 vector-view: $(VECTOR_OBJECTS)
 	@$(ECHO) " [link] "$@

@@ -22,14 +22,41 @@
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>
-#include "index.h"
+#include <qdialog.h>
 #include <ctype.h>
+#include "index.h"
 #include "unistd.h"
 #include "common.h"
 #include "memory.h"
 #include "scripts.h"
 #include "version.h"
+#include "player-config.h"
+#include "histogram-property.cpp"
+#include "smallhistogram-type.cpp"
+#include "signals-template.cpp"
 
+/*-------------------------------------------
+ *         Templates we need
+ *-------------------------------------------*/
+
+// types
+template class smallhistogram_type<32>;
+template class smallhistogram_type<96>;
+template class histogram_property<32>;
+template class histogram_property<96>;
+
+// signals
+template double normalize_abs_max<double>(double*, long);
+template double find_abs_max<double>(double*, long);
+
+/*-------------------------------------------
+ *         Vars
+ *-------------------------------------------*/
+PlayerConfig * config;      // will be the standard configuration
+
+/*-------------------------------------------
+ *         BpmDj Merger
+ *-------------------------------------------*/
 void options_failure(char* err)
 {
   printf("BpmDj Merger v%s, Copyright (c) 2001-2005 Werner Van Belle\n",VERSION);
@@ -374,6 +401,9 @@ bool createFiles(char* a, char* b)
   Index idx_b(b);
   filename_b = strdup(idx_b.get_filename());
   period_b = period_to_quad(idx_b.get_period());
+
+  set_decoder_environment(config,&idx_b);
+  
   printf("Decoding %s\n",b);
   if (!vexecute(CREATERAW_CMD,"./",filename_b))
     exit(100);
@@ -382,9 +412,9 @@ bool createFiles(char* a, char* b)
   
   if (normalize)
     normalize_file();
-
+  
   Index idx_a(a);
-
+  
   period_a = period_to_quad(idx_a.get_period());
   
   file_a=fopen(BPMMIXED_NAME,"r+b");
@@ -779,6 +809,9 @@ int main(int argc, char* argv[])
 {
   openlog();
   process_options(argc,argv);
+  config = new PlayerConfig();
+  assert(config);
+  
   // essentially two seperate behaviors are offered by the program
   // the first is to merge 2 songs together
   // the second is to split one large song in seperate pieces

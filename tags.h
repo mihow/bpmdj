@@ -39,7 +39,7 @@ class Tag2Index: public Node<QString>
 class Tags
 {
   private:
-    static AvlTree      <QString> tree;
+    static AvlTree   <QString> tree;
     static QString   find_tag(tag_type tag);
     static tag_type  add_tag(QString tag);
   public:

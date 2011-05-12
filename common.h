@@ -32,6 +32,6 @@ double atod(const char* str);
 int    clip(int val);
 inline bool option(char* arg, char* name) { return strcmp(arg,name)==0; };
 inline bool option(char* arg, char* namea, char* nameb) { return (strcmp(arg,namea)==0 || strcmp(arg,nameb)==0); };
-char *  tohex(long i);
-long    toint(const char* name);
+char * tohex(long i);
+long   toint(const char* name);
 #endif

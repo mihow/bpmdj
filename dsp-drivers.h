@@ -21,6 +21,7 @@
 #define DSP_DRIVERS
 #include "common.h"
 #include "stereo-sample2.h"
+#include "player-config.h"
 #ifndef COMPILE_OSS
 #ifndef COMPILE_ALSA
 #error -------------------------------------------
@@ -31,6 +32,11 @@
 #endif
 
 /*-------------------------------------------
+ *         Forward
+ *-------------------------------------------*/
+class PlayerConfig;
+
+/*-------------------------------------------
  *         Dsp operations
  *-------------------------------------------*/
 class dsp_driver
@@ -39,15 +45,17 @@ class dsp_driver
   bool verbose;
  public:
   // playing
-  dsp_driver() { verbose = false; };
+  dsp_driver(const PlayerConfig & config) { verbose = false; };
   virtual void start() = 0;
   virtual void pause() = 0;
   virtual void write(stereo_sample2 value) = 0;
   virtual signed8 latency() = 0;
   virtual int  open() = 0;
   virtual void close() = 0;
-  // options
-  virtual int parse_option(char* option, char* argument);
+  virtual bool is_none() {return false; };
+  virtual ~dsp_driver() {};
+  static dsp_driver * get_driver(PlayerConfig * cfg);
 };
+
 
 #endif

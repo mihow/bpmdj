@@ -22,18 +22,30 @@
 #include "dirscanner.h"
 #include "renamer.h"
 
+class RenamerChangesFilename
+{
+ public:
+  RenamerChangesFilename() {};
+  virtual ~RenamerChangesFilename() {};
+  virtual bool shouldFilenameBeExcluded(QString name) = 0;
+  virtual void filenameChanged(QString from, QString to) = 0;
+};
+
 class RenamerLogic: 
   public Renamer, 
   public DirectoryScanner
 {
    Q_OBJECT
  public:
-   RenamerLogic(QWidget* parent=0, const QString name=0);
+   RenamerLogic(QWidget* parent, RenamerChangesFilename * rcf);
+   virtual ~RenamerLogic();
    void add(const QString name, const QString pos);
+   virtual void scan(const QString dirname);
  protected:
    virtual void checkfile(const QString fullname, const QString filename);
    virtual bool matchextension(const QString filename);
  private:
+   RenamerChangesFilename * inform;
    QString smallCapsInWord(QString in);
    QString capitalizeAfterSpace(QString in);
    QString removeSpaces(QString in);

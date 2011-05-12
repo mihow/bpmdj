@@ -46,9 +46,9 @@
             </property>
             <property name="paletteBackgroundColor">
                 <color>
-                    <red>170</red>
+                    <red>152</red>
                     <green>255</green>
-                    <blue>127</blue>
+                    <blue>104</blue>
                 </color>
             </property>
             <property name="palette">
@@ -60,34 +60,34 @@
                             <blue>255</blue>
                         </color>
                         <color>
-                            <red>170</red>
+                            <red>152</red>
                             <green>255</green>
-                            <blue>127</blue>
+                            <blue>104</blue>
                         </color>
                         <color>
-                            <red>255</red>
+                            <red>239</red>
+                            <green>255</green>
+                            <blue>231</blue>
+                        </color>
+                        <color>
+                            <red>195</red>
+                            <green>255</green>
+                            <blue>167</blue>
+                        </color>
+                        <color>
+                            <red>76</red>
                             <green>127</green>
-                            <blue>191</blue>
+                            <blue>52</blue>
                         </color>
                         <color>
-                            <red>255</red>
-                            <green>63</green>
-                            <blue>159</blue>
+                            <red>101</red>
+                            <green>170</green>
+                            <blue>69</blue>
                         </color>
                         <color>
-                            <red>127</red>
+                            <red>0</red>
                             <green>0</green>
-                            <blue>64</blue>
-                        </color>
-                        <color>
-                            <red>170</red>
-                            <green>0</green>
-                            <blue>85</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>255</green>
-                            <blue>255</blue>
+                            <blue>0</blue>
                         </color>
                         <color>
                             <red>255</red>
@@ -100,9 +100,9 @@
                             <blue>0</blue>
                         </color>
                         <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>0</blue>
+                            <red>255</red>
+                            <green>255</green>
+                            <blue>255</blue>
                         </color>
                         <color>
                             <red>0</red>
@@ -115,56 +115,66 @@
                             <blue>0</blue>
                         </color>
                         <color>
+                            <red>255</red>
+                            <green>221</green>
+                            <blue>118</blue>
+                        </color>
+                        <color>
+                            <red>3</red>
+                            <green>3</green>
+                            <blue>3</blue>
+                        </color>
+                        <color>
                             <red>0</red>
+                            <green>0</green>
+                            <blue>192</blue>
+                        </color>
+                        <color>
+                            <red>128</red>
                             <green>0</green>
                             <blue>128</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>255</green>
-                            <blue>255</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>0</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>0</blue>
                         </color>
                     </active>
                     <disabled>
                         <color>
-                            <red>128</red>
-                            <green>128</green>
-                            <blue>128</blue>
-                        </color>
-                        <color>
-                            <red>170</red>
+                            <red>255</red>
                             <green>255</green>
-                            <blue>127</blue>
+                            <blue>255</blue>
                         </color>
                         <color>
-                            <red>255</red>
+                            <red>152</red>
+                            <green>255</green>
+                            <blue>104</blue>
+                        </color>
+                        <color>
+                            <red>239</red>
+                            <green>255</green>
+                            <blue>231</blue>
+                        </color>
+                        <color>
+                            <red>178</red>
+                            <green>255</green>
+                            <blue>142</blue>
+                        </color>
+                        <color>
+                            <red>76</red>
                             <green>127</green>
-                            <blue>191</blue>
+                            <blue>52</blue>
+                        </color>
+                        <color>
+                            <red>101</red>
+                            <green>170</green>
+                            <blue>69</blue>
+                        </color>
+                        <color>
+                            <red>194</red>
+                            <green>194</green>
+                            <blue>194</blue>
                         </color>
                         <color>
                             <red>255</red>
-                            <green>38</green>
-                            <blue>147</blue>
-                        </color>
-                        <color>
-                            <red>127</red>
-                            <green>0</green>
-                            <blue>64</blue>
-                        </color>
-                        <color>
-                            <red>170</red>
-                            <green>0</green>
-                            <blue>85</blue>
+                            <green>255</green>
+                            <blue>255</blue>
                         </color>
                         <color>
                             <red>128</red>
@@ -175,16 +185,6 @@
                             <red>255</red>
                             <green>255</green>
                             <blue>255</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>0</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>0</blue>
                         </color>
                         <color>
                             <red>0</red>
@@ -224,34 +224,34 @@
                             <blue>255</blue>
                         </color>
                         <color>
-                            <red>170</red>
+                            <red>152</red>
                             <green>255</green>
-                            <blue>127</blue>
+                            <blue>104</blue>
                         </color>
                         <color>
-                            <red>255</red>
+                            <red>239</red>
+                            <green>255</green>
+                            <blue>231</blue>
+                        </color>
+                        <color>
+                            <red>178</red>
+                            <green>255</green>
+                            <blue>142</blue>
+                        </color>
+                        <color>
+                            <red>76</red>
                             <green>127</green>
-                            <blue>191</blue>
+                            <blue>52</blue>
                         </color>
                         <color>
-                            <red>255</red>
-                            <green>38</green>
-                            <blue>147</blue>
+                            <red>101</red>
+                            <green>170</green>
+                            <blue>69</blue>
                         </color>
                         <color>
-                            <red>127</red>
+                            <red>0</red>
                             <green>0</green>
-                            <blue>64</blue>
-                        </color>
-                        <color>
-                            <red>170</red>
-                            <green>0</green>
-                            <blue>85</blue>
-                        </color>
-                        <color>
-                            <red>255</red>
-                            <green>255</green>
-                            <blue>255</blue>
+                            <blue>0</blue>
                         </color>
                         <color>
                             <red>255</red>
@@ -264,29 +264,29 @@
                             <blue>0</blue>
                         </color>
                         <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>0</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>0</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>0</blue>
-                        </color>
-                        <color>
-                            <red>0</red>
-                            <green>0</green>
-                            <blue>128</blue>
-                        </color>
-                        <color>
                             <red>255</red>
                             <green>255</green>
                             <blue>255</blue>
+                        </color>
+                        <color>
+                            <red>0</red>
+                            <green>0</green>
+                            <blue>0</blue>
+                        </color>
+                        <color>
+                            <red>0</red>
+                            <green>0</green>
+                            <blue>0</blue>
+                        </color>
+                        <color>
+                            <red>255</red>
+                            <green>221</green>
+                            <blue>118</blue>
+                        </color>
+                        <color>
+                            <red>3</red>
+                            <green>3</green>
+                            <blue>3</blue>
                         </color>
                         <color>
                             <red>0</red>
@@ -727,7 +727,6 @@ werner.van.belle@itek.norut.no
 FFT-code :  Don Cross (dcross@intersrv.com)
 PCA-code : F. Murtagh (murtagh@scivax.stsci.edu)
 BPM-code : W. Van Belle (werner.van.belle@itek.norut.no)
-Old Makefiles : Thomas Steudten (thomas@steudten.com)
 Meta import filter : Tom Vogt (tom@lemuria.org)
 Electric Fence : Bruce Perens (bruce@pixar.com)</string>
                         </property>
@@ -766,6 +765,7 @@ Electric Fence : Bruce Perens (bruce@pixar.com)</string>
                         <property name="text">
                             <string>(c) Werner Van Belle  2001-2005
 e-mail: werner.van.belle@itek.norut.no
+werner@onlinux.be
 
 http://bpmdj.sourceforge.net/</string>
                         </property>
@@ -824,7 +824,6 @@ http://bpmdj.sourceforge.net/</string>
                         <property name="font">
                             <font>
                                 <family>Helvetica</family>
-                                <pointsize>14</pointsize>
                             </font>
                         </property>
                         <property name="text">

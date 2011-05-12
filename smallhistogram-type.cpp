@@ -27,9 +27,15 @@
 #include "signals.h"
 #include "files.h"
 
+template <int smallhistogram_size> void smallhistogram_type<smallhistogram_size>::validate_scale()
+{
+  if (isnan(scale) || isinf(scale))
+    scale = 0;
+}
+
 template <int smallhistogram_size> void smallhistogram_type<smallhistogram_size>::init(histogram_type * other)
 {
-  scale = other->scale;
+  set_scale(other->scale);
   if (other->count<smallhistogram_size)
     {
       for(int i = 0 ; i < other->count; i++)
@@ -69,6 +75,7 @@ template <int smallhistogram_size> void smallhistogram_type<smallhistogram_size>
   char * cur;
   char * nxt;
   scale = strtof(str,&cur);
+  validate_scale();
   int count = strtol(cur,&nxt,10);
   cur=nxt;
   if (count>smallhistogram_size) 
@@ -95,12 +102,14 @@ template <int smallhistogram_size> const void smallhistogram_type<smallhistogram
 template <int smallhistogram_size> void smallhistogram_type<smallhistogram_size>::read_bib_v271()
 {
   scale = buffer_float4();
+  validate_scale();
   buffer_sequence(bin,smallhistogram_size);
 }
 
 template <int smallhistogram_size> void smallhistogram_type<smallhistogram_size>::read_bib_v272()
 {
   scale = buffer_float4();
+  validate_scale();
   int count = buffer_unsigned1();
   assert(count>=0);
   buffer_sequence(bin,count);

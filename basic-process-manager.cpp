@@ -19,13 +19,7 @@
 
 #include <unistd.h>
 #include <dirent.h>
-#include <qmessagebox.h>
 #include <ctype.h>
-#include <qdir.h>
-#include <qfiledialog.h>
-#include <qmultilineedit.h>
-#include <qlineedit.h>
-#include <qcheckbox.h>
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -36,57 +30,97 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
-#include <libgen.h>
-#include "preferences.h"
-#include "about.h"
-#include "songselector.logic.h"
 #include "history.h"
-#include "version.h"
-#include "kbpm-dj.h"
 #include "basic-process-manager.h"
-#include "config.h"
 #include "scripts.h"
 #include "memory.h"
+#include "growing-array.h"
 
-BasicProcessManager* processManager = NULL;
+/**
+ * The died processes class keeps track of all processes which returned
+ * a status. Data can be set only by the signal handler, while data
+ * can be cleared only by a process manager. This ensures no concurrency
+ * problems.
+ */
+#define MAX_PROCESSES (50)
+class DiedProcesses
+{
+public:
+  int died_pids[MAX_PROCESSES];
+  GrowingArray<BasicProcessManager*> *listeners;
+  bool sigs_installed;
+  void init(BasicProcessManager * l);
+  void check();
+  DiedProcesses() : sigs_installed(false) {};
+  ~DiedProcesses() {};
+};
+
+void DiedProcesses::check()
+{
+  if (!sigs_installed) return;
+  int tmp;
+  for(int i = 0 ; i < MAX_PROCESSES ; i ++)
+    {
+      tmp=died_pids[i];
+      if (tmp!=-1)
+	{
+	  died_pids[i]=-1;
+	  for(int i = 0 ; i < listeners->count ; i++)
+	    {
+	      BasicProcessManager * listener = listeners->elements[i];
+	      listener->processDied(tmp);
+	    }
+	}
+    }
+}
+
+static DiedProcesses dead_processes;
 
 void ToSwitchOrNotToSwitchSignal(int sig, siginfo_t *info, void* hu)
 {
   int blah;
   waitpid(info->si_pid,&blah,0);
-  for(int i = 0 ; i < 4 ; i ++)
-    if (processManager->died_pids[i]==-1)
+  // grmpf ! error here !!!
+  for(int i = 0 ; i < MAX_PROCESSES ; i ++)
+    if (dead_processes.died_pids[i]==-1)
       {
-	processManager->died_pids[i] = info->si_pid;
+	dead_processes.died_pids[i] = info->si_pid;
 	return;
       }
   printf("Warning: not enough place to store died pids\n");
 }
 
-BasicProcessManager::BasicProcessManager(int count, ProcessChanged* lis)
+
+void DiedProcesses::init(BasicProcessManager * l)
 {
- // the process manager is a singleton
-  assert(processManager==NULL);
-  assert(lis);
-  processManager = this;
-  listener = lis;
+  if (!sigs_installed)
+    {
+      sigs_installed = true;
+      listeners = new GrowingArray<BasicProcessManager*>();
+      // clear the dead array
+      for(int i = 0 ; i < MAX_PROCESSES ; i ++)
+	died_pids[i]=-1;
+      // catch signals
+      struct sigaction *act;
+      act=allocate(1,struct sigaction);
+      act->sa_sigaction=ToSwitchOrNotToSwitchSignal;
+      act->sa_flags=SA_SIGINFO;
+      sigaction(SIGUSR1,act,NULL);
+      // ignore sigchlds
+      // signal(SIGCHLD,SIG_IGN);
+    };
+  listeners->add(l);
+}
+
+BasicProcessManager::BasicProcessManager(int count)
+{
+  // the process manager is a singleton
+  dead_processes.init(this);
   // initialise fields
   pid_count = count;
   active_pids = allocate(count,int);
-  died_pids = allocate(count,int);
-  for(int i = 0 ; i < pid_count ; i ++)
-    {
-      died_pids[i]=-1;
-      active_pids[i]=0;
-    }
-  // catch signals
-  struct sigaction *act;
-  act=allocate(1,struct sigaction);
-  act->sa_sigaction=ToSwitchOrNotToSwitchSignal;
-  act->sa_flags=SA_SIGINFO;
-  sigaction(SIGUSR1,act,NULL);
-  // ignore sigchlds
-  // signal(SIGCHLD,SIG_IGN);
+  for(int i = 0 ; i < count ; i ++)
+    active_pids[i]=0;
 };
 
 void BasicProcessManager::processDied(int pid)
@@ -97,23 +131,13 @@ void BasicProcessManager::processDied(int pid)
 	clearId(i);
 	return;
       }
-  printf("Warning: a process died which I didn't know\n");
+  //  printf("Warning: a process died which I didn't know\n");
   // assert(0);
 }
 
 void BasicProcessManager::checkSignals()
 {
-  int tmp;
-  for(int i = 0 ; i < pid_count ; i ++)
-    {
-      tmp=died_pids[i];
-      // printf("%d: Died %d,  Active %d\n",i,tmp,active_pids[i]);
-      if (tmp!=-1)
-	{
-	  died_pids[i]=-1;
-	  processDied(tmp);
-	}
-    }
+  dead_processes.check();
 }
 
 void BasicProcessManager::clearId(int id)
@@ -121,13 +145,30 @@ void BasicProcessManager::clearId(int id)
   active_pids[id] = 0;
 }
 
-void BasicProcessManager::start(int id,const char* command)
+void BasicProcessManager::start(int id,const char* command, QString logname)
 {
-  // fork the command and once it exists stop immediatelly
+  QString final_command(command);
+  if (!logname.isEmpty())
+    {
+      QString fulllog = "/tmp/"+logname+".kbpmdj.log";
+      final_command+=QString(" >>")+fulllog+" 2>&1";
+      FILE * flog = fopen(fulllog,"wb");
+      assert(flog);
+      fprintf(flog,"%s\n%s\n\n",(const char*)logname,command);
+      fclose(flog);
+    }
+  
+  const char * tostart(final_command);
+  // fork the command and once it exits stop immediatelly 
   if (!(active_pids[id]=fork()))
     { 
-      execute(command);
+      // we first 
+      execute(tostart);
       kill(getppid(),SIGUSR1);
-      exit(0);
+      /**
+       * If we use exit instead of _exit our own static data structures
+       * will be destroyed !
+       */
+      _exit(0);
     }
 }

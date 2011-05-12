@@ -21,15 +21,21 @@
 #include <qfile.h>
 #include <qdatastream.h>
 #include <qspinbox.h>
+#include <qcombobox.h>
+#include <qlistbox.h>
 #include <qcheckbox.h>
 #include <stdlib.h>
 #include <qpushbutton.h>
+#include <qbuttongroup.h>
+#include <qmessagebox.h>
 #include "preferences.logic.h"
 #include "config.h"
 #include "song.h"
 #include "song-metric.h"
 #include "metric-widget.h"
 #include "kbpm-dj.h"
+#include "scripts.h"
+#include "magic.h"
 
 init_singleton_var(Config,file_count,int,1000);
 init_singleton_var(Config,yellowTime,int,120);
@@ -60,7 +66,6 @@ init_singleton_var(Config,playCommand1,QString,"");
 init_singleton_var(Config,playCommand2,QString,"");
 init_singleton_var(Config,playCommand3,QString,"");
 init_singleton_var(Config,playCommand4,QString,"");
-init_singleton_var(Config,tmp_directory,QString,"./");
 init_singleton_var(Config,mixer_command,QString,"");
 init_singleton_var(Config,record_command,QString,"");
 init_singleton_var(Config,replay_command,QString,"");
@@ -96,6 +101,17 @@ init_singleton_var(Config,distance_rythmweight,float,2.5);
 init_singleton_var(Config,distance_compositionweight,float,1.0);
 init_singleton_var(Config,max_songs,int,100);
 init_singleton_var(Config,color_unchecked,QColor,QColor(219,219,219));
+init_singleton_var(Config,analCommand1,QString,"");
+init_singleton_var(Config,analCommand2,QString,"");
+init_singleton_var(Config,analCommand3,QString,"");
+init_singleton_var(Config,analCommand4,QString,"");
+init_singleton_var(Config,analCommand5,QString,"");
+init_singleton_var(Config,analCommand6,QString,"");
+init_singleton_var(Config,analCommand7,QString,"");
+init_singleton_var(Config,analCommand8,QString,"");
+init_singleton_var(Config,anal_bpm_from,float,90);
+init_singleton_var(Config,anal_bpm_to,float,160);
+init_singleton_var(Config,anal_bpm_technique,int,1);
 
 /**
  * we don't open the mixer command because the program its normal 
@@ -130,6 +146,11 @@ void Config::save()
 {
   QFile f(".kbpmdj");
   f.open(IO_WriteOnly);
+  if (!f.isOpen() || !f.isWritable())
+    {
+      Error(true,"Configuration file \".kbpmdj\" cannot be opened for writing");
+      return;
+    }
   QDataStream s(&f);
   s << (Q_UINT16)MAGIC_NOW;
   s << (Q_UINT16)get_file_count();
@@ -158,7 +179,6 @@ void Config::save()
   s << get_distance_spectrumweight();
   s << (Q_INT8)get_limit_authornonplayed();
   s << (Q_INT8)get_shown_aboutbox();
-  s << get_tmp_directory();
   s << get_mixer_command();
   s << (Q_INT8)get_open_mixer();
   s << (Q_INT8)get_ask_mix();
@@ -222,6 +242,17 @@ void Config::save()
   s << (Q_UINT16)get_max_songs();
   // save pixmap if it is there
   s << get_color_unchecked();
+  s << get_analCommand1();
+  s << get_analCommand2();
+  s << get_analCommand3();
+  s << get_analCommand4();
+  s << get_analCommand5();
+  s << get_analCommand6();
+  s << get_analCommand7();
+  s << get_analCommand8();
+  s << get_anal_bpm_from();
+  s << get_anal_bpm_to();
+  s << (Q_UINT16)get_anal_bpm_technique();
 }
 
 void Config::load()
@@ -362,7 +393,7 @@ void Config::load()
 	  s >> fl; set_distance_spectrumweight(fl);
 	  s >> b; set_limit_authornonplayed(b);
 	  s >> b; set_shown_aboutbox(b);
-	  s >> str; set_tmp_directory(str);
+	  s >> str; 
 	  s >> str; set_mixer_command(str);
 	  s >> b; set_open_mixer(b);
 	}
@@ -394,7 +425,7 @@ void Config::load()
 	  s >> fl; set_distance_spectrumweight(fl);
 	  s >> b; set_limit_authornonplayed(b);
 	  s >> b; set_shown_aboutbox(b);
-	  s >> str; set_tmp_directory(str);
+	  s >> str; 
 	  s >> str; set_mixer_command(str);
 	  s >> b; set_open_mixer(b);
 	  s >> b; set_ask_mix(b);
@@ -428,7 +459,7 @@ void Config::load()
 	  s >> fl; set_distance_spectrumweight(fl);
 	  s >> b; set_limit_authornonplayed(b);
 	  s >> b; set_shown_aboutbox(b);
-	  s >> str; set_tmp_directory(str);
+	  s >> str; 
 	  s >> str; set_mixer_command(str);
 	  s >> b; set_open_mixer(b);
 	  s >> b; set_ask_mix(b);
@@ -465,7 +496,7 @@ void Config::load()
 	  s >> fl; set_distance_spectrumweight(fl);
 	  s >> b; set_limit_authornonplayed(b);
 	  s >> b; set_shown_aboutbox(b);
-	  s >> str; set_tmp_directory(str);
+	  s >> str; 
 	  s >> str; set_mixer_command(str);
 	  s >> b; set_open_mixer(b);
 	  s >> b; set_ask_mix(b);
@@ -546,7 +577,7 @@ void Config::load()
 	  s >> fl; set_distance_spectrumweight(fl);
 	  s >> b; set_limit_authornonplayed(b);
 	  s >> b; set_shown_aboutbox(b);
-	  s >> str; set_tmp_directory(str);
+	  s >> str; 
 	  s >> str; set_mixer_command(str);
 	  s >> b; set_open_mixer(b);
 	  s >> b; set_ask_mix(b);
@@ -629,7 +660,7 @@ void Config::load()
 	  s >> fl; set_distance_spectrumweight(fl);
 	  s >> b; set_limit_authornonplayed(b);
 	  s >> b; set_shown_aboutbox(b);
-	  s >> str; set_tmp_directory(str);
+	  s >> str; 
 	  s >> str; set_mixer_command(str);
 	  s >> b; set_open_mixer(b);
 	  s >> b; set_ask_mix(b);
@@ -718,7 +749,7 @@ void Config::load()
 	  s >> fl; set_distance_spectrumweight(fl);
 	  s >> b; set_limit_authornonplayed(b);
 	  s >> b; set_shown_aboutbox(b);
-	  s >> str; set_tmp_directory(str);
+	  s >> str; 
 	  s >> str; set_mixer_command(str);
 	  s >> b; set_open_mixer(b);
 	  s >> b; set_ask_mix(b);
@@ -780,6 +811,106 @@ void Config::load()
 	  s >> w; set_max_songs(w);
 	  s >> clr; set_color_unchecked(clr);
 	}
+      else if (magic == MAGIC_2_9)
+	{
+	  s >> w; set_file_count (w);
+	  s >> w; set_yellowTime (w);
+	  s >> w; set_orangeTime (w);
+	  s >> w; set_redTime (w);
+	  s >> w; set_filterBpm (w);
+	  s >> b; set_color_range(b);
+	  s >> b; set_color_played(b);
+	  s >> b; set_color_authorplayed(b);
+	  s >> b; set_color_ondisk(b);
+	  s >> b; set_color_cues(b);
+	  s >> b; set_color_dcolor(b);
+	  s >> b; set_color_spectrum(b);
+	  s >> b; set_authorDecay(b);
+	  s >> b; set_limit_ondisk(b);
+	  s >> b; set_limit_nonplayed(b);
+	  s >> b; set_limit_uprange(b);
+	  s >> b; set_limit_downrange(b);
+	  s >> b; set_limit_indistance(b);
+	  s >> str; set_playCommand1(str);
+	  s >> str; set_playCommand2(str);
+	  s >> str; set_playCommand3(str);
+	  s >> str; set_playCommand4(str);
+	  s >> fl; set_distance_temposcale(fl);
+	  s >> fl; set_distance_spectrumweight(fl);
+	  s >> b; set_limit_authornonplayed(b);
+	  s >> b; set_shown_aboutbox(b);
+	  s >> str; set_mixer_command(str);
+	  s >> b; set_open_mixer(b);
+	  s >> b; set_ask_mix(b);
+	  s >> b; set_auto_popqueue(b);
+	  s >> str; set_record_command(str);
+	  s >> str; set_replay_command(str);
+	  s >> str; set_record_mixer_command(str);
+	  s >> clr; set_color_tempo44(clr);
+	  s >> clr; set_color_tempo54(clr);
+	  s >> clr; set_color_tempo64(clr);
+	  s >> clr; set_color_tempo74(clr);
+	  s >> clr; set_color_tempo84(clr);
+	  s >> b; set_show_tempo54(b);
+	  s >> b; set_show_tempo64(b);
+	  s >> b; set_show_tempo74(b);
+	  s >> b; set_show_tempo84(b);
+	  s >> b; set_show_unknown_tempo(b);
+	  s >> clr; set_color_green_time(clr);
+	  s >> clr; set_color_yellow_time(clr);
+	  s >> clr; set_color_orange_time(clr);
+	  s >> clr; set_color_red_time(clr);
+	  s >> b; set_color_main_window(b);
+	  s >> b; set_log_spectrum_distance(b);
+	  s >> clr; set_color_played_song(clr);
+	  s >> clr; set_color_played_author(clr);
+	  s >> clr; set_color_unavailable(clr);
+	  s >> clr; set_color_dcolor_col(clr);
+	  s >> w; set_color_cluster_depth (w);
+	  s >> str; set_bpm_mixer_command(str);
+	  s >> b; set_open_bpmmixer(b);
+	  // read tag data
+	  s >> w; 
+	  while(w-->0)
+	    {
+	      QString t;
+	      Q_INT8 i,m,e;
+	      s >> t;
+	      s >> i; 
+	      s >> m; 
+	      s >> e; 
+	      new QListViewItem(get_taglist(), t, i ? TAG_TRUE : TAG_FALSE,
+				m ? TAG_TRUE : TAG_FALSE,
+				e ? TAG_TRUE : TAG_FALSE);
+	    }
+	  // read header
+	  s >> w; 
+	  for(int i = 0 ; i < w ; i++)
+	    get_header()->addLabel("");
+	  for(int i = 0 ; i < w ; i++)
+	    {
+	      Q_UINT16 m1,m2; s >> m1; s >> m2;
+	      realize_mapping(get_header(),i,m1,m2);
+	    }
+	  float F;
+	  s >> F; set_distance_tempoweight(F);
+	  s >> F; set_distance_echoweight(F);
+	  s >> F; set_distance_rythmweight(F);
+	  s >> F; set_distance_compositionweight(F);
+	  s >> w; set_max_songs(w);
+	  s >> clr; set_color_unchecked(clr);
+	  s >> str; set_analCommand1(str);
+	  s >> str; set_analCommand2(str);
+	  s >> str; set_analCommand3(str);
+	  s >> str; set_analCommand4(str);
+	  s >> str; set_analCommand5(str);
+	  s >> str; set_analCommand6(str);
+	  s >> str; set_analCommand7(str);
+	  s >> str; set_analCommand8(str);
+	  s >> fl;  set_anal_bpm_from(fl);
+	  s >> fl;  set_anal_bpm_to(fl);
+	  s >> w;   set_anal_bpm_technique(w);
+	}
       else
 	printf("Wrong config file format\n");
       if (magic != MAGIC_NOW)
@@ -798,7 +929,7 @@ void Config::load()
     }
 }
 
-bool Config::open_ui()
+bool Config::open_ui(int pane)
 {
   char tmp[50];
   PreferencesLogic preferences(NULL,NULL,TRUE);
@@ -806,6 +937,16 @@ bool Config::open_ui()
   preferences.playerCommand2 -> setText ( get_playCommand2() ) ;
   preferences.playerCommand3 -> setText ( get_playCommand3() ) ;
   preferences.playerCommand4 -> setText ( get_playCommand4() ) ;
+
+  preferences.analyzerCommand1 -> setText( get_analCommand1() );
+  preferences.analyzerCommand2 -> setText( get_analCommand2() );
+  preferences.analyzerCommand3 -> setText( get_analCommand3() );
+  preferences.analyzerCommand4 -> setText( get_analCommand4() );
+  preferences.analyzerCommand5 -> setText( get_analCommand5() );
+  preferences.analyzerCommand6 -> setText( get_analCommand6() );
+  preferences.analyzerCommand7 -> setText( get_analCommand7() );
+  preferences.analyzerCommand8 -> setText( get_analCommand8() );
+
   sprintf(tmp,"%d",get_yellowTime());
   preferences.yellowTime->setText(tmp);
   sprintf(tmp,"%d",get_orangeTime());
@@ -820,7 +961,6 @@ bool Config::open_ui()
   
   preferences.authorDecay  -> setValue ( get_authorDecay() ) ;
   preferences.tempoSpin    -> setValue ( lround(get_distance_temposcale()*100.0) ) ;
-  preferences.tmpDirectory -> setText  ( get_tmp_directory() ) ;
   preferences.mixerCommand -> setText  ( get_mixer_command() ) ;
   preferences.record       -> setText  ( get_record_command() ) ;
   preferences.record_mixer -> setText  ( get_record_mixer_command() ) ;
@@ -853,7 +993,12 @@ bool Config::open_ui()
 
   preferences.clusterDepth -> setValue (get_color_cluster_depth ());
 
-  preferences.bpmmixcmd -> setText( get_bpm_mixer_command ());
+  preferences.bpmmixcmd -> setText( get_bpm_mixer_command () );
+  preferences.subtabs -> setCurrentItem( pane );
+
+  preferences.From -> setText(get_anal_bpm_from() ? QString::number(get_anal_bpm_from()) : "");
+  preferences.To   -> setText(get_anal_bpm_to() ? QString::number(get_anal_bpm_to()): "");
+  preferences.bpmalgo -> setButton(get_anal_bpm_technique()-1);
 
   if (preferences.exec()==QDialog::Accepted)
     {
@@ -861,13 +1006,22 @@ bool Config::open_ui()
       set_playCommand2(preferences.playerCommand2->text());
       set_playCommand3(preferences.playerCommand3->text());
       set_playCommand4(preferences.playerCommand4->text());
+
+      set_analCommand1(preferences.analyzerCommand1->text());
+      set_analCommand2(preferences.analyzerCommand2->text());
+      set_analCommand3(preferences.analyzerCommand3->text());
+      set_analCommand4(preferences.analyzerCommand4->text());
+      set_analCommand5(preferences.analyzerCommand5->text());
+      set_analCommand6(preferences.analyzerCommand6->text());
+      set_analCommand7(preferences.analyzerCommand7->text());
+      set_analCommand8(preferences.analyzerCommand8->text());
+
       set_yellowTime(atoi(preferences.yellowTime->text()));
       set_orangeTime(atoi(preferences.orangeTime->text()));
       set_redTime(atoi(preferences.redTime->text()));
       set_authorDecay ( preferences.authorDecay->value());
       set_distance_temposcale ( (float)(preferences.tempoSpin->value())/100.0);
 
-      set_tmp_directory ( preferences.tmpDirectory->text());
       set_mixer_command ( preferences.mixerCommand->text());
       set_record_command ( preferences.record->text());
       set_replay_command ( preferences.replay->text());
@@ -880,8 +1034,8 @@ bool Config::open_ui()
       set_color_tempo84(preferences.colorTempo84->paletteBackgroundColor());
 
       set_show_tempo54 (preferences.showTempo54->isChecked());
-      set_show_tempo64 (preferences.showTempo54->isChecked());
-      set_show_tempo74 (preferences.showTempo64->isChecked());
+      set_show_tempo64 (preferences.showTempo64->isChecked());
+      set_show_tempo74 (preferences.showTempo74->isChecked());
       set_show_tempo84 (preferences.showTempo84->isChecked());
       set_show_unknown_tempo(preferences.showUnknownTempo->isChecked());
       
@@ -906,12 +1060,27 @@ bool Config::open_ui()
       set_distance_compositionweight ( (float)(preferences.dColorMetric->compositionSpin->value())/100.0);
       set_max_songs(preferences.max_songs->value());
 
+      set_anal_bpm_from(atof(preferences.From -> text()));
+      set_anal_bpm_to(  atof(preferences.To   -> text()));
+      set_anal_bpm_technique(preferences.bpmalgo -> selectedId()+1);
+      if (get_anal_bpm_from()>get_anal_bpm_to())
+	{
+	  float t=get_anal_bpm_from();
+	  set_anal_bpm_from(get_anal_bpm_to());
+	  set_anal_bpm_to(t);
+	}
+
       save();
       calc_and_cache();
       return true;
     }
   return false;
 }
+/*      if (bounds->resamplingScan->isChecked()) technique = 1;
+      else if (bounds->ultraLongFFT->isChecked()) technique = 2;
+      else if (bounds->enveloppeSpectrum->isChecked()) technique = 3;
+      else if (bounds->fullAutoCorrelation->isChecked()) technique = 4;
+*/
 
 void Config::calc_and_cache()
 {

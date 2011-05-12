@@ -24,6 +24,7 @@
 #include <qpainter.h>
 #include <qtextedit.h>
 #include <qlabel.h>
+#include "kbpm-dj.h"
 #include "song.h"
 #include "histogram-type.h"
 #include "echo-property.h"
@@ -33,6 +34,7 @@
 #include "files.h"
 #include "statistics.h"
 #include "memory.h"
+#include "pca.h"
 
 spectrum_freq devs[spectrum_size] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 spectrum_freq means[spectrum_size] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
@@ -44,7 +46,8 @@ float8 **echo_dev=NULL;
 
 static int echos = 0;
 
-/* in comparison to pre2.7 versions, the spectrum scale is now calculated differently
+/**
+ * in comparison to pre2.7 versions, the spectrum scale is now calculated differently
  * first we take the mean value. Based on this we also take the mean variation
  * rescaling happend by subtracting the mean and then dividing by the standard deviation
  */
@@ -196,10 +199,38 @@ float4 stats_get_echo_old(int band, int delay)
   return echo_mean[band][delay];
 }
 
+int bit_rev(int in, int check)
+{
+  int out = 0;
+  while(check>1)
+    {
+      out*=2;
+      if (in % 2) out++;
+      in/=2;
+      check/=2;
+    }
+  return out;
+}
+
+
+static int compare_int(const void * a, const void * b)
+{
+  assert(a);
+  assert(b);
+  int A = *((int *)a);
+  int B = *((int *)b);
+  A%=1000;
+  B%=1000;
+  return A < B ? -1 : (A > B ? 1 : 0);
+}
+
 void SongSelectorLogic::openStatistics()
 {
   StatisticsDialog * statistics = new StatisticsDialog(this);
   
+  //---------------------------------------
+  //    The mean spectrum characteristics
+  //---------------------------------------
   // the frequency means and deviations
   QPixmap *pm = new QPixmap(spectrum_size,200);
   QPainter p;
@@ -216,7 +247,7 @@ void SongSelectorLogic::openStatistics()
       if (energy_fix+energy_dev>max_freq) max_freq = energy_fix+energy_dev;
     }
   
-  QString data_text = "";
+  QString data_text = "Band\tEnergy (dB)\tVariance (dB)\n";
   if (max_freq!=-1000)
     {
       float dbf = 199.0/(max_freq-min_freq);  //pixels per dB
@@ -235,6 +266,8 @@ void SongSelectorLogic::openStatistics()
 	  data_text += QString::number(stats_get_band_freq(j));
 	  data_text += "\t";
 	  data_text += QString::number(energy_fix);
+	  data_text += "\t";
+	  data_text += QString::number(stats_get_freq_dev(j));
 	  data_text +="\n";
 	  energy_fix -= min_freq;
 	  
@@ -259,38 +292,295 @@ void SongSelectorLogic::openStatistics()
   statistics->spectrum->setPixmap(*pm);
   statistics->spectrum_data->setText(data_text);
 
-  // the echo characteristics
-  /*  pm = new QPixmap(echo_prop_sx, spectrum_size);
-  p.begin(pm);
-  min_freq = 1000;
-  max_freq = -1000;
-  for (int j = 0; j < spectrum_size ; j++)
-    for (int i = 0 ; i < echo_prop_sx ; i++)
-      {
-	float energy_fix = stats_get_echo(j,i);
-	if (energy_fix<min_freq) min_freq = energy_fix;
-	if (energy_fix>max_freq) max_freq = energy_fix;
-      }
+  //---------------------------------------
+  //    The echo characteristics
+  //---------------------------------------
+  // because this process can take a while we already open the window
+  statistics->show();
+  app->processEvents();
   
-  if (max_freq!=-1000)
+  // 1- copy all data into a new array
+  statistics->status->setText("1- copying all data");
+  app->processEvents();
+
+  GrowingArray<Song*> *all = database->getAllSongs();
+  float * * echo_stack = allocate(all->count,float *);
+  int vec_size = spectrum_size*echo_prop_sx;
+  int nr = 0;
+  for(int i = 0 ; i < all->count ; i++)
     {
-      float4 cr = 255/(max_freq - min_freq);
-      for (int j = 0; j < spectrum_size ; j++)
-	for (int i = 0; i < echo_prop_sx ; i++)
-	  {
-	    float energy_fix = stats_get_echo(j,i);
-	    energy_fix -= min_freq;
-	    energy_fix *= cr;
-	    int v = (int)energy_fix;
-	    p.setPen(QColor(v,v,v));
-	    p.drawPoint(i,spectrum_size-1-j);
-	  }
+      Song * song = all->elements[i];
+      echo_property echo = song->get_histogram();
+      if (!echo.empty())
+	{
+	  echo_stack[nr] = allocate(vec_size,float);
+	  for(int x = 0 ; x < echo_prop_sx ; x++)
+	    for(int y = 0 ; y < spectrum_size ; y++)
+	      echo_stack[nr][x+y*echo_prop_sx]=echo.get_freq_energy_probability_scaled(y,x);
+	  nr++;
+	}
     }
+  echo_stack = reallocate(echo_stack,nr,float*);
+  printf("   we have %d elements\n",nr);
+
+  // 2 - normalize the mean value for every element
+  statistics->status->setText("2- translating mean");
+  app->processEvents();
+
+  float * mean = allocate(vec_size, float);
+  for(int i = 0 ; i < vec_size ; i ++)
+    mean[i]=0;
+  for(int i = 0 ; i < nr ; i ++)
+    for(int j = 0 ; j < vec_size ; j++)
+      mean[j]+=echo_stack[i][j];
+  for(int j = 0 ; j < vec_size ; j++)
+    mean[j]/=nr;
+  for(int i = 0 ; i < nr ; i ++)
+    for(int j = 0 ; j < vec_size ; j++)
+      echo_stack[i][j]-=mean[j];
+  
+  // 3 - normalize the nr * standard deviation
+  statistics->status->setText("3- normalizing standard deviation");
+  app->processEvents();
+
+  float * stddev = allocate(vec_size, float);
+  for(int i = 0 ; i < vec_size ; i ++)
+    stddev[i]=0;
+  for(int i = 0 ; i < nr ; i ++)
+    for(int j = 0 ; j < vec_size ; j++)
+      stddev[j]+=echo_stack[i][j]*echo_stack[i][j];
+  for(int j = 0 ; j < vec_size ; j++)
+    stddev[j]=sqrt(stddev[j]);
+  for(int i = 0 ; i < nr ; i ++)
+    for(int j = 0 ; j < vec_size ; j++)
+      echo_stack[i][j]/=stddev[j];
+  
+  // 4 - allocate the color array
+  statistics->status->setText("4- allocating colors");
+  app->processEvents();
+
+  int nr_colors = 16 ;
+  float * * colors = allocate(nr_colors , float *);
+  for(int i = 0 ; i < nr_colors ; i++)
+    {
+      colors[i] = allocate(vec_size , float);
+      for(int j = 0 ; j < vec_size ; j++)
+	colors[i][j]=0.0;
+    }
+  
+  // 5 - for every color select a good correlation vector
+  //     and correlate with that one
+  for(int c = 0 ; c < nr_colors ; c ++)
+    {
+      // 5a - select a position with the lowest correlations
+      int x = 0;
+      double v = 1.0;
+      for(int i = 0 ; i < vec_size ; i ++)
+	{
+	  double w = 0;
+	  for(int j = 0 ; j < nr_colors ; j ++)
+	    w+=colors[j][i];
+	  w/=nr_colors;
+	  if (w<v)
+	    {
+	      x = i;
+	      v = w;
+	    }
+	}
+
+      statistics->status->setText(QString("5- correlating color ")+QString::number(c)+"/"+QString::number(nr_colors-1));
+      app->processEvents();
+      // printf("5- correlating with vector (%d,%d)=%g nr %d/%d\n",x%echo_prop_sx,x/echo_prop_sx,v,c,nr_colors-1);
+      
+      // 5b - fill in this color position with the new correlation analysis
+      for(int i = 0 ; i < vec_size ; i++)
+	{
+	  double r = 0;
+	  for(int j = 0 ; j < nr ; j++)
+	    r+=echo_stack[j][i]*echo_stack[j][x];
+	  colors[c][i] = r;
+	}
+
+
+      // 5c - we create a picture of this plane and dump it to disk 
+#ifdef DUMP_PLANES
+      QPixmap * pm = new QPixmap(echo_prop_sx, spectrum_size);
+      p.begin(pm);
+      int X = x;
+      for (int y= 0; y < spectrum_size ; y++)
+	for (int x = 0; x < echo_prop_sx ; x++)
+	  {
+	    int idx = x+y*echo_prop_sx;
+	    double cv = colors[c][idx];
+	    QColor C;
+	    if (cv>0)
+	      C.setRgb(255-cv*255,255,255-cv*255);
+	    else
+	      C.setRgb(255,255+cv*255,255+cv*255);
+	    if (idx == X)
+	      C.setRgb(0,0,255);
+	    p.setPen(C);
+	    p.drawPoint(x,spectrum_size-1-y);
+	  }
+      p.end();
+      pm->save(QString("Plane"+QString::number(c)+QString(".png")),"PNG");
+      delete(pm);
+#endif
+
+
+      // 5c - normalize the correlation result for this color slice
+      /*      double m = 1.0;
+      for(int i = 0 ; i < vec_size ; i ++)
+	if (colors[c][i]<m) m=colors[c][i];
+      for(int i = 0 ; i < vec_size ; i ++)
+	colors[c][i]-=m;
+      m = 0.0;
+      for(int i = 0 ; i < vec_size ; i ++)
+	if (colors[c][i]>m) m=colors[c][i];
+      for(int i = 0 ; i < vec_size ; i ++)
+	colors[c][i]/=m;
+      */
+      
+      for(int i = 0 ; i < vec_size ; i++)
+	colors[c][i] = fabs(colors[c][i]);
+    }
+
+  // 6 - determine the colors based on a PCA analysis of the colors matrix
+  statistics->status->setText("6- singular value decomposition");
+  app->processEvents();
+  
+  // 6a - copy data
+  printf("Copying PCA data\n");
+  float ** pca_in_out = matrix(nr_colors,vec_size/8);
+  for(int y = 0 ; y < nr_colors ; y ++)
+    for(int x = 0 ; x < vec_size ; x ++)
+      pca_in_out[y+1][x/8+1]=colors[y][x] > 0.1 ? colors[y][x] : 0;
+  
+  // 6b - perform PCA
+  printf("Performing PCA\n");
+  char * err = NULL;
+  do_pca(nr_colors,vec_size/8,pca_in_out,err);
+  if (err) printf("Error %s\n",err);
+  
+  // 6c - translate central position
+  printf("Translateing mean\n");
+  double cx =0, cy=0;
+  for(int y = 1 ; y <=nr_colors ; y++)
+    {
+      cx+=pca_in_out[y][1];
+      cy+=pca_in_out[y][2];
+    }
+  cx/=nr_colors;
+  cy/=nr_colors;
+  for(int y = 1 ; y <=nr_colors ; y++)
+    {
+      pca_in_out[y][1]-=cx;
+      pca_in_out[y][2]-=cy;
+    }
+  
+  // 6d - determine angle
+  printf("Determining angle\n");
+  int * tmphue = allocate(nr_colors,int);
+  for(int y = 1 ; y <= nr_colors ; y++)
+    {
+      pca_in_out[y][3]=atan2(pca_in_out[y][2],pca_in_out[y][1]);
+      pca_in_out[y][3]*=180;
+      pca_in_out[y][3]/=M_PI;
+      pca_in_out[y][3]+=180.0;
+      tmphue[y-1]=((int)pca_in_out[y][3])+1000*y;
+      printf("Angle %d: %g\n",y,pca_in_out[y][3]);
+    }
+  // we have a set of angles for every color, we now want
+  // to make the contrast between every two angles as large
+  // as possible by hussling 'em around
+  qsort(tmphue,nr_colors,sizeof(int),compare_int);
+  // the new tmphue array has the sorted indices if we divide it by 
+  // 1000. So c=tmphue[idx]/1000 specifies that c is the color which
+  // is enumerated at idx. We need to reverse this
+  int *hue = allocate(nr_colors,int);
+  for(int i = 0 ; i < nr_colors ; i++)
+    {
+      int j = (tmphue[i]/1000)-1;
+      assert(j>=0);
+      assert(j<nr_colors);
+      hue[j]=i;
+    }
+  deallocate(tmphue);
+  
+  // 6d - to determine the colors for every position we select which
+  //     correlation vectort had the most influence
+
+  statistics->status->setText("Preparing Pixmap");
+  app->processEvents();
+  
+  /*  float * values =  allocate(vec_size, float);
+  float m = mean[0];
+  for(int i = 1 ; i < vec_size ; i ++)
+    if (mean[i]<m) m = mean[i];
+  for(int i = 1 ; i < vec_size ; i ++)
+    values[i]=mean[i]-m;
+  m = values[0];
+  for(int i = 1 ; i < vec_size ; i ++)
+    if (values[i]>m) m = values[i];
+  for(int i = 1 ; i < vec_size ; i ++)
+    values[i]/=m;
+  // noramlisation of the stddev
+  double stddev_max = 0;
+  for(int j = 0 ; j < vec_size ; j++)
+    if (stddev[j]>stddev_max) stddev_max=stddev[j];
+  */
+  
+  pm = new QPixmap(echo_prop_sx, spectrum_size);
+  p.begin(pm);
+  for (int y= 0; y < spectrum_size ; y++)
+    for (int x = 0; x < echo_prop_sx ; x++)
+      {
+	int idx = x+y*echo_prop_sx;
+	// int col = 0;
+	// double m = 0;
+	double r, g, b;
+	r = g = b= 0;
+	QColor C;
+	for(int c = 0 ; c < nr_colors ; c++)
+	  {
+	    float v = colors[c][idx];
+	    v*=v;
+	    int cp = hue[c]; // we need to know the position in the sorting
+	    cp = bit_rev(cp,nr_colors);
+	    assert(cp<nr_colors);
+	    float color = 360.0 * (float)cp/ (float)nr_colors;
+	    C.setHsv((int)color,255,(int)(v*255.0));
+	    int R,G,B;
+	    C.getRgb(&R,&G,&B);
+	    r+=R;
+	    g+=G;
+	    b+=B;
+	  }
+	
+	float m = std::max(r,std::max(g,b));
+	r *= 255.0 / m;
+	g *= 255.0 / m;
+	b *= 255.0 / m;
+	
+	int H,S,V;
+	C.setRgb((int)r,(int)g,(int)b);
+	C.getHsv(&H,&S,&V);
+
+	int my = spectrum_size-1;
+	
+	// the fake color
+	C.setHsv(H,S,255);
+	p.setPen(C);
+	p.drawPoint(x,my-y);
+      }
   p.end();
   statistics->echo->setPixmap(*pm);
-  */
+
+  // - free all data used to analyze echo characteristic
+  free_matrix(pca_in_out,nr_colors,vec_size/8);
 
   // execute the dialogbox
+  statistics->status->setText("");
   statistics->exec();
   delete statistics;
 }

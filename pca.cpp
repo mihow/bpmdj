@@ -96,36 +96,45 @@ void do_pca(int n, int m, float** data, char* &error_msg)
   
   /* evals now contains the eigenvalues,
      columns of symmat now contain the associated eigenvectors. */
+
+#ifdef PRINT_PCA_RESULTS
+  printf("\nEigenvalues:\n");
+  for (j = m; j >= 1; j--) {
+    printf("%18.5f\n", evals[j]); }
+  printf("\n(Eigenvalues should be strictly positive; limited\n");
+  printf("precision machine arithmetic may affect this.\n");
+  printf("Eigenvalues are often expressed as cumulative\n");
+  printf("percentages, representing the 'percentage variance\n");
+  printf("explained' by the associated axis or principal component.)\n");
   
-  /* 
-     printf("\nEigenvalues:\n");
-     for (j = m; j >= 1; j--) {
-     printf("%18.5f\n", evals[j]); }
-     printf("\n(Eigenvalues should be strictly positive; limited\n");
-     printf("precision machine arithmetic may affect this.\n");
-     printf("Eigenvalues are often expressed as cumulative\n");
-     printf("percentages, representing the 'percentage variance\n");
-     printf("explained' by the associated axis or principal component.)\n");
-     
-     printf("\nEigenvectors:\n");
-     printf("(First three; their definition in terms of original vbes.)\n");
-     for (j = 1; j <= m; j++) {
-     for (i = 1; i <= 3; i++)  {
-     printf("%12.4f", symmat[j][m-i+1]);  }
-     printf("\n");  }
-  */
-  
+  printf("\nEigenvectors:\n");
+  printf("(First three; their definition in terms of original vbes.)\n");
+  for (j = 1; j <= m; j++) {
+    for (i = 1; i <= m; i++)  {
+      printf("%12.4f", symmat[j][m-i+1]);  }
+    printf("\n");  } 
+#endif
+
   /* Form projections of row-points on first three prin. components. */
   /* Store in 'data', overwriting original data. */
-  for (i = 1; i <= n; i++) {
-    for (j = 1; j <= m; j++) {
-      interm[j] = data[i][j]; }   /* data[i][j] will be overwritten */
-    for (k = 1; k <= 3; k++) {
-      data[i][k] = 0.0;
-      for (k2 = 1; k2 <= m; k2++) {
-	data[i][k] += interm[k2] * symmat[k2][m-k+1]; }
+  for (i = 1; i <= n; i++) 
+    {
+      for (j = 1; j <= m; j++) 
+	interm[j] = data[i][j]; // data[i][j] will be overwritten 
+      for (k = 1; k <= 3; k++) 
+	{
+	  data[i][k] = 0.0;
+	  for (k2 = 1; k2 <= m; k2++) 
+	    data[i][k] += interm[k2] * symmat[k2][m-k+1]; 
+#ifdef PRINT_ROWS
+	  if (k==1)
+	    printf("%g\t",data[i][1]);
+	  else if (k==2)
+	    printf("%g\n",data[i][2]);
+#endif	  
+	}
     }
-  }
+
   
   /*
     printf("\nProjections of row-points on first 3 prin. comps.:\n");

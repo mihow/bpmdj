@@ -35,7 +35,7 @@
 #include "spectrum-type.h"
 #include "database.h"
 #include "songtree.h"
-#include "avltree.cpp"
+#include "avltree.h"
 
 static int songs_already_in_database = 0;
 

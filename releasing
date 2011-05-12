@@ -1,5 +1,6 @@
 - fix the color of the splash screen
 - add a screenshot of kbpm-play to webpage
+- add changes to webpage and changelog
 To release the software
 - make check [-bin,-doc]
 - make tgz

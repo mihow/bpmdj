@@ -17,6 +17,17 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#include "rythm-property.h"
-#include "smallhistogram-type.cpp"
-#include "histogram-property.cpp"
+#define MAGIC_1_6 0xBDE0
+#define MAGIC_1_7 0xBDE1
+#define MAGIC_1_8 0xBDE2
+#define MAGIC_1_9 0xBDE3
+#define MAGIC_2_1 0xBDE4
+#define MAGIC_2_2 0xBDE5
+#define MAGIC_2_4 0xBDE6
+#define MAGIC_2_5 0xBDE7
+#define MAGIC_2_6 0xBDE8
+#define MAGIC_2_7 0xBDE9
+#define MAGIC_2_8 0xBDEA
+#define MAGIC_2_9 0xBDEB
+#define MAGIC_NOW MAGIC_2_9
+

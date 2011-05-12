@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "songtree.h"
+#include "avltree.h"
 
 const QString TRUE_TEXT("Yes");
 const QString FALSE_TEXT("No");
@@ -29,6 +30,8 @@ const QString zero("0");
 const QString zeroo("00");
 const QString slash("/");
 const QString EMPTY("");
+const QString ANAL_NOTNEC("___");
+const QString ANAL_NEC("Missing");
 
 QString tonumber(const int b)
 {

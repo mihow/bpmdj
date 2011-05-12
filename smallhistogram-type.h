@@ -54,7 +54,9 @@ template <int smallhistogram_size> class smallhistogram_type
   void set_scale(double s)
     {
       scale = s;
+      validate_scale();
     }
+  void validate_scale();
   unsigned1 get_probability(int delay)
     {
       // assert(delay<count);

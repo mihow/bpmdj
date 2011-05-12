@@ -18,7 +18,7 @@
 ****/
 
 #include "songtree.h"
-#include "avltree.cpp"
+#include "avltree.h"
 
 int QStringSortedNode::compareAddData(Node<QString>* n)
 {

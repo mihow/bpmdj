@@ -35,7 +35,7 @@
 #define CP "cp -- "
 #define MV "mv -i -- "
 #define MKDIR "mkdir -p -- "
-#define CREATERAW_CMD "bpmdj-raw \"%s\" \"%s\"\n"
+#define CREATERAW_CMD "bpmdj-raw \"%s\" \"%s\""
 #define ENCODE "bladeenc -del *.wav"
 #define RAW2WAV "sox -r 44100 -s -w -c 2 "
 #define BPLAY "bplay -s 44100 -S -b 16 "
@@ -63,3 +63,11 @@ void   dumpAudio(const char* fname, unsigned4 * buffer, long length);
 void   spawn(const char* script);
 int    execute(const char* script);
 int    vexecute(const char* script,...);
+
+// logging, warning, and other similar functions
+void Log(const char* prefix, const char* text);
+void Debug(const char* script,...);
+void Info(const char* script,...);
+void Warning(const char* script,...);
+void Error(bool ui, const char* script,...);
+void Remote(const char* script,...);

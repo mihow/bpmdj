@@ -1,3 +1,34 @@
+2.9
+  kplay - unknown tempo crashed the beatgraph
+  ksel  + keeps output log from different players	
+  ksel  + added a song color based on its playcount	
+  ksel  + added specific analyzer configurations	
+  ksel  + automatic installation option for remote machines
+  kplay - beatgraph no longer crashes on too empty songs
+  kmix  + added new command line options to use configurations
+  anal  + possibility to specify decoder options per player/host
+  anal  + we can now work with different versions of mplayer
+  ksel  - bad pixmap and child dead errors
+  kplay + scrambler positions were wrong
+  ksel  - vertical drawn line in songlist
+  ksel  + added history clear and save	
+  kplay - no longer direct exit after DSP startup errors
+  kplay - multiple button presses on rythm analyzer -> crash	
+  ksel  - RGB parameter out of range has been solved	
+  kplay - song now plays until the end	
+  ksel  + fixed various update problems	
+  ksel  + songlist jumps back to the selected song after changing the view	
+  ksel  + luser box for empty renamer	
+  ksel  - compaction & renaming did not communicate properly with songlist in memory
+  ksel  + queue insert new songs will use main or monitor if anker missing	
+  doc   + more documentation on the echo analyzer
+  ksel  - could not scroll down at first line of vectorview with keyboard  	
+  count + added again a command line counter of wav and raw files	
+  tools + compiles under gcc4.0
+  ksel  + integrated the analyzing program kbpm-batch into the selector
+  ksel  + added the possibility to pass global decoding options	
+  ksel  - fixed QPixmap caching bug. Statis structure are inherited by children
+	  and destroyed when child dies. Weird behavior 
 2.8:
   ksel  - bug in amount limited songlist. Comparison operator was entirily wrong	 
   anal  - composition-analysis: toos hort songs were analyzed wrong	
@@ -7,7 +38,7 @@
   ksel  + added played log view in history tab	
   anal  + added idiot-boxes to rhythm analyzer (need tempo & spectrum)	
   anal  + added beat detection algorithm	
-  ksel  - echo picture was shown upsuide down	
+  ksel  - echo picture was shown upside down	
   batch - 4 minutes per song on remote machines was not enough, so we increased it
 	  to an 8 minutes timeout
   anal  - sometimes a bug occured in rayshooting at the left side

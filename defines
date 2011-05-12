@@ -1,24 +1,20 @@
 # DEBIAN 
 
-# The following packages are necessary, 
-#  - qt3-mt
+# The following programs and packages are necessary, 
+#  - libqt3-mt-dev
 #  - qt3-designer
-#  - qt3-mt-headers
-#  - qt3-mt-dev
-#  - mplayer
-#  - gcc
-#  - distcc
+#  - qt3-dev-tool
+#  - libqt3c102-mt
 #  - fftw3
 #  - make
 #  - alsa-headers (for alsa support)
 
-
-# full optimalisations
+# full optimalisation
 CPP = distcc g++ -O3 
-CC = distcc gcc -O3
+CC =  distcc gcc -O3
 
-#CPP = distcc g++ -O0 -g -pg -Wall
-#CC = distcc gcc -O0 -g -pg -Wall
+#CPP = distcc g++ -O0 -g -Wall
+#CC = distcc gcc -O0 -g -Wall
 
 UIC = uic
 MOC = moc
@@ -29,9 +25,9 @@ INSTALL = install
 # -D COMPILE_ALSA = include ALSA drivers
 # -D EFENCE = include electric fence debugging code
 # -D NDEBUG = remove all asserts
-
-CFLAGS+= -D COMPILE_OSS -D COMPILE_ALSA -D NDEBUG
+CFLAGS+= -D COMPILE_OSS -D COMPILE_ALSA -D QT_THREAD_SUPPORT
 LDFLAGS+= -lpthread -lm -lasound -lrt -lfftw3
 QT_INCLUDE_PATH=-I/usr/include/qt3/
 QT_LIBRARY_PATH=
 QT_LIBS= -lqt-mt
+

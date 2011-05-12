@@ -59,13 +59,11 @@
 /*-------------------------------------------
  *         Constants & Variables
  *-------------------------------------------*/
-static int    opt_quiet;
 char*   arg_latency = "300";
-static int    arg_posx = -1;
-static int    arg_posy = -1;
 static dsp_driver *dsp1;
 static dsp_driver *dsp2;
-
+static PlayerConfig *config1;
+static PlayerConfig *config2;
 
 void wait_for_unpause()
 {
@@ -90,8 +88,6 @@ void terminal_start()
 {
   pthread_t *y = allocate(1,pthread_t);
   mixer_window = new MixerDialogLogic();
-  if (arg_posx >=0 && arg_posy >=0)
-    mixer_window->move(arg_posx,arg_posy);
   app->setMainWidget(mixer_window);
   mixer_window->show();
   pthread_create(y,NULL,go,NULL);
@@ -99,84 +95,46 @@ void terminal_start()
 
 void options_failure(char* err)
 {
-  QMessageBox::critical(NULL,
-			"Command line arguments",
-			QString(err),
-			QMessageBox::Ok,QMessageBox::NoButton);
-  
-  // print options
-  printf("Usage:  kbpm-mix <options>\n\n"
-	 "   -q          --quiet               be quiet\n"
-	 "   -m arg      --match arg           song to match tempo with\n"
-	 "   -p nbr nbr  --position nbr nbr    position to place the window\n"
-	 OSS_OPTION_HELP
-	 ALSA_OPTION_HELP
-	 " if you specify more than one dsp device then the order of \n"
-	 " parameters is important. First specify all the parameters \n"
-	 " of one device, then all the arguments to the second. E.g: \n"
-	 "  ./kbpm-mix --alsa --dev hw:0 --alsa --dev hw:1\n"
-	 );
-  exit(1);
 }
-
-#define toggle(name) name=1;
-#define next_arg if (++i>=argc) options_failure("missing argument to last option");
-#define arg_int(name) next_arg name=atoi(argv[i]);
-#define arg_str(name) next_arg name=argv[i];
-#define arg_float(name) next_arg name=atof(argv[i]);
 
 static int dsps_chosen = 0;
 void process_options(int argc, char* argv[])
 {
-  int i=1;
-  int used = 0;
-  dsp_driver * dsps[3];
-  dsps[0]=dsps[1]=dsps[2]=0;
-  dsp_driver *dsp = new dsp_none();
-  for(i = 1 ; i < argc ; i ++)
+  argc--;
+  if (argc==1)
     {
-      if (argv[i][0]=='-')
-	{
-	  char* arg;
-	  // check long opt ?
-	  if (argv[i][1]=='-')
-	    arg=argv[i]+2;
-	  else if (argv[i][1]==0 || argv[i][2]!=0)
-	    options_failure("option neither short or long");
-	  else arg=argv[i]+1;
-	  
-	  // check value
-	  if (dsp && (used=dsp->parse_option(arg,argv[i+1])))
-	    {
-	      i+=used-1;
-	    }
-	  else if (option(arg,"quiet","q"))
-	    opt_quiet=true;
-#ifdef COMPILE_OSS
-	  else if (option(arg,"oss")) 
-	    {
-	      dsp = new dsp_oss();
-	      dsps[dsps_chosen++]=dsp;
-	    }
-#endif
-#ifdef COMPILE_ALSA
-	  else if (option(arg,"alsa"))
-	    {
-	      dsp = new dsp_alsa();
-	      dsps[dsps_chosen++]=dsp;
-	    }
-#endif
-	  else if (option(arg,"position","p"))
-	    {
-	      arg_int(arg_posx); 
-	      arg_int(arg_posy); 
-	    }
-	}
+      config1 = new PlayerConfig(argv[1]);
+      config2 = NULL;
+      dsp1    = dsp_driver::get_driver(config1);
+      dsp2    = NULL;
+      dsps_chosen = 1;
     }
-  if (dsps_chosen==0) 
-    options_failure("You must supply a dsp device\n");
-  dsp1 = dsps[0];
-  dsp2 = dsps[1];
+  else if (argc==2)
+    {
+      config1 = new PlayerConfig(argv[1]);
+      config2 = new PlayerConfig(argv[2]);;
+      dsp1    = dsp_driver::get_driver(config1);
+      dsp2    = dsp_driver::get_driver(config2);
+      dsps_chosen = 2;
+    }
+  else if (argc>2)
+    {
+      Error(true,"Usage:  kbpm-mix <config1> [<config2>]\n\n"
+	    " At most two names of configurations should be given.\n"
+	    " These can be made with kbpm-play --config <config> --setup\n"
+	    " The DSP device mentioned in each one will be opened for\n"
+	    " playing");
+      exit(1);
+    }
+  else 
+    {
+      Error(true,"Usage:  kbpm-mix <config1> [<config2>]\n\n"
+	    " At least one configurations should be given.\n"
+	    " These can be made with kbpm-play --config <config> --setup\n"
+	    " The DSP device mentioned in each one will be opened for\n"
+	    " playing");
+      exit(1);
+    }
 }
 bool show_error(int err, int err2, const char*text)
 {

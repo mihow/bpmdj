@@ -19,18 +19,42 @@
 #ifndef ANAL_MGR_H
 #define ANAL_MGR_H
 
-#include "analyzers-progress.logic.h"
 #include "basic-process-manager.h"
-#include "config.h"
+class Song;
+
+class AnalyzerChanged
+{
+ public: 
+  AnalyzerChanged() {};
+  virtual ~AnalyzerChanged() {};
+  /**
+   * This function is called by the processmanager when slot 'on_slot'
+   * becomes available again. This function should be overridden.
+   */
+  virtual void startAnotherAnalyzer(Song* previous, int on_slot) = 0;
+};
 
 class AnalyzersManager:
   public BasicProcessManager
 {
   private:
-    int monitorPlayCommand;
+    int    * running_time;              // the current running time
+    long   * total_running_time;        // the cummulated running time
+    int    * songs_analyzed;            // the amount of stopped songs
+    time_t * started_at;                // start_time when running
+    int      limit_time;                // the timeout before considering child non responsive
+    int      report_time;               // the color die out time
+    Song * * songs_under_investigation; // the song under investigation
+    AnalyzerChanged * listener;
     virtual void clearId(int id);    
   public:
-    AnalyzersManager(int nr, ProcessChanged *sel);
+    AnalyzersManager(int nr, AnalyzerChanged *sel, int timeout, int report);
+    virtual ~AnalyzersManager() {};
+    virtual void start(int id, Song* song, const char* command);
+    virtual void checkSignals();
+    virtual float relative_running_time(int slot);
+    virtual bool slot_free(int slot);
+    virtual float songs_per_second(int slot);
 };
 
 #endif

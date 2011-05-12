@@ -29,19 +29,6 @@
 const QString MusicDir = "./music";
 const QString IndexDir = "./index";
 
-#define MAGIC_1_6 0xBDE0
-#define MAGIC_1_7 0xBDE1
-#define MAGIC_1_8 0xBDE2
-#define MAGIC_1_9 0xBDE3
-#define MAGIC_2_1 0xBDE4
-#define MAGIC_2_2 0xBDE5
-#define MAGIC_2_4 0xBDE6
-#define MAGIC_2_5 0xBDE7
-#define MAGIC_2_6 0xBDE8
-#define MAGIC_2_7 0xBDE9
-#define MAGIC_2_8 0xBDEA
-#define MAGIC_NOW MAGIC_2_8
-
 void realize_mapping(QHeader * h, int column, int location, int size);
 void copy_header(QHeader * in, QHeader * out);
 
@@ -82,7 +69,7 @@ class Config
   singleton_accessors(bool,limit_authornonplayed);
   singleton_accessors(bool,shown_aboutbox);
   // version 2.1
-  singleton_accessors(QString,tmp_directory);
+  // removed tmp_directory from version 2.9
   singleton_accessors(QString,mixer_command);
   singleton_accessors(bool,open_mixer);
   // version 2.2
@@ -129,10 +116,23 @@ class Config
   singleton_accessors(int,  max_songs);
   // 2.8
   singleton_accessors(QColor,color_unchecked);
+  // 2.9
+  singleton_accessors(QString,analCommand1);
+  singleton_accessors(QString,analCommand2);
+  singleton_accessors(QString,analCommand3);
+  singleton_accessors(QString,analCommand4);
+  singleton_accessors(QString,analCommand5);
+  singleton_accessors(QString,analCommand6);
+  singleton_accessors(QString,analCommand7);
+  singleton_accessors(QString,analCommand8);
+  // from here on the options are saved again
+  singleton_accessors(float, anal_bpm_from);
+  singleton_accessors(float, anal_bpm_to);
+  singleton_accessors(int, anal_bpm_technique);
  private:
   static void calc_and_cache();
  public:
-  static bool open_ui();
+  static bool open_ui(int pane = 0);
   static void save();
   static void load();
 };

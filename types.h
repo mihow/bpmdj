@@ -17,6 +17,9 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
+#ifndef TYPES_BH
+#define TYPES_BH
+
 #include "basic-types.h"
 #include "tempo-type.h"
 #include "period-type.h"
@@ -37,6 +40,14 @@ inline tempo_type period_to_tempo(period_type a)
   tempo_type b;
   if (a.period > 0)
     b.tempo = 4.0*11025.0*60.0/(double)a.period;
+  return b;
+}
+
+inline period_type tempo_to_period(tempo_type a)
+{
+  period_type b;
+  if (a.tempo > 0)
+    b.period = (int)(4.0*11025.0*60.0/(double)a.tempo);
   return b;
 }
 
@@ -66,3 +77,6 @@ inline int compare_tempo(tempo_type a, tempo_type b)
   if (a.tempo < b.tempo) return -1;
   return 0;
 }
+
+#endif 
+

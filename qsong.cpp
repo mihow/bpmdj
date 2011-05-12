@@ -31,6 +31,7 @@
 #include "tags.h"
 #include "memory.h"
 #include "avltree.h"
+#include "pixmap-cache.h"
 
 //-----------------------------------------------------------
 //            qsong
@@ -40,9 +41,10 @@ init_singleton_var(QSong,compare_col,int,LIST_TEMPO);
 init_singleton_var(QSong,compare_asc,bool,true);
 init_singleton_var(QSong,songs,Song**,NULL);
 init_singleton_var(QSong,song_count,int,0);
-QPixmapCache QSong::echo_icon_cache = QPixmapCache(); 
-QPixmapCache QSong::rythm_icon_cache = QPixmapCache(); 
-QPixmapCache QSong::composition_icon_cache = QPixmapCache(); 
+    
+static PixmapCache echo_icon_cache; 
+static PixmapCache rythm_icon_cache;
+static PixmapCache composition_icon_cache;
 
 void QSong::setVector(Song**arr, int cnt)
 {
@@ -104,6 +106,15 @@ QColor * QSong::colorOfAuthorCol(Song* song)
   int played_author_songs_ago = History::get_songs_played() - song->get_played_author_at_time();
   if (played_author_songs_ago < Config::get_authorDecay())
     return mixColor(Config::get_color_played_author(), (float)played_author_songs_ago/(float)Config::get_authorDecay() ,Qt::white);
+  return NULL;
+}
+
+QColor * QSong::colorOfPlaycount(Song* song)
+{
+  float count = song->get_alltime_playcount();
+  float total = song->get_max_alltime_total();
+  if (count)
+    return mixColor(Qt::white, count/total, QColor(0,0,255));
   return NULL;
 }
 
@@ -188,14 +199,13 @@ void QSong::paintCell(QVectorView* vv, int i, QPainter *p,const QColorGroup &cg,
       if (!song->get_histogram().empty())
 	{
 	  int h = height() - 1;
-	  
 	  // do we have a cached version ?
-	  QPixmap picture = echo_icon_cache.find(song,main,echo_prop_sx,h);
-	  if (picture.isNull())
+	  QPixmap * picture = echo_icon_cache.find(song,main,echo_prop_sx,h);
+	  if (picture->isNull())
 	    {
-	      picture.resize(echo_prop_sx,h+1);
+	      picture->resize(echo_prop_sx,h+1);
 	      QPainter icon;
-	      icon.begin(&picture);
+	      icon.begin(picture);
 	      
 	      echo_property his = song->get_histogram();
 	      if (main && !main->get_histogram().empty())
@@ -230,10 +240,9 @@ void QSong::paintCell(QVectorView* vv, int i, QPainter *p,const QColorGroup &cg,
 		      }
 		  }
 	      icon.end();
-	      echo_icon_cache.insert(song,picture);
 	    }
 
-	  p->drawPixmap(0,0,picture);
+	  p->drawPixmap(0,0,*picture);
 	  if (wid>echo_prop_sx)
 	    {
 	      p->setPen(Qt::white);
@@ -246,13 +255,12 @@ void QSong::paintCell(QVectorView* vv, int i, QPainter *p,const QColorGroup &cg,
       if (!song->get_rythm().empty())
 	{
 	  int h = height() - 1;
-	  QPixmap picture = rythm_icon_cache.find(song,main,wid,h);
-	  
-	  if (picture.isNull())
+	  QPixmap *picture = rythm_icon_cache.find(song,main,wid,h);
+	  if (picture->isNull())
 	    {
-	      picture.resize(wid,h+1);
+	      picture->resize(wid,h+1);
 	      QPainter icon;
-	      icon.begin(&picture);
+	      icon.begin(picture);
 	      
 	      rythm_property his = song->get_rythm();
 	      QColor co;
@@ -310,9 +318,8 @@ void QSong::paintCell(QVectorView* vv, int i, QPainter *p,const QColorGroup &cg,
 		  }
 	      
 	      icon.end();
-	      rythm_icon_cache.insert(song,picture);
 	    }
-	  p->drawPixmap(0,0,picture);
+	  p->drawPixmap(0,0,*picture);
 	  return;
 	}
       break;
@@ -320,13 +327,13 @@ void QSong::paintCell(QVectorView* vv, int i, QPainter *p,const QColorGroup &cg,
       if (!song->get_composition().empty())
 	{
 	  int h = height() - 1;
-	  QPixmap picture = composition_icon_cache.find(song,main,wid,h);
+	  QPixmap *picture = composition_icon_cache.find(song,main,wid,h);
 
-	  if (picture.isNull())
+	  if (picture->isNull())
 	    {
-	      picture.resize(wid,h+1);
+	      picture->resize(wid,h+1);
 	      QPainter icon;
-	      icon.begin(&picture);
+	      icon.begin(picture);
 	      
 	      composition_property his = song->get_composition();
 	      QColor co;
@@ -385,9 +392,8 @@ void QSong::paintCell(QVectorView* vv, int i, QPainter *p,const QColorGroup &cg,
 		      }
 		  }
 	      icon.end();
-	      composition_icon_cache.insert(song,picture);
 	    }
-	  p->drawPixmap(0,0,picture);
+	  p->drawPixmap(0,0,*picture);
 	  return;
 	}
       break;
@@ -401,18 +407,33 @@ void QSong::paintCell(QVectorView* vv, int i, QPainter *p,const QColorGroup &cg,
 	  QColorGroup ncg(cg);
 	  ncg.setColor(QColorGroup::Base,Config::get_color_unchecked());
 	  QVectorViewData::paintCell(vv,i,p,ncg,col,wid,align);
+	  return;
 	}
       else if (!song->get_ondisk())
 	{
 	  QColorGroup ncg(cg);
 	  ncg.setColor(QColorGroup::Base,Config::get_color_unavailable());
 	  QVectorViewData::paintCell(vv,i,p,ncg,col,wid,align);
-	}  
-      else
-	QVectorViewData::paintCell(vv,i,p,cg,col,wid,align);
+	  return;
+	}
     }
-  else
-    QVectorViewData::paintCell(vv,i,p,cg,col,wid,align);
+
+  // how many times did the song play ?
+
+
+  if (col==LIST_TITLE || col==LIST_AUTHOR || col==LIST_TIME
+      || col == LIST_VERSION || col==LIST_TAGS || col == LIST_INDEX 
+      || col == LIST_MD5SUM || col==LIST_FILE || col == LIST_MIN
+      || col == LIST_MAX || col==LIST_MEAN || col==LIST_POWER)
+    if (color=colorOfPlaycount(song))
+      {
+	QColorGroup ncg(cg);
+	ncg.setColor(QColorGroup::Base,*color);
+	QVectorViewData::paintCell(vv,i,p,ncg,col,wid,align);
+	delete(color);
+	return;
+      }
+  QVectorViewData::paintCell(vv,i,p,cg,col,wid,align);
 }
 
 QString QSong::Text(Song * j, int i)
@@ -455,6 +476,7 @@ QString QSong::Text(Song * j, int i)
     default:
       assert(0);
     }
+  return "NA";
   
 }
 

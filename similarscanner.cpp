@@ -26,6 +26,7 @@
 #include "kbpm-dj.h"
 #include "edit-distance.h"
 #include "scripts.h"
+#include "capacity.h"
 
 #define LIST_SONGNAME 0
 #define LIST_SIMILARNAME 1

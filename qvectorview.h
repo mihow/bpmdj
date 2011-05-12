@@ -57,11 +57,9 @@ class Q_EXPORT QVectorViewData : public Qt
   virtual void sort(int col, bool ascending) = 0;
   // Might require overriding
   virtual void paintCell( QVectorView*, int number, QPainter *, const QColorGroup & cg, int column, int width, int alignment );
-  virtual void paintFocus( QVectorView*, int number, QPainter *, const QColorGroup & cg, const QRect & r );
  private:
   void init();
   uint configured: 1;
-  void * columns;
   friend class QVectorView;
 };
 
@@ -74,7 +72,6 @@ class Q_EXPORT QVectorView: public QScrollView
   Q_OBJECT ;
   Q_ENUMS( ResizeMode RenameAction ) ;
   Q_PROPERTY( int columns READ columns ) ;
-  Q_PROPERTY( bool allColumnsShowFocus READ allColumnsShowFocus WRITE setAllColumnsShowFocus ) ;
   Q_PROPERTY( bool showSortIndicator READ showSortIndicator WRITE setShowSortIndicator ) ;
   Q_PROPERTY( int itemMargin READ itemMargin WRITE setItemMargin ) ;
   Q_PROPERTY( bool rootIsDecorated READ rootIsDecorated WRITE setRootIsDecorated ) ;
@@ -116,13 +113,10 @@ class Q_EXPORT QVectorView: public QScrollView
   virtual void setSelected( int i, bool );
   void setSelectionAnchor( int );
   bool isSelected( int ) const;
-  int selectedItem() const;
   virtual void setCurrentItem( int );
   int currentItem() const;
   int firstChild() const;
   int lastItem() const;
-  virtual void setAllColumnsShowFocus( bool );
-  bool allColumnsShowFocus() const;
   virtual void setItemMargin( int );
   int itemMargin() const;
   virtual void setRootIsDecorated( bool );
@@ -202,6 +196,8 @@ class Q_EXPORT QVectorView: public QScrollView
   GrowingArray<int> dirty_items; // items that need repainting
   int bottom_line_number;       // the lowest linenumber to on screen (the highest number)
   int top_line_number;          // the highest linenumber to on screen (the lowest number)
+ public:
+  void get_visible_range(int &lo, int &hi) {lo=top_line_number; hi=bottom_line_number;};
  private:
   ViewColumnInfo * d_vci;
   QHeader * d_h;
@@ -222,7 +218,6 @@ class Q_EXPORT QVectorView: public QScrollView
   QTimer *d_scrollTimer;
   bool d_sortIndicator		:1;
   // whether to select or deselect during this mouse press.
-  bool d_allColumnsShowFocus	:1;
   bool d_select			:1;
   // TRUE if the widget should take notice of mouseReleaseEvent
   bool d_buttonDown		:1;

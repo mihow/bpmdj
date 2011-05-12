@@ -27,6 +27,7 @@
 #include "echo-property.h"
 #include "composition-property.h"
 #include "rythm-property.h"
+#include "capacity.h"
 
 /*-------------------------------------------
  *         Index operations
@@ -78,7 +79,7 @@ class Index
   char            * index_time;           // the normal playing time of the song
   spectrum_type   * index_spectrum;       // the bark frequencies
   echo_property     index_histogram;     // the histogram of the SFFT at the different bark bands
-  rythm_property     index_rythm;         // the slice rotated SFFT of measures
+  rythm_property    index_rythm;         // the slice rotated SFFT of measures
   composition_property index_composition; // the autocorrelation of the composition of the song
   // information only available from v2.2 on
   char            * title;
@@ -94,6 +95,8 @@ class Index
   sample4_type       index_max;   // max value 
   sample4_type       index_mean;  // mean value
   power_type         index_power; // rms
+  // information availble from v2.9 and above
+  capacity_type      index_disabled_capacities;  // disabled capacities for this song
  private:
   // some conversion functions from old versions
   bool fix_tagline();
@@ -103,6 +106,7 @@ class Index
   void add_prev_history(HistoryField *);
   void add_next_history(HistoryField *);
   HistoryField * find_field(HistoryField **&, const char* mp3);
+  void make_valid_tar();
  protected:
   void init();
   void free();
@@ -116,8 +120,9 @@ class Index
   void read_v272_field();
   void read_v273_field();
   void read_v274_field();
+  void read_v291_field();
   void read_bib_field(const char* name);
-  void write_v274_field(FILE * file);
+  void write_v291_field(FILE * file);
  public:
   bool fix_tar_info();
   static void init_bib_batchread(const char* name);
@@ -132,6 +137,7 @@ class Index
   bool   valid_tar_info() {return meta_contains_tar;};
   char * encoded_tar();
   char * readable_description();
+  void   set_author(char * new_author);
   char * get_display_author()  { return author ? strdup(author) : strdup(""); };
   char * get_display_title();
   char * get_display_version() { if (version) return *version ? strdup(version) : strdup("1"); else return strdup("");}
@@ -207,6 +213,11 @@ class Index
   // composition accessors
   void             set_composition(composition_property r) { index_composition = r ; meta_changed = true; } ;
   composition_property get_composition() { return index_composition; };
+  // capacity accessors
+  capacity_type    get_disabled_capacities() { return index_disabled_capacities; };
+  void             set_disabled_capacities(capacity_type c) { index_disabled_capacities = c; meta_changed = true; };
+  // total useful playcount of this song (before or after a mix)
+  int              get_playcount();
 };
 
 #endif

@@ -23,7 +23,6 @@
 #include "cluster.h"
 #include "song.h"
 #include "data.h"
-#include "pixmap-cache.h"
 
 #define LIST_TEMPO 0
 #define LIST_DCOLOR 2
@@ -54,16 +53,12 @@ class QSong: public QVectorViewData
     singleton_accessors(int,compare_col);
     singleton_accessors(bool,compare_asc);
     singleton_accessors(int,song_count);
-   private:
-    static QPixmapCache echo_icon_cache;
-    static QPixmapCache rythm_icon_cache;
-    static QPixmapCache composition_icon_cache;
-    
+
    public:
     static void setVector(Song** arr, int cnt);
     // functions required by the vectorview
     virtual int vectorSize() const;
-    virtual bool isSelected(int i) const { return get_selected(i); };
+    virtual bool isSelected(int i) const { assert(i>=0); return get_selected(i); };
     virtual void setSelected(int i, bool val=true) {get_selected()[i]=val;};
     virtual void sort(int col, bool ascending);
     virtual void paintCell(QVectorView* vv, int i, QPainter *p, const QColorGroup &cg, int col, int wid, int align);
@@ -73,7 +68,8 @@ class QSong: public QVectorViewData
     QSong();
     static Song * songEssence(int i);
     static QColor * colorOfTempoCol(const Song* main, Song* song);
-    static QColor * colorOfAuthorCol(Song* song);
+    static QColor * colorOfAuthorCol(Song * song);
+    static QColor * colorOfPlaycount(Song * song);
     static QColor * QSong::colorOfdColorCol(Song* song);
     static void playedAuthorAtTime(int i, int t) {get_songs(i)->set_played_author_at_time(t);};
     static QString Text(Song * j, int i);

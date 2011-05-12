@@ -17,6 +17,8 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
+#ifndef _SYNCED_STERO
+#define _SYNCED_STERO
 #include "stereo-sample2.h"
 
 #define sync_max 8192
@@ -28,3 +30,4 @@ class synced_stereo_sample2
   stereo_sample2 value;
   signed4 sync;
 };
+#endif

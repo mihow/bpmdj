@@ -25,7 +25,6 @@
 #include <sys/stat.h>
 #include <qpainter.h>
 #include "songselector.logic.h"
-#include "qsong.h"
 #include "process-manager.h"
 #include "history.h"
 #include "dirscanner.h"
@@ -35,6 +34,9 @@
 #include "memory.h"
 #include "song-statistics.h"
 #include "song-metric.h"
+#include "song.h"
+
+init_singleton_var(Song,max_alltime_total,int,1);
 
 void Song::refill(Index &reader, bool allowed_to_write)
 {
@@ -61,6 +63,10 @@ void Song::refill(Index &reader, bool allowed_to_write)
   set_rythm(reader.get_rythm());
   set_composition(reader.get_composition());
   set_has_cues(reader.get_cue_z() + reader.get_cue_x() + reader.get_cue_c() + reader.get_cue_v());
+  int t = reader.get_playcount();
+  set_alltime_playcount(t);
+  if (t>get_max_alltime_total())
+    set_max_alltime_total(t);
 }
 
 bool Song::has_all_cluster_fields()
@@ -127,6 +133,7 @@ Song::Song()
   init_rythm();
   init_composition();
   init_ondisk_checked();
+  init_alltime_playcount();
 }
 
 Song::Song(Index * idx, bool allowwrite, bool check_ondisk)
@@ -144,7 +151,6 @@ Song::Song(Index * idx, bool allowwrite, bool check_ondisk)
 void Song::reread()
 {
   Index reader((const char*)get_storedin());
-  // if (reader.changed()) reader.write_idx();
   refill(reader);
 }
 
@@ -160,7 +166,7 @@ void Song::realize()
       char fullprop[500];
       sprintf(fullprop,"%s.idx",proposal);
       char * uniquename = findUniqueName(fullprop);
-      printf("Debug: realizing song %s as %s\n",proposal, uniquename);
+      // printf("Debug: realizing song %s as %s\n",proposal, uniquename);
       set_storedin(uniquename);
       transfer.nolonger_inbib();
       transfer.write_idx(get_storedin());
@@ -171,8 +177,16 @@ void Song::realize()
 
 void Song::setColor(QColor transfer)
 {
-  set_color(transfer);
-  set_spectrum_string(get_color().isValid() ? get_color().name() : QString::null);
+  if (transfer.isValid())
+    {
+      set_color(transfer);
+      set_spectrum_string(transfer.name());
+    }
+  else
+    {
+      set_color(QColor(255,255,255));
+      set_spectrum_string(QString::null);
+    }
 }
 
 void Song::simpledump(int d)
@@ -203,7 +217,6 @@ void Song::determine_color(float hue, float dummy, int dummy2, int dummy3)
   set_color(c);
   set_spectrum_string(tonumber((int)hue));
 }
-
 
 bool Song::tempo_show(const Song* main, bool uprange, bool downrange)
 {
@@ -256,21 +269,12 @@ float Song::distance(Point* point, Metriek* dp, double limit)
   return sm->distance((const Song &)*this,(const Song &)*(Song*)point,limit);
 }
 
-Point* Song::percentToward(Point * other, Metriek * dp, float percent)
+float Song::distance(Song* a, float wa, Song* b, float wb, Metriek * dp)
 {
-  Song * song = (Song*)other;
-  SongMetriek * measure = (SongMetriek*)dp;
-  assert(other);
-  assert(measure);
-  Song * result = new Song();
-  if (measure->tempo)
-    result->set_tempo(tempo_between(song,percent));
-  if (measure->spectrum)
-    {
-      result -> set_spectrum ( between_spectra(get_spectrum(),song->get_spectrum(),percent) );
-      result -> setColor( color_between(song,percent) );
-    }
-  return result;
+  double d1 = distance(a,dp,100000);
+  double d2 = distance(b,dp,100000);
+  double d  = (d1*wa+d2*wb)/(wa+wb);
+  return d;
 }
 
 bool Song::get_distance_to_main(float limit)

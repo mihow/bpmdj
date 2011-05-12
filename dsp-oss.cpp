@@ -29,6 +29,8 @@
 #include <signal.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
+#include <qstring.h>
+#include <qdialog.h>
 #include <libgen.h>
 #include <linux/soundcard.h>
 #include <time.h>
@@ -62,15 +64,15 @@ signed8 clock_ticks()
  *         Dsp operations
  *-------------------------------------------*/ 
 
-dsp_oss::dsp_oss() : dsp_driver()
+dsp_oss::dsp_oss(const PlayerConfig & config) : dsp_driver(config)
 {
-  opt_fragments = 0;
-  arg_dsp = "/dev/dsp";
-  arg_fragments = "16";
-  opt_nolatencyaccounting = 0;
+  opt_fragments = config.get_oss_init_fragments();
+  arg_dsp = strdup(config.get_oss_dsp());
+  arg_fragments = config.get_oss_fragments();
+  opt_nolatencyaccounting = config.get_oss_nolatencyaccounting();
   dsp_writecount=0;
-  opt_latency = 0;
-  arg_latency = "300";
+  arg_latency = config.get_oss_latency();
+  verbose = config.get_oss_verbose();
 }
 
 void dsp_oss::start()
@@ -168,12 +170,12 @@ int dsp_oss::open()
   {
     int latency_setter;
     int latency_checker;
-    p = atoi(arg_fragments) << 16;
-    latency_setter  = ms2bytes(atoi(arg_latency));
-    latency_setter /= atoi(arg_fragments);
-    latency_checker = atoi(arg_fragments);
+    p = arg_fragments << 16;
+    latency_setter  = ms2bytes(arg_latency);
+    latency_setter /= arg_fragments;
+    latency_checker = arg_fragments;
     if (verbose)
-      printf("dsp: setting latency to %s ms\n",arg_latency);
+      printf("dsp: setting latency to %d ms\n",arg_latency);
     while(latency_setter>=1)
       {
 	latency_setter/=2;
@@ -215,30 +217,6 @@ int dsp_oss::open()
 void dsp_oss::flush()
 {
   ioctl(dsp,SNDCTL_DSP_SYNC);
-}
-
-int dsp_oss::parse_option(char* arg, char* argument)
-{
-  if (option(arg,"latency","L")) 
-    {
-      arg_latency=argument;
-      return 2;
-    } 
-  if (option(arg,"dsp","d"))
-    {
-      arg_dsp=argument;
-      return 2;
-    } 
-  if (option(arg,"fragments","F"))
-    {
-      opt_fragments=true; 
-      arg_fragments=argument;
-    } 
-  if (option(arg,"nolatencyaccounting","X"))
-    {
-      opt_nolatencyaccounting=true;
-    } 
-  return dsp_driver::parse_option(arg,argument);
 }
 
 void dsp_oss::close()

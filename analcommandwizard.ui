@@ -1,0 +1,182 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>AnalyzerCommandWizard</class>
+<widget class="QDialog">
+    <property name="name">
+        <cstring>AnalyzerCommandWizard</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>549</width>
+            <height>235</height>
+        </rect>
+    </property>
+    <property name="sizePolicy">
+        <sizepolicy>
+            <hsizetype>3</hsizetype>
+            <vsizetype>3</vsizetype>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+        </sizepolicy>
+    </property>
+    <property name="caption">
+        <string>Analyzer Command</string>
+    </property>
+    <grid>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <widget class="QPushButton" row="5" column="2">
+            <property name="name">
+                <cstring>pushButton7</cstring>
+            </property>
+            <property name="text">
+                <string>Ok</string>
+            </property>
+        </widget>
+        <widget class="QPushButton" row="5" column="1">
+            <property name="name">
+                <cstring>pushButton8</cstring>
+            </property>
+            <property name="text">
+                <string>Cancel</string>
+            </property>
+        </widget>
+        <spacer row="5" column="0">
+            <property name="name">
+                <cstring>spacer4</cstring>
+            </property>
+            <property name="orientation">
+                <enum>Horizontal</enum>
+            </property>
+            <property name="sizeType">
+                <enum>Expanding</enum>
+            </property>
+            <property name="sizeHint">
+                <size>
+                    <width>278</width>
+                    <height>20</height>
+                </size>
+            </property>
+        </spacer>
+        <widget class="Line" row="4" column="0" rowspan="1" colspan="3">
+            <property name="name">
+                <cstring>line3</cstring>
+            </property>
+            <property name="frameShape">
+                <enum>HLine</enum>
+            </property>
+            <property name="frameShadow">
+                <enum>Sunken</enum>
+            </property>
+            <property name="orientation">
+                <enum>Horizontal</enum>
+            </property>
+        </widget>
+        <widget class="QLayoutWidget" row="2" column="0" rowspan="1" colspan="3">
+            <property name="name">
+                <cstring>layout18</cstring>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QLayoutWidget">
+                    <property name="name">
+                        <cstring>layout17</cstring>
+                    </property>
+                    <vbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>textLabel5</cstring>
+                            </property>
+                            <property name="text">
+                                <string>Analyzer name</string>
+                            </property>
+                        </widget>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>textLabel4_2</cstring>
+                            </property>
+                            <property name="text">
+                                <string>Remote location</string>
+                            </property>
+                        </widget>
+                    </vbox>
+                </widget>
+                <widget class="QLayoutWidget">
+                    <property name="name">
+                        <cstring>layout16</cstring>
+                    </property>
+                    <vbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QLineEdit">
+                            <property name="name">
+                                <cstring>player_name</cstring>
+                            </property>
+                        </widget>
+                        <widget class="QLineEdit">
+                            <property name="name">
+                                <cstring>remote</cstring>
+                            </property>
+                        </widget>
+                    </vbox>
+                </widget>
+            </hbox>
+        </widget>
+        <widget class="QLabel" row="1" column="0" rowspan="1" colspan="3">
+            <property name="name">
+                <cstring>textLabel1</cstring>
+            </property>
+            <property name="text">
+                <string>Choose a name for the configuration of this analyzer. 
+If you fill in a remote host it must be of the form 
+&lt;name&gt;@&lt;host&gt; (without ':'). E.g: werner@orbit. 
+ssh will be used to transfer the song and the index 
+file and then start the analyzer.</string>
+            </property>
+            <property name="alignment">
+                <set>WordBreak|AlignVCenter</set>
+            </property>
+        </widget>
+        <spacer row="0" column="0" rowspan="1" colspan="2">
+            <property name="name">
+                <cstring>spacer31</cstring>
+            </property>
+            <property name="orientation">
+                <enum>Vertical</enum>
+            </property>
+            <property name="sizeType">
+                <enum>Expanding</enum>
+            </property>
+            <property name="sizeHint">
+                <size>
+                    <width>20</width>
+                    <height>40</height>
+                </size>
+            </property>
+        </spacer>
+    </grid>
+</widget>
+<connections>
+    <connection>
+        <sender>pushButton7</sender>
+        <signal>clicked()</signal>
+        <receiver>AnalyzerCommandWizard</receiver>
+        <slot>accept()</slot>
+    </connection>
+    <connection>
+        <sender>pushButton8</sender>
+        <signal>clicked()</signal>
+        <receiver>AnalyzerCommandWizard</receiver>
+        <slot>reject()</slot>
+    </connection>
+</connections>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

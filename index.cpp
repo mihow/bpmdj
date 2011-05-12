@@ -41,10 +41,8 @@
 #include "memory.h"
 #include "spectrum-type.h"
 #include "kbpm-dj.h"
-#include "smallhistogram-type.cpp"
-#include "histogram-property.cpp"
-//#include "echo-property.h"
-//#include "histogram-property.h"
+#include "smallhistogram-type.h"
+#include "histogram-property.h"
 
 /*-------------------------------------------
  *         Performance operations
@@ -102,6 +100,13 @@ static char* strldup(char* str, int l)
 long int buffer_signed4()
 {
   signed4 p = *(long*)(buffer+buffer_ptr);
+  buffer_ptr+=4;
+  return p;
+}
+
+unsigned4 buffer_unsigned4()
+{
+  unsigned4 p = *(unsigned4*)(buffer+buffer_ptr);
   buffer_ptr+=4;
   return p;
 }
@@ -204,6 +209,7 @@ void Index::init()
   albums = allocate(1, AlbumField*);
   albums[0]=NULL;
   clear_energy();
+  index_disabled_capacities = no_disabled_capacities;
 }
 
 void Index::free()
@@ -268,6 +274,7 @@ void Index::write_idx()
    if (index_remark) fprintf(f,"remark   : %s\n",index_remark);
    if (index_time) fprintf(f,"time : %s\n",index_time);
    if (index_spectrum!=no_spectrum) index_spectrum->write_idx(f);
+   if (index_disabled_capacities!=no_disabled_capacities) fprintf(f,"disabled-capacities : %d\n",index_disabled_capacities);
    index_histogram.write_idx(f,"histogram");
    index_rythm.write_idx(f,"rythm");
    index_composition.write_idx(f,"composition");
@@ -547,6 +554,7 @@ void Index::read_idx(const char* indexn)
       else if(strcmp(field,"histogram")==0) index_histogram.read_idx(value);
       else if(strcmp(field,"rythm")==0) index_rythm.read_idx(value);
       else if(strcmp(field,"composition")==0) index_composition.read_idx(value);
+      else if(strcmp(field,"disabled-capacities")==0) index_disabled_capacities=atol(value);
       else if(strcmp(field,"prev")==0 || strcmp(field,"next")==0)
 	{
 	  char * subfield, * subvalue;
@@ -1163,6 +1171,82 @@ void Index::read_v274_field()
     }
 }
 
+void Index::read_v291_field()
+{
+  HistoryField * current = NULL;
+  // initialize the buffer to the correct size
+  // 1. read all kinds of strings
+  meta_contains_tar = true;   // otherwise it should not be placed into the .bib file
+  title = buffer_strdup();
+  author = buffer_strdup();
+  remix = zeroable(buffer_strdup());
+  version = buffer_strdup();
+  index_file= buffer_strdup();
+  buffer_strdup();  // was index_tempo
+  index_remark= zeroable(buffer_strdup());
+  index_time= buffer_strdup();
+  index_md5sum= buffer_strdup();
+  if (buffer_signed4())
+    {
+      index_spectrum = new spectrum_type();
+      index_spectrum->read_bib_v27();
+    }
+  else
+    index_spectrum = no_spectrum;
+  index_histogram.read_bib_v272();
+  index_rythm.read_bib_v272();
+  index_composition.read_bib_v272();
+  index_tags=buffer_strdup();
+  // 2. read all kinds of numbers
+  index_period = buffer_signed4();
+  index_bpmcount_from = buffer_signed4();
+  index_bpmcount_to = buffer_signed4();
+  index_cue = buffer_signed4();
+  index_cue_z = buffer_signed4();
+  index_cue_x = buffer_signed4();
+  index_cue_c = buffer_signed4();
+  index_cue_v = buffer_signed4();
+  index_min.left = buffer_signed4();
+  index_min.right = buffer_signed4();
+  index_max.left = buffer_signed4();
+  index_max.right = buffer_signed4();
+  index_mean.left = buffer_signed4();
+  index_mean.right = buffer_signed4();
+  index_power.left = buffer_float8();
+  index_power.right = buffer_float8();
+  index_disabled_capacities = buffer_unsigned4();
+
+  // 3. read the list structures... (prev, next, album)
+  int count;
+  count = buffer_signed4();
+  // printf("prev_count = %ld\n",count);
+  while(count-->0)
+    {
+      current = new HistoryField(buffer_strdup());
+      current->count = buffer_signed4();
+      current->comment = buffer_strdup();
+      add_prev_history(current);
+    }
+  count = buffer_signed4();
+  // printf("next_count = %ld\n",count);
+  while(count-->0)
+    {
+      current = new HistoryField(buffer_strdup());
+      current->count = buffer_signed4();
+      current->comment = buffer_strdup();
+      add_next_history(current);
+    }
+  count = buffer_signed4();
+  // printf("album_count = %ld\n",count);
+  while(count-->0)
+    {
+      int   nr = buffer_signed4();
+      char * n = buffer_strdup();
+      add_album(new AlbumField(nr,n));
+      // printf("Located in album %d : %s\n",nr,n);
+    }
+}
+
 static void file_string(char*str, FILE * f)
 {
   int written;
@@ -1179,7 +1263,7 @@ static void file_string(char*str, FILE * f)
   assert(written==1);
 }
 
-void Index::write_v274_field(FILE * index)
+void Index::write_v291_field(FILE * index)
 {
   HistoryField * current = NULL;
   // initialize the buffer to the correct size
@@ -1222,6 +1306,7 @@ void Index::write_v274_field(FILE * index)
   file_signed4(index_mean.right,index);
   file_float8(index_power.left,index);
   file_float8(index_power.right,index);
+  file_unsigned4(index_disabled_capacities,index);
   
   // 3. write the list structures... (prev, next, album)
   HistoryField ** tmp = prev;
@@ -1268,8 +1353,8 @@ void Index::write_v274_field(FILE * index)
 
 void Index::write_bib_field(FILE * index)
 {
-  file_signed4(274,index);
-  write_v274_field(index);
+  file_signed4(291,index);
+  write_v291_field(index);
 }
 
 long Index::read_bib_field(long position, const char* meta_shortname)
@@ -1290,6 +1375,7 @@ long Index::read_bib_field(long position, const char* meta_shortname)
   else if (meta_version==272) read_v272_field();
   else if (meta_version==273) read_v273_field();
   else if (meta_version==274) read_v274_field();
+  else if (meta_version==291) read_v291_field();
   else assert(0);
   // fix fields when necessary
   if (fix_tempo_fields()) meta_changed=true;
@@ -1540,6 +1626,8 @@ void Index::executeInfoDialog()
   info.versionEdit->setText(version);
   info.remixEdit->setText(remix);
   info.tagEdit->setText(index_tags);
+  capacity_type old_disabled_capacity = index_disabled_capacities;
+  init_capacity_widget(info.capacity,old_disabled_capacity);
   if (info.exec()==QDialog::Accepted)
     {
       field2this(title, title);
@@ -1547,6 +1635,8 @@ void Index::executeInfoDialog()
       field2this(remix, remix);
       field2this(version, version);
       field2this(tag, index_tags);
+      index_disabled_capacities = get_capacity(info.capacity);
+      meta_changed |= old_disabled_capacity!=index_disabled_capacities;
     }
 }
 
@@ -1620,4 +1710,38 @@ int Index::get_time_in_seconds()
   if (*T!=':') return -1;
   int seconds = atoi(T);
   return minutes*60+seconds;
+}
+
+void Index::make_valid_tar()
+{
+  if (valid_tar_info()) return;
+  title = strdup(meta_filename);
+  meta_contains_tar = true;
+  meta_changed = true;
+}
+
+void Index::set_author(char * new_author)
+{
+  if (!valid_tar_info()) make_valid_tar();
+  if (author) ::deallocate(author);
+  author = new_author;
+  meta_changed = true;
+}
+
+int Index::get_playcount()
+{
+  int total = 0;
+  if (prev)
+    {
+      int i = 0;
+      while(prev[i])
+	total+=prev[i++]->count;
+    }
+  if(next)
+    {
+      int i = 0;
+      while(next[i])
+	total+=next[i++]->count;
+    }
+  return total;
 }

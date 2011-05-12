@@ -19,7 +19,7 @@
 
 #include "pixmap-cache.h"
 
-QPixmapCache::QPixmapCache() : QIntCache<QPixmap>()
+PixmapCache::PixmapCache() : QIntCache<QPixmap>()
 {
   main = NULL;
   width = -1;
@@ -27,37 +27,29 @@ QPixmapCache::QPixmapCache() : QIntCache<QPixmap>()
   setAutoDelete(true);
 }
 
-void QPixmapCache::insert(Song* a, QPixmap * pm)
+QPixmap * PixmapCache::insert(Song* a, QPixmap * pm)
 {
   QIntCache<QPixmap>::insert((int)(void*)a,pm);
+  return pm;
 }
 
-void QPixmapCache::insert(Song* a, const QPixmap & pm)
-{
-  insert(a,new QPixmap(pm));
-}
-
-void QPixmapCache::remove(Song * a)
+void PixmapCache::remove(Song * a)
 {
   QIntCache<QPixmap>::remove((int)a);
 }
 
-const QPixmap QPixmapCache::find(Song* a, Song* m, int w, int h)
+QPixmap *PixmapCache::find(Song* a, Song* m, int w, int h)
 {
-  if(w!=width || h!=height || m!=main)
+  if (w!=width || h!=height || m!=main)
     {
       QIntCacheIterator<QPixmap> it(*this);
-      do
-	{
-	  QIntCache<QPixmap>::remove(it.currentKey());
-	}
-      while (!it.atLast());
+      while (!it.isEmpty())
+      	QIntCache<QPixmap>::remove(it.currentKey());
       main = m;
       width = w;
       height = h;
     }
   QPixmap * answer = QIntCache<QPixmap>::find((int)a);
-  
-  if (answer) return *answer;
-  return QPixmap();
+  if (answer) return answer;
+  return insert(a,new QPixmap());
 }

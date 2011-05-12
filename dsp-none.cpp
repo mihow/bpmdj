@@ -21,6 +21,8 @@
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
+#include <qdialog.h>
+#include <qstring.h>
 #include <string.h>
 #include <unistd.h>
 #include "player-core.h"
@@ -37,6 +39,7 @@ void dsp_none::start()
 
 void dsp_none::pause()
 {
+  wait_for_unpause();
 }
 
 void dsp_none::write(stereo_sample2 value)
@@ -56,28 +59,4 @@ int dsp_none::open()
 
 void dsp_none::close()
 {
-}
-
-extern void options_failure(char * err);
-int dsp_none::parse_option(char* arg, char* argument)
-{
-  if (option(arg,"dev")             )
-    {
-      options_failure("The --dev option is dependent on the alsa driver\n"
-		      "as such it should come _after_ the --alsa option\n");
-      return 1;
-    }
-  if (option(arg,"verbose","v")    )
-    {
-      options_failure("The -v option is dependent on a dsp driver,\n"
-		      "as such it should come _after_ a dsp selection\n"
-		      "(--alsa, --oss,...)\n");
-    } 
-  if (option(arg,"latency","L")) 
-    {
-      options_failure("The latency option is dependent on a dsp driver\n"
-		      "as such it should come _after_ a dsp selection \n"
-		      "(--alsa, --oss,...)\n");
-    } 
-  return 0;
 }

@@ -17,47 +17,20 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#include <unistd.h>
-#include <dirent.h>
-#include <qmessagebox.h>
-#include <ctype.h>
-#include <qdir.h>
-#include <qfiledialog.h>
-#include <qmultilineedit.h>
-#include <qlineedit.h>
-#include <qcheckbox.h>
-#include <assert.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <signal.h>
-#include <unistd.h>
-#include <errno.h>
-#include <sys/mount.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <sys/stat.h>
-#include <libgen.h>
-#include "preferences.h"
-#include "about.h"
 #include "songselector.logic.h"
-#include "history.h"
-#include "version.h"
-#include "kbpm-dj.h"
 #include "process-manager.h"
-#include "qsong.h"
-#include "config.h"
 #include "scripts.h"
-#include "memory.h"
+#include "history.h"
 
 Song* *ProcessManager::playing_songs = NULL;
 
 // when a process stops this method is called
 // normally it will immidatelly invoke the one and
 // only process manager.
-
 ProcessManager::ProcessManager(SongSelectorLogic * sel) :
-  BasicProcessManager(4,sel)
+  BasicProcessManager(4)
 {
+  listener = sel;
   monitorPlayCommand=1;
   selector = sel;
   playing_songs = allocate(pid_count,Song*);
@@ -119,10 +92,9 @@ void ProcessManager::startExtraSong(int id, Song *song)
   sprintf(playercommand,
 	  (const char*)(id == 3 ? Config::get_playCommand4()
 			: Config::get_playCommand3()),
-	  (const char*)Config::get_tmp_directory(),
 	  (const char*)matchWith->get_storedin(), 
 	  (const char*)song->get_storedin());
-  start(id,playercommand);
+  start(id,playercommand, QString("player#")+QString::number(id == 3 ? 4 : 3));
   get_selector()->updateProcessView(false);
 }
 
@@ -136,9 +108,7 @@ void ProcessManager::startSong(Song *song)
   // if there is still a song playing in the monitor, don't go
   if (active_pids[1]!=0)
     {
-      const QString a=QString("Error");
-      const QString b=QString("Cannot start playing in monitor, other monitor song still playing !");
-      QMessageBox::critical(NULL,a,b,QMessageBox::Ok,0,0);
+      Error(true,"Cannot start playing in monitor, other monitor song still playing !");
       return;
     }
   // create suitable start command
@@ -148,11 +118,10 @@ void ProcessManager::startSong(Song *song)
   player = monitorPlayCommand == 1 ? Config::get_playCommand1() : Config::get_playCommand2();
   sprintf(playercommand, 
 	  (const char*)player, 
-	  (const char*)Config::get_tmp_directory(),
 	  (const char*)matchWith->get_storedin(), 
 	  (const char*)playing_songs[1]->get_storedin());
   // fork the command and once the player exists immediatelly stop
-  start(1,playercommand);
+  start(1,playercommand, QString("player#")+QString::number(monitorPlayCommand == 1 ? 1 : 2));
   // if there is no main song playing. Place it in the main, otherwise, try the monitor
   if (!playingInMain())
     {

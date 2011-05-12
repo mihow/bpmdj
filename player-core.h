@@ -25,7 +25,7 @@
 /*-------------------------------------------
  *         Wavrate conversion routines
  *-------------------------------------------*/ 
-#define  WAVRATE  (44100)
+#define WAVRATE (44100)
 #define  samples2ms(samples) (int)(1000*(samples)/WAVRATE)
 #define  bytes2ms(bytes) (int)samples2ms((bytes)/4)
 #define  ms2samples(ms) (int)((ms)*WAVRATE/1000)
@@ -50,14 +50,14 @@ extern  cue_info cues[4];
 extern  char* wave_name;
 extern  Index* playing;
 unsigned4 wave_max();
-unsigned8 x_normalise(unsigned8 y);
-unsigned8 y_normalise(unsigned8 x);
+signed8   x_normalise(signed8 y);
+signed8   y_normalise(signed8 x);
 void      cue_set();
-void      cue_store(char*, int);
-void      cue_retrieve(char*, int);
+void      cue_store(int);
+void      cue_retrieve(int);
 void      jumpto(signed8, int);
 void      changetempo(signed8);
-void      cue_shift(char*, signed8);
+void      cue_shift(signed8);
 
 extern dsp_driver *dsp;
 
@@ -69,24 +69,22 @@ extern dsp_driver *dsp;
 #define   err_nospawn 3
 int       core_meta_init();
 int       core_object_init(bool sync);
-// opens the playing device
-// #define   err_mixer   4
 #define   err_dsp     5
 int       core_open();
 // plays until asked to stop
 void      core_play();
 bool      get_paused();
 void      pause_playing();
-void      unpause_if_necessary();
+void      unpause_playing();
 void      wait_for_unpause();
-void      stop_and_wait_for_finish();
 // closes the playing device
 void      core_close();
 // closes the wave and writes any changes to the index 
 void      core_done();
-// runs the entire core in its own thread and finishes 
-// when the stop flag is set
-int       core_run();
+// starts the core if the wave is already opened
+int       core_start();
+// waits for the core to finish, does nothing else
+void      core_stop();
 
 stereo_sample2 lfo_no(stereo_sample2 x);
 stereo_sample2 lfo_saw(stereo_sample2 x);
@@ -115,16 +113,16 @@ void map_set(signed2 map_size, map_data m, unsigned8 size, signed8 exit, bool lo
 void map_loop_set(bool l);
 void map_stop();
 
-extern int    opt_rms;
-extern float8 arg_rms;
 extern int   opt_quiet;
 extern int   opt_match;
 extern char* arg_match;
-extern char* arg_rawpath;
 extern char* argument;
 
 extern int app_init(int argc, char *argv[]);
 extern void process_options(int argc,char *argv[]);
-extern void msg_slowdown(int c);
-extern void msg_speedup(int c);
+extern void msg_playing_state_changed();
+
+// exported functions
+FILE * openCoreRawFile();
+
 #endif

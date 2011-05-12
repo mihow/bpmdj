@@ -18,9 +18,10 @@
 ****/
 
 #include "tags.h"
-#include "avltree.cpp"
+#include "memory.h"
+#include "avltree.h"
 #include "qstring-factory.h"
-#include "growing-array.cpp"
+#include "growing-array.h"
 
 Tag2Index::Tag2Index(QString pt, int idx) :
   Node<QString>()

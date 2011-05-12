@@ -23,7 +23,10 @@
 #include <qprogressbar.h>
 #include <qlabel.h>
 #include <qstatusbar.h>
+#include <qmutex.h>
 
 extern QApplication *app;
-extern const char* programname;
-extern QStatusBar* status;
+extern const char*   programname;
+extern QStatusBar*   status;
+extern QMutex        bpmdj_busy;
+#define EXCLUSIVE QMutexLocker bpmdj_entered(&::bpmdj_busy);

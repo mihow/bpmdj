@@ -19,19 +19,9 @@
 
 #include "version.h"
 
-#define ALSA_OPTION_HELP ""
-
 #ifdef COMPILE_ALSA
 #include <alsa/asoundlib.h>
 #include "dsp-drivers.h"
-
-#undef ALSA_OPTION_HELP
-#define ALSA_OPTION_HELP \
-"  --alsa-driver---------------------------------\n" \
-"               --alsa                use ALSA sound driver\n"\
-"               --dev arg             device to use (default = hw:0,0)\n" \
-"   -v          --verbose             be verbose with respect to latency\n"\
-"   -L nbr      --latency nbr         required latency in ms (default = 744)\n"
 
 class dsp_alsa: public dsp_driver
 {
@@ -42,17 +32,16 @@ class dsp_alsa: public dsp_driver
   unsigned4 * buffer;
   unsigned4 filled;
   void    wwrite(unsigned4 *value);
- public:
+  int        arg_latency;
   char *     arg_dev;
-  char *     arg_latency;
-  dsp_alsa();
+ public:
+  dsp_alsa(const PlayerConfig & config);
   void    start();
   void    pause();
   void    write(stereo_sample2 value);
   signed8 latency();
   int     open();
   void    close();
-  int     parse_option(char* option, char* argument);
 };
 
 #endif

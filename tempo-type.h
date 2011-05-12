@@ -24,7 +24,7 @@ class tempo_type
 {
  public:
   float tempo;
-  static const float no_tempo = -1;
+  static const float no_tempo;
   tempo_type()
     {
       tempo = no_tempo;

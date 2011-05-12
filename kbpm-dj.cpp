@@ -25,9 +25,12 @@
 #include <qgroupbox.h>
 #include <qlabel.h>
 #include <stdlib.h>
+#include <qptrvector.h>
 #include <qprogressbar.h>
-#include <qsplashscreen.h>
 #include <qmessagebox.h>
+#include <qimage.h>
+#include <qcstring.h>
+#include <qintcache.h>
 #include "kbpm-dj.h"
 #include "setupwizard.h"
 #include "songselector.logic.h"
@@ -38,8 +41,52 @@
 #include "scripts.h"
 #include "loader.h"
 #include "tags.h"
+#include "qsong.h"
+#include "magic.h"
+#include "embedded-files.h"
+#include "histogram-property.cpp"
+#include "smallhistogram-type.cpp"
+#include "avltree.cpp"
+#include "growing-array.cpp"
+#include "signals-template.cpp"
 
+/*-------------------------------------------
+ *         Templates we need
+ *-------------------------------------------*/
+
+// types
+template class smallhistogram_type<32>;
+template class smallhistogram_type<96>;
+template class histogram_property<32>;
+template class histogram_property<96>;
+
+// signals
+template double normalize_abs_max<double>(double*, long);
+template double find_abs_max<double>(double*, long);
+
+// trees
+template class AvlTree<QString>;
+template class Node<QString>;
+template class AvlTree<Song*>;
+template class Node<Song*>;
+template class Sentinel<QString>;
+template class Sentinel<Song*>;
+
+// arrays
+template class GrowingArray<Song*>;
+template class GrowingArray<int>;
+template class GrowingArray<BasicProcessManager*>;
+template class GrowingArray<QString>;
+
+// qt based templates
+template class QIntCache<QPixmap>;
+template class QPtrVector<QVectorView::Column>;
+
+/*-------------------------------------------
+ *         BpmDj Main Startup
+ *-------------------------------------------*/
 QApplication *app;
+QMutex bpmdj_busy(true);
 
 class RawScanner: public DirectoryScanner
 {
@@ -70,7 +117,7 @@ public:
   };
   virtual void scan()
   { 
-    DirectoryScanner::scan(Config::get_tmp_directory(),NULL); 
+    DirectoryScanner::scan("./",NULL); 
   };
 };
 
@@ -78,41 +125,29 @@ public:
  * The overriden loader object will allow us to load the picture from
  * another place
  */
-class BpmDjSplash: public QSplashScreen
+class BpmDjSplash: public Loader
 {
 public:
-  QProgressBar * progress;
-  QLabel       * reading;
-  BpmDjSplash(const QPixmap & pm);
+  BpmDjSplash();
 };
 
-BpmDjSplash::BpmDjSplash(const QPixmap & pm): QSplashScreen(pm)
+BpmDjSplash::BpmDjSplash(): Loader(NULL,NULL,FALSE,WStyle_Customize | WStyle_Splash)
 {
-  progress = new QProgressBar(this);
-  progress->setGeometry( QRect( 10, 160, 378, 27 ) );
-  progress->setPaletteBackgroundPixmap( pm );
-  progress->setBackgroundOrigin( QLabel::ParentOrigin );
-  reading = new QLabel( this, "reading" );
-  reading->setGeometry( QRect( 12, 136, 376, 19 ) );
-  reading->setBackgroundOrigin( QLabel::ParentOrigin );
-  reading->setPaletteBackgroundPixmap( pm );
-  show();
+  // read the image from memory
+  QByteArray image_data;
+  image_data.setRawData(logo_png,logo_png_size);
+  QImage image(image_data);
+  // when deleting the object we don't want to screw our memory
+  image_data.resetRawData(logo_png,logo_png_size);
+  QPixmap pixmap(image);
+  // set the dialog background
+  setPaletteBackgroundPixmap(pixmap);
+  progress->setProgress(0,0);
   app->processEvents();
-}
-
-BpmDjSplash * create_splash()
-{
-  QString logo_name = ".bpmdj-logo.png";
-  QPixmap *bpmdj = new QPixmap(logo_name);
-  if (bpmdj->isNull() || !Config::get_shown_aboutbox())
-    {
-      // if we don't have the pixmap we create a window and get it from there
-      Loader * loader = new Loader();
-      const QPixmap * created = loader->paletteBackgroundPixmap();
-      (*bpmdj)=(*created);
-      created->save(logo_name,"PNG");
-    }
-  return new BpmDjSplash(*bpmdj);
+  // show it
+  show();
+  // make sure it is there
+  app->processEvents();
 }
 
 const char* programname;
@@ -120,6 +155,8 @@ QStatusBar* status = NULL;
 
 int main(int argc, char* argv[])
 {
+  init_embedded_files();
+
   programname = argv[0];
 
   Tags::init();
@@ -130,7 +167,7 @@ int main(int argc, char* argv[])
   
   // 2. read the configuration
   Config::load();    
-  BpmDjSplash * splash = create_splash();
+  BpmDjSplash * splash = new BpmDjSplash();
 
   // 1.a first check the availability of a number of directories...
   DIR * mdir;
@@ -168,7 +205,7 @@ int main(int argc, char* argv[])
     if (QMessageBox::warning(NULL,RAW_EXT " files check",
 			     "There are some left over "RAW_EXT" files. These are:\n"+raw.result,
 			     "Remove", "Ignore", 0, 0, 1)==0)
-      removeAllRaw(Config::get_tmp_directory());  
+      removeAllRaw("./");  
   
   // 3. read all the files in memory
   main_window.initialize_using_config();

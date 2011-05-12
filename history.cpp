@@ -30,9 +30,12 @@
 #include <qlineedit.h>
 #include <assert.h>
 #include <stdio.h>
+#include <qmessagebox.h>
+#include <qfiledialog.h>
 #include <qinputdialog.h>
 #include "history.h"
 #include "common.h"
+#include "scripts.h"
 
 Song * History::t_2 = NULL;
 Song * History::t_1 = NULL;
@@ -40,6 +43,7 @@ Song * History::t_0 = NULL;
 init_singleton_var(History,songs_played,int,0);
 QListView * History::log_ui = NULL;
 FILE *History::f = NULL;
+QString History::history_filename;
 
 History::History(const QString filename, DataBase *db, QListView * putin)
 {
@@ -60,6 +64,7 @@ History::History(const QString filename, DataBase *db, QListView * putin)
       if (line)
 	deallocate(line);
     }
+  history_filename = filename;
   f=fopen(filename,"ab");
 }
 
@@ -79,6 +84,43 @@ void History::mark_as_played(Song *song)
 		      tonumber(get_songs_played()),
 		      song->get_title(),
 		      song->get_author());
+}
+
+void History::save_history()
+{
+  // ask for filename
+  QString s = QFileDialog::getSaveFileName("","History (*.log)",NULL,"Save Play History","Choose a filename" );
+  if (s.isNull()) return;
+  // open target file
+  const char* filename = s;
+  vexecute(CP"\"%s\" \"%s\"",(const char*)history_filename,filename);
+}
+
+void History::clear_history(DataBase * db)
+{
+  // check user stupidity
+  if (QMessageBox::question(NULL,"Clear History", 
+			    "Are you sure that you want\n"
+			    "to clear the history ?", 
+			    QMessageBox::Yes, 
+			    QMessageBox::No|QMessageBox::Default)
+      !=QMessageBox::Yes) return;
+  // clear history view
+  log_ui->clear();
+  // clear file
+  fclose(f);
+  f=fopen(history_filename,"wb");
+  // clear memory marks
+  GrowingArray<Song*> *songs = db->getAllSongs();
+  for(int i = 0 ; i < songs->count ; i++)
+    {
+      Song * song = songs->elements[i];
+      if (song)
+	{
+	  song->init_played_author_at_time();
+	  song->init_played();
+ 	}
+    }
 }
 
 void History::this_is_playing(Song * main_now)

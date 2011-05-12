@@ -32,7 +32,6 @@
 #include <qcursor.h>
 #include <qptrstack.h>
 #include <qptrlist.h>
-#include <qstrlist.h>
 #include <qapplication.h>
 #include <qbitmap.h>
 #include <qdatetime.h>
@@ -49,7 +48,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include "qvectorview.h"
-#include "growing-array.cpp"
+#include "growing-array.h"
 
 class ItemColumnInfo
 {
@@ -80,7 +79,6 @@ QVectorViewData::QVectorViewData( )
 void QVectorViewData::init()
 {
     ownHeight = 0;
-    columns = 0;
     configured = FALSE;
 }
 
@@ -111,37 +109,24 @@ void QVectorViewData::paintCell(QVectorView* lv, int number, QPainter * p, const
   QFontMetrics fm( p->fontMetrics() );
   QString t = text( number, column );
   int marg = lv->itemMargin();
-  int r = marg;
   const BackgroundMode bgmode = lv->viewport()->backgroundMode();
   const QColorGroup::ColorRole crole = QPalette::backgroundRoleFromMode( bgmode );
   if ( cg.brush( crole ) != lv->colorGroup().brush( crole ) )
     p->fillRect( 0, 0, width, height(), cg.brush( crole ) );
   else
     lv->paintEmptyArea( p, QRect( 0, 0, width, height() ) );
-  if ( isSelected(number) &&
-       (column == 0 || lv->allColumnsShowFocus()) ) 
+  if ( isSelected(number) ) 
     {
-      p->fillRect( r - marg, 0, width - r + marg, height(),
-		   cg.brush( QColorGroup::Highlight ) );
+      p->fillRect( 0 , 0, width, height(), cg.brush( QColorGroup::Highlight ) );
       p->setPen( cg.highlightedText() );
     } 
   else 
     p->setPen( cg.text() );
-  //  bool reverse = FALSE;
   if ( !t.isEmpty() ) {
     if ( !(align & AlignTop || align & AlignBottom) )
       align |= AlignVCenter;
-    p->drawText( r, 0, width-marg-r, height(), align, t );
+    p->drawText(marg , 0, width, height(), align, t );
   }  
-}
-
-void QVectorViewData::paintFocus( QVectorView* lv, int number, QPainter *p, const QColorGroup &cg, const QRect & r )
-{
-  lv->style().drawPrimitive( QStyle::PE_FocusRect, p, r, cg,
-			     (isSelected(number) ?
-			      QStyle::Style_FocusAtBorder :
-			      QStyle::Style_Default),
-			     QStyleOption(isSelected(number) ? cg.highlight() : cg.base() ));
 }
 
 QVectorView::QVectorView( QWidget * parent, QVectorViewData * container, WFlags f)
@@ -171,7 +156,6 @@ void QVectorView::init()
     d_dirtyItemTimer = new QTimer( this );
     d_visibleTimer = new QTimer( this );
     d_margin = 1;
-    d_allColumnsShowFocus = FALSE;
     d_fontMetricsHeight = fontMetrics().height();
     d_h->setTracking(TRUE);
     d_buttonDown = FALSE;
@@ -249,7 +233,7 @@ QVectorView::~QVectorView()
 }
 
 void QVectorView::drawContentsOffset( QPainter * p, int ox, int oy,
-				    int cx, int cy, int cw, int ch )
+				      int cx, int cy, int cw, int ch )
 {
   if ( columns() == 0 ) 
     {
@@ -341,95 +325,22 @@ void QVectorView::drawContentsOffset( QPainter * p, int ox, int oy,
 		r.setRect( x - ox, y - oy, cs, ih );
 		p->save();
 		// No need to paint if the cell isn't technically visible
-		if ( !( r.width() == 0 || r.height() == 0 ) ) {
-		  p->translate( r.left(), r.top() );
-		  int ac = d_h->mapToLogical( c );
-		  // map to Left currently. This should change once we
-		  // can really reverse the listview.
-		  int align = columnAlignment( ac );
-		  if ( align == AlignAuto ) align = AlignLeft;
-		  //if ( d_useDoubleBuffer ) 
-		  // {
-		  //assert(0);
-		  /*
-		    QRect a( 0, 0, r.width(), current->i->height() );
-		    QSharedDoubleBuffer buffer( p, a, QSharedDoubleBuffer::Force );
-		    if ( buffer.isBuffered() ) paintEmptyArea( buffer.painter(), a );
-		    buffer.painter()->setFont( p->font() );
-		    buffer.painter()->setPen( p->pen() );
-		    buffer.painter()->setBrush( p->brush() );
-		    buffer.painter()->setBrushOrigin( -r.left(), -r.top() );
-		    current->i->paintCell( buffer.painter(), cg, ac, r.width(),align );
-		  */
-		  // } 
-		  // else 
-		  // {
-		  // WVB -- modified this to pass the linenumber instead of the
-		  // listviewitem
-		  item_container->paintCell(this, current, p, cg, ac, r.width(), align);
-		  // was originally:
-		  //   current->i->paintCell( p, cg, ac, r.width(),align );
-		  //}
-		}
+		if ( !( r.width() == 0 || r.height() == 0 ) ) 
+		  {
+		    p->translate( r.left(), r.top() );
+		    int ac = d_h->mapToLogical( c );
+		    // map to Left currently. This should change once we can really reverse the listview.
+		    int align = columnAlignment( ac );
+		    if ( align == AlignAuto ) align = AlignLeft;
+		    item_container->paintCell(this, current, p, cg, ac, r.width(), align);
+		  }
 		p->restore();
 		x += cs;
 		c++;
-	      }
-	    
-	    if ( current == d_focusItem && hasFocus() && !d_allColumnsShowFocus ) 
-	      {
-		p->save();
-		int cell = d_h->mapToActual( 0 );
-		QRect r( d_h->cellPos( cell ) - ox, y - oy, d_h->cellSize( cell ), ih );
-		// WVB -- no parents
-		// if ( current->i->parentItem )
-		// r.setLeft( r.left() + current->l * treeStepSize() );
-		if ( r.left() < r.right() )
-		  // WVB -- use item_container instead
-		  item_container->paintFocus(this, current, p, colorGroup(), r);
-		// removed current->i->paintFocus( p, colorGroup(), r );
-		p->restore();
-	      }
+	      }	    
 	  }
 	
 	const int cell = d_h->mapToActual( 0 );
-	
-	// does current need focus indication?
-	if ( current == d_focusItem && hasFocus() && d_allColumnsShowFocus ) 
-	  {
-	    p->save();
-	    int x = -contentsX();
-	    int w = header()->cellPos( header()->count() - 1 ) +
-	      header()->cellSize( header()->count() - 1 );
-	    
-	    r.setRect( x, y - oy, w, ih );
-	    if ( d_h->mapToActual( 0 ) == 0 /* WVB || ( current->l == 0 && !rootIsDecorated() ) */ )
-	      {
-		int offsetx = QMIN( /* WVB current->l * treeStepSize() */ 0, d_h->cellSize( cell ) );
-		r.setLeft( r.left() + offsetx );
-		//WVB -- changed to item_container
-		// current->i->paintFocus( p, colorGroup(), r );
-		item_container->paintFocus(this, current, p, colorGroup(), r);
-	      } 
-	    else
-	      {
-		// WVB - we assume a standard depth of 000
-		// int xdepth = QMIN( treeStepSize() * ( current->i->depth() + ( rootIsDecorated() ? 1 : 0) )
-		// + itemMargin(), d_h->cellSize( cell ) );
-		int xdepth = QMIN( itemMargin(), d_h->cellSize( cell ) );
-		xdepth += d_h->cellPos( cell );
-		QRect r1( r );
-		r1.setRight( d_h->cellPos( cell ) - 1 );
-		QRect r2( r );
-		r2.setLeft( xdepth - 1 );
-		item_container->paintFocus(this, current, p,colorGroup(),r1);
-		item_container->paintFocus(this, current, p,colorGroup(),r2);
-		// WVB -- removed 
-		//current->i->paintFocus( p, colorGroup(), r1 );
-		//current->i->paintFocus( p, colorGroup(), r2 );
-	      }
-	    p->restore();
-	  }
 	
 	if ( tx < 0 )
 	  tx = d_h->cellPos( cell );
@@ -462,7 +373,7 @@ void QVectorView::buildDrawableList()
   // could mess with cy and ch in order to speed up vertical scrolling
   int cy = contentsY();
   int ch = ((QVectorView *)this)->visibleHeight();
-  d_topPixel = cy + ch; // one below bottom
+  d_topPixel = cy + ch;   // one below bottom
   d_bottomPixel = cy - 1; // one above top
   int ih = item_container->height();
   top_line_number = d_bottomPixel / ih;
@@ -1391,11 +1302,6 @@ bool QVectorView::isSelected( int i ) const
   return item_container->isSelected(i);
 }
 
-int QVectorView::selectedItem() const
-{
-  return -1;
-}
-
 void QVectorView::setCurrentItem( int i )
 {
   if ( i<0 || i>=item_container->vectorSize() || d_focusItem == i)
@@ -1492,17 +1398,6 @@ void QVectorView::reconfigureItems()
 void QVectorView::widthChanged( int c )
 {
 }
-
-void QVectorView::setAllColumnsShowFocus( bool enable )
-{
-    d_allColumnsShowFocus = enable;
-}
-
-bool QVectorView::allColumnsShowFocus() const
-{
-    return d_allColumnsShowFocus;
-}
-
 
 int QVectorView::firstChild() const
 {

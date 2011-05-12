@@ -28,6 +28,8 @@ extern const QString zero;
 extern const QString zeroo;
 extern const QString slash;
 extern const QString EMPTY;
+extern const QString ANAL_NOTNEC;
+extern const QString ANAL_NEC;
 
 QString tonumber(const int b);
 QString tonumber(const float f);
@@ -37,7 +39,6 @@ class QStringFactory
   private:
     static bool killed;
     static AvlTree<QString> tree;
-    static QString * lookup(QString *str);
   public:
     // WVB -- try to majke this const char *str)
     static QString create(char* str);

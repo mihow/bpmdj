@@ -8,7 +8,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>951</width>
+            <width>906</width>
             <height>487</height>
         </rect>
     </property>
@@ -36,6 +36,12 @@
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                 </sizepolicy>
+            </property>
+            <property name="frameShape">
+                <enum>NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+                <enum>Plain</enum>
             </property>
             <property name="text">
                 <string>Key:</string>

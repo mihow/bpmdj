@@ -20,7 +20,20 @@
 #define PROCESS_MGR_H
 
 #include "basic-process-manager.h"
-#include "config.h"
+
+/**
+ * TODO: this should be renamed to PlayerChanged
+ */
+class ProcessChanged
+{
+ public:
+  virtual ~ProcessChanged() {};
+  virtual void resetCounter() {};
+  virtual void updateProcessView() {};
+};
+
+class SongSelectorLogic;
+class Song;
 
 class ProcessManager:
   public BasicProcessManager
@@ -28,14 +41,17 @@ class ProcessManager:
   public:
     static Song* *playing_songs;
     SongSelectorLogic * selector;
+    ProcessChanged* listener;
   private:
     int monitorPlayCommand;
     inline SongSelectorLogic* get_selector() { return selector; };
     virtual void clearId(int id);
   public:
     static inline Song* playingInMain() {return playing_songs[0];};
+    static inline Song* playingInMonitor() {return playing_songs[1];};
     static inline bool monitorFree() {return playing_songs[1]==NULL;};
     ProcessManager(SongSelectorLogic *sel);
+    virtual ~ProcessManager() {};
     void clearPlayer(int id, bool update=true);
     void switchMonitorToMain();
     void setMainSong(Song * song);

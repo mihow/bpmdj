@@ -20,15 +20,17 @@
 #include "songplayer.h"
 #include "basic-types.h"
 #include "rythm-analyzer.h"
+#include "analyzer.h"
 
-class RythmDialogLogic : public RythmDialog
+class RythmDialogLogic : public RythmDialog, public ReentrantAnalyzer
 {
    Q_OBJECT
  public:
    RythmDialogLogic(SongPlayer*parent=0, const char * name=0, bool modal=FALSE, WFlags f=0);
  public slots:
    virtual void calculateRythmPattern2();
-   virtual void calculateRythmPattern() { calculateRythmPattern2();};
+   virtual void run() { calculateRythmPattern2();};
+   virtual void calculate() { startAnalyzer(); };
 };
 
 void write_out_projection(long slice_size, unsigned4 *phases, int maximum_slice, const char * target);

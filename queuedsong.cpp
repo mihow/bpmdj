@@ -29,6 +29,7 @@
 #include "dirscanner.h"
 #include "queuedsong.h"
 #include "tags.h"
+#include "config.h"
 
 #define QUEUED_ANKER 0
 #define QUEUED_DLINE 1
@@ -45,6 +46,22 @@
 #define QUEUED_MD5SUM 12
 #define QUEUED_FILE 13
 
+QString QueuedAnalSong::text(int i) const
+{
+  switch (i)
+    {
+    case ANAL_TITLE : return song->get_title();
+    case ANAL_AUTHOR : return song->get_author();
+    case ANAL_INDEX : return song->get_storedin();
+    case ANAL_RMS : return needs_energy() ? ANAL_NEC : ANAL_NOTNEC;
+    case ANAL_TEMPO : return needs_tempo() ? ANAL_NEC : ANAL_NOTNEC;
+    case ANAL_SPECTRUM : return needs_spectrum() ? ANAL_NEC : ANAL_NOTNEC;
+    case ANAL_ECHO : return needs_echo() ? ANAL_NEC : ANAL_NOTNEC;
+    case ANAL_RYTHM : return needs_rythm() ? ANAL_NEC : ANAL_NOTNEC;
+    case ANAL_COMPOSITION : return needs_composition() ? ANAL_NEC : ANAL_NOTNEC;
+    }
+  return QListViewItem::text(i);
+}
 
 /**
  * this is a mess... (TM)
@@ -192,6 +209,9 @@ QueuedSong::QueuedSong(QListView* parent, QListViewItem *after) :
   pos = parent->childCount();
 }
 
+QueuedAnalSong::QueuedAnalSong(QListView* parent, Song * s) :
+  QListViewItem(parent), song(s) {};
+
 void QueuedSong::setSong(Song* s, double d)
 {
   song=s; 
@@ -200,3 +220,40 @@ void QueuedSong::setSong(Song* s, double d)
     setText(QUEUED_TEMPO, song->tempo_str()); 
 }
 
+QString QueuedAnalSong::getCommand(QString form)
+{
+  QString tempoLine = "";
+  if (needs_tempo())
+    {
+      char frombound[500], tobound[500];
+      frombound[0]=tobound[0]=0;
+      if (Config::get_anal_bpm_from())
+	sprintf(frombound,"--low %g",Config::get_anal_bpm_from());
+      if (Config::get_anal_bpm_to())
+	sprintf(tobound,"--high %g",Config::get_anal_bpm_to());
+      int technique = Config::get_anal_bpm_technique();
+      tempoLine=QString("--bpm ")+QString::number(technique)+" "+frombound+" "+tobound;
+    }
+
+  QString spectrumLine = "";
+  if (needs_spectrum() || needs_echo())
+    spectrumLine="--spectrum";
+  
+  QString energyLine = "";
+  if (needs_energy())
+    energyLine="--energy";
+  
+  QString rythmLine = "";
+  if (needs_rythm() || needs_composition()) 
+    rythmLine="--rythm";
+  
+  song->realize();
+  return 
+    form+
+    QString(" -q --batch ") + 
+    QString(tempoLine)+" "+
+    QString(spectrumLine)+" "+
+    QString(energyLine)+" "+
+    QString(rythmLine)+" "+
+    QString("\"")+song->get_storedin()+"\"";
+}

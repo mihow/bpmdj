@@ -41,6 +41,7 @@ class History
   static Song * t_1;  // T - 1
   static Song * t_0;  // T: the current main
   static FILE* f;
+  static QString history_filename;
   singleton_accessors(int,songs_played);
   static QListView * log_ui;
   static void mark_as_played(DataBase * db, QString s);
@@ -48,4 +49,6 @@ class History
  public:
   History(const QString filename, DataBase * db, QListView * putin);
   static void this_is_playing(Song * main_now);
+  static void save_history();
+  static void clear_history(DataBase * db);
 };

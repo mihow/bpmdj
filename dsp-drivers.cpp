@@ -18,8 +18,12 @@
 ****/
 
 #include <assert.h>
+#include <qdialog.h>
+#include <qstring.h>
 #include "dsp-oss.h"
 #include "dsp-alsa.h"
+#include "dsp-none.h"
+#include "dsp-mixed.h"
 
 #ifndef COMPILE_OSS
 #ifndef COMPILE_ALSA
@@ -30,12 +34,14 @@
 #endif
 #endif
 
-int dsp_driver::parse_option(char* opt, char* argument)
+dsp_driver * dsp_driver::get_driver(PlayerConfig * cfg)
 {
-  if (option(opt,"v","verbose"))
+  switch (cfg->get_player_dsp())
     {
-      verbose = true;
-      return 1;
+    case 0 : return new dsp_none ( * cfg ) ;
+    case 1 : return new dsp_oss  ( * cfg ) ;
+    case 2 : return new dsp_alsa ( * cfg ) ;
+    case 3 : return new dsp_mixed( * cfg ) ;
     }
-  return 0;
+  return new dsp_none( * cfg );
 }

@@ -46,6 +46,9 @@
 #include <sys/times.h>
 #include <math.h>
 #include <assert.h>
+#include <stdlib.h>
+#include <sys/mman.h>
+#include <syscall.h>
 #include <math.h>
 #include "bpm-analyzer.logic.h"
 #include "sys/times.h"
@@ -53,6 +56,7 @@
 #include "player-core.h"
 #include "fourier.h"
 #include "scripts.h"
+#include "bpm.h"
 #include "memory.h"
 
 //#define PROFILER
@@ -222,7 +226,7 @@ void BpmAnalyzerDialog::timerTick()
 
 void BpmAnalyzerDialog::readAudio()
 {
-  FILE * raw = openRawFile(playing,arg_rawpath);
+  FILE * raw = openCoreRawFile();
   
   // read complete file shrunken down into memory
   audiosize=fsize(raw);
@@ -280,7 +284,7 @@ void BpmAnalyzerDialog::readAudio()
 
 void BpmAnalyzerDialog::readAudioBlock(int blocksize)
 {
-  FILE * raw = openRawFile(playing,arg_rawpath);
+  FILE * raw = openCoreRawFile();
   
   // read complete file shrunken down into memory
   audiosize=fsize(raw);  // uitgedrukt in bytes...
@@ -486,7 +490,7 @@ void BpmAnalyzerDialog::fft()
 {
   // first we need to read all data in memory en scale it down
   signed8 audiosize;
-  FILE * raw = openRawFile(playing,arg_rawpath);
+  FILE * raw = openCoreRawFile();
   fseek(raw,0,SEEK_END);
   audiosize = ftell(raw) / 4;
   fseek(raw,0,SEEK_SET);
@@ -587,7 +591,7 @@ void BpmAnalyzerDialog::enveloppe_spectrum()
   // first we need to read all data in memory en scale it down
   start_timer();
   signed8 audiosize;
-  FILE * raw = openRawFile(playing,arg_rawpath);
+  FILE * raw = openCoreRawFile();
   fseek(raw,0,SEEK_END);
   audiosize = ftell(raw) / 4;
   fseek(raw,0,SEEK_SET);
@@ -701,7 +705,7 @@ void BpmAnalyzerDialog::autocorrelate_spectrum()
   // 0. read everything in memory
   start_timer();
   signed8 audiosize;
-  FILE * raw = openRawFile(playing,arg_rawpath);
+  FILE * raw = openCoreRawFile();
   fseek(raw,0,SEEK_END);
   audiosize = ftell(raw) / 4;
   fseek(raw,0,SEEK_SET);
@@ -815,6 +819,24 @@ void BpmAnalyzerDialog::autocorrelate_spectrum()
     }
 }
 
+void BpmAnalyzerDialog::wec()
+{
+  // 0. read everything in memory
+  start_timer();
+  FILE * file = openCoreRawFile();
+  assert(file);
+  int fd = fileno(file);
+  unsigned4 map_length = fsize(file);
+  stereo_sample2 * audio = (stereo_sample2*)mmap(NULL,map_length,PROT_READ,MAP_SHARED,fd,0);
+  assert(audio!=MAP_FAILED);
+  assert(audio);
+  BpmCounter bc(stderr,audio,map_length/4,WAVRATE,startbpm,stopbpm);
+  tempo_type result(bc.measure());
+  munmap(audio,map_length);
+  stop_timer();
+  set_measured_period("Wec",tempo_to_period(result).period*4);
+}
+
 // momenteel wordt een scan 457 keer uitgevoerd... ongeveer...
 void BpmAnalyzerDialog::run()
 {
@@ -879,6 +901,12 @@ void BpmAnalyzerDialog::run()
       return;
     }
 
+  if (weightedEnvCor->isChecked()) 
+    {
+      wec();
+      return;
+    }
+
   if (stop_signal) return;
 
   if (ultraLongFFT->isChecked()) 
@@ -893,8 +921,9 @@ void BpmAnalyzerDialog::run()
       p.end();
       BpmPix->setPixmap(*pm);
     }
-    
+   
   if (stop_signal) return;
+  
   if (resamplingScan->isChecked())
     {
       rayshoot_scan();

@@ -18,16 +18,19 @@
 ****/
 
 #include <stdio.h>
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#include <qstring.h>
+#include <qdialog.h>
 #include "player-core.h"
 #include "md5-analyzer.h"
 #include "scripts.h"
-#include <assert.h>
+
 void Md5Analyzer::run()
 {
   FILE * kloink;
-  if (!vexecute("md5sum \"%s\" | awk '{printf $1}' >sum.tmp\n",argument))
+  if (!vexecute("md5sum \"%s\" | awk '{printf $1}' >sum.tmp",argument))
     exit(101);
   kloink=fopen("sum.tmp","r");
   char s[40];

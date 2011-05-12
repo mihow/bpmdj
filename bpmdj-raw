@@ -22,10 +22,10 @@ songname="$2"
 songlocation=$songname
 rawname=$1"`basename "$2"`.raw"
 extension=${songname##*.}
-
 #echo LOCATION = $songlocation
 #echo RAWNAME = $rawname
 #echo EXTENSION = $extension
+#echo DECODER = $DECODER
 
 # if the raw filename already exists, don't write it
 (test -f "$rawname") && exit 1;
@@ -34,12 +34,42 @@ extension=${songname##*.}
 (! (test -f "$songlocation") ) && songlocation=music/"$songlocation" \
 && (! (test -f "$songlocation") ) && exit 2;
 
-# now check the filename extension
-#case $extension in 
-#  (MP3)  mpg123 -s "$songlocation" >"$rawname" 2>/dev/null;;
-#  (mp3)  mpg123 -s "$songlocation" >"$rawname" 2>/dev/null;;
-#  (ogg)  ogg123 -q -d raw -f "$rawname" "$songlocation";;
-#  (flac) ogg123 -q -d raw -f "$rawname" "$songlocation";;
-#esac;
+#____________________________________________________________
+# DECODER 1: mplayer 1.0pre6-3.3.5 decoder
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+if test $DECODER = "1"; then
+    echo "Information: decoder is mpg123"
+    mpg123 -s "$songlocation" >"$rawname" ;
+ 
+#____________________________________________________________
+# DECODER 2: mplayer 1.0pre6-3.3.5 decoder
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+elif test $DECODER = "2"; then
+    echo "Information: decoder is mpg321"
+    mpg321 -s "$songlocation" >"$rawname";
+    
+#____________________________________________________________
+# DECODER 3: ogg123 decoder
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+elif test $DECODER = "3"; then
+    echo "Information: decoder is ogg123"
+    ogg123 -q -d raw -f "$rawname" "$songlocation";
 
-mplayer "$songlocation" -ao pcm -aofile "$rawname" -af resample=44100 -really-quiet 2>/dev/null >/dev/null
+#____________________________________________________________
+# DECODER 4: mplayer 1.0pre6-3.3.5 decoder
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+elif test $DECODER = "4"; then
+    echo "Information: decoder is mplayer 1.0pre6"
+    mplayer "$songlocation" -ao pcm -aofile "$rawname" -af resample=44100 -vo null -quiet;
+    
+#____________________________________________________________
+# DECODER 5: mplayer 1.0pre7-3.3.5 decoder
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+elif test $DECODER = "5"; then
+    echo "Information: decoder is mplayer 1.0pre7"
+    # the pre7 release is somewhat troubling because it seems unable to 
+    # use a resmapling filter of the same freq as the normal data format
+    mplayer "$songlocation" -ao pcm:file="$rawname" -af resample=44100 -vo null -quiet;
+    (test -f "$rawname") && exit 0;
+    mplayer "$songlocation" -ao pcm:file="$rawname" -vo null -quiet;
+fi

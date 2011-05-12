@@ -22,27 +22,22 @@
 #include "config.h"
 #include "growing-array.h"
 
-class ProcessChanged
-{
- public:
-  virtual void resetCounter() {};
-  virtual void updateProcessView() {};
-};
-
+class DiedProcesses;
 class BasicProcessManager
 {
-  public:
-    int * active_pids;
-    int * died_pids;
-    int   pid_count;
+  private:
+    void processDied(int pid);
+    friend class DiedProcesses;
   protected:
-    virtual void processDied(int pid);
+    int * active_pids;
+    int   pid_count;
     virtual void clearId(int id);
-    ProcessChanged* listener;
   public:
-    BasicProcessManager(int count, ProcessChanged *lis);
+    BasicProcessManager(int count);
+    virtual ~BasicProcessManager() {};
     virtual void checkSignals();
-    virtual void start(int id, const char* command);
+    virtual void start(int id, const char* command) {assert(0);};
+    virtual void start(int id, const char* command, QString logname);
 };
 
 #endif

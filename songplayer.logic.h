@@ -24,6 +24,9 @@
 
 class BpmAnalyzerDialog;
 
+#define TAB_BEATGRAPH 2
+#define TAB_OPTIONS   3 
+
 class SongPlayerLogic : 
   public SongPlayer
 {
@@ -124,4 +127,13 @@ class SongPlayerLogic :
    virtual void openInfo();
    virtual void openAbout();
    virtual void tabChanged();
+   // functions to have an exclusive sound card selection
+   virtual void setAlsa();
+   virtual void setOss();
+   virtual void setBpmMixingDesk();
+   virtual void restartCore();
+   virtual void customEvent(QCustomEvent * e);
+   virtual void startCore();
+   virtual void stopCore();
+   virtual void initCore();
 };

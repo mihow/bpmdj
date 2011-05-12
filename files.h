@@ -31,10 +31,12 @@ void file_signed4  (signed4     i, FILE * f);
 void file_float4   (float4      i, FILE * f);
 void file_float8   (float8      i, FILE * f);
 void file_unsigned1(unsigned1   i, FILE * f);
+void file_unsigned4(unsigned4   i, FILE * f);
 void file_sequence (unsigned1 * a, int length, FILE *f);
 
 // reading
 float4    buffer_float4();
 unsigned1 buffer_unsigned1();
+unsigned4 buffer_unsigned4();
 void      buffer_sequence(unsigned1 *a, int length);
 

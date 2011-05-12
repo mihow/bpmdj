@@ -24,23 +24,17 @@
 #include <qpixmap.h>
 #include "song.h"
 
-/**
- * This pixmap cache allows the songselector to create pixmaps
- * and store them for later reference. The cache automatically deletes
- * pixmaps which are no longer necessary.
- */
-class QPixmapCache: private QIntCache<QPixmap>
+class PixmapCache: private QIntCache<QPixmap>
 {
   private:
     int width;
     int height;
     Song * main;
-    void insert(Song* a, QPixmap * pm);
-  public:
-    QPixmapCache();
-    void insert(Song* a, const QPixmap & pm);
+    QPixmap * insert(Song* a, QPixmap * pm);
     void remove(Song* a);
-    const QPixmap find(Song* a, Song* m, int w, int h);
+  public:
+    PixmapCache();
+    QPixmap * find(Song* a, Song* m, int w, int h);
 };
 
 #endif

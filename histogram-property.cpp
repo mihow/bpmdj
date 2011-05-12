@@ -17,6 +17,9 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
+#ifndef HISTOGRAM_PROP_CPP
+#define HISTOGRAM_PROP_CPP
+
 #include <assert.h>
 #include <math.h>
 #include <stdlib.h>
@@ -24,6 +27,12 @@
 #include "common.h"
 #include "memory.h"
 #include "signals.h"
+
+
+template <int bandsize> void histogram_property<bandsize>::init()
+{
+  bark = new smallhistogram_type<bandsize>[spectrum_size]();
+}
 
 template <int bandsize> void histogram_property<bandsize>::read_idx(const char *str)
 {
@@ -78,7 +87,4 @@ template <int bandsize> void histogram_property<bandsize>::read_bib_v272()
     bark[i].read_bib_v272();
 }
 
-
-// instatiating some dummys
-static const histogram_property<32> ignore_1;
-static const histogram_property<96> ignore_2;
+#endif

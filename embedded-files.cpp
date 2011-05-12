@@ -17,6 +17,27 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#include "composition-property.h"
-#include "smallhistogram-type.cpp"
-#include "histogram-property.cpp"
+#include "embedded-files.h"
+
+/**
+ * Here we perofrm the linkage to the objects
+ */
+#define FILE(name) \
+  extern const char _binary_##name## _start; \
+  extern const char _binary_##name## _end; \
+  int name## _size; \
+  const char * name;
+EMBEDDED_FILES
+#undef FILE
+
+void init_embedded_files()
+{
+/**
+ * here we map the objectaddresses to proper defined variables
+ */
+#define FILE(name) \
+  name## _size = & _binary_##name## _end - & _binary_##name## _start; \
+  name         = & _binary_##name## _start;
+EMBEDDED_FILES
+#undef FILE
+}

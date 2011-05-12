@@ -19,7 +19,7 @@
 
 #include "song.h"
 #include "heap.h"
-#include "avltree.cpp"
+#include "avltree.h"
 
 class SongWithDistance: public Node<Song*>
 {

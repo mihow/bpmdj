@@ -71,6 +71,7 @@ template <class Key> class Node
    Node<Key> * right;
    int       flag;
    Node<Key>();
+   virtual ~Node<Key>() {};
    virtual int compareAddData(Node<Key>* w2) = 0; // compares this with w2
    virtual int compareSearchData(Key key) = 0;    // compares this with key
    virtual void print() {assert(0);};

@@ -18,20 +18,20 @@
 ****/
 
 #include "version.h"
+#include "player-config.h"
+#include "dsp-drivers.h"
 #include "common.h"
-
-#define NONE_OPTION_HELP \
-"  --none-driver---------------------------------\n"\
-"               --none                use no sound driver (default)\n"
 
 class dsp_none: public dsp_driver
 {
-  void    start();
-  void    pause();
-  void    write(stereo_sample2 value);
-  signed8 latency();
-  int     open();
-  void    close();
-  int     parse_option(char* arg, char* argument);
+  public:
+    dsp_none(const PlayerConfig & config) : dsp_driver(config) {};
+    void    start();
+    void    pause();
+    void    write(stereo_sample2 value);
+    signed8 latency();
+    int     open();
+    void    close();
+    virtual bool is_none() { return true;};
 };
 

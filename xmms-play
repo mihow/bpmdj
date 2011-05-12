@@ -1,5 +1,6 @@
 #!/bin/bash
-cat $3 | grep file | awk -F ": " '{print "xmms -e \"" $2 "\""}' >/tmp/filename
+echo "$3"
+cat "$3" | grep file | head -n 1 | awk -F ": " '{print "xmms -e \"" $2 "\""}' >/tmp/filename
 cat /tmp/filename
 cd music
 . /tmp/filename &

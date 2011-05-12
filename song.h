@@ -34,6 +34,7 @@ QString tonumber(const int b);
 
 class Song: public Point
 {
+  singleton_accessors(int, max_alltime_total);
   // taken from the index file
   accessors(QString, title,"");
   accessors(QString, author,"");
@@ -63,6 +64,7 @@ class Song: public Point
   accessors(bool,ondisk_checked,false);
   accessors(int,has_cues,0);
   accessors(int,played_author_at_time,-100);
+  accessors(int,alltime_playcount,0);
  private:
   void  init(const QString fullname, bool checkondisk);
   void  clearFloatingFields();
@@ -86,7 +88,8 @@ class Song: public Point
   QColor  color_between(Song* song, float percent);
   virtual float distance(Point* point, Metriek * dp, double limit);
   virtual float distance(Point* point, Metriek* dp);
-  virtual Point* percentToward(Point * other, Metriek * dp, float percent);
+  virtual float distance(Song* a, float wa, Song* b, float wb, Metriek * dp);
+ public:
   virtual void simpledump(int d);
   virtual void determine_color(float hue, float, int, int);
   virtual void color_sub_elements(int a, int b, float d);

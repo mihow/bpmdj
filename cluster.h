@@ -36,13 +36,14 @@ class Point
 {
   public:
     Point();
+    virtual ~Point() {};
     virtual float  distance(Point * other, Metriek * dp) {return 0;};
     virtual Point* percentToward(Point * other, Metriek * dp, float percent) {return NULL;};
     virtual void   simpledump(int d) {};
     virtual void   determine_color(float hue_min, float hue_max, int depth, int stopat) {};
     virtual int    cluster_elements() { return 1; };
-    virtual int    clusters_with_size(int min_size, int max_size,float &min_internal_distance, float& max_internal_distance) {assert(0);};
-    virtual int    color_clusters_with_size(int min, int max, int nr, int count, float min_dist, float max_dist) {assert(0);};
+    virtual int    clusters_with_size(int min_size, int max_size,float &min_internal_distance, float& max_internal_distance) {assert(0); return 0;};
+    virtual int    color_clusters_with_size(int min, int max, int nr, int count, float min_dist, float max_dist) {assert(0);  return 0;};
     virtual void   color_sub_elements(int, int, float) {assert(0);};
     virtual void   color_clusters_dw(float hue_min, float hue_max, float max_dist, float last_dist);
     virtual void   color_clusters_dw2(float hue_min, float hue_max, int min_depth, int max_depth, int depth);
@@ -68,6 +69,7 @@ class Couple: public Point
   int second;
  public:
   Couple(int a, int b);
+  virtual ~Couple() {};
   float distance2point(int idx, Metriek* metriek);
   virtual void simpledump(int d);
   virtual void determine_color(float hue_min, float hue_max, int depth, int stopat);

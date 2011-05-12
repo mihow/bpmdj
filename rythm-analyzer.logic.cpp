@@ -37,6 +37,8 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <signal.h>
+#include <fftw3.h>
+#include <qmessagebox.h>
 #include <sys/ioctl.h>
 #include <qspinbox.h>
 #include <unistd.h>
@@ -55,9 +57,7 @@
 #include "kbpm-play.h"
 #include "version.h"
 #include "scripts.h"
-#include "signals.h"
-#include <fftw3.h>
-#include <qmessagebox.h>
+#include "pca.h"
 
 RythmDialogLogic::RythmDialogLogic(SongPlayer*parent, const char*name, bool modal, WFlags f) :
   RythmDialog(0,name,modal,f)
@@ -80,108 +80,498 @@ static double tovol(double a)
   return r+30;
 }
 
+double xy_dist(double x1, double y1, double x2, double y2)
+{
+  double a = x1 - x2;
+  double b = y1 - y2;
+  a *= a;
+  b *= b;
+  return sqrt(a+b);
+}
+
+void wavelet_subtraction_test(long slice_size, unsigned4* phases, int maximum_slice, const char* target)
+{
+  int window_size = higher_power_of_two(slice_size);
+  maximum_slice--;
+  Signal<signed2,2> slice(window_size);
+  Signal<double,2>  pattern(window_size);
+  pattern.clear();
+  
+  // read file, rotate and place in pattern array
+  SignalIO<signed2,2> i(openCoreRawFile(),false);
+  for(int x = 0 ; x < maximum_slice ; x++)
+    {
+      i.readSamples(slice,x*slice_size);
+      Shift<signed2,2> shifted(slice,phases[x]);
+      Signal<double,2> waved(window_size);
+      Haar<signed2,double,2> h(shifted,waved,true);
+      h.execute();
+      waved.absolute();
+      pattern.add(waved);
+    }
+  
+  pattern.divide(maximum_slice);
+  //  pattern.normalize_abs_max();
+  //  pattern.multiply(32768);
+  
+  Signal<double,2> wave_pattern(window_size);
+  Haar<double,double,2> forward1(pattern,wave_pattern,true);
+  forward1.execute();
+  
+  // read file, rotate and place in pattern array
+  SignalIO<signed2,2> o(target,"wb");
+  for(int x = 0 ; x < maximum_slice ; x++)
+    {
+      printf("%d/%d\n",x,maximum_slice);
+      i.readSamples(slice,x*slice_size);
+      Shift<signed2,2> shifted(slice,phases[x]);
+      Signal<double,2> new_wave(window_size);
+      Haar<signed2,double,2> forward(shifted,new_wave,true);
+      forward.execute();
+      for(int k = 0 ; k < window_size ; k++)
+	for(int l = 0 ; l < 2 ; l++)
+	  {
+	    double T = new_wave.get(k,l);
+	    double W = fabs(wave_pattern.get(k,l));
+	    if (T > 0)
+	      new_wave.set(k,l,T-W > 0 ? T-W : 0);
+	    else
+	      new_wave.set(k,l,T+W < 0 ? T+W : 0);
+	  }
+      //      new_wave-=wave_pattern;
+      Haar<double,double,2> backward(new_wave,new_wave,false);
+      backward.execute();
+      new_wave.normalize_abs_max();
+      new_wave.multiply(32768);
+      Shift<double,2> S(new_wave,-phases[x]);
+      o.writeSamples(S,slice_size);
+    }
+}
+
+void subtraction_test(long slice_size, unsigned4* phases, int maximum_slice, const char* target)
+{
+  int window_size = higher_power_of_two(slice_size);
+  maximum_slice--;
+  Signal<signed2,2> slice(window_size);
+  Signal<double,2>  pattern(window_size);
+  pattern.clear();
+  
+  // read file, rotate and place in pattern array
+  SignalIO<signed2,2> f(openCoreRawFile(),false);
+  for(int x = 0 ; x < maximum_slice ; x++)
+    {
+      f.readSamples(slice,x*slice_size);
+      Shift<signed2,2> shifted(slice,phases[x]);
+      pattern.add(shifted);
+    }
+  
+  pattern.normalize_abs_max();
+  pattern.multiply(32768);
+  
+  // read file, rotate and place in pattern array
+  SignalIO<signed2,2> out(target,"wb");
+  for(int x = 0 ; x < maximum_slice ; x++)
+    {
+      f.readSamples(slice,x*slice_size);
+      Signal<double,2> slice2(slice);
+      Shift<double,2> shifted(pattern,-phases[x]);
+      slice2-=shifted;
+      out.writeSamples(slice2,slice_size);
+    }
+}
+
+/**
+ * Calculates the raw overlay pattern and writes it out to disk after shaping
+ * the spectrum to fit the perfect spectrum.
+ */
+static double perfectspectrum[barksize] = 
+  {
+    7.48973,   8.60855,   7.30108,   6.08735,
+    5.05958,   4.22398,   3.55564,   2.84894,
+    1.99757,   1.37338,   0.814002,  0.479557,
+   -0.125073, -0.522579, -0.939505, -1.68769,
+   -2.2336,   -3.15377,  -4.26618,  -5.23179,
+   -6.09273,  -7.06462,  -8.35773,  -10.1641
+  };
+
+void shape(Signal<double,2> &in)
+{
+  in.normalize_abs_max();
+  HalfComplex<double,2> *freq = new HalfComplex<double,2>(in.length/2,in.length/2);
+  Fft<2> forward(in,*freq);
+  forward.execute();
+  Signal<double,2> energy(in.length/2);
+  Signal<double,2> angle(in.length/2);
+  freq->toPolar(energy,angle);
+  Sample<double,2> basis = 0;
+  for(int b = 0 ; b < barksize ; b ++)
+    {
+      double a = barkbounds[b];
+      double c = barkbounds[b+1];
+      int l = (int)(a * in.length / 44100.0);
+      int r = (int)(c * in.length / 44100.0);
+      Sample<double,2> e = 0;
+      for(int i = l ; i < r ; i ++)
+	{
+	  // this strange construction is due to the tovol function
+	  e[0]+=tovol(fabs(energy[i][0]*cos(angle[i][0])));
+	  e[1]+=tovol(fabs(energy[i][1]*cos(angle[i][1])));
+	}
+      e/=r-l;
+      if (b==0) basis=e;
+      e-=basis;
+      double f = perfectspectrum[b];
+      printf("%g\t%g\n",e[0],f);
+      e[0]=exp10((f-e[0])/10);
+      e[1]=exp10((f-e[1])/10);
+      printf("factor for %d is %g\n",b,e[0]);
+      for(int i = l ; i < r ; i ++)
+	energy.set(i,energy[i]*e);
+    }
+  
+  double a = barkbounds[barksize];
+  double c = 22050;
+  int l = (int)(a * in.length / 44100.0);
+  int r = (int)(c * in.length / 44100.0);
+  for(int i = l ; i < r ; i ++)
+    energy.set(i,0);
+  
+  freq->fromPolar(energy,angle);
+  Fft<2> backward(*freq,in);
+  backward.execute();
+  delete(freq);
+}
+
+void pattern_shaped_test(long slice_size, unsigned4* phases, int maximum_slice, const char* target)
+{
+  int window_size = higher_power_of_two(slice_size);
+  maximum_slice--;
+  Signal<signed2,2> slice(slice_size);
+  Signal<double,2>  pattern(window_size);
+  pattern.clear();
+  
+  // read file, rotate and place in pattern array
+  SignalIO<signed2,2> f(openCoreRawFile(),false);
+  for(int x = 0 ; x < maximum_slice ; x++)
+    {
+      f.readSamples(slice,x*slice_size);
+      Shift<signed2,2> shift(slice,phases[x]);
+      pattern.add(shift);
+    }
+  
+  shape(pattern);
+  pattern.normalize_abs_max();
+  
+  // write out the pattern
+  SignalIO<signed2,2> out(target,"wb");
+  pattern.multiply(32767);
+  out.writeSamples(pattern,slice_size);
+  out.writeSamples(pattern,slice_size);
+  out.writeSamples(pattern,slice_size);
+  out.writeSamples(pattern,slice_size);
+}  
+
+/**
+ * Calculates the raw overlay pattern and writes it out to disk 
+ */
+void pattern_test(long slice_size, unsigned4* phases, int maximum_slice, const char* target)
+{
+  int window_size = higher_power_of_two(slice_size);
+  maximum_slice--;
+  Signal<signed2,2> slice(window_size);
+  Signal<double,2>  pattern(window_size);
+  pattern.clear();
+  
+  // read file, rotate and place in pattern array
+  SignalIO<signed2,2> f(openCoreRawFile(),false);
+  for(int x = 0 ; x < maximum_slice ; x++)
+    {
+      f.readSamples(slice,x*slice_size);
+      Shift<signed2,2> shift(slice,phases[x]);
+      pattern.add(shift);
+    }
+  
+  pattern.normalize_abs_max();
+
+  // multiply rotating pattern with the signal
+
+  // write out the pattern
+  SignalIO<signed2,2> out(target,"wb");
+  pattern.multiply(32767);
+  out.writeSamples(pattern,slice_size);
+  out.writeSamples(pattern,slice_size);
+  out.writeSamples(pattern,slice_size);
+  out.writeSamples(pattern,slice_size);
+}  
+
+
 void write_out_projection(long slice_size, unsigned4* phases, int maximum_slice, const char* target)
 {
-  FILE * f = openRawFile(playing,arg_rawpath);
-  stereo_sample2 *slice = allocate(slice_size,stereo_sample2);
-  double *pattern_l = allocate(slice_size,double);
-  double *pattern_r = allocate(slice_size,double);
-  for(int y = 0 ; y < slice_size ; y++)
-    pattern_l[y] = pattern_r[y] = 0;
+  int frame_size = higher_power_of_two(2 * WAVRATE / 40);
+  Signal<double,2> curr_frame(frame_size);
+  Signal<double,2> prev_frame(frame_size);
+  HalfComplex<double,2> curr_spectr(frame_size/2,frame_size/2);
+  HalfComplex<double,2> prev_spectr(frame_size/2,frame_size/2);
+  Fft<2> curr_forward(curr_frame,curr_spectr);
+  //  Signal<double,2> curr_energy(frame_size/2);
+  //  Signal<double,2> curr_angle(frame_size/2);
+  //  Signal<double,2> prev_energy(frame_size/2);
+  SignalIO<signed2,2> f(openCoreRawFile());
+  unsigned4 l = f.samples();
+  curr_frame.clear();
+  // we allocate the matrix
+  int count = l/frame_size;
+  float ** target_m = matrix(count,frame_size);
+  for(unsigned4 x = 0 ; x + frame_size < l ; x+=frame_size)
+    {
+      // read current frame
+      f.readSamples(curr_frame,x);
+      curr_forward.execute();
+      printf("%d/%d\n",(int)x/frame_size,count);
+      fflush(stdout);
+      for(int i = 0 ; i < frame_size ; i ++)
+	target_m[(x/frame_size)+1][i+1]=curr_spectr.get(i)[0];
+    }
+  char *ignore = NULL;
+  printf("starting PCA\n");
+  fflush(stdout);
+  do_pca(count,frame_size,target_m,ignore);
+  if (ignore) printf("%s\n",ignore);
+  else
+    for(unsigned4 x = 0 ; x + frame_size < l ; x+=frame_size)
+      printf("%g %g\n",target_m[(x/frame_size)+1][1],target_m[(x/frame_size)+1][2]);
+  fflush(stdout);
+  exit(0);
+}  
+
+/**
+ * In this routine we go through the song window size by window size and 
+ * we subtract the energy of x windows ago, we keep the phase as it was. 
+ */
+void write_out_projection_hald_working(long slice_size, unsigned4* phases, int maximum_slice, const char* target)
+{
+  int frame_size = higher_power_of_two(2 * WAVRATE / 40);
+  Signal<double,2> curr_frame(frame_size);
+  Signal<double,2> prev_frame(frame_size);
+  HalfComplex<double,2> curr_spectr(frame_size/2,frame_size/2);
+  HalfComplex<double,2> prev_spectr(frame_size/2,frame_size/2);
+  Fft<2> curr_forward(curr_frame,curr_spectr);
+  Fft<2> prev_forward(prev_frame,prev_spectr);
+  Fft<2> curr_backward(curr_spectr,curr_frame);
+  Signal<double,2> curr_energy(frame_size/2);
+  Signal<double,2> curr_angle(frame_size/2);
+  Signal<double,2> prev_energy(frame_size/2);
+  SignalIO<signed2,2> f(openCoreRawFile());
+  SignalIO<signed2,2> out(target,"wb");
+  unsigned4 l = f.samples();
+  curr_frame.clear();
+  out.writeSamples(curr_frame,frame_size);
+  for(unsigned4 x = 0 ; x + frame_size < l ; x+=frame_size/8)
+    {
+      printf("%d/%d\n",(int)x/frame_size,(int)l/frame_size);
+      // read current frame
+      f.readSamples(curr_frame,x);
+      // read old frame
+      if (x>slice_size)
+	f.readSamples(prev_frame,x-slice_size);
+      // convert both to their spectrum
+      curr_forward.execute();
+      prev_forward.execute();
+      // measure the difference in energy and store it into 
+      curr_spectr.toPolar(curr_energy,curr_angle);
+      prev_spectr.toPolar(prev_energy);
+      //      prev_energy.smooth(40);
+      //      prev_energy.multiply(1.75);
+      curr_energy-=prev_energy;
+      curr_energy>=0;
+      curr_energy.absolute();
+      // change the energy of the new spectrum
+      curr_spectr.fromPolar(curr_energy,curr_angle);
+      // do backward transform
+      curr_frame.clear();
+      curr_backward.execute();
+      curr_frame.divide(frame_size);
+      // and write it out
+      out.writeSamples(curr_frame,frame_size/8);
+    }
+  exit(0);
+}  
+
+// deconvolution really messes it up because we need to describe all the
+// remaining as superpositions of the entire wave...
+// we don't want that. We want to filter out those frequencies
+// I still do have a problem with the theory:
+// a single pulse convolved with the full measure = measure
+// however, if we divide this in the specrtaldomain by itself 
+// we get white noise, in which all frequencies are present.
+// this is the good thing, we really get whiteish noise.
+// if we then remove any frequency smaller < 1
+// what we are looking for is (* = convolution)
+// a = p*s+r >==> A=P.S+R
+// we want s to be as sparse as possible and a the remainder
+// we also want p to be the mean measure, so we now have 
+void write_out_projection_old(long slice_size, unsigned4* phases, int maximum_slice, const char* target)
+{
+  int     window_size = higher_power_of_two(slice_size);
+  maximum_slice--;
+  Signal<signed2,2> slice(window_size);
+  Signal<double,2> pattern(window_size);
+  pattern.clear();
+  
+  // read file, rotate and place in pattern array
+  printf("First run\n");
+  SignalIO<signed2,2> f(openCoreRawFile());
+  for(int x = 0 ; x < maximum_slice ; x++)
+    {
+      f.readSamples(slice,x*slice_size);
+      Shift<signed2,2> shift(slice,phases[x]);
+      pattern.add(shift);
+    }
+
+  pattern.normalize_abs_max();
+
+  // convert to frequency domain
+  HalfComplex<double,2> spectrum(window_size/2,window_size/2);
+  Fft<2> forward(pattern,spectrum);
+  forward.execute();
+  
+  // we traverse the entire file
+  int max_frames = f.samples();
+  max_frames /=window_size;
+  Signal<double,2> frame(window_size);
+  HalfComplex<double,2> spec(window_size/2,window_size/2);
+  Fft<2> warp(frame,spec);
+  Fft<2> back(spec,frame);
+  SignalIO<signed2,2> out(target,"wb");
+  for(int x = 0 ; x < max_frames ; x++)
+    {
+      printf("%d/%d\n",x,max_frames);
+      f.readSamples(frame,x*window_size);
+      frame.normalize_abs_max();
+      warp.execute();
+      spec/=spectrum;
+      back.execute();
+      frame.normalize_abs_max();
+      frame.multiply(32767);
+      out.writeSamples(frame,window_size);
+    }
+  exit(0);
+  
+  // when we have the pattern array, 
+  // we convert it to its frequency domain, 
+  // which forms the target phases
+  /*  fftw_execute(plan_l);
+  for(int i = 0 ; i < window_size ; i++)
+    mean_l[i]=spectrum[i];
+  fftw_execute(plan_r);
+  for(int i = 0 ; i < window_size ; i++)
+    mean_r[i]=spectrum[i];
+  for(int i = 1 ; i < window_size/2 ; i++)
+    {
+      double lx = mean_l[i];
+      double ly = mean_l[window_size-i];
+      double rx = mean_r[i];
+      double ry = mean_r[window_size-i];
+      angle_l[i]=atan2(ly,lx);
+      angle_r[i]=atan2(ry,rx);
+    }
+  
+  // secondly, we go through the entire file again,
+  // calculate the energies and obtain the angle variance
+  // this time. This variance will afterwards be used to alter
+  // the strength of the output signal
+  printf("Second run\n");
+  f = openCoreRawFile();
   for(int x = 0 ; x < maximum_slice ; x++)
     {
       readsamples(slice,slice_size,f);
       for(int y = 0 ; y < slice_size ; y++)
 	{
 	  int z = ( y + phases[x] ) % slice_size;
-	  pattern_l[y]+=slice[z].left;
-	  pattern_r[y]+=slice[z].right;
+	  pattern_l[y]=slice[z].left;
+	  pattern_r[y]=slice[z].right;
 	}
-    }
-  // first we remove the 'noise'
-  // this is done by obtaining the mean spectrum
-  
-  /*  static int size = 512;
-  double * mean_fft_energy = allocate(size,double);
-  for(int i = 0 ; i < size ; i ++)
-    mean_fft_energy[i]=0;
-  double * amp = allocate(size,double);
-  double * ro = allocate(size,double);
-  double * io = allocate(size,double);
-  double * neglect = allocate(size,double);
-  int ffts_done = 0;
-  for(int x = 0 ; x < slice_size ; x+=size)
-    {
-      // copy data
-      for(int y = x ; y < x + size ; y++)
-	if (y<slice_size)
-	  amp[y-x] = pattern_l[y] + pattern_r[y];
-	else
-	  amp[y-x]=0;
-      // do the fft
-      fft_double(size,0,amp,NULL,ro,io);
-      // calculate the energy
-      for(int i = 0 ; i < size ; i++)
+      printf("%d/%d\n",x,maximum_slice);
+      // when we have it in the pattern array for the
+      // first time, we convert it to its frequency domain
+      // of which we then calculate the mean phase
+      fftw_execute(plan_l);
+      for(int i = 1 ; i < window_size / 2 ; i++)
 	{
-	  double e = sqrt(ro[i]*ro[i]+io[i]*io[i]);
-	  mean_fft_energy[i]+=e;
+	  double x1 = spectrum[i];
+	  double y1 = spectrum[window_size-i];
+	  double angle = atan2(y1,x1);
+	  angle-=angle_l[i];
+	  angle=fabs(angle);
+	  if (angle>M_PI) angle-=M_PI;
+	  var_l[i]+=angle;
 	}
-      ffts_done++;
-    }
-  for(int i = 0 ; i < size ; i++)
-    mean_fft_energy[i]/=ffts_done;
-  // go again through the data and increase steapness of everything below mean
-  for(int x = 0 ; x < slice_size ; x+=size)
-    {
-      // copy data
-      for(int y = x ; y < x + size ; y++)
-	if (y<slice_size)
-	  amp[y-x] = pattern_l[y] + pattern_r[y];
-	else 
-	  amp[y-x]=0;
-      // do the fft
-      fft_double(size,0,amp,NULL,ro,io);
-      // calculate the energy
-      for(int i = 0 ; i < size ; i++)
+      fftw_execute(plan_r);
+      for(int i = 1 ; i < window_size / 2 ; i++)
 	{
-	  double e = ro[i] * ro[i] + io[i] * io[i];
-	  double ea = sqrt(e);
-	  double an = atan2(io[i],ro[i]);
-	  double m = mean_fft_energy[i];
-	  ea/=m;
-
-	  double E = ((ea/m)-1.0);
-	  if (E>1) E=1; 
-	  if (E<-1) E=-1;
-	  E*=M_PI/2.0;
-	  E = sin(E);
-	  E += 1.0;
-	  E /= 2.0;
-
-	  ea = pow(ea,E);
-	  	  
-	  ro[i]=ea*cos(an);
-	  io[i]=ea*sin(an);
+	  double x1 = spectrum[i];
+	  double y1 = spectrum[window_size-i];
+	  double angle = atan2(y1,x1);
+	  angle-=angle_r[i];
+	  angle=fabs(angle);
+	  if (angle>M_PI) angle-=M_PI;
+	  var_r[i]+=angle;
 	}
-      // do the inverse transofmration
-      fft_double(size,1,ro,io,amp,neglect);
-      // copy data back
-      for(int y = x ; y < x + size ; y++)
-	if (y<slice_size)
-	  {
-	    pattern_l[y]  = amp[y-x];
-	    pattern_r[y]  = amp[y-x];
-	  }
     }
-  */
+  fclose(f);
 
-  // now we normalize the whole
+  // the final step is the noramlisation of the allowable
+  // phase differences. We do this by finding the mean phase
+  // then the deviation and scale everything from m-d to m+d
+  double ml=0,mr=0;
+  for(int i = 0 ; i < window_size/2 ; i++)
+    {
+      var_l[i]/=maximum_slice; 
+      var_r[i]/=maximum_slice; 
+      var_l[i]/=M_PI;
+      var_r[i]/=M_PI;
+      var_l[i]=1-var_l[i];
+      var_r[i]=1-var_r[i];
+    }
+  normalize_mean(var_l,window_size/2);
+  normalize_mean(var_r,window_size/2);
+
+  // good this experiment doesn't work...
+  // the variance is a bad measure...
+  // we modify the strength of a specific frequency depending on its
+  // variance. If it varies a lot then we remove it slightly
+  for(int i = 1 ; i < window_size/2 ; i++)
+    {
+      double vl = var_l[i];
+      double vr = var_r[i];
+      vl*=vl;
+      vr*=vr;
+
+      vl*=vl;
+      vr*=vr;
+
+      vl*=vl;
+      vr*=vr;
+
+      vl*=vl;
+      vr*=vr;
+      mean_l[i]*=vl;
+      mean_r[i]*=vr;
+      mean_l[window_size-i]*=vl;
+      mean_r[window_size-i]*=vr;
+    }
+  // now we can write out the inverse transform of the mean spectra
+  // by storing everything back into the pattern and normalizing it
+  // afterwards
+  printf("Creating mean stuff\n");
+  fftw_execute(plan_lr);
+  fftw_execute(plan_rr);
   normalize_abs_max(pattern_l,slice_size);
   normalize_abs_max(pattern_r,slice_size);
-  
+
   deallocate(slice);
-  // normalize the energy content to the required level
-  FILE * out = fopen(target,"wb");
+  
+  out = fopen(target,"wb");
   for(int y = 0 ; y < slice_size ; y++)
     {
       signed2 t = (signed2)(pattern_l[y]*32767.0);
@@ -210,8 +600,7 @@ void write_out_projection(long slice_size, unsigned4* phases, int maximum_slice,
       t = (signed2)(pattern_r[y]*32767.0);
       fwrite(&t,2,1,out);
     }
-  fclose(out);
-  fclose(f);
+    fclose(out);*/
 }
 
 void fft_to_bark(double * in_r, int window_size, spectrum_type &out)
@@ -298,7 +687,7 @@ void RythmDialogLogic::calculateRythmPattern2()
       }
   double * buffer_fft = init_bark_fft2(window_size);
   // open song
-  FILE * raw = openRawFile(playing, arg_rawpath);
+  FILE * raw = openCoreRawFile();
   long int audio_size = fsize(raw)/4;
   int max_slices = audio_size / slice_samples;
   spectrum_type * changes = allocate(max_slices,spectrum_type);
@@ -397,7 +786,7 @@ void RythmDialogLogic::calculateRythmPattern2()
     {
       status_bar->setText("Writing out projection");
       app->processEvents();
-      write_out_projection(slice_samples,phases,max_slices,outfile->text());
+      pattern_shaped_test(slice_samples,phases,max_slices,outfile->text());
     }
   
   status_bar->setText("Normalizing");
@@ -602,7 +991,7 @@ void RythmDialogLogic::calculateRythmPattern2()
 	periods[pml]=ain[pml];
       periods[0]=0;
       double maxed = normalize_abs_max(periods,ps);
-      printf("%g\n",maxed);
+      // printf("%g\n",maxed);
       // assign the autocorrelation to the composition property
       cp.set_scale(y,maxed);
       for(int x = 1 ; x < ps ; x ++)

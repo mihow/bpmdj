@@ -23,21 +23,7 @@
 #include <string.h>
 #include "dirscanner.h"
 #include "common.h"
-
-bool DirectoryScanner::songExtension(QString ext)
-{
-  return goodExtension(ext.lower());
-}
-
-bool DirectoryScanner::goodExtension(QString ext)
-{
-  // important !!!
-  // opgelet met extenties langer dan 4 tekens !!!
-  return (ext.endsWith(".mp3") || 
-	  ext.endsWith(".ogg") || 
-	  ext.endsWith(".m4a") || 
-	  ext.endsWith(".flac"));
-}
+#include "capacity.h"
 
 bool DirectoryScanner::goodName(QString name)
 {

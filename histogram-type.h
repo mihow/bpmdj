@@ -43,7 +43,6 @@ class histogram_type
   void normalize_autocorrelation_diff(int val);
   void strip();
   int valat(double v);
-  //double median_scaled(double m);
   double mean();
   double dev();
   double best_dist(histogram_type *a);

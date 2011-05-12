@@ -28,10 +28,12 @@ template<int bandsize> class histogram_property
 {
  public:
   smallhistogram_type<bandsize> *bark;
+
   histogram_property()
     {
       bark = NULL;
     }
+  virtual ~histogram_property() {};
   histogram_property(histogram_type**arr)
     {
       init();
@@ -46,10 +48,7 @@ template<int bandsize> class histogram_property
     {
       return bark==NULL;
     }
-  virtual void init()
-    {
-      bark = new smallhistogram_type<bandsize>[spectrum_size]();
-    }
+  virtual void init();
   void read_idx(const char* str);
   const void write_idx(FILE * f, char* fieldname);
   const void write_bib_v272(FILE * index);

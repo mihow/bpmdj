@@ -42,3 +42,34 @@ class QueuedSong:
     virtual void paintCell(QPainter *p, const QColorGroup &cg, int col, int wid, int align);
     virtual QString text(int i) const;
 };
+
+
+#define ANAL_TITLE 0
+#define ANAL_AUTHOR 1
+#define ANAL_RMS 2
+#define ANAL_SPECTRUM 3
+#define ANAL_ECHO 4
+#define ANAL_TEMPO 5
+#define ANAL_RYTHM 6
+#define ANAL_COMPOSITION 7
+#define ANAL_INDEX 8
+
+class QueuedAnalSong: 
+  public QListViewItem
+{
+  private:
+    Song * song;
+    bool needs_energy() const { return  !song->get_power().fully_defined(); };
+    bool needs_tempo() const { return !song->get_tempo().valid(); };
+    bool needs_spectrum() const { return song->get_spectrum()==no_spectrum; };
+    bool needs_echo() const { return song->get_histogram().empty(); };
+    bool needs_rythm() const { return song->get_rythm().empty(); };
+    bool needs_composition() const { return song->get_composition().empty(); };
+  public:
+    //    void setSong(Song* s, double d);
+    Song* getSong() { return song; };
+    QString getDisplayTitle() {return song->getDisplayTitle();};
+    QueuedAnalSong(QListView* parent,Song *song);
+    virtual QString text(int i) const;
+    QString getCommand(QString form);
+};

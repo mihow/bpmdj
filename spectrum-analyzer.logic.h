@@ -20,8 +20,9 @@
 #include "songplayer.h"
 #include "common.h"
 #include "spectrum-analyzer.h"
+#include "analyzer.h"
 
-class SpectrumDialogLogic : public SpectrumDialog
+class SpectrumDialogLogic : public SpectrumDialog, public ReentrantAnalyzer
 {
    Q_OBJECT
  public:
@@ -29,5 +30,6 @@ class SpectrumDialogLogic : public SpectrumDialog
  public slots:
    virtual void fetchSpectrum_old();
    virtual void fetchSpectrum_normal();
-   virtual void fetchSpectrum() {fetchSpectrum_normal();};
+   virtual void run() { fetchSpectrum_normal();};
+   virtual void fetchSpectrum() {startAnalyzer(); };
 };

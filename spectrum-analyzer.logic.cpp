@@ -42,6 +42,7 @@
 #include <unistd.h>
 #include <libgen.h>
 #include <qslider.h>
+#include <fftw3.h>
 #include <time.h>
 #include <sys/times.h>
 #include <math.h>
@@ -56,9 +57,8 @@
 #include "version.h"
 #include "scripts.h"
 #include "signals.h"
-#include "smallhistogram-type.cpp"
-#include "histogram-property.cpp"
-#include <fftw3.h>
+#include "smallhistogram-type.h"
+#include "histogram-property.h"
 
 SpectrumDialogLogic::SpectrumDialogLogic(SongPlayer*parent, const char*name, bool modal, WFlags f) :
   SpectrumDialog(0,name,modal,f)
@@ -91,7 +91,7 @@ void SpectrumDialogLogic::fetchSpectrum_old()
   fftfreqi = allocate(blocksize,double);
   // hieronder x 2 omdat we zowel links als rechts binnen krijgen
   data=allocate((blocksize+slidesize)*2 ,signed short);
-  FILE * raw = openRawFile(playing, arg_rawpath);
+  FILE * raw = openCoreRawFile();
   // reset the fftfreq
   long pos;
   for(pos=0;pos<blocksize/2;pos++)
@@ -196,8 +196,8 @@ static double tovol(double a)
 {
   double r = 10*log(a)/log(10);
   if (isnan(r)) return -1;
-  if (r<-30) return -1;
-  return r+30;
+  if (r<-60) return -1;
+  return r+60;
 }
 
 void fft_to_bark(double * in_r, int window_size, double * out)
@@ -217,17 +217,13 @@ void fft_to_bark(double * in_r, int window_size, double * out)
 	}
       // bin * WAVRATE / window_size = freq; thus...
       // bin = freq * window_size / WAVRATE
-      out[b]=0;
-      for(int i = a ; i < c; i++)
-	out[b]+=tovol(fabs(in_r[i]));
-      out[b]/=c-a;
-    } 
-}
 
-void fft_to_all(double * in_r, int window_size, double * out)
-{
-  for(int b = 0 ; b < window_size ; b ++)
-    out[b]=tovol(fabs(in_r[b]));
+      double r = 0;
+      for(int i = a ; i < c; i++)
+	r+= fabs(in_r[i]); // the use of only the cosine compacts the energy
+      r /= c-a;
+      out[b]=tovol(r);
+    } 
 }
 
 static fftw_plan plan;
@@ -251,7 +247,6 @@ static void bark_fft(int window_size, double * bark_energy)
 {
   fftw_execute(plan);
   fft_to_bark(fft_out,window_size,bark_energy);
-  //fft_to_all(fft_out,window_size/2,bark_energy);
 }
 
 // the histogram can be used to see how the energy is used within a band. Where the 
@@ -269,7 +264,7 @@ void SpectrumDialogLogic::fetchSpectrum_normal()
   double * fft_in = init_bark_fft(window_size);
   // we need to go two times through the entire file 2 times. First to find the maxima
   // then to obtain the distribution
-  FILE * raw = openRawFile(playing, arg_rawpath);
+  FILE * raw = openCoreRawFile();
   long int fs = fsize(raw)/4;
   stereo_sample2 * block = allocate(window_size, stereo_sample2);
   histogram_type * * bark_energy_distri = allocate (barksize,histogram_type *);

@@ -21,6 +21,7 @@
 #include <assert.h>
 #include <string.h>
 #include <libgen.h>
+#include <qmessagebox.h>
 #include <unistd.h>
 #include "index.h"
 #include "scripts.h"
@@ -40,11 +41,6 @@ FILE * openRawFile(Index* index, const char * rawpath)
   char * name = getRawFilename(rawpath, index->get_filename());
   assert(name);
   raw = fopen(name,"rb");
-  if (!raw)
-    {
-      printf("Error: Unable to open %s\n",name);
-      exit(3);
-    }
   deallocate(name);
   return raw;
 }
@@ -55,11 +51,6 @@ FILE * openRawFileForWriting(Index* index, const char *d)
   char * name = getRawFilename(d,index->get_filename());
   assert(name);
   raw = fopen(name,"r+b");
-  if (!raw)
-    {
-      printf("Error: Unable to open %s\n",name);
-      exit(3);
-    }
   deallocate(name);
   return raw;
 }
@@ -89,7 +80,11 @@ void spawn(const char* script)
   if (!fork())
     {
       execute(script);
-      exit(100);
+      /**
+       * If we use exit instead of _exit our own static data structures
+       * will be destroyed !
+       */
+      _exit(100);
     }
 }
 
@@ -97,10 +92,12 @@ int execute(const char* script)
 {
   if (system(script)<=256) 
     {
-      // printf("Information: started %s\n",script);
+      Debug("started %s",script);
       return 1;
     }
-  printf("Error: couldn't execute %s\n",script);
+  // we cannot simply make this true because then we might end up using the
+  // wrong thrzead to access graphics, with disaster as a result.
+  Error(false,"couldn't execute %s",script);
   return 0;
 }
 
@@ -121,3 +118,68 @@ FILE* openScriptFile(const char* name)
   fprintf(script,SHELL_HEADER);
   return script;
 }
+
+void Log(const char* prefix, const char* text)
+{
+  char * copy = strdup(text);
+  char * current = copy;
+  while(current)
+    {
+      
+      char * nextstart = strchr(current,'\n');
+      if (nextstart)
+	*nextstart=0;
+      printf("%s%s\n",prefix,current);
+      if (nextstart)
+	current=nextstart+1;
+      else 
+	current=NULL;
+    }
+  // in order to guarantee descent output buffering and flushing
+  // we overwrite the stderr (2) with the standard output (1)
+  fflush(stdout);
+  fflush(stderr);
+  free(copy);
+}
+
+void Info(const char* script, ...)
+{
+  char toexecute[1024];
+  va_list ap;
+  va_start(ap,script);
+  vsprintf(toexecute,script,ap);
+  va_end(ap);
+  Log("Information: ", toexecute);
+};
+
+void Debug(const char* script, ...)
+{
+  char toexecute[1024];
+  va_list ap;
+  va_start(ap,script);
+  vsprintf(toexecute,script,ap);
+  va_end(ap);
+  Log("Debug: ", toexecute);
+};
+
+void Error(bool ui, const char* script, ...)
+{
+  char toexecute[1024];
+  va_list ap;
+  va_start(ap,script);
+  vsprintf(toexecute,script,ap);
+  va_end(ap);
+  Log("Error: ", toexecute);
+  if (ui)
+    QMessageBox::critical(NULL,"Error",toexecute,QMessageBox::Ok, QMessageBox::NoButton);
+};
+
+void Remote(const char* script, ...)
+{
+  char toexecute[1024];
+  va_list ap;
+  va_start(ap,script);
+  vsprintf(toexecute,script,ap);
+  va_end(ap);
+  Log("Remote: ", toexecute);
+};

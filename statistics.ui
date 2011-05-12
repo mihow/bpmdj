@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>613</width>
-            <height>412</height>
+            <height>441</height>
         </rect>
     </property>
     <property name="caption">
@@ -52,7 +52,7 @@
                             </font>
                         </property>
                         <property name="text">
-                            <string>This graph shows the mean energy/frequency band. Every green line is 3 dB. The length of a grey smear is " times the standarddeviation on that band.</string>
+                            <string>This graph shows the mean energy/frequency band. Every green line is 3 dB. The length of a grey smear is the standarddeviation on that band.</string>
                         </property>
                         <property name="alignment">
                             <set>WordBreak|AlignVCenter|AlignRight</set>
@@ -95,6 +95,38 @@
                     </widget>
                 </grid>
             </widget>
+            <widget class="QWidget">
+                <property name="name">
+                    <cstring>TabPage</cstring>
+                </property>
+                <attribute name="title">
+                    <string>Echo</string>
+                </attribute>
+                <grid>
+                    <property name="name">
+                        <cstring>unnamed</cstring>
+                    </property>
+                    <widget class="QLabel" row="0" column="0">
+                        <property name="name">
+                            <cstring>echo</cstring>
+                        </property>
+                        <property name="frameShape">
+                            <enum>Box</enum>
+                        </property>
+                        <property name="scaledContents">
+                            <bool>true</bool>
+                        </property>
+                    </widget>
+                </grid>
+            </widget>
+        </widget>
+        <widget class="QLabel" row="1" column="0">
+            <property name="name">
+                <cstring>status</cstring>
+            </property>
+            <property name="text">
+                <string>Initializing</string>
+            </property>
         </widget>
     </grid>
 </widget>

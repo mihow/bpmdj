@@ -237,13 +237,7 @@
         <sender>pushButton9</sender>
         <signal>clicked()</signal>
         <receiver>RythmDialog</receiver>
-        <slot>calculateRythmPattern()</slot>
-    </connection>
-    <connection>
-        <sender>outfile</sender>
-        <signal>returnPressed()</signal>
-        <receiver>RythmDialog</receiver>
-        <slot>calculateRythmPattern()</slot>
+        <slot>calculate()</slot>
     </connection>
 </connections>
 <tabstops>
@@ -261,7 +255,7 @@
     <slot>balanceChanged()</slot>
     <slot>dumpPatternToIdx()</slot>
     <slot>filterChanged()</slot>
-    <slot>calculateRythmPattern()</slot>
+    <slot>calculate()</slot>
     <slot>fatten()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>

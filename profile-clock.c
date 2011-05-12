@@ -29,7 +29,6 @@
 
 int main(int argc, char**argv)
 {
-   int loops;
    int clock_freq;
    clock_t start,stop;
    start=times(NULL);
@@ -45,14 +44,8 @@ int main(int argc, char**argv)
        printf("#error CLOCK_FREQ could not be determined = %d\n",(int)stop);
        return 1;
      }
-   printf("#define CLOCK_FREQ %d\n",(int)stop);
+   printf("#define CLOCK_FREQ (%d)\n",(int)stop);
    clock_freq=stop;
-   
-   // measure nanosleeptime..
-   // we measure how many full seconds we need to sleep to reach 5 seconds...
-   
    start=times(NULL);
-   loops=0;
-   printf("// loops = %d\n",loops);
    return 0;
 }

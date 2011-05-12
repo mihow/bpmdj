@@ -48,6 +48,8 @@ class BpmAnalyzerDialog : public CountDialog, ThreadedAnalyzer
  	    int    windowsize;
 	    int    peaks;
    void          set_measured_period(QString technique, int period);
+            // Weighted enveloppe and autocorrelation
+   void          wec();
 	    // Enveloppe fft's
    void          enveloppe_spectrum();
    void          autocorrelate_spectrum();

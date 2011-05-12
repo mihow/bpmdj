@@ -36,6 +36,7 @@
 #include "qvectorview.h"
 #include "freq-mapping.h"
 #include "process-manager.h"
+#include "analyzers-manager.h"
 
 #define TAGS_TEXT 0
 #define TAGS_OR 1
@@ -46,16 +47,16 @@ extern const QString TAG_TRUE;
 extern const QString TAG_FALSE;
 
 class QProgressBar;
-class ProcessManager;
 class QSong;
 
 class SongSelectorLogic: 
-public SongSelector, public ProcessChanged
+public SongSelector, public ProcessChanged, public AnalyzerChanged
 {
     Q_OBJECT
   private:
     FrequencyDialog *frequency_dialog;
     ProcessManager *processManager;
+    AnalyzersManager * analyzers;
     QTimer *timer;
     int mainTicks;
     QPopupMenu *selection;
@@ -94,6 +95,10 @@ public SongSelector, public ProcessChanged
     // process functions
     virtual void resetCounter();
     virtual void updateProcessView(bool main_changed);
+    // batch analyzer functions
+    void checkAnalyzers();
+    void setAnalyzersColors();
+    virtual void startAnotherAnalyzer(Song * finished_analyzing, int on_slot);
     // tag functionality
     void findsimilarnames(const QString & name, const QString & fullname);
     void initialize_using_config();
@@ -109,11 +114,14 @@ public SongSelector, public ProcessChanged
     void updateColors();
     void setColor(QColor color);
     void setPlayerColor(QLabel *player, QColor color);
+    void songSetAuthor(Song *song, const QString & tag);
     void songAddTag(Song * song, const QString & tag);
     void songDelTag(Song * song, const QString & tag);
     void songEditInfo(Song * song);
     void queueFindAndRename(int oldpos, int newpos);
     void queueOrder();
+  public: 
+    void reread_and_repaint(Song* song);
   public slots:
     void start_spectrum_pca();
     void start_existence_check();
@@ -121,11 +129,12 @@ public SongSelector, public ProcessChanged
     virtual void selectAllTags();
     // a signal from the UI to notify a forced switch
     virtual void switchMonitorToMain();
-  
+    
     virtual void timerTick();
     virtual void selectSong(int i);
     virtual void doPreferences();
     virtual void openMixer();
+    virtual void openLogDialog();
     virtual void openBpmMixer();
     virtual void openRecorder();
     virtual void openRecordMixer();
@@ -142,6 +151,7 @@ public SongSelector, public ProcessChanged
     virtual void doClustering();
     virtual void doBackup();
     virtual void selectionAddTags();
+    virtual void selectionSetAuthor();
     virtual void selectionPlayIn3th();
     virtual void selectionPlayIn4th();
     virtual void selectionSetMainSong();
@@ -182,7 +192,8 @@ public SongSelector, public ProcessChanged
     virtual void findsimilarnames();
     virtual void findallsimilarnames();
     virtual void importSongs();
-    virtual void batchAnalyzing();
+    virtual void queueAnalysis();
+    virtual void toAnalyzeOrNot();
     virtual void doOnlineHelp();
     virtual void doAutoMix();
     virtual void selectionMenu();
@@ -207,6 +218,8 @@ public SongSelector, public ProcessChanged
 
     // history actions
     virtual void playHistorySong(QListViewItem *);
+    virtual void savePlayHistory();
+    virtual void clearPlayHistory();
 
     // album actions
     virtual void albumItemChanged(QListViewItem*, int col);

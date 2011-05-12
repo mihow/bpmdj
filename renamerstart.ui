@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>649</width>
-            <height>244</height>
+            <width>483</width>
+            <height>384</height>
         </rect>
     </property>
     <property name="caption">
@@ -30,7 +30,7 @@
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
-                <widget class="QRadioButton" row="0" column="0">
+                <widget class="QRadioButton" row="0" column="0" rowspan="1" colspan="2">
                     <property name="name">
                         <cstring>already_indexed</cstring>
                     </property>
@@ -41,7 +41,7 @@
                         <bool>true</bool>
                     </property>
                 </widget>
-                <widget class="QRadioButton" row="1" column="0">
+                <widget class="QRadioButton" row="2" column="0" rowspan="1" colspan="2">
                     <property name="name">
                         <cstring>not_yet_indexed</cstring>
                     </property>
@@ -49,14 +49,64 @@
                         <string>not yet indexed songs</string>
                     </property>
                 </widget>
-                <widget class="QLabel" row="2" column="0">
+                <widget class="QLabel" row="1" column="1">
+                    <property name="name">
+                        <cstring>textLabel2_2</cstring>
+                    </property>
+                    <property name="text">
+                        <string>In this mode the renamer will look for index files that have 
+an inappropriate filename. Only the index filename will 
+change (as it should), the mp3 file will still have the same
+ name.</string>
+                    </property>
+                </widget>
+                <widget class="QLabel" row="3" column="1">
                     <property name="name">
                         <cstring>textLabel2</cstring>
                     </property>
                     <property name="text">
-                        <string>In this mode the renamer will look for music files (.ogg, .mp3, ...) that have an incorrect filename. The filename of these songs can then be changed. &lt;b&gt;This should not be done on songs which are already known to the program.&lt;/b&gt; This is mainly usefull to rename songs before they are imported in bpmdj.</string>
+                        <string>In this mode the renamer will look for music files (.ogg,&lt;br&gt;
+.mp3, ...) that have an incorrect filename. The filename&lt;br&gt;
+of these songs can then be changed. &lt;b&gt;This should &lt;br&gt;
+&lt;font color="#ff0000"&gt;not&lt;/font&gt; be done on songs which are already known&lt;br&gt;
+ to the program.&lt;/b&gt; This is mainly usefull to rename songs &lt;br&gt;
+before they are imported in bpmdj.</string>
                     </property>
                 </widget>
+                <spacer row="3" column="0">
+                    <property name="name">
+                        <cstring>spacer16_2</cstring>
+                    </property>
+                    <property name="orientation">
+                        <enum>Horizontal</enum>
+                    </property>
+                    <property name="sizeType">
+                        <enum>Maximum</enum>
+                    </property>
+                    <property name="sizeHint">
+                        <size>
+                            <width>20</width>
+                            <height>20</height>
+                        </size>
+                    </property>
+                </spacer>
+                <spacer row="1" column="0">
+                    <property name="name">
+                        <cstring>spacer16</cstring>
+                    </property>
+                    <property name="orientation">
+                        <enum>Horizontal</enum>
+                    </property>
+                    <property name="sizeType">
+                        <enum>Maximum</enum>
+                    </property>
+                    <property name="sizeHint">
+                        <size>
+                            <width>20</width>
+                            <height>20</height>
+                        </size>
+                    </property>
+                </spacer>
             </grid>
         </widget>
         <spacer row="1" column="0">

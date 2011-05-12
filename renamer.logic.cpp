@@ -25,15 +25,23 @@
 #include <qfiledialog.h>
 #include <stdio.h>
 #include <qradiobutton.h>
+#include <qmessagebox.h>
 #include "renamer.logic.h"
 #include "renamerstart.h"
 #include "songselector.logic.h"
 #include "scripts.h"
+#include "capacity.h"
 
-RenamerLogic::RenamerLogic(QWidget*parent,const QString name) :
-  Renamer(parent,name),
-  DirectoryScanner("")
+RenamerLogic::RenamerLogic(QWidget*parent, RenamerChangesFilename *rcf) :
+  Renamer(parent),
+  DirectoryScanner(""),
+  inform(rcf)
 {
+}
+
+RenamerLogic::~RenamerLogic()
+{
+  if (inform) delete inform;
 }
 
 #define FOREACH(operation) {\
@@ -63,15 +71,7 @@ void RenamerLogic::add(const QString name, const QString pos)
   // check whether the filename is too good
   if (goodName(name)) return;
   // if it is an index it should have no correct information
-  if (name.contains(".idx",0))
-    {
-      Index i(pos);
-      if (i.valid_tar_info()) 
-	{
-	  printf("Skipping %s because it contains correct information\n",(const char*)name);
-	  return;
-	}
-    }
+  if (inform && inform->shouldFilenameBeExcluded(pos)) return;
   // so it is an incorrect filename which does not contain correct information
   new QListViewItem(NameList,name,name,pos);
 }
@@ -250,7 +250,7 @@ QString RenamerLogic::fixExtention(QString in)
 QString RenamerLogic::removeFirstChar(QString in)
 {
   return in.right(in.length()-1);
-}
+} 
 
 
 void RenamerLogic::keySelectionIsAuthor() 
@@ -408,8 +408,11 @@ void RenamerLogic::realizeSelection()
 		  to=nto;
 		}
 	      sprintf(fullcommand,MV"\"%s\" \"%s\"",((const char*)from),((const char*)to));
-	      printf("Executing %s\n",fullcommand);
 	      execute(fullcommand);
+	      // does the target file exist, if so, we inform the 
+	      // interested one
+	      if (exists(to) && inform)
+		inform->filenameChanged(from,to);
 	    }
 	  // benieuwd of het dees gaat werken...
 	  delete item;
@@ -417,6 +420,17 @@ void RenamerLogic::realizeSelection()
       else
 	++it;
     }
+}
+
+void RenamerLogic::scan(const QString dirname)
+{
+  DirectoryScanner::scan(dirname);
+  if (NameList->childCount())
+    show();
+  else
+    QMessageBox::information(this, 
+			     "Renamer",
+			     "There are no wrongly named files in the specified directory");
 }
 
 void RenamerLogic::ignoreSelection()
@@ -431,6 +445,47 @@ void RenamerLogic::ignoreSelection()
     }
 }
 
+//---------------------------------------------------------
+//   Updating changing index files
+//---------------------------------------------------------
+class UpdateIndexedSong: public RenamerChangesFilename
+{
+private:
+  DataBase* database;
+  SongSelectorLogic * selector;
+public:
+  UpdateIndexedSong(SongSelectorLogic * l);
+  virtual bool shouldFilenameBeExcluded(QString name);
+  virtual void filenameChanged(QString from, QString to);
+};
+
+UpdateIndexedSong::UpdateIndexedSong(SongSelectorLogic * l)
+{
+  selector = l;
+  assert(selector);
+  database = l->database;
+  assert(database);
+}
+
+bool UpdateIndexedSong::shouldFilenameBeExcluded(QString name)
+{
+  Index i(name);
+  return i.valid_tar_info();
+}
+
+void UpdateIndexedSong::filenameChanged(QString from, QString to)
+{
+  // we read the index file to obtain the song filename
+  Index * index = new Index(to);
+  assert(index);
+  QString mp3_filename(index->get_filename());
+  delete index;
+  // we find the song
+  Song * song = database -> find(mp3_filename);
+  song -> set_storedin(to);
+  // we update the selector
+  selector -> reread_and_repaint(song);
+};
 
 //---------------------------------------------------------
 //   Starting the stuff from within the song selector
@@ -442,9 +497,9 @@ void SongSelectorLogic::startRenamer()
   if (result!=which_renamer.Accepted) return;
   if (which_renamer.already_indexed->isOn())
     {
-      RenamerLogic *renamer = new RenamerLogic(this);
-      renamer->scan(IndexDir,IndexDir);
-      renamer->show();
+      UpdateIndexedSong *updateIndexedSong = new UpdateIndexedSong(this);
+      RenamerLogic *renamer = new RenamerLogic(this,updateIndexedSong);
+      renamer->scan(IndexDir);
     }
   else if (which_renamer.not_yet_indexed->isOn())
     {
@@ -453,9 +508,8 @@ void SongSelectorLogic::startRenamer()
 	{
 	  if (text.right(1)=="/")
 	    text = text.left(text.length()-1);
-	  RenamerLogic *renamer = new RenamerLogic(this);
-	  renamer->scan(text,text);
-	  renamer->show();
+	  RenamerLogic *renamer = new RenamerLogic(this,NULL);
+	  renamer->scan(text);
 	}
     }
 }

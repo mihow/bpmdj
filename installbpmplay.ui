@@ -1,0 +1,130 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>InstallBpmPlay</class>
+<widget class="QDialog">
+    <property name="name">
+        <cstring>InstallBpmPlay</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>541</width>
+            <height>603</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>Installing BpmPlay at Remote Host</string>
+    </property>
+    <grid>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <widget class="QPushButton" row="3" column="1">
+            <property name="name">
+                <cstring>okbutton</cstring>
+            </property>
+            <property name="enabled">
+                <bool>false</bool>
+            </property>
+            <property name="text">
+                <string>Ok</string>
+            </property>
+        </widget>
+        <spacer row="3" column="0">
+            <property name="name">
+                <cstring>spacer20</cstring>
+            </property>
+            <property name="orientation">
+                <enum>Horizontal</enum>
+            </property>
+            <property name="sizeType">
+                <enum>Expanding</enum>
+            </property>
+            <property name="sizeHint">
+                <size>
+                    <width>40</width>
+                    <height>20</height>
+                </size>
+            </property>
+        </spacer>
+        <widget class="QListView" row="0" column="0" rowspan="1" colspan="2">
+            <column>
+                <property name="text">
+                    <string>Host</string>
+                </property>
+                <property name="clickable">
+                    <bool>true</bool>
+                </property>
+                <property name="resizable">
+                    <bool>true</bool>
+                </property>
+            </column>
+            <property name="name">
+                <cstring>hosts</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>7</hsizetype>
+                    <vsizetype>0</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="maximumSize">
+                <size>
+                    <width>32767</width>
+                    <height>100</height>
+                </size>
+            </property>
+        </widget>
+        <widget class="QTextEdit" row="2" column="0" rowspan="1" colspan="2">
+            <property name="name">
+                <cstring>output</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>7</hsizetype>
+                    <vsizetype>3</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="font">
+                <font>
+                    <family>Courier 10 Pitch</family>
+                    <pointsize>10</pointsize>
+                </font>
+            </property>
+            <property name="text">
+                <string></string>
+            </property>
+            <property name="wordWrap">
+                <enum>WidgetWidth</enum>
+            </property>
+            <property name="readOnly">
+                <bool>true</bool>
+            </property>
+            <property name="undoRedoEnabled">
+                <bool>false</bool>
+            </property>
+        </widget>
+        <widget class="QLabel" row="1" column="0" rowspan="1" colspan="2">
+            <property name="name">
+                <cstring>textLabel1</cstring>
+            </property>
+            <property name="text">
+                <string>Ouput</string>
+            </property>
+        </widget>
+    </grid>
+</widget>
+<connections>
+    <connection>
+        <sender>okbutton</sender>
+        <signal>clicked()</signal>
+        <receiver>InstallBpmPlay</receiver>
+        <slot>accept()</slot>
+    </connection>
+</connections>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

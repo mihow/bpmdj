@@ -31,6 +31,7 @@
 #include <time.h>
 #include <sys/times.h>
 #include <math.h>
+#include <qdialog.h>
 #include "player-core.h"
 #include "scripts.h"
 #include "version.h"
@@ -38,6 +39,8 @@
 #include "fourier.h"
 #include "energy-analyzer.h"
 #include "memory.h"
+#include "player-config.h"
+#include "capacity.h"
 
 //#define DEBUG_WAIT_STATES
 
@@ -48,27 +51,41 @@
 
 volatile int stop = 0;
 volatile int finished = 0;
-volatile int paused = 0;
+static volatile int paused = 0;
 
 quad_period_type targetperiod;
 quad_period_type currentperiod;
 quad_period_type normalperiod;
 signed8 y,x=0;
-int    opt_rms = 0;
-float8 arg_rms = 0;
 int     opt_quiet = 0;
 int     opt_match = 0;
 char*   arg_match = 0;
-char*   arg_rawpath = "./";
 char*   argument;
 Index*  playing = NULL;
 dsp_driver *dsp = NULL;
 
+extern PlayerConfig * config;
+
+QString rawpath="";
+
+QString get_rawpath()
+{
+  assert(config);
+  if (rawpath.isEmpty())
+    rawpath = config->get_core_rawpath();
+  return rawpath;
+}
+
+FILE * openCoreRawFile()
+{
+  if (!playing) return NULL;
+  return openRawFile(playing,get_rawpath());
+}
 
 /*-------------------------------------------
  *         File input oprations
  *-------------------------------------------*/
-char * wave_name=NULL;
+char * wave_name = NULL;
 stereo_sample2 wave_buffer[wave_bufsize];
 FILE * wave_file;
 unsigned4 wave_bufferpos=wave_bufsize;
@@ -92,14 +109,19 @@ void writer_died(int sig, siginfo_t *info, void* hu)
   playing->set_time(newstr);
 }
 
-int wave_open(char* fname, bool synchronous)
+int wave_open(Index * playing, bool synchronous)
 {
+  if (!playing) return err_none;
+  char * fname = playing->get_filename();
+  int decoder = set_decoder_environment(config,playing);
+  if (!decoder) return err_noraw;
+
   // start decoding the file; this means: fork bpmdj-raw process
   // wait 1 second and start reading the file
   if (synchronous)
     {
       writing = 1;
-      if (!vexecute(CREATERAW_CMD,arg_rawpath,fname))
+      if (!vexecute(CREATERAW_CMD,(const char*)get_rawpath(),fname))
 	return err_nospawn;
       writing = 0;
     }
@@ -114,31 +136,32 @@ int wave_open(char* fname, bool synchronous)
       writing = 1;
       if (!(writer = fork()))
 	{
-	  vexecute(CREATERAW_CMD,arg_rawpath,fname);
+	  vexecute(CREATERAW_CMD,(const char*)get_rawpath(),fname);
 	  kill(getppid(),SIGUSR1);
-	  exit(0);
+	  /**
+	   * If we use exit instead of _exit our own static data structures
+	   * will be destroyed !
+	   */
+	  _exit(0);
 	}
     }
-  wave_name=getRawFilename(arg_rawpath,fname);
-  int tries = 20;
-  do
-    {
-      wave_file=fopen(wave_name,"rb");
-      sleep(1);
-    }
-  while (wave_file==NULL && tries-->0);
-  
-  if (synchronous)
-    writer_died(0,NULL,NULL);
+  wave_name=getRawFilename(get_rawpath(),fname);
 
-  if (!wave_file)
-    return err_noraw;
+  wave_file=fopen(wave_name,"rb");
+      
+  if (synchronous)
+    {
+      writer_died(0,NULL,NULL);
+      if (!wave_file)
+	return err_noraw;
+    }
   return err_none;
 }
 
 void wave_close()
 {
-  fclose(wave_file);
+  if (wave_file)
+    fclose(wave_file);
   if (writing)
     {
       // send terminate (the insisting variant) signal
@@ -150,7 +173,11 @@ void wave_close()
 
 unsigned4 wave_max()
 {
-  if (!wave_file) return 0;
+  if (!wave_file) 
+    {
+      wave_file=fopen(wave_name,"rb");
+      if (!wave_file) return 0;
+    }
   return fsize(wave_file)/4;
 }
 
@@ -223,15 +250,26 @@ void wave_process()
     wave_process(wave_buffer+i,size);
 }
 
-
 int wave_read(unsigned4 pos, stereo_sample2 *val)
 {
-  if (pos-wave_bufferpos>=wave_bufsize)
+  if (pos<wave_bufferpos || pos-wave_bufferpos>=wave_bufsize)
     {
-      if (pos>wave_max()) return -1;
+      // we only stop one second later than necessary
+      if (pos>=wave_max()+44100L) return -1;
+      if (pos>=wave_max())
+	{
+	  wave_bufferpos=pos;
+	  for(int i = 0 ; i < wave_bufsize ; i ++)
+	    wave_buffer[i].value(0);
+	  val->value(0);
+	  return 0;
+	} 
       wave_bufferpos=pos;
       fseek(wave_file,pos*4,SEEK_SET);
-      fread(wave_buffer,4,wave_bufsize,wave_file);
+      int r = fread(wave_buffer,4,wave_bufsize,wave_file);
+      if (r>-1 && r < wave_bufsize)
+	for(int i = r ; i < wave_bufsize ; i ++)
+	  wave_buffer[i].value(0);
       //wave_process();
     }
   *val=wave_buffer[pos-wave_bufferpos];
@@ -262,13 +300,11 @@ void lfo_set(char* name, _lfo_ l, unsigned8 freq, unsigned8 phase)
     {
       jumpto(0,0);
       lfo_phase=y;
-      paused=0;
-      printf("Restarted with %s lfo at 4M/%d\n",name,(int)freq);
+      unpause_playing();
     }
   else
     {
       lfo_phase=phase;
-      printf("Switched to %s lfo at 4M/%d\n",name,(int)freq);
     }
 }
 
@@ -391,7 +427,7 @@ unsigned8 map_active(unsigned8 a)
 	  if (map_exit_pos == map_exit_stop)
 	    {
 	      x = map_start_pos;
-	      paused = true;
+	      pause_playing();
 	    }
 	  if (map_exit_pos == map_exit_restart)
 	    x = map_start_pos;
@@ -489,7 +525,7 @@ void map_set(signed2 size, map_data inmap, unsigned8 msize, signed8 mexit, bool 
   if (paused)
     {
       jumpto(0,0);
-      paused=0;
+      unpause_playing();
     }
 }
 
@@ -505,12 +541,12 @@ void map_init()
  * real (non-stretched) song
  */
 
-unsigned8 x_normalise(unsigned8 y)
+signed8 x_normalise(signed8 y)
 {
   return y*normalperiod/currentperiod;
 }
 
-unsigned8 y_normalise(unsigned8 x)
+signed8 y_normalise(signed8 x)
 {
   return x*currentperiod/normalperiod;
 }
@@ -521,44 +557,54 @@ cue_info cues[4] = {0,0,0,0};
 
 void cue_set()
 {
-   cue=x_normalise(y-dsp->latency());
-   // printf("Setting cue\n");
+  cue=x_normalise(y-dsp->latency());
 }
 
-void cue_shift(char* txt, signed8 whence)
+void cue_shift(signed8 whence)
 {
   if (whence < 0 && (unsigned8)(-whence) > cue) cue=0;
   else cue+=whence;
   if (!paused) 
-    paused=1;
+    pause_playing();
 }
 
-void cue_store(char* text,int nr)
+void cue_store(int nr)
 {
   cues[nr]=cue;
 }
 
-void cue_retrieve(char* text,int nr)
+void cue_retrieve(int nr)
 {
   cue=cues[nr];
 }
 
 void cue_write()
 {
-  playing->set_cue(cue);
-  playing->set_cue_z(cues[0]);
-  playing->set_cue_x(cues[1]);
-  playing->set_cue_c(cues[2]);
-  playing->set_cue_v(cues[3]);
+  if (playing)
+    {
+      playing->set_cue(cue);
+      playing->set_cue_z(cues[0]);
+      playing->set_cue_x(cues[1]);
+      playing->set_cue_c(cues[2]);
+      playing->set_cue_v(cues[3]);
+    }
 }
 
 void cue_read()
 {
-  cue_before=cue=playing->get_cue();
-  cues[0]=playing->get_cue_z();
-  cues[1]=playing->get_cue_x();
-  cues[2]=playing->get_cue_c();
-  cues[3]=playing->get_cue_v();
+  if (playing)
+    {
+      cue_before=cue=playing->get_cue();
+      cues[0]=playing->get_cue_z();
+      cues[1]=playing->get_cue_x();
+      cues[2]=playing->get_cue_c();
+      cues[3]=playing->get_cue_v();
+    }
+  else
+    {
+      cue_before = 0;
+      cues[0]=cues[1]=cues[2]=cues[3]=0;
+    }
 }
 
 /*-------------------------------------------
@@ -568,9 +614,14 @@ static float4 left_sub;
 static float4 left_fact;
 static float4 right_sub;
 static float4 right_fact;
+static bool   opt_rms = false;
 
 void rms_init()
 {
+  assert(config);
+  opt_rms = config->get_player_rms();
+  float arg_rms = config->get_player_rms_target();
+  
   sample4_type min = playing->get_min();
   sample4_type max = playing->get_max();
   sample4_type mean = playing->get_mean();
@@ -578,8 +629,7 @@ void rms_init()
   if (!min.fully_defined() || !max.fully_defined() || 
       !mean.fully_defined() || !pow.fully_defined())
     {
-      printf("Switching of rms normalisation, this song has no known "
-	     "energy levels\n");
+      Info("Switching of rms normalisation, this song has no known energy levels");
       opt_rms=0;
       return;
     }
@@ -629,7 +679,7 @@ int loop_set(unsigned8 jumpback)
       loop_at = cue;
       if (loop_at<0) 
 	loop_at = loop_off;
-      paused = 0;
+      unpause_playing();
     }
   if (loop_at == loop_off)
     {
@@ -642,7 +692,6 @@ int loop_set(unsigned8 jumpback)
       loop_restart=loop_at-jumpback;
     else
       loop_at=loop_off;
-  //  printf("loop_at = %d, loop_restart = %d, cue = %d, jumpback=%d, paused = %d\n",(int)loop_at,(int)loop_restart,(int)cue,(int)jumpback,(int)paused);
   return loop_at!=loop_off;
 }
 
@@ -655,30 +704,22 @@ void loop_jump()
 /*-------------------------------------------
  *         Program logic
  *-------------------------------------------*/
-void help();
-
 void changetempo(signed8 period)
 {
-   /* change tempo to period
-    * - the current x should remain the same
-    * x = y * normalperiod / currentperiod
-    * y = x * currentperiod / normalperiod
-    */
-   int change=(long)(currentperiod*1000/period)-(long)1000;
-   if (period>currentperiod)
-     msg_slowdown(change);
-   else
-     msg_speedup(change);
-   currentperiod = period;
-   y = x * currentperiod / normalperiod;
-   
+  /* change tempo to period
+   * - the current x should remain the same
+   * x = y * normalperiod / currentperiod
+   * y = x * currentperiod / normalperiod
+   */
+  currentperiod = period;
+  y = x * currentperiod / normalperiod; 
 }
 
 void jumpto(signed8 mes, int txt)
 {
   if (paused)
     {
-      paused=0;
+      unpause_playing();
       y=y_normalise(cue);
       if (txt) printf("Restarted at cue ");
     }
@@ -690,7 +731,7 @@ void jumpto(signed8 mes, int txt)
       // - if we subtract the latency from the data being queued, we have the real playing position
       // - if we subtract what should be playing with what is playing, we have a difference
       // - we can fix this difference to fit a measure
-      // - this fixed difference is added to gotopos.
+      // - this fixed difference is added to gotopos
       signed8 gotopos=y_normalise(cue)-currentperiod*mes;
       // signed8 difference=gotopos-y+dsp->latency();
       signed8 difference=gotopos-y;
@@ -729,8 +770,8 @@ void read_write_bare_loop()
 	m = x;
       if (wave_read(m,value)<0)
 	{
-	  printf("End of song, pausing\n");
-	  paused = 1;
+	  // printf("End of song, pausing\n");
+	  pause_playing();
 	  value[0] = stereo_sample2();
 	};
       value[0]=lfo_do(value[0]);
@@ -745,7 +786,6 @@ void read_write_normalize_loop()
 {
   stereo_sample2 value[1];
   unsigned8 m;
-  rms_init();
   if (!opt_rms)
     {
       read_write_bare_loop();
@@ -769,8 +809,8 @@ void read_write_normalize_loop()
 	m = x;
       if (wave_read(m,value)<0)
 	{
-	  printf("End of song, pausing\n");
-	  paused = 1;
+	  // printf("End of song, pausing\n");
+	  pause_playing();
 	  value[0] = stereo_sample2();
 	};
       rms_normalize(value);
@@ -790,30 +830,15 @@ void read_write_loop()
     read_write_bare_loop();
 }  
 
-void stop_and_wait_for_finish()
-{
-#ifdef DEBUG_WAIT_STATES
-  printf("stop_and_wait_for_finish(): entered\n");
-  fflush(stdout);
-#endif
-  ::stop=1;
-  ::paused=0;
-  while(!finished) ;
-#ifdef DEBUG_WAIT_STATES
-  printf("stop_and_wait_for_finish(): finished\n");
-  fflush(stdout);
-#endif
-}
-
 void wait_for_unpause()
 {
 #ifdef DEBUG_WAIT_STATES
-  printf("wait_for_unpause(): entered\n");
+  Debug("wait_for_unpause(): entered\n");
   fflush(stdout);
 #endif
   while(paused);
 #ifdef DEBUG_WAIT_STATES
-  printf("wait_for_unpause(): finished\n");
+  Debug("wait_for_unpause(): finished\n");
   fflush(stdout);
 #endif
 }
@@ -825,13 +850,20 @@ bool get_paused()
 
 void pause_playing()
 {
-  paused = 1;
+  if (!paused)
+    {
+      paused = true;
+      msg_playing_state_changed();
+    }
 }
 
-void unpause_if_necessary()
+void unpause_playing()
 {
-  if (::paused)
-    ::paused=0;
+  if (paused)
+    {
+      paused=false;
+      msg_playing_state_changed();
+    }
 }
 
 /*-------------------------------------------
@@ -842,6 +874,8 @@ void copyright()
   printf("BpmDj Player v%s, Copyright (c) 2001-2005 Werner Van Belle\n",VERSION);
   printf("This software is distributed under the GPL2 license. See copyright.txt\n");
   printf("--------------------------------------------------------------------\n");
+  fflush(stdout);
+  fflush(stderr);
 }
 
 int core_meta_init()
@@ -854,7 +888,11 @@ int core_meta_init()
       Index target(arg_match);
       targetperiod=period_to_quad(target.get_period());
     }
-  if ( strstr(argument,".idx")==NULL || strcmp(strstr(argument,".idx"),".idx")!=0)
+
+  int L = strlen(argument);
+  
+  if (L<4 || strcmp(argument+L-4,".idx")!=0)
+    //if ( strstr(argument,".idx")==NULL || strcmp(strstr(argument,".idx"),".idx")!=0)
     return err_needidx;
   playing = new Index(argument);
   
@@ -878,7 +916,7 @@ int core_meta_init()
 
 int core_object_init(bool sync)
 {
-  return wave_open(playing->get_filename(),sync);
+  return wave_open(playing, sync);
 }
 
 int core_open()
@@ -888,45 +926,70 @@ int core_open()
 
 void core_play()
 {
-   read_write_loop();
+  if (playing)
+    {
+      stop = 0;
+      finished = 0;
+      unpause_playing();
+      rms_init();
+      read_write_loop();
+    }
+  else
+    {
+      stop = true;
+      finished = true;
+      pause_playing();
+    }
 }
 
 void core_close()
 {
   dsp->close();
+  finished = 1;
 }
 
 void core_done()
 {
   wave_close();
-  cue_write();
-  if (playing->changed())
+  if (playing)
     {
-      if (!opt_quiet) printf("Updating index file\n");
-      playing->write_idx();
+      cue_write();
+      if (playing->changed())
+	{
+	  if (!opt_quiet) Info("Updating index file");
+	  playing->write_idx();
+	}
+      delete playing;
     }
-  delete playing;
 #ifdef DEBUG_WAIT_STATES
-  printf("finished marked true\n");
+  Debug("finished marked true");
   fflush(stdout);
 #endif
-  finished = 1;
+  finished = 2;
 }
 
-static void * go(void* neglect)
+/*static void * go(void* neglect)
 {
   core_play();
   core_close();
   core_done();
   return neglect;
 }
+*/
 
+static void * go2(void* neglect)
+{
+  core_play();
+  core_close();
+  return neglect;
+}
 
-int core_run()
+/*int core_run()
 {
   int err = core_object_init(false);
   if (err==err_noraw || err==err_nospawn)
     return err;
+  core_start();
   err = core_open();
   if (err==err_dsp) 
     {
@@ -936,4 +999,31 @@ int core_run()
   pthread_t *y = allocate(1,pthread_t);
   pthread_create(y,NULL,go,NULL);
   return err_none;
+}
+*/
+
+int core_start()
+{
+  int err = core_open();
+  if (err==err_dsp) 
+    {
+      core_close();
+      return err;
+    }
+  pthread_t *y = allocate(1,pthread_t);
+  pthread_create(y,NULL,go2,NULL);
+  return err_none;
+}
+
+void core_stop()
+{
+#ifdef DEBUG_WAIT_STATES
+  Debug("core_stop(): entered\n");
+#endif
+  ::stop=1;
+  unpause_playing();
+  while(!finished) ;
+#ifdef DEBUG_WAIT_STATES
+  Debug("core_stop(): finished\n");
+#endif
 }

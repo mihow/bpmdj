@@ -60,6 +60,11 @@
  *-------------------------------------------*/ 
 int        dsp_mixed::mix_dev = 0;
 
+dsp_mixed::dsp_mixed(const PlayerConfig & config) : dsp_driver(config)
+{
+  mix_dev = config.get_mixed_channel();
+}
+
 void dsp_mixed::start()
 {
   shared -> status = mix_start;
@@ -80,15 +85,16 @@ void dsp_mixed::write(stereo_sample2 value)
   // do skip writing when we are starting
   // but when we start reset the read and write pointers
   if (toskip) 
-      {
-	// printf("Skipping %d\n",toskip);
-	toskip--;
-	if (toskip) return;
-	shared -> write = 1; // read will never skip write so we put this first
-	shared -> read = 0;  // then we set the read pointer and assign the initial value
-	audio[0].sync = ((signed4)((::x - ::cue) % ::normalperiod)) * sync_max / (signed4)::normalperiod;
-	shared -> status = mix_sync;
-      }
+    {
+      // printf("Skipping %d\n",toskip);
+      toskip--;
+      if (toskip) return;
+      shared -> write = 1; // read will never skip write so we put this first
+      shared -> read = 0;  // then we set the read pointer and assign the initial value
+      audio[0].sync = ((signed4)((::x - ::cue) % ::normalperiod)) * sync_max / (signed4)::normalperiod;
+      shared -> status = mix_sync;
+    }
+  
   // do not advance when buffer is full
   signed4 w = shared->write;
   while (w==shared->read && shared->status!=mix_halt) 

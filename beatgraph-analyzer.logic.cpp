@@ -88,7 +88,8 @@ void BeatGraphAnalyzer::activate()
 void BeatGraphAnalyzer::readFileSigned()
 {
   // read in memory and shrink it 
-  FILE * raw=openRawFile(playing,arg_rawpath);
+  FILE * raw=openCoreRawFile();
+  if (!raw) return;
   long newaudiosize=fsize(raw)/4;
   if (newaudiosize!=audiosize)
     {
@@ -223,7 +224,7 @@ void getBandColor(int band, QColor &color, float val)
 void BeatGraphAnalyzer::calculateEnergy()
 {
   if (data) return;
-  unsigned4 collapsed_period = period  / COLLAPSE ;
+  // unsigned4 collapsed_period = period  / COLLAPSE ;
   unsigned4 collapsed_size = audiosize / COLLAPSE ;
   data = allocate(collapsed_size,compressed);
   
@@ -262,7 +263,7 @@ void BeatGraphAnalyzer::calculateEnergy()
     data[x]=(unsigned1)(bt[x]*255.0/me);
   
   // now we have the joy to run through the entire set and select the first maximas
-  int cs = collapsed_period / 4;
+  /*  int cs = collapsed_period / 4;
   printf("ms\tintensity\n---in steps of %d-----------\n",cs);
   for(unsigned4 x = 0 ; x < collapsed_size - cs ; x += cs)
     {
@@ -274,18 +275,14 @@ void BeatGraphAnalyzer::calculateEnergy()
       for(int y = 0 ; y < 100 ; y++)
 	data[z+y]=(100-y)*255/100;
       printf("%g\t%g\n",(double)z*((double)COLLAPSE*1000.0/(double)WAVRATE),bt[z]/me);
-    }
+      }*/
   deallocate(bt);
 }
 
 void BeatGraphAnalyzer::calculateHaar()
 { 
   if (bank) return;
-  unsigned4 collapsed_period = period  / COLLAPSE ;
   unsigned4 collapsed_size = audiosize / COLLAPSE ;
-  int window_xsize = collapsed_size / collapsed_period - 1 ;
-  int window_ysize = pattern->contentsRect().height();
-  assert(window_ysize>0);
   // First we calculate a number of layers, based on the audio-stream...
   // In every step we will modify the signed_data set by subtracting the
   // current mean...
@@ -303,7 +300,7 @@ void BeatGraphAnalyzer::calculateHaar()
 	{
 	  filtered = bank[filter] = allocate(haar_size+1, float);
 	  filtered[haar_size]=0;
-	  for(int i = 0 ; i < collapsed_size ; i++)
+	  for(unsigned4 i = 0 ; i < collapsed_size ; i++)
 	    filtered[i]=signed_data[i];
 	}
       else
@@ -469,7 +466,7 @@ void BeatGraphAnalyzer::showHaarPattern()
 /**
  * Checks whether a descent visualisation is possible
  */
-bool BeatGraphAnalyzer::check_visualisation_conditions()
+bool BeatGraphAnalyzer::check_visualisation_conditions(bool file_read)
 {
   if (!period)
     {
@@ -478,7 +475,8 @@ bool BeatGraphAnalyzer::check_visualisation_conditions()
 			   "Please go to the bpm counter and measure the tempo first");
       return false;
     }
-  if (!audiosize)
+  
+  if (!audiosize && file_read)
     {
       QMessageBox::warning(this,"Fragment too small",
 			   "There is simply no raw data on disk,\n"
@@ -506,6 +504,7 @@ void BeatGraphAnalyzer::showPattern()
  */
 void BeatGraphAnalyzer::changeVisualisation()
 {
+  if (!check_visualisation_conditions(false)) return;
   readFileSigned(); 
   if (!check_visualisation_conditions()) return;
   if (haar->isChecked())
@@ -518,8 +517,9 @@ void BeatGraphAnalyzer::changeVisualisation()
 
 void BeatGraphAnalyzer::getTempo()
 {
-  period=normalperiod+periodDelta->value()+periodDelta10->value();
-  if (period<=0) period=1;
+  if (!normalperiod.valid()) period = 0;
+  else period=normalperiod+periodDelta->value()+periodDelta10->value();
+  if (period<=0) period=0;
 }
 
 void BeatGraphAnalyzer::slantChanged()
@@ -530,10 +530,15 @@ void BeatGraphAnalyzer::slantChanged()
 
 void BeatGraphAnalyzer::setTempo()
 {
+  if (!playing) return;
+  bool was_normal = normalperiod == currentperiod;
+  bool was_target = targetperiod == currentperiod;
   normalperiod = normalperiod+periodDelta->value()+periodDelta10->value();
   if (normalperiod<=0) normalperiod = 1;
   ::y = ::x * currentperiod / normalperiod;
   periodDelta->setValue(0);
   periodDelta10->setValue(0);
   playing->set_period(normalperiod/4);
+  if (was_target) emit targetTempo();
+  if (was_normal) emit normalTempo();
 }

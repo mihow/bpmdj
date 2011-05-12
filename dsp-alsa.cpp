@@ -24,6 +24,8 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#include <qdialog.h>
+#include <qstring.h>
 #define ALSA_PCM_NEW_HW_PARAMS_API
 #define ALSA_PCM_NEW_SW_PARAMS_API
 #include "player-core.h"
@@ -154,29 +156,15 @@ signed8 dsp_alsa::latency()
   return delay + filled;
 }
 
-dsp_alsa::dsp_alsa() : dsp_driver()
+dsp_alsa::dsp_alsa(const PlayerConfig & config) : dsp_driver(config)
 {
-  arg_dev = "hw:0,0";
+  arg_dev = strdup(config.get_alsa_dev());
   dsp = NULL;
   filled = 0;
   buffer_size = 0;
   period_size = 0;
-  arg_latency = "150";
-}
-
-int dsp_alsa::parse_option(char* arg, char* argument)
-{
-  if (option(arg,"dev"))
-    {
-      arg_dev=argument;
-      return 2;
-    }
-  if (option(arg,"latency","L")) 
-    {
-      arg_latency=argument;
-      return 2;
-    } 
-  return dsp_driver::parse_option(arg,argument);
+  arg_latency = config.get_alsa_latency();
+  verbose = config.get_alsa_verbose();
 }
 
 int dsp_alsa::open()
@@ -250,7 +238,7 @@ int dsp_alsa::open()
     }
 
   // playing latency instellen...
-  period_time = atoi(arg_latency) * 1000;
+  period_time = arg_latency * 1000;
   // period_time /=2; // we do this so we can afterward use multiple periods
   buffer_time = period_time *2;
   {
@@ -359,8 +347,11 @@ int dsp_alsa::open()
 
 void dsp_alsa::close()
 {
-  snd_pcm_drain(dsp);
-  snd_pcm_close(dsp);
+  if (dsp)
+    {
+      snd_pcm_drain(dsp);
+      snd_pcm_close(dsp);
+    }
 }
 
 #endif

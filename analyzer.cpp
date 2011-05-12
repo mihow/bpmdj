@@ -32,6 +32,12 @@ ThreadedAnalyzer::ThreadedAnalyzer():
   stop_signal = false;
 }
 
+ReentrantAnalyzer::ReentrantAnalyzer(): 
+  Analyzer()
+{
+  working = false;
+}
+
 void ThreadedAnalyzer::startStopAnalyzer()
 {
   if (working)
@@ -63,8 +69,12 @@ void Analyzer::startAnalyzer()
   stoppedAnalyzing();
 }
 
-void Analyzer::stopAnalyzer()
+void ReentrantAnalyzer::startAnalyzer()
 {
+  if (working) return;
+  working=true;
+  Analyzer::startAnalyzer();
+  working=false;
 }
 
 void ThreadedAnalyzer::startAnalyzer()
@@ -74,6 +84,11 @@ void ThreadedAnalyzer::startAnalyzer()
   stop_signal=false;
   pthread_t y;
   pthread_create(&y,NULL,::doit,(void*)this);
+}
+
+
+void Analyzer::stopAnalyzer()
+{
 }
 
 void ThreadedAnalyzer::stopAnalyzer()

@@ -30,6 +30,7 @@
 #include "songtree.h"
 #include "compacter.h"
 #include "tags.h"
+#include "avltree.h"
 
 #define SPLIT_ONEFILE 0
 #define SPLIT_ARTIST 1

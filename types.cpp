@@ -17,7 +17,6 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#include "echo-property.h"
-#include "smallhistogram-type.cpp"
-#include "histogram-property.cpp"
+#include "tempo-type.h"
 
+const float tempo_type::no_tempo = -1;

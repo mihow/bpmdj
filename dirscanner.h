@@ -37,8 +37,8 @@ class DirectoryScanner
  public:
     DirectoryScanner(QString  extension);
     static bool goodName(QString name);
-    static bool songExtension(QString extension);
-    static bool goodExtension(QString extension);
+    virtual void scan(const QString dirname)
+      { scan(dirname,dirname); };
     virtual void scan(const QString  dirname, const QString  checkname)
       { scandir(dirname, checkname); };
 };

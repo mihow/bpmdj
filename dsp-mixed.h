@@ -19,10 +19,8 @@
 
 #include "version.h"
 #include "dsp-drivers.h"
-
-#define MIXED_OPTION_HELP \
-	 "  --mixed-driver---------------------------------\n"\
-	 "               --mixed nbr           use the single sound card mix driver (1 or 2)\n"
+#include "synced-stereo-sample2.h"
+#include "player-config.h"
 
 typedef enum {mix_start, mix_sync, mix_syncing, mix_playing, mix_pause, mix_paused, mix_stop, mix_stopped, mix_halt} mixstate;
 
@@ -54,6 +52,7 @@ class dsp_mixed: public dsp_driver
   unsigned4 toskip;
  public:
   static int mix_dev;
+  dsp_mixed(const PlayerConfig & config);
   void    start();
   void    pause();
   void    write(stereo_sample2 value);

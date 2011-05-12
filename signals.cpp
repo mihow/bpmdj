@@ -17,14 +17,18 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
+#ifndef SIGNALS_CPP
+#define SIGNALS_CPP
+
 #include <assert.h>
+#include <stdlib.h>
 #include <math.h>
 #include "common.h"
-#include "basic-types.h"
+#include "signals.h"
 #include "memory.h"
 #include "fourier.h"
-#include <fftw3.h>
-#include <stdlib.h>
+
+BasicConvertor::BasicConvertor() {};
 
 signed8 higher_power_of_two(signed8 a)
 {
@@ -66,26 +70,6 @@ void vector_mul_div(signed4 * data, long l, signed4 mul, signed4 div)
     data[i]=(signed4)((signed8)data[i]*m/d);
 }
 
-double find_abs_max(double * data, long l)
-{
-  if (l==0) return 0;
-  double m = data[0];
-  for(long i = 0 ; i < l ; i ++)
-    if (fabs(data[i])>m)
-      m=fabs(data[i]);
-  return m;
-}
-
-float find_abs_max(float * data, long l)
-{
-  if (l==0) return 0;
-  double m = data[0];
-  for(long i = 0 ; i < l ; i ++)
-    if (fabs(data[i])>m)
-      m=fabs(data[i]);
-  return m;
-}
-
 double find_mean(double * data, long l)
 {
   if (l==0) return 0;
@@ -111,21 +95,13 @@ void translate_mean(float * data, long l)
     data[i]-=m;
 }
 
-double normalize_abs_max(double * data, long l)
+template<class type> type normalize_abs_max(type * data, long l)
 {
-  double m = find_abs_max(data,l);
+  type m = find_abs_max(data,l);
   if (m>0)
     for(long i = 0 ; i < l ; i ++)
       data[i]/=m;
   return m;
-}
-
-void normalize_abs_max(float * data, long l)
-{
-  double m = find_abs_max(data,l);
-  if (m>0)
-    for(long i = 0 ; i < l ; i ++)
-      data[i]/=m;
 }
 
 void normalize_mean(double * data, long l)
@@ -271,6 +247,36 @@ void differentiate(double * arr, int s)
    arr[s-1]=-arr[s-1];
 }
 
+void energize(double*data, double audiosize, unsigned4 fs)
+{
+  array(rr,fs,float);
+  for(unsigned4 i = 0 ; i < fs ; i++)
+    rr[i]=0;
+  double M = 0;
+  for(unsigned4 x = 0 ; x < audiosize ; x ++)
+    {
+      M-=rr[x%fs];
+      rr[x%fs]=data[x];
+      M+=data[x];
+      double R = M/fs;
+      data[x>=fs ? x - fs : 0 ] -= R;
+    }
+  for(unsigned4 x = 0 ; x < audiosize ; x ++)
+    data[x]*=data[x];
+  for(unsigned4 i = 0 ; i < fs ; i++)
+    rr[i]=0;
+  double S = 0;
+  for(unsigned4 x = 0 ; x < audiosize ; x ++)
+    {
+      S-=rr[x%fs];
+      rr[x%fs]=data[x];
+      S+=data[x];
+      double R = sqrt(S/fs);
+      data[x>=fs ? x - fs : 0 ] = R;
+    }
+  deallocate(rr);
+}
+
 void test_signals()
 {
   return;
@@ -318,3 +324,5 @@ void test_signals()
 	printf("%d %g %g\n",test,l2d,a2d);
      }
 }
+
+#endif

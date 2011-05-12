@@ -51,6 +51,12 @@ void file_signed4(long i, FILE * f)
   assert(written==1);
 }
 
+void file_unsigned4(unsigned4 i, FILE * f)
+{
+  int written = fwrite(&i,4,1,f);
+  assert(written==1);
+}
+
 void file_unsigned1(unsigned1 i, FILE * f)
 {
   int written = fwrite(&i,1,1,f);

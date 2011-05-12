@@ -35,6 +35,8 @@
 #include <sys/times.h>
 #include <math.h>
 #include <assert.h>
+#include <qstring.h>
+#include <qdialog.h>
 #include <math.h>
 #include "energy-analyzer.h"
 #include "version.h"
@@ -45,7 +47,7 @@
 
 void EnergyAnalyzer::readAudio()
 {
-  FILE * raw = openRawFile(playing,arg_rawpath);
+  FILE * raw = openCoreRawFile();
   audiosize=fsize(raw);
   audiosize/=4;
   audio=allocate(audiosize+1,stereo_sample2);

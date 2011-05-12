@@ -17,23 +17,9 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#define OSS_OPTION_HELP ""
-
 #ifdef COMPILE_OSS
-
 #include <linux/soundcard.h>
 #include "dsp-drivers.h"
-
-#undef OSS_OPTION_HELP
-#define OSS_OPTION_HELP \
-	 "  --oss-driver---------------------------------\n"\
-	 "               --oss                 use OSS driver\n"\
-	 "   -d arg      --dsp arg             dsp device to use (default = /dev/dsp)\n"\
-	 "   -F nbr      --fragments nbr       the number of fragments used to play audio.\n"\
-	 "   -X          --nolatencyaccounting does not take into account the latency when marking a cue\n"\
-	 "   -v          --verbose             be verbose with respect to latency\n"\
-	 "   -L nbr      --latency nbr         required latency in ms (default = 744)\n"
-
 
 class dsp_oss: public dsp_driver
 {
@@ -42,21 +28,19 @@ class dsp_oss: public dsp_driver
   signed8        dsp_writecount;
   audio_buf_info dsp_latency;
   char * arg_dsp;
-  char * arg_fragments;
+  int    arg_fragments;
   int    opt_fragments;
   int    opt_nolatencyaccounting;
-  int    opt_latency ;
-  char*  arg_latency ;
+  int    arg_latency ;
   signed8 playcount();
   void flush();
  public:
-  dsp_oss();
+  dsp_oss(const PlayerConfig & config);
   void    start();
   void    pause();
   void    write(stereo_sample2 value);
   signed8 latency();
   int     open();
   void    close();
-  int     parse_option(char* arg, char* argument);
 };
 #endif

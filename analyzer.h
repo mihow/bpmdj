@@ -36,13 +36,28 @@ class Analyzer
   // fill this in with appropriate logic
   virtual void store() {};
   // fill in with appropriate index store logic
+  virtual ~Analyzer() {};
+};
+
+/**
+ * The reentrant analyzer will only start a new process if the old one died
+ * already.
+ */
+
+class ReentrantAnalyzer: public Analyzer
+{
+ protected:
+  volatile bool working;
+ public:
+  ReentrantAnalyzer();
+  virtual void startAnalyzer();
 };
 
 class ThreadedAnalyzer: public Analyzer
 {
  protected:
-  volatile bool stop_signal;
   volatile bool working;
+  volatile bool stop_signal;
  public:
   void doit();
   void doitwrapper();

@@ -18,6 +18,7 @@
 ****/
 
 #include <qlabel.h>
+#include <pthread.h>
 #include "history.h"
 #include "database.h"
 #include "song-metric.h"
@@ -25,11 +26,10 @@
 #include "songselector.logic.h"
 #include "process-manager.h"
 #include "songtree.h"
-#include "avltree.cpp"
-#include "growing-array.cpp"
+#include "avltree.h"
+#include "growing-array.h"
 #include "tags.h"
 #include "heap.h"
-#include <pthread.h>
 #include "kbpm-dj.h"
 
 /**
@@ -272,7 +272,6 @@ int DataBase::get_unheaped_selection(SongSelectorLogic* selector, Song* main, QV
   return set_answer(show,itemcount,target);
 }
 
-
 int DataBase::set_answer(Song ** show, int itemcount, QVectorView* target)
 {
   if (itemcount)
@@ -282,8 +281,37 @@ int DataBase::set_answer(Song ** show, int itemcount, QVectorView* target)
       show = NULL;
       deallocate(show);
     }
+  int ibefore = target->currentItem();
+  // store old current item if available
+  Song * before = NULL;
+  if(ibefore>=0 && ibefore < QSong::get_song_count())
+    before = QSong::songEssence(ibefore);
+  // set the vector
   QSong::setVector(show,itemcount);
+  // find the old current item and make it the current again
+  //  if (before)
+  //    printf("Song before was %s\n",(const char*)before->getDisplayTitle());
+  //  else
+  //    printf("There was no song before\n");
+  int item_to_select = 0;
+  if (before && show)
+    for(int i = 0 ; i < itemcount ; i ++)
+      if (show[i]==before)
+	{
+	  item_to_select = i;
+	  break;
+	}
+  // set the focus
+  //  printf("The new item to select is %d\n",item_to_select);
+  target->setCurrentItem(item_to_select);
+  if (item_to_select < itemcount && item_to_select >=0)
+    QSong::set_selected(item_to_select,true);
+  target->ensureItemVisible(item_to_select);
+  //  printf("The new first item is selected ? %d\n",QSong::get_selected(0));
+  // inform the target that the vector has changed
   target->vectorChanged();
+  //  printf("The new focus is at %d\n\n",target->currentItem());
+  //  printf("The vectorview thinks that first item isSelected: %d\n\n",target->isSelected(0));
   return itemcount;
 }
 
@@ -313,7 +341,10 @@ int DataBase::getSelection(SongSelectorLogic* selector, Song* main, QVectorView*
   return set_answer(show,itemcount,target);
 }
 
-Song * * DataBase::closestSongs(SongSelectorLogic * selector, Song * target, SongMetriek * metriek, int maximum, int &count)
+Song * * DataBase::closestSongs(SongSelectorLogic * selector,
+				Song * target1, float weight1,
+				Song * target2, float weight2,
+				SongMetriek * metriek, int maximum, int &count)
 {
   int i, j;
   float * minima = allocate(maximum,float);
@@ -332,7 +363,7 @@ Song * * DataBase::closestSongs(SongSelectorLogic * selector, Song * target, Son
       if (!song->get_ondisk()) continue;
       if (!tagFilter(song)) continue;
       // measure distance, gegeven de metriek
-      double d = song->distance(target,metriek,100000);
+      double d = song->distance(target1,weight1,target2,weight2,metriek);
       // find the best position to insert the item..
       for (j = 0 ; j < count ; j++)
 	if (minima[j]>d) 

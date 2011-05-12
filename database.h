@@ -63,7 +63,7 @@ class DataBase
     GrowingArray<Song*> * getAllSongs() { return &all;};
     AvlTree<QString> * getFileTreeRef();
     AvlTree<QString> * getFileTreeCopy();
-    Song * * closestSongs(SongSelectorLogic * selector, Song * target, SongMetriek * metriek, int maximum, int &count);
+    Song * * closestSongs(SongSelectorLogic * selector,Song * target1, float weight1, Song * target2, float weight2, SongMetriek * metriek, int maximum, int &count);
 };
 
 #endif
