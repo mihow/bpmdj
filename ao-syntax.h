@@ -55,8 +55,9 @@
      PRECOMPILER = 271,
      VOLATILE = 272,
      CLASS = 273,
-     TEMPLATE_OPEN = 274,
-     TEMPLATE_CLOSE = 275
+     USES = 274,
+     TEMPLATE_OPEN = 275,
+     TEMPLATE_CLOSE = 276
    };
 #endif
 
@@ -67,7 +68,7 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 80 "ao-syntax.y"
+#line 135 "ao-syntax.y"
  
   char           * token;
   s_arg            arg;
@@ -76,7 +77,7 @@ typedef union YYSTYPE
 
 
 /* Line 1676 of yacc.c  */
-#line 80 "ao-syntax.h"
+#line 81 "ao-syntax.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

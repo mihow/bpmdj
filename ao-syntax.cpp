@@ -78,6 +78,7 @@
 /* Line 189 of yacc.c  */
 #line 1 "ao-syntax.y"
 
+#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <map>
@@ -85,38 +86,74 @@
 #include "ao-lexer.h"
 #include "sao-printer.h"
 #include "ao-grammar.h"
+
+/**
+ * Since some people want prefixes such as 'T' in the generated pascal code
+ * it is possible to declare them here. By default, the prefix is omitted
+ * since I believe it is a stupid convention; Active objects are no longer objects
+ * and even the 'objects' are already pointers, so they should basically be called
+ * pointers, but then it becomes even more confusing. However, T as a prefix
+ * is also not completely correct, semantically speaking. Maybe the prefix A would
+ * make more sense, or AO. One could also argue, that if your active obejcts needs a 
+ * prefix, then you should call it like that.
+ */
+#define T ""
+
 void aoerror(const char* text);
 char* cat(const char* a, const char* b)
-   {
-     if (a==NULL && b==NULL) return strdup("");
-     if (a==NULL) return strdup(b);
-     if (b==NULL) return strdup(a);
-     char* c = (char*)malloc(strlen(a)+strlen(b)+1);
-     strcpy(c,a);
-     strcat(c,b);
-     return c;
-   }
-
-char* args2str(vector<s_arg> * args, string sepi = ", ")
 {
-  char* sep=strdup(sepi.c_str());
-  char* accu=strdup("");
-  for(unsigned i = 0 ; i < args->size() ; i++)
-    {
-      accu=cat(accu,args[0][i].type);
-      accu=cat(accu," ");
-      accu=cat(accu,args[0][i].name);
-      if (i<args->size()-1)
-	accu=cat(accu,sep);
-    }
-  return accu;
+  if (a==NULL && b==NULL) return strdup("");
+  if (a==NULL) return strdup(b);
+  if (b==NULL) return strdup(a);
+  char* c = (char*)malloc(strlen(a)+strlen(b)+1);
+  strcpy(c,a);
+  strcat(c,b);
+  return c;
 }
  
-char* argnames2str(vector<s_arg> * args)
+extern bool pascal; 
+ 
+char* args2str(vector<s_arg> * args, string sepi = ", ", string prefix= "")
 {
+  if (!pascal)
+    {
+      char* sep=strdup(sepi.c_str());
+      char* accu=strdup("");
+      for(unsigned i = 0 ; i < args->size() ; i++)
+	{
+	  accu=cat(accu,args[0][i].type);
+	  accu=cat(accu," ");
+	  accu=cat(accu,args[0][i].name);
+	  if (i<args->size()-1)
+	    accu=cat(accu,sep);
+	}
+      return accu;
+    }
+  else
+    {
+      char* sep=strdup(sepi.c_str());
+      char* accu=strdup("");
+      char* prefix_=strdup(prefix.c_str());
+      for(unsigned i = 0 ; i < args->size() ; i++)
+	{
+	  accu=cat(accu,prefix_);
+	  accu=cat(accu,args[0][i].name);
+	  accu=cat(accu,": ");
+	  accu=cat(accu,args[0][i].type);
+	  if (i<args->size()-1)
+	    accu=cat(accu,sep);
+	}
+      return accu;
+    }
+}
+ 
+char* argnames2str(vector<s_arg> * args,string prefix="")
+{
+  char* pref=strdup(prefix.c_str());
   char* accu=strdup("");
   for(unsigned i = 0 ; i < args->size() ; i++)
     {
+      accu=cat(accu,pref);
       accu=cat(accu,args[0][i].name);
       if (i<args->size()-1)
 	accu=cat(accu,", ");
@@ -125,24 +162,42 @@ char* argnames2str(vector<s_arg> * args)
 }
  
 char* copyargs(vector<s_arg> * args)
-  {
-    char* accu=strdup("");
-    for(unsigned i = 0 ; i < args->size() ; i++)
-      {
-	char temp[1000];
-	sprintf(temp,"%s(%s)",args[0][i].name,args[0][i].name);
-	accu=cat(accu,temp);
-	if (i<args->size()-1)
-	  accu=cat(accu,", ");
-      }
-    return accu;
-  }
+{
+  if (!pascal)
+    {
+      char* accu=strdup("");
+      for(unsigned i = 0 ; i < args->size() ; i++)
+	{
+	  char temp[1000];
+	  sprintf(temp,"%s(%s)",args[0][i].name,args[0][i].name);
+	  accu=cat(accu,temp);
+	  if (i<args->size()-1)
+	    accu=cat(accu,", ");
+	}
+      return accu;
+    }
+  else
+    {
+      char* accu=strdup("");
+      for(unsigned i = 0 ; i < args->size() ; i++)
+	{
+	  char temp[1000];
+	  sprintf(temp,"  %s:=bloody_local_var_%s;\n",args[0][i].name,args[0][i].name);
+	  accu=cat(accu,temp);
+	  //if (i<args->size()-1)
+	  //	    accu=cat(accu,", ");
+	}
+      return accu;
+    }
+}
 
 extern outputbuf object;  // the object class declaration
 extern outputbuf object2; // the object methods
 extern outputbuf meta;
 extern outputbuf msgs; 
 extern outputbuf msgs1; 
+extern outputbuf impl; 
+extern outputbuf useslist;
 extern outputbuf globhead;
 extern char * current_ao;
 extern map<string,string> field2init;
@@ -151,7 +206,7 @@ extern map<string,string> field2init;
 
 
 /* Line 189 of yacc.c  */
-#line 155 "ao-syntax.cpp"
+#line 210 "ao-syntax.cpp"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -194,8 +249,9 @@ extern map<string,string> field2init;
      PRECOMPILER = 271,
      VOLATILE = 272,
      CLASS = 273,
-     TEMPLATE_OPEN = 274,
-     TEMPLATE_CLOSE = 275
+     USES = 274,
+     TEMPLATE_OPEN = 275,
+     TEMPLATE_CLOSE = 276
    };
 #endif
 
@@ -206,7 +262,7 @@ typedef union YYSTYPE
 {
 
 /* Line 214 of yacc.c  */
-#line 80 "ao-syntax.y"
+#line 135 "ao-syntax.y"
  
   char           * token;
   s_arg            arg;
@@ -215,7 +271,7 @@ typedef union YYSTYPE
 
 
 /* Line 214 of yacc.c  */
-#line 219 "ao-syntax.cpp"
+#line 275 "ao-syntax.cpp"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -227,7 +283,7 @@ typedef union YYSTYPE
 
 
 /* Line 264 of yacc.c  */
-#line 231 "ao-syntax.cpp"
+#line 287 "ao-syntax.cpp"
 
 #ifdef short
 # undef short
@@ -442,20 +498,20 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  2
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   59
+#define YYLAST   61
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  21
+#define YYNTOKENS  22
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  12
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  28
+#define YYNRULES  29
 /* YYNRULES -- Number of states.  */
-#define YYNSTATES  60
+#define YYNSTATES  63
 
 /* YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.  */
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   275
+#define YYMAXUTOK   276
 
 #define YYTRANSLATE(YYX)						\
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
@@ -490,7 +546,7 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
-      15,    16,    17,    18,    19,    20
+      15,    16,    17,    18,    19,    20,    21
 };
 
 #if YYDEBUG
@@ -498,33 +554,33 @@ static const yytype_uint8 yytranslate[] =
    YYRHS.  */
 static const yytype_uint8 yyprhs[] =
 {
-       0,     0,     3,     6,     7,     9,    13,    14,    22,    25,
-      26,    30,    36,    41,    48,    53,    59,    64,    67,    69,
-      74,    81,    83,    87,    90,    94,    96,    99,   101
+       0,     0,     3,     6,     7,     9,    13,    17,    18,    26,
+      29,    30,    34,    40,    45,    52,    57,    63,    68,    71,
+      73,    78,    85,    87,    91,    94,    98,   100,   103,   105
 };
 
 /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
 static const yytype_int8 yyrhs[] =
 {
-      22,     0,    -1,    22,    23,    -1,    -1,    16,    -1,    18,
-       4,     8,    -1,    -1,    11,     4,    13,    24,    25,    14,
-       8,    -1,    25,    26,    -1,    -1,    27,     4,     8,    -1,
-      27,     4,    10,    32,     8,    -1,    28,    27,     4,     8,
-      -1,    28,    27,     4,    10,    32,     8,    -1,    27,     4,
-      29,     8,    -1,     3,    27,     4,    29,     8,    -1,     7,
-       4,    29,     8,    -1,    27,    15,    -1,     4,    -1,     4,
-      19,    27,    20,    -1,     4,    19,    27,    12,    27,    20,
-      -1,    17,    -1,     5,    30,     6,    -1,     5,     6,    -1,
-      30,    12,    31,    -1,    31,    -1,    27,     4,    -1,     9,
-      -1,     4,    -1
+      23,     0,    -1,    23,    24,    -1,    -1,    16,    -1,    19,
+       4,     8,    -1,    18,     4,     8,    -1,    -1,    11,     4,
+      13,    25,    26,    14,     8,    -1,    26,    27,    -1,    -1,
+      28,     4,     8,    -1,    28,     4,    10,    33,     8,    -1,
+      29,    28,     4,     8,    -1,    29,    28,     4,    10,    33,
+       8,    -1,    28,     4,    30,     8,    -1,     3,    28,     4,
+      30,     8,    -1,     7,     4,    30,     8,    -1,    28,    15,
+      -1,     4,    -1,     4,    20,    28,    21,    -1,     4,    20,
+      28,    12,    28,    21,    -1,    17,    -1,     5,    31,     6,
+      -1,     5,     6,    -1,    31,    12,    32,    -1,    32,    -1,
+      28,     4,    -1,     9,    -1,     4,    -1
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,    92,    92,    93,    96,    97,    99,    98,   205,   206,
-     209,   211,   213,   215,   217,   218,   224,   258,   259,   260,
-     261,   264,   267,   268,   271,   272,   275,   278,   279
+       0,   147,   147,   148,   151,   152,   153,   155,   154,   334,
+     335,   338,   345,   353,   355,   357,   358,   364,   447,   448,
+     449,   450,   453,   456,   457,   460,   461,   464,   467,   468
 };
 #endif
 
@@ -535,10 +591,10 @@ static const char *const yytname[] =
 {
   "$end", "error", "$undefined", "META", "NAME", "LPAREN", "RPAREN",
   "MESSAGE", "SEMICOLON", "NUMBER", "INIT", "ACTIVE", "COMMA", "LBRACE",
-  "RBRACE", "STAR", "PRECOMPILER", "VOLATILE", "CLASS", "TEMPLATE_OPEN",
-  "TEMPLATE_CLOSE", "$accept", "aoheaders", "aoheader", "$@1", "contents",
-  "content", "type", "varflags", "args", "args_lst", "arg",
-  "init_expression", 0
+  "RBRACE", "STAR", "PRECOMPILER", "VOLATILE", "CLASS", "USES",
+  "TEMPLATE_OPEN", "TEMPLATE_CLOSE", "$accept", "aoheaders", "aoheader",
+  "$@1", "contents", "content", "type", "varflags", "args", "args_lst",
+  "arg", "init_expression", 0
 };
 #endif
 
@@ -549,24 +605,24 @@ static const yytype_uint16 yytoknum[] =
 {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
-     275
+     275,   276
 };
 # endif
 
 /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    21,    22,    22,    23,    23,    24,    23,    25,    25,
-      26,    26,    26,    26,    26,    26,    26,    27,    27,    27,
-      27,    28,    29,    29,    30,    30,    31,    32,    32
+       0,    22,    23,    23,    24,    24,    24,    25,    24,    26,
+      26,    27,    27,    27,    27,    27,    27,    27,    28,    28,
+      28,    28,    29,    30,    30,    31,    31,    32,    33,    33
 };
 
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
-       0,     2,     2,     0,     1,     3,     0,     7,     2,     0,
-       3,     5,     4,     6,     4,     5,     4,     2,     1,     4,
-       6,     1,     3,     2,     3,     1,     2,     1,     1
+       0,     2,     2,     0,     1,     3,     3,     0,     7,     2,
+       0,     3,     5,     4,     6,     4,     5,     4,     2,     1,
+       4,     6,     1,     3,     2,     3,     1,     2,     1,     1
 };
 
 /* YYDEFACT[STATE-NAME] -- Default rule to reduce with in state
@@ -574,39 +630,41 @@ static const yytype_uint8 yyr2[] =
    means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       3,     0,     1,     0,     4,     0,     2,     0,     0,     6,
-       5,     9,     0,     0,    18,     0,     0,    21,     8,     0,
-       0,     0,     0,     0,     7,     0,    17,     0,     0,     0,
-       0,     0,    10,     0,     0,     0,     0,     0,    19,    23,
-       0,     0,    25,    16,    28,    27,     0,    14,    12,     0,
-      15,     0,    26,    22,     0,    11,     0,    20,    24,    13
+       3,     0,     1,     0,     4,     0,     0,     2,     0,     0,
+       0,     7,     6,     5,    10,     0,     0,    19,     0,     0,
+      22,     9,     0,     0,     0,     0,     0,     8,     0,    18,
+       0,     0,     0,     0,     0,    11,     0,     0,     0,     0,
+       0,    20,    24,     0,     0,    26,    17,    29,    28,     0,
+      15,    13,     0,    16,     0,    27,    23,     0,    12,     0,
+      21,    25,    14
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     1,     6,    11,    12,    18,    40,    20,    31,    41,
-      42,    46
+      -1,     1,     7,    14,    15,    21,    43,    23,    34,    44,
+      45,    49
 };
 
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
    STATE-NUM.  */
-#define YYPACT_NINF -20
+#define YYPACT_NINF -23
 static const yytype_int8 yypact[] =
 {
-     -20,     2,   -20,    24,   -20,    38,   -20,     6,    35,   -20,
-     -20,   -20,     0,    40,    27,    41,    39,   -20,   -20,     1,
-      40,     7,    40,    43,   -20,    26,   -20,     8,    43,     9,
-      34,    42,   -20,    28,    44,    31,    45,    40,   -20,   -20,
-      11,    21,   -20,   -20,   -20,   -20,    46,   -20,   -20,    28,
-     -20,    15,   -20,   -20,    40,   -20,    47,   -20,   -20,   -20
+     -23,     2,   -23,    15,   -23,    26,    27,   -23,    29,    36,
+      38,   -23,   -23,   -23,   -23,     0,    43,    30,    44,    41,
+     -23,   -23,     1,    43,     7,    43,    46,   -23,    31,   -23,
+       8,    46,    12,    34,    45,   -23,    28,    47,    35,    48,
+      43,   -23,   -23,    11,    22,   -23,   -23,   -23,   -23,    49,
+     -23,   -23,    28,   -23,    14,   -23,   -23,    43,   -23,    50,
+     -23,   -23,   -23
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -20,   -20,   -20,   -20,   -20,   -20,   -12,   -20,   -19,   -20,
-      -5,    10
+     -23,   -23,   -23,   -23,   -23,   -23,   -15,   -23,   -22,   -23,
+      -5,     9
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
@@ -616,34 +674,37 @@ static const yytype_int8 yypgoto[] =
 #define YYTABLE_NINF -1
 static const yytype_uint8 yytable[] =
 {
-      19,    21,     2,    13,    14,    25,    34,    15,    27,    36,
-      29,    28,    35,     3,    16,    52,    26,    17,     4,     9,
-       5,    37,    26,    26,    26,    51,    26,    53,     7,    38,
-      26,    30,    44,    54,    32,    57,    33,    45,    14,    48,
-      39,    49,     8,    10,    14,    23,    22,    24,    30,    58,
-      43,     0,    47,    50,    55,    59,     0,     0,     0,    56
+      22,    24,     2,    16,    17,    28,    37,    18,    30,    39,
+      32,    31,    38,     3,    19,    55,    29,    20,     4,     8,
+       5,     6,    29,    29,    40,    54,    29,    29,    56,    29,
+       9,    10,    47,    41,    57,    60,    33,    48,    17,    35,
+      42,    36,    11,    51,    12,    52,    13,    17,    26,    27,
+      25,    33,    61,    46,     0,    50,    53,    58,    62,     0,
+       0,    59
 };
 
 static const yytype_int8 yycheck[] =
 {
-      12,    13,     0,     3,     4,     4,    25,     7,    20,    28,
-      22,     4,     4,    11,    14,     4,    15,    17,    16,    13,
-      18,    12,    15,    15,    15,    37,    15,     6,     4,    20,
-      15,     5,     4,    12,     8,    20,    10,     9,     4,     8,
-       6,    10,     4,     8,     4,     4,    19,     8,     5,    54,
-       8,    -1,     8,     8,     8,     8,    -1,    -1,    -1,    49
+      15,    16,     0,     3,     4,     4,    28,     7,    23,    31,
+      25,     4,     4,    11,    14,     4,    15,    17,    16,     4,
+      18,    19,    15,    15,    12,    40,    15,    15,     6,    15,
+       4,     4,     4,    21,    12,    21,     5,     9,     4,     8,
+       6,    10,    13,     8,     8,    10,     8,     4,     4,     8,
+      20,     5,    57,     8,    -1,     8,     8,     8,     8,    -1,
+      -1,    52
 };
 
 /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
    symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,    22,     0,    11,    16,    18,    23,     4,     4,    13,
-       8,    24,    25,     3,     4,     7,    14,    17,    26,    27,
-      28,    27,    19,     4,     8,     4,    15,    27,     4,    27,
-       5,    29,     8,    10,    29,     4,    29,    12,    20,     6,
-      27,    30,    31,     8,     4,     9,    32,     8,     8,    10,
-       8,    27,     4,     6,    12,     8,    32,    20,    31,     8
+       0,    23,     0,    11,    16,    18,    19,    24,     4,     4,
+       4,    13,     8,     8,    25,    26,     3,     4,     7,    14,
+      17,    27,    28,    29,    28,    20,     4,     8,     4,    15,
+      28,     4,    28,     5,    30,     8,    10,    30,     4,    30,
+      12,    21,     6,    28,    31,    32,     8,     4,     9,    33,
+       8,     8,    10,     8,    28,     4,     6,    12,     8,    33,
+      21,    32,     8
 };
 
 #define yyerrok		(yyerrstatus = 0)
@@ -1457,178 +1518,269 @@ yyreduce:
         case 4:
 
 /* Line 1455 of yacc.c  */
-#line 96 "ao-syntax.y"
+#line 151 "ao-syntax.y"
     { print(globhead,"%s\n",(yyvsp[(1) - (1)].token)); ;}
     break;
 
   case 5:
 
 /* Line 1455 of yacc.c  */
-#line 97 "ao-syntax.y"
-    { print(globhead,"class %s;\n",(yyvsp[(2) - (3)].token)); ;}
+#line 152 "ao-syntax.y"
+    {assert(pascal); print(useslist,", %s",(yyvsp[(2) - (3)].token));;}
     break;
 
   case 6:
 
 /* Line 1455 of yacc.c  */
-#line 99 "ao-syntax.y"
-    {
-      field2init.clear();
-      print(object,"class Active%s: public ActiveObject<Smart< Active%s_msg_ > >\n{\n",(yyvsp[(2) - (3)].token),(yyvsp[(2) - (3)].token));
-      print(object,"  friend class %s;\n",(yyvsp[(2) - (3)].token));
-      print(object,"  %s * self;\n",(yyvsp[(2) - (3)].token));
-      print(object,
-	    "    virtual elementResult handle(Smart< Active%s_msg_> cmd)\n"
-	    "      {\n"
-	    "        if (cmd) return cmd->run(this);\n"
-	    "        else return Done;\n"
-	    "      };\n",(yyvsp[(2) - (3)].token));
-      print(globhead, "class %s;\n",(yyvsp[(2) - (3)].token));
-      print(globhead, "class Active%s;\n",(yyvsp[(2) - (3)].token));
-      print(globhead, "#ifdef TRACE_MESSAGES\n"
-	    "#define ENTER_MSG cerr << \"Start \" << declaration() << \"\\n\";\n"
-	    "#define LEAVE_MSG cerr << \"Stop \" << declaration()  << \"\\n\";\n"
-	    "#endif\n");
-      print(globhead, "#ifndef ENTER_MSG\n"
-	    "#define ENTER_MSG ;\n"
-	    "#endif\n"
-	    "#ifndef LEAVE_MSG\n"
-	    "#define LEAVE_MSG ;\n"
-	    "#endif\n");
-
-      print(msgs1,
-"/**\n"
-" * Represents the basic message that is used to queue or deliver a call to \n"
-" * the true Active%s. Active%s_msg_ has a run method which is invoked\n"
-" * by ActiveObject whenever it wants to handle the message. For each \n"
-" * declared method in the active object description, a specific subclass\n"
-" * of Active%s_msg_ has been generated. See inheritance diagram.\n"
-" * The message classes are automatically instantiated by the active object\n"
-" * stub %s\n"
-" * The message class is also an instance of ReferenceCount, which makes it \n"
-" * ideally suited to use within Smart pointers.\n"	    
-" */\n",(yyvsp[(2) - (3)].token),(yyvsp[(2) - (3)].token),(yyvsp[(2) - (3)].token),(yyvsp[(2) - (3)].token));
-
-      print(msgs1,  "class Active%s_msg_: public ReferenceCount\n",(yyvsp[(2) - (3)].token));
-      print(msgs1,  "{\n"
-	    "  public:\n"
-	    "    /**\n"
-	    "     * Called by ActiveObject to handle this queued message.\n"
-	    "     * %%arg caller is the Active%s itself.\n"
-	    "     */\n"
-	    "    virtual elementResult run(Active%s * caller)\n"
-	    "    {\n"
-	    "      assert(0);\n"
-	    "    }\n",(yyvsp[(2) - (3)].token),(yyvsp[(2) - (3)].token));
-      print(msgs1, 
-	    "    /**\n"
-	    "     * Returns the name of this message. Since this is the message baseclass\n"
-	    "     * it has no identity and will return 'Unknown Message' \n"
-	    "     */\n"
-	    "    virtual string declaration()\n"
-	    "    {\n"
-	    "      return \"Unknown message\";\n"
-	    "    }\n"
-	    "};\n\n");
-      print(meta, 
-	    "/**\n"
-	    " * Represents the stub that will transform each incoming call (method)\n"
-	    " * to an object subclassed from type Active%s_msg_\n"
-	    " * The stub itself has an instance of the true active object.\n"
-	    " */\n",(yyvsp[(2) - (3)].token));
-      print(meta, "class %s\n{\n",(yyvsp[(2) - (3)].token));
-      print(meta, "  private:\n"
-	    "    /**\n"
-	    "     * The object that is covered for by this stub. The fact that the\n"
-	    "     * stub allocates the object ensures that only one of it exists and that any\n"
-	    "     * interaction must go through the stub. As such it is kept private.\n"
-	    "     */\n"
-	    "    Active%s object;\n",(yyvsp[(2) - (3)].token));
-      print(meta,"  public:\n"
-	    "    /**\n"
-"     * The constructor of the stub will also directly initalize the main\n"
-"     * object. Because object construction and delayed calls interfere\n"
-"     * somewhat we prohibit the actual implementation (and especially use)\n"
-"     * of a specialized Active Object constructor. Instead, simply the name\n"
-"     * is passed to the object. If you need to initialize the stub, you\n"
-"     * should consider adding an init message to the active object and\n"
-"     * calling (well sending a message to) it directly when the stub is\n"
-"     * generated.\n"
-"     */\n");
-      print(meta, "    %s(string name=\"%s\"): object(this, name) {};\n",(yyvsp[(2) - (3)].token),(yyvsp[(2) - (3)].token));
-      current_ao = strdup((yyvsp[(2) - (3)].token));
-    ;}
+#line 153 "ao-syntax.y"
+    { print(globhead,"class %s;\n",(yyvsp[(2) - (3)].token)); ;}
     break;
 
   case 7:
 
 /* Line 1455 of yacc.c  */
-#line 186 "ao-syntax.y"
+#line 155 "ao-syntax.y"
     {
-      print(object,
-	    "  protected:\n    Active%s(%s* s, string name):\n"
-	    "      ActiveObject<Smart< Active%s_msg_ > >(name), self(s)\n",(yyvsp[(2) - (7)].token),(yyvsp[(2) - (7)].token),(yyvsp[(2) - (7)].token));
-      print(object, "      {\n");
+      field2init.clear();
+      if (!pascal)
+	{
+	  print(object,"class Active%s: public ActiveObject< Active%s_msg_* >\n{\n",(yyvsp[(2) - (3)].token),(yyvsp[(2) - (3)].token));
+	  print(object,"  friend class %s;\n",(yyvsp[(2) - (3)].token));
+	  print(object,"  %s * self;\n",(yyvsp[(2) - (3)].token));
+	  print(object,
+		"    virtual elementResult handle( Active%s_msg_* cmd)\n"
+		"      {\n"
+		"        if (cmd) return cmd->run(this);\n"
+		"        else return Done;\n"
+		"      };\n",(yyvsp[(2) - (3)].token));
+	  print(globhead, "class %s;\n",(yyvsp[(2) - (3)].token));
+	  print(globhead, "class Active%s;\n",(yyvsp[(2) - (3)].token));
+	  print(globhead, "#ifdef TRACE_MESSAGES\n"
+		"#define ENTER_MSG cerr << \"Start \" << declaration() << \"\\n\";\n"
+		"#define LEAVE_MSG cerr << \"Stop \" << declaration()  << \"\\n\";\n"
+		"#endif\n");
+	  print(globhead, "#ifndef ENTER_MSG\n"
+		"#define ENTER_MSG ;\n"
+		"#endif\n"
+		"#ifndef LEAVE_MSG\n"
+		"#define LEAVE_MSG ;\n"
+		"#endif\n");
+	}
+      else
+	{
+	  // pascal declarations
+	  print(globhead,"Type "T"Active%s=Class;\n",(yyvsp[(2) - (3)].token));
+	  print(globhead,"Type "T"%s=Class;\n",(yyvsp[(2) - (3)].token));
+	  print(globhead,"Type "T"Active%s_msg_=Class;\n",(yyvsp[(2) - (3)].token));
+	  print(globhead,"Type "T"ActiveObject_"T"Active%s_msg_=specialize ActiveObject<"T"Active%s_msg_>;\n",(yyvsp[(2) - (3)].token),(yyvsp[(2) - (3)].token));
+	  
+	  // pascal implementation
+	  print(object,"Type "T"Active%s=Class("T"ActiveObject_"T"Active%s_msg_)\n",(yyvsp[(2) - (3)].token),(yyvsp[(2) - (3)].token));
+	  print(object,"  public meta: "T"%s;\n",(yyvsp[(2) - (3)].token));
+	  print(object,"  public function handle(cmd: "T"Active%s_msg_): elementResult; override;\n",(yyvsp[(2) - (3)].token));
+	  print(impl,"function "T"Active%s.handle(cmd: "T"Active%s_msg_): elementResult;\n  begin\n",(yyvsp[(2) - (3)].token));
+	  print(impl,"  if (assigned(cmd)) then Result:=cmd.run(self)\n"
+		"  else Result:=Done;\n"
+		"  end;\n\n");
+      	}
+      if (!pascal)
+	{
+	  print(msgs1,
+		"/**\n"
+		" * Represents the basic message that is used to queue or deliver a call to \n"
+		" * the true Active%s. Active%s_msg_ has a run method which is invoked\n"
+		" * by ActiveObject whenever it wants to handle the message. For each \n"
+		" * declared method in the active object description, a specific subclass\n"
+		" * of Active%s_msg_ has been generated. See inheritance diagram.\n"
+		" * The message classes are automatically instantiated by the active object\n"
+		" * stub %s\n"
+		" */\n",(yyvsp[(2) - (3)].token),(yyvsp[(2) - (3)].token),(yyvsp[(2) - (3)].token),(yyvsp[(2) - (3)].token));
+	  
+	  print(msgs1,  "class Active%s_msg_\n",(yyvsp[(2) - (3)].token));
+	  print(msgs1,  "{\n"
+		"  public:\n"
+		"    /**\n"
+		"     * Called by ActiveObject to handle this queued message.\n"
+		"     * %%arg caller is the Active%s itself.\n"
+		"     */\n"
+		"    virtual elementResult run(Active%s * /* caller */)\n"
+		"    {\n"
+		"      assert(0);\n"
+		"      return Revisit;\n"
+		"    }\n",(yyvsp[(2) - (3)].token),(yyvsp[(2) - (3)].token));
+	  print(msgs1, 
+		"    /**\n"
+		"     * Returns the name of this message. Since this is the message baseclass\n"
+		"     * it has no identity and will return 'Unknown Message' \n"
+		"     */\n"
+		"    virtual string declaration()\n"
+		"    {\n"
+		"      return \"Unknown message\";\n"
+		"    }\n"
+		"};\n\n");
+	  print(meta, 
+		"/**\n"
+		" * Represents the stub that will transform each incoming call (method)\n"
+		" * to an object subclassed from type Active%s_msg_\n"
+		" * The stub itself has an instance of the true active object.\n"
+		" */\n",(yyvsp[(2) - (3)].token));
+	  print(meta, "class %s\n{\n",(yyvsp[(2) - (3)].token));
+	  print(meta, "  private:\n"
+		"    /**\n"
+		"     * The object that is covered for by this stub. The fact that the\n"
+		"     * stub allocates the object ensures that only one of it exists and that any\n"
+		"     * interaction must go through the stub. As such it is kept private.\n"
+		"     */\n"
+		"    Active%s object;\n",(yyvsp[(2) - (3)].token));
+	  print(meta,"  public:\n"
+		"    /**\n"
+		"     * The constructor of the stub will also directly initalize the main\n"
+		"     * object. Because object construction and delayed calls interfere\n"
+		"     * somewhat we prohibit the actual implementation (and especially use)\n"
+		"     * of a specialized Active Object constructor. Instead, simply the name\n"
+		"     * is passed to the object. If you need to initialize the stub, you\n"
+		"     * should consider adding an init message to the active object and\n"
+		"     * calling (well sending a message to) it directly when the stub is\n"
+		"     * generated.\n"
+		"     */\n");
+	  print(meta, "    %s(string name=\"%s\"): object(this, name) {};\n",(yyvsp[(2) - (3)].token),(yyvsp[(2) - (3)].token));
+	  current_ao = strdup((yyvsp[(2) - (3)].token));
+	}
+      else
+	{
+	  // pascal
+	  print(msgs1,
+		"(*\n"
+		" * Represents the basic message that is used to queue or deliver a call to \n"
+		" * the true Active%s. Active%s_msg_ has a run method which is invoked\n"
+		" * by ActiveObject whenever it wants to handle the message. For each \n"
+		" * declared method in the active object description, a specific subclass\n"
+		" * of Active%s_msg_ has been generated. See inheritance diagram.\n"
+		" * The message classes are automatically instantiated by the active object\n"
+		" * stub %s\n"
+		" *)\n",(yyvsp[(2) - (3)].token),(yyvsp[(2) - (3)].token),(yyvsp[(2) - (3)].token),(yyvsp[(2) - (3)].token));
+	  
+	  print(msgs1,"Type "T"Active%s_msg_=class\n",(yyvsp[(2) - (3)].token));
+	  print(msgs1,"  public function run(caller: "T"Active%s): elementResult; virtual; abstract;\n",(yyvsp[(2) - (3)].token));
+	  print(msgs1,"  end;\n\n");
+	  print(meta,"Type "T"%s=class\n",(yyvsp[(2) - (3)].token));
+	  print(meta, "  private\n"
+		"    _object: "T"Active%s;\n",(yyvsp[(2) - (3)].token));
+	  print(meta,"  public\n");
+	  print(meta, "    Constructor Create(bloody_local_var_name: string=\'%s\');\n",(yyvsp[(2) - (3)].token));
+	  
+	  print(impl,"Constructor "T"%s.Create(bloody_local_var_name: string);\nbegin\n  _object:="T"Active%s.Create(self,bloody_local_var_name);\nend;\n\n",
+		(yyvsp[(2) - (3)].token),(yyvsp[(2) - (3)].token));
+	  current_ao = strdup((yyvsp[(2) - (3)].token));
+	}
+    ;}
+    break;
+
+  case 8:
+
+/* Line 1455 of yacc.c  */
+#line 290 "ao-syntax.y"
+    {
+      if (!pascal)
+	{
+	  print(object,
+		"  protected:\n    Active%s(%s* s, string name):\n"
+		"      ActiveObject< Active%s_msg_ * >(name), self(s)\n",(yyvsp[(2) - (7)].token),(yyvsp[(2) - (7)].token),(yyvsp[(2) - (7)].token));
+	  print(object, "      {\n");
+	}
+      else
+	{
+	  print(object,"  public constructor Create(s: "T"%s; bloody_local_name: string);\n",(yyvsp[(2) - (7)].token));
+	  print(impl,"constructor "T"Active%s.Create(s: "T"%s; bloody_local_name: string);\n"
+		"  begin\n"
+		"  inherited Create(bloody_local_name);\n"
+		"  meta:=s;\n",(yyvsp[(2) - (7)].token),(yyvsp[(2) - (7)].token));
+	}
       map<string,string>::iterator it=field2init.begin();
       while(it!=field2init.end())
 	{
 	  if (it->second!="")
-	    print(object,"      %s = %s;\n",it->first.c_str(), it->second.c_str());
+	    {
+	      if (pascal)
+		print(impl,"      %s := %s;\n",it->first.c_str(), it->second.c_str());
+	      else
+		print(object,"      %s = %s;\n",it->first.c_str(), it->second.c_str());
+	    }
 	  it++;
 	}
-      print(object, "      };\n");
       field2init.clear();
-      print(object,"};\n\n");
-      print(meta,"};\n\n");
+      if (!pascal)
+	{
+	  print(object, "      };\n");
+	  print(object,"};\n\n");
+	  print(meta,"};\n\n");
+	}
+      else
+	{
+	  print(object,"  end;\n\n");
+	  print(impl,"  end;\n\n");
+	  print(meta,"end;\n\n");
+	}
     ;}
-    break;
-
-  case 9:
-
-/* Line 1455 of yacc.c  */
-#line 206 "ao-syntax.y"
-    {;}
     break;
 
   case 10:
 
 /* Line 1455 of yacc.c  */
-#line 210 "ao-syntax.y"
-    {print(object,"  %s %s;\n",(yyvsp[(1) - (3)].token),(yyvsp[(2) - (3)].token)); field2init[(yyvsp[(2) - (3)].token)]=""; ;}
+#line 335 "ao-syntax.y"
+    {;}
     break;
 
   case 11:
 
 /* Line 1455 of yacc.c  */
-#line 212 "ao-syntax.y"
-    {print(object,"  %s %s;\n",(yyvsp[(1) - (5)].token),(yyvsp[(2) - (5)].token)); field2init[(yyvsp[(2) - (5)].token)]=(yyvsp[(4) - (5)].token); ;}
+#line 339 "ao-syntax.y"
+    {if (!pascal)
+      print(object,"  %s %s;\n",(yyvsp[(1) - (3)].token),(yyvsp[(2) - (3)].token)); 
+    else
+      print(object,"  public %s: %s;\n",(yyvsp[(2) - (3)].token),(yyvsp[(1) - (3)].token));
+    field2init[(yyvsp[(2) - (3)].token)]=""; 
+  ;}
     break;
 
   case 12:
 
 /* Line 1455 of yacc.c  */
-#line 214 "ao-syntax.y"
-    {print(object,"  %s %s %s;\n",(yyvsp[(1) - (4)].token),(yyvsp[(2) - (4)].token),(yyvsp[(3) - (4)].token)); field2init[(yyvsp[(3) - (4)].token)]=""; ;}
+#line 346 "ao-syntax.y"
+    {
+    if (!pascal)
+      print(object,"  %s %s;\n",(yyvsp[(1) - (5)].token),(yyvsp[(2) - (5)].token));
+    else
+      print(object,"  public %s: %s;\n",(yyvsp[(2) - (5)].token),(yyvsp[(1) - (5)].token)); 
+    field2init[(yyvsp[(2) - (5)].token)]=(yyvsp[(4) - (5)].token); 
+  ;}
     break;
 
   case 13:
 
 /* Line 1455 of yacc.c  */
-#line 216 "ao-syntax.y"
-    {print(object,"  %s %s %s;\n",(yyvsp[(1) - (6)].token),(yyvsp[(2) - (6)].token),(yyvsp[(3) - (6)].token)); field2init[(yyvsp[(3) - (6)].token)]=(yyvsp[(5) - (6)].token); ;}
+#line 354 "ao-syntax.y"
+    {print(object,"  %s %s %s;\n",(yyvsp[(1) - (4)].token),(yyvsp[(2) - (4)].token),(yyvsp[(3) - (4)].token)); field2init[(yyvsp[(3) - (4)].token)]=""; ;}
     break;
 
   case 14:
 
 /* Line 1455 of yacc.c  */
-#line 217 "ao-syntax.y"
-    {print(object,"  %s %s(%s);\n",(yyvsp[(1) - (4)].token),(yyvsp[(2) - (4)].token),args2str((yyvsp[(3) - (4)].args)));;}
+#line 356 "ao-syntax.y"
+    {print(object,"  %s %s %s;\n",(yyvsp[(1) - (6)].token),(yyvsp[(2) - (6)].token),(yyvsp[(3) - (6)].token)); field2init[(yyvsp[(3) - (6)].token)]=(yyvsp[(5) - (6)].token); ;}
     break;
 
   case 15:
 
 /* Line 1455 of yacc.c  */
-#line 219 "ao-syntax.y"
+#line 357 "ao-syntax.y"
+    {print(object,"  %s %s(%s);\n",(yyvsp[(1) - (4)].token),(yyvsp[(2) - (4)].token),args2str((yyvsp[(3) - (4)].args)));;}
+    break;
+
+  case 16:
+
+/* Line 1455 of yacc.c  */
+#line 359 "ao-syntax.y"
     {
       print(meta,
 	    "  public:\n"
@@ -1636,110 +1788,159 @@ yyreduce:
     ;}
     break;
 
-  case 16:
-
-/* Line 1455 of yacc.c  */
-#line 225 "ao-syntax.y"
-    {
-      // the object code
-      print(object,"  public: elementResult %s(%s);\n",(yyvsp[(2) - (4)].token),args2str((yyvsp[(3) - (4)].args)));
-      // the message class
-      print(msgs,"class Active%s_msg_%s: public Active%s_msg_\n",current_ao,(yyvsp[(2) - (4)].token),current_ao);
-      print(msgs,"{\n    %s;\n",args2str((yyvsp[(3) - (4)].args),";\n    "));
-      print(msgs,"  public:\n    Active%s_msg_%s(%s)",current_ao,(yyvsp[(2) - (4)].token),args2str((yyvsp[(3) - (4)].args)));
-      if ((yyvsp[(3) - (4)].args)->size())
-	print(msgs," : %s\n      {\n      };\n",copyargs((yyvsp[(3) - (4)].args)));
-      else
-	print(msgs,"\n      {\n      };\n");
-      print(msgs, "    virtual string declaration()\n"
-	    "    {\n"
-	    "      return \"%s::%s(%s)\";\n"
-	    "    }\n",current_ao,(yyvsp[(2) - (4)].token),args2str((yyvsp[(3) - (4)].args))
-	    );
-      print(msgs,"    virtual elementResult run(Active%s * ao)\n",current_ao);
-      print(msgs,"      {\n        ENTER_MSG;\n");
-      print(msgs,"        elementResult res = ao->%s(%s);\n",(yyvsp[(2) - (4)].token),argnames2str((yyvsp[(3) - (4)].args)));
-      print(msgs,"        LEAVE_MSG;\n",(yyvsp[(2) - (4)].token),argnames2str((yyvsp[(3) - (4)].args)));
-      print(msgs,"        return res;\n      };\n",(yyvsp[(2) - (4)].token),argnames2str((yyvsp[(3) - (4)].args)));
-      print(msgs,"};\n\n");
-      // the meta call
-      print(object,"  protected: void queue_%s(%s);\n",(yyvsp[(2) - (4)].token),args2str((yyvsp[(3) - (4)].args)));
-      print(object2,"inline void Active%s::queue_%s(%s)\n",current_ao,(yyvsp[(2) - (4)].token),args2str((yyvsp[(3) - (4)].args)));
-      print(object2,"  {\n");
-      print(object2,"    push(Smart<Active%s_msg_%s>(\n        "
-	    "new Active%s_msg_%s(%s)));\n  };\n",current_ao,(yyvsp[(2) - (4)].token),current_ao, (yyvsp[(2) - (4)].token),argnames2str((yyvsp[(3) - (4)].args)));
-      print(meta,  "  public:\n    void %s(%s)\n",(yyvsp[(2) - (4)].token),args2str((yyvsp[(3) - (4)].args),", "));
-      print(meta,  "    {\n      object.queue_%s(%s);\n    };\n",(yyvsp[(2) - (4)].token),argnames2str((yyvsp[(3) - (4)].args)));
-    ;}
-    break;
-
   case 17:
 
 /* Line 1455 of yacc.c  */
-#line 258 "ao-syntax.y"
-    {(yyval.token)=cat((yyvsp[(1) - (2)].token),"*");;}
+#line 365 "ao-syntax.y"
+    {
+      // the object code
+      if (!pascal)
+	{
+	  print(object,"  public: elementResult %s(%s);\n",(yyvsp[(2) - (4)].token),args2str((yyvsp[(3) - (4)].args)));
+	  print(object,"  protected: void queue_%s(%s);\n",(yyvsp[(2) - (4)].token),args2str((yyvsp[(3) - (4)].args)));
+	}
+      else
+	{
+	  print(object,"  public function %s(%s): elementResult;\n",(yyvsp[(2) - (4)].token),args2str((yyvsp[(3) - (4)].args),"; ",""));
+	  print(object,"  public procedure queue_%s(%s);\n",(yyvsp[(2) - (4)].token),args2str((yyvsp[(3) - (4)].args),"; ", "bloody_local_var_"));
+	}
+      
+      // the message class
+      if (!pascal)
+	{
+	  print(msgs,"class Active%s_msg_%s: public Active%s_msg_\n",current_ao,(yyvsp[(2) - (4)].token),current_ao);
+	  print(msgs,"{\n    %s;\n",args2str((yyvsp[(3) - (4)].args),";\n    "));
+	  print(msgs,"  public:\n    Active%s_msg_%s(%s)",current_ao,(yyvsp[(2) - (4)].token),args2str((yyvsp[(3) - (4)].args)));
+	  if ((yyvsp[(3) - (4)].args)->size())
+	    print(msgs," : %s\n      {\n      };\n",copyargs((yyvsp[(3) - (4)].args)));
+	  else
+	    print(msgs,"\n      {\n      };\n");
+	  print(msgs, "    virtual string declaration()\n"
+		"    {\n"
+		"      return \"%s::%s(%s)\";\n"
+		"    }\n",current_ao,(yyvsp[(2) - (4)].token),args2str((yyvsp[(3) - (4)].args))
+		);
+	  print(msgs,"    virtual elementResult run(Active%s * ao)\n",current_ao);
+	  print(msgs,"      {\n        ENTER_MSG;\n");
+	  print(msgs,"        elementResult res = ao->%s(%s);\n",(yyvsp[(2) - (4)].token),argnames2str((yyvsp[(3) - (4)].args)));
+	  print(msgs,"        LEAVE_MSG;\n",(yyvsp[(2) - (4)].token),argnames2str((yyvsp[(3) - (4)].args)));
+	  print(msgs,"        return res;\n      };\n",(yyvsp[(2) - (4)].token),argnames2str((yyvsp[(3) - (4)].args)));
+	  print(msgs,"};\n\n");
+	}
+      else
+	{
+	  print(globhead,"Type "T"Active%s_msg_%s=Class;\n",current_ao,(yyvsp[(2) - (4)].token));
+	  print(msgs,"Type "T"Active%s_msg_%s=Class("T"Active%s_msg_)\n",current_ao,(yyvsp[(2) - (4)].token),current_ao);
+	  if ((yyvsp[(3) - (4)].args)->size())
+	    print(msgs,"  public %s;\n",args2str((yyvsp[(3) - (4)].args),";\n  "));
+	  print(msgs,"  constructor Create(%s);\n",args2str((yyvsp[(3) - (4)].args),"; ","bloody_local_var_"));
+	  print(impl,"constructor "T"Active%s_msg_%s.Create(%s);\n  begin\n",current_ao,(yyvsp[(2) - (4)].token),args2str((yyvsp[(3) - (4)].args),"; ","bloody_local_var_"));
+	  
+	  if ((yyvsp[(3) - (4)].args)->size())
+	    print(impl,"%s  end;\n\n",copyargs((yyvsp[(3) - (4)].args)));
+	  else
+	    print(impl,"  end;\n\n");
+
+	  print(msgs,"  public function run(ao: "T"Active%s): elementResult; override;\n",current_ao);
+	  print(impl,"function "T"Active%s_msg_%s.run(ao: "T"Active%s): elementResult;\n  begin\n",current_ao, (yyvsp[(2) - (4)].token), current_ao);
+	  print(impl,"  Result:=ao.%s(%s);\n  end;\n\n",(yyvsp[(2) - (4)].token),argnames2str((yyvsp[(3) - (4)].args)));
+	  print(msgs,"end;\n\n");
+	}
+      // the meta call
+      if (!pascal)
+	{
+	  print(object2,"inline void Active%s::queue_%s(%s)\n",current_ao,(yyvsp[(2) - (4)].token),args2str((yyvsp[(3) - (4)].args)));
+	  print(object2,"  {\n");
+	  print(object2,"    push(new Active%s_msg_%s(%s));\n  };\n",
+		current_ao,(yyvsp[(2) - (4)].token),argnames2str((yyvsp[(3) - (4)].args)));
+	}
+      else
+	{
+	  print(impl,"procedure "T"Active%s.queue_%s(%s);\n  begin\n",current_ao,(yyvsp[(2) - (4)].token),args2str((yyvsp[(3) - (4)].args),"; ","bloody_local_var_"));
+	  print(impl,"  push("T"Active%s_msg_%s.Create(%s));\n  end;\n\n",
+		current_ao,(yyvsp[(2) - (4)].token),argnames2str((yyvsp[(3) - (4)].args),"bloody_local_var_"));
+	}
+      if (!pascal)
+	{
+	  print(meta,  "  public:\n    void %s(%s)\n",(yyvsp[(2) - (4)].token),args2str((yyvsp[(3) - (4)].args),", "));
+	  print(meta,  "    {\n      object.queue_%s(%s);\n    };\n",(yyvsp[(2) - (4)].token),argnames2str((yyvsp[(3) - (4)].args)));
+	}
+      else
+	{
+	  print(meta,  "  public procedure %s(%s);\n",(yyvsp[(2) - (4)].token),args2str((yyvsp[(3) - (4)].args),"; ","bloody_local_var_"));
+	  print(impl,  "procedure "T"%s.%s(%s);\n",current_ao,(yyvsp[(2) - (4)].token),args2str((yyvsp[(3) - (4)].args),"; ","bloody_local_var_"));
+	  print(impl,  "  begin\n    _object.queue_%s(%s);\n  end;\n\n",(yyvsp[(2) - (4)].token),argnames2str((yyvsp[(3) - (4)].args),"bloody_local_var_"));
+	}
+    ;}
     break;
 
-  case 19:
+  case 18:
 
 /* Line 1455 of yacc.c  */
-#line 260 "ao-syntax.y"
-    {(yyval.token)=cat(cat((yyvsp[(1) - (4)].token)," < "),cat((yyvsp[(3) - (4)].token)," > ")); ;}
+#line 447 "ao-syntax.y"
+    {(yyval.token)=cat((yyvsp[(1) - (2)].token),"*");;}
     break;
 
   case 20:
 
 /* Line 1455 of yacc.c  */
-#line 261 "ao-syntax.y"
-    {(yyval.token)=  cat(cat(cat((yyvsp[(1) - (6)].token), "<"), cat((yyvsp[(3) - (6)].token),",")), cat((yyvsp[(5) - (6)].token),">"));;}
+#line 449 "ao-syntax.y"
+    {(yyval.token)=cat(cat((yyvsp[(1) - (4)].token)," < "),cat((yyvsp[(3) - (4)].token)," > ")); ;}
     break;
 
   case 21:
 
 /* Line 1455 of yacc.c  */
-#line 264 "ao-syntax.y"
-    {(yyval.token)=strdup("volatile");;}
+#line 450 "ao-syntax.y"
+    {(yyval.token)=  cat(cat(cat((yyvsp[(1) - (6)].token), "<"), cat((yyvsp[(3) - (6)].token),",")), cat((yyvsp[(5) - (6)].token),">"));;}
     break;
 
   case 22:
 
 /* Line 1455 of yacc.c  */
-#line 267 "ao-syntax.y"
-    {(yyval.args)=(yyvsp[(2) - (3)].args);;}
+#line 453 "ao-syntax.y"
+    {(yyval.token)=strdup("volatile");;}
     break;
 
   case 23:
 
 /* Line 1455 of yacc.c  */
-#line 268 "ao-syntax.y"
-    { (yyval.args)=new vector<s_arg>();;}
+#line 456 "ao-syntax.y"
+    {(yyval.args)=(yyvsp[(2) - (3)].args);;}
     break;
 
   case 24:
 
 /* Line 1455 of yacc.c  */
-#line 271 "ao-syntax.y"
-    {(yyval.args)=(yyvsp[(1) - (3)].args); (yyval.args)->push_back((yyvsp[(3) - (3)].arg));;}
+#line 457 "ao-syntax.y"
+    { (yyval.args)=new vector<s_arg>();;}
     break;
 
   case 25:
 
 /* Line 1455 of yacc.c  */
-#line 272 "ao-syntax.y"
-    {(yyval.args)=new vector<s_arg>(); (yyval.args)->push_back((yyvsp[(1) - (1)].arg));;}
+#line 460 "ao-syntax.y"
+    {(yyval.args)=(yyvsp[(1) - (3)].args); (yyval.args)->push_back((yyvsp[(3) - (3)].arg));;}
     break;
 
   case 26:
 
 /* Line 1455 of yacc.c  */
-#line 275 "ao-syntax.y"
+#line 461 "ao-syntax.y"
+    {(yyval.args)=new vector<s_arg>(); (yyval.args)->push_back((yyvsp[(1) - (1)].arg));;}
+    break;
+
+  case 27:
+
+/* Line 1455 of yacc.c  */
+#line 464 "ao-syntax.y"
     {(yyval.arg).name = (yyvsp[(2) - (2)].token); (yyval.arg).type=(yyvsp[(1) - (2)].token);;}
     break;
 
 
 
 /* Line 1455 of yacc.c  */
-#line 1743 "ao-syntax.cpp"
+#line 1944 "ao-syntax.cpp"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1951,6 +2152,6 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 280 "ao-syntax.y"
+#line 469 "ao-syntax.y"
 
 

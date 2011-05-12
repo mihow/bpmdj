@@ -17,34 +17,36 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-#ifndef __loaded__set_cpp__
-#define __loaded__set_cpp__
+#ifndef __loaded__template_instances_cpp__
+#define __loaded__template_instances_cpp__
 using namespace std;
-#line 1 "set.c++"
-#include "set.h"
-#include "array-iterator.h"
-#include "symbol.h"
-#include "numbers.h"
-#include "data-io.h"
+#line 1 "template-instances.c++"
+#include "om-data.h"
 
-//---------------------------------------------------------------
-//             The set interpretation of a 1D array
-//---------------------------------------------------------------
-void Set::ensure_size(int s)
-{
-   if (s<=allocated_size()) return;
-   int newsize = allocated_size();
-   if (newsize==0) newsize=8;
-   while(s>newsize) newsize*=2;
-   Content newcontent(newsize);
-   newcontent.copyFrom(content,0);
-   content = newcontent;
-};
+#define ZERO_TYPES \
+ARRAY_TYPE(0,signed1)  \
+ARRAY_TYPE(0,signed2)  \
+ARRAY_TYPE(0,signed4)  \
+ARRAY_TYPE(0,signed8)  \
+ARRAY_TYPE(0,unsigned1)\
+ARRAY_TYPE(0,unsigned2)\
+ARRAY_TYPE(0,unsigned4)\
+ARRAY_TYPE(0,unsigned8)\
+ARRAY_TYPE(0,float4)   \
+ARRAY_TYPE(0,float8)   \
+ARRAY_TYPE(0,Data)     
 
-void Set::add(const Data& val)
-{
-   ensure_size(next_element+1);
-   content[next_element]=val;
-   next_element++;
-}
-#endif // __loaded__set_cpp__
+#define ARRAY_TYPE(NR,TYPE) template class ArrayMeta<NR,TYPE>;
+ARRAY_TYPES
+ZERO_TYPES
+#undef ARRAY_TYPE
+
+#define ARRAY_TYPE(NR,TYPE) template class Array<NR,TYPE>;
+ARRAY_TYPES
+ZERO_TYPES
+#undef ARRAY_TYPE
+
+template class ArrayIteratorBacking<Data, false>;
+template class ArrayIteratorBacking<Data, true>;
+
+#endif // __loaded__template_instances_cpp__

@@ -1,8 +1,7 @@
 /****
- Borg4 Data Library
- Copyright (C) 2005-2010 Werner Van Belle
-
- http://werner.yellowcouch.org/Borg4/group__data.html
+ Hierarchical Data Objects
+ Copyright (C) 2005-2011 Werner Van Belle
+ http://flow.yellowcouch.org/data/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -70,7 +69,7 @@ int main(int argc,char* argv[])
   ofstream out(ofn);
   out << "/****\n"
     "Data Object compiled file\n"
-    "Copyright (C) 2006-2010 Werner Van Belle\n"
+    "Copyright (C) 2006-2011 Werner Van Belle\n"
     "Do not change. Changes might be lost\n"
     "------------------------------------------\n"
     "\n"
@@ -102,7 +101,9 @@ int main(int argc,char* argv[])
   out << "#include <typeinfo>\n";
   if (access_checks)
     out << "#define DATA_RO_FIELD\n";
-  out << "#include \"data-reference-count.h\"\n";
+  char* tmp=strdup(argv[0]);
+  tmp[strlen(tmp)-3]=0;
+  out << "#include \"" << tmp << "reference-count.h\"\n";
   //  out << "using namespace std;\n";
   for(unsigned i = 0 ; i < globhead.size(); i++)
     out << globhead[i];

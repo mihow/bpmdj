@@ -1486,23 +1486,23 @@ yyreduce:
 #line 88 "do-syntax.y"
     {
       current_do = strdup((yyvsp[(2) - (3)].token));
-      print(object,"class %sData: public DataReferenceCount\n{\n",(yyvsp[(2) - (3)].token));
+      print(object,"class %sData: public ReferenceCount\n{\n",(yyvsp[(2) - (3)].token));
       print(object,"  friend class %s;\n",(yyvsp[(2) - (3)].token));
       print(object,"  public: virtual ~%sData();\n",current_do);
       
-      print(object,"  public: virtual DataReferenceCount* clone();\n");
+      print(object,"  public: virtual ReferenceCount* clone();\n");
       if (access_checks)
 	{
-	  print(object,"  public: virtual DataReferenceCount* reallocate();\n");
+	  print(object,"  public: virtual ReferenceCount* reallocate();\n");
 	  print(object,"  public: bool smaller_than(%sData* other);\n",(yyvsp[(2) - (3)].token));
 	  print(object,"  public: virtual bool most_specialized_smaller_than(void* other);\n",(yyvsp[(2) - (3)].token));
 	}
       
-      print(methods,"inline DataReferenceCount* %sData::clone()\n",(yyvsp[(2) - (3)].token));
+      print(methods,"inline ReferenceCount* %sData::clone()\n",(yyvsp[(2) - (3)].token));
       print(methods,"  {\n  return new %sData(*this);\n  }\n\n",(yyvsp[(2) - (3)].token));
       if (access_checks)
 	{
-	  print(methods,"inline DataReferenceCount* %sData::reallocate()\n",(yyvsp[(2) - (3)].token));
+	  print(methods,"inline ReferenceCount* %sData::reallocate()\n",(yyvsp[(2) - (3)].token));
 	  print(methods,"  {static Uniqueifier<%sData> u;\n",(yyvsp[(2) - (3)].token));
 	  print(methods,"  return u.reallocate(this);}\n",(yyvsp[(2) - (3)].token));
 	  print(methods,"inline bool %sData::most_specialized_smaller_than(void* other)\n",(yyvsp[(2) - (3)].token));
@@ -1512,7 +1512,7 @@ yyreduce:
       print(globhead, "class %s;\n",(yyvsp[(2) - (3)].token));
       print(globhead, "class %sData;\n",(yyvsp[(2) - (3)].token));
 
-      print(meta,  "class %s: public DataSmart<%sData>\n{\n",(yyvsp[(2) - (3)].token),(yyvsp[(2) - (3)].token));
+      print(meta,  "class %s: public Smart<%sData>\n{\n",(yyvsp[(2) - (3)].token),(yyvsp[(2) - (3)].token));
       print(meta,"  public: template <class SmartRefChild> %s(SmartRefChild& other)\n",current_do);
       print(meta,"    {\n");
       print(meta,"    other.incref();\n");
@@ -1522,7 +1522,7 @@ yyreduce:
       print(meta,"    }\n");
 
       print(meta,"  public: %s(%sData * other):\n",current_do, current_do);
-      print(meta,"    DataSmart<%sData>(other)\n",current_do);
+      print(meta,"    Smart<%sData>(other)\n",current_do);
       print(meta,"    {\n");
       print(meta,"    }\n");
     ;}
@@ -1557,19 +1557,19 @@ yyreduce:
       print(object,"  friend class %s;\n",(yyvsp[(2) - (5)].token));
       print(object,"  public: virtual ~%sData();\n",current_do);
 
-      print(object,"  public: virtual DataReferenceCount* clone();\n");
+      print(object,"  public: virtual ReferenceCount* clone();\n");
       if (access_checks)
 	{
-	  print(object,"  public: virtual DataReferenceCount* reallocate();\n");
+	  print(object,"  public: virtual ReferenceCount* reallocate();\n");
 	  print(object,"  public: bool smaller_than(%sData* other);\n",(yyvsp[(2) - (5)].token));
 	  print(object,"  public: virtual bool most_specialized_smaller_than(void* other);\n",(yyvsp[(2) - (5)].token));
 	}
 
-      print(methods,"inline DataReferenceCount* %sData::clone()\n",(yyvsp[(2) - (5)].token));
+      print(methods,"inline ReferenceCount* %sData::clone()\n",(yyvsp[(2) - (5)].token));
       print(methods,"  {\n  return new %sData(*this);\n  }\n\n",(yyvsp[(2) - (5)].token));
       if (access_checks)
 	{
-	  print(methods,"inline DataReferenceCount* %sData::reallocate()\n",(yyvsp[(2) - (5)].token));
+	  print(methods,"inline ReferenceCount* %sData::reallocate()\n",(yyvsp[(2) - (5)].token));
 	  print(methods,"  {static Uniqueifier<%sData> u;\n",(yyvsp[(2) - (5)].token));
 	  print(methods,"  return u.reallocate(this);}\n",(yyvsp[(2) - (5)].token));
 	  print(methods,"inline bool %sData::most_specialized_smaller_than(void* other)\n",(yyvsp[(2) - (5)].token));
@@ -1578,7 +1578,7 @@ yyreduce:
 
       print(globhead, "class %s;\n",(yyvsp[(2) - (5)].token));
       print(globhead, "class %sData;\n",(yyvsp[(2) - (5)].token));
-      print(meta,  "class %s: public DataSmart<%sData>\n{\n",(yyvsp[(2) - (5)].token),(yyvsp[(2) - (5)].token));
+      print(meta,  "class %s: public Smart<%sData>\n{\n",(yyvsp[(2) - (5)].token),(yyvsp[(2) - (5)].token));
       //       print(meta,  "  private:\n    Active%s object;\n",$2);
       print(meta,"  public: template <class SmartRefChild> %s(SmartRefChild& other)\n",current_do);
       print(meta,"    {\n");
@@ -1589,7 +1589,7 @@ yyreduce:
       print(meta,"    }\n");
 
       print(meta,"  public: %s(%sData * other):\n",current_do, current_do);
-      print(meta,"    DataSmart<%sData>(other)\n",current_do);
+      print(meta,"    Smart<%sData>(other)\n",current_do);
       print(meta,"    {\n");
       print(meta,"    }\n");
 
@@ -1729,7 +1729,7 @@ yyreduce:
 			    print(object,"  protected: %sData(%s);\n",(yyvsp[(1) - (3)].token),args2str((yyvsp[(2) - (3)].args))); 
   			    print(meta,  "  public: %s(%s);\n",(yyvsp[(1) - (3)].token),args2str((yyvsp[(2) - (3)].args))); 
 			    print(methods,"inline %s::%s(%s):\n",current_do,current_do,args2str((yyvsp[(2) - (3)].args)));
-			    print(methods,"  DataSmart<%sData>(new %sData(%s))\n",current_do,current_do,argnames2str((yyvsp[(2) - (3)].args)));
+			    print(methods,"  Smart<%sData>(new %sData(%s))\n",current_do,current_do,argnames2str((yyvsp[(2) - (3)].args)));
 			    print(methods,"  {\n");
 			    print(methods,"  }\n\n");
 			  ;}

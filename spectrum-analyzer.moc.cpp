@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'spectrum-analyzer.h'
 **
-** Created: Thu May 12 14:46:13 2011
+** Created: Thu May 12 18:31:05 2011
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.2)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,7 +23,7 @@ static const uint qt_meta_data_SpectrumAnalyzer[] = {
        5,       // revision
        0,       // classname
        0,    0, // classinfo
-       4,   14, // methods
+       3,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -33,16 +33,14 @@ static const uint qt_meta_data_SpectrumAnalyzer[] = {
  // slots: signature, parameters, type, tag, flags
       18,   17,   17,   17, 0x0a,
       41,   17,   17,   17, 0x0a,
-      65,   17,   17,   17, 0x0a,
-      75,   17,   17,   17, 0x0a,
+      51,   17,   17,   17, 0x0a,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_SpectrumAnalyzer[] = {
     "SpectrumAnalyzer\0\0fetchSpectrum_normal()\0"
-    "fetchSpectrum_wavelet()\0analyze()\0"
-    "on_fetchSpectrum_clicked()\0"
+    "analyze()\0on_fetchSpectrum_clicked()\0"
 };
 
 const QMetaObject SpectrumAnalyzer::staticMetaObject = {
@@ -79,12 +77,11 @@ int SpectrumAnalyzer::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_c == QMetaObject::InvokeMetaMethod) {
         switch (_id) {
         case 0: fetchSpectrum_normal(); break;
-        case 1: fetchSpectrum_wavelet(); break;
-        case 2: analyze(); break;
-        case 3: on_fetchSpectrum_clicked(); break;
+        case 1: analyze(); break;
+        case 2: on_fetchSpectrum_clicked(); break;
         default: ;
         }
-        _id -= 4;
+        _id -= 3;
     }
     return _id;
 }

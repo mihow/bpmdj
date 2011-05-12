@@ -1,6 +1,6 @@
 /****
  Active Object compiled file
- Copyright (C) 2006-2010 Werner Van Belle
+ Copyright (C) 2006-2011 Werner Van Belle
  Do not modify. Changes might be lost
  --------------------------------------------
  This program is free software; you can redistribute it and/or modify
@@ -16,8 +16,7 @@
 
 #ifndef __EXISTENCE_SCANNER_H
 #define __EXISTENCE_SCANNER_H
-#include "active-objects.h"
-#include "reference-count.h"
+#include "./active-objects.h"
 using namespace std;
 #include <vector> 
 #include "song.h"
@@ -45,19 +44,18 @@ class ActiveExistenceScanner;
  * of ActiveExistenceScanner_msg_ has been generated. See inheritance diagram.
  * The message classes are automatically instantiated by the active object
  * stub ExistenceScanner
- * The message class is also an instance of ReferenceCount, which makes it 
- * ideally suited to use within Smart pointers.
  */
-class ActiveExistenceScanner_msg_: public ReferenceCount
+class ActiveExistenceScanner_msg_
 {
   public:
     /**
      * Called by ActiveObject to handle this queued message.
      * %arg caller is the ActiveExistenceScanner itself.
      */
-    virtual elementResult run(ActiveExistenceScanner * caller)
+    virtual elementResult run(ActiveExistenceScanner * /* caller */)
     {
       assert(0);
+      return Revisit;
     }
     /**
      * Returns the name of this message. Since this is the message baseclass
@@ -73,11 +71,11 @@ class ActiveExistenceScanner_msg_: public ReferenceCount
 //-------------------------------------
 // Main object definition
 //-------------------------------------
-class ActiveExistenceScanner: public ActiveObject<Smart< ActiveExistenceScanner_msg_ > >
+class ActiveExistenceScanner: public ActiveObject< ActiveExistenceScanner_msg_* >
 {
   friend class ExistenceScanner;
   ExistenceScanner * self;
-    virtual elementResult handle(Smart< ActiveExistenceScanner_msg_> cmd)
+    virtual elementResult handle( ActiveExistenceScanner_msg_* cmd)
       {
         if (cmd) return cmd->run(this);
         else return Done;
@@ -92,7 +90,7 @@ class ActiveExistenceScanner: public ActiveObject<Smart< ActiveExistenceScanner_
   protected: void queue_terminate();
   protected:
     ActiveExistenceScanner(ExistenceScanner* s, string name):
-      ActiveObject<Smart< ActiveExistenceScanner_msg_ > >(name), self(s)
+      ActiveObject< ActiveExistenceScanner_msg_ * >(name), self(s)
       {
       current =  0;
       songs = NULL;
@@ -216,17 +214,14 @@ class ExistenceScanner
 //-------------------------------------
 inline void ActiveExistenceScanner::queue_start(vector < Song* > * all)
   {
-    push(Smart<ActiveExistenceScanner_msg_start>(
-        new ActiveExistenceScanner_msg_start(all)));
+    push(new ActiveExistenceScanner_msg_start(all));
   };
 inline void ActiveExistenceScanner::queue_thunk()
   {
-    push(Smart<ActiveExistenceScanner_msg_thunk>(
-        new ActiveExistenceScanner_msg_thunk()));
+    push(new ActiveExistenceScanner_msg_thunk());
   };
 inline void ActiveExistenceScanner::queue_terminate()
   {
-    push(Smart<ActiveExistenceScanner_msg_terminate>(
-        new ActiveExistenceScanner_msg_terminate()));
+    push(new ActiveExistenceScanner_msg_terminate());
   };
 #endif // __EXISTENCE_SCANNER_H

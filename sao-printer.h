@@ -1,8 +1,7 @@
 /****
- Active Objects
- Copyright (C) 2006-2010 Werner Van Belle
-
- http://werner.yellowcouch.org/Borg4/group__ao.html
+ Active Objects v4.3
+ Copyright (C) 2006-2011 Werner Van Belle
+ http://active.yellowcouch.org/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by

@@ -1,8 +1,7 @@
 /****
- Active Objects
- Copyright (C) 2006-2010 Werner Van Belle
-
- http://werner.yellowcouch.org/Borg4/group__ao.html
+ Active Objects v4.3
+ Copyright (C) 2006-2011 Werner Van Belle
+ http://active.yellowcouch.org/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -41,9 +40,6 @@ using namespace std;
  * - shared scheduler
  * - no double deletion of active objects
  * - automatic exit when no threads left to play
- * @todo The standard pool should be extended with 
- * - the possibility to assign threads to groups, each with their
- *   own scheduling behavior
  */ 
 class StdDawnTilDusk: public DawnTilDusk
 {

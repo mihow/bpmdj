@@ -1,6 +1,6 @@
 /****
 Data Object compiled file
-Copyright (C) 2006-2010 Werner Van Belle
+Copyright (C) 2006-2011 Werner Van Belle
 Do not change. Changes might be lost
 ------------------------------------------
 
@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #ifndef __DO_FRAGMENT_H
 #define __DO_FRAGMENT_H
 #include <typeinfo>
-#include "data-reference-count.h"
+#include "./reference-count.h"
 #include "song.h"
 #include "stereo-sample2.h"
 #include "memory.h"
@@ -34,7 +34,7 @@ class FragmentFileData;
 //-------------------------------------
 // Data Meta Definition 
 //-------------------------------------
-class FragmentInMemory: public DataSmart<FragmentInMemoryData>
+class FragmentInMemory: public Smart<FragmentInMemoryData>
 {
   public: template <class SmartRefChild> FragmentInMemory(SmartRefChild& other)
     {
@@ -44,7 +44,7 @@ class FragmentInMemory: public DataSmart<FragmentInMemoryData>
     ptr=target;
     }
   public: FragmentInMemory(FragmentInMemoryData * other):
-    DataSmart<FragmentInMemoryData>(other)
+    Smart<FragmentInMemoryData>(other)
     {
     }
   public: stereo_sample2* get_samples();
@@ -55,7 +55,7 @@ class FragmentInMemory: public DataSmart<FragmentInMemoryData>
   public: FragmentInMemory(QString filename);
 };
 
-class FragmentFile: public DataSmart<FragmentFileData>
+class FragmentFile: public Smart<FragmentFileData>
 {
   public: template <class SmartRefChild> FragmentFile(SmartRefChild& other)
     {
@@ -65,7 +65,7 @@ class FragmentFile: public DataSmart<FragmentFileData>
     ptr=target;
     }
   public: FragmentFile(FragmentFileData * other):
-    DataSmart<FragmentFileData>(other)
+    Smart<FragmentFileData>(other)
     {
     }
   public: QString get_f();
@@ -82,11 +82,11 @@ class FragmentFile: public DataSmart<FragmentFileData>
 //-------------------------------------
 // Data Object Definition
 //-------------------------------------
-class FragmentInMemoryData: public DataReferenceCount
+class FragmentInMemoryData: public ReferenceCount
 {
   friend class FragmentInMemory;
   public: virtual ~FragmentInMemoryData();
-  public: virtual DataReferenceCount* clone();
+  public: virtual ReferenceCount* clone();
   protected: stereo_sample2* samples;
   public: stereo_sample2* get_samples();
   public: void set_samples(stereo_sample2*);
@@ -97,11 +97,11 @@ class FragmentInMemoryData: public DataReferenceCount
   protected: FragmentInMemoryData(QString filename);
 };
 
-class FragmentFileData: public DataReferenceCount
+class FragmentFileData: public ReferenceCount
 {
   friend class FragmentFile;
   public: virtual ~FragmentFileData();
-  public: virtual DataReferenceCount* clone();
+  public: virtual ReferenceCount* clone();
   protected: QString f;
   public: QString get_f();
   public: void set_f(QString);
@@ -118,7 +118,7 @@ class FragmentFileData: public DataReferenceCount
 //-------------------------------------
 // Data Methods
 //-------------------------------------
-inline DataReferenceCount* FragmentInMemoryData::clone()
+inline ReferenceCount* FragmentInMemoryData::clone()
   {
   return new FragmentInMemoryData(*this);
   }
@@ -164,16 +164,16 @@ inline void FragmentInMemory::set_size(unsigned4 __arg)
   }
 
 inline FragmentInMemory::FragmentInMemory():
-  DataSmart<FragmentInMemoryData>(new FragmentInMemoryData())
+  Smart<FragmentInMemoryData>(new FragmentInMemoryData())
   {
   }
 
 inline FragmentInMemory::FragmentInMemory(QString filename):
-  DataSmart<FragmentInMemoryData>(new FragmentInMemoryData(filename))
+  Smart<FragmentInMemoryData>(new FragmentInMemoryData(filename))
   {
   }
 
-inline DataReferenceCount* FragmentFileData::clone()
+inline ReferenceCount* FragmentFileData::clone()
   {
   return new FragmentFileData(*this);
   }
@@ -224,12 +224,12 @@ inline bool FragmentFile::isEmpty()
   }
 
 inline FragmentFile::FragmentFile():
-  DataSmart<FragmentFileData>(new FragmentFileData())
+  Smart<FragmentFileData>(new FragmentFileData())
   {
   }
 
 inline FragmentFile::FragmentFile(Song* s, QString f):
-  DataSmart<FragmentFileData>(new FragmentFileData(s, f))
+  Smart<FragmentFileData>(new FragmentFileData(s, f))
   {
   }
 

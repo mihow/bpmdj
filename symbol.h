@@ -1,8 +1,7 @@
 /****
- Borg4 Data Library
- Copyright (C) 2005-2010 Werner Van Belle
-
- http://werner.yellowcouch.org/Borg4/group__data.html
+ Hierarchical Data Objects
+ Copyright (C) 2005-2011 Werner Van Belle
+ http://flow.yellowcouch.org/data/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -54,7 +53,7 @@ class Symbol: public DataClass
     {
       return "Symbol";
     }
- Symbol() :  text((const char*)NULL) 
+  Symbol() :  text((const char*)NULL) 
     {
     }; 
   Symbol(const QString &s)

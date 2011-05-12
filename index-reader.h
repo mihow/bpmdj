@@ -1,6 +1,6 @@
 /****
  Active Object compiled file
- Copyright (C) 2006-2010 Werner Van Belle
+ Copyright (C) 2006-2011 Werner Van Belle
  Do not modify. Changes might be lost
  --------------------------------------------
  This program is free software; you can redistribute it and/or modify
@@ -16,8 +16,7 @@
 
 #ifndef __INDEX_READER_H
 #define __INDEX_READER_H
-#include "active-objects.h"
-#include "reference-count.h"
+#include "./active-objects.h"
 using namespace std;
 class IndexScanner;
 class IndexReader;
@@ -44,19 +43,18 @@ class ActiveIndexReader;
  * of ActiveIndexReader_msg_ has been generated. See inheritance diagram.
  * The message classes are automatically instantiated by the active object
  * stub IndexReader
- * The message class is also an instance of ReferenceCount, which makes it 
- * ideally suited to use within Smart pointers.
  */
-class ActiveIndexReader_msg_: public ReferenceCount
+class ActiveIndexReader_msg_
 {
   public:
     /**
      * Called by ActiveObject to handle this queued message.
      * %arg caller is the ActiveIndexReader itself.
      */
-    virtual elementResult run(ActiveIndexReader * caller)
+    virtual elementResult run(ActiveIndexReader * /* caller */)
     {
       assert(0);
+      return Revisit;
     }
     /**
      * Returns the name of this message. Since this is the message baseclass
@@ -72,11 +70,11 @@ class ActiveIndexReader_msg_: public ReferenceCount
 //-------------------------------------
 // Main object definition
 //-------------------------------------
-class ActiveIndexReader: public ActiveObject<Smart< ActiveIndexReader_msg_ > >
+class ActiveIndexReader: public ActiveObject< ActiveIndexReader_msg_* >
 {
   friend class IndexReader;
   IndexReader * self;
-    virtual elementResult handle(Smart< ActiveIndexReader_msg_> cmd)
+    virtual elementResult handle( ActiveIndexReader_msg_* cmd)
       {
         if (cmd) return cmd->run(this);
         else return Done;
@@ -92,7 +90,7 @@ class ActiveIndexReader: public ActiveObject<Smart< ActiveIndexReader_msg_ > >
   protected: void queue_terminate();
   protected:
     ActiveIndexReader(IndexReader* s, string name):
-      ActiveObject<Smart< ActiveIndexReader_msg_ > >(name), self(s)
+      ActiveObject< ActiveIndexReader_msg_ * >(name), self(s)
       {
       expected_files =  1;
       reader = NULL;
@@ -217,17 +215,14 @@ class IndexReader
 //-------------------------------------
 inline void ActiveIndexReader::queue_start(int expected)
   {
-    push(Smart<ActiveIndexReader_msg_start>(
-        new ActiveIndexReader_msg_start(expected)));
+    push(new ActiveIndexReader_msg_start(expected));
   };
 inline void ActiveIndexReader::queue_thunk()
   {
-    push(Smart<ActiveIndexReader_msg_thunk>(
-        new ActiveIndexReader_msg_thunk()));
+    push(new ActiveIndexReader_msg_thunk());
   };
 inline void ActiveIndexReader::queue_terminate()
   {
-    push(Smart<ActiveIndexReader_msg_terminate>(
-        new ActiveIndexReader_msg_terminate()));
+    push(new ActiveIndexReader_msg_terminate());
   };
 #endif // __INDEX_READER_H

@@ -1,6 +1,6 @@
 /****
  Active Object compiled file
- Copyright (C) 2006-2010 Werner Van Belle
+ Copyright (C) 2006-2011 Werner Van Belle
  Do not modify. Changes might be lost
  --------------------------------------------
  This program is free software; you can redistribute it and/or modify
@@ -16,8 +16,7 @@
 
 #ifndef __FRAGMENT_PLAYER_H
 #define __FRAGMENT_PLAYER_H
-#include "active-objects.h"
-#include "reference-count.h"
+#include "./active-objects.h"
 using namespace std;
 #include "song.h"
 #include "active-objects.h"
@@ -49,19 +48,18 @@ class ActiveFragmentPlayer;
  * of ActiveFragmentPlayer_msg_ has been generated. See inheritance diagram.
  * The message classes are automatically instantiated by the active object
  * stub FragmentPlayer
- * The message class is also an instance of ReferenceCount, which makes it 
- * ideally suited to use within Smart pointers.
  */
-class ActiveFragmentPlayer_msg_: public ReferenceCount
+class ActiveFragmentPlayer_msg_
 {
   public:
     /**
      * Called by ActiveObject to handle this queued message.
      * %arg caller is the ActiveFragmentPlayer itself.
      */
-    virtual elementResult run(ActiveFragmentPlayer * caller)
+    virtual elementResult run(ActiveFragmentPlayer * /* caller */)
     {
       assert(0);
+      return Revisit;
     }
     /**
      * Returns the name of this message. Since this is the message baseclass
@@ -77,11 +75,11 @@ class ActiveFragmentPlayer_msg_: public ReferenceCount
 //-------------------------------------
 // Main object definition
 //-------------------------------------
-class ActiveFragmentPlayer: public ActiveObject<Smart< ActiveFragmentPlayer_msg_ > >
+class ActiveFragmentPlayer: public ActiveObject< ActiveFragmentPlayer_msg_* >
 {
   friend class FragmentPlayer;
   FragmentPlayer * self;
-    virtual elementResult handle(Smart< ActiveFragmentPlayer_msg_> cmd)
+    virtual elementResult handle( ActiveFragmentPlayer_msg_* cmd)
       {
         if (cmd) return cmd->run(this);
         else return Done;
@@ -104,7 +102,7 @@ class ActiveFragmentPlayer: public ActiveObject<Smart< ActiveFragmentPlayer_msg_
   protected: void queue_terminate();
   protected:
     ActiveFragmentPlayer(FragmentPlayer* s, string name):
-      ActiveObject<Smart< ActiveFragmentPlayer_msg_ > >(name), self(s)
+      ActiveObject< ActiveFragmentPlayer_msg_ * >(name), self(s)
       {
       finished = false;
       player_slot = -1;
@@ -283,27 +281,22 @@ class FragmentPlayer
 //-------------------------------------
 inline void ActiveFragmentPlayer::queue_playWave(FragmentInMemory fragment)
   {
-    push(Smart<ActiveFragmentPlayer_msg_playWave>(
-        new ActiveFragmentPlayer_msg_playWave(fragment)));
+    push(new ActiveFragmentPlayer_msg_playWave(fragment));
   };
 inline void ActiveFragmentPlayer::queue_delivererFinished()
   {
-    push(Smart<ActiveFragmentPlayer_msg_delivererFinished>(
-        new ActiveFragmentPlayer_msg_delivererFinished()));
+    push(new ActiveFragmentPlayer_msg_delivererFinished());
   };
 inline void ActiveFragmentPlayer::queue_stopOutput()
   {
-    push(Smart<ActiveFragmentPlayer_msg_stopOutput>(
-        new ActiveFragmentPlayer_msg_stopOutput()));
+    push(new ActiveFragmentPlayer_msg_stopOutput());
   };
 inline void ActiveFragmentPlayer::queue_startOutput()
   {
-    push(Smart<ActiveFragmentPlayer_msg_startOutput>(
-        new ActiveFragmentPlayer_msg_startOutput()));
+    push(new ActiveFragmentPlayer_msg_startOutput());
   };
 inline void ActiveFragmentPlayer::queue_terminate()
   {
-    push(Smart<ActiveFragmentPlayer_msg_terminate>(
-        new ActiveFragmentPlayer_msg_terminate()));
+    push(new ActiveFragmentPlayer_msg_terminate());
   };
 #endif // __FRAGMENT_PLAYER_H

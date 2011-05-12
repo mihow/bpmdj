@@ -5,7 +5,7 @@
   <property name="geometry">
    <rect>
     <x>0</x>
-    <y>1</y>
+    <y>0</y>
     <width>648</width>
     <height>408</height>
    </rect>
@@ -1589,19 +1589,6 @@
              </property>
              <property name="shortcut">
               <string/>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="clocksync">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Sync</string>
              </property>
             </widget>
            </item>
@@ -3668,22 +3655,6 @@
     <hint type="destinationlabel">
      <x>206</x>
      <y>116</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>clocksync</sender>
-   <signal>clicked()</signal>
-   <receiver>SongPlayer</receiver>
-   <slot>switchClock()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>107</x>
-     <y>254</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>292</x>
-     <y>234</y>
     </hint>
    </hints>
   </connection>

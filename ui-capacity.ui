@@ -1,77 +1,78 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>CapacityWidget</class>
- <widget class="QWidget" name="CapacityWidget" >
-  <property name="geometry" >
+ <widget class="QWidget" name="CapacityWidget">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>268</width>
-    <height>112</height>
+    <height>115</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Form3</string>
   </property>
-  <layout class="QGridLayout" >
-   <property name="margin" >
+  <layout class="QGridLayout">
+   <property name="margin">
     <number>0</number>
    </property>
-   <property name="spacing" >
+   <property name="spacing">
     <number>0</number>
    </property>
-   <item row="3" column="0" >
-    <widget class="QCheckBox" name="mplayer1pre6" >
-     <property name="autoFillBackground" >
+   <item row="3" column="0">
+    <widget class="QCheckBox" name="mplayer1pre6">
+     <property name="autoFillBackground">
       <bool>true</bool>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>mplayer 1.0pre6-3.3.5</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="0" >
-    <widget class="QCheckBox" name="mplayer1pre7" >
-     <property name="autoFillBackground" >
+   <item row="4" column="0">
+    <widget class="QCheckBox" name="mplayer1pre7">
+     <property name="autoFillBackground">
       <bool>true</bool>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>mplayer 1.0pre7-3.3.5 or 1.0rc1-4.1.2</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="0" >
-    <widget class="QCheckBox" name="ogg123" >
-     <property name="autoFillBackground" >
+   <item row="2" column="0">
+    <widget class="QCheckBox" name="ogg123">
+     <property name="autoFillBackground">
       <bool>true</bool>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>ogg123</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="0" >
-    <widget class="QCheckBox" name="mpg321" >
-     <property name="autoFillBackground" >
+   <item row="1" column="0">
+    <widget class="QCheckBox" name="mpg321">
+     <property name="autoFillBackground">
       <bool>true</bool>
      </property>
-     <property name="text" >
+     <property name="text">
       <string>mpg321</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="0" >
-    <widget class="QCheckBox" name="mpg123059r" >
-     <property name="autoFillBackground" >
+   <item row="0" column="0">
+    <widget class="QCheckBox" name="mpg123059r">
+     <property name="autoFillBackground">
       <bool>true</bool>
      </property>
-     <property name="text" >
-      <string>mpg123 0.59r/0.60</string>
+     <property name="text">
+      <string>mpg123 0.59r/0.60/1.4.3/1.10.0</string>
      </property>
     </widget>
    </item>
   </layout>
  </widget>
- <layoutdefault spacing="6" margin="11" />
+ <layoutdefault spacing="6" margin="11"/>
  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
  <tabstops>
   <tabstop>mpg123059r</tabstop>

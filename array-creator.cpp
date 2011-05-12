@@ -1,8 +1,7 @@
 /****
- Borg4 Data Library
- Copyright (C) 2005-2010 Werner Van Belle
-
- http://werner.yellowcouch.org/Borg4/group__data.html
+ Hierarchical Data Objects
+ Copyright (C) 2005-2011 Werner Van Belle
+ http://flow.yellowcouch.org/data/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -134,5 +133,6 @@ if (D==dimension && QString(type) == QString(#T)) \
   ARRAY_TYPES
 #undef ARRAY_TYPE
   assert(0);
+  return Data();
 }
 #endif // __loaded__array_creator_cpp__

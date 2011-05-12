@@ -1,6 +1,6 @@
 /****
  Active Object compiled file
- Copyright (C) 2006-2010 Werner Van Belle
+ Copyright (C) 2006-2011 Werner Van Belle
  Do not modify. Changes might be lost
  --------------------------------------------
  This program is free software; you can redistribute it and/or modify
@@ -16,8 +16,7 @@
 
 #ifndef __FRAGMENT_CREATOR_H
 #define __FRAGMENT_CREATOR_H
-#include "active-objects.h"
-#include "reference-count.h"
+#include "./active-objects.h"
 using namespace std;
 #include <deque>
 #include "fragment-cache.h"
@@ -45,19 +44,18 @@ class ActiveFragmentCreator;
  * of ActiveFragmentCreator_msg_ has been generated. See inheritance diagram.
  * The message classes are automatically instantiated by the active object
  * stub FragmentCreator
- * The message class is also an instance of ReferenceCount, which makes it 
- * ideally suited to use within Smart pointers.
  */
-class ActiveFragmentCreator_msg_: public ReferenceCount
+class ActiveFragmentCreator_msg_
 {
   public:
     /**
      * Called by ActiveObject to handle this queued message.
      * %arg caller is the ActiveFragmentCreator itself.
      */
-    virtual elementResult run(ActiveFragmentCreator * caller)
+    virtual elementResult run(ActiveFragmentCreator * /* caller */)
     {
       assert(0);
+      return Revisit;
     }
     /**
      * Returns the name of this message. Since this is the message baseclass
@@ -73,11 +71,11 @@ class ActiveFragmentCreator_msg_: public ReferenceCount
 //-------------------------------------
 // Main object definition
 //-------------------------------------
-class ActiveFragmentCreator: public ActiveObject<Smart< ActiveFragmentCreator_msg_ > >
+class ActiveFragmentCreator: public ActiveObject< ActiveFragmentCreator_msg_* >
 {
   friend class FragmentCreator;
   FragmentCreator * self;
-    virtual elementResult handle(Smart< ActiveFragmentCreator_msg_> cmd)
+    virtual elementResult handle( ActiveFragmentCreator_msg_* cmd)
       {
         if (cmd) return cmd->run(this);
         else return Done;
@@ -91,7 +89,7 @@ class ActiveFragmentCreator: public ActiveObject<Smart< ActiveFragmentCreator_ms
   bool handle();
   protected:
     ActiveFragmentCreator(FragmentCreator* s, string name):
-      ActiveObject<Smart< ActiveFragmentCreator_msg_ > >(name), self(s)
+      ActiveObject< ActiveFragmentCreator_msg_ * >(name), self(s)
       {
       };
 };
@@ -190,12 +188,10 @@ class FragmentCreator
 //-------------------------------------
 inline void ActiveFragmentCreator::queue_createOneFor(Song* song)
   {
-    push(Smart<ActiveFragmentCreator_msg_createOneFor>(
-        new ActiveFragmentCreator_msg_createOneFor(song)));
+    push(new ActiveFragmentCreator_msg_createOneFor(song));
   };
 inline void ActiveFragmentCreator::queue_terminate()
   {
-    push(Smart<ActiveFragmentCreator_msg_terminate>(
-        new ActiveFragmentCreator_msg_terminate()));
+    push(new ActiveFragmentCreator_msg_terminate());
   };
 #endif // __FRAGMENT_CREATOR_H

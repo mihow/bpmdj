@@ -17,36 +17,20 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-#ifndef __loaded__ao_pool_h__
-#define __loaded__ao_pool_h__
+#ifndef __loaded__ao_printer_cpp__
+#define __loaded__ao_printer_cpp__
 using namespace std;
-#line 1 "ao-pool.h++"
-#include "ao-scheduler.h"
-using namespace std;
-
-class DawnTilDusk
+#line 1 "ao-printer.c++"
+#include <cstdio>
+#include "ao-printer.h"
+void print(outputbuf& where, const char* script, ...)
 {
-public:
-  /**
-   * Called by the constructor of each active object to obtain 
-   * a scheduler for itself
-   */
-  virtual Scheduler * sunrise(string who) = 0;
-  /**
-   * Called by the scheduler whenever an active object
-   * dies
-   */
-  virtual void sunset(string who) = 0;
-  virtual void print_active_object_list() = 0;
-  virtual void wait_for_finish() = 0;
-  virtual ~DawnTilDusk()
-  {
-  };
+  char toexecute[1024];
+  va_list ap;
+  va_start(ap,script);
+  vsprintf(toexecute,script,ap);
+  va_end(ap);
+  where.push_back(toexecute);
 };
 
-/**
- * The point where each active object will acquire its scheduler and
- * where each active object will be buried
- */
-extern DawnTilDusk *aoPool;
-#endif // __loaded__ao_pool_h__
+#endif // __loaded__ao_printer_cpp__

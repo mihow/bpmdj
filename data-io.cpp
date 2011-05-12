@@ -1,8 +1,7 @@
 /****
- Borg4 Data Library
- Copyright (C) 2005-2010 Werner Van Belle
-
- http://werner.yellowcouch.org/Borg4/group__data.html
+ Hierarchical Data Objects
+ Copyright (C) 2005-2011 Werner Van Belle
+ http://flow.yellowcouch.org/data/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -557,8 +556,12 @@ Data DataBinner::read_file(QString filename)
 void DataBinner::write_fileformat_versionnr()
 {
   assert(sizeof(version)==4);
+#ifndef NDEBUG
   size_t w = fwrite(&version,4,1,text);
   assert(w = 1);
+#else
+  fwrite(&version,4,1,text);
+#endif
 }
 
 int DataBinner::read_fileformat_versionnr()
@@ -671,8 +674,12 @@ bool DataBinner::munmap_textfile()
 
 void DataBinner::write_internal(const char * ptre, int size)
 {
+#ifndef NDEBUG
   size_t w = fwrite(ptre,size,1,text);
   assert(w = 1);
+#else
+  fwrite(ptre,size,1,text);
+#endif
 };
 
 void DataBinner::read_internal(char * ptre, int size)
@@ -734,6 +741,7 @@ if (D==dimension && strcmp(type,#T)==0) return read_array_internal<D,T>();
   ARRAY_TYPES
 #undef ARRAY_TYPE
   assert(0);
+  return Data();
 }
 
 template <int D, class T> 
@@ -1183,6 +1191,6 @@ QString DataBinner::read_internal_qstring()
   read_internal(l);             // A
   char str[l+1]; 
   read_internal(str,l+1);       // B
-  return QString::fromUtf8(strdup(str));
+  return QString::fromUtf8(str);
 }
 #endif // __loaded__data_io_cpp__

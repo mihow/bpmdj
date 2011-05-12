@@ -1,8 +1,7 @@
 /****
- Active Objects
- Copyright (C) 2006-2010 Werner Van Belle
-
- http://werner.yellowcouch.org/Borg4/group__ao.html
+ Active Objects v4.3
+ Copyright (C) 2006-2011 Werner Van Belle
+ http://active.yellowcouch.org/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -118,7 +117,6 @@ typedef enum{RevisitLater, Revisit, RevisitAfterIncoming, Done, Interrupt}
  *
  * File: demo1.ao; compile with aoc demo1.ao >demo1.h
  *
- *
  *  <code><pre>
  *   active DemoSender
  *     {
@@ -134,7 +132,8 @@ typedef enum{RevisitLater, Revisit, RevisitAfterIncoming, Done, Interrupt}
  *     };
  *  </pre></code>
  *
- * The implementation side of these two active objects looks as follows. File: @ref demo1.cpp
+ * The implementation side of these two active objects looks as follows. 
+ * File: @ref demo1.cpp
  *
  *  <code><pre>
  *   \#include "demo1.h"
@@ -161,15 +160,6 @@ typedef enum{RevisitLater, Revisit, RevisitAfterIncoming, Done, Interrupt}
  *     sleep(100);
  *     }
  *  </pre></code>
- *
- * @todo with respect to the compiler we should allow any block outside the active section.
- * 
- * @todo the compiler should export first all the global vars and then each active object one
- *       by one.
- * 
- * @todo active objects should be able to inherit from each other. If I is an interface and A
- * the active object that must inherit from it, then we get
- * BA: BI and MA: MI
  */
 
 /**
@@ -196,16 +186,16 @@ typedef enum{RevisitLater, Revisit, RevisitAfterIncoming, Done, Interrupt}
  * An active object can be locked to gain access to its outgoing queues 
  * (if these are present). When an active object is locked, it does not mean 
  * that the object cannot run. It merely means, that the incoming and outgoing 
- * queues are locked. %To avoid concurrency problems at this front, the active object
- * will copy the messages that require handling to a separate queue before 
- * calling handle.
+ * queues are locked. %To avoid concurrency problems at this front, the active 
+ * object will copy the messages that require handling to a separate queue 
+ * before calling handle.
  */
 template <class message>
 class ActiveObject: public Lock, protected Runnable
 {
  private:
   /**
-   * The private queue which accepts incoming messages in the
+   * The private queue which accepts incoming messages while the
    * object is locked.
    */
   deque<message> incoming;
@@ -268,10 +258,10 @@ public:
   }
 private:
   /**
-   * This method can be used to push a message, if the caller already acquired the
-   * active object lock. This is useful if we want to assure that a collection
-   * of messages arrives uninterrupted at the queue. This method will activate
-   *  the active object if need be.
+   * This method can be used to push a message, if the caller already acquired 
+   * the active object lock. This is useful if we want to assure that a 
+   * collection of messages arrives uninterrupted at the queue. This method
+   * will activate the active object if need be.
    */
   void push_internal(message d)
   {
@@ -392,7 +382,7 @@ protected:
 private:
   /**
    * The step method is called by the scheduler to
-   * perform one turn of the message handling wheel
+   * perform one turn of the message handling
    * This function must return true when it should be 
    * called again. This method will a) transfer the 
    * necessary message from the inqueue, b) execute 
@@ -412,8 +402,9 @@ private:
       }
       if (transfer_needed)
 	/**
-	 * @internal transfers the incoming messages to the handling queue, preserving the order.
-	 * This method locks the active object during its execution.
+	 * @internal transfers the incoming messages to the handling queue, 
+	 * preserving the order. This method locks the active object during 
+	 * its execution.
 	 */
 	{
 	  Synchronized(this);
@@ -424,15 +415,16 @@ private:
 	    }
 	}
       /**
-       * @internal We had a logic here that would handle as many message as possible with a 
-       * routine such as 'if (handle_as_many_as_possible) while(handle());' but that
-       * broke the semantics of the handle routine. Between calls to the handle routine
-       * one can assume that the incoming messages have been transferred. With the 
-       * above statement, we could no longer assume that and needed an artificial fetch_incoming
+       * @internal We had a logic here that would handle as many message as 
+       * possible with a routine such as 'if (handle_as_many_as_possible) 
+       * while(handle());' but that broke the semantics of the handle routine.
+       * Between calls to the handle routine one can assume that the incoming 
+       * messages have been transferred. With the above statement, we could no
+       * longer assume that and needed an artificial fetch_incoming
        * routine.
        */
       if (handle() && scheduler)
-	return true;
+	  return true;
       {
 	Synchronized(updating_state);
 	if (changed) return true;
@@ -443,7 +435,8 @@ private:
 protected:
   /**
    * This method is called from within the scheduler. It should
-   * perform the runnable action, which in this case it the handling of messages.
+   * perform the runnable action, which in this case it the handling of
+   * messages.
    * If handle_as_many_as_possible, 
    * it should perform as many steps as possible before returning. If not,
    * it should return asap. This function should return true if a next call
@@ -462,21 +455,22 @@ protected:
     {
       if (handle_as_many_as_possible)
 	{
-	  while(step());
+	  while(step()) {};
 	  return false;
 	}
       else
 	return step();
     }
   /**
-   * This method will be called in its own (virtual) thread, to handle a collection
-   * of messages. The messages to be handled are listed in the protected handle field.
-   * That queue can be accessed and manipulated as necessary. This method should 
-   * return true when it can perform more work or false when it has nothing more to 
-   * do (handling empty for instance, or no useful message left in handling).
-   * The standard implementation will take the front of the handling queue and 
-   * present it to the more specific handle(T) member. Based on the return of that 
-   * function a decision is made for the specif handling element.
+   * This method will be called in its own (virtual) thread, to handle a 
+   * collection of messages. The messages to be handled are listed in the
+   * protected handle field. That queue can be accessed and manipulated as
+   * necessary. This method should return true when it can perform more work
+   * or false when it has nothing more to do (handling empty for instance, 
+   * or no useful message left in handling). The standard implementation will
+   * take the front of the handling queue and present it to the more specific 
+   * handle(T) member. Based on the return of that function a decision is made
+   * for the specif handling element.
    */
   virtual bool handle()
     {
@@ -488,8 +482,13 @@ protected:
 	{
 	case RevisitLater:
 	  handling.push_back(f);
+	  handling.pop_front();
+	  // no deletion of the message
+	  break;
 	case Done:
 	  handling.pop_front();
+	  // deletion of message when done
+	  delete f;
 	  break;
 	case Revisit:
 	  break;
@@ -505,12 +504,16 @@ protected:
       bool t=!handling.empty();
       return t;
     }
+
   /**
    * The standard queue handler (handle()), looks at each element in turn
-   * for each element it calls handle(T), which  should return one of the following states
-   * - RevisitLater: will put the current message at the end of the current handling queue
+   * for each element it calls handle(T), which  should return one of the
+   * following states
+   * - RevisitLater: will put the current message at the end of the current
+   *   handling queue
    * - Revisit: will keep the element at the beginning of the handling queue
-   * - RevisitAfterIncoming: will revisit the element after all the new incoming messages
+   * - RevisitAfterIncoming: will revisit the element after all the new 
+   *   incoming messages
    * - Done: zaps the element from the queue.
    * - Interrupt: stop the handling until a new element arrives
    * 

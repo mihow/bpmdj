@@ -1,6 +1,6 @@
 /****
  Active Object compiled file
- Copyright (C) 2006-2010 Werner Van Belle
+ Copyright (C) 2006-2011 Werner Van Belle
  Do not modify. Changes might be lost
  --------------------------------------------
  This program is free software; you can redistribute it and/or modify
@@ -16,8 +16,7 @@
 
 #ifndef __CLUSTERER_H
 #define __CLUSTERER_H
-#include "active-objects.h"
-#include "reference-count.h"
+#include "./active-objects.h"
 using namespace std;
 #include "cluster.h"
 #include "song-metric.h"
@@ -45,19 +44,18 @@ class ActiveClusterer;
  * of ActiveClusterer_msg_ has been generated. See inheritance diagram.
  * The message classes are automatically instantiated by the active object
  * stub Clusterer
- * The message class is also an instance of ReferenceCount, which makes it 
- * ideally suited to use within Smart pointers.
  */
-class ActiveClusterer_msg_: public ReferenceCount
+class ActiveClusterer_msg_
 {
   public:
     /**
      * Called by ActiveObject to handle this queued message.
      * %arg caller is the ActiveClusterer itself.
      */
-    virtual elementResult run(ActiveClusterer * caller)
+    virtual elementResult run(ActiveClusterer * /* caller */)
     {
       assert(0);
+      return Revisit;
     }
     /**
      * Returns the name of this message. Since this is the message baseclass
@@ -73,11 +71,11 @@ class ActiveClusterer_msg_: public ReferenceCount
 //-------------------------------------
 // Main object definition
 //-------------------------------------
-class ActiveClusterer: public ActiveObject<Smart< ActiveClusterer_msg_ > >
+class ActiveClusterer: public ActiveObject< ActiveClusterer_msg_* >
 {
   friend class Clusterer;
   Clusterer * self;
-    virtual elementResult handle(Smart< ActiveClusterer_msg_> cmd)
+    virtual elementResult handle( ActiveClusterer_msg_* cmd)
       {
         if (cmd) return cmd->run(this);
         else return Done;
@@ -94,7 +92,7 @@ class ActiveClusterer: public ActiveObject<Smart< ActiveClusterer_msg_ > >
   protected: void queue_terminate();
   protected:
     ActiveClusterer(Clusterer* s, string name):
-      ActiveObject<Smart< ActiveClusterer_msg_ > >(name), self(s)
+      ActiveObject< ActiveClusterer_msg_ * >(name), self(s)
       {
       };
 };
@@ -241,22 +239,18 @@ class Clusterer
 //-------------------------------------
 inline void ActiveClusterer::queue_reset()
   {
-    push(Smart<ActiveClusterer_msg_reset>(
-        new ActiveClusterer_msg_reset()));
+    push(new ActiveClusterer_msg_reset());
   };
 inline void ActiveClusterer::queue_add(Point* p)
   {
-    push(Smart<ActiveClusterer_msg_add>(
-        new ActiveClusterer_msg_add(p)));
+    push(new ActiveClusterer_msg_add(p));
   };
 inline void ActiveClusterer::queue_agglomerate(SongMetriek metriek)
   {
-    push(Smart<ActiveClusterer_msg_agglomerate>(
-        new ActiveClusterer_msg_agglomerate(metriek)));
+    push(new ActiveClusterer_msg_agglomerate(metriek));
   };
 inline void ActiveClusterer::queue_terminate()
   {
-    push(Smart<ActiveClusterer_msg_terminate>(
-        new ActiveClusterer_msg_terminate()));
+    push(new ActiveClusterer_msg_terminate());
   };
 #endif // __CLUSTERER_H

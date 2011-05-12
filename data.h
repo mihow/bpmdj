@@ -1,8 +1,7 @@
 /****
- Borg4 Data Library
- Copyright (C) 2005-2010 Werner Van Belle
-
- http://werner.yellowcouch.org/Borg4/group__data.html
+ Hierarchical Data Objects
+ Copyright (C) 2005-2011 Werner Van Belle
+ http://flow.yellowcouch.org/data/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -298,6 +297,7 @@ class Data
   ARRAY_TYPES;
 #undef ARRAY_TYPE
 
+#ifndef NDEBUG
   /**
    * Empty function at the moment. Will assert itself. This function is 
    * necessary to allow the array templates to compile properly
@@ -344,6 +344,18 @@ class Data
       assert(0); 
     };
 
+  /**
+   * Empty function at the moment. Will assert itself. This function is 
+   * necessary to 
+   * allow the array templates to compile properly
+   */
+  bool & operator ==(const Data &) 
+    {
+      assert(0); 
+    };
+
+#endif //NDEBUG
+
    /**
     * Value retrieval by string reference
     */
@@ -354,15 +366,6 @@ class Data
    */
    void setField(QString s, Data v);
      
-  /**
-   * Empty function at the moment. Will assert itself. This function is 
-   * necessary to 
-   * allow the array templates to compile properly
-   */
-  bool & operator ==(const Data &) 
-    {
-      assert(0); 
-    };
  protected:
   friend class DataVisitor;
   void visit(DataVisitor& v);

@@ -324,7 +324,7 @@ extern int aolex (void);
 #undef YY_DECL
 #endif
 
-#line 44 "ao-lexer.l"
+#line 45 "ao-lexer.l"
 
 
 #line 331 "ao-lexer.h"

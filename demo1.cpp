@@ -17,36 +17,36 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-#ifndef __loaded__ao_pool_h__
-#define __loaded__ao_pool_h__
+#ifndef __loaded__demo1_cpp__
+#define __loaded__demo1_cpp__
 using namespace std;
-#line 1 "ao-pool.h++"
-#include "ao-scheduler.h"
-using namespace std;
+#line 1 "demo1.c++"
+#define TRACE_MESSAGES
+#include "demo1.h"
 
-class DawnTilDusk
+elementResult ActiveDemoSender::startSending(DemoReceiver* recv, int a)
 {
-public:
-  /**
-   * Called by the constructor of each active object to obtain 
-   * a scheduler for itself
-   */
-  virtual Scheduler * sunrise(string who) = 0;
-  /**
-   * Called by the scheduler whenever an active object
-   * dies
-   */
-  virtual void sunset(string who) = 0;
-  virtual void print_active_object_list() = 0;
-  virtual void wait_for_finish() = 0;
-  virtual ~DawnTilDusk()
-  {
-  };
-};
+  tosend = a;
+  for(int i = 0 ; i < tosend ;  i++)
+    recv->printNumber(i);
+  deactivate();
+  return Done;
+}
 
-/**
- * The point where each active object will acquire its scheduler and
- * where each active object will be buried
- */
-extern DawnTilDusk *aoPool;
-#endif // __loaded__ao_pool_h__
+elementResult ActiveDemoReceiver::printNumber(int nr)
+{
+   printf("%d  ",nr);
+   fflush(stdout);
+   if (nr==20) deactivate();
+   return Done;
+}
+
+DemoSender sender;
+DemoReceiver recv;
+
+int main(int, char* [])
+{
+  sender.startSending(&recv,100);
+  sleep(10);
+}
+#endif // __loaded__demo1_cpp__

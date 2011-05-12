@@ -1,6 +1,6 @@
 /****
  Active Object compiled file
- Copyright (C) 2006-2010 Werner Van Belle
+ Copyright (C) 2006-2011 Werner Van Belle
  Do not modify. Changes might be lost
  --------------------------------------------
  This program is free software; you can redistribute it and/or modify
@@ -16,8 +16,7 @@
 
 #ifndef __SONG_COPIER_H
 #define __SONG_COPIER_H
-#include "active-objects.h"
-#include "reference-count.h"
+#include "./active-objects.h"
 using namespace std;
 #include "song.h"
 #include "active-objects.h"
@@ -45,19 +44,18 @@ class ActiveSongCopier;
  * of ActiveSongCopier_msg_ has been generated. See inheritance diagram.
  * The message classes are automatically instantiated by the active object
  * stub SongCopier
- * The message class is also an instance of ReferenceCount, which makes it 
- * ideally suited to use within Smart pointers.
  */
-class ActiveSongCopier_msg_: public ReferenceCount
+class ActiveSongCopier_msg_
 {
   public:
     /**
      * Called by ActiveObject to handle this queued message.
      * %arg caller is the ActiveSongCopier itself.
      */
-    virtual elementResult run(ActiveSongCopier * caller)
+    virtual elementResult run(ActiveSongCopier * /* caller */)
     {
       assert(0);
+      return Revisit;
     }
     /**
      * Returns the name of this message. Since this is the message baseclass
@@ -73,11 +71,11 @@ class ActiveSongCopier_msg_: public ReferenceCount
 //-------------------------------------
 // Main object definition
 //-------------------------------------
-class ActiveSongCopier: public ActiveObject<Smart< ActiveSongCopier_msg_ > >
+class ActiveSongCopier: public ActiveObject< ActiveSongCopier_msg_* >
 {
   friend class SongCopier;
   SongCopier * self;
-    virtual elementResult handle(Smart< ActiveSongCopier_msg_> cmd)
+    virtual elementResult handle( ActiveSongCopier_msg_* cmd)
       {
         if (cmd) return cmd->run(this);
         else return Done;
@@ -94,7 +92,7 @@ class ActiveSongCopier: public ActiveObject<Smart< ActiveSongCopier_msg_ > >
   protected: void queue_terminate();
   protected:
     ActiveSongCopier(SongCopier* s, string name):
-      ActiveObject<Smart< ActiveSongCopier_msg_ > >(name), self(s)
+      ActiveObject< ActiveSongCopier_msg_ * >(name), self(s)
       {
       };
 };
@@ -241,22 +239,18 @@ class SongCopier
 //-------------------------------------
 inline void ActiveSongCopier::queue_setTarget(QString trgt)
   {
-    push(Smart<ActiveSongCopier_msg_setTarget>(
-        new ActiveSongCopier_msg_setTarget(trgt)));
+    push(new ActiveSongCopier_msg_setTarget(trgt));
   };
 inline void ActiveSongCopier::queue_fetch(Song* s)
   {
-    push(Smart<ActiveSongCopier_msg_fetch>(
-        new ActiveSongCopier_msg_fetch(s)));
+    push(new ActiveSongCopier_msg_fetch(s));
   };
 inline void ActiveSongCopier::queue_fetchNextSong()
   {
-    push(Smart<ActiveSongCopier_msg_fetchNextSong>(
-        new ActiveSongCopier_msg_fetchNextSong()));
+    push(new ActiveSongCopier_msg_fetchNextSong());
   };
 inline void ActiveSongCopier::queue_terminate()
   {
-    push(Smart<ActiveSongCopier_msg_terminate>(
-        new ActiveSongCopier_msg_terminate()));
+    push(new ActiveSongCopier_msg_terminate());
   };
 #endif // __SONG_COPIER_H

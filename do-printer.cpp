@@ -1,8 +1,7 @@
 /****
- Borg4 Data Library
- Copyright (C) 2005-2010 Werner Van Belle
-
- http://werner.yellowcouch.org/Borg4/group__data.html
+ Hierarchical Data Objects
+ Copyright (C) 2005-2011 Werner Van Belle
+ http://flow.yellowcouch.org/data/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -22,7 +21,9 @@
 #define __loaded__do_printer_cpp__
 using namespace std;
 #line 1 "do-printer.c++"
+#include <stdio.h>
 #include "do-printer.h"
+
 void print(outputbuf& where, const char* script, ...)
 {
   char toexecute[1024];

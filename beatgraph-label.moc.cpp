@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'beatgraph-label.h'
 **
-** Created: Thu May 12 14:45:16 2011
+** Created: Thu May 12 18:30:12 2011
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.7.2)
 **
 ** WARNING! All changes made in this file will be lost!
