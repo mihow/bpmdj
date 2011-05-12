@@ -20,6 +20,7 @@
 #define __loaded__log_viewer_cpp__
 using namespace std;
 #line 1 "log-viewer.c++"
+#include <cstdio>
 #include <qstringlist.h>
 #include <qlistview.h>
 #include <qstring.h>
@@ -120,7 +121,6 @@ void LogViewer::on_list_currentItemChanged(QListWidgetItem* i,
 
 void LogViewer::goTo(QString name)
 {
-  
   QList<QListWidgetItem*> lst = list->findItems(name,0);
   if (lst.count()>0)
     {

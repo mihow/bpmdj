@@ -22,6 +22,7 @@
 #define __loaded__ao_pool_cpp__
 using namespace std;
 #line 1 "ao-pool.c++"
+#include <cstdio>
 #include <iostream>
 #include "ao-pool.h"
 #include "ao-tracker.h"
@@ -89,9 +90,9 @@ public:
 	sleep(1);
 	if (running)
 	  {
-	    printf("Waiting for objects to finish\n"); 
+	    cout<<"Waiting for objects to finish\n"; 
 	    print_active_object_list();
-	    fflush(stdout);
+	    cout.flush();
 	  }
       }
   };

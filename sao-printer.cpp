@@ -22,6 +22,7 @@
 #define __loaded__sao_printer_cpp__
 using namespace std;
 #line 1 "sao-printer.c++"
+#include <cstdio>
 #include "sao-printer.h"
 
 void print(outputbuf& where, const char* script, ...)

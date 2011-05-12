@@ -22,6 +22,7 @@ using namespace std;
 #line 1 "info.c++"
 #include <stdlib.h>
 #include <assert.h>
+#include <stdio.h>
 #include <string.h>
 #include <libgen.h>
 #include <qmessagebox.h>

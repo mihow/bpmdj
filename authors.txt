@@ -10,6 +10,8 @@ Bernard Fortz <bernard.fortz@gmail.com>
   JACK support, Midi bindings, Gentoo packaging
 Toni Graffy <oc2pus@arcor.de>
   Suse packaging
+Martin Stolpe <martin.stople@uni-ulm.de>
+  Compiling on more modern systems
 
 Passive
 -------

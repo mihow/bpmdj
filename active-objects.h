@@ -22,6 +22,7 @@
 #define __loaded__active_objects_h__
 using namespace std;
 #line 1 "active-objects.h++"
+#include <cstdio>
 #include <iostream>
 #include <string>
 #include <pthread.h>
@@ -34,7 +35,9 @@ using namespace std;
 #include "ao-scheduler.h"
 #include "ao-pool.h"
 using namespace std;
-typedef enum{RevisitLater, Revisit, RevisitAfterIncoming, Done, Interrupt} elementResult;
+
+typedef enum{RevisitLater, Revisit, RevisitAfterIncoming, Done, Interrupt} 
+  elementResult;
 
 /**
  * @defgroup ao Active Objects
@@ -61,46 +64,57 @@ typedef enum{RevisitLater, Revisit, RevisitAfterIncoming, Done, Interrupt} eleme
  * - Where is the code located that runs in this thread. Or rather how 
  *   does the thread weave itself throughout the program ?
  *
- * %To remedy these problems we, you guessed it, developed our own threading/process
- * library :) In Borg4 all threads are syntactically encapsulated in one file. At runtime they
- * are isolated in space (memory) and time (messages are delivered asynchronously)
+ * %To remedy these problems we, you guessed it, developed our own
+ * threading/process library :) In Borg4 all threads are syntactically
+ * encapsulated in one file. At runtime they are isolated in space
+ * (memory) and time (messages are delivered asynchronously)
  *
- * The entire architecture is build around 'active queues'. These are objects
- * aimed to facilitate inter thread communication thereby separating different
- * threads in space and time from each other. Next to this they also aim to 
- * improve performance of typical 'waiting' loops by automatically activating 
- * those queues where necessary. An active queue consists logically out of a queue
- * and a message handler inside the queue. The message handler will be called 
- * when necessary and must return its control flow back to the caller as soon 
- * as the message is handled. During message handling new information might be
- * put into the queue. Since this might lead to interesting concurrency 
- * problems we chose to adapt a 'stable state view' onto the queue, meaning that
- * during handling of a message the state of the queue will remain stable. This 
- * is achieved by separating the internals of an active queue in 3 different 
- * queues. The first queue is the queue with incoming messages. Anybody wanting
- * to push data into this queue need to lock the active queue. The second queue
- * is the handling queue, which is automatically copied from the incoming queue
- * as soon as new information arrives. The queue's actives side should only access
- * the handling queue. %To allow messages to be passed to other entities that 
- * might be interested in receiving data from the queue, an outgoing queue is available.
+ * The entire architecture is build around 'active queues'. These are
+ * objects aimed to facilitate inter thread communication thereby
+ * separating different threads in space and time from each
+ * other. Next to this they also aim to improve performance of typical
+ * 'waiting' loops by automatically activating those queues where
+ * necessary. An active queue consists logically out of a queue and a
+ * message handler inside the queue. The message handler will be
+ * called when necessary and must return its control flow back to the
+ * caller as soon as the message is handled. During message handling
+ * new information might be put into the queue. Since this might lead
+ * to interesting concurrency problems we chose to adapt a 'stable
+ * state view' onto the queue, meaning that during handling of a
+ * message the state of the queue will remain stable. This is achieved
+ * by separating the internals of an active queue in 3 different
+ * queues. The first queue is the queue with incoming
+ * messages. Anybody wanting to push data into this queue need to lock
+ * the active queue. The second queue is the handling queue, which is
+ * automatically copied from the incoming queue as soon as new
+ * information arrives. The queue's actives side should only access
+ * the handling queue. %To allow messages to be passed to other
+ * entities that might be interested in receiving data from the queue,
+ * an outgoing queue is available.
  *
- * These pages document the active objects as used in Borg4. 
- * The active objects are supported by a compact
- * runtime that allows messages to be queued into objects, which will then in turn be activated as soon as
- * new messages are available. The runtime is mainly accessed through the @ref ActiveObject class.
+ * These pages document the active objects as used in Borg4.  The
+ * active objects are supported by a compact runtime that allows
+ * messages to be queued into objects, which will then in turn be
+ * activated as soon as new messages are available. The runtime is
+ * mainly accessed through the @ref ActiveObject class.
  * 
- * There is also a compiler available that will automatically create code for active objects. 
- * The aoc compiler generates a wrapper for an active object. The inside of that object
- * will be the active object that is shielded from the rest of the world. The 
- * outside (the meta-object) will accept all the incoming calls and forward them 
- * to the active object. The following header file, demo1.ao declares two active objects, Sender and Receiver. 
- * The sender will accept startSending. The receiver will accept printNumber. The aoc compiler will automatically
- * generate an appropriate header that will declare two separate object. In the case of the sender 
- * active object, these will be called Sender and ActiveSender. The ActiveSender will contain 
- * all the methods we declared (except for the meta method). The Sender class will be a proxy 
- * and can be accessed concurrently. All the arguments to each call will be wrapped into a 
- * message and passed to the underlying ActiveObject. If access to the object fields is necessary
- * then a meta method must be declared.
+ * There is also a compiler available that will automatically create
+ * code for active objects.  The aoc compiler generates a wrapper for
+ * an active object. The inside of that object will be the active
+ * object that is shielded from the rest of the world. The outside
+ * (the meta-object) will accept all the incoming calls and forward
+ * them to the active object. The following header file, demo1.ao
+ * declares two active objects, Sender and Receiver.  The sender will
+ * accept startSending. The receiver will accept printNumber. The aoc
+ * compiler will automatically generate an appropriate header that
+ * will declare two separate object. In the case of the sender active
+ * object, these will be called Sender and ActiveSender. The
+ * ActiveSender will contain all the methods we declared (except for
+ * the meta method). The Sender class will be a proxy and can be
+ * accessed concurrently. All the arguments to each call will be
+ * wrapped into a message and passed to the underlying
+ * ActiveObject. If access to the object fields is necessary then a
+ * meta method must be declared.
  *
  * File: demo1.ao; compile with aoc demo1.ao >demo1.h
  *
@@ -134,7 +148,7 @@ typedef enum{RevisitLater, Revisit, RevisitAfterIncoming, Done, Interrupt} eleme
  *
  *   elementResult ActiveDemoReceiver::printNumber(int nr)
  *     {
- *     printf("%d  ",nr);
+ *     cout << nr << "  ";
  *     fflush(stdout);
  *     return RevisitAfterIncoming;
  *     }
@@ -160,13 +174,15 @@ typedef enum{RevisitLater, Revisit, RevisitAfterIncoming, Done, Interrupt} eleme
 
 /**
  * @ingroup ao
- * @brief Active Objects perform their task 
- * separated in time (control flow) and space (data) from the rest of the program.
+ * @brief Active Objects perform their task separated in time (control
+ * flow) and space (data) from the rest of the program.
  *
- * Active objects do not share data between each other and they can only be accessed
- * through message transfer (@ref push). As a simple (but powerful) process model they
- * allow the encapsulation of logical processes into syntactic units. Looking at the code
- * we know automatically which thread will run through which section. Within an active
+ * Active objects do not share data between each other and they can
+ * only be accessed through message transfer (@ref push). As a simple
+ * (but powerful) process model they allow the encapsulation of
+ * logical processes into syntactic units. Looking at the code we know
+ * automatically which thread will run through which section. Within
+ * an active
  * object we can be sure of the following conditions:
  * - when handling a message, we have full read/write access to all the fields
  * - nobody else will be accessing the fields.
@@ -364,9 +380,9 @@ protected:
   elementResult deactivate()
   {
 #ifdef DEBUG_ACTIVATION
-    cerr << "Deactivating " << name << '\n';
+    cerr << "Deactivating " << name << endl;
+    cerr.flush();
 #endif 
-    fflush(stderr);
     assert(scheduler);
     scheduler = false;
     if (aoPool)

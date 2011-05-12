@@ -22,6 +22,8 @@
 #define __loaded__ao_scheduler_cpp__
 using namespace std;
 #line 1 "ao-scheduler.c++"
+#include <cstdio>
+#include <iostream>
 #include <string>
 #include <stdlib.h>
 #include <assert.h>
@@ -43,11 +45,11 @@ static void * startRunner(void* neglect)
   static int threadcount = 0;
   int tn=++threadcount;
   string name = info.name;
-  printf("Start [%d]: %s\n",tn,name.c_str());
+  cout << "Start [" << tn << "]: "<< name << endl;
 #endif
   info.run(true);
 #ifdef THREAD_LOGGING
-  printf(" Stop [%d]: %s\n",tn,name.c_str());
+  cout << " Stop ["<<tn<<"]: " << name << endl;
   threadcount--;
 #endif
   return NULL;
@@ -59,7 +61,8 @@ void SpawnWhenActivated::start(Runnable * torun)
   int err = pthread_create(y,NULL,startRunner,(void*)torun);
   if (err)
     {
-      printf("Could not spawn thread , errno = %d\n",err);
+      cerr << "Could not spawn thread , errno = " << err << endl;
+      cerr.flush();
       assert(0);
     };
   pthread_detach(*y);

@@ -22,13 +22,16 @@
 #define __loaded__null_cpp__
 using namespace std;
 #line 1 "null.c++"
+#include <iostream>
 #include "null.h"
 //---------------------------------------------------------------
 //                            Null
 //---------------------------------------------------------------
 void Null::crash() const
 {
-  printf("Action called upon Null\n");
+  cerr<<"Action called upon Null\n";
+  cerr.flush();
   assert(0);
+  _exit(63);
 }
 #endif // __loaded__null_cpp__

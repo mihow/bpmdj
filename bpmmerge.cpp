@@ -22,6 +22,8 @@ using namespace std;
 #line 1 "bpmmerge.c++"
 #include <stdlib.h>
 #include <cstdio>
+#include <iostream>
+#include <iomanip>
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
@@ -39,16 +41,15 @@ using namespace std;
 #include "smallhistogram-type.h"
 #include "signals.h"
 
-PlayerConfig * config;      // will be the standard configuration
+PlayerConfig * config;
 
 /*-------------------------------------------
  *         BpmDj Merger
  *-------------------------------------------*/
 void options_failure(const char* err)
 {
-  printf("BpmDj Merger v%s, Copyright (c) 2000-2010 Werner Van Belle\n",
-	 VERSION);
-  printf(
+  cout << "BpmDj Merger v"VERSION", Copyright (c) 2000-2010 Werner Van Belle\n";
+  cout << 
 "This software is distributed under the GPL2 license. See copyright.txt\n\n"
 "Usage:  bpmmerge <options> [old-song] new-song\n\n"
 "  --mix         nbr  how many measures should be used to create the mix\n" 
@@ -68,7 +69,8 @@ void options_failure(const char* err)
 "    --aftertempo     split after tempo change\n"
 "    --number         number every part of the split process\n"
 "  old-song           the index file of the last song\n"
-"  new-song           the index file of the new song\n\n%s\n\n",err);
+"  new-song           the index file of the new song\n\n" 
+  << err << endl << endl;
   _exit(1);
 }
 
@@ -134,7 +136,7 @@ void cut_at(signed8 position, char* target)
   signed8 length = ftell(f1);
   fseek(f1,position,SEEK_SET);
   signed8 togo = length - position;
-  printf("Writing %s\n",target);
+  cout << "Writing "<< target << endl;
   // copy file
   unsigned4 buffer[64*1024];
   while(togo>0)
@@ -179,8 +181,8 @@ char * split_raw(int nr, signed8 lastpos)
   // continue reading the file
   if (position<lastpos)
     {
-      printf("Just read %s\n",entry);
-      fflush(stdout);
+      cout<<"Just read "<<entry<<endl;
+      cout.flush();
     }
   assert(position>=lastpos);
   if (T == 'M' && split_beforemix)
@@ -370,7 +372,7 @@ void normalize_file()
   stereo_sample2 buffer[BUFSIZE];
   signed4 read;
   signed8 position;
-  printf("Normalizing new song\n");
+  cout << "Normalizing new song\n";
   // find maximum..
   fseek(file_b,0,SEEK_SET);
   signed8 leftmax = 0;
@@ -418,7 +420,7 @@ bool createFiles(char* a, char* b)
   period_b   = period_to_quad(idx_b.get_period());
   cue_b      = period_to_quad(idx_b.get_cue());
   set_decoder_environment(config,&idx_b);
-  printf("Decoding %s\n",b);
+  cout << "Decoding " << b << endl;
   if (!bpmdjraw(true,filename_b,"./")) _exit(100);
   file_b=openRawFileForWriting(&idx_b, "./");
   if (normalize) normalize_file();
@@ -430,10 +432,10 @@ bool createFiles(char* a, char* b)
   if (file_a)
     {
       if (verbose)
-	printf("Found target file\n");
+	cout << "Found target file\n";
       return true;
     }
-  printf("This is the first song of the mix\n");
+  cout << "This is the first song of the mix\n";
   file_a=fopen(BPMMIXED_NAME,"ab");
   assert(file_a);
   return false;
@@ -451,8 +453,8 @@ void readTail(signed8 measures)
   filelength_a = fsize(file_a);
   if (length_a * 4 > filelength_a)
     {
-      printf("Error: not enough data in file...\n");
-      fflush(stdout);
+      cout << "Error: not enough data in file...\n";
+      cout.flush();
       _exit(50);
     }
   position_a = filelength_a-(length_a*4);
@@ -460,8 +462,10 @@ void readTail(signed8 measures)
   position_a *= 4;
 
   fseek(file_a,position_a,SEEK_SET);
-  printf("Reading tail (%d samples at position %d of length %d)\n",
-	 (int)length_a,(int)position_a,(int)filelength_a);
+  cout << "Reading tail (" << (int)length_a
+       << " samples at position " << (int)position_a 
+       << " of length " << (int)filelength_a
+       <<")\n";
   readsamples(buffer_a,length_a,file_a);
 }
 
@@ -481,7 +485,7 @@ void readHead(signed8 percent, signed8 measures)
     {
       position_b=cue_b;
       if (!cue_b)
-	printf("Cannot use cue as head since cue does not exist\n");
+	cout<<"Cannot use cue as head since cue does not exist\n";
       if (before_cue)
 	{
 	  if (length_b>position_b) position_b=0;
@@ -497,8 +501,10 @@ void readHead(signed8 percent, signed8 measures)
   position_b *= 4;
   buffer_b = bpmdj_allocate(length_b,stereo_sample2);
   fseek(file_b,position_b,SEEK_SET);
-  printf("Reading head (%d samples at position %d of length %d)\n",
-	 (int)length_b,(int)position_b,(int)filelength_b);
+  cout <<"Reading head ("<<length_b
+       <<" samples at position "<<position_b
+       <<" of length "<<filelength_b
+       <<")\n";	 
   readsamples(buffer_b,length_b,file_b);
 }
 
@@ -511,7 +517,7 @@ void copySong(signed8 percent)
   unsigned4 togo=(filelength_b*percent/100)-position_b;
   togo/=4;
   assert(togo>=0);
-  printf("Copying non-mixed part of song (%d samples)\n",(int)togo);
+  cout << "Copying non-mixed part of song (" <<(int)togo << " samples)\n";
   log_entry(ftell(file_a),"S",new_index);
   while(togo>0)
     {
@@ -528,8 +534,8 @@ static stereo_sample2 *buffer_c;  // stretched full data of head
 static unsigned4 length_c;
 void stretchHead(signed8 headmeasures)
 {
-  printf("Stretching head to fit (period_a = %d, period_b = %d)\n",
-	 (int)period_a,(int)period_b);
+  cout << "Stretching head to fit (period_a = " << period_a 
+       <<", period_b = " << period_b << ")\n";
   length_c = period_a*headmeasures;
   buffer_c = bpmdj_allocate(length_c,stereo_sample2);
   for(unsigned4 i = 0 ; i < length_c ; i ++)
@@ -617,18 +623,18 @@ void rescanTempo()
   float8 S=T;
   signed8 T1=(signed8)(4.0*(float8)11025*60.0/(float8)(T-1));
   signed8 T2=(signed8)(4.0*(float8)11025*60.0/(float8)(T+1));
-  printf("Rescanning frequency of tail ");
+  cout<<"Rescanning frequency of tail ";
   period_a=rescanTempo(T1,T2,buffer_d,length_d)*4;
   T=4.0*(float8)11025*60.0/(float8)(period_a/4);
-  printf("(%g adjustment)\n",T-S);
+  cout<<"("<<T-S<<" adjustment)\n";
   
   S=T=4.0*(float8)11025*60.0/(float8)(period_b/4);
   T1=(signed8)(4.0*(float8)11025*60.0/(float8)(T-1));
   T2=(signed8)(4.0*(float8)11025*60.0/(float8)(T+1));
-  printf("Rescanning frequency of head ");
+  cout << "Rescanning frequency of head ";
   period_b=rescanTempo(T1,T2,buffer_f,length_f)*4;
   T=4.0*(float8)11025*60.0/(float8)(period_b/4);
-  printf("(%g adjustment)\n",T-S);
+  cout <<"("<<T-S<<" adjustment)\n";
 }
 
 unsigned4 findMatchWithVolumeAccounting()
@@ -636,31 +642,27 @@ unsigned4 findMatchWithVolumeAccounting()
   unsigned int step = 10;
   unsigned4 mindiff=(unsigned4)-1;
   unsigned4 minpos=0;
-  printf("Finding volume accounted approximate fit ");
-
+  cout << "Finding approximate fit, taking into account volume ";
   // volume accounting on head
   for(unsigned4 pos = 0 ; pos < length_e ; pos ++)
     buffer_e[pos]=(unsigned4)buffer_e[pos]*pos/(unsigned4)length_e;
-  
   // find global match
   for(unsigned4 pos = 0 ; pos < length_d-length_e; pos += step ) 
     {
       unsigned4 diff = 0;
       compressed * buffer_dprime = (compressed*)(buffer_d+pos);
       for(unsigned4 y = 0 ; y < length_e && diff < mindiff; y ++)
-	{
-	  diff+= (unsigned4)labs(
-				 (signed4)buffer_dprime[y]*(length_e-y)/length_e
-				 -(signed4)buffer_e[y]
-				 );
-	}
-      
+	diff+=(unsigned4)labs((signed4)buffer_dprime[y]*(length_e-y)/length_e
+			      -(signed4)buffer_e[y]);
       if (diff<mindiff)
 	{
 	  mindiff = diff;
 	  minpos = pos;
-	  if (verbose) printf("%d ",(int)minpos);
-	  fflush(stdout);
+	  if (verbose) 
+	    {
+	      cout << minpos << " ";
+	      cout.flush();
+	    }
 	}
     }
   step*=4;
@@ -668,7 +670,7 @@ unsigned4 findMatchWithVolumeAccounting()
     minpos = step;
   if (minpos + step > length_d - length_e)
     minpos = length_d - length_e - step;
-  printf("\nFinding volume accounted fine fit ");
+  cout << "\nFinding volume accounted fine fit ";
   for(unsigned4 pos = minpos - step ; pos < minpos + step; pos ++) 
     {
       unsigned4 diff = 0;
@@ -684,11 +686,14 @@ unsigned4 findMatchWithVolumeAccounting()
 	{
 	  mindiff = diff;
 	  minpos = pos;
-	  if (verbose) printf(" %d",(int)minpos);
-	  fflush(stdout);
+	  if (verbose) 
+	    {
+	      cout << " " << minpos;
+	      cout.flush();
+	    }
 	}
     }
-  printf("\n");
+  cout << endl;
   return minpos*COLLAPSE;
 }
 
@@ -698,7 +703,7 @@ unsigned4 findMatchWithoutVolumeAccounting()
   // find global match
   unsigned4 mindiff=(unsigned4)-1;
   unsigned4 minpos=0;
-  printf("Finding approximate fit ");
+  cout<< "Finding approximate fit ";
   for(unsigned4 pos = 0 ; pos < length_d-length_e; pos += step ) 
     {
       unsigned4 diff = 0;
@@ -715,8 +720,11 @@ unsigned4 findMatchWithoutVolumeAccounting()
 	{
 	  mindiff = diff;
 	  minpos = pos;
-	  if (verbose) printf("%d ",(int)minpos);
-	  fflush(stdout);
+	  if (verbose) 
+	    {
+	      cout << minpos << " ";
+	      cout.flush();
+	    }
 	}
     }
   step*=4;
@@ -724,7 +732,7 @@ unsigned4 findMatchWithoutVolumeAccounting()
     minpos = step;
   if (minpos + step > length_d - length_e)
     minpos = length_d - length_e - step;
-  printf("\nFinding fine fit ");
+  cout << "\nFinding fine fit ";
   for(unsigned4 pos = minpos - step ; pos < minpos + step; pos ++) 
     {
       unsigned4 diff = 0;
@@ -742,11 +750,13 @@ unsigned4 findMatchWithoutVolumeAccounting()
 	  mindiff = diff;
 	  minpos = pos;
 	  if (verbose)
-	    printf(" %d",(int)minpos);
-	  fflush(stdout);
+	    {
+	      cout << " " << minpos;
+	      cout.flush();
+	    }
 	}
     }
-  printf("\n");
+  cout << endl;
   return minpos*COLLAPSE;
 }
 
@@ -770,7 +780,7 @@ stereo_sample2 mix(stereo_sample2 a, stereo_sample2 b, signed8 vol, signed8 tot)
 
 void volumefade(signed8 pos)
 {
-  printf("Creating the mix (pos = %ld)\n",(long int)pos);
+  cout << "Creating the mix (pos = "<<pos<<")\n";
   signed8 start=(signed8)position_a+(signed8)sizeof(unsigned4)*(signed8)pos;
   signed8 end = start+sizeof(unsigned4)*length_c;
   signed8 centre = (start+end)/2;
@@ -804,9 +814,10 @@ void tempofade(int time)
   signed4 maxmeasures = (filelength_b - pos)/4;
   maxmeasures/=period_b;
   if (time > maxmeasures)
-    printf("Warning: tempo fade can only be done in %d measures\n",
-	   time=maxmeasures);
-  printf("Doing tempo fade (%d measures)\n",time);
+    cout<<"Warning: tempo fade can only be done in "
+	<< (time=maxmeasures)
+	<< " measures\n";
+  cout<< "Tempo fading during "<<time << " measures\n";
   log_entry(ftell(file_a),"T",new_index);
   while(now<time)
     {
@@ -824,7 +835,7 @@ void closeFiles()
   fclose(file_b);
   char* rawname = getRawFilename("./",filename_b);
   if (verbose)
-    printf("Removing %s\n",rawname);
+    cout<<"Removing "<<rawname <<endl;
   remove(rawname);
 }
 

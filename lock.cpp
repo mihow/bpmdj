@@ -62,8 +62,9 @@ void Lock::wait_lock(string w)
       {
 	cerr << "Cannot obtain lock for " << w << "\n"
 	     << "because " << who << " holds it excessively long\n";	
-	fflush(stderr);
+	cerr.flush();
 	assert(0);
+	_exit(24);
       }
 }
 
