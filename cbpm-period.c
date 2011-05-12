@@ -1,5 +1,5 @@
 /****
- Divine Intervention: Free Dj Tools
+ BpmDj: Free Dj Tools
  Copyright (C) 2001 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
@@ -72,7 +72,7 @@ long fsize(FILE * f)
 
 void copyright()
 {
-   printf("# Divine Intervention Player v0.5, Copyright (c) 2001 Werner Van Belle\n");
+   printf("# cBpmDj Period v0.5, Copyright (c) 2001 Werner Van Belle\n");
    printf("# This software is distributed under the GPL2 license. See Gpl2.txt for details\n");
    printf("# See BeatMixing.ps for details how to use the program.\n");
    printf("# --------------------------------------------------------------------\n");

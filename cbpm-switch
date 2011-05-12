@@ -1,0 +1,27 @@
+#!/bin/bash
+device="/dev/dsp"
+normalfullname=$2;
+targetfullname=$1;
+
+if [ $1 = "-d" ]; then
+  device=$2;
+  targetfullname=$3;
+  normalfullname=$4;
+  fi
+
+targetrawname=`basename $targetfullname`.raw
+normalrawname=`basename $normalfullname`.raw
+
+! (test -f $normalrawname) && ./glue-mp3raw $normalfullname &
+
+echo -n  "                      | " >>logfile
+echo $targetrawname >>logfile
+date +%a\ %D\ %X\ \|\ $normalrawname >>logfile
+
+./cbpm-player \
+  -v -d $device\
+  -t `./glue-getperiod $targetfullname`\
+  -n `./glue-getperiod $normalfullname`\
+  $normalrawname
+
+rm *.raw

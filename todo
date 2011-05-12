@@ -1,0 +1,11 @@
+- subdirectories toelaten
+- pause/play (rekening houdend met latency tijd)
+- manual updaten aangaande command line switches
+- logfile doc schrijven
+- eens testen of een kwadratische fout nog betere resultaten geeft of niet.
+- text schrijven over het begin van de 8 maten...
+- nBpm schrijven
+- datadir ontkoppelen van bpm-files
+- glue-mp3raw aanpassen naargelang compilatie optie (WAVRATE)
+- aanpassen van de lyx file met automatische insertie correct versienummer
+- 2 soundcards in 1 pc: beats aanduiden om automatische switching te kunnen hebben

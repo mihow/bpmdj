@@ -1,4 +1,0 @@
-#!/bin/bash
-! (test -f `basename $2`.raw) && ./glue-mp3raw $2;
-./divine-player `basename $2`.raw `./glue-getperiod $1` `./glue-getperiod $2`
-rm *.raw

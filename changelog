@@ -1,0 +1,11 @@
+0.6:
+  - changed name from DivineIntervention to BpmDj
+  - project webpage added at sourceforge.net
+  - decoding happens in background and in a smaller format 44100/16/2 is
+    stupid if your soundcard doesn't support it
+  - help notice with 'h'
+  - beat shifting with ENTER
+0.5: 
+  - written documentation
+0.1: 
+  - initial tests

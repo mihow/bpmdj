@@ -1,5 +1,5 @@
 #!/bin/bash
-! (test -f `basename $1`.raw) && ./glue-mp3raw $1 2>/dev/null >/dev/null;
+! (test -f `basename $1`.raw) && ./glue-bpmraw $1 2>/dev/null >/dev/null;
 echo -n `basename $1` " "
 ./glue-bpmgraph `basename $1`.raw
 grep TEMPO `basename $1 .mp3`.idx

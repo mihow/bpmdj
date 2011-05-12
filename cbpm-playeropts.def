@@ -1,0 +1,49 @@
+Autogen Definitions options;
+prog_name  = cbpmplayer;
+prog_title = "cBpm-player";
+long_opts;
+
+flag = {
+  name = debuglatency;
+  descrip = "Debug latency";
+  value = w;
+};
+
+flag = {
+  name = verbose;
+  descrip = "Verbose";
+  value = v;
+};
+
+flag = {
+  name = device;
+  descrip = "Dsp device to use";
+  value = d;
+  arg_type = string;
+  arg_default = "/dev/dsp";
+  };
+
+flag = {
+  name = target;
+  descrip = "Target Period";
+  value = t;
+  arg_type = string;
+  };
+
+flag = {
+  name = normal;
+  descrip = "Normal period";
+  value = n;
+  arg_type = string;
+  };
+
+flag = {
+  name = latency;
+  descrip = "Fix latency (ms)";
+  value = l;
+  arg_type = string;
+  arg_default = "744";
+  };
+
+
+argument=string;  
