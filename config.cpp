@@ -22,6 +22,7 @@
 #include <qfile.h>
 #include <qdatastream.h>
 #include <qspinbox.h>
+#include <qcheckbox.h>
 #include <stdlib.h>
 #include "preferences.logic.h"
 #include "config.h"
@@ -46,6 +47,7 @@ bool Config::limit_downrange = false;
 bool Config::limit_indistance = false;
 bool Config::limit_authornonplayed = false;
 bool Config::shown_aboutbox = false;
+bool Config::open_mixer = false;
 float Config::distance_temposcale = 0.06;
 float Config::distance_spectrumscale = 1.0;
 
@@ -94,6 +96,7 @@ void Config::save()
   s << (Q_INT8)shown_aboutbox;
   s << tmp_directory;
   s << mixer_command;
+  s << (Q_INT8)open_mixer;
 }
 
 void Config::load()
@@ -237,6 +240,7 @@ void Config::load()
 	  s >> b; shown_aboutbox = b;
 	  s >> tmp_directory;
 	  s >> mixer_command;
+	  s >> b; open_mixer = b;
 	}
       else
 	printf("Wrong config file format\n");
@@ -273,6 +277,7 @@ void Config::openUi()
   preferences.spectrumSpin->setValue((int)(distance_spectrumscale*100.0));
   preferences.tmpDirectory->setText(tmp_directory);
   preferences.mixerCommand->setText(mixer_command);
+  preferences.open_mixer->setChecked(open_mixer);
   if (preferences.exec()==QDialog::Accepted)
     {
       playCommand1=preferences.playerCommand1->text();
@@ -287,6 +292,7 @@ void Config::openUi()
       distance_spectrumscale = (float)(preferences.spectrumSpin->value())/100.0;
       tmp_directory = preferences.tmpDirectory->text();
       mixer_command = preferences.mixerCommand->text();
+      open_mixer = preferences.open_mixer->isChecked();
       save();
     }
 }

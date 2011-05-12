@@ -1,7 +1,7 @@
 VERSION = 2.1
 include defines
 
-BIN = cbpm-play kbpm-play kbpm-dj merger bpmdj-raw rbpm-play xmms-play
+BIN = cbpm-play kbpm-play kbpm-dj merger bpmdj-raw rbpm-play xmms-play alsamixerguis
 DOC = authors changelog copyright todo readme ${shell ls *.html *.png}
 UIS = ${shell ls *.ui}
 

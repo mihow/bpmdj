@@ -46,6 +46,7 @@
  *-------------------------------------------*/ 
 static snd_pcm_t     *dsp;
 static snd_pcm_uframes_t buffer_size;
+static snd_pcm_uframes_t period_size;
 char * arg_dev = "hw:0,0";
 
 void alsa_start()
@@ -99,14 +100,15 @@ void alsa_pause()
   //}
 }
 
-void alsa_write(unsigned4 *value)
+// the normal write routine without prebuffering...
+void alsa_wwrite(unsigned4 *value)
 {
   int err = 0;
   do
     {
       err = snd_pcm_writei(dsp,value,1);
     }
-  while (err==0);
+  while (err==0) ;
   assert(err!=-EAGAIN);
   assert(err!=-ESTRPIPE);
   if (err==-EPIPE)
@@ -119,21 +121,59 @@ void alsa_write(unsigned4 *value)
     }
 }
 
+static unsigned4 *buffer;
+static int       filled = 0;
+void alsa_write(unsigned4 *value)
+{
+  buffer[filled]=*value;
+  if (++filled>=period_size)
+    {
+      int err;
+      void* buf= buffer;
+      do 
+	{
+	  err = snd_pcm_writei(dsp,buf,filled);
+	  if (err<0) 
+	    {
+	      assert(err!=-EAGAIN);
+	      assert(err!=-ESTRPIPE);
+	      if (err==-EPIPE)
+		{
+		  printf("underrun occured...\n");
+		  filled = 0;
+		  err = snd_pcm_prepare(dsp);
+		  if (err < 0)
+		    printf("cant recover from underrun: %s\n",snd_strerror(err));
+		  return;
+		}
+	    }
+	  filled-=err;
+	  buf+=err;
+	}
+      while (filled);
+      filled = 0;
+    }
+}
+
 signed8 alsa_latency()
 {
   snd_pcm_sframes_t delay;
   int err = snd_pcm_delay(dsp,&delay);
+  if (err<0)
+    {
+      printf("error obtaining latency:%d %s\n",err,snd_strerror(err));
+      return 0;
+    }
   assert(err==0);
-  // printf("delay = %d\n",delay);
+  printf("delay = %d\n",delay);
   assert(delay>=0 && delay <=buffer_size);
-  return delay;
+  return delay + filled;
 }
 
 int alsa_open()
 {
   int err, p;
   unsigned int buffer_time, period_time;
-  snd_pcm_uframes_t period_size;
   //  snd_pcm_hw_params_t *hparams;
   snd_pcm_hw_params_t *hparams;
   snd_pcm_sw_params_t *sparams;
@@ -201,6 +241,7 @@ int alsa_open()
 
   // playing latency instellen...
   period_time = atoi(arg_latency) * 1000;
+  // period_time /=2; // we do this so we can afterward use multiple periods
   buffer_time = period_time *2;
   {
     unsigned int t = buffer_time;
@@ -233,13 +274,22 @@ int alsa_open()
 	printf("     ompossible to obtain period data size: %s\n",snd_strerror(err));
 	return err_dsp;
       }
-    if (period_size*2>buffer_size)
+    if (period_size*2 - 1>buffer_size)
       {
 	printf("     impossible to allocate large enough buffers. Please decrease the latency\n");
 	printf("       playbuffer size = %li\n",period_size);
 	printf("       total buffer    = %li\n",buffer_size);
 	return err_dsp;
       }
+    dir = 0;
+    /*
+    err = snd_pcm_hw_params_set_periods(dsp,hparams,2,0);
+    if (err < 0)
+      {
+	printf("    impossible to set periods to 4: %s\n",snd_strerror(err));
+	return err_dsp;
+      }
+    */
   }
 
   // set the hardware parameters
@@ -289,6 +339,9 @@ int alsa_open()
   
   if (opt_dspverbose)
     snd_pcm_dump(dsp,output);
+
+  // allocate buffer of correct size
+  buffer = allocate(period_size,unsigned4);
   
   alsa_start();
   return err_none;
@@ -296,7 +349,7 @@ int alsa_open()
 
 void alsa_close()
 {
-  snd_pcm_drop(dsp);
+  snd_pcm_drain(dsp);
   snd_pcm_close(dsp);
 }
 

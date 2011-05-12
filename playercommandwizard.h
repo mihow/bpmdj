@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Form interface generated from reading ui file 'playercommandwizard.ui'
 **
-** Created: Fri Oct 10 09:11:11 2003
+** Created: Fri Oct 10 19:42:54 2003
 **      by: The User Interface Compiler ($Id: qt/main.cpp   3.1.2   edited Dec 19 11:45 $)
 **
 ** WARNING! All changes made in this file will be lost!

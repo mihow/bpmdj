@@ -2,7 +2,7 @@
 ** Form implementation generated from reading ui file 'pattern-analyzer.ui'
 **
 ** Created: Sun Sep 14 13:38:46 2003
-**      by: The User Interface Compiler ($Id: qt/main.cpp   3.1.2   edited Dec 19 11:45 $)
+**      by: The User Interface Compiler ($Id: pattern-analyzer.cpp,v 1.1 2003/10/10 08:50:55 krubbens Exp $)
 **
 ** WARNING! All changes made in this file will be lost!
 ****************************************************************************/

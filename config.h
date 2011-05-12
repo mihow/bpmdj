@@ -72,6 +72,7 @@ class Config
     // version 2.1
     static QString tmp_directory;
     static QString mixer_command;
+    static bool    open_mixer;
  public:
     static void openUi();
     static void save();

@@ -87,7 +87,7 @@ QString PreferencesLogic::getCommand()
     }
   else if (commandCreator.alsa->isChecked())
     {
-      options+="--alsa";
+      options+="--alsa ";
       text = commandCreator.dev->text();
       if (!text.isNull())
 	options+="--dev "+text+" ";

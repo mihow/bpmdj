@@ -1,5 +1,6 @@
 2.1:
-  ksel  + added a palyer command creator wizard
+  ksel  + removed some important bugs...	 
+  ksel  + added a player command creator wizard
   kplay + added native alsa driver	 
   kplay + removed mixer interface, because this is essentially useless and a whole bunch of other (and better) 
 	  programs exist to manipûlate the volumes of a mixer device

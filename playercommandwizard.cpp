@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Form implementation generated from reading ui file 'playercommandwizard.ui'
 **
-** Created: Fri Oct 10 09:11:11 2003
+** Created: Fri Oct 10 19:42:54 2003
 **      by: The User Interface Compiler ($Id: qt/main.cpp   3.1.2   edited Dec 19 11:45 $)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -66,6 +66,7 @@ PlayerCommandWizard::PlayerCommandWizard( QWidget* parent, const char* name, boo
     buttonGroup2Layout->addMultiCellWidget( textLabel4, 1, 1, 0, 1 );
 
     verbose = new QCheckBox( buttonGroup2, "verbose" );
+    verbose->setChecked( TRUE );
 
     buttonGroup2Layout->addWidget( verbose, 2, 0 );
 
@@ -207,6 +208,7 @@ void PlayerCommandWizard::languageChange()
     textLabel4->setText( tr( "Screen Position" ) );
     verbose->setText( tr( "verbose" ) );
     textLabel3->setText( tr( "Latency (ms)" ) );
+    latency->setText( tr( "150" ) );
     comboBox5->clear();
     comboBox5->insertItem( tr( "50" ) );
     comboBox5->insertItem( tr( "100" ) );
@@ -220,13 +222,20 @@ void PlayerCommandWizard::languageChange()
     comboBox7->insertItem( tr( "800" ) );
     x->setText( tr( "0" ) );
     textLabel5->setText( tr( "," ) );
+    y->setText( tr( "0" ) );
     buttonGroup4->setTitle( tr( "ALSA options" ) );
     textLabel9->setText( tr( "ALSA device to use" ) );
+    dev->setText( tr( "hw:0" ) );
     comboBox2->clear();
     comboBox2->insertItem( tr( "hw:0,0" ) );
     comboBox2->insertItem( tr( "hw:1,0" ) );
+    comboBox2->insertItem( tr( "plughw:0" ) );
+    comboBox2->insertItem( tr( "plughw:1" ) );
+    comboBox2->insertItem( tr( "default" ) );
     buttonGroup3->setTitle( tr( "OSS options" ) );
     textLabel6->setText( tr( "DSP device to use" ) );
+    dsp->setText( tr( "/dev/dsp" ) );
+    fragments->setText( tr( "16" ) );
     textLabel7->setText( tr( "Fragment count" ) );
     nolatency->setText( tr( "no latency accounting" ) );
     comboBox3->clear();

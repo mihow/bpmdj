@@ -155,6 +155,10 @@ int main(int argc, char* argv[])
 	}
     }
   
+  // 5b. startup mixers ?
+  if (Config::open_mixer)
+    test.openMixer();
+  
   // 6. start the application
   test.show();
   int result = app->exec();

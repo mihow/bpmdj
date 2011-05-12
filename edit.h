@@ -2,7 +2,7 @@
 ** Form interface generated from reading ui file 'edit.ui'
 **
 ** Created: Sun Aug 10 13:36:00 2003
-**      by: The User Interface Compiler ($Id: qt/main.cpp   3.1.2   edited Dec 19 11:45 $)
+**      by: The User Interface Compiler ($Id: edit.h,v 1.1 2003/10/10 08:50:55 krubbens Exp $)
 **
 ** WARNING! All changes made in this file will be lost!
 ****************************************************************************/

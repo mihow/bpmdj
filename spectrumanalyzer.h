@@ -2,7 +2,7 @@
 ** Form interface generated from reading ui file 'spectrumanalyzer.ui'
 **
 ** Created: Wed Jul 9 19:18:38 2003
-**      by: The User Interface Compiler ($Id: qt/main.cpp   3.1.2   edited Dec 19 11:45 $)
+**      by: The User Interface Compiler ($Id: spectrumanalyzer.h,v 1.1 2003/10/10 08:50:55 krubbens Exp $)
 **
 ** WARNING! All changes made in this file will be lost!
 ****************************************************************************/

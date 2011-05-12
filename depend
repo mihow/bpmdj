@@ -183,8 +183,10 @@ config.o: config.cpp /usr/include/qt3/qlineedit.h \
   /usr/include/qt3/qfont.h /usr/include/qt3/qfontmetrics.h \
   /usr/include/qt3/qfontinfo.h /usr/include/qt3/qsizepolicy.h \
   /usr/include/qt3/qfile.h /usr/include/qt3/qspinbox.h \
-  /usr/include/qt3/qrangecontrol.h preferences.logic.h preferences.h \
-  /usr/include/qt3/qvariant.h /usr/include/qt3/qdialog.h config.h
+  /usr/include/qt3/qrangecontrol.h /usr/include/qt3/qcheckbox.h \
+  /usr/include/qt3/qbutton.h /usr/include/qt3/qkeysequence.h \
+  preferences.logic.h preferences.h /usr/include/qt3/qvariant.h \
+  /usr/include/qt3/qdialog.h config.h
 database.o: database.cpp /usr/include/qt3/qlabel.h \
   /usr/include/qt3/qframe.h /usr/include/qt3/qwidget.h \
   /usr/include/qt3/qwindowdefs.h /usr/include/qt3/qobjectdefs.h \
@@ -685,9 +687,10 @@ preferences.o: preferences.cpp preferences.h /usr/include/qt3/qvariant.h \
   /usr/include/qt3/qpixmap.h /usr/include/qt3/qtabwidget.h \
   /usr/include/qt3/qlabel.h /usr/include/qt3/qframe.h \
   /usr/include/qt3/qlineedit.h /usr/include/qt3/qcombobox.h \
-  /usr/include/qt3/qspinbox.h /usr/include/qt3/qrangecontrol.h \
-  /usr/include/qt3/qlayout.h /usr/include/qt3/qtooltip.h \
-  /usr/include/qt3/qwhatsthis.h /usr/include/qt3/qcursor.h
+  /usr/include/qt3/qcheckbox.h /usr/include/qt3/qspinbox.h \
+  /usr/include/qt3/qrangecontrol.h /usr/include/qt3/qlayout.h \
+  /usr/include/qt3/qtooltip.h /usr/include/qt3/qwhatsthis.h \
+  /usr/include/qt3/qcursor.h
 preferences.logic.o: preferences.logic.cpp /usr/include/qt3/qlineedit.h \
   /usr/include/qt3/qframe.h /usr/include/qt3/qwidget.h \
   /usr/include/qt3/qwindowdefs.h /usr/include/qt3/qobjectdefs.h \
