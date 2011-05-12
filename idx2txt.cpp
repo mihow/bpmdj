@@ -20,6 +20,7 @@
 #define __loaded__idx2txt_cpp__
 using namespace std;
 #line 1 "idx2txt.c++"
+#include <cstdio>
 #include "data.h"
 #include "data-io.h"
 

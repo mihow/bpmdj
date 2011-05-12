@@ -43,6 +43,7 @@ using namespace std;
 #include "scripts.h"
 #include "dsp-oss.h"
 #include "scripts.h"
+#include "info.h"
 
 /*-------------------------------------------
  *         Clock operations
@@ -68,7 +69,7 @@ signed8 clock_ticks()
 dsp_oss::dsp_oss(const PlayerConfig & config) : dsp_driver(config)
 {
   opt_fragments = config.get_oss_init_fragments();
-  arg_dsp = strdup(config.get_oss_dsp());
+  arg_dsp = strdup(config.get_oss_dsp().toAscii().data());
   arg_fragments = config.get_oss_fragments();
   opt_nolatencyaccounting = config.get_oss_nolatencyaccounting();
   dsp_writecount=0;
@@ -224,7 +225,7 @@ void dsp_oss::close(bool fl)
   latencycheck=clock_ticks();
   if (fl) flush();
   if (verbose)
-    Info("Fluffy-measured playing latency when closing = %d ms",
+    Info("Fluffily-measured playing latency when closing = %d ms",
 	 samples2ms(clock_ticks()-latencycheck));
   ::close(dsp);
 }

@@ -9,7 +9,7 @@ all: .link-targets .ui-forms .rc-files .source-creator .depend .compile
 # software (the compiler ?) is educated enough to point to the proper
 # headers and libraries
 ifeq (${shell if test ! -f defines; then echo "N"; else echo "Y"; fi},N)
-$(error "Please read 'compile.txt' (make sure to include the .txt)")
+$(error "Please read 'compile.txt' (don't forget the extention .txt)")
 endif
 CFLAGS=-DLINUX -DSHORT_ONE
 JOBS=1
@@ -51,6 +51,13 @@ LINK =  $(CPP) $(LDFLAGS) $(QT_INCLUDE_PATH) $(QT_LIBRARY_PATH) $(QT_LIBS)
 packages: packager all
 	@echo "Packaging:"
 	@make -s --no-print-directory -f packager
+
+beta: packager all
+	@echo "Creating and uploading beta release:"
+	@make -s --no-print-directory -f packager source.tgz-dist
+	@rsync -xavz bpmdj-$(VERSION).source.tgz werner@sigtrans.org:/home/ftp/bpmdj/
+	@md5sum bpmdj-$(VERSION).source.tgz
+	@mv bpmdj-$(VERSION).source.tgz ..
 
 documentation:
 	@echo "Documenting:"

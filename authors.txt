@@ -11,7 +11,7 @@ Bernard Fortz <bernard.fortz@gmail.com>
 Toni Graffy <oc2pus@arcor.de>
   Suse packaging
 Martin Stolpe <martin.stople@uni-ulm.de>
-  Compiling on more modern systems
+  Cmake files
 
 Passive
 -------
