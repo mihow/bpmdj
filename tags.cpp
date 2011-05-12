@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__tags_cpp__
 #define __loaded__tags_cpp__
@@ -83,7 +85,7 @@ tags_type Tags::parse_tags(QString tagstring)
   // first we should somehow count the number of tags.
   // Afterward we can insert them one by one
   int count = 0;
-  char * original = strdup(tagstring);
+  char * original = strdup(tagstring.toAscii());
   char * runner=original;
   if (runner) 
     while(*runner)

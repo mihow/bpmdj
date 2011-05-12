@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__database_h__
 #define __loaded__database_h__
@@ -21,18 +23,19 @@ using namespace std;
 #include <vector>
 #include <map>
 #include <vector>
+#include "qsong.h"
 
 class Song;
 class SongMetriek;
 class SongSelectorLogic;
-class QVectorView;
+class QSong;
 
 class DataBase
 {
 private:
   /**
    * The cache is the collection of songs that fall within the selected tags. 
-   * This is a very important improvement in the speed of bpmdj since 
+   * This is a very important improvement in the speed of BpmDj since 
    * we often reduce the large song collection to a certain style.
    */
   vector<Song*> cache;
@@ -55,14 +58,14 @@ protected:
   virtual void clear();
 private:
   int get_unheaped_selection(SongSelectorLogic* selector, Song* main, 
-			     QVectorView* target);
+			     QSong* target);
   /**
-   * Will update the target QVectorView by calling setVector (which in turn
+   * Will update the target QSong by calling setVector (which in turn
    * will sort the list and clear the selection). The show argument will be 
-   * owned by the vectorview afterwards. Before changing the songilst, the 
+   * owned by the vectorview afterward. Before changing the songlist, the 
    * current item will be determined and reset after we changed the songlist.
    */
-  int      set_answer(Song ** show, int length, QVectorView* target);
+  signed4 set_answer(Song ** show, int length, QSong* target);
   bool     rebuild_cache;
 public:
   void reset();
@@ -95,11 +98,11 @@ public:
     rebuild_cache = true;
   };
   int getSelection(SongSelectorLogic* selector, 
-		   QVectorView* target, 
-		   int nr  // if nr == 0 we will return an ungheaped selection
+		   QSong* target, 
+		   int nr  // if nr == 0 we will return an unheaped selection
 		   );
-  void addNewSongs(SongSelectorLogic* selector,  // for the searchline
-		   QVectorView* target,          // to schedule a repaint
+  void addNewSongs(SongSelectorLogic* selector,  // for the search line
+		   QSong* target,          // to schedule a repaint
 		   vector<Song*> *collection);
   Song * * closestSongs(SongSelectorLogic * selector,
 			Song * target1, float4 weight1, 

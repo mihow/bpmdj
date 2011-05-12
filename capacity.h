@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__capacity_h__
 #define __loaded__capacity_h__
@@ -24,7 +26,7 @@ using namespace std;
  * Capacities specify which programs are available and which 
  * programs can be used to decode a file at a specific host ? 
  * capacities are used in a negated setting. We specify which ones
- * are disabled. This allows much esaier backward compatibility
+ * are disabled. This allows much easier backward compatibility
  * in future versions
  */
 #define CAPACITY_MPG123059R   0x01  // 1
@@ -51,7 +53,7 @@ int capacity_to_prognr(int full_capacity);
 int get_decoder_program(Capacity host_disabled, Capacity ext_disabled, 
 			Capacity song_disabled);
 
-// is something an extenstion with capacity ?
+// is something an extension with capacity ?
 QString extensionList();
 bool goodExtension(QString extension);
 

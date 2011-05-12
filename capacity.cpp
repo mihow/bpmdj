@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__capacity_cpp__
 #define __loaded__capacity_cpp__
@@ -27,7 +29,7 @@ using namespace std;
 
 Capacity get_ext_disabled_capacities(QString ext)
 {
-  ext = ext.lower();
+  ext = ext.toLower();
   if (ext.endsWith(".mp3"))  
     return CAPACITY_OGG123                                        ;
   if (ext.endsWith(".ogg"))  
@@ -48,7 +50,7 @@ QString extensionList()
 
 bool goodExtension(QString ext)
 {
-  ext = ext.lower();
+  ext = ext.toLower();
   return (ext.endsWith(".mp3") || 
 	  ext.endsWith(".ogg") || 
 	  ext.endsWith(".m4a") || 

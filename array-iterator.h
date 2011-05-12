@@ -1,6 +1,6 @@
 /****
  Borg4 Data Library
- Copyright (C) 2005-2009 Werner Van Belle
+ Copyright (C) 2005-2010 Werner Van Belle
 
  http://werner.yellowcouch.org/Borg4/group__data.html
 
@@ -26,9 +26,11 @@ using namespace std;
  * @ingroup data
  * @brief backend multidimensional iterator
  * 
- * The array iterator is a very fast but flexible iterator it is used by combining different iteration walks into one
- * iterator (extend). This is then assigned in the ArrayIterator. After trying to use this a couple of times it seems
- * that it is somewhat too complex. We might want to rethink this one.
+ * The array iterator is a very fast but flexible iterator it is used by
+ * combining different iteration walks into one iterator (extend). This is
+ * then assigned in the ArrayIterator. After trying to use this a couple of 
+ * times it seems that it is somewhat too complex. We might want to rethink 
+ * this one.
  */
 template <class T, bool PT> class ArrayIteratorBacking
 {
@@ -242,8 +244,10 @@ bool ArrayIteratorBacking<T,PT>::needmore()
 };
 
 template <class T, bool PT>
-ArrayIteratorBacking<T,PT>::ArrayIteratorBacking(T* _start, int _delta, int _s, int* target) : 
-  idx(0), delta(_delta), next(_s*_delta), first(_start), _more(NULL), pos(target)
+ArrayIteratorBacking<T,PT>::ArrayIteratorBacking(T* _start, int _delta, 
+						 int _s, int* target) : 
+  idx(0), delta(_delta), next(_s*_delta), first(_start), 
+  _more(NULL), pos(target)
 {
   if (PT)
     {
@@ -379,7 +383,8 @@ void ArrayIterator<D,T,PT,SM,ORDERED>::setup(const Array<D,T>& m,
       int * posfield = NULL;
       if (PT) posfield = &(position[selected[addr[dim]]]);
       ArrayIteratorBacking<T,PT> * new_iterator;
-      new_iterator = new ArrayIteratorBacking<T,PT>(start, deltas[dim], sizes[dim], posfield);
+      new_iterator = new ArrayIteratorBacking<T,PT>(start, deltas[dim], 
+						    sizes[dim], posfield);
       new_iterator->_more = next_iterator;
       next_iterator = new_iterator;
     }
@@ -412,10 +417,12 @@ void ArrayIteratorBacking<T,PT>::print() const
   if (PT)
     {
       assert(pos);
-      printf("Idx = %d; Delta = %d; Size = %d; Next = %d Pos = %d\n",idx,delta,next/delta,next,*pos);
+      printf("Idx = %d; Delta = %d; Size = %d; Next = %d Pos = %d\n",
+	     idx,delta,next/delta,next,*pos);
     }
   else
-    printf("Idx = %d; Delta = %d; Size = %d; Next = %d\n",idx,delta,next/delta,next);
+    printf("Idx = %d; Delta = %d; Size = %d; Next = %d\n",
+	   idx,delta,next/delta,next);
   if (_more) _more->print();
   else printf("-------------------\n");
 }

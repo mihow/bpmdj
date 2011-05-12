@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__scripts_cpp__
 #define __loaded__scripts_cpp__
@@ -33,6 +35,7 @@ using namespace std;
 #include "memory.h"
 #include "bpmplay.h"
 #include "overseer.h"
+#include "info.h"
 
 char *getRawFilename(const char * rawpath, const char * n)
 {
@@ -43,10 +46,12 @@ char *getRawFilename(const char * rawpath, const char * n)
 
 FILE * openRawFile(Index* index, const char * rawpath)
 {
-  FILE * raw;
-  char * name = getRawFilename(rawpath, index->get_filename());
+  //  Debug("Opening %s\n",rawpath);
+  char * name = getRawFilename(rawpath,
+			       index->get_filename().toAscii().data());
   assert(name);
-  raw = fopen(name,"rb");
+  //  Debug("which became %s\n",name);
+  FILE * raw = fopen(name,"rb");
   bpmdj_deallocate(name);
   return raw;
 }
@@ -54,7 +59,7 @@ FILE * openRawFile(Index* index, const char * rawpath)
 FILE * openRawFileForWriting(Index* index, const char *d)
 {
   FILE * raw;
-  char * name = getRawFilename(d,index->get_filename());
+  char * name = getRawFilename(d,index->get_filename().toAscii().data());
   assert(name);
   raw = fopen(name,"r+b");
   bpmdj_deallocate(name);
@@ -63,7 +68,7 @@ FILE * openRawFileForWriting(Index* index, const char *d)
 
 void removeRaw(Index* index, char* d)
 {
-  char * name = getRawFilename(d,index->get_filename());
+  char * name = getRawFilename(d,index->get_filename().toAscii().data());
   remove(name);
   bpmdj_deallocate(name);
 }
@@ -75,7 +80,6 @@ void dumpAudio(const char* fname, unsigned4 *buffer, long length)
   fclose(tmp);
 }
 
-
 FILE* openScriptFile(const char* name)
 {
   FILE * script = fopen(name,"wb");
@@ -83,82 +87,6 @@ FILE* openScriptFile(const char* name)
   fprintf(script,SHELL_HEADER);
   return script;
 }
-
-void Log(const char* prefix, const char* text)
-{
-  char * copy = strdup(text);
-  char * current = copy;
-  while(current)
-    {
-      
-      char * nextstart = strchr(current,'\n');
-      if (nextstart)
-	*nextstart=0;
-      printf("%s%s\n",prefix,current);
-      if (nextstart)
-	current=nextstart+1;
-      else 
-	current=NULL;
-    }
-  // in order to guarantee descent output buffering and flushing
-  // we overwrite the stderr (2) with the standard output (1)
-  fflush(stdout);
-  fflush(stderr);
-  free(copy);
-}
-
-void Info(const char* script, ...)
-{
-  char toexecute[1024];
-  va_list ap;
-  va_start(ap,script);
-  vsnprintf(toexecute,1024,script,ap);
-  va_end(ap);
-  Log("Information: ", toexecute);
-};
-
-void Warning(const char* script, ...)
-{
-  char toexecute[1024];
-  va_list ap;
-  va_start(ap,script);
-  vsnprintf(toexecute,1024,script,ap);
-  va_end(ap);
-  Log("Warning: ", toexecute);
-};
-
-void Debug(const char* script, ...)
-{
-  char toexecute[1024];
-  va_list ap;
-  va_start(ap,script);
-  vsnprintf(toexecute,1024,script,ap);
-  va_end(ap);
-  Log("Debug: ", toexecute);
-};
-
-void Fatal(const char* script, ...)
-{
-  char toexecute[1024];
-  va_list ap;
-  va_start(ap,script);
-  vsnprintf(toexecute,1024,script,ap);
-  va_end(ap);
-  Log("Fatal: ", toexecute);
-  _exit(100);
-};
-
-void Error(bool ui, const char* script, ...)
-{
-  char toexecute[1024];
-  va_list ap;
-  va_start(ap,script);
-  vsnprintf(toexecute,1024,script,ap);
-  va_end(ap);
-  Log("Error: ", toexecute);
-  if (ui)
-    QMessageBox::critical(NULL,"Error",toexecute,QMessageBox::Ok, 0, 0);
-};
 
 void Remote(const char* script, ...)
 {
@@ -185,7 +113,7 @@ char * escape(const char * in)
   while((c=*(in++)) && i < 2048)
     {
       if (c=='\n' || c=='&' || c=='\\' || c==' ' || c=='(' || c==')'
-       || c=='\'' || c=='`')
+	  || c=='\'' || c=='`' || c==';')
 	{
 	  escaped[i++]='\\';
 	}
@@ -196,46 +124,53 @@ char * escape(const char * in)
   return strdup(escaped);
 }
 
-void start_mkdir(const char* dir)
+QString escape(const QString& in)
 {
-  char * d = escape(dir);
+  char* res=escape(in.toAscii().data());
+  QString answer(res);
+  bpmdj_deallocate(res);
+  return answer;
+}
+
+void start_mkdir(const QString& dir)
+{
+  QString d = escape(dir);
   char a[2048],b[2048];
-  sprintf(a,"Making directory %s",dir);
-  sprintf(b,"mkdir -p -- %s",d);
-  bpmdj_deallocate(d);
+  sprintf(a,"Making directory %s",dir.toAscii().data());
+  sprintf(b,"mkdir -p -- %s",d.toAscii().data());
   exec(b,a);
 }
 
-void start_cp(const char* from, const char* to)
+void start_cp(const QString& from, const QString& to)
 {
-  char * a = escape(from);
-  char * b = escape(to);
+  QString a = escape(from);
+  QString b = escape(to);
   char c[2048],d[2048];
-  sprintf(c,"Copying %s to %s",from,to);
-  sprintf(d,"cp -- %s %s",a,b);
-  bpmdj_deallocate(a);
-  bpmdj_deallocate(b);
+  sprintf(c,"Copying %s to %s",from.toAscii().data(),to.toAscii().data());
+  sprintf(d,"cp -- %s %s",a.toAscii().data(),b.toAscii().data());
   exec(d,c);
 }
 
-int start_mv(const char* from, const char* to)
+int start_mv(const QString& from, const QString& to)
 {
-  char * a = escape(from);
-  char * b = escape(to);
+  QString a = escape(from);
+  QString b = escape(to);
   char c[2048];
   char d[2048];
-  sprintf(c,"Moving %s to %s",from,to);
-  sprintf(d,"mv -i -- %s %s",a,b);
-  bpmdj_deallocate(a);
-  bpmdj_deallocate(b);
+  sprintf(c,"Moving %s to %s",from.toAscii().data(),to.toAscii().data());
+  sprintf(d,"mv -i -- %s %s",a.toAscii().data(),b.toAscii().data());
   return execute(c,d);
 }
 
-void start_rm(const char* what)
+void start_rm(const QString& what)
 {
-  char * a = escape(what);
-  vexecute("rm -- %s",a);
-  bpmdj_deallocate(a);
+  QString a = escape(what);
+  vexecute("rm -- %s",a.toAscii().data());
+}
+
+void remove(QString a)
+{
+  ::remove(a.toAscii().data());
 }
 
 void removeAllRaw(const char* d)
@@ -266,6 +201,11 @@ int bpmdjraw(bool synchronous, const char* fname, const char* where)
   return pid;
 }
 
+int bpmdjraw(bool synchronous, const char* fname, QString where)
+{
+  return ::bpmdjraw(synchronous,fname,where.toAscii().data());
+}
+
 /**
  * Two wrappers to make command line arguments easier
  */
@@ -282,9 +222,10 @@ ExitStatus vexec(const char* description, const char* script, ...)
 /**
  * Two wrappers which will simply return true or false
  */
-bool execute(const char* description, const char* script)
+bool execute(QString description, QString script)
 {
-  ExitStatus status=exec(script,description);
+  ExitStatus status=exec(script.toAscii().data(),
+			 description.toAscii().data());
   if (!status.exited())
     {
       char* err=status.error();

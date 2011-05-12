@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__about_h__
 #define __loaded__about_h__
@@ -22,6 +24,7 @@ using namespace std;
 #include "ui-about.h"
 
 void doAbout(int pg);
+extern const char* authors;
 
 class About: 
   public QDialog,
@@ -29,13 +32,12 @@ class About:
 {
   Q_OBJECT
 public:
-  About(int pg): QDialog(0,0,1)
+  About(int pg): QDialog()
   {
     setupUi(this);
-    char tmp[500];
-    sprintf(tmp,"BpmDj v%s",VERSION);
-    versionLabel->setText(tmp);
-    pages->setCurrentPage(pg);
+    versionLabel->setText(QString("BpmDj v"VERSION));
+    authorsText->setPlainText(::authors);
+    pages->setCurrentIndex(pg);
     exec();
   }
 };

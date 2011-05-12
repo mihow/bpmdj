@@ -1,6 +1,6 @@
 /****
  Borg4 Data Library
- Copyright (C) 2005-2009 Werner Van Belle
+ Copyright (C) 2005-2010 Werner Van Belle
 
  http://werner.yellowcouch.org/Borg4/group__data.html
 
@@ -26,7 +26,7 @@ using namespace std;
 #include <Qt/qstring.h>
 
 // can be used to limit the maximum array size to 4 dimensions
-// #define SHORT_ONE  
+// #define SHORT_ONE 
 
 //===============================================================
 //                         Data Types
@@ -79,40 +79,47 @@ typedef FloatClass<float8,'d'>   Float8;
 // A list of useful array types
 #ifdef SHORT_ONE
 #define ARRAY_TYPES \
-  ARRAY_TYPE(1,signed1)   ARRAY_TYPE(2,signed1)   ARRAY_TYPE(3,signed1)   ARRAY_TYPE(4,signed1) \
-ARRAY_TYPE(1,signed2)   ARRAY_TYPE(2,signed2)   ARRAY_TYPE(3,signed2)   ARRAY_TYPE(4,signed2) \
-ARRAY_TYPE(1,signed4)   ARRAY_TYPE(2,signed4)   ARRAY_TYPE(3,signed4)   ARRAY_TYPE(4,signed4) \
-ARRAY_TYPE(1,signed8)   ARRAY_TYPE(2,signed8)   ARRAY_TYPE(3,signed8)   ARRAY_TYPE(4,signed8) \
+ ARRAY_TYPE(1,signed1)  ARRAY_TYPE(2,signed1)  ARRAY_TYPE(3,signed1)  ARRAY_TYPE(4,signed1) \
+ARRAY_TYPE(1,signed2)  ARRAY_TYPE(2,signed2)  ARRAY_TYPE(3,signed2)  ARRAY_TYPE(4,signed2) \
+ARRAY_TYPE(1,signed4)  ARRAY_TYPE(2,signed4)  ARRAY_TYPE(3,signed4)  ARRAY_TYPE(4,signed4) \
+ARRAY_TYPE(1,signed8)  ARRAY_TYPE(2,signed8)  ARRAY_TYPE(3,signed8)  ARRAY_TYPE(4,signed8) \
 ARRAY_TYPE(1,unsigned1) ARRAY_TYPE(2,unsigned1) ARRAY_TYPE(3,unsigned1) ARRAY_TYPE(4,unsigned1) \
 ARRAY_TYPE(1,unsigned2) ARRAY_TYPE(2,unsigned2) ARRAY_TYPE(3,unsigned2) ARRAY_TYPE(4,unsigned2) \
 ARRAY_TYPE(1,unsigned4) ARRAY_TYPE(2,unsigned4) ARRAY_TYPE(3,unsigned4) ARRAY_TYPE(4,unsigned4) \
 ARRAY_TYPE(1,unsigned8) ARRAY_TYPE(2,unsigned8) ARRAY_TYPE(3,unsigned8) ARRAY_TYPE(4,unsigned8) \
-ARRAY_TYPE(1,float4)    ARRAY_TYPE(2,float4)    ARRAY_TYPE(3,float4)    ARRAY_TYPE(4,float4) \
-ARRAY_TYPE(1,float8)    ARRAY_TYPE(2,float8)    ARRAY_TYPE(3,float8)    ARRAY_TYPE(4,float8) \
-ARRAY_TYPE(1,Data)      ARRAY_TYPE(2,Data)      ARRAY_TYPE(3,Data)      ARRAY_TYPE(4,Data) 
+ARRAY_TYPE(1,float4)  ARRAY_TYPE(2,float4)  ARRAY_TYPE(3,float4)  ARRAY_TYPE(4,float4) \
+ARRAY_TYPE(1,float8)  ARRAY_TYPE(2,float8)  ARRAY_TYPE(3,float8)  ARRAY_TYPE(4,float8) \
+ARRAY_TYPE(1,Data)   ARRAY_TYPE(2,Data)   ARRAY_TYPE(3,Data)   ARRAY_TYPE(4,Data) 
 #else
 #define ARRAY_TYPES \
-ARRAY_TYPE(1,signed1)   ARRAY_TYPE(2,signed1)   ARRAY_TYPE(3,signed1)   ARRAY_TYPE(4,signed1) \
-ARRAY_TYPE(5,signed1)   ARRAY_TYPE(6,signed1)   ARRAY_TYPE(7,signed1)   ARRAY_TYPE(8,signed1) \
-ARRAY_TYPE(1,signed2)   ARRAY_TYPE(2,signed2)   ARRAY_TYPE(3,signed2)   ARRAY_TYPE(4,signed2) \
-ARRAY_TYPE(5,signed2)   ARRAY_TYPE(6,signed2)   ARRAY_TYPE(7,signed2)   ARRAY_TYPE(8,signed2) \
-ARRAY_TYPE(1,signed4)   ARRAY_TYPE(2,signed4)   ARRAY_TYPE(3,signed4)   ARRAY_TYPE(4,signed4) \
-ARRAY_TYPE(5,signed4)   ARRAY_TYPE(6,signed4)   ARRAY_TYPE(7,signed4)   ARRAY_TYPE(8,signed4) \
-ARRAY_TYPE(1,signed8)   ARRAY_TYPE(2,signed8)   ARRAY_TYPE(3,signed8)   ARRAY_TYPE(4,signed8) \
-ARRAY_TYPE(5,signed8)   ARRAY_TYPE(6,signed8)   ARRAY_TYPE(7,signed8)   ARRAY_TYPE(8,signed8) \
-ARRAY_TYPE(1,unsigned1) ARRAY_TYPE(2,unsigned1) ARRAY_TYPE(3,unsigned1) ARRAY_TYPE(4,unsigned1) \
-ARRAY_TYPE(5,unsigned1) ARRAY_TYPE(6,unsigned1) ARRAY_TYPE(7,unsigned1) ARRAY_TYPE(8,unsigned1) \
-ARRAY_TYPE(1,unsigned2) ARRAY_TYPE(2,unsigned2) ARRAY_TYPE(3,unsigned2) ARRAY_TYPE(4,unsigned2) \
-ARRAY_TYPE(5,unsigned2) ARRAY_TYPE(6,unsigned2) ARRAY_TYPE(7,unsigned2) ARRAY_TYPE(8,unsigned2) \
-ARRAY_TYPE(1,unsigned4) ARRAY_TYPE(2,unsigned4) ARRAY_TYPE(3,unsigned4) ARRAY_TYPE(4,unsigned4) \
-ARRAY_TYPE(5,unsigned4) ARRAY_TYPE(6,unsigned4) ARRAY_TYPE(7,unsigned4) ARRAY_TYPE(8,unsigned4) \
-ARRAY_TYPE(1,unsigned8) ARRAY_TYPE(2,unsigned8) ARRAY_TYPE(3,unsigned8) ARRAY_TYPE(4,unsigned8) \
-ARRAY_TYPE(5,unsigned8) ARRAY_TYPE(6,unsigned8) ARRAY_TYPE(7,unsigned8) ARRAY_TYPE(8,unsigned8) \
-ARRAY_TYPE(1,float4)    ARRAY_TYPE(2,float4)    ARRAY_TYPE(3,float4)    ARRAY_TYPE(4,float4) \
-ARRAY_TYPE(5,float4)    ARRAY_TYPE(6,float4)    ARRAY_TYPE(7,float4)    ARRAY_TYPE(8,float4) \
-ARRAY_TYPE(1,float8)    ARRAY_TYPE(2,float8)    ARRAY_TYPE(3,float8)    ARRAY_TYPE(4,float8) \
-ARRAY_TYPE(5,float8)    ARRAY_TYPE(6,float8)    ARRAY_TYPE(7,float8)    ARRAY_TYPE(8,float8) \
-ARRAY_TYPE(1,Data)      ARRAY_TYPE(2,Data)      ARRAY_TYPE(3,Data)      ARRAY_TYPE(4,Data) \
-ARRAY_TYPE(5,Data)      ARRAY_TYPE(6,Data)      ARRAY_TYPE(7,Data)      ARRAY_TYPE(8,Data) 
+ARRAY_TYPE(1,signed1) ARRAY_TYPE(2,signed1) ARRAY_TYPE(3,signed1) \
+ARRAY_TYPE(4,signed1) ARRAY_TYPE(5,signed1) ARRAY_TYPE(6,signed1) \
+ARRAY_TYPE(7,signed1) ARRAY_TYPE(8,signed1) ARRAY_TYPE(1,signed2) \
+ARRAY_TYPE(2,signed2) ARRAY_TYPE(3,signed2) ARRAY_TYPE(4,signed2) \
+ARRAY_TYPE(5,signed2) ARRAY_TYPE(6,signed2) ARRAY_TYPE(7,signed2) \
+ARRAY_TYPE(8,signed2) ARRAY_TYPE(1,signed4) ARRAY_TYPE(2,signed4) \
+ARRAY_TYPE(3,signed4) ARRAY_TYPE(4,signed4) ARRAY_TYPE(5,signed4) \
+ARRAY_TYPE(6,signed4) ARRAY_TYPE(7,signed4) ARRAY_TYPE(8,signed4) \
+ARRAY_TYPE(1,signed8) ARRAY_TYPE(2,signed8) ARRAY_TYPE(3,signed8) \
+ARRAY_TYPE(4,signed8) ARRAY_TYPE(5,signed8) ARRAY_TYPE(6,signed8) \
+ARRAY_TYPE(7,signed8) ARRAY_TYPE(8,signed8) ARRAY_TYPE(1,unsigned1) \
+ARRAY_TYPE(2,unsigned1) ARRAY_TYPE(3,unsigned1) ARRAY_TYPE(4,unsigned1) \
+ARRAY_TYPE(5,unsigned1) ARRAY_TYPE(6,unsigned1) ARRAY_TYPE(7,unsigned1) \
+ARRAY_TYPE(8,unsigned1) ARRAY_TYPE(1,unsigned2) ARRAY_TYPE(2,unsigned2) \
+ARRAY_TYPE(3,unsigned2) ARRAY_TYPE(4,unsigned2) ARRAY_TYPE(5,unsigned2) \
+ARRAY_TYPE(6,unsigned2) ARRAY_TYPE(7,unsigned2) ARRAY_TYPE(8,unsigned2) \
+ARRAY_TYPE(1,unsigned4) ARRAY_TYPE(2,unsigned4) ARRAY_TYPE(3,unsigned4) \
+ARRAY_TYPE(4,unsigned4) ARRAY_TYPE(5,unsigned4) ARRAY_TYPE(6,unsigned4) \
+ARRAY_TYPE(7,unsigned4) ARRAY_TYPE(8,unsigned4) ARRAY_TYPE(1,unsigned8) \
+ARRAY_TYPE(2,unsigned8) ARRAY_TYPE(3,unsigned8) ARRAY_TYPE(4,unsigned8) \
+ARRAY_TYPE(5,unsigned8) ARRAY_TYPE(6,unsigned8) ARRAY_TYPE(7,unsigned8) \
+ARRAY_TYPE(8,unsigned8) ARRAY_TYPE(1,float4) ARRAY_TYPE(2,float4) \
+ARRAY_TYPE(3,float4) ARRAY_TYPE(4,float4) ARRAY_TYPE(5,float4) \
+ARRAY_TYPE(6,float4) ARRAY_TYPE(7,float4) ARRAY_TYPE(8,float4) \
+ARRAY_TYPE(1,float8) ARRAY_TYPE(2,float8) ARRAY_TYPE(3,float8) \
+ARRAY_TYPE(4,float8) ARRAY_TYPE(5,float8) ARRAY_TYPE(6,float8) \
+ARRAY_TYPE(7,float8) ARRAY_TYPE(8,float8) ARRAY_TYPE(1,Data) \
+ARRAY_TYPE(2,Data) ARRAY_TYPE(3,Data) ARRAY_TYPE(4,Data) ARRAY_TYPE(5,Data) \
+ARRAY_TYPE(6,Data) ARRAY_TYPE(7,Data) ARRAY_TYPE(8,Data) 
 #endif
 #endif // __loaded__types_h__

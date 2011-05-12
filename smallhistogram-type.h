@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__smallhistogram_type_h__
 #define __loaded__smallhistogram_type_h__
@@ -125,7 +127,7 @@ void smallhistogram_type<smallhistogram_size>::set_data(Data& data)
   Token result = data;
   scale = (Float8)result[key_scale];
   Array<1,unsigned1> a = result[key_content];
-  // can we make use of an ordere array ?
+  // can we make use of an ordered array ?
   typename Array<1,unsigned1>::ordered i(a);
   if (i.linear() && i.size()==smallhistogram_size)
     memcpy(bin,i.current(),smallhistogram_size);

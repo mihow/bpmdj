@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__beatgraph_label_h__
 #define __loaded__beatgraph_label_h__
@@ -24,15 +26,15 @@ using namespace std;
 #include <Qt/qpainter.h>
 #include <qmutex.h>
 #include "common.h"
-#include "bloody-moc.h"
+#include "qt-helpers.h"
 
 /**
  * The port from Qt3 to Qt4 is a bit tricky here. First: the new painter system
- * does not allow us to draw outside a paintevent message, so we need to fake 
+ * does not allow us to draw outside a paint event message, so we need to fake 
  * these. Secondly: the double buffering makes the xor operation effectively
  * useless. Third: removing the old line with a small redraw will redraw the
  * entire bitmap regardless. These 3 reasons forced me to redraw the content of
- * the window myself by updating the resized pixmap. The result is that 
+ * the window myself by updating the resized QPixMap. The result is that 
  * drawCursor will always update the image in a way that only leaves 1 line on 
  * the image. Once the image is updated we either request two paint operations 
  * (if the lines are far apart), or 1 merged operation if they are close to each
@@ -89,7 +91,7 @@ protected:
    */
   void drawCueText();
   /**
-   * Will move the ruler and report back (through the 4 output parametes) which 
+   * Will move the ruler and report back (through the 4 output parameters) which 
    * columns must be redrawn.
    */
   void moveRuler(int &x1, int &x2, int &x3, int &x4);
@@ -100,13 +102,13 @@ public:
    */
   QTimer timer;
   /**
-   * Remembers how many audiosamples are in one measure. 
+   * Remembers how many audio samples are in one measure. 
    * This makes it possible to calculate the current measure
    * based on the current songposition ::x
    */
   unsigned8 samples_per_column;
   /**
-   * Creates a beatgraphlabel to be used in BpmPlay.
+   * Creates a beatgraph label to be used in BpmPlay.
    */
   BeatGraphLabel(QWidget * parent, const char * name = 0);
   /**
@@ -128,7 +130,7 @@ public slots:
    */
   virtual void drawCursor();
   /**
-   * once the pixamp is set it remains the property of the label
+   * once the QPixMap is set it remains the property of the label
    */
   virtual void setImage(QImage I, wunsigned8 samplespercol);
 };

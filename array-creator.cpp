@@ -1,6 +1,6 @@
 /****
  Borg4 Data Library
- Copyright (C) 2005-2009 Werner Van Belle
+ Copyright (C) 2005-2010 Werner Van Belle
 
  http://werner.yellowcouch.org/Borg4/group__data.html
 
@@ -73,10 +73,12 @@ Data Creator::createAndFillTarget(Size<8> s)
    for(;position.more(); ++position)
      {
 	Content cur = getContentData();
-	// here we navigate down to the right dimension. 
-	// Because the first element is ourselves we need to add one to the coordinate
-	// for all the sub-elements we can be confident that the content is a proper 
-	// matrix already
+	/**
+	 * Gere we navigate down to the right dimension. 
+	 * Because the first element is ourselves we need to add one to the
+	 * coordinate for all the sub-elements we can be confident that the
+	 * content is a proper matrix already
+	 */
 	int idx;
 	for(int d = 0 ; d < D-1 ; d++)
 	  {
@@ -127,7 +129,8 @@ Data Creator::convertTo(Unsigned4 dimension, Symbol type)
   updateSize(size,dimension-1);
   // instantiate the right type
 #define ARRAY_TYPE(D,T) \
-if (D==dimension && QString(type) == QString(#T)) return createAndFillTarget<D,T>(size);
+if (D==dimension && QString(type) == QString(#T)) \
+  return createAndFillTarget<D,T>(size);
   ARRAY_TYPES
 #undef ARRAY_TYPE
   assert(0);

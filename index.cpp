@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,14 +13,13 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__index_cpp__
 #define __loaded__index_cpp__
 using namespace std;
 #line 1 "index.c++"
-/*-------------------------------------------
- *         Headers
- *-------------------------------------------*/
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -45,6 +44,7 @@ using namespace std;
 #include "bpmdj.h"
 #include "smallhistogram-type.h"
 #include "histogram-property.h"
+#include "info.h"
 
 using namespace std;
 
@@ -204,12 +204,12 @@ void AlbumField::set_data(Data &data)
   nr=(Signed4)cast[key_nr];
 }
 
-void Index::write_idx()
+bool Index::write_idx()
 {
   if (meta_filename.isEmpty())
     {
       printf("Error: no name given to write index file to\n");
-      return;
+      return false;
     }
   
   Token token;
@@ -260,7 +260,33 @@ void Index::write_idx()
       amp++;
     }
   token[key_albums]=album_data;
-  DataBinner::write(token,meta_filename);
+  
+  /**
+   * #1155. To avoid incomplete files we write to a tmp file. 
+   * If that file was writeable then we use that one.
+   */
+  QString tmpname=meta_filename+".tmp";
+  bool done=DataBinner::write(token,tmpname);
+  if (done && exists(tmpname))
+    {
+      FILE *tmp=fopen(tmpname.toAscii().data(),"rb");
+      if (fsize(tmp)>0)
+	{
+	  fclose(tmp);
+	  signed4 err=rename(tmpname.toAscii().data(),
+			     meta_filename.toAscii().data());
+	  if (err)
+	    {
+	      Error("Could not rename %s to %s",
+		    tmpname.toAscii().data(),
+		    meta_filename.toAscii().data());
+	      return false;
+	    }
+	}
+      else
+	fclose(tmp);
+    }
+  return true;
 }
 
 AlbumField::AlbumField(int r, QString n)
@@ -276,8 +302,12 @@ int strcompare(const void *a, const void * b)
 
 bool Index::fix_tagline()
 {
-  // hoe kunnen we de tagline fixed ?
-  // we creeeren een array die refereert naar de gevraagde words,
+  /** 
+   * To fix the tagline we run through the string
+   * in a good old fashioned char* kind of manner.
+   * It is faster than using QStrings but I would
+   * rather not need to convert the incoming strings
+   */
   int length;
   int nextword = 0;
   const char* lastword;
@@ -289,7 +319,7 @@ bool Index::fix_tagline()
   if (index_tags.isNull())
     return false;
   // find all tags
-  temp=strdup(index_tags);
+  temp=strdup(index_tags.toAscii());
   runner=temp;
   length = strlen(runner);
   while(1)
@@ -321,7 +351,10 @@ bool Index::fix_tagline()
     *(runner-1)=0;
   else
     *(runner)=0;
-  if (strcmp(index_tags,new_tags)==0)
+  // I think that converting the QString to a const char*
+  // and then comparing them is faster than comparing the new_tags
+  // to a QString and then comparing those.
+  if (strcmp(index_tags.toAscii(),new_tags)==0)
     {
       bpmdj_deallocate(new_tags);
       bpmdj_deallocate(temp);
@@ -329,7 +362,6 @@ bool Index::fix_tagline()
     }
   else
     {
-      // printf("Index: tags '%s' to '%s'\n",index_tags,new_tags);
       bpmdj_deallocate(temp);
       index_tags=new_tags;
       return true;
@@ -429,7 +461,7 @@ void Index::read_idx(QString indexn)
   // we assume we have a text file format
   try
     {
-      Token token = (Token)DataBinner::read_file((const char*)meta_filename);
+      Token token = (Token)DataBinner::read_file(meta_filename.toAscii());
       
       // we retrieve all fields that we are interested in
       String meta_version = (String)token[key_bpmdj_version];
@@ -477,11 +509,9 @@ void Index::read_idx(QString indexn)
     }
   catch (DataError *e)
     {
-      fprintf(stderr,"Could not read %s\nError was %s\n",
-	      indexn.ascii(),
-	      e->msg.c_str());
-      fflush(stderr);
-      exit(0);
+      Fatal("Could not read %s\nError was %s\n",
+	    (const char*)(indexn.toAscii().data()),
+	    e->msg.c_str());
     }
   if (fix_tempo_fields())
     meta_changed=true;
@@ -628,9 +658,9 @@ void Index::clear_energy()
   index_power=power_type();
 }
 
-int Index::get_time_in_seconds()
+unsigned2 Index::get_time_in_seconds()
 {
-  const char * T = get_time();
+  const char* T = get_time().toAscii().data();
   if (!T) return -1;
   int minutes = atoi(T);
   while(*T && isdigit(*T)) T++;
@@ -667,7 +697,7 @@ unsigned4 Index::get_playcount()
  */
 bool Index::set_title_author_remix(QString meta_filename)
 {
-  char * original = strdup(meta_filename);
+  char * original = strdup(meta_filename.toAscii());
   if(!original) return false;
   int l = strlen(original);
   // if the filename does not end on .idx then we skip
@@ -687,12 +717,14 @@ bool Index::set_title_author_remix(QString meta_filename)
   char * _author = NULL;
   char * _version = NULL;
   title = fulltitle;
-  // busy = 0, begonnen aan title
-  // busy = 1, begonnen aan remix
-  // busy = 2, geeindigt met remix
-  // busy = 3, begonnen met author
-  // busy = 4, geeindigt met author, begonnen met version
-  // busy >= 6, geeindigt met crash
+  /**
+   * busy = 0, started with title
+   * busy = 1, started with remix
+   * busy = 2, ended with remix
+   * busy = 3, started with author
+   * busy = 4, started with author, started with version
+   * busy >= 6, ended with a crash
+   */
   while(*tmp)
     {
       if (*tmp == '{')
@@ -774,18 +806,16 @@ QString findUniqueName(QString directory, QString filename)
 
 Index* createNewIndexFor(QString filename, QString directory)
 {
-  // find a unique index filename
   QString indexname = findUniqueName(directory,filename);
-  // printf("Creating index file %s\n",indexname.ascii());
-  // create an index and set the file in which it is stored
   Index *index = new Index();
   index->set_storedin(indexname);
-  // set the song name 
   index->set_filename(filename);
   index->set_tags("New");
   index->set_title_author_remix(indexname);
-  // we set the period to unknown, which will also 
-  // immediately write the index to disk
+  /**
+   * We set the period to unknown, which will also immediately write the 
+   * index to disk
+   */
   index->set_period(-1,true);
   return index;
 }

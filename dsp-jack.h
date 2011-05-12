@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__dsp_jack_h__
 #define __loaded__dsp_jack_h__
@@ -21,43 +23,35 @@ using namespace std;
 #ifdef COMPILE_JACK
 #include "version.h"
 #include <jack/jack.h>
+#include <jack/ringbuffer.h>
 #include <pthread.h>
 #include "dsp-drivers.h"
+
+typedef jack_default_audio_sample_t sample_t;
 
 class dsp_jack: public dsp_driver
 {
 private:
-  bool synchronous;
   bool verbose;
-  char *     arg_dev;      // the device string from the config file
+  char *     arg_dev;      // the device string from the configuration file
+  char * lout;
+  char * rout;
   jack_port_t *output_port_1;
   jack_port_t *output_port_2;
   jack_client_t *client;
-  unsigned4 buffer_size;
-  unsigned4 * buffer;
-  /**
-   * The position to which the buffer is filled
-   * The enxt sample will be written into address
-   * buffer+filled.
-   */
-  unsigned4 filled;
-  /**
-   * The current playing position in the buffer
-   * When the jack threat calls us back we start to deliver data
-   * from buffer+position on.
-   */
-  unsigned4 position; 
-  unsigned4 jack_time;
   int fill_empty_buffer(jack_nframes_t);
-  int get_buffer(jack_nframes_t);
   int generate_buffer(jack_nframes_t);
+  int bufsize;
+  size_t minfill;
+  jack_ringbuffer_t *buf1;
+  jack_ringbuffer_t *buf2;
 public:
   dsp_jack(const PlayerConfig & config);
   void    start(audio_source* s);
   void    stop();
-  void    internal_pause();
-  void    internal_unpause();
-  void    write(stereo_sample2 value);
+  void    internal_pause() {}
+  void    internal_unpause() {}
+  void    write(stereo_sample2 value) {}
   signed8 latency();
   int     open(bool ui);
   void    close(bool flush_first);
@@ -71,17 +65,14 @@ public:
    * generate_next_buffer
    */
   int audio_process (jack_nframes_t nframes);
+  int set_buffer_size (jack_nframes_t nframes);
+  void process_buffers();
   jack_client_t *get_client() { return client; }
   jack_port_t *get_output_port_1() { return output_port_1; }
   jack_port_t *get_output_port_2() { return output_port_2; }
-  unsigned4 get_jack_time() { return jack_time; }
-  void set_jack_time(unsigned4 t) { jack_time = t; }
 };
 
-/**
- * used for the async jack driver
- */
-int jack_process(jack_nframes_t nframes, void *ignored);
+
 bool is_jack_driver();
 #endif
 #endif // __loaded__dsp_jack_h__

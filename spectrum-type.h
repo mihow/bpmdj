@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__spectrum_type_h__
 #define __loaded__spectrum_type_h__
@@ -29,8 +31,8 @@ using namespace std;
 extern float8 barkbounds[barksize+1];
 
 /**
- * Versions <2.7 used a lineair scale
- * Versions >=2.7 use a logartihmic scale in dB normalized to 1
+ * Versions <2.7 used a linear scale
+ * Versions >=2.7 use a logarithmic scale in dB normalized to 1
  */
 typedef float4 spectrum_freq;
 extern float8 barkbounds[barksize+1];

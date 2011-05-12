@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__song_process_cpp__
 #define __loaded__song_process_cpp__
@@ -62,21 +64,22 @@ void SongProcess::checkSignals()
 
 void SongProcess::start(QString command, QString description, bool append)
 {
-  const char* cstr=command;
   QString logname=slot->getLogName();
   QString final_command(command);
   if (!logname.isEmpty())
     {
       QString fulllog = "/tmp/"+logname+".bpmdj.log";
       final_command+=QString(" >>")+fulllog+" 2>&1";
-      FILE * flog = fopen(fulllog,append ? "ab" : "wb");
+      FILE * flog = fopen(fulllog.toAscii().data(),append ? "ab" : "wb");
       assert(flog);
       fprintf(flog,"%s\n<u><b>Command: %s</b></u>\n\n",
-	      (const char*)logname,cstr);
+	      logname.toAscii().data(),
+	      command.toAscii().data());
       fclose(flog);
     }
   
-  Process::command(final_command,description);
+  Process::command(final_command.toAscii().data(),
+		   description.toAscii().data());
   actives.insert(this);
   spawn();
 }

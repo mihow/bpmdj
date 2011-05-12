@@ -1,6 +1,6 @@
 /****
  Borg4 Data Library
- Copyright (C) 2005-2009 Werner Van Belle
+ Copyright (C) 2005-2010 Werner Van Belle
 
  http://werner.yellowcouch.org/Borg4/group__data.html
 
@@ -69,24 +69,24 @@ int main(int argc,char* argv[])
   fclose(f);
   ofstream out(ofn);
   out << "/****\n"
-    " Data Object compiled file\n"
-    " Copyright (C) 2006-2009 Werner Van Belle\n"
-    " Do not change. Changes might be lost\n"
-    " ------------------------------------------\n"
+    "Data Object compiled file\n"
+    "Copyright (C) 2006-2010 Werner Van Belle\n"
+    "Do not change. Changes might be lost\n"
+    "------------------------------------------\n"
     "\n"
-    " This program is free software; you can redistribute it and/or modify\n"
-    " it under the terms of the GNU General Public License as published by\n"
-    " the Free Software Foundation; either version 2 of the License, or\n"
-    " (at your option) any later version.\n"
+    "This program is free software; you can redistribute it and/or modify\n"
+    "it under the terms of the GNU General Public License as published by\n"
+    "the Free Software Foundation; either version 2 of the License, or\n"
+    "(at your option) any later version.\n"
     "\n"
-    " This program is distributed in the hope that it will be useful,\n"
-    " but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
-    " MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
-    " GNU General Public License for more details.\n"
+    "This program is distributed in the hope that it will be useful,\n"
+    "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+    "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+    "GNU General Public License for more details.\n"
     "\n"
-    " You should have received a copy of the GNU General Public License\n"
-    " along with this program; if not, write to the Free Software\n"
-    " Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA\n"
+    "You should have received a copy of the GNU General Public License\n"
+    "along with this program; if not, write to the Free Software\n"
+    "Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA\n"
     "****/\n\n";
   
   char* s = strdup(ofn);

@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__historysong_cpp__
 #define __loaded__historysong_cpp__
@@ -43,118 +45,42 @@ using namespace std;
 #define HISTORY_TAGS 10
 #define HISTORY_ONDISK 11
 
-void HistorySong::paintCell(QPainter *p,const QColorGroup &cg, int col, 
-			    int wid, int align)
+HistorySong::HistorySong(Song * s, QString r, QString c, QTreeWidget* parent) :
+  TreeWidgetSong(s,parent)
 {
-  QColor * color;
-  switch(col)
-    {
-    case HISTORY_CUES:
-      if (Config::color_cues && !song->get_has_cues())
-	{
-	  QColorGroup ncg(cg);
-	  ncg.setColor(QColorGroup::Window,QColor(0,0,255));
-	  Q3ListViewItem::paintCell(p,ncg,col,wid,align);
-	  return;
-	}
-      break;
-      
-    case HISTORY_TEMPO: 
-      {
-	Song * main = ::main_song;
-	if ( (color=QSong::colorOfTempoCol(main,song)) )
-	  {
-	    QColorGroup ncg(cg);
-	    ncg.setColor(QColorGroup::Window,*color);
-	    Q3ListViewItem::paintCell(p,ncg,col,wid,align);
-	    delete(color);
-	    return;
-	  }
-	break;
-      }
-
-    case HISTORY_TITLE:
-      if (Config::color_played && song->get_played())
-	{
-	  QColorGroup ncg(cg);
-	  ncg.setColor(QColorGroup::Window,Config::get_color_played_song());
-	  Q3ListViewItem::paintCell(p,ncg,col,wid,align);
-	  return;
-	}
-      break;
-      
-    case HISTORY_AUTHOR:
-      if ( (color=QSong::colorOfAuthorCol(song)) )
-	{
-	  QColorGroup ncg(cg);
-	  ncg.setColor(QColorGroup::Window,*color);
-	  Q3ListViewItem::paintCell(p,ncg,col,wid,align);
-	  delete(color);
-	  return;
-	}
-      break;
-      
-    case HISTORY_DCOLOR:
-      if ( (color=QSong::colorOfdColorCol(song)) )
-	{
-	  QColorGroup ncg(cg);
-	  ncg.setColor(QColorGroup::Window,*color);
-	  Q3ListViewItem::paintCell(p,ncg,col,wid,align);
-	  delete(color);
-	  return;
-	}
-      break;
-      
-    case HISTORY_SPECTRUM:
-      if (Config::color_spectrum)
-	if (song->get_spectrum()!=no_spectrum)
-	  {
-	    QColorGroup ncg(cg);
-	    ncg.setColor(QColorGroup::Window,song->get_color());
-	    Q3ListViewItem::paintCell(p,ncg,col,wid,align);
-	    return;
-	  }
-      break;
-    }
-  if (Config::color_ondisk && !song->get_ondisk())
-    {
-      QColorGroup ncg(cg);
-      ncg.setColor(QColorGroup::Window,Config::get_color_unavailable());
-      Q3ListViewItem::paintCell(p,ncg,col,wid,align);
-    }
-  else
-    Q3ListViewItem::paintCell(p,cg,col,wid,align);
-}
-
-QString HistorySong::text(int i) const
-{
-  switch (i)
-    {
-    case HISTORY_MAINRELATION : return relation;
-    case HISTORY_COMMENT : return comment;
-    case HISTORY_VERSION : return song->get_version();
-    case HISTORY_TITLE : return song->get_title();
-    case HISTORY_AUTHOR : return song->get_author();
-    case HISTORY_TEMPO : return song->tempo_str();
-    case HISTORY_TAGS : return Tags::full_string(song->get_tags());
-    case HISTORY_TIME : return song->get_time();
-    case HISTORY_DCOLOR : return song->get_distance_string();
-    case HISTORY_SPECTRUM : return song->get_spectrum_string();
-    case HISTORY_ONDISK :
-      if (song->get_ondisk()) 	return TRUE_TEXT;
-      else 	return FALSE_TEXT;
-    case HISTORY_CUES :
-      if (song->get_has_cues())  return TRUE_TEXT;
-      else 	return FALSE_TEXT;
-    }
-  return QString::null;
-}
-
-HistorySong::HistorySong(Song * s, QString r, QString c, Q3ListView* parent) :
-  Q3ListViewItem(parent,"","","","","","","")
-{
-  song =  s;
   relation = r;
   comment = c;
+
+  setText(HISTORY_MAINRELATION,relation);
+  setText(HISTORY_COMMENT,comment);
+  setText(HISTORY_VERSION,song->get_version());
+  setText(HISTORY_TITLE,song->get_title());
+  setText(HISTORY_AUTHOR,song->get_author());
+  setText(HISTORY_TEMPO,song->tempo_str());
+  setText(HISTORY_TAGS,Tags::full_string(song->get_tags()));
+  setText(HISTORY_TIME,song->get_time());
+  setText(HISTORY_DCOLOR,song->get_distance_string());
+  setText(HISTORY_SPECTRUM,song->get_spectrum_string());
+  setText(HISTORY_ONDISK,song->get_ondisk() ? TRUE_TEXT : FALSE_TEXT);
+  setText(HISTORY_CUES,song->get_has_cues() ? TRUE_TEXT : FALSE_TEXT);
+
+  if (Config::color_ondisk && !song->get_ondisk())
+    for(int i = 0 ; i < columnCount(); i++)
+      setBackground(i,Config::get_color_unavailable());
+
+  setBackground(HISTORY_CUES,QColor(0,0,255));
+  
+  Song * main = ::main_song;
+  setBackground(HISTORY_TEMPO,QSong::colorOfTempoCol(main,song));
+  
+  if (Config::color_played && song->get_played())
+    setBackground(HISTORY_TITLE,Config::get_color_played_song());
+  
+  setBackground(HISTORY_AUTHOR,QSong::colorOfAuthorCol(song));
+  setBackground(HISTORY_DCOLOR,QSong::colorOfdColorCol(song));
+  
+  if (Config::color_spectrum)
+    if (song->get_spectrum()!=no_spectrum)
+      setBackground( HISTORY_SPECTRUM,song->get_color());  
 }
 #endif // __loaded__historysong_cpp__

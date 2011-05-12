@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,11 +13,14 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__database_cpp__
 #define __loaded__database_cpp__
 using namespace std;
 #line 1 "database.c++"
+#include <qtreewidget.h>
 #include <qlabel.h>
 #include "history.h"
 #include "database.h"
@@ -36,6 +39,8 @@ using namespace std;
 #include "song-metric.h"
 #include "qsong.h"
 #include "scripts.h"
+#include "info.h"
+#include "qt-helpers.h"
 
 void DataBase::reset()
 {
@@ -91,22 +96,20 @@ ITERATE_OVER(i)
 
 bool DataBase::cacheValid(SongSelectorLogic * selector)
 {
-  if (rebuild_cache || selector->tagList->childCount() != tag_size)
+  if (rebuild_cache || selector->tagList->topLevelItemCount() != tag_size)
     return false;
-  Q3ListViewItemIterator it(selector->tagList);
   int i = 0;
-  while(it.current())
-    {
-      Q3ListViewItem *t = it.current();
-      tag_type ta = Tags::find_tag(t->text(TAGS_TEXT));
+  stdTreeWidgetIterator t(selector->tagList);
+ITERATE_OVER(t)
+
+      tag_type ta = Tags::find_tag(t.val()->text(TAGS_TEXT));
       if ( (ta != tag[i]) ||
-	   (t->text(TAGS_AND) == TAG_TRUE) != and_include[i] ||
-	   (t->text(TAGS_OR)  == TAG_TRUE) != or_include[i] ||
-	   (t->text(TAGS_NOT) == TAG_TRUE) != exclude[i])
+	   (t.val()->text(TAGS_AND) == TAG_TRUE) != and_include[i] ||
+	   (t.val()->text(TAGS_OR)  == TAG_TRUE) != or_include[i] ||
+	   (t.val()->text(TAGS_NOT) == TAG_TRUE) != exclude[i])
 	return false;
       i++;
-      it++;
-    }
+  }
   return true;
 }
 
@@ -116,26 +119,24 @@ void DataBase::copyTags(SongSelectorLogic * selector)
   if (or_include) bpmdj_deallocate(or_include);
   if (exclude) bpmdj_deallocate(exclude);
   if (tag) delete[](tag);
-  tag_size    = selector->tagList->childCount();
+  tag_size    = selector->tagList->topLevelItemCount();
   and_include = bpmdj_allocate(tag_size,bool);
   or_include  = bpmdj_allocate(tag_size,bool);
   exclude     = bpmdj_allocate(tag_size,bool);
   tag         = new tag_type[tag_size];
   and_includes_checked = false;
   excludes_checked = false;
-  Q3ListViewItemIterator it(selector->tagList);
   int i = 0;
-  while(it.current())
-    {
-      Q3ListViewItem * t = it.current();
-      tag[i] = Tags::find_tag(t->text(TAGS_TEXT));
-      // printf("%s = %d\n",(const char*) t->text(TAGS_TEXT),tag[i]);
-      or_include[i] = t->text(TAGS_OR) == TAG_TRUE;
-      and_includes_checked |= and_include[i] = t->text(TAGS_AND) == TAG_TRUE;
-      excludes_checked     |= exclude[i] = t->text(TAGS_NOT) == TAG_TRUE;
-      i++;
-      it++;
-    }
+  stdTreeWidgetIterator t(selector->tagList);
+ITERATE_OVER(t)
+
+    tag[i] = Tags::find_tag(t.val()->text(TAGS_TEXT));
+    // printf("%s = %d\n",(const char*) t->text(TAGS_TEXT),tag[i]);
+    or_include[i] = t.val()->text(TAGS_OR) == TAG_TRUE;
+    and_includes_checked |= and_include[i] = t.val()->text(TAGS_AND) == TAG_TRUE;
+    excludes_checked     |= exclude[i] = t.val()->text(TAGS_NOT) == TAG_TRUE;
+    i++;
+  }
 }
 
 bool DataBase::tagFilter(Song* item)
@@ -193,8 +194,8 @@ bool DataBase::filter(SongSelectorLogic* selector, Song *item, Song* main,
     return false;
   // okay, no similar authors please..
   if (Config::limit_authornonplayed && 
-      History::get_songs_played() - item->get_played_author_at_time() < 
-      Config::get_authorDecay())
+      (signed4)(History::get_songs_played()-item->get_played_author_at_time()) 
+      < Config::get_authorDecay())
     return false;
   // now check the tempo stuff
   if (main && (Config::limit_uprange || Config::limit_downrange))
@@ -205,8 +206,8 @@ bool DataBase::filter(SongSelectorLogic* selector, Song *item, Song* main,
   const QString lookingfor = selector -> searchLine -> text();
   if (!lookingfor.isEmpty())
     {
-      QString title=item->get_title().upper();
-      QString author=item->get_author().upper();
+      QString title=item->get_title().toUpper();
+      QString author=item->get_author().toUpper();
       if (!title.contains(lookingfor) && !author.contains(lookingfor))
 	return false;
     }
@@ -218,7 +219,7 @@ bool DataBase::filter(SongSelectorLogic* selector, Song *item, Song* main,
 }
 
 int DataBase::get_unheaped_selection(SongSelectorLogic* selector, Song* main, 
-				     QVectorView* target)
+				     QSong* target)
 {
   // to get an appropriate selection we allocate the necessary vector
   int itemcount=0;
@@ -233,7 +234,7 @@ ITERATE_OVER(song)
   return set_answer(show,itemcount,target);
 }
 
-int DataBase::set_answer(Song ** show, int itemcount, QVectorView* target)
+int DataBase::set_answer(Song ** show, int itemcount, QSong* target)
 {
   if (itemcount)
     show = bpmdj_reallocate(show, itemcount, Song*);
@@ -242,28 +243,13 @@ int DataBase::set_answer(Song ** show, int itemcount, QVectorView* target)
       show = NULL;
       bpmdj_deallocate(show);
     }
-  int ibefore = target->currentItem();
-  Song * before = NULL;
-  if(ibefore>=0 && ibefore < QSong::get_song_count())
-    before = QSong::songEssence(ibefore);
-  QSong::setVector(show,itemcount);
-  int item_to_select = 0;
-  if (before && show)
-    for(int i = 0 ; i < itemcount ; i ++)
-      if (show[i]==before)
-	{
-	  item_to_select = i;
-	  break;
-	}
-  target->setCurrentItem(item_to_select);
-  if (item_to_select < itemcount && item_to_select >=0)
-    QSong::set_selected(item_to_select,true);
-  target->ensureItemVisible(item_to_select);
-  target->vectorChanged();
+  Song* before=get_current_song();
+  target->setVector(show,itemcount);
+  set_current_song(before,true);
   return itemcount;
 }
  
-int DataBase::getSelection(SongSelectorLogic* selector, QVectorView* target, 
+int DataBase::getSelection(SongSelectorLogic* selector, QSong* target, 
 			   int count)
 {
   Song* main=::main_song;
@@ -287,7 +273,7 @@ ITERATE_OVER(song)
   return set_answer(show,itemcount,target);
 }
 
-void DataBase::addNewSongs(SongSelectorLogic* selector, QVectorView* target, 
+void DataBase::addNewSongs(SongSelectorLogic* selector, QSong* target, 
 			   vector<Song*> *newsongs)
 {
   /**
@@ -315,9 +301,7 @@ ITERATE_OVER(song)
     }
   }
   assert(count<=newsongs->size());
-  QSong::addVector(show,count);
-  // printf("Accepting %x\n",(unsigned4)newsongs); fflush(stdout);
-  target->vectorChanged();
+  target->addVector(show,count);
 }
 
 void DataBase::add(Song* song)
@@ -330,9 +314,9 @@ void DataBase::add(Song* song)
 	    "occurs at least two times in different index files\n"
 	    "The first index file is \n    %s\n"
 	    "The second index file is \n    %s",
-	    (const char*)song->get_file(),
-	    (const char*)song->get_storedin(),
-	    (const char*)song2->get_storedin());
+	    (const char*)song->get_file().toAscii().data(),
+	    (const char*)song->get_storedin().toAscii().data(),
+	    (const char*)song2->get_storedin().toAscii().data());
     }
   file2song[song->get_file()]=song;
   flush_cache();
@@ -343,16 +327,6 @@ Song * * DataBase::closestSongs(SongSelectorLogic * selector,
 				Song * target2, float4 weight2,
 				SongMetriek * metriek, int maximum, int &count)
 {
-  /*
-  cerr << "Looking for a song between " << target1->getDisplayTitle().
-  toStdString()
-  << " and " << target2->getDisplayTitle().toStdString() 
-  << " weight1 = " << weight1 
-  << " weight2 = " << weight2
-  << " maximum weight = " << maximum 
-  << "\n";
-  */
-
   int i, j;
   float4 * minima = bpmdj_allocate(maximum,float4);
   Song * * entries = bpmdj_allocate(maximum,Song*);

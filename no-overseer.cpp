@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__no_overseer_cpp__
 #define __loaded__no_overseer_cpp__
@@ -23,6 +25,7 @@ using namespace std;
 #include <qapplication.h>
 #include "scripts.h"
 #include "process.h"
+#include "info.h"
 
 /**
  * Performs a synchronous execution of the exec process
@@ -34,7 +37,7 @@ ExitStatus exec(const char* script, const char* description)
   int status = system(script);
   if  (status == -1)
     { 
-      Fatal(false,"couldn't execute [fork failed] %s",script);
+      Fatal("couldn't execute [fork failed] %s",script);
       return ExitStatus();
     }
   res.pid=0;
@@ -45,7 +48,7 @@ ExitStatus exec(const char* script, const char* description)
 int spawn(const char* script, const char* description)
 {
   int cid;
-  QApplication::flushX();
+  QApplication::flush();
   /**
    * A vfork should work slightly faster
    * We don't care about a new task structure anyway

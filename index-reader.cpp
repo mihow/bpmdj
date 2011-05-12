@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__index_reader_cpp__
 #define __loaded__index_reader_cpp__
@@ -100,8 +102,8 @@ public:
   }
   virtual void run()
   {
-    int progress= total_files*100/(expected_files ? expected_files : 1);
-    ::status->message("Reading index: "+QString::number(progress)+"%",5000);
+    unsigned4 progress= total_files*100/(expected_files ? expected_files : 1);
+    ::status->showMessage("Reading index: "+QString::number(progress)+"%",5000);
     // printf("Passing along %x\n",(unsigned4)collection); fflush(stdout);
     if (collection->size())
       selector->step_reading_indices(collection);

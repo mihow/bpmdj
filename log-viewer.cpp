@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__log_viewer_cpp__
 #define __loaded__log_viewer_cpp__
@@ -27,12 +29,16 @@ using namespace std;
 
 class LogItem: public QListWidgetItem
 {
-  QStringList logtext;
+  QString logtext;
 public:
   LogItem(QListWidget* parent, QString dirname, QString logfilename);
+  void setLogText(QStringList t)
+  {
+    logtext=t.join("");
+  }
   QString getLogText() 
   {
-    return logtext.join("");
+    return logtext;
   };
 };
 
@@ -44,15 +50,16 @@ QString wrap_color(QString t, QString b, QString color)
 }
 
 LogItem::LogItem(QListWidget* parent, QString dirname, QString logfilename) :
-  QListWidgetItem(logfilename,parent), 
-  logtext()
+  QListWidgetItem(logfilename,parent)
 {
+  QStringList logtext;
   QString fullname = dirname+slash+logfilename;
-  FILE * fp = fopen(fullname,"rb");
+  FILE * fp = fopen(fullname.toAscii().data(),"rb");
   if (!fp)
     {
       setText(logfilename);
       logtext.append(QString("<b>Impossible to open file ")+fullname+"</b>");
+      setLogText(logtext);
       return;
     }
   char * line = NULL;
@@ -86,6 +93,8 @@ LogItem::LogItem(QListWidget* parent, QString dirname, QString logfilename) :
     }
   if (line)
     free(line);
+  fclose(fp);
+  setLogText(logtext);
 }
 
 LogViewer::LogViewer(QWidget*parent): 

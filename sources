@@ -4,7 +4,7 @@ B4      = ${shell ls *.b4  2>/dev/null | grep -v .*\.L.c++ 2>/dev/null}
 DO      = ${shell ls *.do  2>/dev/null | grep -v .*\.L.c++ 2>/dev/null}
 
 .PHONY:.sources .cflags
-.sources: version.h $(HEADERS:%.h++=%.h) $(SOURCES:%.c++=%.cpp) $(B4:%.b4=%.h) $(DO:%.do=%.h) \
+.sources: version.h authors.cpp $(HEADERS:%.h++=%.h) $(SOURCES:%.c++=%.cpp) $(B4:%.b4=%.h) $(DO:%.do=%.h) \
 	data-lexer.cpp data-syntax.h data-syntax.cpp .cflags
 	@cat .cflags >/tmp/t
 	@grep "#include\ *\"" *.h *.cpp >>/tmp/t
@@ -15,7 +15,7 @@ DO      = ${shell ls *.do  2>/dev/null | grep -v .*\.L.c++ 2>/dev/null}
 	@echo $(VERSION) >/tmp/t
 	@echo $(CFLAGS) >>/tmp/t
 	@echo $(CPP) >>/tmp/t
-	@if ! [ -e .cflags ]; then cp /tmp/t .cflags; touch *.h *.c; fi
+	@if ! [ -e .cflags ]; then cp /tmp/t .cflags; touch *.h *.cpp; fi
 	@if ! cmp /tmp/t .cflags >/dev/null; then mv /tmp/t .cflags; touch *.h *.cpp; fi
 
 %.h: %.b4 aoc
@@ -33,7 +33,7 @@ DO      = ${shell ls *.do  2>/dev/null | grep -v .*\.L.c++ 2>/dev/null}
 %.h: %.h++ header.txt ++2--
 	@echo "  [h++] "$@
 	@"++2--" $< $@
-
+	   
 %.cpp: %.c++ header.txt ++2--
 	@echo "  [c++] "$@
 	@"++2--" $< $@
@@ -63,6 +63,12 @@ version.h: profile-clock
 	@echo " [test] clock - 10 seconds"
 	@echo "#define VERSION \""$(VERSION)"\"" >version.h
 	@./profile-clock >>version.h
+
+authors.cpp: authors.txt
+	@echo "  [cpp] authors.cpp"
+	@echo "const char* authors=" >$@
+	@gawk '{print "\""$$0"\\n\""}' <$< >>$@
+	@echo ';' >>$@
 
 data-lexer.cpp: data-lexer.l data-syntax.h
 	@echo " [flex] data-lexer.cpp"

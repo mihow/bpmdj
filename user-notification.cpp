@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__user_notification_cpp__
 #define __loaded__user_notification_cpp__
@@ -44,7 +46,7 @@ void UserNotification::send()
 void UserNotification::run()
 {
   if (!status.isEmpty())
-    ::status->message(status,status_time);
+    ::status->showMessage(status,status_time);
   if (!error.isEmpty())
     QMessageBox::warning(selector,title,error);
   if (update_item_list)

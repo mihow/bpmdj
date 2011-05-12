@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__bpmdj_pref_cpp__
 #define __loaded__bpmdj_pref_cpp__
@@ -35,28 +37,31 @@ using namespace std;
 #include "scripts.h"
 #include "common.h"
 #include "config.h"
+#include "qt-helpers.h"
 
-BpmDjPreferences::BpmDjPreferences(QWidget*parent,const char*name, bool modal, 
-				   Qt::WindowFlags f):
-  QDialog(parent,name,modal,f)
+BpmDjPreferences::BpmDjPreferences(QWidget*parent): QDialog(parent)
 {
   setupUi(this);
   //  QWidget * w = widgetStack->widget(2);
   for(int i = 0 ; i < 8; i ++)
-    analyzerStack->layout()->add(new SongProcPrefView(analyzerStack,
-						      Config::analyzers[i]));
+    analyzerStack->layout()->addWidget(new SongProcPrefView(analyzerStack,
+						    Config::analyzers[i]));
   //  w = widgetStack->widget(0);
   for(int i = 0 ; i < 4 ; i++)
-    playerStack->layout()->add(new SongProcPrefView(playerStack,
+    playerStack->layout()->addWidget(new SongProcPrefView(playerStack,
 						    Config::players[i]));
 }
 
 void BpmDjPreferences::fixColorOf(QWidget *p)
 {
-  QColor c = p->paletteBackgroundColor();
+  QPalette P=p->palette();
+  QColor c=P.color(p->backgroundRole());
   c = QColorDialog::getColor(c,this);
   if (c.isValid())
-    p->setPaletteBackgroundColor(c);
+    {
+      P.setColor(p->backgroundRole(),c);
+      p->setPalette(P);
+    }
 }
 
 void BpmDjPreferences::on_colorAlltimePlaycount_clicked()
@@ -133,39 +138,38 @@ void BpmDjPreferences::copyProgramTo(QString program, QString host,
 				     Ui_InstallRemotes * dialog)
 {
   QString command = QString("scp -B ")+program+" "+host+":";
-  QString makeexec = QString("ssh ")+host+" chmod +rx bpmplay bpmdjraw";
-
-  dialog->output->setBold(true);
-  dialog->output->setColor(QColor(255,0,0));
+  QString makeexec = QString(SSH)+host+" chmod +rx bpmplay bpmdjraw";
+  
+  dialog->output->setFontWeight(QFont::Bold);
+  dialog->output->setTextColor(QColor(255,0,0));
   dialog->output->append(host+"\n");
-  dialog->output->setColor(QColor(0,0,0));
-  dialog->output->setBold(true);
+  dialog->output->setTextColor(QColor(0,0,0));
   dialog->output->append(QString("$ ")+command+"\n");
-  dialog->output->setBold(false);
+  dialog->output->setFontWeight(QFont::Normal);
   app->processEvents();
 
   QFile log("install.log");
-  log.open(IO_WriteOnly);
+  log.open(QIODevice::WriteOnly);
   log.close();
   execute("Install "+command+" at "+host,
 	  command+" >>install.log 2>>install.log");
-  log.open(IO_ReadOnly);
+  log.open(QIODevice::ReadOnly);
   char log_line[5000];
   while(log.readLine(log_line,5000)>=0)
     dialog->output->append(log_line);
   log.close();
 
-  dialog->output->setBold(true);
+  dialog->output->setFontWeight(QFont::Bold);
   dialog->output->append(QString("$ ")+makeexec+"\n");
-  dialog->output->setBold(false);
+  dialog->output->setFontWeight(QFont::Normal);
 
-  log.open(IO_WriteOnly);
+  log.open(QIODevice::WriteOnly);
   log.close();
   
   execute("Making "+command+" at "+host+" executable",
 	  makeexec+" >>install.log 2>>install.log");
   
-  log.open(IO_ReadOnly);
+  log.open(QIODevice::ReadOnly);
   while(log.readLine(log_line,5000)>=0)
     dialog->output->append(log_line);
   log.close();
@@ -182,35 +186,33 @@ void BpmDjPreferences::installRemotes(Ui_InstallRemotes * dialog)
     exists("/usr/bin/bpmdjraw") ? "/usr/bin/bpmdjraw" : "";
   if (location_bpmplay.isEmpty())
     {
-      QMessageBox::message("Install","I cannot find the bpmplay binary\n");
+      QMessageBox::warning(this,"Install","I cannot find the bpmplay binary");
       return;
     }
   if (location_bpmdjraw.isEmpty())
     {
-      QMessageBox::message("Install","I cannot find the bpmdjraw script\n");
+      QMessageBox::warning(this,"Install","I cannot find the bpmdjraw script");
       return;
     }
 
   /**
-   * copy them to the remote host
+   * Copy them to the remote host
    */
-  Q3ListViewItemIterator it(dialog->hosts);
-  while(*it)
-    {
-      Q3ListViewItem *i = *it;
-      QString host = i -> text(0);
+  stdTreeWidgetIterator i(dialog->hosts);
+ITERATE_OVER(i)
+
+      QString host = i.val() -> text(0);
       QString program_files = location_bpmplay+" "+location_bpmdjraw;
       copyProgramTo(program_files,host,dialog);
-      it++;
-    }
+  }
   
   /**
-   * inform user of finish
+   * Inform user of finish
    */
-  dialog->output->setBold(true);
-  dialog->output->setColor(QColor(255,0,0));
+  dialog->output->setFontWeight(QFont::Bold);
+  dialog->output->setTextColor(QColor(255,0,0));
   dialog->output->append("Finished\n");
-  dialog->output->setColor(QColor(0,0,0));
+  dialog->output->setTextColor(QColor(0,0,0));
   dialog->okbutton->setEnabled(true);
 }
 
@@ -225,20 +227,20 @@ void BpmDjPreferences::installRemotes()
   for(int i = 0 ; i < 4; i++)
     {
       remote = Config::players[i].getRemote();
-      if(!remote.isEmpty() && !dialog.hosts->findItem(remote,0)) 
-	new Q3ListViewItem(dialog.hosts,remote);
+      if(!remote.isEmpty() && !findStdItem(dialog.hosts,remote,0))
+	new QTreeWidgetItem(dialog.hosts,QStringList(remote));
     }
   for(int i = 0 ; i < 8; i++)
     {
       remote = Config::analyzers[i].getRemote();
-      if(!remote.isEmpty() && !dialog.hosts->findItem(remote,0)) 
-	new Q3ListViewItem(dialog.hosts,remote);
+      if(!remote.isEmpty() && !findStdItem(dialog.hosts,remote,0)) 
+	new QTreeWidgetItem(dialog.hosts,QStringList(remote));
     }
-  if (dialog.hosts->childCount()==0)
+  if (dialog.hosts->topLevelItemCount()==0)
     {
-      QMessageBox::message("Install",
-			   "Install is only necessary for remote players\n"
-			   "There seem to be no remote players present.\n");
+      QMessageBox::information(this,"Install",
+		   "Install is only necessary for remote players\n"
+		   "There seem to be no remote players present.");
       return;
     }
   installRemotes(&dialog);

@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__dsp_alsa_cpp__
 #define __loaded__dsp_alsa_cpp__
@@ -33,6 +35,7 @@ using namespace std;
 #include "dsp-alsa.h"
 #include "memory.h"
 #include "scripts.h"
+#include "info.h"
 
 void dsp_alsa::start(audio_source * a)
 {
@@ -132,7 +135,7 @@ dsp_alsa::dsp_alsa(const PlayerConfig & config) : dsp_driver(config)
 #ifdef DEBUG_WAIT_STATES
   Debug("dsp_alsa::dsp_alsa<constructor>");
 #endif
-  arg_dev = strdup(config.get_alsa_dev());
+  arg_dev = strdup(config.get_alsa_dev().toAscii().data());
   dsp = NULL;
   filled = 0;
   buffer_size = 0;

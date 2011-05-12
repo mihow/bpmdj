@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__tempo_type_h__
 #define __loaded__tempo_type_h__
@@ -56,23 +58,6 @@ public:
   {
     return (signed4)tempo+delta;
   }
-  char * get_charstr()
-  {
-    char T[500];
-    if (none())
-      return strdup("/");
-    if (tempo>=100.0)
-      sprintf(T,"%g",tempo);
-    else 
-      sprintf(T,"0%g",tempo);
-    return strdup(T);
-  }
-  
-  /**
-   * We don't use the factory here because these are only numbers and creating
-   * them would simply fill up the factory for nothing: after their usage
-   * in listviewitems these are destroyed again
-   */
   QString qstring()
   {
     if (none()) return slash;

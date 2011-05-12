@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__fragment_cpp__
 #define __loaded__fragment_cpp__
@@ -20,6 +22,7 @@ using namespace std;
 #line 1 "fragment.c++"
 #include "files.h"
 #include "do-fragment.h"
+#include "info.h"
 
 FragmentInMemoryData::FragmentInMemoryData()
 {
@@ -29,10 +32,11 @@ FragmentInMemoryData::FragmentInMemoryData()
 
 FragmentInMemoryData::FragmentInMemoryData(QString filename)
 {
-  FILE * f = fopen(filename.ascii(),"rb");
+  FILE * f = fopen(filename.toAscii().data(),"rb");
   if (!f)
     {
-      printf("Could not read fragment \"%s\"\n",filename.ascii());
+      Warning("Could not read fragment \"%s\"",
+	      filename.toAscii().data());
       size = 0;
       samples = NULL;
       return;

@@ -2,59 +2,63 @@
 
 BpmDj relies on
  - libqt4-dev
- - uic-qt4 and uic-qt3
+ - uic-qt4 
  - qt4-designer
  - qt4-dev-tools
+ - libasound2-dev
+ - fftw3-dev
  - fftw3
  - make
  - alsa-headers (for alsa support)
-
+ 
+Furthermore you need mpg123, lame, oggenc and preferably mplayer
 
 
                                COMPILING BPMDJ
   
 If you want to compile this package you need to create a defines
-file. The defines file is a file that contains a number of definitions of
-program locations. Depending on the distribution a standard definition file
-can be used:
+file. The defines file is a file that contains a number of definitions
+of program locations. Depending on the distribution a standard
+definition file can be used:
 
-  gentoo -> defines.gentoo
-  debian -> defines.debian
+  gentoo -> defines.gentoo 
+  debian -> defines.debian 
   ... and others ...
 
-If you are running another distribution please take a look at one of these
-defines files and adapt where necessary. The file format is self explanatory !
-After creating such a file be sure to send it to me
-(werner.van.belle@gmail.com) so I can include it in the next release.
+To use one of the predefined defines files use something like
 
-Creating the defines file can be done by copying one of the examples to
-the file name defines (thereby overwriting the current defines). Furthermore you 
-need lame, oggenc, libasound2-dev, fftw3-dev and maybe some other libraries
-I forgot to mention.
+  cp defines.debian defines
+  
+If you are running another distribution please take a look at one of
+these defines files and adapt where necessary. The file format is self
+explanatory ! After creating such a file be sure to send it to
+werner@yellowcouch.org such that I can include it in the next release. 
 
 Some compile time flags:
  
   COMPILE_OSS 
-    add to the CFLAGS '-D COMPILE_OSS' to include native support for OSS 
-    drivers. Please note that these drivers might have a loosy latency reporting.
+    add to the CFLAGS '-D COMPILE_OSS' to include native support for 
+    OSS drivers. Please note that these drivers might have a loosy
+    latency reporting. 
 
   COMPILE_ALSA 
-    add to the CFLAGS '-D COMPILE_ALSA' to include native support for alsalib. 
-    Don't forget to add -lasound to the LDFLAGS !
+    add to the CFLAGS '-D COMPILE_ALSA' to include native support for
+    alsalib. Don't forget to add -lasound to the LDFLAGS !
 
   COMPILE_JACK
-    add to the CFLAGS '-D COMPILE_JACK' to include native support for jackd.
+    add to the CFLAGS '-D COMPILE_JACK' to include native support for
+    jackd. 
 
   EFENCE 
     links in the efence code to debug bpmdj memory allocations
 
   NDEBUG 
-    removes assert statements, which could lead to faster code. But if it crashes
-    we have no idea where it happened.
+    removes assert statements, which could lead to faster code. But if
+    it crashes we have no idea where it happened.
 
-The defines files probably include distcc. This programs is of course not strictly
-necessary. Removing the word distcc will resolve the problem.
+After installing the defines file enter 'make' again. More specific
+information can be found at the website
+http://bpmdj.yellowcouch.org/install.html 
 
 -- 
-Werner Van Belle (werner.van.belle@gmail.com)
-
+Werner Van Belle (werner@yellowcouch.org)

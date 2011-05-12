@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,13 +13,14 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__song_slot_cpp__
 #define __loaded__song_slot_cpp__
 using namespace std;
 #line 1 "song-slot.c++"
 #include <iostream>
-#include <q3button.h>
 #include <qlabel.h>
 #include <qsizepolicy.h>
 #include <qmessagebox.h>
@@ -31,11 +32,13 @@ using namespace std;
 #include "analyzers-manager.h"
 #include "log-viewer.h"
 #include "overseer.h"
+#include "info.h"
 
 void SongSlot::init()
 {
   underlying_process=NULL;
   remote  = "";
+  copysong=false;
   cmd = empty;
   estate = disabled;
   text    = "";
@@ -112,11 +115,8 @@ void SongSlot::setEnabled(bool val)
 	return;
       else if (estate==ok)
 	{
-	  // is there still a command running somewhere ?
 	  if (isBusy())
-	    {
-	      setEstate(disabling);
-	    }
+	    setEstate(disabling);
 	  else
 	    {
 	      setEstate(disabled);
@@ -130,7 +130,7 @@ void SongSlot::setEnabled(bool val)
 
 void SongSlot::setRemote(QString r)
 {
-  r = r.stripWhiteSpace();
+  r = r.trimmed();
   if (r==remote) return;
   remote = r;
   emit stateChanged();
@@ -153,45 +153,11 @@ void SongSlot::setCommand(command_type c)
   emit stateChanged();
 }
 
-void SongSlot::setOldCommand(QString s)
+void SongSlot::setCopyMusic(bool t)
 {
-  // we now go back and try to figure out
-  QString command = s.stripWhiteSpace();
-  int idx;
-  // what the command prefix is 
-  cmd=empty;
-  if (command.find("xmms")>=0) cmd=xmms;
-  if (command.find("bpmplay")>=0) cmd=standard;
-  if (cmd==empty) return;
-  // what the remote host is
-  idx = command.find("--remote ");
-  remote = QString::null;
-  if (idx>=0)
-    {
-      idx += 9;
-      QString host = command.mid(idx);
-      host = host.stripWhiteSpace();
-      idx = host.find(' ');
-      if (idx) host=host.left(idx);
-      remote = host.stripWhiteSpace();
-    }
-  // what the configuration name is
-  idx = command.find("--config ");
-  if (idx>=0)
-    {
-      idx += 9;
-      QString host = command.mid(idx);
-      host = host.stripWhiteSpace();
-      idx = host.find(' ');
-      if (idx) host=host.left(idx);
-      name = host.stripWhiteSpace();
-    }
-  // print out some conversion information
-  printf("command: %s\n  name: %s\n  remote: %s\n  prefix: %d\n",
-	 (const char*)command,
-	 (const char*)name,
-	 (const char*)remote,
-	 (int)cmd);
+  if (t==copysong) return;
+  copysong=t;
+  emit stateChanged();
 }
 
 QString SongSlot::getBasicCommand() const
@@ -199,7 +165,11 @@ QString SongSlot::getBasicCommand() const
   assert(cmd==standard);
   QString result("bpmplay ");
   if (!remote.isEmpty())
-    result +="--remote "+remote+" ";
+    {
+      result +="--remote "+remote+" ";
+      if (copysong)
+	result += "--copymusic ";
+    }
   if (!name.isEmpty())
     result +="--config "+name+" ";
   result +="--verbose ";
@@ -212,18 +182,16 @@ QString SongSlot::getPlayCommand(Index& match_with_index,
   if (cmd==xmms)
     {
       return QString("xmms -e music/")
-	+QString(escape(to_play_song.get_filename())) + QString(" &");
+	+escape(to_play_song.get_filename()) + QString(" &");
     }
   else if (cmd==standard)
     {
       QString match_with = match_with_index.get_storedin();
       QString song_name  = to_play_song.get_storedin();
-      char * c1 = escape(match_with);
-      char * c2 = escape(song_name);
+      QString c1 = escape(match_with);
+      QString c2 = escape(song_name);
       QString result = getBasicCommand();
-      result += QString(c2)+" -m "+QString(c1);
-      bpmdj_deallocate(c1);
-      bpmdj_deallocate(c2);
+      result += c2+" -m "+c1;
       return result;
     }
   assert(0);
@@ -260,7 +228,7 @@ QString SongSlot::getAnalCommand(bool tempo, int technique,
     spectrumLine+" "+
     energyLine+" "+
     rhythmLine+" "+
-    QString(escape(song));
+    escape(song);
 }
 
 void SongSlot::setSong(Song * s)
@@ -321,12 +289,9 @@ void SongSlot::stop()
 void SongSlot::setup()
 {
   if (cmd==standard)
-    spawn(getBasicCommand()+ " --setup","Setup "+getName());
+    spawn((getBasicCommand()+ " --setup").toAscii(),("Setup "+getName()).toAscii());
   else
-    QMessageBox::information(NULL,
-			     "Non standard player",
-			     "A non standard player cannot be configured",
-			     QMessageBox::Ok);
+    Error(true,"A non standard player cannot be configured");
 }
 
 void SongSlot::setText(QString t)
@@ -381,7 +346,7 @@ void SongSlot::startChecking()
   QString path = QString("music/")+filename;
 
   // create a sound on disk
-  FILE * f = fopen((const char*)path,"wb");
+  FILE * f = fopen(path.toAscii().data(),"wb");
   static bool shown_music_error = false;
   if (!f)
     {
@@ -472,12 +437,12 @@ void SongSlot::setUsefullState()
 //----------------------------------------------------------
 SongSelectorAnalView::SongSelectorAnalView(QWidget * parent, 
 AnalyzersManager * processes, SongSlot & proc) :
-QCheckBox(parent,""), song_process(&proc)
+QCheckBox(parent), song_process(&proc)
 {
   setTristate(true);
   setAutoFillBackground(true);
   QSizePolicy policy = sizePolicy();
-  policy.setHorData(QSizePolicy::Expanding);
+  policy.setHorizontalPolicy(QSizePolicy::Expanding);
   setSizePolicy(policy);
   processChange();
   connect(song_process,SIGNAL(viewChanged()),this,SLOT(processChange()));
@@ -510,18 +475,18 @@ void SongSelectorAnalView::processChange()
   switch(song_process->enabledState())
     {
     case SongSlot::disabled: 
-      QCheckBox::setState(QCheckBox::Off);      
+      QCheckBox::setCheckState(Qt::Unchecked);      
       break;
     case SongSlot::enabling: 
       text="Switching on ";
-      QCheckBox::setState(QCheckBox::NoChange); 
+      QCheckBox::setCheckState(Qt::PartiallyChecked); 
       break;
     case SongSlot::disabling: 
       text="Waiting for  ";
-      QCheckBox::setState(QCheckBox::NoChange); 
+      QCheckBox::setCheckState(Qt::PartiallyChecked); 
       break;
     case SongSlot::ok:
-      QCheckBox::setState(QCheckBox::On);       
+      QCheckBox::setCheckState(Qt::Checked);       
       break;
     default: 
       assert(0);
@@ -558,19 +523,22 @@ void SongSelectorAnalView::colorChange()
   c.setHsv(song_process->getId()*240/7,
 	   255-(int)(f*255.0),
 	   255-(int)(f*127.0));
-  QCheckBox::setBackgroundColor(c);
+
+  QPalette palette;
+  palette.setColor(backgroundRole(), c);
+  setPalette(palette);
 }
 
 //----------------------------------------------------------
 // The player view in the song selector
 //----------------------------------------------------------
 SongSelectorPlayView::SongSelectorPlayView(QWidget * parent, SongSlot & proc) :
-  QCheckBox(parent,""), song_process(&proc)
+  QCheckBox(parent), song_process(&proc)
 {
   setTristate(true);
   setAutoFillBackground(true);
   QSizePolicy policy = sizePolicy();
-  policy.setHorData(QSizePolicy::Expanding);
+  policy.setHorizontalPolicy(QSizePolicy::Expanding);
   setSizePolicy(policy);
   processChange();
   connect(song_process,SIGNAL(viewChanged()),this,SLOT(processChange()));
@@ -583,18 +551,18 @@ void SongSelectorPlayView::processChange()
   switch(song_process->enabledState())
     {
     case SongSlot::disabled:  
-      QCheckBox::setState(QCheckBox::Off);      
+      QCheckBox::setCheckState(Qt::Unchecked);      
       break;
     case SongSlot::enabling:  
       text="Switching on ";
-      QCheckBox::setState(QCheckBox::NoChange); 
+      QCheckBox::setCheckState(Qt::PartiallyChecked); 
       break;
     case SongSlot::disabling: 
       text="Waiting for ";
-      QCheckBox::setState(QCheckBox::NoChange); 
+      QCheckBox::setCheckState(Qt::PartiallyChecked); 
       break;
     case SongSlot::ok:
-      QCheckBox::setState(QCheckBox::On);       
+      QCheckBox::setCheckState(Qt::Checked);
       break;
     default: 
       assert(0);
@@ -613,48 +581,77 @@ void SongSelectorPlayView::processChange()
   if (song) color = song->get_color();
   else color.setHsv(0,0,128);
   if (!color.isValid() || color.value()<127) color=QColor(255,255,255);
-  QCheckBox::setBackgroundColor(color);
+  
+  QPalette palette;
+  palette.setColor(backgroundRole(), color);
+  setPalette(palette);
 }
 
 //----------------------------------------------------------
 // The widgets in the preference box
 //----------------------------------------------------------
 SongProcPrefView::SongProcPrefView(QWidget * parent, SongSlot & proc): 
-  Q3HBox(parent)
+  QWidget(parent)
 {
+  QHBoxLayout * layout=new QHBoxLayout();
   song_process = & proc;
   cmd_box = new QComboBox(this);
-  cmd_box->insertItem("empty",SongSlot::empty);
-  cmd_box->insertItem("standard",SongSlot::standard);
-  if (!proc.isAnalyzer())
-    cmd_box->insertItem("xmms",SongSlot::xmms);
-  cmd_box->setCurrentItem(song_process->getCmd());
-  new QLabel("name",this);
+  if (proc.isAnalyzer())
+    {
+      cmd_box->insertItem(SongSlot::empty,"disabled");
+      cmd_box->insertItem(SongSlot::standard,"enabled");
+    }
+  else
+    {
+      cmd_box->insertItem(SongSlot::empty,"disabled");
+      cmd_box->insertItem(SongSlot::standard,"standard");
+      cmd_box->insertItem(SongSlot::xmms,"xmms");
+    } 
+  cmd_box->setCurrentIndex(song_process->getCmd()); 
+  layout->addWidget(cmd_box);
+  layout->addWidget(new QLabel("name",this));
   name_edit = new QLineEdit(song_process->getName(),this);
-  new QLabel("host",this);
+  layout->addWidget(name_edit);
+  layout->addWidget(new QLabel("host",this));
   remote_edit = new QLineEdit(song_process->getRemote(),this);
+  layout->addWidget(remote_edit);
+  copy_music = new QCheckBox("copy song",this);
+  copy_music->setChecked(song_process->getCopyMusic());
+  layout->addWidget(copy_music);
+
   configure_button = new QPushButton("Configure",this);
+  layout->addWidget(configure_button);
+
   update_disable_enable();
-  connect(remote_edit, SIGNAL(textChanged(const QString &)), 
+  connect(remote_edit, SIGNAL(textChanged(const QString &)),
 	  this, SLOT(commandChanged()));
-  connect(name_edit, SIGNAL(textChanged(const QString &)), 
+  connect(name_edit, SIGNAL(textChanged(const QString &)),
 	  this, SLOT(commandChanged()));
   connect(cmd_box, SIGNAL(activated(int)), this, SLOT(commandChanged()));
+  connect(copy_music, SIGNAL(stateChanged(int)),
+	  this, SLOT(commandChanged()));
   connect(configure_button, SIGNAL(clicked()), song_process, SLOT(setup()));
+
+  setLayout(layout);
 }
 
 void SongProcPrefView::update_disable_enable()
 {
-  bool enable = cmd_box->currentItem()==SongSlot::standard;
+  bool enable = cmd_box->currentIndex()==SongSlot::standard;
   name_edit->setEnabled(enable);
   remote_edit->setEnabled(enable);
+  if (enable)
+    copy_music->setEnabled(!remote_edit->text().isEmpty());
+  else
+    copy_music->setEnabled(false);
 }
 
 void SongProcPrefView::commandChanged()
 {
   song_process->setName(name_edit->text());
   song_process->setRemote(remote_edit->text());
-  song_process->setCommand((SongSlot::command_type)cmd_box->currentItem());
+  song_process->setCommand((SongSlot::command_type)cmd_box->currentIndex());
+  song_process->setCopyMusic(copy_music->checkState()==Qt::Checked);
   update_disable_enable();
 }
 #endif // __loaded__song_slot_cpp__

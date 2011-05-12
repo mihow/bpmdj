@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__capacity_checker_cpp__
 #define __loaded__capacity_checker_cpp__
@@ -25,20 +27,20 @@ using namespace std;
 #include "common.h"
 #include "bpmplay.h"
 #include "scripts.h"
+#include "info.h"
 
 bool DecoderChecker::works()
 {
   bool success = false;
   int progr_nr = capacity_to_prognr(decoder_to_use);
-  Info("Checking program %d: %s",progr_nr,(const char*)ext);
+  Info("Checking program %d: %s",progr_nr,ext.toAscii().data());
   // determine unique filename
   int pid = getpid();
   int nr = 0;
   char filename[1000];
   do
     {
-      nr++;
-      sprintf(filename,"%d-%d.%s",pid,nr,(const char*)ext);
+      sprintf(filename,"%d-%d.%s",pid,++nr,ext.toAscii().data());
     }
   while (exists(filename));
   if (checkProgram(filename)) 
@@ -61,7 +63,7 @@ bool DecoderChecker::works()
       bpmdjraw(true,filename,get_rawpath());
       // gather the output of the writing process [NYI]
       // check the existence of the target raw file
-      char * wave_name=getRawFilename(get_rawpath(),filename);
+      char * wave_name=getRawFilename(get_rawpath().toAscii().data(),filename);
       FILE * raw_file = fopen(wave_name,"rb");
       if(raw_file)
 	{
@@ -90,19 +92,19 @@ bool DecoderChecker::works()
 bool Mpg123Decoder::checkProgram(QString filename)
 {
   QString log=filename+".log";
-  vexecute("mpg123 2>%s",(const char*)log);
+  vexecute("mpg123 2>%s",log.toAscii().data());
   QFile logfile(log);
-  if (!logfile.open(IO_ReadOnly)) return false;
+  if (!logfile.open(QIODevice::ReadOnly)) return false;
   QTextStream stream(&logfile);
   QString line;
   bool check1=false;
   bool check2=false;
   while(!(line=stream.readLine()).isNull())
     {
-      if (line.find("0.59r")>=0) check1=true;
-      if (line.find("0.6")>=0) check1=true;
-      if (line.find("1.4.3")>=0) check1=true;
-      if (line.find("Michael Hipp")>=0) check2=true;
+      if (line.indexOf("0.59r")>=0) check1=true;
+      if (line.indexOf("0.6")>=0) check1=true;
+      if (line.indexOf("1.4.3")>=0) check1=true;
+      if (line.indexOf("Michael Hipp")>=0) check2=true;
     }
   logfile.close();
   remove(log);
@@ -112,17 +114,17 @@ bool Mpg123Decoder::checkProgram(QString filename)
 bool Mpg321Decoder::checkProgram(QString filename)
 {
   QString log=filename+".log";
-  vexecute("mpg321 2>%s",(const char*)log);
+  vexecute("mpg321 2>%s",log.toAscii().data());
   QFile logfile(log);
-  if (!logfile.open(IO_ReadOnly)) return false;
+  if (!logfile.open(QIODevice::ReadOnly)) return false;
   QTextStream stream(&logfile);
   QString line;
   bool check1=false;
   bool check2=false;
   while(!(line=stream.readLine()).isNull())
     {
-      if (line.find("mpg321")>=0) check1=true;
-      if (line.find("Joe Drew")>=0) check2=true;
+      if (line.indexOf("mpg321")>=0) check1=true;
+      if (line.indexOf("Joe Drew")>=0) check2=true;
     }
   logfile.close();
   remove(log);

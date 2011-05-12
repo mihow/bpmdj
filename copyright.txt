@@ -1,4 +1,7 @@
-Please have also a look at support.txt
+Please have also a look at support.txt or authors.txt depending on what
+you are looking for. Note that this is the GPL2 _not_ the LGPL nor GPL3.
+As such there are limits on how you can use the bpmcounter in your 
+application.
 
 
 		    GNU GENERAL PUBLIC LICENSE

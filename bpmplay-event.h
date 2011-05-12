@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__bpmplay_event_h__
 #define __loaded__bpmplay_event_h__
@@ -22,11 +24,11 @@ using namespace std;
 
 class Player;
 /**
- * A player event used to signal various things to the Qt songplayer.
- * The playerwindow will accept each playevent by executing the 
+ * A player event used to signal various things to the Qt song player.
+ * The player window will accept each play event by executing the 
  * run method. This double dispatching makes it possible
  * to be thread safe while at the same time have the flexibility
- * to wrtie things outside the user interface itself.
+ * to write things outside the user interface itself.
  */
 class BpmPlayEvent: public QEvent
 {

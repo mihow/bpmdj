@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__renamer_h__
 #define __loaded__renamer_h__
@@ -22,14 +24,21 @@ using namespace std;
 #include <qwidget.h>
 #include "dirscanner.h"
 #include "ui-renamer.h"
+#include "song.h"
 
 class RenamerChangesFilename
 {
 public:
-  RenamerChangesFilename() {};
-  virtual ~RenamerChangesFilename() {};
-  virtual bool shouldFilenameBeExcluded(QString name) = 0;
-  virtual void filenameChanged(QString from, QString to) = 0;
+  RenamerChangesFilename() 
+  {
+  };
+  virtual ~RenamerChangesFilename() 
+  {
+  };
+  /**
+   * Change should return false if an error occured
+   */
+  virtual bool change(QString from, QString to, QString location) =0;
 };
 
 class RenamerLogic: 
@@ -42,6 +51,8 @@ class RenamerLogic:
    RenamerLogic(QWidget* parent, RenamerChangesFilename * rcf);
    virtual ~RenamerLogic();
    void add(const QString name, const QString pos);
+   void add(Song* song);
+   void start_dialog();
    void scan(const QString dirname);
  protected:
    virtual void checkfile(const QString fullname, const QString filename);

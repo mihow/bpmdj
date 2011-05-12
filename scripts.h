@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,11 +13,14 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__scripts_h__
 #define __loaded__scripts_h__
 using namespace std;
 #line 1 "scripts.h++"
+#include <qstring.h>
 #include <stdio.h>
 #include "index.h"
 #include "process.h"
@@ -30,6 +33,14 @@ using namespace std;
 // commands
 #define RAW2WAV "sox -r 44100 -s -w -c 2 "
 #define BPLAY "bplay -s 44100 -S -b 16 "
+
+/**
+ * The SSH prefix requires some attention. 
+ * -X makes the target to forward the X events
+ * -T disables the allocation of a pseudotty. This was the reason of bug #1047
+ * -e none disables the presence of an escape character.
+ */
+#define SSH " ssh -X -T -e none "
 
 // filenames
 #define PROCESS_MIX "./process_mix.sh"
@@ -49,25 +60,18 @@ void   dumpAudio(const char* fname, unsigned4 * buffer, long length);
 
 /**
  * Will start bpmdjraw and wait for the result or not depending on the 
- * syncrhonous flag. The return value is the process id in the asynchronous
+ * synchronous flag. The return value is the process id in the asynchronous
  * case, 0 when there was an error. The location to place the rawfile is 
  * obtained through the raw_location() function call.
  */
 int bpmdjraw(bool synchronous, const char* fname, const char* where);
+int bpmdjraw(bool synchronous, const char* fname, QString where);
 
-void start_mkdir(const char* dir);
-void start_cp(const char* from, const char* to);
-int  start_mv(const char* from, const char* to);
-void start_rm(const char* what);
-
-// logging, warning, and other similar functions
-void Log(const char* prefix, const char* text);
-void Debug(const char* script,...);
-void Info(const char* script,...);
-void Warning(const char* script,...);
-void Error(bool ui, const char* script,...);
-void Fatal(const char* script,...);
-void Remote(const char* script,...);
+void start_mkdir(const QString& dir);
+void start_cp(const QString& from, const QString& to);
+int  start_mv(const QString& from, const QString& to);
+void start_rm(const QString& what);
+void remove(QString str);
 
 /**
  * This function returns a new string with all characters escaped as
@@ -76,12 +80,14 @@ void Remote(const char* script,...);
  * a secure shell command.
  */
 char *escape(const char * in);
+QString escape(const QString& in);
 
 /**
  * executes the given command. Returns a simple true
  * if successful, false otherwise. The description will be
  * printed to the terminal. The script will be executed.
  */
-bool execute(const char* description, const char* script);
+bool execute(QString description, QString script);
 bool vexecute(const char* script,...);
+
 #endif // __loaded__scripts_h__

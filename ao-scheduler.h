@@ -1,6 +1,6 @@
 /****
  Active Objects
- Copyright (C) 2006-2009 Werner Van Belle
+ Copyright (C) 2006-2010 Werner Van Belle
 
  http://werner.yellowcouch.org/Borg4/group__ao.html
 

@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__selector_h__
 #define __loaded__selector_h__
@@ -31,21 +33,12 @@ using namespace std;
 #include "config.h"
 #include "database.h"
 #include "albumitem.h"
-#include "qvectorview.h"
 #include "ui-freq-mapping.h"
 #include "players-manager.h"
 #include "spectrum-pca.h"
 #include "analyzers-manager.h"
 #include "do-fragment.h"
 #include "ui-selector.h"
-
-#define TAGS_TEXT 0
-#define TAGS_OR 1
-#define TAGS_AND 2
-#define TAGS_NOT 3
-
-extern const QString TAG_TRUE;
-extern const QString TAG_FALSE;
 
 class QProgressBar;
 class QSong;
@@ -64,11 +57,11 @@ private:
   AnalyzersManager * analyzers;
   QTimer *timer;
   int mainTicks;
-  Q3PopupMenu *selection;
-  Q3PopupMenu *queuemenu;
+  QMenu *selection;
+  QMenu *queuemenu;
   QMutex lock;
 public:
-  QVectorView* songList;
+  QSong* songList;
   DataBase *database;
   SongSelectorLogic(QWidget*parent=0);
   virtual ~SongSelectorLogic();
@@ -106,11 +99,8 @@ public:
   //--------------------------------------------------------------------------
 private:
   void parse_tags();
-  void insertSongInAlbum(Song*, const QString & a, int nr);
-  void deleteSongFromAlbum(AlbumItem *);
   void updateFrequencyMap();
   void toggleAutoItem(int which);
-  Q3ListViewItem *filterView(Q3ListViewItem * who, Q3ListViewItem * parent);
   void updateColors();
   void setColor(QColor color);
   void setPlayerColor(QLabel *player, QColor color);
@@ -120,8 +110,8 @@ private:
   void songEditInfo(Song * song);
   void queueFindAndRename(int oldpos, int newpos);
   void queueOrder();
-  void linkViewProp(ConfigState & prop, Q3PopupMenu *menu, QString text);
-  void linkAutoProp(ConfigState & prop, Q3PopupMenu *menu, QString text);
+  QAction* linkViewProp(ConfigState & prop, QMenu *menu, QString text);
+  QAction* linkAutoProp(ConfigState & prop, QMenu *menu, QString text);
 public: 
   void reread_and_repaint(Song* song);
 #ifdef INCOMPLETE_FEATURES
@@ -138,7 +128,7 @@ public slots:
   virtual void switchMonitorToMain();
   
   virtual void timerTick();
-  virtual void selectSong(int i);
+  virtual void startSong(const QModelIndex& i);
   virtual void doPreferences();
   virtual void openLogDialog();
   virtual void doAbout();
@@ -168,16 +158,18 @@ public slots:
   
   virtual void importSongs();
   virtual void queueAnalysis();
+  virtual void clearMetaData();
   virtual void toAnalyzeOrNot();
   virtual void doOnlineHelp();
   virtual void doAutoMix();
-  virtual void selectionMenu();
+  virtual void selectionMenu(const QPoint&);
   virtual void openQueueMenu();
   virtual void openStatistics();
-  virtual void startRenamer();
+  virtual void startRenamerOnSongs();
+  virtual void startRenamerOnIndices();
   
   // queue actions
-  virtual void playQueueSong(Q3ListViewItem *);
+  virtual void playTreeSong(QTreeWidgetItem *);
   virtual void queueShiftUp();
   virtual void queueShiftDown();
   virtual void queueDelete();
@@ -192,22 +184,30 @@ public slots:
   virtual void queueAnker();
   
   // history actions
-  virtual void playHistorySong(Q3ListViewItem *);
   virtual void savePlayHistory();
   virtual void clearPlayHistory();
   
   // album actions
-  virtual void albumItemChanged(Q3ListViewItem*, int col);
-  virtual void renameAlbumItem(Q3ListViewItem*);
-  virtual void selectAlbumItem(Q3ListViewItem*);
+private:
+  void insertSongInAlbum(Song*, const QString & a, int nr);
+  void deleteSongFromAlbum(AlbumItem *);
+public slots:
+  virtual void albumItemChanged(QTreeWidgetItem*, int col);
+  virtual void selectAlbumItem(QTreeWidgetItem*);
+  /**
+   * The keypress slot will check whether a delete is pressed
+   * while viewing the albumList. If so, it will delete that
+   * song from the album.
+   */
   virtual void keyPressEvent(QKeyEvent*);
   virtual bool eventFilter(QObject*, QEvent*);
-  
+
+  virtual void sortByColumn(int col, Qt::SortOrder);
   // taglist things
-  virtual void changeTagList(Q3ListViewItem* item, const QPoint & pos, int col);
+  virtual void changeTagList(QTreeWidgetItem* item, int col);
   
   // fragment playing
-  virtual void playFragment(int);
+  virtual void playFragment(const QModelIndex&);
   void fragmentCreated(FragmentCreated* fc);
   
   // other

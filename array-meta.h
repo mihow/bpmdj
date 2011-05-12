@@ -1,6 +1,6 @@
 /****
  Borg4 Data Library
- Copyright (C) 2005-2009 Werner Van Belle
+ Copyright (C) 2005-2010 Werner Van Belle
 
  http://werner.yellowcouch.org/Borg4/group__data.html
 
@@ -36,7 +36,7 @@ public:
   ArrayStorage<T> * storage;      // data storage
   T * offset;                     // the start of the array
   Size<D> size;                   // size of this access area
-  Delta<D> delta;                 // the number of elements to move along this dimension
+  Delta<D> delta;     // the number of elements to move along this dimension
 
   ArrayMeta(Size<D> size);
   ArrayMeta(ArrayMeta<D,T> *other, const From<D> &from);
@@ -56,11 +56,13 @@ public:
     }
 
   /**
-   * this function will return a meta description based on other but with a reduced size
+   * This function returns a meta description based on other but with a
+   * reduced size
    */
   ArrayMeta(ArrayMeta<D,T> *other, const Size<D> &sized_to);
   ArrayMeta(ArrayMeta<D,T> *other, const To<D>   &to);
-  ArrayMeta(ArrayMeta<D,T> *other, const From<D> & from, const Size<D> &sized_to);
+  ArrayMeta(ArrayMeta<D,T> *other, const From<D> & from, 
+	    const Size<D> &sized_to);
   ArrayMeta(ArrayMeta<D,T> *other, const From<D> & from, const To<D> &to);
   ArrayMeta(const ArrayMeta&) 
     {
@@ -75,7 +77,8 @@ public:
    * this function returns a meta description based on o
    * but with only the selected dimensions remaining
    */
-  template <int O> ArrayMeta(const ArrayMeta<O,T>& o, const Select<D> & selected);
+  template <int O> ArrayMeta(const ArrayMeta<O,T>& o, 
+			     const Select<D> & selected);
   ArrayMeta &operator = (const ArrayMeta&) 
     {
       assert(0);
@@ -154,7 +157,8 @@ ArrayMeta<D,T>::ArrayMeta(Size<D> size)
   offset = storage->data;
 }
 
-template <int D, class T> ArrayMeta<D,T>::ArrayMeta(ArrayMeta<D,T> * other, const From<D> &from)
+template <int D, class T> ArrayMeta<D,T>::ArrayMeta(ArrayMeta<D,T> * other, 
+						    const From<D> &from)
 {
   refcount = 1;
   other->storage->refcount++;
@@ -190,7 +194,8 @@ ArrayMeta<D,T>::ArrayMeta(ArrayMeta<D,T> * other, const To<D> &to)
 }
 
 template <int D, class T>
-ArrayMeta<D,T>::ArrayMeta(ArrayMeta<D,T> * other, const From<D> &from, const Size<D> &sized)
+ArrayMeta<D,T>::ArrayMeta(ArrayMeta<D,T> * other, const From<D> &from, 
+			  const Size<D> &sized)
 {
   refcount = 1;
   other->storage->refcount++;
@@ -202,7 +207,8 @@ ArrayMeta<D,T>::ArrayMeta(ArrayMeta<D,T> * other, const From<D> &from, const Siz
 }
 
 template <int D, class T> 
-ArrayMeta<D,T>::ArrayMeta(ArrayMeta<D,T> * other, const From<D> &from, const To<D> &to)
+ArrayMeta<D,T>::ArrayMeta(ArrayMeta<D,T> * other, const From<D> &from, 
+			  const To<D> &to)
 {
   refcount = 1;
   other->storage->refcount++;

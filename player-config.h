@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__player_config_h__
 #define __loaded__player_config_h__
@@ -37,7 +39,7 @@ class PlayerConfig
    * Which DSP do we want ?
    * 0 = none; 
    * 1 = oss; 
-   * 2 = alsa; 
+   * 2 = ALSA; 
    * 3 = mixed; 
    * 4 = jack
    */
@@ -59,21 +61,9 @@ class PlayerConfig
   accessors(QString, jack_dev,"");
   accessors(int,jack_latency,150);
   accessors(bool,jack_verbose,true);
-  // version 3.9
-  accessors(bool,jack_lowlatency,false);
-  // version 4.0
-  /**
-   * Jack clock mode
-   * 0 - none
-   * 1 - auto
-   * 2 - master
-   * 3 - slave
-   */
-  accessors(int,jack_clock,false);
-  accessors(bool,jack_emittempo,true);
-  accessors(bool,jack_receivetempo,true);
-  accessors(bool,jack_emitposition,true);
-  accessors(bool,jack_receiveposition,true);
+  // version 4.1
+  accessors(QString, jack_lout,"");
+  accessors(QString, jack_rout,"");
   PlayerConfig();
   PlayerConfig(QString configname);
   void load_ui_position(QDialog * dialog);

@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__bpmplay_cpp__
 #define __loaded__bpmplay_cpp__
@@ -22,7 +24,6 @@ using namespace std;
 #include <Qt/qmessagebox.h>
 #include <Qt/qlistview.h>
 #include <Qt/qlcdnumber.h>
-#include <Qt/q3header.h>
 #include <Qt/qgroupbox.h>
 #include <stdlib.h>
 #include <stdlib.h>
@@ -62,9 +63,9 @@ using namespace std;
 #include "bpmplay.h"
 #include "capacity-checker.h"
 #include "bpmplay-event.h"
-#include "clock-jack.h"
 #include "clock-drivers.h"
 #include "hues.h"
+#include "info.h"
 
 /*-------------------------------------------
  *         Templates we need
@@ -138,6 +139,7 @@ static int    opt_rhythm = 0;
 static int    arg_low = 80;
 static int    arg_high = 160;
 static bool   opt_remote = false;
+static bool   opt_copymusic = false;
 static const char * arg_remote = "";
        bool   opt_setup = false;
        const char * arg_config = "";
@@ -156,16 +158,16 @@ void options_failure(const char* err)
 			"Command line arguments",
 			QString(err),
 			QMessageBox::Ok,QMessageBox::NoButton); 
-  
-  // print options
   printf("Usage:  bpmplay <options> argument\n\n"
 "        --config name     name of the configfile\n"
 " -s     --setup           setup a configuration\n"
 " -c     --create          create an index file if none exists\n"
 " -q     --quiet           be quiet\n"
 " -m arg --match arg       song to match tempo with\n"
-"      --remote user@host  copy necessary files (requires ssh & scp)\n"
-"--analysis------------------------------------\n"
+"--remote------------------------------------------\n"
+"      --remote user@host  executes bpmplay remotely\n"
+"      --copymusic         copy music first\n"
+"--analysis----------------------------------------\n"
 " -b     --batch           no ui output, md5sum is automatically checked\n"
 "        --bpm [1,2,3,4,5] measure bpm with specified technique (default = 1)\n"
 " -l nbr --low nbr         lowest bpm to look for (default = 120)\n"
@@ -214,7 +216,8 @@ void process_options(int argc, char* argv[])
 	      opt_remote=true;
 	      arg_str(arg_remote);
 	      argv[i]=argv[i-1]=(char*)"";
-	    } 
+	    }
+	  else if (option(arg,"copymusic")) opt_copymusic=true;
 	  else if (option(arg,"config"))
 	    {
 	      opt_config=true;
@@ -281,17 +284,14 @@ void process_options(int argc, char* argv[])
       else
 	{
 	  dsp = dsp_driver::get_driver(config);
-	  if (is_none_driver())
-	    {
-	      if (!opt_check)
-		QMessageBox::information(NULL, "DSP Driver Selection",
-			 "No DSP driver has been selected. Go to the\n"
-			 "options tab and select an appropriate one.",
-			 QMessageBox::Ok,QMessageBox::NoButton);
-	    }
+	  if (is_none_driver() && !opt_check)
+	      QMessageBox::information(NULL, "DSP Driver Selection",
+	       "No DSP driver has been selected. Go to the\n"
+	       "options tab and select an appropriate one.",
+	       QMessageBox::Ok,QMessageBox::NoButton);
 	}
 
-      // we always need a clock driver also for the analyzers. 
+      // we always need a clock driver also for the analyzers.
       // During analysis we might set the tempo with set_normal_period.
       metronome = new clock_driver();
       
@@ -314,11 +314,11 @@ void process_options(int argc, char* argv[])
     }
 }
 
-bool show_error(int err, int err2, const char*text)
+bool show_error(int err, int err2, QString text)
 {
   if (err==err2)
     {
-      Error(true,text);
+      Error(true,text.toAscii().data());
       return true;
     }
   return false;
@@ -338,8 +338,7 @@ void setup_start()
   playing = NULL;
   check_capacities();
   player_window = new Player();
-  //app->setMainWidget(player_window);
-  player_window->tab->setCurrentPage(TAB_OPTIONS);
+  player_window->tab->setCurrentIndex(TAB_OPTIONS);
   player_window->show();
   config->load_ui_position(player_window);
   app->postEvent(player_window,new InitAndStart());
@@ -407,13 +406,14 @@ void batch_start()
       return;
     }
   Info("%d. Wave written: %s",nr++,
-       (const char*)playing->readable_description());
+       playing->readable_description().toAscii().data());
   // 1. md5sum
   if (playing->get_md5sum().isEmpty())
     {
       Md5Analyzer * md5_analyzer = new Md5Analyzer();
       md5_analyzer->start();
-      Info("%d. Md5 sum: %s",nr++,(const char*)playing->get_md5sum());
+      Info("%d. Md5 sum: %s",nr++,
+	   playing->get_md5sum().toAscii().data());
     }
   // 2. energy levels
   if (!playing->fully_defined_energy() || opt_energy)
@@ -447,7 +447,8 @@ void batch_start()
 	  else if (arg_bpm==4) counter->fullAutoCorrelation->setChecked(true);
 	  else if (arg_bpm==5) counter->weightedEnvCor->setChecked(true);
 	  counter->start();
-	  Info("%d. Bpm count: %s",nr++,playing->get_tempo().get_charstr());
+	  Info("%d. Bpm count: %s",nr++,
+	       playing->get_tempo().qstring().toAscii().data());
 	}
     }
   
@@ -503,7 +504,7 @@ void batch_start()
 
 bool to_remote(char* filename)
 {
-  return vexecute(" ssh %s  mkdir -p %s",arg_remote,
+  return vexecute(SSH" %s mkdir -p %s",arg_remote,
 		  escape(escape(dirname(strdup(filename)))))
     && vexecute(" scp -q %s %s:%s",escape(filename),arg_remote,
 		escape(escape(dirname(strdup(filename)))));
@@ -517,7 +518,7 @@ bool from_remote(char* filename)
 
 bool delete_remote(char* filename)
 {
-  return vexecute(" ssh %s rm %s",arg_remote,escape(escape(filename)));
+  return vexecute(SSH" %s rm %s",arg_remote,escape(escape(filename)));
 }
 
 int remote(int argc, char* argv[])
@@ -526,15 +527,20 @@ int remote(int argc, char* argv[])
   if (!opt_setup)
     {
       Index * toplay = new Index(argument);
-      Remote("Uploading song & index file");
-      sprintf(mp3,"./music/%s",(const char*)toplay->get_filename());
-      if (!to_remote(mp3)) return 1;
+      if (opt_copymusic)
+	Remote("Uploading song & index file");
+      else
+	Remote("Uploading index file");
+      sprintf(mp3,"./music/%s",
+	      toplay->get_filename().toAscii().data());
+      if (opt_copymusic)
+	if (!to_remote(mp3)) return 1;
       if (!to_remote(argument)) return 2;
-      if (opt_match && strcmp(arg_match,argument)) 
+      if (opt_match && strcmp(arg_match,argument))
 	if (!to_remote(arg_match)) return 3;
     }
   char newcmd[2000];
-  sprintf(newcmd," ssh -X %s ",arg_remote);
+  sprintf(newcmd,SSH" %s ",arg_remote);
   for(int i = 0 ; i < argc ; i ++)
     {
       strcat(newcmd,escape(escape(argv[i])));
@@ -547,8 +553,9 @@ int remote(int argc, char* argv[])
       Remote("Downloading index file");
       if (!from_remote(argument)) return 5;
       if (!delete_remote(argument)) return 6;
-      if (!delete_remote(mp3)) return 7;
-      if (opt_match && strcmp(arg_match,argument)) 
+      if (opt_copymusic)
+	if (!delete_remote(mp3)) return 7;
+      if (opt_match && strcmp(arg_match,argument))
 	if (!delete_remote(arg_match)) return 8;
     }
   return 0;
@@ -566,7 +573,7 @@ int main(int argc, char *argv[])
   if (opt_create)
     {
       Index *index = createNewIndexFor(argument,"./");
-      argument = strdup(index->get_storedin());
+      argument = strdup(index->get_storedin().toAscii().data());
       delete(index);
     }
   if (opt_check)

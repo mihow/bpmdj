@@ -1,6 +1,6 @@
 /****
  Borg4 Data Library
- Copyright (C) 2005-2009 Werner Van Belle
+ Copyright (C) 2005-2010 Werner Van Belle
 
  http://werner.yellowcouch.org/Borg4/group__data.html
 
@@ -50,32 +50,46 @@ using namespace std;
 /**
  * @defgroup data Data
  *
- * The data layer was written in order to solve a number of annoyances when programming in C++
+ * The data layer was written in order to solve a number of annoyances when 
+ * programming in C++
  * 
- * - C++ does not provide automatic serialization/deserialization and data compatibility between 
- *   different hosts and processes is a modern necessity when writing applications.
- * - There is no generic 'object' type in C++ and simply implementations (e.g : creating a library/application Object
- *   root) easily leads to inefficient representations with generic types such as Integers, Floats,... are subclassed
- *   from such a root. For instance: an array of native integers versus 'object' based integers might be twice as large.
- * - Many generic data formats lacks multidimensional arrays, requiring the user to wrap arrays within arrays, which in 
- *   itself might make specific optimizations impossible. Traversing through multi- dimensional operations can often be
- *   optimized by properly sorting the stride, sizes and offsets before iteration. This can lead to efficient use of 
- *   specialized operations for linear blocks of data. E.g MMX optimized array operations. By providing an array data
- *   type this kind of use has become feasible.
- * - Often, when working with generic data types in C++, downcasting is a necessity. However, downcasts themselves
- *   override compiler warnings and bypassing the type checking. Since many errors occur due to wrong downcasts, it is 
- *   necessary to integrate a type checking operator into a generic data framework.
- * - Memory allocation of generic data types is often overlooked, leading to memory leaks or inefficient use of memory. 
- *   In the data library memory allocation is performed using reference counting, which leads to one of the more efficient
- *   implementations as observed by [REF]. The requirement on the application program is not to introduce loops, but this 
- *   is not a problem, since those classes are aimed to provide an efficient serialization/deserialization interface.
- * - Languages that provide generic data types often also include garbage collection features. Those languages are often
- *   too impractical for heavy duty operations such as image processing and sound processing. (however their 'heaviness' 
- *   is not necessarily linked to the garbage collection as such)
+ * - C++ does not provide automatic serialization/deserialization and data 
+ *   compatibility between different hosts and processes is a modern necessity
+ *   when writing applications.
+ * - There is no generic 'object' type in C++ and simply implementations (e.g:
+ *   creating a library/application Object root) easily leads to inefficient 
+ *   representations with generic types such as Integers, Floats,... are 
+ *   subclassed from such a root. For instance: an array of native integers
+ *   versus 'object' based integers might be twice as large.
+ * - Many generic data formats lacks multidimensional arrays, requiring the
+ *   user to wrap arrays within arrays, which in itself might make specific 
+ *   optimizations impossible. Traversing through multi- dimensional operations
+ *   can often be optimized by properly sorting the stride, sizes and offsets 
+ *   before iteration. This can lead to efficient use of specialized operations
+ *   for linear blocks of data. E.g MMX optimized array operations. By 
+ *   providing an array data type this kind of use has become feasible.
+ * - Often, when working with generic data types in C++, downcasting is a 
+ *   necessity. However, downcasts themselves override compiler warnings and 
+ *   bypassing the type checking. Since many errors occur due to wrong 
+ *   downcasts, it is necessary to integrate a type checking operator into a 
+ *   generic data framework.
+ * - Memory allocation of generic data types is often overlooked, leading to 
+ *   memory leaks or inefficient use of memory. In the data library memory 
+ *   allocation is performed using reference counting, which leads to one of 
+ *   the more efficient implementations as observed by [REF]. The requirement
+ *   on the application program is not to introduce loops, but this is not a 
+ *   problem, since those classes are aimed to provide an efficient 
+ *   serialization/deserialization interface.
+ * - Languages that provide generic data types often also include garbage 
+ *   collection features. Those languages are often too impractical for heavy 
+ *   duty operations such as image processing and sound processing. (however 
+ *   their 'heaviness' is not necessarily linked to the garbage collection as
+ *   such)
  * 
- * @todo We should replace the template array class with the generic message class which still resides in the hatchery. 
- * There is no need to use this complicated template since it does not make programs perform much faster. Instead we 
- * seem to loose a lot of flexibility by using these templates. 
+ * @todo We should replace the template array class with the generic message 
+ * class which still resides in the hatchery. There is no need to use this 
+ * complicated template since it does not make programs perform much faster.
+ * Instead we seem to loose a lot of flexibility by using these templates. 
  */
 
 //===============================================================
@@ -102,14 +116,16 @@ class DataClass
   friend class Data;
   /** 
    * Normally an implicit
-   * allocation has allocation_count == 0, indicating that it only exists in some temporary storage
-   * As soon as a memory_copy is realized the allocation_count will increase. 
+   * allocation has allocation_count == 0, indicating that it only exists in 
+   * some temporary storage. As soon as a memory_copy is realized the 
+   * allocation_count will increase. 
    */
   int allocation_count;
 
   /**
    * returns a copy to the dataclass object, by either making a shallow copy 
-   * (when going from allocation count 0 to 1) or by returning the this pointer. 
+   * (when going from allocation count 0 to 1) or by returning the this 
+   * pointer. 
    * In all cases the allocation_count will be increased. The memory_copy and 
    * memory_release functions are only available from within the Data class, 
    * ensuring that a proper pointer management is possible.
@@ -117,9 +133,11 @@ class DataClass
   DataClass* memory_copy() const;
   
   /**
-   * decreases the allocation count. If it reaches zero, the object deletes itself with delete.
-   * The memory_copy  and memory_release functions are only available from within the Data class, ensuring that
-   * a proper pointer management is possible.
+   * Decreases the allocation count. If it reaches zero, the object deletes 
+   * itself with delete.
+   * The memory_copy  and memory_release functions are only available from 
+   * within the Data class, ensuring that a proper pointer management is 
+   * possible.
    */
   void       memory_release();
    
@@ -281,8 +299,8 @@ class Data
 #undef ARRAY_TYPE
 
   /**
-   * Empty function at the moment. Will assert itself. This function is necessary to 
-   * allow the array templates to compile properly
+   * Empty function at the moment. Will assert itself. This function is 
+   * necessary to allow the array templates to compile properly
    */
   Data & operator +=(const Data &) 
     {
@@ -290,8 +308,8 @@ class Data
     };
 
   /**
-   * Empty function at the moment. Will assert itself. This function is necessary to 
-   * allow the array templates to compile properly
+   * Empty function at the moment. Will assert itself. This function is 
+   * necessary to allow the array templates to compile properly
    */
   Data & operator -=(const Data &) 
     {
@@ -299,8 +317,8 @@ class Data
     };
 
   /**
-   * Empty function at the moment. Will assert itself. This function is necessary to 
-   * allow the array templates to compile properly
+   * Empty function at the moment. Will assert itself. This function is
+   * necessary to allow the array templates to compile properly
    */
   Data & operator /=(const Data &) 
     {
@@ -308,8 +326,8 @@ class Data
     };
 
   /**
-   * Empty function at the moment. Will assert itself. This function is necessary to 
-   * allow the array templates to compile properly
+   * Empty function at the moment. Will assert itself. This function is
+   *  necessary to  allow the array templates to compile properly
    */
   Data & operator *=(const Data &) 
     {
@@ -317,7 +335,8 @@ class Data
     };
 
   /**
-   * Empty function at the moment. Will assert itself. This function is necessary to 
+   * Empty function at the moment. Will assert itself. This function is 
+   * necessary to 
    * allow the array templates to compile properly
    */
   bool & operator !=(const Data &)
@@ -336,7 +355,8 @@ class Data
    void setField(QString s, Data v);
      
   /**
-   * Empty function at the moment. Will assert itself. This function is necessary to 
+   * Empty function at the moment. Will assert itself. This function is 
+   * necessary to 
    * allow the array templates to compile properly
    */
   bool & operator ==(const Data &) 

@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__albumitem_cpp__
 #define __loaded__albumitem_cpp__
@@ -25,25 +27,45 @@ using namespace std;
 #include "albumitem.h"
 #include "qsong.h"
 #include "dirscanner.h"
+#include "qstring-factory.h"
 
-AlbumItem::AlbumItem(const char* name, Q3ListView* parent) :
-  Q3ListViewItem(parent,name)
+AlbumItem::AlbumItem(QString name, QTreeWidget* parent) :
+  TreeWidgetSong(NULL,parent)
 {
-  init_song();
+  setText(ALBUM_NR,name);
+  setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 }
 
-AlbumItem::AlbumItem(int nr, Song * s, Q3ListViewItem* parent) :
-  Q3ListViewItem(parent,QString::number(nr),s->get_title(),s->get_author(),
-		 s->get_time(),s->get_storedin(),s->get_file())
+AlbumItem::AlbumItem(unsigned1 nr, Song * s, AlbumItem* parent) :
+  TreeWidgetSong(s,parent)
 {
-  set_song(s);
-  setRenameEnabled(0,true);
-  fixNr();
+  setNr(nr);
+  init();
+  setFlags(Qt::ItemIsEditable | Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 }
 
-void AlbumItem::fixNr()
+void AlbumItem::init()
 {
-  if (text(0).length()<2)
-    setText(0,QString("0")+text(0));
+  if (!song)
+    {
+      setText(ALBUM_TITLE,EMPTY);
+      setText(ALBUM_AUTHOR,EMPTY);
+      setText(ALBUM_TIME,EMPTY);
+      setText(ALBUM_INDEX,EMPTY);
+      setText(ALBUM_FILE,EMPTY);
+    }
+  else
+    {
+      setText(ALBUM_TITLE,song->get_title());
+      setText(ALBUM_AUTHOR,song->get_author());
+      setText(ALBUM_TIME,song->get_time());
+      setText(ALBUM_INDEX,song->get_storedin());
+      setText(ALBUM_FILE,song->get_file());
+    }
+}
+
+void AlbumItem::setNr(unsigned1 nr)
+{
+  setText(ALBUM_NR,tonumber((unsigned4)nr));
 }
 #endif // __loaded__albumitem_cpp__

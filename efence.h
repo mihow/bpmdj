@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__efence_h__
 #define __loaded__efence_h__
@@ -23,13 +25,13 @@ using namespace std;
  * Bruce Perens, 1988, 1993
  * 
  * This is a special version of malloc() and company for debugging software
- * that is suspected of overrunning or underrunning the boundaries of a
+ * that is suspected of overrunning or under-running the boundaries of a
  * malloc buffer, or touching free memory.
  *
  * It arranges for each malloc buffer to be followed (or preceded)
- * in the address space by an inaccessable virtual memory page,
- * and for free memory to be inaccessable. If software touches the
- * inaccessable page, it will get an immediate segmentation
+ * in the address space by an inaccessible virtual memory page,
+ * and for free memory to be inaccessible. If software touches the
+ * inaccessible page, it will get an immediate segmentation
  * fault. It is then trivial to uncover the offending code using a debugger.
  *
  * An advantage of this product over most malloc debuggers is that this one

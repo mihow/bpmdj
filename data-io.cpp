@@ -1,6 +1,6 @@
 /****
  Borg4 Data Library
- Copyright (C) 2005-2009 Werner Van Belle
+ Copyright (C) 2005-2010 Werner Van Belle
 
  http://werner.yellowcouch.org/Borg4/group__data.html
 
@@ -22,6 +22,8 @@
 #define __loaded__data_io_cpp__
 using namespace std;
 #line 1 "data-io.c++"
+#include <errno.h>
+#include <string.h>
 #include <sys/mman.h>
 #include <qstring.h>
 #include "symbol.h"
@@ -136,7 +138,8 @@ void DataTexter::dumpSequence(Array<D,T> & array) \
 { \
   int mark = push("["); \
   int count = array.size(0); \
-  for(ArrayIterator<D,T,true,D-1,false> submatrix(array,0) ; submatrix.more() ; ++submatrix) \
+  for(ArrayIterator<D,T,true,D-1,false> submatrix(array,0) ; \
+      submatrix.more() ; ++submatrix)			\
     {\
 	int lastline = get_line();\
 	Array<D-1,T> &sub  = submatrix;\
@@ -313,7 +316,8 @@ void DataTexter::visit(String & str)
   pop(mark,"\'");
 }
 
-DataTexter::DataTexter(QString fn, const char* mode) : DataIo(fn,mode), newline(true)
+DataTexter::DataTexter(QString fn, const char* mode) : 
+  DataIo(fn,mode), newline(true)
 {
   lines = 0;
   written = 0;
@@ -527,18 +531,20 @@ DataBinner::~DataBinner()
   munmap_textfile();
 }
 
-void DataBinner::write(Data data, QString filename)
+bool DataBinner::write(Data data, QString filename)
 {
   DataBinner dt(filename,"wb");
   dt.start_writing();
   dt.write(data);
+  return dt.munmap_textfile();
 }
 
-void DataBinner::write(Data data, FILE *file)
+bool DataBinner::write(Data data, FILE *file)
 {
   DataBinner dt(file);
   dt.start_writing();
   dt.write(data);
+  return dt.munmap_textfile();
 }
 
 Data DataBinner::read_file(QString filename)
@@ -565,7 +571,8 @@ int DataBinner::read_fileformat_versionnr()
 #else
       QByteArray ba=file_in_use.ascii();
 #endif
-      printf("Could not read fileformat version from file %s\n",(const char*)ba);
+      printf("Could not read fileformat version from file %s\n",
+	     (const char*)ba);
       exit(150);
     }
   int version=*(int*)cur_ptr;
@@ -629,19 +636,37 @@ void DataBinner::mmap_textfile()
     }
   cur_ptr = mapped_region;
 #endif
-  
 }
 
-void DataBinner::munmap_textfile()
+bool DataBinner::munmap_textfile()
 {
 #ifdef LINUX
-  munmap(mapped_region,mapped_size);
+  if (mapped_region==NULL || mapped_size==0) return true;
+  int err=munmap(mapped_region,mapped_size);
+  if (err!=0)
+    {
+      printf("Could not unmap %s - error: %s. Mapped_size=%d\n",
+	     file_in_use.toAscii().data(),
+	     strerror(errno),
+	     mapped_size);
+      return false;
+    }
+  else
+    {
+      mapped_region=NULL;
+      mapped_size=0;
+    }
 #endif
-
+  
 #ifdef WINDOWS
   if (mapped_region)
-    free(mapped_region);
+    {
+      free(mapped_region);
+      mapped_region=NULL;
+      mapped_size=0;
+    }
 #endif
+  return true;
 }
 
 void DataBinner::write_internal(const char * ptre, int size)
@@ -678,7 +703,6 @@ void DataBinner::visitArray(Array<D,T> & array)
   for(int d = 0 ; d < D ; d++)  
     write_internal((unsigned8)array.size(d));  // D
   for(typename Array<D,T>::ordered element(array) ; element.more() ; ++element)
-
     write_internal((T&)element);  // E
 };
 
@@ -729,11 +753,13 @@ Data DataBinner::read_array_internal()
   if (element.linear() && typeid(T)!=typeid(Data))
     while(element.more())
       {
-	read_internal((char*)element.current(),element.size()*sizeof(T));  // E's
+	// E's
+	read_internal((char*)element.current(),element.size()*sizeof(T));  
 	element.skipBlock();
       }
   else
-    for(typename Array<D,T>::ordered element(result) ; element.more() ; ++element)
+    for(typename Array<D,T>::ordered element(result) ; element.more() ; 
+	++element)
       read_internal((T&)element);  // one E
   return result;
 }

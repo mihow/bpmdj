@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__beatgraph_analyzer_cpp__
 #define __loaded__beatgraph_analyzer_cpp__
@@ -64,13 +66,15 @@ using namespace std;
 #include "signals.h"
 #include "clock-drivers.h"
 #include "hues.h"
+#include "info.h"
 
 #define COLLAPSE 4
 const int maxslice = 8;
 
 BeatGraphAnalyzer::BeatGraphAnalyzer(QWidget * parent, const char* name) :
-  QWidget(parent,name)
+  QWidget(parent)
 {
+  setWindowTitle(name);
   setupUi(this);
   period = 0;
   audiosize = 0;
@@ -279,9 +283,11 @@ void BeatGraphAnalyzer::calculateHaar()
 { 
   if (bank) return;
   unsigned4 collapsed_size = audiosize / COLLAPSE ;
-  // First we calculate a number of layers, based on the audio-stream...
-  // In every step we will modify the signed_data set by subtracting the
-  // current mean...
+  /**
+   * First we calculate a number of layers, based on the audio-stream...
+   * In every step we will modify the signed_data set by subtracting the
+   * current mean...
+   */
   bank = bpmdj_allocate(maxslice+1,float4*);
   bpmdj_array(bank_energy,maxslice+1,float8);
   bool power = false;
@@ -620,7 +626,14 @@ void BeatGraphAnalyzer::calculateF1()
       unsigned4* cur=channels[tofill];
       unsigned4 last=channelsize*channelcount;
       for(unsigned4 y = 0 ; y < last; y+=channelcount)
-	dist+=abs(cur[y]-prev[y]);
+	{
+	  unsigned4 cy=cur[y];
+	  unsigned4 py=prev[y];
+	  if (cy>py)
+	    dist+=cy-py;
+	  else
+	    dist+=py-cy;
+	}
       channel_energy[tofill]=sqrt(dist);
     }
   
@@ -664,9 +677,10 @@ void BeatGraphAnalyzer::calculateF1()
 	    }
 	  oj=j;
 	}
-      // an interesting side effect from all these
-      // calculations is that we can see how many sounds
-      // we have at the same time
+      /**
+       * An interesting side effect from all these calculations is that we can
+       * see how many sounds we have at the same time
+       */
       sat[i]=S/channelcount;
       hue[i]=channel2hue[ma];
     }

@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__player_cpp__
 #define __loaded__player_cpp__
@@ -54,12 +56,34 @@ using namespace std;
 #include "bpmplay-event.h"
 #include "ao-som-beatgraph.h"
 #include "clock-drivers.h"
-#include "scripts.h"
+#include "info.h"
 #include "dsp-jack.h"
-#include "clock-jack.h"
 #include "clock-drivers.h"
+#include "ext-clock.h"
+#include "qt-helpers.h"
 
+/**
+ * The user interface is a secondary aspect, and fast updates (especially 10 
+ * per second) interfere with the proper operation of the player on my machine
+ * (which is kinda old). If you want another speed, consider setting it in the
+ * defines file
+ */
+
+/** 
+ * BF: tempo fading should not be related with the UI.
+ * sync operations now rely on a timer to avoid spawning a new thread,
+ * but need a much lower refresh time, so I introduced a second timer.
+ *
+ */
+#ifndef REFRESH_TIME
 #define REFRESH_TIME 1000
+#endif
+#ifndef FINE_REFRESH_TIME
+#define FINE_REFRESH_TIME 100
+#endif
+#ifdef MIDI
+#include "midi-bindings.h"
+#endif
 
 void fetch_config_from(PlayerConfig * target, const Player& song_player);
 void store_config_into(PlayerConfig * from,   Player* song_player);
@@ -83,10 +107,11 @@ void fetch_config_from(PlayerConfig * target, const Player& player)
   Capacity cap = get_capacity(player.capacity);
   if (target->get_disabled_capacities()!=cap)
     {
-      QMessageBox::information(NULL,"Decoder option",
-       "The new decoding capacities will only be in effect the next\n"
-       "time you start bpmplay with this configuration\n",
-       QMessageBox::Ok,QMessageBox::NoButton);
+      if (!opt_setup)
+	QMessageBox::information(NULL,"Decoder option",
+	 "The new decoding capacities will only be in effect the next\n"
+         "time you start bpmplay with this configuration\n",
+	 QMessageBox::Ok,QMessageBox::NoButton);
       target->set_disabled_capacities(cap);
     }
   
@@ -95,19 +120,8 @@ void fetch_config_from(PlayerConfig * target, const Player& player)
     target->set_player_dsp(2);
   if (player.oss->isChecked())
     target->set_player_dsp(1);
-  if (player.bpm->isChecked())
-    target->set_player_dsp(3);
   if (player.jack->isChecked())
     target->set_player_dsp(4);
-
-  if (player.jack_noclock->isChecked())
-    target->set_jack_clock(0);
-  else if (player.jack_autoclock->isChecked())
-    target->set_jack_clock(1);
-  else if (player.jack_masterclock->isChecked())
-    target->set_jack_clock(2);
-  else if (player.jack_slaveclock->isChecked())
-    target->set_jack_clock(3);
 
 #define BOOL(a) target->set_##a(player.a->isChecked());
 #define NR(a) target->set_##a(player.a->value());
@@ -122,19 +136,14 @@ void fetch_config_from(PlayerConfig * target, const Player& player)
    BOOL(oss_nolatencyaccounting); 
    NR(oss_latency);
    BOOL(jack_verbose);
-   NR(bpm_channel);
    TEXT(jack_dev);
-   NR(bpm_channel);
-   BOOL(jack_lowlatency);
-   BOOL(jack_emittempo);
-   BOOL(jack_emitposition);
-   BOOL(jack_receivetempo);
-   BOOL(jack_receiveposition);
+   TEXT(jack_lout);
+   TEXT(jack_rout);
 #undef TEXT
 #undef NR
 #undef BOOL
    target->set_player_rms(player.rms_toggle->isChecked());
-   target->set_player_rms_target(atof(player.rms->text()));
+   target->set_player_rms_target(qtof4(player.rms->text()));
 }
 
 void store_config_into(PlayerConfig * from, Player* player)
@@ -143,13 +152,7 @@ void store_config_into(PlayerConfig * from, Player* player)
   // clear all selections according to numerical coding
   player->alsa->setChecked(from->get_player_dsp()==2);
   player->oss->setChecked(from->get_player_dsp()==1);
-  player->bpm->setChecked(from->get_player_dsp()==3);
   player->jack->setChecked(from->get_player_dsp()==4);
-
-  player->jack_noclock->setChecked(from->get_jack_clock()==0);
-  player->jack_autoclock->setChecked(from->get_jack_clock()==1);
-  player->jack_masterclock->setChecked(from->get_jack_clock()==2);
-  player->jack_slaveclock->setChecked(from->get_jack_clock()==3);
   
 #define BOOL(a) player->a->setChecked(from->get_##a())
 #define NR(a) player->a->setValue(from->get_##a())
@@ -165,12 +168,8 @@ void store_config_into(PlayerConfig * from, Player* player)
   NR(oss_latency);
   BOOL(jack_verbose);
   TEXT(jack_dev);     
-  NR(bpm_channel);
-  BOOL(jack_lowlatency);
-  BOOL(jack_emittempo);
-  BOOL(jack_emitposition);
-  BOOL(jack_receivetempo);
-  BOOL(jack_receiveposition);
+  TEXT(jack_lout);
+  TEXT(jack_rout);
 #undef TEXT
 #undef NR
 #undef BOOL
@@ -219,18 +218,20 @@ void Player::init_tempo_switch_time()
   tempoSwitchTime->setValue(time);
 }
 
-Player::Player(): 
-  QDialog(NULL,"songplayer",false,Qt::Window)
+Player::Player(): QDialog()
 {
   setupUi(this);
   bpmCounter->player=this;
   timer = new QTimer(this);
+  finetimer = new QTimer(this);
   map = NULL;
   map_size = 0;
   map_scale = 16;
   mapLengthChanged(64);
   connect(timer,SIGNAL(timeout()), SLOT(timerTick()));
   timer->start(REFRESH_TIME);
+  connect(finetimer,SIGNAL(timeout()), SLOT(fineTimerTick()));
+  finetimer->start(FINE_REFRESH_TIME);
   tempo_fade=-1;
   fade_time=0;
   wantedcurrentperiod=0;
@@ -247,14 +248,10 @@ Player::Player():
 #endif
 #ifndef COMPILE_JACK
   jacktab->setDisabled(true);
-  jackbox->setDisabled(true);
-  jackbox->setHidden(true);
 #endif  
-#ifndef JACK_TRANSPORT
-  jackbox->setDisabled(true);
-  jackbox->setHidden(true);
+#ifndef EXT_CLOCK
+  clocksync->setDisabled(true);
 #endif
-  smallmixertab->setDisabled(true);
 
   // set colors of tempo change buttons
   init_tempo_switch_time();
@@ -279,22 +276,20 @@ void Player::captionize_according_to_index()
     {
       blah = playing->readable_description();
     }
-  setCaption(blah);
+  setWindowTitle(blah);
 }
 
 void Player::tabChanged()
 {
-  // The beatgraph ins and outs
-  if (tab->currentPageIndex() == TAB_BEATGRAPH)
+  if (tab->currentIndex() == TAB_BEATGRAPH)
     beatGraphAnalyzer->activate();
   else
     beatGraphAnalyzer->deactivate();
-  // The info ins and outs
-  if (tab->currentPageIndex() == TAB_INFO)
+  if (tab->currentIndex() == TAB_INFO)
     songInfo->updateDataFrom(playing);
   else
     captionize_according_to_index();
-  if (tab->currentPageIndex() == TAB_OPTIONS)
+  if (tab->currentIndex() == TAB_OPTIONS)
     store_config_into(config,this);
 }
 
@@ -309,76 +304,12 @@ void Player::redrawCues()
 
 void Player::setColor(QWidget *button, bool enabled)
 {
-   QColor a, ad, am, aml, al;
-   QPalette pal;
-   QColorGroup cg;
-
+   QColor a;
    if (enabled)
-     {
-	a=QColor(0,255,127);
-	ad=QColor(0,127,64);
-	am=QColor(0, 170, 85);
-	aml=QColor(63, 255,  159);
-	al=QColor( 127,255,191) ;
-     }
+     a=QColor(0,255,127);
    else
-     {
-	a=QColor(255,0,127);
-	ad=QColor(127,0,64);
-	am=QColor( 170, 0, 85);
-	aml=QColor( 255, 63, 159);
-	al=QColor( 255, 127, 191) ;
-     }
-
-   cg.setColor( QColorGroup::Foreground, Qt::black );
-   cg.setColor( QColorGroup::Button, a );
-   cg.setColor( QColorGroup::Light, al);
-   cg.setColor( QColorGroup::Midlight, aml);
-   cg.setColor( QColorGroup::Dark, ad );
-   cg.setColor( QColorGroup::Mid, am);
-   cg.setColor( QColorGroup::Text, Qt::black );
-   cg.setColor( QColorGroup::BrightText, Qt::white );
-   cg.setColor( QColorGroup::ButtonText, Qt::black );
-   cg.setColor( QColorGroup::Base, Qt::white );
-   cg.setColor( QColorGroup::Background, a ); //QColor( 192, 192, 192) );
-   cg.setColor( QColorGroup::Shadow, Qt::black );
-   cg.setColor( QColorGroup::Highlight, QColor( 0, 0, 128) );
-   cg.setColor( QColorGroup::HighlightedText, Qt::white );
-   
-   pal.setActive( cg );
-   cg.setColor( QColorGroup::Foreground, Qt::black );
-   cg.setColor( QColorGroup::Button, a );
-   cg.setColor( QColorGroup::Light, QColor( 255, 127, 191) );
-   cg.setColor( QColorGroup::Midlight, QColor( 255, 38, 147) );
-   cg.setColor( QColorGroup::Dark, ad );
-   cg.setColor( QColorGroup::Mid, am);
-   cg.setColor( QColorGroup::Text, Qt::black );
-   cg.setColor( QColorGroup::BrightText, Qt::white );
-   cg.setColor( QColorGroup::ButtonText, Qt::black );
-   cg.setColor( QColorGroup::Base, Qt::white );
-   cg.setColor( QColorGroup::Background, a); // QColor( 192, 192, 192) );
-   cg.setColor( QColorGroup::Shadow, Qt::black );
-   cg.setColor( QColorGroup::Highlight, QColor( 0, 0, 128) );
-   cg.setColor( QColorGroup::HighlightedText, Qt::white );
-  
-   pal.setInactive( cg );
-   cg.setColor( QColorGroup::Foreground, QColor( 128, 128, 128) );
-   cg.setColor( QColorGroup::Button, a );
-   cg.setColor( QColorGroup::Light, QColor( 255, 127, 191) );
-   cg.setColor( QColorGroup::Midlight, QColor( 255, 38, 147) );
-   cg.setColor( QColorGroup::Dark, ad );
-   cg.setColor( QColorGroup::Mid, am);
-   cg.setColor( QColorGroup::Text, Qt::black );
-   cg.setColor( QColorGroup::BrightText, Qt::white );
-   cg.setColor( QColorGroup::ButtonText, QColor( 128, 128, 128) );
-   cg.setColor( QColorGroup::Base, Qt::white );
-   cg.setColor( QColorGroup::Background, a); // QColor( 192, 192, 192) );
-   cg.setColor( QColorGroup::Shadow, Qt::black );
-   cg.setColor( QColorGroup::Highlight, QColor( 0, 0, 128) );
-   cg.setColor( QColorGroup::HighlightedText, Qt::white );
-   pal.setDisabled( cg );
-   
-   button->setPalette( pal );
+     a=QColor(255,0,127);
+   setBackgroundColor(button,a);
 }
 
 typedef enum {PlayingAtNormalTempo, 
@@ -388,23 +319,11 @@ typedef enum {PlayingAtNormalTempo,
 
 void setTempoColors(QWidget *button, tempoState state)
 {
-  QColor a;
-  QPalette pal;
-  QColorGroup cg;
-  
-       if (state==PlayingAtNormalTempo) a=QColor(0,255,0);
-  else if (state==TempoIsChanging)      a=QColor(255,255,0);
-  else if (state==PlayingAtTargetTempo) a=QColor(255,0,0);
-       
-  cg.setColor( QColorGroup::Foreground, a );
-  cg.setColor( QColorGroup::Background, Qt::black );
-  pal.setActive( cg );
-  cg.setColor( QColorGroup::Foreground, a);
-  cg.setColor( QColorGroup::Background, Qt::black );
-  pal.setInactive( cg );
-  cg.setColor( QColorGroup::Foreground, a);
-  cg.setColor( QColorGroup::Background, Qt::black );
-  button->setPalette( pal );
+  QColor a; 
+  if (state==PlayingAtNormalTempo) a=QColor(0,255,0);
+  else if (state==TempoIsChanging) a=QColor(255,255,0);
+  else if (state==PlayingAtTargetTempo) a=QColor(255,0,0);  
+  setBackgroundColor(button,a);
 }
 
 void Player::updateTempoColors()
@@ -457,13 +376,13 @@ void Player::retrieveNextCue()
 
 bool Player::cueKey(QKeyEvent* e, int p)
 {
-  int bs = e->state() & Qt::KeyButtonMask;
+  int bs = e->modifiers() & Qt::KeyboardModifierMask;
   if (bs==0) 
     {
       retrieveCue(p);
       return true;
     }
-  else if (bs==Qt::AltButton)
+  else if (bs==Qt::AltModifier)
     {
       storeCue(p);
       return true;
@@ -473,7 +392,7 @@ bool Player::cueKey(QKeyEvent* e, int p)
 
 void Player::keyPressEvent(QKeyEvent * e)
 {
-  if (tab->currentPageIndex() == TAB_BEATGRAPH)
+  if (tab->currentIndex() == TAB_BEATGRAPH)
     {
 #define ACCEPT e->accept(); return;
       switch (e->key())
@@ -584,6 +503,7 @@ void Player::nudgeMinus8M()
 void Player::accept()
 {
   timer->stop();
+  finetimer->stop();
   beatGraphAnalyzer->deactivate();
   done(Accepted);
 }
@@ -598,12 +518,15 @@ void Player::timerTick()
       // see comments in PlayerConfig::load_ui_position
       if (no_raw_file_error_box==9) 
 	config->load_ui_position(this);
+#ifndef NO_AUTOSTART
       // should we start playing ?
       if (!autostarted && m>5*44100 && dsp->get_paused())
 	{
 	  autostarted=true;
+	  retrieveZ();
 	  restart();
 	}
+#endif
       // error on the disk stuff ?
       if (m==0 && no_raw_file_error_box==0 && playing)
 	{
@@ -640,19 +563,30 @@ void Player::timerTick()
       NormalTempoLCD -> display(T1);
       TempoLd->display(100.0*(float4)normalperiod/(float4)currentperiod);
       updateTempoColors();
-#ifdef JACK_TRANSPORT
-      char bbtstr[20];
-      char timestr[20];
-      unsigned8 clocktime = samples2s(clockframes);
-      sprintf(timestr,"%02d:%02d:%02d",(int)(clocktime/3600),
-	      (int)(clocktime%3600)/60,(int)(clocktime%60));
-      jacktime->display(timestr);
-      sprintf(bbtstr, "%02d:%02d", (int)bar, (int)beat);
-      jackbbt->display(bbtstr);
-      if (timemaster)
-	jackmaster->setText("Jack Master");
-      else	  
-	jackmaster->setText("Jack Slave");
+#ifdef EXT_CLOCK
+      if (currentperiod > 0) {
+	ext_clock *c = (ext_clock *)::metronome;
+	/*
+	  char bbtstr[20];
+	  char timestr[20];
+	  unsigned8 ct = samples2s(c->clock->currentframe);
+
+	  T1 = mperiod2bpm(c->clock->currentperiod);
+	  if (T1 < -1) T1=0;
+	  clockbpm->display(T1);
+	  sprintf(timestr,"%02d:%02d:%02d",(int)(ct/3600),
+	  (int)(ct%3600)/60,(int)(ct%60));
+	  clocktime->display(timestr);
+	  int bar = ((::y-dsp->latency()-c->first_beat) / currentperiod) + 1;
+	  int beat = (((::y-dsp->latency()-c->first_beat) % currentperiod) / (currentperiod / 4)) + 1;
+	  sprintf(bbtstr, "%02d:%02d", (int)bar, (int)beat);      
+	  clockbbt->display(bbtstr);
+	*/
+	if (c->sync)
+	  clocksync->setText("Detach from clock");
+	else	  
+	  clocksync->setText("Sync with clock");
+      }
 #endif
     }
   else
@@ -661,8 +595,13 @@ void Player::timerTick()
       beatGraphAnalyzer->currentTempoLcd -> display(0);
       NormalTempoLCD -> display(0);
     }
+}
+
+void Player::fineTimerTick()
+{
   if (fade_time>0)
     targetStep();
+  ::metronome->sync_with_clock();
 }
 
 void Player::setCue()
@@ -697,6 +636,7 @@ void Player::start_stop()
       if (!cue) 
 	cue_set();
       pause_playing();
+      ::metronome->become_slave();
       if (!cue_wasset)
 	beatGraphAnalyzer->cuesChanged();
     }
@@ -794,7 +734,8 @@ void Player::changeTempo(int p)
     }
   p*=100;
   p/=pos;
-  changetempo(p);
+
+  ::metronome->changetempo(p);
   TempoLd->display(100.0*(float4)normalperiod/(float4)currentperiod);
 }
 
@@ -815,14 +756,16 @@ void Player::normalTempo()
 void Player::mediumSwitch()
 {
   fade_time = tempoSwitchTime->value();
+  savedtargetperiod = currentperiod;
   tempo_fade=0;
 }
 
 void Player::targetStep()
 {
-  tempo_fade += ((float4) REFRESH_TIME/1000);
+  tempo_fade += ((float4) FINE_REFRESH_TIME/1000.);
   if (tempo_fade>fade_time)
     {
+      changeTempo(normalperiod);
       tempo_fade=0;
       fade_time=0;
       updateTempoColors();
@@ -844,8 +787,8 @@ void Player::targetStep()
    * See report 'Stepwise Tempo Changes in BpmDj'
    * at http://werner.yellowcouch.org/Papers/stepwise/index.html
    */
-  float4 result = (float4)targetperiod*
-    pow((float4)normalperiod/(float4)targetperiod,
+  float4 result = (float4)savedtargetperiod*
+    pow((float4)normalperiod/(float4)savedtargetperiod,
 	(float4)tempo_fade/(float4)fade_time);
   changeTempo((int)result);
 }
@@ -944,11 +887,11 @@ void Player::mapScaleChanged(int i)
 
 void Player::update_map_scale_box()
 {
-  if (map_scale == 64) mapping_scale->setCurrentItem(0);
-  else if (map_scale == 32) mapping_scale->setCurrentItem(1);
-  else if (map_scale == 16) mapping_scale->setCurrentItem(2);
-  else if (map_scale == 8) mapping_scale->setCurrentItem(3);
-  else if (map_scale == 4) mapping_scale->setCurrentItem(4);
+  if (map_scale == 64) mapping_scale->setCurrentIndex(0);
+  else if (map_scale == 32) mapping_scale->setCurrentIndex(1);
+  else if (map_scale == 16) mapping_scale->setCurrentIndex(2);
+  else if (map_scale == 8) mapping_scale->setCurrentIndex(3);
+  else if (map_scale == 4) mapping_scale->setCurrentIndex(4);
   else assert(0);
 }
 
@@ -983,10 +926,10 @@ void Player::mapLengthChanged(int new_size)
 
 void Player::saveMap()
 {
-  QString s = QFileDialog::getSaveFileName("sequences","Beat Patterns (*.map)",
-	        this,"Save pattern","Choose a filename" );
+  QString s = QFileDialog::getSaveFileName(this,"Save Pattern",
+					   "Beat Patterns (*.map)");
   if (s.isNull()) return;
-  const char* filename = s;
+  const char* filename = strdup(s.toAscii().data());
   FILE *f =fopen(filename,"wb");
   int magic = 0x0002;
   // magic number
@@ -1010,7 +953,7 @@ void Player::saveMap()
   // stop flag 
   if (atend_stop->isChecked()) nr |= 4;
   // loop flag
-  if (atend_loop->isOn()) nr |= 8;
+  if (atend_loop->isChecked()) nr |= 8;
   // Z flag
   if (atend_z->isChecked()) nr |= 16;
   // X flag
@@ -1027,10 +970,10 @@ void Player::saveMap()
 
 void Player::loadMap()
 {
-  QString s = QFileDialog::getOpenFileName("sequences","Beat Patterns (*.map)",
-		this,"Load Pattern","Choose a file");
+  QString s = QFileDialog::getOpenFileName(this,"Load pattern","",
+	   "Beat Patterns (*.map)");
   if (s.isNull()) return;
-  const char* filename = s;
+  const char* filename = strdup(s.toAscii().data());
   FILE *f =fopen(filename,"rb");
   if (!f) return;
   int magic = -1;
@@ -1122,7 +1065,7 @@ void Player::mapStart()
   else
     assert(0);
   map_set(map_size,mapcopy,normalperiod*map_size/map_scale,mexit,
-	  atend_loop->isOn());
+	  atend_loop->isChecked());
 }
 
 void Player::mapStop()
@@ -1132,7 +1075,7 @@ void Player::mapStop()
 
 void Player::mapLoopChange()
 {
-  map_loop_set(atend_loop->isOn());
+  map_loop_set(atend_loop->isChecked());
 }
 
 void Player::openAbout()
@@ -1343,21 +1286,12 @@ void Player::update_map_pixmaps()
 void Player::setAlsa()
 {
   oss->setChecked(false);
-  bpm->setChecked(false);
   jack->setChecked(false);
 }
 
 void Player::setOss()
 {
   alsa->setChecked(false);
-  bpm->setChecked(false);
-  jack->setChecked(false);
-}
-
-void Player::setBpmMixingDesk()
-{
-  alsa->setChecked(false);
-  oss->setChecked(false);
   jack->setChecked(false);
 }
 
@@ -1365,7 +1299,6 @@ void Player::setJack()
 {
   alsa->setChecked(false);
   oss->setChecked(false);
-  bpm->setChecked(false);
 }
 
 static void init_dsp_and_clock()
@@ -1374,16 +1307,12 @@ static void init_dsp_and_clock()
   // grab old
   clock_driver* old=metronome;
   // replace with new
-#ifdef COMPILE_JACK
-#ifdef JACK_TRANSPORT
-  if (is_jack_driver() && config->get_jack_clock()!=0)
-    metronome=new clock_jack(*config);
+#ifdef EXT_CLOCK
+  if (!opt_check) 
+    metronome=new ext_clock();
   else
 #endif
-#endif
     metronome=new clock_driver();
-
-  // delete old
   delete old;
 }
 
@@ -1395,14 +1324,20 @@ void Player::restartCore()
   startCore(0);
   config->save();
   store_config_into(config,this);
+  if (::metronome) 
+    ::metronome->attach_clock(true);
 }
 
 void InitAndStart::run(Player * player)
 {
   player->initCore();
   init_dsp_and_clock();
+#ifdef MIDI
+  midi_bindings* mbindings = new midi_bindings(player);
+#endif
   player->startCore();
-  metronome->init();
+  ::metronome->init();
+  ::metronome->attach_clock(true);
 }
 
 void PlayingStateChanged::run(Player * player)
@@ -1449,6 +1384,9 @@ void Player::startCore(int opening_tries)
 	    }
 	}
     }
+#ifdef DEBUG_WAIT_STATES
+  Debug("startCore finished");
+#endif
 }
 
 /**
@@ -1464,12 +1402,20 @@ void Player::stopCore()
 
 void Player::initCore()
 {
-  // if we check the raw file, we want to write the information synchronous
+  store_config_into(config,this);
+  /**
+   * See bug #1099 to understand why this doesn't work
+   */
+  // tab->setCurrentIndex(TAB_PLAYER);
+
+  /**
+   * Check the raw file, we want to write the information synchronous
+   */
   int err = core_object_init(opt_check);
   if (  show_error(err, err_noraw, "No raw file to be read. Probably the .mp3 "
-		   "is broken.\n")
+		   "is broken.")
 	|| show_error(err, err_nospawn, "Unable to spawn decoding process.\n"
-		      "Please check your PATH environment variable\n")
+		      "Please check your PATH environment variable")
 	)
     if (opt_check)
       reject();
@@ -1507,10 +1453,31 @@ void msg_writing_finished()
     app->postEvent(player_window,new WritingFinished());
 }
 
-void Player::sync() 
+void Player::switchClock() 
 {
-#ifdef JACK_TRANSPORT
-  ::metronome->request_sync(3);
-#endif
+  if (::metronome) {
+    ::metronome->switch_sync();
+  }
+}
+
+void Player::loop(unsigned8 beats)
+{
+  loop_set((beats*normalperiod)/4);
+}
+
+void Player::nudge(unsigned8 dir)
+{
+  static unsigned8 prev_dir = 64;
+  while (dir < prev_dir) 
+    {
+      nudgeMinus1M();
+      prev_dir --;
+    }
+  while (dir > prev_dir) 
+    {
+      nudgePlus1M();
+      prev_dir ++;
+    }
+  prev_dir = dir;
 }
 #endif // __loaded__player_cpp__

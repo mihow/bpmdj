@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__dsp_jack_cpp__
 #define __loaded__dsp_jack_cpp__
@@ -32,81 +34,31 @@ using namespace std;
 #include "player-core.h"
 #include "version.h"
 #include "memory.h"
-#include "scripts.h"
 #include "lock.h"
+#include "info.h"
 
-typedef jack_default_audio_sample_t sample_t;
 pthread_mutex_t thread_lock = PTHREAD_MUTEX_INITIALIZER;
-
-void source_to_jack_buffers(unsigned4* _src, sample_t *l, sample_t*r,
-			    unsigned4 nsamples) 
-{
-  stereo_sample2* src=(stereo_sample2*)_src;
-  while (nsamples--) 
-    {
-      *l++ = src->left / signed2_sample_max_f;
-      *r++ = src->right / signed2_sample_max_f;
-      src++;
-    }
-}
 
 void dsp_jack::start(audio_source* s)
 {
+#ifdef DEBUG_WAIT_STATES
   Debug("dsp_jack::start called");
+#endif
   
-  if (synchronous)
-    dsp_driver::start(s);
-  else
-    {
-      audio=s;
-      stop_request=false;
-      stopped=false;
-    }
-}
-
-void dsp_jack::internal_pause()
-{
-  pthread_mutex_lock (&thread_lock);
-  if (synchronous)
-    memset(buffer, 0, buffer_size*sizeof(unsigned4));
-  filled = position = 0;
-  pthread_mutex_unlock (&thread_lock);
-}
-
-void dsp_jack::internal_unpause()
-{
-  position=latency();
-}
-
-void dsp_jack::write(stereo_sample2 value)
-{
-  assert(synchronous);
-  /**
-   * Jack is not using blocking I/O, so everything is buffered until the
-   * callback is called 
-   */
-  pthread_mutex_lock (&thread_lock);
-  buffer[filled++]=value.value();
-  /**
-   * WVB - i don't think this should happen, since you nicely wait with the 
-   * usleep below. It can normally happen only when the consumer thread does not
-   * eat the data sufficient, but how this could happen is not yet clear to me 
-   * at the moment. If it does we should know when and why it happens and solve
-   * it.
-   */
-  assert(filled<=buffer_size);
-  pthread_mutex_unlock (&thread_lock);
-  if (filled > position) 
-    while (filled - position > 4096)
-      usleep(10);
+  audio=s;
+  stop_request=false;
+  stopped=false;
+#ifndef NO_AUTOSTART
+  paused=false;
+#else
+  paused=true;
+#endif
 }
 
 signed8 dsp_jack::latency()
 {
   signed8 l = (signed4)jack_port_get_total_latency(client,output_port_1)
-    + ((signed4)filled - (signed4)position); 
-  if (verbose)
-    Info("latency = %lld",l);
+    + jack_ringbuffer_read_space(buf1) / sizeof(sample_t);
   return l;
 } 
  
@@ -149,6 +101,26 @@ int chunk_getter(jack_nframes_t nframes, void *dsp)
   return dj->audio_process(nframes);
 }
 
+int buffer_size_callback(jack_nframes_t nframes, void *arg) 
+{
+  dsp_jack* dj=(dsp_jack*)dsp;
+  return dj->set_buffer_size(nframes);
+}
+
+int dsp_jack::set_buffer_size(jack_nframes_t nframes)
+{
+  if (bufsize) 
+    {
+      jack_ringbuffer_free(buf1);
+      jack_ringbuffer_free(buf2);
+    }
+  bufsize = nframes;
+  minfill = 8*bufsize*sizeof(sample_t);
+  buf1 = jack_ringbuffer_create(2*minfill);
+  buf2 = jack_ringbuffer_create(2*minfill);
+  return 0;
+}
+
 dsp_jack::dsp_jack(const PlayerConfig & config) : dsp_driver(config)
 {
 #ifdef DEBUG_WAIT_STATES
@@ -157,13 +129,14 @@ dsp_jack::dsp_jack(const PlayerConfig & config) : dsp_driver(config)
     jack_dsps.insert(this);
   }
 #endif
-  arg_dev = strdup(config.get_jack_dev());
+  arg_dev = strdup(config.get_jack_dev().toAscii().data());
+  lout = strdup(config.get_jack_lout().toAscii().data());
+  rout = strdup(config.get_jack_rout().toAscii().data());
   verbose = config.get_jack_verbose();
-  synchronous = !config.get_jack_lowlatency();
+  bufsize = 0;
   if (verbose)
     Debug("dsp_jack::<constructor> called\n"
-	  "  device = %s\n"
-	  "  synchronous = %d",arg_dev,synchronous);
+	  "  device = %s\n", arg_dev);
 }
 
 int dsp_jack::fill_empty_buffer(jack_nframes_t nframes) 
@@ -172,60 +145,72 @@ int dsp_jack::fill_empty_buffer(jack_nframes_t nframes)
   sample_t *b2 = (sample_t *) jack_port_get_buffer (output_port_2, nframes);
   memset(b1, 0, nframes*(sizeof(sample_t)));
   memset(b2, 0, nframes*(sizeof(sample_t)));
-  jack_time += nframes;
   return 0;
+}
+
+void * pbuffers(void* dsp)
+{
+  dsp_jack* dj=(dsp_jack*)dsp;
+  dj->process_buffers();
+  return NULL;
+}
+
+void dsp_jack::process_buffers()
+{
+  while (1) 
+    {    
+      if ((jack_ringbuffer_read_space(buf1) < minfill) && (!get_stopped()) && (!paused)) 
+	{
+	  while (jack_ringbuffer_read_space(buf1) < minfill)
+	    {
+	      stereo_sample2 value=audio->read();
+	      sample_t val;
+	      val = value.left / signed2_sample_max_f;
+	      jack_ringbuffer_write(buf1, (const char *)&val, sizeof(sample_t));
+	      val = value.right / signed2_sample_max_f;
+	      jack_ringbuffer_write(buf2, (const char *)&val, sizeof(sample_t));
+	    }
+	}
+      if (get_stopped() || paused) 
+	{
+	  jack_ringbuffer_reset(buf1);
+	  jack_ringbuffer_reset(buf2);
+	}      
+      usleep(1);
+  }
 }
 
 int dsp_jack::generate_buffer(jack_nframes_t nframes) 
 {
-  if (get_stopped()) return fill_empty_buffer(nframes);
+  size_t nbytes = nframes*sizeof(sample_t);
+  if ((jack_ringbuffer_read_space(buf1) < nbytes) 
+      && (!get_stopped()) && (!paused))
+    Debug("dsp_jack: Data not ready");
+  if (get_stopped() || paused || (jack_ringbuffer_read_space(buf1)  < nbytes)) 
+    return fill_empty_buffer(nframes);
   sample_t *b1 = (sample_t *) jack_port_get_buffer (output_port_1, nframes);
   sample_t *b2 = (sample_t *) jack_port_get_buffer (output_port_2, nframes);
-  for (jack_nframes_t k = 0; k < nframes; k++) 
-    {
-      if (paused)
-	b2[k] = b1[k] = 0;
-      else
-	{
-	  stereo_sample2 value=audio->read();
-	  b1[k] = value.left / signed2_sample_max_f;
-	  b2[k] = value.right / signed2_sample_max_f;
-	}
-    }
-  jack_time += nframes;
+  jack_ringbuffer_read(buf1, (char *)b1, nbytes);
+  jack_ringbuffer_read(buf2, (char *)b2, nbytes);
   return 0;
 }
 
 int dsp_jack::audio_process (jack_nframes_t nframes) 
 {
-#ifdef DEBUG_WAIT_STATES
-  Debug("dsp_jack::audio_process() entered");
-#endif
   int retval;
   // client = NULL when the player has been closed
   if (!client) retval=0;
   // if the player stopped we can directly dump zeros
   else if (stopped)
     retval=fill_empty_buffer(nframes);
-  // if it was synchronous we need to take it from our own internal buffer
-  else if (synchronous)
-    retval=get_buffer(nframes);
   // otherwise we generate the data on the fly
   else 
     retval=generate_buffer(nframes);
-#ifdef DEBUG_WAIT_STATES
-  Debug("dsp_jack::audio_process() finished");
-#endif
   return retval;
 }
 
 void dsp_jack::stop()
 {
-  if (synchronous) 
-    {
-      dsp_driver::stop();
-      return;
-    }
 #ifdef DEBUG_WAIT_STATES
   Debug("dsp_jack_stop(): entered");
 #endif
@@ -238,71 +223,13 @@ void dsp_jack::stop()
 #endif
 }
 
-int dsp_jack::get_buffer(jack_nframes_t nframes) 
-{
-  sample_t *b1 = (sample_t *) jack_port_get_buffer (output_port_1, nframes);
-  sample_t *b2 = (sample_t *) jack_port_get_buffer (output_port_2, nframes);
-  
-  /**
-   * WVB - I moved this to the front to avoid a change in the position and 
-   * filled variables during updating of them
-   */
-  pthread_mutex_lock (&thread_lock);
-  
-  /**
-   *  WVB - I modified this a bit to handle the cases where position < filled 
-   * and position + nframes > filled. The idea is to copy everything necessary.
-   */
-  if (position + nframes <= filled) 
-    {
-      source_to_jack_buffers(buffer+position,b1,b2,nframes);
-      position += nframes;
-    }
-  else if (position < filled)
-    {
-      assert(filled-position<nframes);
-      int todo=filled-position;
-      source_to_jack_buffers(buffer+position,b1,b2,nframes);
-      position += todo;
-      memset(b1+todo, 0, (nframes-todo)*(sizeof(sample_t)));
-      memset(b2+todo, 0, (nframes-todo)*(sizeof(sample_t)));
-    }
-  else 
-    {
-      memset(b1, 0, nframes*(sizeof(sample_t)));
-      memset(b2, 0, nframes*(sizeof(sample_t)));
-    }
-  
-  if ((filled > position) && (position > buffer_size / 2)) 
-    {
-      /**
-       * WVB - there is a small reason to start allocating new buffers although
-       * I believe we can be much more optimal here by using some modulo 
-       * arithmetic.
-       */
-      unsigned4 *newbuf = bpmdj_allocate(buffer_size,unsigned4);  
-      memcpy(newbuf, buffer + position, (filled - position)*sizeof(sample_t));
-      bpmdj_deallocate(buffer);
-      buffer = newbuf;
-      filled -= position;
-      position = 0;
-    }
-  pthread_mutex_unlock (&thread_lock);
-  return 0;
-}
-
 int dsp_jack::open(bool ui)
 { 
+#ifdef DEBUG_WAIT_STATES
   Debug("dsp_jack::open called");
-  
-  /* we want realtime scheduling */
-  int priority = sched_get_priority_max(SCHED_FIFO);
-  sched_param sp;
-  sp.sched_priority = priority;
-  sched_setscheduler(getpid(), SCHED_FIFO, &sp);
-  mlockall(MCL_FUTURE | MCL_CURRENT);
+#endif
 
-  if ((client = jack_client_new (arg_dev)) == 0) 
+  if ((client = jack_client_open (arg_dev, JackNullOption, NULL)) == 0) 
     {
       Error(ui,"The jack server (jackd) should be running. Is it ?");
       return err_dsp;
@@ -318,33 +245,53 @@ int dsp_jack::open(bool ui)
 	    jack_get_sample_rate (client));
       return err_dsp;
     }
-  buffer_size = 100000;
-  filled = position = 0;
-  buffer = bpmdj_allocate(buffer_size,unsigned4);
   
+
   /* opening jack port */
   output_port_1 = jack_port_register (client, "output_1", 
 		      JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
   output_port_2 = jack_port_register (client, "output_2", 
 		      JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
+
   jack_set_process_callback (client, chunk_getter, this);
-  
+
+  set_buffer_size(jack_get_buffer_size(client));
+
+  /* starting buffering thread */
+  pthread_t *jt = bpmdj_allocate(1,pthread_t);
+  pthread_create(jt,NULL,pbuffers,(void *)this);
+
   /* activating client */
   if (jack_activate (client)) 
     {
       Error(ui,"Cannot activate jack client");
       return err_dsp;
     }      
+
+  char dstport[100];
+  sprintf(dstport, "%s:output_1", arg_dev);
+  jack_connect(client, dstport, lout);
+  sprintf(dstport, "%s:output_2", arg_dev);
+  jack_connect(client, dstport, rout);
+
+
   return err_none;
 }
 
 void dsp_jack::close(bool flush_first)
 {
-  if (!client)
+  if (!client) {
+#ifdef DEBUG_WAIT_STATES
     Debug("dsp_jack::close unnecessary");
+#endif
+    ;;
+  }
   else 
     {
+#ifdef DEBUG_WAIT_STATES
       Debug("dsp_jack::close called");
+#endif
+      jack_deactivate(client);
       jack_client_close(client);
       client=NULL;
     }

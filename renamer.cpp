@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__renamer_cpp__
 #define __loaded__renamer_cpp__
@@ -28,13 +30,15 @@ using namespace std;
 #include <qradiobutton.h>
 #include <qmessagebox.h>
 #include "renamer.h"
-#include "ui-renamerstart.h"
 #include "selector.h"
 #include "scripts.h"
 #include "capacity.h"
+#include "song-iterator.h"
+#include "info.h"
+#include "qt-helpers.h"
 
 RenamerLogic::RenamerLogic(QWidget*parent, RenamerChangesFilename *rcf) :
-  QDialog(parent),
+  QDialog(parent,Qt::Window),
   DirectoryScanner(""),
   inform(rcf)
 {
@@ -47,13 +51,23 @@ RenamerLogic::~RenamerLogic()
     delete inform;
 }
 
-#define FOREACH(operation) {\
-  Q3ListViewItemIterator it(NameList);\
-   for(;it.current();++it) {\
-	Q3ListViewItem * item = it.current();\
-	if (item->isSelected())\
-	  item->setText(0,operation(item->text(0)));\
-     }}
+/**
+ * Since Qt4 a modification to a text item directly resorts
+ * the surrounding item list, the interator looses completely 
+ * track. This double iteration deals with that.
+ */
+#define FOREACH(operation) {					     \
+  map<QTreeWidgetItem*,QString> newtexts;			     \
+  QTreeWidgetItemIterator it(NameList);				     \
+  for(;*it;++it) {						     \
+    QTreeWidgetItem * item = *it;				     \
+    if (item->isSelected())					     \
+      newtexts[item]=operation(item->text(0));			     \
+  }								     \
+  for(map<QTreeWidgetItem*,QString>::iterator it=newtexts.begin();   \
+      it!=newtexts.end(); it++)					     \
+    it->first->setText(0,it->second);				     \
+  }
 
 void RenamerLogic::checkfile(const QString  pathname, const QString  filename)
 {
@@ -63,22 +77,34 @@ void RenamerLogic::checkfile(const QString  pathname, const QString  filename)
 
 bool RenamerLogic::matchextension(const QString  filename)
 {
-  return goodExtension(filename) || filename.contains(".idx",0);
+  return goodExtension(filename) 
+    || filename.contains(".idx",Qt::CaseInsensitive);
 }
 
 void RenamerLogic::add(const QString name, const QString pos)
 {
   // check whether the filename is too good
   if (goodName(name)) return;
-  // if it is an index it should have no correct information
-  if (inform && inform->shouldFilenameBeExcluded(pos)) return;
   // so it is an incorrect filename which does not contain correct information
-  new Q3ListViewItem(NameList,name,name,pos);
+  QStringList content;
+  content << name << name << pos;
+  new QTreeWidgetItem(NameList,content);
+}
+
+void RenamerLogic::add(Song* s)
+{
+  if (!s) return;
+  QString v=s->getDisplayTitle();
+  QStringList content;
+  content << v
+	  << v
+	  << s->get_storedin();
+  new QTreeWidgetItem(NameList,content);
 }
 
 QString RenamerLogic::smallCapsInWord(QString in)
 {
-   char* out = strdup((const char*)in);
+  char* out = strdup(in.toAscii().data());
    int i = 0;
    bool prevupper = false;
    while(out[i])
@@ -100,7 +126,7 @@ QString RenamerLogic::smallCapsInWord(QString in)
 
 QString RenamerLogic::capitalizeAfterSpace(QString in)
 {
-   char* out = strdup((const char*)in);
+   char* out = strdup(in.toAscii().data());
    int i = 0;
    bool prevspace = true;
    while(out[i])
@@ -120,7 +146,7 @@ QString RenamerLogic::capitalizeAfterSpace(QString in)
 
 QString RenamerLogic::removeSpaces(QString in)
 {
-   char * out = strdup((const char*)in);
+  char * out = strdup(in.toAscii().data());
    int i = 0;
    int j = 0;
    while(out[i])
@@ -138,7 +164,7 @@ QString RenamerLogic::removeSpaces(QString in)
 
 QString RenamerLogic::betweenBracesIsTrash(QString in)
 {
-  char * out = strdup((const char*)in);
+  char * out = strdup(in.toAscii().data());
   int i = 0;
   int j = 0;
   bool removing = false;
@@ -166,7 +192,7 @@ QString RenamerLogic::betweenBracesIsTrash(QString in)
 
 QString RenamerLogic::replaceUnderscores(QString in)
 {
-   char * out = strdup((const char*)in);
+   char * out = strdup(in.toAscii().data());
    int i = 0;
    while(out[i])
      {
@@ -179,29 +205,29 @@ QString RenamerLogic::replaceUnderscores(QString in)
 
 QString RenamerLogic::removeSpecials(QString in)
 {
-   char * out = strdup((const char*)in);
-   int i = 0;
-   int j = 0;
-   while(out[i])
-     {
-	if (isalnum(out[i]) || out[i]=='&'
-	    || out[i]=='(' || out[i]==')'
-	    || out[i]=='[' || out[i]==']'
-	    || out[i]=='{' || out[i]=='}' 
-	    || (out[i]=='.' && i == (signed)in.length()-4))
-	  {
-	     out[j]=out[i];
-	     j++;
-	  }
-	i++;
-     }
-   out[j]=out[i];
-   return QString(out);
+  char * out = strdup(in.toAscii().data());
+  int i = 0;
+  int j = 0;
+  while(out[i])
+    {
+      if (isalnum(out[i]) || out[i]=='&'
+	  || out[i]=='(' || out[i]==')'
+	  || out[i]=='[' || out[i]==']'
+	  || out[i]=='{' || out[i]=='}' 
+	  || (out[i]=='.' && i == (signed)in.length()-4))
+	{
+	  out[j]=out[i];
+	  j++;
+	}
+      i++;
+    }
+  out[j]=out[i];
+  return QString(out);
 }
 
 QString RenamerLogic::removeFirstSpecials(QString in)
 {
-   char * out = strdup((const char*)in);
+   char * out = strdup(in.toAscii().data());
    int newstart = 0;
    while(out[newstart])
      {
@@ -216,7 +242,7 @@ QString RenamerLogic::replaceSubString(QString in)
 {
    QString key = SubString->text();
    QString replace = ReplaceString->text();
-   int pos = in.find(key);
+   int pos = in.indexOf(key);
    if (pos!=-1)
      return in.replace(pos,key.length(),replace);
    return in;
@@ -225,7 +251,9 @@ QString RenamerLogic::replaceSubString(QString in)
 QString RenamerLogic::deleteSubString(QString txt)
 {
   QString key = SubString->text();
-  txt.replace(txt.find(key),key.length(),"");
+  int i=txt.indexOf(key);
+  if (i>=0)
+    txt.replace(i,key.length(),EMPTY);
   return txt;
 }
 
@@ -233,15 +261,18 @@ QString RenamerLogic::beforeMinusIsAuthor(QString in)
 {
   if (in.contains('-')!=1) 
     return in;
-  int pos = in.find('-');
+  int pos = in.indexOf('-');
   QString author = in.left(pos);
   QString out = in.right(in.length()-pos-1);
-  return out.insert(out.length()-4,"["+author+"]");
+  if (in[in.length()-4]!='.')
+    return out.append("["+author+"]");
+  else
+    return out.insert(out.length()-4,"["+author+"]");
 }
 
 QString RenamerLogic::fixExtention(QString in)
 {
-  QString ext = in.right(4).lower();
+  QString ext = in.right(4).toLower();
   if (goodExtension(ext) || ext==".idx")
     return in.replace(in.length()-4,4,ext);
   return in;
@@ -250,8 +281,7 @@ QString RenamerLogic::fixExtention(QString in)
 QString RenamerLogic::removeFirstChar(QString in)
 {
   return in.right(in.length()-1);
-} 
-
+}
 
 void RenamerLogic::keySelectionIsAuthor() 
 {
@@ -261,19 +291,28 @@ void RenamerLogic::keySelectionIsAuthor()
 QString RenamerLogic::subStringIsAuthor(QString txt)
 {
   // check extension
-  QString key = "["+SubString->text()+"]"+txt.right(4);
-  txt = txt.left(txt.length()-4);
-  txt = txt.append(key);
-  return txt;
+  if (txt[txt.length()-4]=='.')
+    {
+      QString key = "["+SubString->text()+"]"+txt.right(4);
+      txt = txt.left(txt.length()-4);
+      txt = txt.append(key);
+      return txt;
+    }
+  else
+    {
+      QString key = "["+SubString->text()+"]";
+      txt = txt.append(key);
+      return txt;
+    }
 }
 
 QString RenamerLogic::subStringIsMix(QString txt)
 {
   // we must place the substring before the '[' if there is one,
   // otherwise we must place it before the last ., if there is one
-  int posbracket = txt.find("[");
+  int posbracket = txt.indexOf("[");
   if (posbracket<0)
-    posbracket = txt.findRev(".");
+    posbracket = txt.lastIndexOf(".");
   if (posbracket>=0)
     txt.insert(posbracket,QString("{")+SubString->text()+"}");
   return txt;
@@ -333,14 +372,14 @@ void RenamerLogic::fixExtention()
 
 void RenamerLogic::changeSelection()
 {
-   // find smallest, this will be our key to find 
-   // the greatest common substring in
-   QString key;
-   int l = -1;
-   Q3ListViewItemIterator it(NameList);
-   for(;it.current();++it)
-     {
-       Q3ListViewItem * item = it.current();
+  // find smallest, this will be our key to find 
+  // the greatest common substring in
+  QString key;
+  int l = -1;
+  QTreeWidgetItemIterator it(NameList);
+  for(;*it;++it)
+    {
+      QTreeWidgetItem * item = *it;
        if (item->isSelected())
 	 {
 	   QString txt = item->text(0);
@@ -354,18 +393,16 @@ void RenamerLogic::changeSelection()
    // now lets look for a matching substring
    bool found = false;
    QString gcs;
- // -3 = extension
-   for(int size = key.length()-3; size>0 && !found; size--)
+   for(int size = key.length(); size>0 && !found; size--)
      {
-       // -3 is extension
-       for(int pos = key.length()-3-size; pos>=0 && !found; pos--) 
+       for(int pos = key.length()-size; pos>=0 && !found; pos--) 
 	 {
-	   Q3ListViewItemIterator it(NameList);
+	   QTreeWidgetItemIterator it(NameList);
 	   found = true;
 	   gcs = key.mid(pos,size);
-	   for(;it.current() && found;++it)
+	   for(;*it && found;++it)
 	     {
-	       Q3ListViewItem * item = it.current();
+	       QTreeWidgetItem * item = *it;
 	       if (item->isSelected())
 		 {
 		   if (!item->text(0).contains(gcs))
@@ -381,83 +418,106 @@ void RenamerLogic::changeSelection()
 
 void RenamerLogic::realizeSelection()
 {
-  Q3ListViewItemIterator it(NameList);
-  for(;it.current();)
-    {
-      Q3ListViewItem * item = it.current();
-      if (item->isSelected())
-	{
-	  // position 0 is the new name
-	  // position 1 is the old name
-	  // position 2 is the full name, with location prefixed.
-	  // find in str2 str1 and replace it by str0
-	  QString from = item->text(2);
-	  QString toreplace = item->text(1);
-	  QString replaceby = item->text(0);
-	  QString to = from;
-	  int pos = to.find(toreplace);
-	  assert(pos>=0);
-	  to.replace(pos,toreplace.length(),replaceby);
-	  // if from = to don't do anything otherwise
-	  if (from != to)
-	    {
-	      if (exists(to))
-		{
-		  // fix target filename...
-		  int trie = 1;
-		  QString nto;
-		  do
-		    {
-		      trie++;
-		      nto=to;
-		      char nr[50];
-		      sprintf(nr,"%d",trie);
-		      nto.insert(nto.length()-4,nr);
-		    }
-		  while (exists(nto));
-		  to=nto;
-		}
-	      
-	      start_mv(from,to);
+  set<QTreeWidgetItem*> todelete;
+  stdTreeWidgetIterator it(NameList);
+ITERATE_OVER(it)
 
-	      // does the target file exist, if so, we inform the 
-	      // interested one
-	      if (exists(to) && inform)
-		inform->filenameChanged(from,to);
-	    }
-	  // benieuwd of het dees gaat werken...
-	  delete item;
-	}
-      else
-	++it;
+    QTreeWidgetItem * item = it.val();
+    if (item->isSelected())
+      {
+	QString to=item->text(0);
+	QString from=item->text(1);
+	QString location=item->text(2);
+	assert(inform);
+	if (inform->change(from,to,location))
+	  todelete.insert(item);
+      }
     }
+  
+  /**
+   * Delete this part of the selection
+   */
+  for(set<QTreeWidgetItem*>::iterator it2=todelete.begin();
+      it2!=todelete.end(); it2++)
+    delete(*it2);
+}
+
+void RenamerLogic::start_dialog()
+{
+  if (NameList->topLevelItemCount())
+    {
+      NameList->resizeColumnToContents(0);
+      NameList->resizeColumnToContents(1);
+      NameList->resizeColumnToContents(2);
+      NameList->sortItems(2,Qt::AscendingOrder);
+      show();
+    }
+  else
+    QMessageBox::information(this, 
+     "Renamer",
+     "There are no wrongly named entries");
 }
 
 void RenamerLogic::scan(const QString dirname)
 {
   reset(dirname);
   DirectoryScanner::scan();
-  if (NameList->childCount())
-    show();
-  else
-    QMessageBox::information(this, 
-	     "Renamer",
-	     "There are no wrongly named files in the specified directory");
 }
 
 void RenamerLogic::ignoreSelection()
 {
-  Q3ListViewItemIterator it(NameList);
-  for(;it.current();)
+  QTreeWidgetItemIterator it(NameList);
+  for(;*it;)
     {
-      Q3ListViewItem * item = it.current();
+      QTreeWidgetItem * item = *it;
       if (item->isSelected())
 	delete item;
       else ++it;
     }
 }
 
-#ifdef INCOMPLETE_FEATURES
+//---------------------------------------------------------
+//   Updating filename of files on disk
+//---------------------------------------------------------
+class UpdateSongFilename: public RenamerChangesFilename
+{
+public:
+  UpdateSongFilename()
+  {
+  };
+  virtual bool change(QString from, QString to, QString location);
+};
+
+bool UpdateSongFilename::change(QString toreplace, QString replaceby,
+				QString from)
+{
+  QString to = from;
+  int pos = to.indexOf(toreplace);
+  assert(pos>=0);
+  to.replace(pos,toreplace.length(),replaceby);
+  // if from = to don't do anything otherwise
+  if (from == to) return true;
+  if (exists(to))
+    {
+      // fix target filename...
+      int trie = 1;
+      QString nto;
+      do
+	{
+	  trie++;
+	  nto=to;
+	  char nr[50];
+	  sprintf(nr,"%d",trie);
+	  nto.insert(nto.length()-4,nr);
+	}
+      while (exists(nto));
+      to=nto;
+    }
+  Debug("Would move %s to %s",from.toAscii().data(),to.toAscii().data());
+  start_mv(from,to);
+  return exists(to);
+};
+
 //---------------------------------------------------------
 //   Updating changing index files
 //---------------------------------------------------------
@@ -468,8 +528,7 @@ private:
   SongSelectorLogic * selector;
 public:
   UpdateIndexedSong(SongSelectorLogic * l);
-  virtual bool shouldFilenameBeExcluded(QString name);
-  virtual void filenameChanged(QString from, QString to);
+  virtual bool change(QString from, QString to, QString location);
 };
 
 UpdateIndexedSong::UpdateIndexedSong(SongSelectorLogic * l)
@@ -480,56 +539,52 @@ UpdateIndexedSong::UpdateIndexedSong(SongSelectorLogic * l)
   assert(database);
 }
 
-bool UpdateIndexedSong::shouldFilenameBeExcluded(QString name)
+bool UpdateIndexedSong::change(QString from, QString to, QString location)
 {
-  assert(0);
-  //Index i(name);
-  //  return i.valid_tar_info();
-  return false;
+  QString mp3_filename;
+  Index index(location);
+  if (!index.set_title_author_remix(to+".idx")) 
+    // We add .idx otherwise the set_title_author_remix function will not find
+    // a proper extension
+    Debug("The new filename %s could not be parsed properly",
+	  to.toAscii().data());
+  mp3_filename=index.get_filename();
+  index.write_idx();
+  Song * song = database -> find(mp3_filename);
+  if(!song)
+    Debug("The filename %s is not visible in the songlist",
+	  mp3_filename.toAscii().data());
+  selector -> reread_and_repaint(song);
+  return true;
+};
+
+//---------------------------------------------------------
+//  Starting the stuff from within the song selector
+//---------------------------------------------------------
+void SongSelectorLogic::startRenamerOnSongs()
+{
+  QString text = QFileDialog::getExistingDirectory(this,
+   "Specify directory to look for songs with wrong name");
+  if (!text.isEmpty())
+    {
+      if (text.right(1)=="/")
+	text = text.left(text.length()-1);
+      UpdateSongFilename *usf=new UpdateSongFilename();
+      RenamerLogic *renamer = new RenamerLogic(this,usf);
+      renamer->scan(text);
+      renamer->start_dialog();
+    }
 }
 
-void UpdateIndexedSong::filenameChanged(QString from, QString to)
+void SongSelectorLogic::startRenamerOnIndices()
 {
-  // we read the index file to obtain the song filename
-  Index * index = new Index(to);
-  assert(index);
-  QString mp3_filename(index->get_filename());
-  delete index;
-  // we find the song
-  Song * song = database -> find(mp3_filename);
-  song -> set_storedin(to);
-  // we update the selector
-  selector -> reread_and_repaint(song);
-};
-#endif
+  UpdateIndexedSong *updateIndexedSong = new UpdateIndexedSong(this);
+  RenamerLogic *renamer = new RenamerLogic(this,updateIndexedSong);
+  selectedSongIterator svi;
+ITERATE_OVER(svi)
 
-//---------------------------------------------------------
-//   Starting the stuff from within the song selector
-//---------------------------------------------------------
-void SongSelectorLogic::startRenamer()
-{
-#ifdef INCOMPLETE_FEATURES
-  RenamerStart which_renamer;
-  int result = which_renamer.exec();
-  if (result!=which_renamer.Accepted) return;
-  if (which_renamer.already_indexed->isOn())
-    {
-      UpdateIndexedSong *updateIndexedSong = new UpdateIndexedSong(this);
-      RenamerLogic *renamer = new RenamerLogic(this,updateIndexedSong);
-      renamer->scan(IndexDir);
-    }
-  else if (which_renamer.not_yet_indexed->isOn())
-#endif
-    {
-      QString text = QFileDialog::getExistingDirectory(this,
-	       "Specify directory to look for songs with wrong name");
-      if (!text.isEmpty())
-	{
-	  if (text.right(1)=="/")
-	    text = text.left(text.length()-1);
-	  RenamerLogic *renamer = new RenamerLogic(this,NULL);
-	  renamer->scan(text);
-	}
-    }
+    renamer->add(svi.val());
+  }
+  renamer->start_dialog();
 }
 #endif // __loaded__renamer_cpp__

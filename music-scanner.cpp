@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__music_scanner_cpp__
 #define __loaded__music_scanner_cpp__
@@ -50,7 +52,7 @@ bool MusicScanner::matchextension(const QString filename)
   if (!res)
     {
       ignored->insertPlainText(filename+"\n");
-      ignored->moveCursor(QTextEdit::MoveEnd);
+      ignored->moveCursor(QTextCursor::End);
     }
   return res;
 }
@@ -76,7 +78,7 @@ void MusicScanner::checkfile(const QString pathname, const QString filen)
       Song  * song = new Song(index,true,true);
       selector -> acceptNewSong( song );
       created->insertPlainText(index->get_storedin().mid(8)+"\n");
-      created->moveCursor(QTextEdit::MoveEnd);
+      created->moveCursor(QTextCursor::End);
       app->processEvents();
       delete index;
     }

@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__index_h__
 #define __loaded__index_h__
@@ -65,7 +67,6 @@ class AlbumField
 
 typedef AlbumField ** AlbumList;
 
-
 /*-------------------------------------------
  *           History Fields
  *-------------------------------------------*/
@@ -95,7 +96,7 @@ class SongInformation;
 class Index
 {
   friend class SongInformation;
-  // the meta fields cover information with repsect to the index file itself
+  // the meta fields cover information with respect to the index file itself
   // all other fields are normally information about the mp3 described.
  private:
   QString           meta_filename;     // the .idx file on disk
@@ -159,7 +160,7 @@ class Index
   sample4_type      index_max;   // max value 
   sample4_type      index_mean;  // mean value
   power_type        index_power; // rms
-  // information availble from v2.9 and above
+  // information available from v2.9 and above
   /**
    * Disabled capacities for this song
    */
@@ -170,7 +171,7 @@ class Index
   //----------------------------------
  public:
   /** 
-   * Initalizes empty index
+   * Initializes empty index
    */
   Index();             
   /**
@@ -186,16 +187,18 @@ class Index
    */
   void read_idx(QString);
   /**
-   * Writes the index to the file called meta_filename
+   * Writes the index to the file 'meta_filename'. Returns true
+   * if the file was completely written. False otherwise.
    */
-  void write_idx();
+  bool write_idx();
   /**
    * Writes the index to a new filename, replaces meta_filename first
+   * Returns true if the file was completely written. False otherwise.
    */
-  void write_idx(QString t) 
+  bool write_idx(QString t) 
     {
       meta_filename = t; 
-      write_idx();
+      return write_idx();
     };
   /**
    * Returns the place where this index is stored in
@@ -231,7 +234,7 @@ class Index
    */
   void init();
   /**
-   * Removes all the self allcoated objects
+   * Removes all the self allocated objects
    */
   void free();
   
@@ -263,7 +266,7 @@ class Index
       return period_to_tempo(index_period); 
     };
  private:
-  // some old convertion functions useful to verify the range
+  // some old conversion functions useful to verify the range
   bool fix_tempo_fields();
   // returns the data for a period 
   Data get_data(const period_type &p);
@@ -289,7 +292,7 @@ class Index
   // adds a new next history field
   void add_next_history(HistoryField *);
  private:
-  // returns the data for a zero termoinated list of historyfields
+  // returns the data for a zero terminated list of historyfields
   Data get_data(HistoryField ** fields);
   void add_history(HistoryField **&, HistoryField *);
   HistoryField * find_field(HistoryField **&, QString mp3);
@@ -310,7 +313,7 @@ class Index
 	  meta_changed = true;
 	}
     }
-  // will attech the remix when possible
+  // will attach the remix when possible
   QString get_display_title();
   // will append remix author and version if possible
   QString readable_description();
@@ -485,7 +488,7 @@ class Index
     {
       return index_time; 
     };
-  int              get_time_in_seconds();
+  unsigned2        get_time_in_seconds();
 
   //--------------------------
   // md5sum 
@@ -576,7 +579,7 @@ class Index
   //--------------------------
 public:
   void executeInfoDialog();
-  // total playcount of this song (before or after a mix)
+  // total play count of this song (before or after a mix)
   unsigned4 get_playcount();
 };
 
@@ -587,7 +590,7 @@ public:
  */ 
 Index * createNewIndexFor(QString song, QString directory);
 /**
- * Prefixs the extention of filename with a number until a unique filename is
+ * Prefixes the extension of filename with a number until a unique filename is
  * found
  */
 QString findUniqueName(QString directory, QString filename);

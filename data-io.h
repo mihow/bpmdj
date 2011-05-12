@@ -1,6 +1,6 @@
 /****
  Borg4 Data Library
- Copyright (C) 2005-2009 Werner Van Belle
+ Copyright (C) 2005-2010 Werner Van Belle
 
  http://werner.yellowcouch.org/Borg4/group__data.html
 
@@ -160,7 +160,7 @@ class DataBinner: public DataIo
   unsigned4 mapped_size;
   unsigned4 file_size;
   void mmap_textfile();
-  void munmap_textfile();
+  bool munmap_textfile();
   void write_internal(const char* ptr, int size);
   void read_internal(char* ptr, int size);
  protected:
@@ -176,8 +176,8 @@ class DataBinner: public DataIo
   virtual void write(Data);
   static Data read_file(QString filename);
  public:
-  static void write(Data data, QString filename);
-  static void write(Data data, FILE *target);
+  static bool write(Data data, QString filename);
+  static bool write(Data data, FILE *target);
 
   // actual writing
 #define ARRAY_TYPE(D,T) \

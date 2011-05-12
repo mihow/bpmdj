@@ -141,23 +141,23 @@ public:
     return *this;
   }
 
-  bool& operator==(const Smart<ReferenceCountedObject>&o) const
+  bool operator==(const Smart<ReferenceCountedObject>&o) const
     {
       return ptr==o.ptr;
     }
-  bool& operator!=(const Smart<ReferenceCountedObject>&o) const
+  bool operator!=(const Smart<ReferenceCountedObject>&o) const
     {
       return ptr!=o.ptr;
     }
-  bool& operator<(const Smart<ReferenceCountedObject>&o) const
+  bool operator<(const Smart<ReferenceCountedObject>&o) const
     {
       return ptr<o.ptr;
     }
-  bool& operator<=(const Smart<ReferenceCountedObject>&o) const
+  bool operator<=(const Smart<ReferenceCountedObject>&o) const
     {
       return ptr<=o.ptr;
     }
-  bool& operator>=(const Smart<ReferenceCountedObject>&o) const
+  bool operator>=(const Smart<ReferenceCountedObject>&o) const
     {
       return ptr>=o.ptr;
     }

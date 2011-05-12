@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__embedded_files_h__
 #define __loaded__embedded_files_h__
@@ -20,7 +22,7 @@ using namespace std;
 #line 1 "embedded-files.h++"
 /**
  * the pointers refers to files that are embedded as object files
- * before they are usefull init_embedded_files should be called
+ * before they are useful init_embedded_files should be called
  */
 void init_embedded_files();
 

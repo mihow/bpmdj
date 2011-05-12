@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__player_core_h__
 #define __loaded__player_core_h__
@@ -32,16 +34,14 @@ using namespace std;
 #define  samples2s(samples) (int)(samples)/WAVRATE
 #define  mperiod2bpm(period) (4.0*(float8)WAVRATE*60.0/(float8)(period))
 
-/*-------------------------------------------
- *         Other prullaria
- *-------------------------------------------*/ 
 #define  wave_bufsize (32L*1024L)
 typedef unsigned8 cue_info;
 /**
- * cue points are expressed as positions (samples) in the non-strertched song
+ * cue points are expressed as positions (samples) in the non-stretched song
  * ::cue is the current cue
  */
 extern  cue_info cue;
+
 /**
  * These are the for Z, X, C and V cues, in that order
  */
@@ -55,30 +55,39 @@ void      cue_retrieve(int);
 void      jumpto(signed8, int);
 void      cue_shift(signed8);
 
+/**
+ * Initializes the index fields and start reading the audio
+ * The error can be err_none (wanted !), err_needidx, err_noraw, err_nospawn, 
+ * or err_dsp.
+ */
+int       core_meta_init();
+int       core_object_init(bool sync);
 #define   err_none    0
-// initializes the index fields
-// and start reading the audio
 #define   err_needidx 1
 #define   err_noraw   2
 #define   err_nospawn 3
-int       core_meta_init();
-int       core_object_init(bool sync);
 #define   err_dsp     5
 
 /**
- * Asks the player to pause its playing. This function must return immediatelly
+ * Asks the player to pause its playing. This function must return immediately
  * and simply signals a pause request
  */
 void      pause_playing();
 void      unpause_playing();
-// closes the wave and writes any changes to the index
-void      core_done();
+
 /**
- * starts the core if the wave is already opened. If ui is true it
+ * Closes the wave and writes any changes to the index
+ */
+void      core_done();
+
+/**
+ * Starts the core if the wave is already opened. If user interface is true it
  * will use QMessageBox to display errors.
  */
 int       core_start(bool ui);
-// waits for the core to finish, does nothing else
+/**
+ * Waits for the core to finish, does nothing else
+ */
 void      core_stop();
 
 stereo_sample2 lfo_no(stereo_sample2 x);
@@ -92,7 +101,8 @@ typedef stereo_sample2 (*_lfo_)(stereo_sample2 x);
 void  lfo_set(const char* name, _lfo_ l, unsigned8 freq, unsigned8 phase);
 _lfo_ lfo_get();
 
-typedef struct t_segment {
+typedef struct t_segment 
+{
   signed2 take_from;
   signed2 speed_mult;
   signed2 speed_div;
@@ -103,7 +113,7 @@ typedef map_segment* map_data;
 #define map_exit_restart -1
 #define map_exit_continue -2
 #define map_exit_stop -1000
-// the exit is expressed at the normal speed of playing
+// exit is expressed at normal playing speed
 void map_set(signed2 map_size, map_data m, unsigned8 size, 
 	     signed8 exit, bool loop);
 void map_loop_set(bool l);
@@ -118,10 +128,15 @@ extern bool  opt_check;
 extern int app_init(int argc, char *argv[]);
 extern void process_options(int argc,char *argv[]);
 extern void msg_playing_state_changed();
+
 /**
  * This function is called by the player core when 
  * the writing process finished its execution.
  */
 extern void msg_writing_finished();
 FILE * openCoreRawFile();
+int loop_set(unsigned8 jumpback);
+
+void set_normalperiod(quad_period_type newnormalperiod, 
+ 		      bool update_on_disk=true);
 #endif // __loaded__player_core_h__

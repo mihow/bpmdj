@@ -1,6 +1,6 @@
 /****
  Borg4 Data Library
- Copyright (C) 2005-2009 Werner Van Belle
+ Copyright (C) 2005-2010 Werner Van Belle
 
  http://werner.yellowcouch.org/Borg4/group__data.html
 
@@ -33,7 +33,8 @@ template <int D> class To;
 //---------------------------------------------------------------
 //                          Coordinates
 //---------------------------------------------------------------
-#define iterate_dimensions(VAR,LIMIT,BLOCK) for(int VAR = LIMIT -1 ; VAR>=0 ; VAR--) {BLOCK;}
+#define iterate_dimensions(VAR,LIMIT,BLOCK) \
+for(int VAR = LIMIT -1 ; VAR>=0 ; VAR--) {BLOCK;}
 
 #ifdef WINDOWS
 /**
@@ -183,7 +184,10 @@ _Coordinate<SEL> _Coordinate<D>::select(const Select<SEL>& sel)
 template <int D> class Select:   public _Coordinate<D> 
 {
  public:
-  Select() : _Coordinate<D>() {for(int i = 0 ; i < D ; i++) _Coordinate<D>::coordinate[i]=i;};
+  Select() : _Coordinate<D>() 
+  {
+    for(int i = 0 ; i < D ; i++) _Coordinate<D>::coordinate[i]=i;
+  };
   Select(int x) : _Coordinate<D>(x) {assert(D==1);};
   Select(int x, int y) : _Coordinate<D>(x,y) {assert(D==2);};
   Select(int x, int y, int z) : _Coordinate<D>(x,y,z) {assert(D==3);};
@@ -237,39 +241,41 @@ template <int D> class Size: public _Coordinate<D>
   Size(int x, int y, int z) : _Coordinate<D>(x,y,z) {};
   Size(int x, int y, int z, int a) : _Coordinate<D>(x,y,z,a) {};
   Size(int x, int y, int z, int a, int b) : _Coordinate<D>(x,y,z,a,b) {};
-  Size(int x, int y, int z, int a, int b, int c) : _Coordinate<D>(x,y,z,a,b,c) {};
+  Size(int x, int y, int z, int a, int b, int c) : _Coordinate<D>(x,y,z,a,b,c)
+  {
+  };
 
-   /**
-    * Calculates the maximum size a subarray can have 
-    * when we start at position pos
-    */
-   void operator()(const From<D>& pos)
-     {
-	for(int i = 0 ; i < D ; i++) 
-	  {
-	     int ws = _Coordinate<D>::coordinate[i];
-	     ws -= pos[i];
-	     if(ws<0) ws=0;
-	     _Coordinate<D>::coordinate[i]=ws;
-	  }
-     }
+  /**
+   * Calculates the maximum size a subarray can have 
+   * when we start at position pos
+   */
+  void operator()(const From<D>& pos)
+  {
+    for(int i = 0 ; i < D ; i++) 
+      {
+	int ws = _Coordinate<D>::coordinate[i];
+	ws -= pos[i];
+	if(ws<0) ws=0;
+	_Coordinate<D>::coordinate[i]=ws;
+      }
+  }
+  
+  /**
+   * Will take the intersection of the two size boxes
+   */
+  void min(const Size<D> & o)
+  {
+    for(int i = 0 ; i < D ; i++)
+      _Coordinate<D>::coordinate[i]=::min(_Coordinate<D>::coordinate[i],o[i]);
+  }
    
-   /**
-    * Will take the intersection of the two size boxes
-    */
-   void min(const Size<D> & o)
-     {
-	for(int i = 0 ; i < D ; i++)
-	  _Coordinate<D>::coordinate[i]=::min(_Coordinate<D>::coordinate[i],o[i]);
-     }
-   
-   template<int R> void takeFrom(const Size<R> &from) 
-     {
-	if(R<D)
-	  for(int i = 0 ; i < R ; i++) _Coordinate<D>::coordinate[i]=from[i];
-	else
-	  for(int i = 0 ; i < D ; i++) _Coordinate<D>::coordinate[i]=from[i];
-     }
+  template<int R> void takeFrom(const Size<R> &from) 
+  {
+    if(R<D)
+      for(int i = 0 ; i < R ; i++) _Coordinate<D>::coordinate[i]=from[i];
+    else
+      for(int i = 0 ; i < D ; i++) _Coordinate<D>::coordinate[i]=from[i];
+  }
 };
 
 typedef Position<2> XY;

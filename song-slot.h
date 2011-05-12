@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__song_slot_h__
 #define __loaded__song_slot_h__
@@ -24,7 +26,6 @@ using namespace std;
 #include <Qt/qcombobox.h>
 #include <Qt/qlineedit.h>
 #include <Qt/qpushbutton.h>
-#include <Qt/q3hbox.h>
 #include "index.h"
 #include "song-process.h"
 
@@ -48,15 +49,21 @@ private:
   QString name;               // the name of this analyzer/player
   command_type cmd;           // the command prefix
   QString remote;             // the remote location of the player, if any
+  /**
+   * The copysong flag is set whenever the player is remote and 
+   * must receive a copy of the song first. When it is set bpmplay will
+   * be started with the extra option --copymusic passed along.
+   */
+  bool    copysong;           //
   enabled_type estate;        // true if the user wants to use this process
-  QString text;               // thename of the playing / analyzing song
+  QString text;               // the name of the playing / analyzing song
   Song  * song;               // the song being analyzed/played;
   /**
    * The current running time
    */
   signed4 running_time;   
   /**
-   * the cummulated running time
+   * the accumulated running time
    */
   signed4 total_running_time;
   /**
@@ -65,10 +72,10 @@ private:
   signed4 songs_finished; 
   time_t  started_at;         // start_time when running
   /**
-   * Whether this one is useable, useless or not yet checked
+   * Whether this one is usable, useless or not yet checked
    */
   state_type state;
- private:
+private:
   void init();
   void setText(QString t);
   void setEstate(enabled_type state);
@@ -112,31 +119,35 @@ public:
     {
       kind = analyzer;
     };
-  void setOldCommand(QString s);
   void setCommand(command_type cmd);
+  void setCopyMusic(bool t);
+  bool getCopyMusic()
+  {
+    return copysong;
+  }
   QString getRemote() const 
-    {
-      return remote;
-    };
+  {
+    return remote;
+  };
   void setRemote(QString remote);
   bool isEmpty() const 
-    {
-      return cmd == empty; 
-    };
+  {
+    return cmd == empty; 
+  };
   bool isBusy() const 
-    {
-      return song != NULL; 
-    };
+  {
+    return song != NULL; 
+  };
   void setSong(Song * s);
   Song * getSong() const 
-    {
-      return song;
-    };
+  {
+    return song;
+  };
   void reread();
   int get_running_time() const 
-    {
-      return running_time; 
-    };
+  {
+    return running_time; 
+  };
   int inc_running_time();
   float4 songs_per_second() const;
 
@@ -205,13 +216,14 @@ class SongSelectorPlayView: public QCheckBox
    void processChange();
 };
 
-class SongProcPrefView: public Q3HBox
+class SongProcPrefView: public QWidget
 {
    Q_OBJECT;
  protected:
    QComboBox   * cmd_box;
    QLineEdit   * name_edit;
    QLineEdit   * remote_edit;
+   QCheckBox   * copy_music;
    SongSlot * song_process; 
  private:
    QPushButton * configure_button;

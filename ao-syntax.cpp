@@ -1,24 +1,23 @@
-/* A Bison parser, made by GNU Bison 2.3.  */
+
+/* A Bison parser, made by GNU Bison 2.4.1.  */
 
 /* Skeleton implementation for Bison's Yacc-like parsers in C
-
-   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
+   
+      Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
    Free Software Foundation, Inc.
-
-   This program is free software; you can redistribute it and/or modify
+   
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
-
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+   
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-
+   
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor,
-   Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* As a special exception, you may create a larger work that contains
    part or all of the Bison parser skeleton and distribute that work
@@ -29,7 +28,7 @@
    special exception, which will cause the skeleton and the resulting
    Bison output files to be licensed under the GNU General Public
    License without this special exception.
-
+   
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
@@ -47,7 +46,7 @@
 #define YYBISON 1
 
 /* Bison version.  */
-#define YYBISON_VERSION "2.3"
+#define YYBISON_VERSION "2.4.1"
 
 /* Skeleton name.  */
 #define YYSKELETON_NAME "yacc.c"
@@ -55,69 +54,28 @@
 /* Pure parsers.  */
 #define YYPURE 0
 
+/* Push parsers.  */
+#define YYPUSH 0
+
+/* Pull parsers.  */
+#define YYPULL 1
+
 /* Using locations.  */
 #define YYLSP_NEEDED 0
 
 /* Substitute the variable and function names.  */
-#define yyparse aoparse
-#define yylex   aolex
-#define yyerror aoerror
-#define yylval  aolval
-#define yychar  aochar
-#define yydebug aodebug
-#define yynerrs aonerrs
-
-
-/* Tokens.  */
-#ifndef YYTOKENTYPE
-# define YYTOKENTYPE
-   /* Put the tokens into the symbol table, so that GDB and other debuggers
-      know about them.  */
-   enum yytokentype {
-     META = 258,
-     NAME = 259,
-     LPAREN = 260,
-     RPAREN = 261,
-     MESSAGE = 262,
-     SEMICOLON = 263,
-     NUMBER = 264,
-     INIT = 265,
-     ACTIVE = 266,
-     COMMA = 267,
-     LBRACE = 268,
-     RBRACE = 269,
-     STAR = 270,
-     PRECOMPILER = 271,
-     VOLATILE = 272,
-     CLASS = 273,
-     TEMPLATE_OPEN = 274,
-     TEMPLATE_CLOSE = 275
-   };
-#endif
-/* Tokens.  */
-#define META 258
-#define NAME 259
-#define LPAREN 260
-#define RPAREN 261
-#define MESSAGE 262
-#define SEMICOLON 263
-#define NUMBER 264
-#define INIT 265
-#define ACTIVE 266
-#define COMMA 267
-#define LBRACE 268
-#define RBRACE 269
-#define STAR 270
-#define PRECOMPILER 271
-#define VOLATILE 272
-#define CLASS 273
-#define TEMPLATE_OPEN 274
-#define TEMPLATE_CLOSE 275
-
-
+#define yyparse         aoparse
+#define yylex           aolex
+#define yyerror         aoerror
+#define yylval          aolval
+#define yychar          aochar
+#define yydebug         aodebug
+#define yynerrs         aonerrs
 
 
 /* Copy the first part of user declarations.  */
+
+/* Line 189 of yacc.c  */
 #line 1 "ao-syntax.y"
 
 #include <stdlib.h>
@@ -192,6 +150,9 @@ extern map<string,string> field2init;
 #define YYSTTYPE char*
 
 
+/* Line 189 of yacc.c  */
+#line 155 "ao-syntax.cpp"
+
 /* Enabling traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -210,29 +171,63 @@ extern map<string,string> field2init;
 # define YYTOKEN_TABLE 0
 #endif
 
+
+/* Tokens.  */
+#ifndef YYTOKENTYPE
+# define YYTOKENTYPE
+   /* Put the tokens into the symbol table, so that GDB and other debuggers
+      know about them.  */
+   enum yytokentype {
+     META = 258,
+     NAME = 259,
+     LPAREN = 260,
+     RPAREN = 261,
+     MESSAGE = 262,
+     SEMICOLON = 263,
+     NUMBER = 264,
+     INIT = 265,
+     ACTIVE = 266,
+     COMMA = 267,
+     LBRACE = 268,
+     RBRACE = 269,
+     STAR = 270,
+     PRECOMPILER = 271,
+     VOLATILE = 272,
+     CLASS = 273,
+     TEMPLATE_OPEN = 274,
+     TEMPLATE_CLOSE = 275
+   };
+#endif
+
+
+
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
+{
+
+/* Line 214 of yacc.c  */
 #line 80 "ao-syntax.y"
-{ 
+ 
   char           * token;
   s_arg            arg;
   vector<s_arg>  * args;
-}
-/* Line 187 of yacc.c.  */
-#line 223 "ao-syntax.cpp"
-	YYSTYPE;
+
+
+
+/* Line 214 of yacc.c  */
+#line 219 "ao-syntax.cpp"
+} YYSTYPE;
+# define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
-# define YYSTYPE_IS_TRIVIAL 1
 #endif
-
 
 
 /* Copy the second part of user declarations.  */
 
 
-/* Line 216 of yacc.c.  */
-#line 236 "ao-syntax.cpp"
+/* Line 264 of yacc.c  */
+#line 231 "ao-syntax.cpp"
 
 #ifdef short
 # undef short
@@ -307,14 +302,14 @@ typedef short int yytype_int16;
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static int
-YYID (int i)
+YYID (int yyi)
 #else
 static int
-YYID (i)
-    int i;
+YYID (yyi)
+    int yyi;
 #endif
 {
-  return i;
+  return yyi;
 }
 #endif
 
@@ -395,9 +390,9 @@ void free (void *); /* INFRINGES ON USER NAME SPACE */
 /* A type that is properly aligned for any stack member.  */
 union yyalloc
 {
-  yytype_int16 yyss;
-  YYSTYPE yyvs;
-  };
+  yytype_int16 yyss_alloc;
+  YYSTYPE yyvs_alloc;
+};
 
 /* The size of the maximum gap between one aligned stack and the next.  */
 # define YYSTACK_GAP_MAXIMUM (sizeof (union yyalloc) - 1)
@@ -431,12 +426,12 @@ union yyalloc
    elements in the stack, and YYPTR gives the new location of the
    stack.  Advance YYPTR to a properly aligned location for the next
    stack.  */
-# define YYSTACK_RELOCATE(Stack)					\
+# define YYSTACK_RELOCATE(Stack_alloc, Stack)				\
     do									\
       {									\
 	YYSIZE_T yynewbytes;						\
-	YYCOPY (&yyptr->Stack, Stack, yysize);				\
-	Stack = &yyptr->Stack;						\
+	YYCOPY (&yyptr->Stack_alloc, Stack, yysize);			\
+	Stack = &yyptr->Stack_alloc;					\
 	yynewbytes = yystacksize * sizeof (*Stack) + YYSTACK_GAP_MAXIMUM; \
 	yyptr += yynewbytes / sizeof (*yyptr);				\
       }									\
@@ -525,11 +520,11 @@ static const yytype_int8 yyrhs[] =
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
-static const yytype_uint8 yyrline[] =
+static const yytype_uint16 yyrline[] =
 {
-       0,    92,    92,    93,    96,    97,    99,    98,   157,   158,
-     161,   163,   165,   167,   169,   170,   176,   210,   211,   212,
-     213,   216,   219,   220,   223,   224,   227,   230,   231
+       0,    92,    92,    93,    96,    97,    99,    98,   205,   206,
+     209,   211,   213,   215,   217,   218,   224,   258,   259,   260,
+     261,   264,   267,   268,   271,   272,   275,   278,   279
 };
 #endif
 
@@ -541,7 +536,7 @@ static const char *const yytname[] =
   "$end", "error", "$undefined", "META", "NAME", "LPAREN", "RPAREN",
   "MESSAGE", "SEMICOLON", "NUMBER", "INIT", "ACTIVE", "COMMA", "LBRACE",
   "RBRACE", "STAR", "PRECOMPILER", "VOLATILE", "CLASS", "TEMPLATE_OPEN",
-  "TEMPLATE_CLOSE", "$accept", "aoheaders", "aoheader", "@1", "contents",
+  "TEMPLATE_CLOSE", "$accept", "aoheaders", "aoheader", "$@1", "contents",
   "content", "type", "varflags", "args", "args_lst", "arg",
   "init_expression", 0
 };
@@ -833,17 +828,20 @@ yy_symbol_print (yyoutput, yytype, yyvaluep)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_stack_print (yytype_int16 *bottom, yytype_int16 *top)
+yy_stack_print (yytype_int16 *yybottom, yytype_int16 *yytop)
 #else
 static void
-yy_stack_print (bottom, top)
-    yytype_int16 *bottom;
-    yytype_int16 *top;
+yy_stack_print (yybottom, yytop)
+    yytype_int16 *yybottom;
+    yytype_int16 *yytop;
 #endif
 {
   YYFPRINTF (stderr, "Stack now");
-  for (; bottom <= top; ++bottom)
-    YYFPRINTF (stderr, " %d", *bottom);
+  for (; yybottom <= yytop; yybottom++)
+    {
+      int yybot = *yybottom;
+      YYFPRINTF (stderr, " %d", yybot);
+    }
   YYFPRINTF (stderr, "\n");
 }
 
@@ -877,11 +875,11 @@ yy_reduce_print (yyvsp, yyrule)
   /* The symbols being reduced.  */
   for (yyi = 0; yyi < yynrhs; yyi++)
     {
-      fprintf (stderr, "   $%d = ", yyi + 1);
+      YYFPRINTF (stderr, "   $%d = ", yyi + 1);
       yy_symbol_print (stderr, yyrhs[yyprhs[yyrule] + yyi],
 		       &(yyvsp[(yyi + 1) - (yynrhs)])
 		       		       );
-      fprintf (stderr, "\n");
+      YYFPRINTF (stderr, "\n");
     }
 }
 
@@ -1161,10 +1159,8 @@ yydestruct (yymsg, yytype, yyvaluep)
 	break;
     }
 }
-
 
 /* Prevent warnings from -Wmissing-prototypes.  */
-
 #ifdef YYPARSE_PARAM
 #if defined __STDC__ || defined __cplusplus
 int yyparse (void *YYPARSE_PARAM);
@@ -1180,11 +1176,10 @@ int yyparse ();
 #endif /* ! YYPARSE_PARAM */
 
 
-
-/* The look-ahead symbol.  */
+/* The lookahead symbol.  */
 int yychar;
 
-/* The semantic value of the look-ahead symbol.  */
+/* The semantic value of the lookahead symbol.  */
 YYSTYPE yylval;
 
 /* Number of syntax errors so far.  */
@@ -1192,9 +1187,9 @@ int yynerrs;
 
 
 
-/*----------.
-| yyparse.  |
-`----------*/
+/*-------------------------.
+| yyparse or yypush_parse.  |
+`-------------------------*/
 
 #ifdef YYPARSE_PARAM
 #if (defined __STDC__ || defined __C99__FUNC__ \
@@ -1218,14 +1213,39 @@ yyparse ()
 #endif
 #endif
 {
-  
-  int yystate;
+
+
+    int yystate;
+    /* Number of tokens to shift before error messages enabled.  */
+    int yyerrstatus;
+
+    /* The stacks and their tools:
+       `yyss': related to states.
+       `yyvs': related to semantic values.
+
+       Refer to the stacks thru separate pointers, to allow yyoverflow
+       to reallocate them elsewhere.  */
+
+    /* The state stack.  */
+    yytype_int16 yyssa[YYINITDEPTH];
+    yytype_int16 *yyss;
+    yytype_int16 *yyssp;
+
+    /* The semantic value stack.  */
+    YYSTYPE yyvsa[YYINITDEPTH];
+    YYSTYPE *yyvs;
+    YYSTYPE *yyvsp;
+
+    YYSIZE_T yystacksize;
+
   int yyn;
   int yyresult;
-  /* Number of tokens to shift before error messages enabled.  */
-  int yyerrstatus;
-  /* Look-ahead token as an internal (translated) token number.  */
-  int yytoken = 0;
+  /* Lookahead token as an internal (translated) token number.  */
+  int yytoken;
+  /* The variables used to return semantic value and location from the
+     action routines.  */
+  YYSTYPE yyval;
+
 #if YYERROR_VERBOSE
   /* Buffer for error messages, and its allocated size.  */
   char yymsgbuf[128];
@@ -1233,51 +1253,28 @@ yyparse ()
   YYSIZE_T yymsg_alloc = sizeof yymsgbuf;
 #endif
 
-  /* Three stacks and their tools:
-     `yyss': related to states,
-     `yyvs': related to semantic values,
-     `yyls': related to locations.
-
-     Refer to the stacks thru separate pointers, to allow yyoverflow
-     to reallocate them elsewhere.  */
-
-  /* The state stack.  */
-  yytype_int16 yyssa[YYINITDEPTH];
-  yytype_int16 *yyss = yyssa;
-  yytype_int16 *yyssp;
-
-  /* The semantic value stack.  */
-  YYSTYPE yyvsa[YYINITDEPTH];
-  YYSTYPE *yyvs = yyvsa;
-  YYSTYPE *yyvsp;
-
-
-
 #define YYPOPSTACK(N)   (yyvsp -= (N), yyssp -= (N))
-
-  YYSIZE_T yystacksize = YYINITDEPTH;
-
-  /* The variables used to return semantic value and location from the
-     action routines.  */
-  YYSTYPE yyval;
-
 
   /* The number of symbols on the RHS of the reduced rule.
      Keep to zero when no symbol should be popped.  */
   int yylen = 0;
+
+  yytoken = 0;
+  yyss = yyssa;
+  yyvs = yyvsa;
+  yystacksize = YYINITDEPTH;
 
   YYDPRINTF ((stderr, "Starting parse\n"));
 
   yystate = 0;
   yyerrstatus = 0;
   yynerrs = 0;
-  yychar = YYEMPTY;		/* Cause a token to be read.  */
+  yychar = YYEMPTY; /* Cause a token to be read.  */
 
   /* Initialize stack pointers.
      Waste one element of value and location stack
      so that they stay on the same level as the state stack.
      The wasted elements are never initialized.  */
-
   yyssp = yyss;
   yyvsp = yyvs;
 
@@ -1307,7 +1304,6 @@ yyparse ()
 	YYSTYPE *yyvs1 = yyvs;
 	yytype_int16 *yyss1 = yyss;
 
-
 	/* Each stack pointer address is followed by the size of the
 	   data in use in that stack, in bytes.  This used to be a
 	   conditional around just the two extra args, but that might
@@ -1315,7 +1311,6 @@ yyparse ()
 	yyoverflow (YY_("memory exhausted"),
 		    &yyss1, yysize * sizeof (*yyssp),
 		    &yyvs1, yysize * sizeof (*yyvsp),
-
 		    &yystacksize);
 
 	yyss = yyss1;
@@ -1338,9 +1333,8 @@ yyparse ()
 	  (union yyalloc *) YYSTACK_ALLOC (YYSTACK_BYTES (yystacksize));
 	if (! yyptr)
 	  goto yyexhaustedlab;
-	YYSTACK_RELOCATE (yyss);
-	YYSTACK_RELOCATE (yyvs);
-
+	YYSTACK_RELOCATE (yyss_alloc, yyss);
+	YYSTACK_RELOCATE (yyvs_alloc, yyvs);
 #  undef YYSTACK_RELOCATE
 	if (yyss1 != yyssa)
 	  YYSTACK_FREE (yyss1);
@@ -1351,7 +1345,6 @@ yyparse ()
       yyssp = yyss + yysize - 1;
       yyvsp = yyvs + yysize - 1;
 
-
       YYDPRINTF ((stderr, "Stack size increased to %lu\n",
 		  (unsigned long int) yystacksize));
 
@@ -1361,6 +1354,9 @@ yyparse ()
 
   YYDPRINTF ((stderr, "Entering state %d\n", yystate));
 
+  if (yystate == YYFINAL)
+    YYACCEPT;
+
   goto yybackup;
 
 /*-----------.
@@ -1369,16 +1365,16 @@ yyparse ()
 yybackup:
 
   /* Do appropriate processing given the current state.  Read a
-     look-ahead token if we need one and don't already have one.  */
+     lookahead token if we need one and don't already have one.  */
 
-  /* First try to decide what to do without reference to look-ahead token.  */
+  /* First try to decide what to do without reference to lookahead token.  */
   yyn = yypact[yystate];
   if (yyn == YYPACT_NINF)
     goto yydefault;
 
-  /* Not known => get a look-ahead token if don't already have one.  */
+  /* Not known => get a lookahead token if don't already have one.  */
 
-  /* YYCHAR is either YYEMPTY or YYEOF or a valid look-ahead symbol.  */
+  /* YYCHAR is either YYEMPTY or YYEOF or a valid lookahead symbol.  */
   if (yychar == YYEMPTY)
     {
       YYDPRINTF ((stderr, "Reading a token: "));
@@ -1410,20 +1406,16 @@ yybackup:
       goto yyreduce;
     }
 
-  if (yyn == YYFINAL)
-    YYACCEPT;
-
   /* Count tokens shifted since error; after three, turn off error
      status.  */
   if (yyerrstatus)
     yyerrstatus--;
 
-  /* Shift the look-ahead token.  */
+  /* Shift the lookahead token.  */
   YY_SYMBOL_PRINT ("Shifting", yytoken, &yylval, &yylloc);
 
-  /* Discard the shifted token unless it is eof.  */
-  if (yychar != YYEOF)
-    yychar = YYEMPTY;
+  /* Discard the shifted token.  */
+  yychar = YYEMPTY;
 
   yystate = yyn;
   *++yyvsp = yylval;
@@ -1463,16 +1455,22 @@ yyreduce:
   switch (yyn)
     {
         case 4:
+
+/* Line 1455 of yacc.c  */
 #line 96 "ao-syntax.y"
     { print(globhead,"%s\n",(yyvsp[(1) - (1)].token)); ;}
     break;
 
   case 5:
+
+/* Line 1455 of yacc.c  */
 #line 97 "ao-syntax.y"
     { print(globhead,"class %s;\n",(yyvsp[(2) - (3)].token)); ;}
     break;
 
   case 6:
+
+/* Line 1455 of yacc.c  */
 #line 99 "ao-syntax.y"
     {
       field2init.clear();
@@ -1497,28 +1495,78 @@ yyreduce:
 	    "#ifndef LEAVE_MSG\n"
 	    "#define LEAVE_MSG ;\n"
 	    "#endif\n");
+
+      print(msgs1,
+"/**\n"
+" * Represents the basic message that is used to queue or deliver a call to \n"
+" * the true Active%s. Active%s_msg_ has a run method which is invoked\n"
+" * by ActiveObject whenever it wants to handle the message. For each \n"
+" * declared method in the active object description, a specific subclass\n"
+" * of Active%s_msg_ has been generated. See inheritance diagram.\n"
+" * The message classes are automatically instantiated by the active object\n"
+" * stub %s\n"
+" * The message class is also an instance of ReferenceCount, which makes it \n"
+" * ideally suited to use within Smart pointers.\n"	    
+" */\n",(yyvsp[(2) - (3)].token),(yyvsp[(2) - (3)].token),(yyvsp[(2) - (3)].token),(yyvsp[(2) - (3)].token));
+
       print(msgs1,  "class Active%s_msg_: public ReferenceCount\n",(yyvsp[(2) - (3)].token));
       print(msgs1,  "{\n"
-	    "  public:\n    virtual elementResult run(Active%s * /* caller */)\n"
+	    "  public:\n"
+	    "    /**\n"
+	    "     * Called by ActiveObject to handle this queued message.\n"
+	    "     * %%arg caller is the Active%s itself.\n"
+	    "     */\n"
+	    "    virtual elementResult run(Active%s * caller)\n"
 	    "    {\n"
 	    "      assert(0);\n"
-	    "    }\n",(yyvsp[(2) - (3)].token));
-      print(msgs1, "    virtual string declaration()\n"
+	    "    }\n",(yyvsp[(2) - (3)].token),(yyvsp[(2) - (3)].token));
+      print(msgs1, 
+	    "    /**\n"
+	    "     * Returns the name of this message. Since this is the message baseclass\n"
+	    "     * it has no identity and will return 'Unknown Message' \n"
+	    "     */\n"
+	    "    virtual string declaration()\n"
 	    "    {\n"
 	    "      return \"Unknown message\";\n"
 	    "    }\n"
 	    "};\n\n");
-      print(meta,  "class %s\n{\n",(yyvsp[(2) - (3)].token));
-      print(meta,  "  private:\n    Active%s object;\n",(yyvsp[(2) - (3)].token));
-      print(meta,  "  public:\n    %s(string name=\"%s\"): object(this, name) {};\n",(yyvsp[(2) - (3)].token),(yyvsp[(2) - (3)].token));
+      print(meta, 
+	    "/**\n"
+	    " * Represents the stub that will transform each incoming call (method)\n"
+	    " * to an object subclassed from type Active%s_msg_\n"
+	    " * The stub itself has an instance of the true active object.\n"
+	    " */\n",(yyvsp[(2) - (3)].token));
+      print(meta, "class %s\n{\n",(yyvsp[(2) - (3)].token));
+      print(meta, "  private:\n"
+	    "    /**\n"
+	    "     * The object that is covered for by this stub. The fact that the\n"
+	    "     * stub allocates the object ensures that only one of it exists and that any\n"
+	    "     * interaction must go through the stub. As such it is kept private.\n"
+	    "     */\n"
+	    "    Active%s object;\n",(yyvsp[(2) - (3)].token));
+      print(meta,"  public:\n"
+	    "    /**\n"
+"     * The constructor of the stub will also directly initalize the main\n"
+"     * object. Because object construction and delayed calls interfere\n"
+"     * somewhat we prohibit the actual implementation (and especially use)\n"
+"     * of a specialized Active Object constructor. Instead, simply the name\n"
+"     * is passed to the object. If you need to initialize the stub, you\n"
+"     * should consider adding an init message to the active object and\n"
+"     * calling (well sending a message to) it directly when the stub is\n"
+"     * generated.\n"
+"     */\n");
+      print(meta, "    %s(string name=\"%s\"): object(this, name) {};\n",(yyvsp[(2) - (3)].token),(yyvsp[(2) - (3)].token));
       current_ao = strdup((yyvsp[(2) - (3)].token));
     ;}
     break;
 
   case 7:
-#line 139 "ao-syntax.y"
+
+/* Line 1455 of yacc.c  */
+#line 186 "ao-syntax.y"
     {
-      print(object,"  protected:\n    Active%s(%s* s, string name):\n"
+      print(object,
+	    "  protected:\n    Active%s(%s* s, string name):\n"
 	    "      ActiveObject<Smart< Active%s_msg_ > >(name), self(s)\n",(yyvsp[(2) - (7)].token),(yyvsp[(2) - (7)].token),(yyvsp[(2) - (7)].token));
       print(object, "      {\n");
       map<string,string>::iterator it=field2init.begin();
@@ -1536,37 +1584,51 @@ yyreduce:
     break;
 
   case 9:
-#line 158 "ao-syntax.y"
+
+/* Line 1455 of yacc.c  */
+#line 206 "ao-syntax.y"
     {;}
     break;
 
   case 10:
-#line 162 "ao-syntax.y"
+
+/* Line 1455 of yacc.c  */
+#line 210 "ao-syntax.y"
     {print(object,"  %s %s;\n",(yyvsp[(1) - (3)].token),(yyvsp[(2) - (3)].token)); field2init[(yyvsp[(2) - (3)].token)]=""; ;}
     break;
 
   case 11:
-#line 164 "ao-syntax.y"
+
+/* Line 1455 of yacc.c  */
+#line 212 "ao-syntax.y"
     {print(object,"  %s %s;\n",(yyvsp[(1) - (5)].token),(yyvsp[(2) - (5)].token)); field2init[(yyvsp[(2) - (5)].token)]=(yyvsp[(4) - (5)].token); ;}
     break;
 
   case 12:
-#line 166 "ao-syntax.y"
+
+/* Line 1455 of yacc.c  */
+#line 214 "ao-syntax.y"
     {print(object,"  %s %s %s;\n",(yyvsp[(1) - (4)].token),(yyvsp[(2) - (4)].token),(yyvsp[(3) - (4)].token)); field2init[(yyvsp[(3) - (4)].token)]=""; ;}
     break;
 
   case 13:
-#line 168 "ao-syntax.y"
+
+/* Line 1455 of yacc.c  */
+#line 216 "ao-syntax.y"
     {print(object,"  %s %s %s;\n",(yyvsp[(1) - (6)].token),(yyvsp[(2) - (6)].token),(yyvsp[(3) - (6)].token)); field2init[(yyvsp[(3) - (6)].token)]=(yyvsp[(5) - (6)].token); ;}
     break;
 
   case 14:
-#line 169 "ao-syntax.y"
+
+/* Line 1455 of yacc.c  */
+#line 217 "ao-syntax.y"
     {print(object,"  %s %s(%s);\n",(yyvsp[(1) - (4)].token),(yyvsp[(2) - (4)].token),args2str((yyvsp[(3) - (4)].args)));;}
     break;
 
   case 15:
-#line 171 "ao-syntax.y"
+
+/* Line 1455 of yacc.c  */
+#line 219 "ao-syntax.y"
     {
       print(meta,
 	    "  public:\n"
@@ -1575,7 +1637,9 @@ yyreduce:
     break;
 
   case 16:
-#line 177 "ao-syntax.y"
+
+/* Line 1455 of yacc.c  */
+#line 225 "ao-syntax.y"
     {
       // the object code
       print(object,"  public: elementResult %s(%s);\n",(yyvsp[(2) - (4)].token),args2str((yyvsp[(3) - (4)].args)));
@@ -1610,53 +1674,72 @@ yyreduce:
     break;
 
   case 17:
-#line 210 "ao-syntax.y"
+
+/* Line 1455 of yacc.c  */
+#line 258 "ao-syntax.y"
     {(yyval.token)=cat((yyvsp[(1) - (2)].token),"*");;}
     break;
 
   case 19:
-#line 212 "ao-syntax.y"
+
+/* Line 1455 of yacc.c  */
+#line 260 "ao-syntax.y"
     {(yyval.token)=cat(cat((yyvsp[(1) - (4)].token)," < "),cat((yyvsp[(3) - (4)].token)," > ")); ;}
     break;
 
   case 20:
-#line 213 "ao-syntax.y"
+
+/* Line 1455 of yacc.c  */
+#line 261 "ao-syntax.y"
     {(yyval.token)=  cat(cat(cat((yyvsp[(1) - (6)].token), "<"), cat((yyvsp[(3) - (6)].token),",")), cat((yyvsp[(5) - (6)].token),">"));;}
     break;
 
   case 21:
-#line 216 "ao-syntax.y"
+
+/* Line 1455 of yacc.c  */
+#line 264 "ao-syntax.y"
     {(yyval.token)=strdup("volatile");;}
     break;
 
   case 22:
-#line 219 "ao-syntax.y"
+
+/* Line 1455 of yacc.c  */
+#line 267 "ao-syntax.y"
     {(yyval.args)=(yyvsp[(2) - (3)].args);;}
     break;
 
   case 23:
-#line 220 "ao-syntax.y"
+
+/* Line 1455 of yacc.c  */
+#line 268 "ao-syntax.y"
     { (yyval.args)=new vector<s_arg>();;}
     break;
 
   case 24:
-#line 223 "ao-syntax.y"
+
+/* Line 1455 of yacc.c  */
+#line 271 "ao-syntax.y"
     {(yyval.args)=(yyvsp[(1) - (3)].args); (yyval.args)->push_back((yyvsp[(3) - (3)].arg));;}
     break;
 
   case 25:
-#line 224 "ao-syntax.y"
+
+/* Line 1455 of yacc.c  */
+#line 272 "ao-syntax.y"
     {(yyval.args)=new vector<s_arg>(); (yyval.args)->push_back((yyvsp[(1) - (1)].arg));;}
     break;
 
   case 26:
-#line 227 "ao-syntax.y"
+
+/* Line 1455 of yacc.c  */
+#line 275 "ao-syntax.y"
     {(yyval.arg).name = (yyvsp[(2) - (2)].token); (yyval.arg).type=(yyvsp[(1) - (2)].token);;}
     break;
 
 
-/* Line 1267 of yacc.c.  */
-#line 1660 "ao-syntax.cpp"
+
+/* Line 1455 of yacc.c  */
+#line 1743 "ao-syntax.cpp"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1666,7 +1749,6 @@ yyreduce:
   YY_STACK_PRINT (yyss, yyssp);
 
   *++yyvsp = yyval;
-
 
   /* Now `shift' the result of the reduction.  Determine what state
      that goes to, based on the state we popped back to and the rule
@@ -1732,7 +1814,7 @@ yyerrlab:
 
   if (yyerrstatus == 3)
     {
-      /* If just tried and failed to reuse look-ahead token after an
+      /* If just tried and failed to reuse lookahead token after an
 	 error, discard it.  */
 
       if (yychar <= YYEOF)
@@ -1749,7 +1831,7 @@ yyerrlab:
 	}
     }
 
-  /* Else will try to reuse look-ahead token after shifting the error
+  /* Else will try to reuse lookahead token after shifting the error
      token.  */
   goto yyerrlab1;
 
@@ -1806,9 +1888,6 @@ yyerrlab1:
       YY_STACK_PRINT (yyss, yyssp);
     }
 
-  if (yyn == YYFINAL)
-    YYACCEPT;
-
   *++yyvsp = yylval;
 
 
@@ -1833,7 +1912,7 @@ yyabortlab:
   yyresult = 1;
   goto yyreturn;
 
-#ifndef yyoverflow
+#if !defined(yyoverflow) || YYERROR_VERBOSE
 /*-------------------------------------------------.
 | yyexhaustedlab -- memory exhaustion comes here.  |
 `-------------------------------------------------*/
@@ -1844,7 +1923,7 @@ yyexhaustedlab:
 #endif
 
 yyreturn:
-  if (yychar != YYEOF && yychar != YYEMPTY)
+  if (yychar != YYEMPTY)
      yydestruct ("Cleanup: discarding lookahead",
 		 yytoken, &yylval);
   /* Do not reclaim the symbols of the rule which action triggered
@@ -1870,6 +1949,8 @@ yyreturn:
 }
 
 
-#line 232 "ao-syntax.y"
+
+/* Line 1675 of yacc.c  */
+#line 280 "ao-syntax.y"
 
 

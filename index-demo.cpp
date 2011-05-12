@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,20 +13,20 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
-#ifndef __loaded__synced_stereo_sample2_h__
-#define __loaded__synced_stereo_sample2_h__
+#ifndef __loaded__index_demo_cpp__
+#define __loaded__index_demo_cpp__
 using namespace std;
-#line 1 "synced-stereo-sample2.h++"
-#include "stereo-sample2.h"
+#line 1 "index-demo.c++"
+#include "index.h"
+#include "types.h"
 
-#define sync_max 8192
-#define sync_halve (8192/2)
-
-class synced_stereo_sample2
+int main(int argc, char* argv[])
 {
- public:
-  stereo_sample2 value;
-  signed4 sync;
-};
-#endif // __loaded__synced_stereo_sample2_h__
+  Index a(argv[1]);
+  printf("Tempo: %s\n",a.get_tempo().qstring().toAscii().data());
+  printf("Cue x: %lld\n",a.get_cue_x());
+}
+#endif // __loaded__index_demo_cpp__

@@ -1,6 +1,6 @@
 /****
  Borg4 Data Library
- Copyright (C) 2005-2009 Werner Van Belle
+ Copyright (C) 2005-2010 Werner Van Belle
 
  http://werner.yellowcouch.org/Borg4/group__data.html
 
@@ -122,10 +122,10 @@ extern long w2r_unknown_singleref;
 #endif
 
 /**
- * This class uses an ugly trick in which we wrongly align the last bit of the pointer
- * as an indication of the fact that we should clone the pointer to a writable
- * one. As soon as this pointer is copied, we check whether we really need to clone 
- * the original or not
+ * This class uses an ugly trick in which we wrongly align the last bit of the 
+ * pointer as an indication of the fact that we should clone the pointer to a 
+ * writable one. As soon as this pointer is copied, we check whether we really
+ * need to clone the original or not
  */
 template <class ReferenceCountedObject> 
 class DataSmart: public Smart<ReferenceCountedObject>

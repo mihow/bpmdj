@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__dsp_drivers_cpp__
 #define __loaded__dsp_drivers_cpp__
@@ -29,6 +31,7 @@ using namespace std;
 #include "dsp-jack.h"
 #include "scripts.h"
 #include "player-core.h"
+#include "info.h"
 
 #ifndef COMPILE_OSS
 #ifndef COMPILE_ALSA
@@ -89,7 +92,11 @@ void dsp_driver::run_pusher_thread()
 {
   stop_request=false;
   stopped=false;
+#ifndef NO_AUTOSTART
   paused=false;
+#else
+  paused=true;
+#endif
   starting=false;
   while(!stop_request)
     {

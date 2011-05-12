@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__clock_drivers_cpp__
 #define __loaded__clock_drivers_cpp__
@@ -27,10 +29,8 @@ quad_period_type normalperiod;
 signed8 x=0;
 signed8 y=0;
 clock_driver *metronome = NULL;
-unsigned8 beat, bar, tick, clockframes;
-bool timemaster = false;
 
-void changetempo(signed8 period)
+void clock_driver::changetempo(signed8 period)
 {
   /**
    * Change tempo to period
@@ -38,8 +38,6 @@ void changetempo(signed8 period)
    * x = y * normalperiod / currentperiod
    * y = x * currentperiod / normalperiod
    */
-  if (metronome)
-    metronome->tempo_will_change(period);
   currentperiod = period;
   y = x * currentperiod / normalperiod; 
 }
@@ -54,10 +52,4 @@ signed8 y_normalise(signed8 x)
   return x*currentperiod/normalperiod;
 }
 
-void set_normalperiod(quad_period_type newnormalperiod, bool update_on_disk)
-{
-  assert(metronome);
-  metronome->set_normalperiod(newnormalperiod);
-  playing->set_period(newnormalperiod/4,update_on_disk);
-}
 #endif // __loaded__clock_drivers_cpp__

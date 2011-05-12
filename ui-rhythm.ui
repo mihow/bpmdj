@@ -85,7 +85,7 @@
     </widget>
    </item>
    <item row="8" column="3" >
-    <widget class="Q3ProgressBar" name="Progress" />
+    <widget class="QProgressBar" name="Progress" />
    </item>
    <item row="1" column="0" colspan="5" >
     <widget class="QLabel" name="rhythm" >
@@ -206,13 +206,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>Q3ProgressBar</class>
-   <extends>QFrame</extends>
-   <header>Qt3Support/Q3ProgressBar</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

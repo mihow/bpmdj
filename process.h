@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__process_h__
 #define __loaded__process_h__
@@ -87,8 +89,8 @@ public:
   ExitStatus exec(const char* script, const char* description);
   /**
    * The died virtual will be called from a random thread
-   * to notify the terminiation of the command.
-   * BEWARE: the thread is not necesarily the same as the
+   * to notify the termination of the command.
+   * BEWARE: the thread is not necessarily the same as the
    * one used to initiate poll_death.
    */
   virtual void died(ExitStatus s);

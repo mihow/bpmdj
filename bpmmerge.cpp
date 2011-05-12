@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__bpmmerge_cpp__
 #define __loaded__bpmmerge_cpp__
@@ -43,7 +45,7 @@ PlayerConfig * config;      // will be the standard configuration
  *-------------------------------------------*/
 void options_failure(const char* err)
 {
-  printf("BpmDj Merger v%s, Copyright (c) 2001-2009 Werner Van Belle\n",
+  printf("BpmDj Merger v%s, Copyright (c) 2000-2010 Werner Van Belle\n",
 	 VERSION);
   printf(
 "This software is distributed under the GPL2 license. See copyright.txt\n\n"
@@ -411,7 +413,7 @@ void normalize_file()
 bool createFiles(char* a, char* b)
 {
   Index idx_b(b);
-  filename_b = strdup(idx_b.get_filename());
+  filename_b = strdup(idx_b.get_filename().toAscii().data());
   period_b   = period_to_quad(idx_b.get_period());
   cue_b      = period_to_quad(idx_b.get_cue());
   set_decoder_environment(config,&idx_b);

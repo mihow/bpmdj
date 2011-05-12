@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__song_iterator_h__
 #define __loaded__song_iterator_h__
@@ -25,8 +27,9 @@ using namespace std;
 
 class selectedSongIterator
 {
-  int idx;
+  unsigned4 idx;
   bool once;
+  vector<Song*> tolookat;
 public:
   inline int key()
   {
@@ -34,27 +37,20 @@ public:
   }
   inline Song* val()
   {
-    return QSong::get_songs(idx);
+    return tolookat[idx];
   }
   inline bool valid()
   {
-    return idx<QSong::get_song_count();
-  }
-  inline void skipNonValids()
-  {
-    while(valid() && !QSong::get_selected(idx))
-      idx++;
+    return idx<tolookat.size();
   }
   inline void step()
   {
     idx++;
-    skipNonValids();
   }
   inline bool prepare_block()
   {
     if (once) return false;
     once=true;
-    skipNonValids();
     return valid();
   }
   inline void need_fields()
@@ -63,8 +59,20 @@ public:
   inline void start()
   {
   }
-  selectedSongIterator(): idx(0), once(false)
+  selectedSongIterator(QTableView* in=NULL): idx(0), once(false)
   {
+    if (!in)
+      in=selector->songListView;
+    assert(in);
+    QItemSelectionModel* sm=in->selectionModel();
+    assert(sm);
+    QModelIndexList all=sm->selectedRows(0);
+    set<int> toretrieve;
+    for(int i = 0 ; i < all.size(); i++)
+      toretrieve.insert(all[i].row());
+    tolookat.clear();
+    for(set<int>::iterator it=toretrieve.begin(); it!=toretrieve.end(); it++)
+      tolookat.push_back(QSong::songEssence(*it));
   };
 };
 #endif // __loaded__song_iterator_h__

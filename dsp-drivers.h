@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__dsp_drivers_h__
 #define __loaded__dsp_drivers_h__
@@ -21,18 +23,6 @@ using namespace std;
 #include "common.h"
 #include "stereo-sample2.h"
 #include "player-config.h"
-
-#ifdef ASYNC_JACK 
-#ifndef COMPILE_JACK
-#error ASYNC_JACK requires COMPILE_JACK
-#endif
-#endif
-
-#ifdef JACK_TRANSPORT
-#ifndef COMPILE_JACK
-#error JACK_TRANSPORT requires COMPILE_JACK
-#endif
-#endif
 
 #ifndef COMPILE_OSS
 #ifndef COMPILE_ALSA
@@ -64,7 +54,7 @@ public:
   /**
    * The read method should return the next sample to be played.
    * It should never wait. If no data is available it can _signal_ to 
-   * some other thread that this is the case, but it shouldn not wait
+   * some other thread that this is the case, but it should not wait
    * for data to become available. Similar, it should not wait if 
    * a pause request has been issued. In those cases it is safe
    * to return 0.
@@ -74,8 +64,8 @@ public:
 
 /**
  * BpmDj can use any sound device driver necessary given that a class exists to
- * support such a driver. For instance, we scurrently have an Alsa driver, an 
- * old fashioned Oss driver and an experimental Jack driver. Examnples of 
+ * support such a driver. For instance, we currently have an ALSA driver, an 
+ * old fashioned OSS driver and an experimental Jack driver. Examples of 
  * drivers can be found in dsp-alsa.h and dsp-oss.h.
  *
  * The dsp driver is responsible for having its own thread of control, created
@@ -135,9 +125,9 @@ public:
 public:
   /**
    * The pause function is called from within the player to signal that the
-   * dsp driver should stop playback immediatelly, in such a manner that it can
-   * later contiunue directly. The pause() function just signals the request 
-   * and should return directly. It is the internal_pause which should perfom
+   * dsp driver should stop playback immediately, in such a manner that it can
+   * later continue directly. The pause() function just signals the request 
+   * and should return directly. It is the internal_pause which should perform
    * the appropriate dsp alterations to actually stop the playback.
    * 
    * In case of the internal synchronous driver (the one which relies on the 
@@ -153,23 +143,23 @@ public:
    *   false
    * - the user interface thread calls the unpause() method which sets the 
    *   pause flag to false;
-   * - the transfer thread will then call internal_unpause to reenable the dsp
+   * - the transfer thread will then call internal_unpause to re-enable the dsp
    *   playback
    * - the transfer thread will then continue playing.
    * 
    * When writing a dsp driver it is unlikely that you need to override the 
-   * pause function. It is more likely that yuou want to override the 
+   * pause function. It is more likely that you want to override the 
    * internal_pause() and internal_unpause() methods.
    */ 
   virtual void pause();
   /**
-   * The unpause method signals that playback should continnue. The function 
+   * The unpause method signals that playback should continue. The function 
    * should return directly. It is up to the internal_unpause to alter the dsp
    * configuration. See pause() for more information.
    */
   virtual void unpause();
   /**
-   * Returns the current pause state. ture if playback is temporarily halted. 
+   * Returns the current pause state. true if playback is temporarily halted. 
    * False otherwise.
    */
   bool get_paused() 
@@ -186,7 +176,7 @@ protected:
   virtual void internal_pause()=0; 
   virtual void internal_unpause()=0;
   /**
-   * The paused field is set to true when no shound should be produced. To 
+   * The paused field is set to true when no sound should be produced. To 
    * pause the output of a dsp driver call the pause() function. To unpause 
    * the playback call the unpause function. When using the standard threaded
    * pusher one can/should rely on the wait_for_unpause function to continue 
@@ -211,23 +201,23 @@ public:
   /**
    * This method must return the latency between the sample position that
    * currently comes out of the speakers and the next sample that will be
-   * read from the audiosource.
+   * read from the audio source.
    */
   virtual signed8 latency() = 0;
   /**
-   * The open function should intialize the specific device such that we can
+   * The open function should initialize the specific device such that we can
    * start writing to it and that it will play sound. If the open is not 
    * possible this function should return err_dsp. If the function is 
-   * successfull open() should return err_none. If ui is set to true
+   * successful open() should return err_none. If user interface is set to true
    * then error dialogs will be shown when errors appear. If the open fails
-   * and returns err_dsp, then expect a close to be followed afterwards.
+   * and returns err_dsp, then expect a close to be followed afterward.
    */
   virtual int  open(bool ui) = 0;
   virtual void close(bool flush_first) = 0;
   /**
    * Will do nothing but delete the object. The driver should make sure
    * that any callbacks to this object will no longer occur. Because after the 
-   * desctructor is called the object is no longer in existence and any callback
+   * destructor is called the object is no longer in existence and any callback
    * might segfault as a result.
    */
   virtual ~dsp_driver() 

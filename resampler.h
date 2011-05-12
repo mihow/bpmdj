@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__resampler_h__
 #define __loaded__resampler_h__
@@ -31,7 +33,7 @@ using namespace std;
 #ifdef INCOMPLETE_FEATURES
 
 /**
- * The resampler below is implemented using polyphase decimation combined with 
+ * The resampler below is implemented using poly-phase decimation combined with 
  * a windowed lowpass filter with size 2*L
  */
 class ImpulseResponse

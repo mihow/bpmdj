@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__dirscanner_h__
 #define __loaded__dirscanner_h__
@@ -26,15 +28,15 @@ using namespace std;
 
 /**
  * The directory scanner provides the possibility to scan a directory tree 
- * in specific chunk sizes. For each filenamne it will check its extension,
+ * in specific chunk sizes. For each filename it will check its extension,
  * and if it matches it will call the checkFile virtual function.
  */
 class DirectoryScanner
 {
 private:
   /**
-   * A subclass used to track in which diretory we currently are. The stack of 
-   * open directories is maintained in dir_stack. Each fram e on this stack 
+   * A subclass used to track in which directory we currently are. The stack of 
+   * open directories is maintained in dir_stack. Each frame e on this stack 
    * contains an opened directory entry (so the readdir function can be called)
    * and the full path to reach that directory.
    */
@@ -61,7 +63,7 @@ private:
   void scanfile(const QString dir, const QString filename);
 protected:
   /**
-   * Should we recurse into subdirectories
+   * Should we recurse into sub directories
    */
   bool recurse;
   /**
@@ -89,12 +91,12 @@ protected:
   };
 public:
   /**
-   * Will create a directoryscanner which will target the required extension.
+   * Will create a directory scanner which will target the required extension.
    * To use it first reset it to a certain directory and then use scan()
    */
   DirectoryScanner(QString extension);
   /**
-   * Creates a directoryscanner that will target the given extension and start
+   * Creates a directory scanner that will target the given extension and start
    * searching for files under @arg dir. Normally recursion is enabled. Use the
    * last parameter to turn it off if necessary
    */

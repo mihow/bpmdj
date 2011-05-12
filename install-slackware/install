@@ -1,8 +1,0 @@
-#!/bin/sh
-LPREFIX="/root/usr/local"
-mkdir -p $LPREFIX/lib
-mkdir $LPREFIX/bin
-tar -xvzf bpmdj-3.3.bin.tgz
-mv bpmdj-3.3 $LPREFIX/lib
-cd $LPREFIX/bin
-ln -s -t . ../lib/bpmdj-3.3/*bpm*

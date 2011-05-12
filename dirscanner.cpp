@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__dirscanner_cpp__
 #define __loaded__dirscanner_cpp__
@@ -26,6 +28,7 @@ using namespace std;
 #include "common.h"
 #include "capacity.h"
 #include "constants.h"
+#include "info.h"
 
 bool DirectoryScanner::goodName(QString name)
 {
@@ -38,8 +41,8 @@ bool DirectoryScanner::goodName(QString name)
   if (name.count("_")>1) return false;
   if (name.contains("_"))
     {
-      int pos = name.findRev("_");
-      int pos2 = name.find("[");
+      int pos = name.lastIndexOf("_");
+      int pos2 = name.indexOf("[");
       if ((pos2-pos>3) || (pos<2))
 	return false;
     }
@@ -47,11 +50,11 @@ bool DirectoryScanner::goodName(QString name)
   if (name.contains("-")) return false;
   if (name.contains("[")!=1) return false;
   if (name.contains("]")!=1) return false;
-  int leftbrace=name.find("[");
-  if (leftbrace>name.find("]")) return false;
+  int leftbrace=name.indexOf("[");
+  if (leftbrace>name.indexOf("]")) return false;
   if (name.at(leftbrace+1).isLetter())
     {
-      char c = name.at(leftbrace+1).latin1();
+      QChar c = name.at(leftbrace+1);
       if (c<'A' || c>'Z')
 	return false;
     }
@@ -73,13 +76,13 @@ DirectoryScanner::DirectoryScanner(QString dir, QString extension, bool rec):
 
 void DirectoryScanner::recursing(const QString dirname)
 {
-  printf("Recursing into %s\n",(const char*)dirname);
+  Info("Recursing into %s",dirname.toAscii().data());
 }
 
 void DirectoryScanner::reset(const QString dirname, unsigned4 fpt)
 {
   DirPos pos;
-  pos.dir = opendir(dirname);
+  pos.dir = opendir(dirname.toAscii().data());
   pos.path = dirname;
   prefix_length=dirname.length();
   dir_stack.push(pos);
@@ -105,7 +108,7 @@ unsigned4 DirectoryScanner::scan()
 	      QString d_name(entry->d_name);
 	      QString newdir = dirpos.path+slash+d_name;
 	      // is it a directory
-	      DIR * nd = opendir(newdir);
+	      DIR * nd = opendir(newdir.toAscii().data());
 	      if (nd)
 		{
 		  if (!recurse) continue;
@@ -135,9 +138,9 @@ unsigned4 DirectoryScanner::scan()
 bool DirectoryScanner::matchextension(const QString filename)
 {
   if (required_extension.isEmpty()) return true;
-  if (strlen(filename)<strlen(required_extension)) return false;
+  if (filename.length()<required_extension.length()) return false;
   return filename.right(required_extension.length()).
-    contains(required_extension,0);
+    contains(required_extension,Qt::CaseInsensitive);
 }
 
 void DirectoryScanner::scanfile(const QString dir, const QString filename)

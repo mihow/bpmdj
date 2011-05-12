@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__bpmplay_h__
 #define __loaded__bpmplay_h__
@@ -36,7 +38,7 @@ extern bool opt_check;
 extern const char * arg_config;
 
 QString get_rawpath();
-bool show_error(int err, int err2, const char*text);
+bool show_error(int err, int err2, QString text);
 void msg_playing_state_changed();
 void msg_writing_finished();
 #endif // __loaded__bpmplay_h__

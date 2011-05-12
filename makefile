@@ -1,5 +1,6 @@
-VERSION = 4.0
-BIN = bos bpmdj bpmplay bpmmerge bpmcount
+VERSION = 4.1
+DEMOS = index-demo idx2txt bos
+BIN =  $(DEMOS) bpmdj bpmplay bpmmerge bpmcount bpmclock
 .EXPORT_ALL_VARIABLES:
 all: .link-targets .ui-forms .rc-files .source-creator .depend .compile 
 
@@ -8,7 +9,7 @@ all: .link-targets .ui-forms .rc-files .source-creator .depend .compile
 # software (the compiler ?) is educated enough to point to the proper
 # headers and libraries
 ifeq (${shell if test ! -f defines; then echo "N"; else echo "Y"; fi},N)
-$(error "Please read 'compile.txt'")
+$(error "Please read 'compile.txt' (make sure to include the .txt)")
 endif
 CFLAGS=-DLINUX -DSHORT_ONE
 JOBS=1
@@ -16,14 +17,14 @@ include defines
 LINK =  $(CPP) $(LDFLAGS) $(QT_INCLUDE_PATH) $(QT_LIBRARY_PATH) $(QT_LIBS)
 
 # Check all the link targets
-.link-targets: fix-link-target
-	@echo "Link targets:"
-	@./fix-link-target
+.link-targets:
+	@if test -e ./fix-link-target; then echo "Link targets:"; ./fix-link-target; fi
 
 # Generate all the necessary user interface files
 .ui-forms: ui-forms
 	@echo "User Interface Resources:"
 	@make -s --no-print-directory -f ui-forms $@
+
 .rc-files: rc-files
 	@echo "Resource files:"
 	@make -s --no-print-directory -f rc-files $@

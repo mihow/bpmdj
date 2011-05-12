@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__bpmcount_cpp__
 #define __loaded__bpmcount_cpp__
@@ -50,7 +52,7 @@ template float8 find_abs_max<float8>(float8*, long);
 
 int main(int argc, char *argv[])
 {
-  printf("bpmcount v"VERSION" (c) Werner Van Belle 2000-2009,"
+  printf("bpmcount v"VERSION" (c) Werner Van Belle 2000-2010,"
 	 " all rights reserved\n");
   printf("http://bpmdj.yellowcouch.org/\n");
   printf("_________________________________________________________________\n");

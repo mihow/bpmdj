@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__lowpass_h__
 #define __loaded__lowpass_h__
@@ -34,14 +36,14 @@ using namespace std;
  * Izero() computes the 0th order modified bessel function of the first kind.
  *    (Needed to compute Kaiser window).
  *
- * LpFilter() computes the coeffs of a Kaiser-windowed low pass filter with
+ * LpFilter() computes the coefficients of a Kaiser-windowed low pass filter with
  *    the following characteristics:
  *
- *       c[]  = array in which to store computed coeffs
+ *       c[]  = array in which to store computed coefficients
  *       frq  = roll-off frequency of filter
- *       N    = Half the window length in number of coeffs
+ *       N    = Half the window length in number of coefficients
  *       Beta = parameter of Kaiser window
- *       Num  = number of coeffs before 1/frq
+ *       Num  = number of coefficients before 1/frq
  *
  * Beta trades the rejection of the lowpass filter against the transition
  *    width from passband to stopband.  Larger Beta means a slower

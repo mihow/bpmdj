@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__player_config_cpp__
 #define __loaded__player_config_cpp__
@@ -34,6 +36,7 @@ using namespace std;
 #include "player.h"
 #include "capacity.h"
 #include "scripts.h"
+#include "info.h"
 
 PlayerConfig::PlayerConfig()
 {
@@ -70,9 +73,9 @@ void PlayerConfig::init()
   init_player_rms_target();
   init_disabled_capacities();
   init_jack_dev();
+  init_jack_lout();
+  init_jack_rout();
   init_jack_verbose();
-  init_jack_latency();
-  init_jack_lowlatency();
 }
 
 /**
@@ -112,53 +115,48 @@ void PlayerConfig::save_ui_position(QDialog * dialog)
 void PlayerConfig::save()
 {
   QFile f(get_meta_name());
-  f.open(IO_WriteOnly);
+  f.open(QIODevice::WriteOnly);
   if (!f.isOpen() || !f.isWritable())
     {
       Error(true,"Configuration file \"%s\" cannot be opened for writing",
-	    (const char*)get_meta_name());
+	    (const char*)get_meta_name().toAscii().data());
       return;
     }
   QDataStream s(&f);
-  s << (Q_UINT16)MAGIC_NOW;
+  s << (quint16)MAGIC_NOW;
   s << get_core_rawpath();
-  s << (Q_UINT16)get_player_dsp();
-  s << (Q_UINT16)get_alsa_latency();
-  s << (Q_INT8)get_alsa_verbose();
+  s << (quint16)get_player_dsp();
+  s << (quint16)get_alsa_latency();
+  s << (qint8)get_alsa_verbose();
   s << get_alsa_dev();
   s << get_oss_dsp();
-  s << (Q_INT8)get_oss_init_fragments();
-  s << (Q_UINT16)get_oss_fragments();
-  s << (Q_INT8)get_oss_verbose();
-  s << (Q_INT8)get_oss_nolatencyaccounting();
-  s << (Q_UINT16)get_oss_latency();
-  s << (Q_UINT16)get_bpm_channel();
-  s << (Q_INT8)get_player_rms();
+  s << (qint8)get_oss_init_fragments();
+  s << (quint16)get_oss_fragments();
+  s << (qint8)get_oss_verbose();
+  s << (qint8)get_oss_nolatencyaccounting();
+  s << (quint16)get_oss_latency();
+  s << (quint16)get_bpm_channel();
+  s << (qint8)get_player_rms();
   s << get_player_rms_target();
-  s << (Q_UINT16)get_disabled_capacities();
-  s << (Q_UINT16)get_ui_posx();
-  s << (Q_UINT16)get_ui_posy();
+  s << (quint16)get_disabled_capacities();
+  s << (quint16)get_ui_posx();
+  s << (quint16)get_ui_posy();
   s << get_jack_dev();
-  s << (Q_UINT16)get_jack_latency();
-  s << (Q_INT8)get_jack_verbose();
-  s << (Q_INT8)get_jack_lowlatency();
-  s << (Q_UINT16)get_jack_clock();
-  s << (Q_INT8)get_jack_emittempo();
-  s << (Q_INT8)get_jack_receivetempo();
-  s << (Q_INT8)get_jack_emitposition();
-  s << (Q_INT8)get_jack_receiveposition();
+  s << (qint8)get_jack_verbose();
+  s << get_jack_lout();
+  s << get_jack_rout();
 }
 
 void PlayerConfig::load()
 {
   if (!QFile::exists(get_meta_name())) return;
-  Q_INT8 b;
-  Q_UINT16 magic;
-  Q_UINT16 w;
+  qint8 b;
+  quint16 magic;
+  quint16 w;
   QString str;
   float4 fl;
   QFile f(get_meta_name());
-  f.open(IO_ReadOnly);
+  f.open(QIODevice::ReadOnly);
   QDataStream s(&f);
   s >> magic;
   if (magic == MAGIC_2_9)
@@ -292,9 +290,9 @@ void PlayerConfig::load()
 	s >> str; set_jack_dev(str);
 	s >> w;  set_jack_latency(w);
 	s >> b; set_jack_verbose(b);
-	s >> b; set_jack_lowlatency(b);
+	s >> b; /* set_jack_lowlatency(b); */
      }
-   else if (magic == MAGIC_3_7)
+   else if (magic == MAGIC_3_7 || magic == MAGIC_4_0)
      {
        s >> str; set_core_rawpath(str);
        s >> w; set_player_dsp(w);
@@ -316,12 +314,30 @@ void PlayerConfig::load()
        s >> str; set_jack_dev(str);
        s >> w;  set_jack_latency(w);
        s >> b; set_jack_verbose(b);
-       s >> b; set_jack_lowlatency(b);
-       s >> w; set_jack_clock(w);
-       s >> b; set_jack_emittempo(b);
-       s >> b; set_jack_receivetempo(b);
-       s >> b; set_jack_emitposition(b);
-       s >> b; set_jack_receiveposition(b);
+     }
+   else if (magic == MAGIC_4_1 || magic==MAGIC_4_1b)
+     {
+       s >> str; set_core_rawpath(str);
+       s >> w; set_player_dsp(w);
+       s >> w; set_alsa_latency(w);
+       s >> b; set_alsa_verbose(b);
+       s >> str; set_alsa_dev(str);
+       s >> str; set_oss_dsp(str);
+       s >> b; set_oss_init_fragments(b);
+       s >> w; set_oss_fragments(w);
+       s >> b; set_oss_verbose(b);
+       s >> b; set_oss_nolatencyaccounting(b);
+       s >> w; set_oss_latency(w);
+       s >> w; set_bpm_channel(w);
+       s >> b; set_player_rms(b);
+       s >> fl; set_player_rms_target(fl);
+       s >> w; set_disabled_capacities(w);
+       s >> w; set_ui_posx(w);
+       s >> w; set_ui_posy(w);
+       s >> str; set_jack_dev(str);
+       s >> b; set_jack_verbose(b);
+       s >> str; set_jack_lout(str);
+       s >> str; set_jack_rout(str);
      }
    else
     Error(true,"bpmplay wrong configuration file format\n");

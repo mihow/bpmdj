@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__signals_h__
 #define __loaded__signals_h__
@@ -196,7 +198,7 @@ public:
 };
 
 /**
- * The haar wavelet transform
+ * The Haar wavelet transform
  */
 template<class Input, class Output, int Channels> class Haar: 
   public BasicConvertor
@@ -214,7 +216,7 @@ public:
 };
 
 /**
- * General usefull functions
+ * General useful functions
  */
 inline unsigned4 absolute(signed4 i) {return abs(i);};
 inline unsigned2 absolute(signed2 i) {return abs(i);};
@@ -267,7 +269,7 @@ float8 biased_best_l2_circular_distance(float8 *a, float8 *b, int size);
 /* finds the best circular shift to give the lowest L2 distance */
 
 void energize(float8*what, float8 length, unsigned4 ws);
-/* will replace every element wioth the RMS value of 
+/* will replace every element with the RMS value of 
  * the surrounding block of size ws */
 
 float8 Index_to_frequency ( unsigned NumSamples, unsigned Index );

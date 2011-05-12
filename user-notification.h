@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__user_notification_h__
 #define __loaded__user_notification_h__
@@ -23,11 +25,11 @@ using namespace std;
 #include "selector.h"
 
 /**
- * A user notification can contain information for dialog boxes
- * and status messages. It can also contain a flag
- * that updates the statusbar if needed. To use it you should
- * create a new object because the object will automatically be 
- * deleted by the receiver.
+ * A user notification can contain information for dialog boxes and status
+ * messages. It can also contain a flag that updates the status bar if needed.
+ * To use it you should always use a new operator and never take the address
+ * of a temporary or static notification. The reason is that the notification 
+ * itself is deleted by the receiver at arrival.
  */
 class UserNotification: public BpmDjEvent
 {

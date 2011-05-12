@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,31 +13,33 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__pca_cpp__
 #define __loaded__pca_cpp__
 using namespace std;
 #line 1 "pca.c++"
-/*********************************************************************/
-/* Principal Components Analysis or the Karhunen-Loeve expansion is a
-   classical method for dimensionality reduction or exploratory data
-   analysis.  One reference among many is: F. Murtagh and A. Heck,
-   Multivariate Data Analysis, Kluwer Academic, Dordrecht, 1987.
-
-   Author:
-   F. Murtagh
-   Phone:        + 49 89 32006298 (work)
-                 + 49 89 965307 (home)
-   Earn/Bitnet:  fionn@dgaeso51,  fim@dgaipp1s,  murtagh@stsci
-   Span:         esomc1::fionn
-   Internet:     murtagh@scivax.stsci.edu
-   F. Murtagh, Munich, 6 June 1989                                   */   
-/*********************************************************************/
-// WVB -- modified to incorporate it into BpmDj
-// WVB -- added DUMP_INFO variable to print out data
-// WVB -- modified malloc to allocate
-// WVB -- added progress bar support..
-// WVB -- added better error handling...
+/*********************************************************************
+ * Principal Components Analysis or the Karhunen-Loeve expansion is a
+ * classical method for dimensionality reduction or exploratory data
+ * analysis.  One reference among many is: F. Murtagh and A. Heck,
+ * Multivariate Data Analysis, Kluwer Academic, Dordrecht, 1987.
+ *
+ * Author: F. Murtagh
+ * Phone:  + 49 89 32006298 (work)
+ *         + 49 89 965307 (home)
+ * Earn/Bitnet:  fionn@dgaeso51,  fim@dgaipp1s,  murtagh@stsci
+ * Span:         esomc1::fionn
+ * Internet:     murtagh@scivax.stsci.edu
+ * F. Murtagh, Munich, 6 June 1989
+ *********************************************************************
+ * WVB - modified to incorporate it into BpmDj
+ * WVB - added DUMP_INFO variable to print out data
+ * WVB - modified malloc to allocate
+ * WVB - added progress bar support..
+ * WVB - added better error handling...
+ */
 
 #include <stdio.h>
 #include <string.h>

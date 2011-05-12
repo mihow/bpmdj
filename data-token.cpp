@@ -1,6 +1,6 @@
 /****
  Borg4 Data Library
- Copyright (C) 2005-2009 Werner Van Belle
+ Copyright (C) 2005-2010 Werner Van Belle
 
  http://werner.yellowcouch.org/Borg4/group__data.html
 
@@ -31,27 +31,18 @@ using namespace std;
 Token::Token() 
 {
   content = new TokenContent();
-  //  printf("constructor: Init content %x(%d)\n",content,content->refcount);
 };
 
 Token::Token(const Token& dc) : DataClass()
 {
   content = dc.content;
   content -> refcount++;
-  //  printf("copy: Increased content %x(%d)\n",content,content->refcount);
 }
 
 Token::~Token()
 {
   if (--content->refcount==0)
-    {
-      //      printf("~: Deleting content %x(%d)\n",content,content->refcount);
-      delete content;
-    }
-  else
-    {
-      //      printf("~: Decreased content %x(%d)\n",content,content->refcount);
-    }
+    delete content;
 }
 
 Token& Token::operator = (const Token& dc)
@@ -59,17 +50,9 @@ Token& Token::operator = (const Token& dc)
   if (content!=dc.content)
     {
       if(--content->refcount==0) 
-	{
-	  //	  printf("=: Deleting content %x(%d)\n",content,content->refcount);
-	  delete content;
-	}
-      else
-	{
-	  //	  printf("=: Decreased content %x(%d)\n",content,content->refcount);
-	}
+	delete content;
       content = dc.content;
       content->refcount++;
-      //      printf("=: Increased content %x(%d)\n",content,content->refcount);
     }
   return *this;
 };

@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__beatgraph_analyzer_h__
 #define __loaded__beatgraph_analyzer_h__
@@ -29,7 +31,7 @@ class BeatGraphAnalyzer : public QWidget, public Ui::BeatGraph
 {
   Q_OBJECT
 private: 
-  // the signed data is used as input into the energy and haar calculations
+  // the signed data is used as input into the energy and Haar calculations
   signed4 audiosize;
   uncompressed * signed_data;  // contains audiosize/COLLAPSED samples
   void readFileSigned();
@@ -37,11 +39,11 @@ private:
   signed4 period;
   void getTempo();
   bool check_visualisation_conditions(bool file_read=true);
-  // energy calculation, storage & visualisation
+  // energy calculation, storage & visualization
   compressed  * data;
   void calculateEnergy();
   void showEnergyPattern();
-  // haar calculation, storage & visualisation
+  // Haar calculation, storage & visualization
   float4 ** bank;
   unsigned1* f1;
   void calculateHaar();

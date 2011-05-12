@@ -57,12 +57,13 @@ data.a : $(DATA_OBJECTS)
 	@echo "   [ar] data.a"
 	@$(AR) r $@ $(DATA_OBJECTS) 2>.ignore
 
-DSP_OBJECTS = dsp-drivers.o dsp-oss.o dsp-alsa.o dsp-none.o dsp-jack.o scripts.o
+DSP_OBJECTS = dsp-drivers.o dsp-oss.o dsp-alsa.o dsp-none.o dsp-jack.o \
+	    info.o scripts.o
 dsp.a : $(DSP_OBJECTS)
 	@echo "   [ar] dsp.a"
 	@$(AR) r $@ $(DSP_OBJECTS) 2>.ignore
 
-EMBEDDED = bpmdj-ogg.o bpmdj-mp3.o embedded-files.o logo-png.o
+EMBEDDED = bpmdj-ogg.o bpmdj-mp3.o embedded-files.o logo-png.o authors.o 
 embedded.a: $(EMBEDDED)
 	@echo "   [ar] embedded.a"
 	@$(AR) r $@ $(EMBEDDED) 2>.ignore
@@ -79,52 +80,57 @@ analyzers.a: $(ANALYZERS)
 	@$(AR) r $@ $(ANALYZERS) 2>.ignore
 
 ACTIVE_OBJECTS = ao-scheduler.o lock.o
-KPLAY_OBJECTS = ao-tracker.o about.moc.o memory.o power-type.o files.o \
+BPMPLAY = ao-tracker.o about.moc.o memory.o power-type.o files.o \
 	player.moc.o player.o constants.o $(ACTIVE_OBJECTS) \
 	sample4-type.o player-core.o spectrum-type.o process.o \
  	song-information.o song-information.moc.o hues.o \
-	pca.o capacity.o index.o bpmplay.o signals.o \
+	pca.o capacity.o index.o bpmplay.o signals.o ext-clock.o \
 	player-config.o data.a capacity-checker.o types.o dsp.a \
 	embedded.a efence.o page.o rc-player.o clock-drivers.o \
-	efence-print.o analyzers.a histogram-type.o \
-	common.o bpm.o ao-som-beatgraph.o ao-pool.o clock-jack.o no-overseer.o
+	efence-print.o analyzers.a histogram-type.o bpmclock-process.o \
+	common.o bpm.o ao-som-beatgraph.o ao-pool.o \
+	midi-bindings.o qt-helpers.o \
+	no-overseer.o
 
 BPM_LIB = bpm.o memory.o	
 BPMCOUNT_OBJECTS = bpmcount.o files.o signals.o bpm.a data.a
-
+BPMCLOCK_OBJECTS = bpmclock.o bpmclock-process.o memory.o \
+		 info.o no-overseer.o process.o
 KCOUNT_OBJECTS = index.o kbpm-count.o \
 	kbpm-count.moc.o scripts.o merger.o
 
 FRAGMENTS = fragment-player.o fragment-cache.o fragment.o fragment-creator.o fragment-deliverer.o
-KSEL_OBJECTS = ao-tracker.o qstring-factory.o tags.o about.moc.o capacity.o heap.o pixmap-cache.o \
+BPMDJ_OBJECTS = ao-tracker.o qstring-factory.o tags.o about.moc.o capacity.o \
+	heap.o pixmap-cache.o \
 	song-slot.o song-slot.moc.o spectrum-type.o \
-	scripts.o cluster.o pca.o clusterer.o process.o \
-	histogram-type.o qvectorview.o qvectorview.moc.o \
-	memory.o analyzer.o \
-	types.o config.moc.o existence-scanner.o player-config.o song-information.o\
-	song-information.moc.o sample4-type.o music-scanner.o \
-	music-scanner.moc.o power-type.o analyzers-manager.o\
+	scripts.o cluster.o pca.o process.o \
+	histogram-type.o \
+	memory.o analyzer.o qt-helpers.o \
+	types.o config.moc.o existence-scanner.o player-config.o \
+	song-information.o song-information.moc.o sample4-type.o \
+	music-scanner.o music-scanner.moc.o power-type.o analyzers-manager.o\
 	song-process.o spectrum-pca.o user-notification.o database.o \
 	dirscanner.o efence.o page.o efence-print.o \
-	selector.o selector.moc.o constants.o \
+	selector.o selector.moc.o constants.o bpmclock-process.o \
 	players-manager.o $(FRAGMENTS) $(ACTIVE_OBJECTS) \
-	dsp.a bpmdj-pref.o bpmdj-pref.moc.o \
+	dsp.a bpmdj-pref.o bpmdj-pref.moc.o clock-drivers.o \
 	song.o qsong.o queuedsong.o historysong.o signals.o\
 	index-reader.o index.o history.o albumitem.o files.o \
 	bpmdj.o edit-distance.o renamer.o renamer.moc.o \
-	config.o common.o song-copier.o \
+	config.o common.o song-copier.o ext-clock.o \
 	statistics.o statistics.moc.o song-metric.o \
-	log-viewer.o log-viewer.moc.o data.a embedded.a ao-pool.o overseer.o 
+	log-viewer.o log-viewer.moc.o data.a embedded.a ao-pool.o \
+	overseer.o # Must be last
 
 MERGER_OBJECTS = bpmmerge.o no-overseer.o process.o index.o common.o \
 	scripts.o song-information.o song-information.moc.o capacity.o \
 	types.o player-config.o efence.o page.o efence-print.o memory.o \
 	sample4-type.o power-type.o spectrum-type.o signals.o files.o \
-	histogram-type.o data.a
+	histogram-type.o info.o data.a
 
-bpmplay: $(KPLAY_OBJECTS)
+bpmplay: $(BPMPLAY)
 	@echo " [link] "$@
-	@$(LINK) $(KPLAY_OBJECTS) -o bpmplay
+	@$(LINK) $(BPMPLAY) -o bpmplay
 
 bpmcount: $(BPMCOUNT_OBJECTS)
 	@echo " [link] "$@
@@ -138,9 +144,9 @@ bpm.a:  $(BPM_LIB)
 	@echo "   [ar] "$@
 	@$(AR) r $@ $(BPM_LIB) >/dev/null 2>/dev/null 
 
-bpmdj: $(KSEL_OBJECTS) 
+bpmdj: $(BPMDJ_OBJECTS) 
 	@echo " [link] "$@
-	@$(LINK) $(KSEL_OBJECTS) -o bpmdj
+	@$(LINK) $(BPMDJ_OBJECTS) -o bpmdj
 
 profile-clock: profile-clock.o
 	@echo " [link] "$@
@@ -149,3 +155,17 @@ profile-clock: profile-clock.o
 bpmmerge: $(MERGER_OBJECTS)
 	@echo " [link] "$@
 	@$(LINK)  $(MERGER_OBJECTS) -o bpmmerge
+
+bpmclock: $(BPMCLOCK_OBJECTS) 
+	@echo " [link] "$@
+	@$(LINK)  $(BPMCLOCK_OBJECTS) -o bpmclock
+
+idx2txt: idx2txt.o data.a
+	@echo " [link] "$@
+	@$(LINK)  $^ -o idx2txt
+
+index-demo: index-demo.o index.o spectrum-type.o sample4-type.o power-type.o \
+        memory.o data.a types.o common.o song-information.o capacity.o \
+        song-information.moc.o info.o files.o
+	@echo " [link] "$@
+	@$(LINK)  $^ -o $@

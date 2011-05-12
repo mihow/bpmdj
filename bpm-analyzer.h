@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__bpm_analyzer_h__
 #define __loaded__bpm_analyzer_h__
@@ -44,7 +46,7 @@ private:
   // tapping fields
   signed4    tapcount;
   signed4    starttime;
-  // fft fields
+  // FFT fields
   fft_type * freq;
   fft_type * peak_bpm;
   fft_type * peak_energy;
@@ -53,13 +55,13 @@ private:
   signed4    peaks;
   void set_measured_period(QString technique, signed4 period, 
 			   bool update_on_disk=true);
-  // Weighted enveloppe and autocorrelation
+  // Weighted envelope and autocorrelation
   void          wec();
-  // Enveloppe fft's
+  // Envelope FFT's
   void          enveloppe_spectrum();
   void          autocorrelate_spectrum();
   // FFT guidance routines
-  void fft();        // do a quick fft to obtain a set of 'hints'
+  void fft();        // do a quick FFT to obtain a set of 'hints'
   void fft_draw(QPainter &p, signed4 xs, signed4 ys, 
 			 signed4 shifter, float8 bpm_divisor);
   void autocorrelate_draw(QPainter &p, signed4 xs, signed4 ys, signed4 shifter);
@@ -67,7 +69,7 @@ private:
   unsigned4 phasefit(unsigned4 i);
   unsigned4 phasefit(unsigned4 i, unsigned4 clip);
   void rayshoot_scan();
-  void peak_scan();                    // scan based on fft-peaks
+  void peak_scan();                    // scan based on FFT-peaks
   void readAudio();                    // reads the file in memory
   /**
    * Reads the file in memory divided by blocks

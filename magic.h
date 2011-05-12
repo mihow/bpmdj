@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__magic_h__
 #define __loaded__magic_h__
@@ -36,5 +38,8 @@ using namespace std;
 #define MAGIC_3_5 0xBDEF
 #define MAGIC_3_6 0xBDF0
 #define MAGIC_3_7 0xBDF1
-#define MAGIC_NOW MAGIC_3_7
+#define MAGIC_4_0 0xBDF2
+#define MAGIC_4_1 0xBDF3
+#define MAGIC_4_1b 0xBDF4
+#define MAGIC_NOW MAGIC_4_1b
 #endif // __loaded__magic_h__

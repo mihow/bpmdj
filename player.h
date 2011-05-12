@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__player_h__
 #define __loaded__player_h__
@@ -41,6 +43,7 @@ public:
   friend class PlayingStateChanged;
 private:
   QTimer *timer;
+  QTimer *finetimer;
   map_data map;
   int mapin_up;
   int mapin_down;
@@ -49,6 +52,7 @@ private:
   float4 tempo_fade;
   float4 fade_time;
   signed8 wantedcurrentperiod;
+  signed8 savedtargetperiod;
   void setColor(QWidget *button, bool enabled);
   /**
    * Will update the colors of the beatgraph LCD. Red when the song is playing 
@@ -85,6 +89,8 @@ public slots:
   virtual void mouseMoveEvent(QMouseEvent * e);
   // screen update and tempo slides
   virtual void timerTick();
+  // fade and sync with clock
+  virtual void fineTimerTick();
   // change the playing position
   virtual void nudgePlus();
   virtual void nudgeMinus();
@@ -148,13 +154,15 @@ public slots:
   virtual void setAlsa();
   virtual void setOss();
   virtual void setJack();
-  virtual void setBpmMixingDesk();
   virtual void restartCore();
   virtual void customEvent(QEvent * e);
   virtual void startCore(int tries=5);
   virtual void stopCore();
   virtual void initCore();
-  // clock functions
-  virtual void sync();
+  // Clock sync functions
+  virtual void switchClock();
+  // Midi helpers
+  virtual void loop(unsigned8 beats);
+  virtual void nudge(unsigned8 dir);
 };
 #endif // __loaded__player_h__

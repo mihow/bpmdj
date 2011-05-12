@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__fragment_creator_cpp__
 #define __loaded__fragment_creator_cpp__
@@ -36,7 +38,7 @@ elementResult ActiveFragmentCreator::createOneFor(Song* song)
     startsec = index.get_time_in_seconds()/4;
   int stopsec = startsec+10; // always 10 seconds playing time
   
-  if (!exists(fragment_filename.ascii()))
+  if (!exists(fragment_filename))
     {
       /**
        * this relies heavily on mplayer its
@@ -48,15 +50,15 @@ elementResult ActiveFragmentCreator::createOneFor(Song* song)
 	+ QString(" -endpos ")
 	+ QString::number(stopsec-startsec)
 	+ QString(" -ao pcm:fast:file=")
-	+ QString(escape(fragment_filename))
+	+ escape(fragment_filename)
 	+ OneSpace
 	+ QString(MusicDir)
 	+ slash
-	+ QString(escape(music_filename))
+	+ escape(music_filename)
 	+ QString(">/dev/null 2>/dev/null");
-      execute(description.ascii(),toexecute.ascii());
+      execute(description,toexecute);
     }
-  if (exists(fragment_filename.ascii()))
+  if (exists(fragment_filename))
     {
       /** 
        * to avoid that we create the same fragment multiple

@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__bpmdj_cpp__
 #define __loaded__bpmdj_cpp__
@@ -48,15 +50,12 @@ using namespace std;
 #include "fragment-player.h"
 #include "fragment-creator.h"
 #include "song-copier.h"
+#include "info.h"
 
 extern FragmentPlayer  fragmentPlayer;
 extern FragmentCreator fragmentCreator;
 extern IndexReader     indexReader;
 extern SongCopier      songCopier;
-
-/*-------------------------------------------
- *         Templates we need
- *-------------------------------------------*/
 template class smallhistogram_type<32>;
 template class smallhistogram_type<96>;
 template class histogram_property<32>;
@@ -64,11 +63,8 @@ template class histogram_property<96>;
 template float8 normalize_abs_max<float8>(float8*, long);
 template float8 find_abs_max<float8>(float8*, long);
 
-/*-------------------------------------------
- *         BpmDj Main Startup
- *-------------------------------------------*/
 QApplication *app;
-QMutex bpmdj_busy(true);
+QMutex bpmdj_busy(QMutex::Recursive);
 
 class RawScanner: public DirectoryScanner
 {
@@ -103,37 +99,44 @@ public:
   };
 };
 
-/**
- * The overridden loader object will allow us to load the  picture from 
- * another place
- */
 class BpmDjSplash: public QDialog, public Ui::Loader
 {
 public:
-  BpmDjSplash(): QDialog(NULL,NULL,FALSE,Qt::SplashScreen)
+  BpmDjSplash(): QDialog(NULL,Qt::SplashScreen)
   {
     setupUi(this);
     // read the image from memory
-    QByteArray image_data;
-    image_data.setRawData(logo_png,logo_png_size);
-    QImage image(image_data);
-    // when deleting the object we don't want to screw up 
-    // our memory
-    image_data.resetRawData(logo_png,logo_png_size);
-    QPixmap pixmap(image);
+    QByteArray image_data(logo_png,logo_png_size);
+    QImage image(QImage::fromData(image_data));
     // set the dialog background
-    setPaletteBackgroundPixmap(pixmap);
+    QPalette p=palette();
+    p.setBrush(backgroundRole(),QBrush(image));
+    setPalette(p);
     app->processEvents();
     // show it
     show();
     QTimer * timer=new QTimer(this);
     connect(timer,SIGNAL(timeout()), this, SLOT(close()));
-    timer->start(10000,true);
+    timer->setSingleShot(true);
+    timer->start(10000);
   }
 };
 
 const char* programname;
 QStatusBar* status = NULL;
+
+void terminate_and_quit(int exitcode)
+{
+  songCopier.terminate();
+  existenceScanner.terminate();
+  fragmentPlayer.terminate();
+  fragmentCreator.terminate();
+  spectrumPca.terminate();
+  indexReader.terminate();
+  clusterer.terminate();
+  aoPool->wait_for_finish();
+  exit(exitcode);
+}
 
 int main(int argc, char* argv[])
 {
@@ -145,8 +148,11 @@ int main(int argc, char* argv[])
   assert(sizeof(signed2)==2);
   assert(sizeof(signed4)==4);
   assert(sizeof(signed8)==8);
+  assert(sizeof(float4)==4);
+  assert(sizeof(float8)==8);
+  
   init_embedded_files();
-
+  
   programname = argv[0];
   Tags::init();
   dsp_driver::init();
@@ -160,7 +166,7 @@ int main(int argc, char* argv[])
 	    "Please remove \".bpmdj\". Also make sure to read the\n"
 	    "release notes because .bib files are no longer supported\n"
 	    "and the index file format has changed\n");
-      exit(10);
+      terminate_and_quit(10);
     }
   SongSelectorLogic main_window;
   selector = & main_window;
@@ -172,15 +178,15 @@ int main(int argc, char* argv[])
   DIR * fdir;
   do
     {
-      mdir = opendir(MusicDir);
-      idir = opendir(IndexDir);
-      fdir = opendir(FragmentsDir);
+      mdir = opendir(MusicDir.toAscii().data());
+      idir = opendir(IndexDir.toAscii().data());
+      fdir = opendir(FragmentsDir.toAscii().data());
       if (mdir == NULL || idir == NULL || fdir == NULL)
 	{
-	  QDialog sw(0,0,true);
+	  QDialog sw;
 	  Ui::SetupWizard swc;
 	  swc.setupUi(&sw);
-	  if (sw.exec() == QDialog::Rejected) exit(0);
+	  if (sw.exec() == QDialog::Rejected) terminate_and_quit(11);
 	}
     }
   while (mdir==NULL || idir==NULL || fdir == NULL);
@@ -203,38 +209,44 @@ int main(int argc, char* argv[])
 			     "There are some left over fragment files.",
 			     "Remove", "Ignore", 0, 0, 1)==0)
       start_rm("./fragments/*.wav");
-   
   BpmDjSplash splash;
   
-  application.setMainWidget(&main_window);
+  // maybe we could set lastWindowClosed to quit() or something similar.
+  // in any case we need to check whether this still works properly then
+  // application.setMainWidget(&main_window);
   main_window.show();
   main_window.start_reading_indices();
-  int result = application.exec();
+
+  /**
+   * Starting bpmclock process 
+   */
+#ifdef EXT_CLOCK
+  metronome = new ext_clock();
+#else
+  metronome = new clock_driver();
+#endif
+  metronome->init();
+  metronome->attach_clock(false);
+  
+  application.exec();
   if (!Config::get_shown_aboutbox())
     {
       Config::set_shown_aboutbox(true);
-      QMessageBox::message(NULL,
-			   "If you use this software regularly, then it would\n"
-			   "be nice if you could place a link to\n"
-			   "http://bpmdj.yellowcouch.org/\n"
-			   "on your homepage\n"
-			   "(together with some nice words of course :)");
+      QMessageBox::information(NULL,
+       "Support BpmDj",
+       "If you use this software regularly, then it would be nice to place\n"
+       "a link to http://bpmdj.yellowcouch.org/ on your homepage.\n"
+       "(together with some nice words of course :)");
     }
   taglist2config(main_window.tagList);
-  Config::save();
-  songCopier.terminate();
-  existenceScanner.terminate();
-  fragmentPlayer.terminate();
-  fragmentCreator.terminate();
-  spectrumPca.terminate();
-  indexReader.terminate();
-  clusterer.terminate();
+  
   /**
-   * For some reason the message to the existenceScanner never gets 
-   * delivered. Why ?
+   * Get the horizontal header here
    */
-  aoPool->wait_for_finish();
-  return result;
+  QHeaderView *h=main_window.songListView->horizontalHeader();
+  if(h) Config::set_header_state(h->saveState());
+  Config::save();
+  terminate_and_quit(0);
 }
 
 /**
@@ -256,6 +268,22 @@ int main(int argc, char* argv[])
  * the .h file. The development tree should be kept private since it doesn't 
  * contain the proper copyright headers.
  *
+ * <b>Debugging</b>
+ * This point should be mentioned relatively early. However the background
+ * might not be that clear directly. This becomes clear later on. 
+ * BpmDj starts a process that will fork off the actual application. This means
+ * that gdb-ing the main application will not make it possible for you to 
+ * trace calls etcetera. There are two solutions to this. 
+ * 
+ * 1- Start bpmdj and connect to the second process with gdb. You do this
+ *    by looking up the bpmdj pids and take the second of the two processes.
+ *    Then start gdb ./bpmdj <pid>
+ * 2- Of course that approach doesn't work when bpmdj crashes. In that
+ *    case use the bash process limits to ask for a core dump
+ *    This is done with ulimit -c 1000000. Once the process crashed and the 
+ *    core dumped, you can inspect it with gdb ./bpmdj core.55318 (or whatever
+ *    it is called at your setup).
+ *
  * <b>Types</b><br> BpmDj relies on types of a specific size. These are 
  * directly reflected with a number such that we know how many bytes that type 
  * takes. For instance unsigned8 is an unsigned long integer of 8 bytes (=64 
@@ -269,7 +297,7 @@ int main(int argc, char* argv[])
  * BpmDj is complicated. Not because it is designed to be complicated, but 
  * rather because process management brings with it a bunch of concurrency 
  * problems for free. Certainly so because 
- * - X doesn't like concurrent access to threads
+ * - X doesn't like concurrent access from different processes
  * - Qt insists on running in the main thread and should never be accessed 
  *   from any other thread 
  * - forking off processes while an ALSA PCM device is open will screw up the 
@@ -278,36 +306,38 @@ int main(int argc, char* argv[])
  *   gets lost
  * - etcetera. There was just no end to the process/thread based concurrency
  *   problems.
- * %To avoid these we make a distinction between \ref Processes and \ref ao 
- * Active objects (these can be compared with thread that receive and handle 
- * messages). There are few processes. Currently these are
+ * %To avoid these we make a distinction between \ref Processes and \ref ao
+ * Active objects (these can be compared to threads that receive and handle
+ * messages, except without the concurrency problems). There are few
+ * processes. Currently these are
  *
  * - \e bpmdj: the main program, which is the selector
  * - \e bpmdj the overseer thread, which is responsible for starting processes
  *   and tracking their state.
- * - \e bpmplay which is a process that plays one song. Typically two bpmplay 
- *   processes are running at the same time. 
- * - \e bpmdjraw although this is a simply script, it is forked off from a 
+ * - \e bpmplay which is a process that plays one song. Typically two bpmplay
+ *   processes are running at the same time.
+ * - \e bpmdjraw although this is a simply script, it is forked off from a
  *   bpmplay player. This scripts is responsible for decoding the mp3 files.
+ * - \e bpmclock to provide an external clock whenever wanted
  *
- * With respect to active objects in a BpmDj process we have: 
- * - <em>a song copier</em> (ActiveSongCopier), which will take a collection 
- *   of songs and copy them to a target directory.  
- * - an existence scanner: ActiveExistenceScanner, which goes through the 
- *   music directory and checks which files exist.  
+ * Active objects in BpmDj:
+ * - <em>a song copier</em> (ActiveSongCopier), which will take a collection
+ *   of songs and copy them to a target directory.
+ * - an existence scanner: ActiveExistenceScanner, which goes through the
+ *   music directory and checks which files exist.
  * - a fragment player: ActiveFragmentPlayer, which will play a fragment when
  *   it is ready. The fragment player also opens the appropriate DSP device.
- * - a fragment creator: ActiveFragmentCreator, which keeps track of the 
+ * - a fragment creator: ActiveFragmentCreator, which keeps track of the
  *   fragments the user might wish to listen to and decodes them. The fragment
  *   creator will spawn off the necessary processes.
- * - a Principal Component Analysis process: ActiveSpectrumPca, which analyzes 
- *   the sound color of all songs after all the indices have been read in 
+ * - a Principal Component Analysis process: ActiveSpectrumPca, which analyzes
+ *   the sound color of all songs after all the indices have been read in
  *   memory.
- * - an Index Reader: ActiveIndexReader, which will scan the index directory 
- *   and read in the entire database.  
- * - a cluster analysis algorithm, ActiveClusterer, which runs through a 
- *   selection of songs and groups them together based on the current distance 
- *   metric.  
+ * - an Index Reader: ActiveIndexReader, which will scan the index directory
+ *   and read in the entire database.
+ * - a cluster analysis algorithm, ActiveCluster, which runs through a
+ *   selection of songs and groups them together based on the current distance
+ *   metric.
  * - An active object which keeps track of all existing active objects: the 
  *   ActiveAoTracker.
  * 
@@ -321,6 +351,12 @@ int main(int argc, char* argv[])
  * takes care to actually read in the database.
  *
  * <b>Code style</b> The coding style for block is that each { or } is placed 
- * on an individual line. 
+ * on an individual line. Lines are 80 characters long.
+ *
+ * <b>Write your own compiler</b> Whenever the same task must be written many
+ * times it is a good idea to think about writing a compiler that will write 
+ * the source for you. This avoids mistakes in the handwritten code and in 
+ * general either works like a charm or crashes eveyrwhere. This is 
+ * demonstated through the active objects library.
  */
 #endif // __loaded__bpmdj_cpp__

@@ -1,3 +1,24 @@
+4.1:
+	+ faster drawing of main songlist
+	- if you had songs that were analyzed and marked as 'Empty' due to 
+	  a wrong configuaration (file not accessible for instance) then 
+          you might find that BpmDj will not reanalyze this song. You can 
+	  fix this problem using the 'Clear Metadata' menuentry in the 
+	  in the selection menu.
+	- due to the upgrade to qt4 the order of the columns in the 
+	  mainsonglist got lost you might need to move all your columns back 
+	  in place. 
+	+ the renamer dialog can now deal with entries from the songlist
+        - wrote documentation on the experiemntal cluster feature
+	- a bug in the cluster algorithm
+ 	- the context menu no longer exists in the song queue, but is
+ 	  still available in the menubar.
+	+ removed more Qt3 dependencies
+	+ added midi bindings
+	+ added an external clock
+	- fixed the screwed up terminal problem.
+	+ added the possibility to work on a shared music body. improves 
+	  analysis a lot on slow networks
 4.0:
         - starting the checkers on machines under heavy load could
 	  crash due to an unpause of the dsp_none driver.

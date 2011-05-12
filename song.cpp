@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__song_cpp__
 #define __loaded__song_cpp__
@@ -82,18 +84,10 @@ bool Song::has_all_cluster_fields()
 
 void Song::checkondisk()
 {
+  static struct stat scratchhere;
   QString songfilename = MusicDir + "/" + get_file();
-  // printf("Checking ondisk of %s",(const char*)songfilename);
-  FILE * f = fopen(songfilename,"rb");
-  if (f)
-    {
-      set_ondisk(true);
-      //      fseek(f,0,SEEK_END);
-      //      total_music_body+=(unsigned8)ftell(f);
-      fclose(f);
-    }
-  else
-    set_ondisk(false);
+  int result=stat(songfilename.toAscii().data(),&scratchhere);
+  set_ondisk(result!=-1);
   set_ondisk_checked(true);
 }
 
@@ -161,7 +155,7 @@ Song::Song(Index * idx, bool allowwrite, bool check_ondisk)
 
 void Song::reread()
 {
-  Index reader((const char*)get_storedin());
+  Index reader(get_storedin());
   refill(reader);
 }
 
@@ -179,8 +173,13 @@ void Song::setColor(QColor transfer)
     }
 }
 
+/**
+ * This routine is necessary for the cluster debug output.
+ * Printing the songname might be a good idea
+ */
 void Song::simpledump(unsigned2 d)
 {
+  assert(0);
 }
 
 void Song::color_sub_elements(int a, int b, float4 d)
@@ -195,7 +194,7 @@ void Song::color_sub_elements(int a, int b, float4 d)
   else
     {
       c.setHsv(a*360/b,255-(int)(d*255.0),255);
-      set_spectrum_string(tonumber(a));
+      set_spectrum_string(tonumber((unsigned4)a));
     }
   set_color(c);
 }
@@ -204,8 +203,9 @@ void Song::determine_color(float4 hue, float4 dummy, int dummy2, int dummy3)
 {
   QColor c;
   c.setHsv((int)hue,255,255);
+  assert(c.isValid());
   set_color(c);
-  set_spectrum_string(tonumber((int)hue));
+  set_spectrum_string(tonumber((unsigned4)hue));
 }
 
 bool Song::tempo_show(const Song* main, bool uprange, bool downrange)
@@ -230,8 +230,8 @@ QColor Song::color_between(Song* song, float4 percent)
   QColor result;
   int r1,g1,b1;
   int r2,g2,b2;
-  a.rgb(&r1,&g1,&b1);
-  b.rgb(&r2,&g2,&b2);
+  a.getRgb(&r1,&g1,&b1);
+  b.getRgb(&r2,&g2,&b2);
   float4 R1,G1,B1;
   float4 R2,G2,B2;
   float4 R3,G3,B3;
@@ -289,7 +289,7 @@ bool Song::get_distance_to_main(float4 limit)
   if (get_color_distance()>1.0)
     set_distance_string(QString::null);
   else
-    set_distance_string(tonumber((int)(get_color_distance()*256)));
+    set_distance_string(tonumber((unsigned4)(get_color_distance()*256)));
   return get_color_distance()<=1.0;
 }
 

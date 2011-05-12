@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,29 +13,32 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__config_h__
 #define __loaded__config_h__
 using namespace std;
 #line 1 "config.h++"
+#include <qtreewidget.h>
+#include <qstandarditemmodel.h>
+#include <qtreeview.h>
 #include <qlistview.h>
 #include <qcolor.h>
-#include <Qt3Support/q3header.h>
-#include <Qt3Support/q3popupmenu.h>
+#include <qheaderview.h>
 #include "data.h"
 #include "song-slot.h"
 #include "accessors.h"
 
-// constants that should not be modified
+/**
+ * Some constants that should not be modified (at the moment)
+ * It would however make sense to allow a different directory 
+ * through a configuration file or so
+ */
 const QString MusicDir = "./music";
 const QString IndexDir = "./index";
 const QString FragmentsDir = "./fragments";
-
-void realize_mapping(Q3Header * h, int column, int location, int size);
-void copy_header(Q3Header * in, Q3Header * out);
-void taglist2config(Q3ListView*taglist);
-
-class Q3PopupMenu;
+void taglist2config(QTreeWidget*taglist);
 
 class ConfigState: public QObject
 {
@@ -43,26 +46,28 @@ class ConfigState: public QObject
 protected:
   bool state;
   friend class Config;
-  QString menu_text;
-  Q3PopupMenu * menu;
-  int item;
+  QAction* item;
   void update();
 public:
   ConfigState(bool init = false);
-  virtual void setMenuText ( const QString & );
   bool isOn() const;
-  virtual void addTo ( Q3PopupMenu * w );
+  virtual QAction* addTo ( QMenu * w, QString menu_text );
   operator bool() const {return state;};  
-  // the set function bypasses the signal emit phase and does not update the UI
+  // the set function bypasses the signal emit phase and does not update the user interface
   void set(bool);
 public slots:
   void toggle ();
-  // setOn will emit a modification signal to the relevant partners.
+  // setOn emits the toggled signal
   virtual void setOn ( bool );
 signals:
   void toggled();
 };
 
+/**
+ * In the list of fields below, we retain those that were present
+ * in odler versions. This helps to understand why the config reader
+ * sometimes reads a variable and then ignores it
+ */
 class Config
 {
  public:
@@ -130,8 +135,8 @@ class Config
   singleton_accessors(QColor,color_unavailable);
   singleton_accessors(QColor,color_dcolor_col);
   singleton_accessors(int,color_cluster_depth);
-  // singleton_accessors(Q3ListView*,taglist);
-  singleton_accessors(Q3Header*,header);
+  // singleton_accessors(QStandardItemView*,taglist);
+  singleton_accessors(QByteArray,header_state);
   // 2.6
   // singleton_accessors(QString,bpm_mixer_command);
   // static ConfigState open_bpmmixer;
@@ -140,7 +145,7 @@ class Config
   singleton_accessors(float4,distance_echoweight);
   singleton_accessors(float4,distance_rhythmweight);
   singleton_accessors(float4,distance_compositionweight);
-  singleton_accessors(int,  max_songs);
+  singleton_accessors(int, max_songs);
   // 2.8
   singleton_accessors(QColor,color_unchecked);
   // 2.9
@@ -160,54 +165,6 @@ class Config
   singleton_accessors(QString, tag_exclude);
  private:
   static void calc_and_cache();
-  static void set_playCommand1(QString s) 
-    {
-      players[0].setOldCommand(s);
-    };
-  static void set_playCommand2(QString s)
-    {
-      players[1].setOldCommand(s);
-    };
-  static void set_playCommand3(QString s)
-    {
-      players[2].setOldCommand(s);
-    };
-  static void set_playCommand4(QString s)
-    {
-      players[3].setOldCommand(s);
-    };
-  static void set_analCommand1(QString s)
-    {
-      analyzers[0].setOldCommand(s);
-    };
-  static void set_analCommand2(QString s)
-    {
-      analyzers[1].setOldCommand(s);
-    };
-  static void set_analCommand3(QString s)
-    {
-      analyzers[2].setOldCommand(s);
-    };
-  static void set_analCommand4(QString s)
-    {
-      analyzers[3].setOldCommand(s);
-    };
-  static void set_analCommand5(QString s)
-    {
-      analyzers[4].setOldCommand(s);
-    };
-  static void set_analCommand6(QString s)
-    {
-      analyzers[5].setOldCommand(s);
-    };
-  static void set_analCommand7(QString s)
-    {
-      analyzers[6].setOldCommand(s);
-    };
-  static void set_analCommand8(QString s) 
-    {
-      analyzers[7].setOldCommand(s);
-    };
  public:
   static bool open_ui(int pane = 0);
   static void save();

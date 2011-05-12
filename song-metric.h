@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__song_metric_h__
 #define __loaded__song_metric_h__
@@ -22,7 +24,6 @@ using namespace std;
 #include <time.h>
 #include <qcolor.h>
 #include <qpixmap.h>
-#include "qvectorview.h"
 #include "data.h"
 #include "config.h"
 #include "cluster.h"
@@ -30,7 +31,6 @@ using namespace std;
 #include "metric-widget.h"
 
 class Song;
-QString tonumber(const int b);
 
 #define no_distance 1000
 class SongMetriek: public Metriek
@@ -47,7 +47,7 @@ public:
   accessors(float4,tempo_limits,0.05); // tempo_limits input from configuration
 
 private:
-  float4 tempo_scale;     // thge tempo scale in the log range
+  float4 tempo_scale;     // the tempo scale in the log range
   float4 total;           // the total weight
   bool  harmonic545;     // which harmonics do we take into account
   bool  harmonic646;     

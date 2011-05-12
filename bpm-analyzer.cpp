@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__bpm_analyzer_cpp__
 #define __loaded__bpm_analyzer_cpp__
@@ -144,8 +146,8 @@ void BpmAnalyzerDialog::updateProcessingProgress(signed4 val)
 
 void BpmAnalyzerDialog::updateInfo()
 {
-  ReadingBar->setProgress(reading_progress);
-  CountingBar->setProgress(processing_progress);
+  ReadingBar->setValue(reading_progress);
+  CountingBar->setValue(processing_progress);
   app->processEvents();
 }
 
@@ -259,10 +261,10 @@ void BpmAnalyzerDialog::rangeCheck()
 {
   unsigned4 val;
   bool changed = false;
-  val = atoi(FromBpmEdit->text());
+  val = FromBpmEdit->text().toInt();
   if (startbpm != val)
     startbpm=val;
-  val = atoi(ToBpmEdit->text());
+  val = ToBpmEdit->text().toInt();
   if (stopbpm != val)
     stopbpm=val;
   if (changed && audio)
@@ -741,6 +743,7 @@ void BpmAnalyzerDialog::set_labels()
 
 void BpmAnalyzerDialog::analyze()
 {
+  ::metronome->release_master();
   rangeCheck();
   set_labels();
   if (stop_signal) return;
@@ -1182,8 +1185,10 @@ void BpmAnalyzerDialog::reset()
 
 void BpmAnalyzerDialog::tap()
 {
-  if (++tapcount==1)
+  if (++tapcount==1) {
     starttime=times(NULL);
+    ::metronome->become_master();
+  }
   else
     {
       /**
@@ -1209,7 +1214,7 @@ void BpmAnalyzerDialog::tap()
       signed8 oldcurrentperiod=currentperiod;
       signed8 oldnormalperiod=normalperiod;
       set_measured_period("Tap measurement",period_to_quad(p),false);
-      changetempo(normalperiod*oldcurrentperiod/oldnormalperiod);
+      ::metronome->changetempo(normalperiod*oldcurrentperiod/oldnormalperiod);
       
       tempo_type tempo = playing->get_tempo();
       setBpmBounds(tempo.lower(10),tempo.higher(10));

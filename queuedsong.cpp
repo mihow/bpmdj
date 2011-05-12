@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__queuedsong_cpp__
 #define __loaded__queuedsong_cpp__
@@ -30,6 +32,8 @@ using namespace std;
 #include "tags.h"
 #include "config.h"
 #include "scripts.h"
+#include "qstring-factory.h"
+#include "qt-helpers.h"
 
 #define QUEUED_ANKER 0
 #define QUEUED_DLINE 1
@@ -46,172 +50,91 @@ using namespace std;
 #define QUEUED_MD5SUM 12
 #define QUEUED_FILE 13
 
-QString QueuedAnalSong::text(int i) const
+QueuedAnalSong::QueuedAnalSong(QTreeWidget* parent, Song * s) :
+  TreeWidgetSong(s,parent)
 {
-  switch (i)
-    {
-    case ANAL_TITLE : return song->get_title();
-    case ANAL_AUTHOR : return song->get_author();
-    case ANAL_INDEX : return song->get_storedin();
-    case ANAL_RMS : return needs_energy() ? ANAL_NEC : ANAL_NOTNEC;
-    case ANAL_TEMPO : return needs_tempo() ? ANAL_NEC : ANAL_NOTNEC;
-    case ANAL_SPECTRUM : return needs_spectrum() ? ANAL_NEC : ANAL_NOTNEC;
-    case ANAL_ECHO : return needs_echo() ? ANAL_NEC : ANAL_NOTNEC;
-    case ANAL_RHYTHM : return needs_rhythm() ? ANAL_NEC : ANAL_NOTNEC;
-    case ANAL_COMPOSITION : return needs_composition() ? ANAL_NEC : ANAL_NOTNEC;
-    }
-  return Q3ListViewItem::text(i);
+  setText( ANAL_TITLE ,song->get_title());
+  setText( ANAL_AUTHOR ,song->get_author());
+  setText( ANAL_INDEX ,song->get_storedin());
+  setText( ANAL_RMS ,needs_energy() ? ANAL_NEC : ANAL_NOTNEC);
+  setText( ANAL_TEMPO ,needs_tempo() ? ANAL_NEC : ANAL_NOTNEC);
+  setText( ANAL_SPECTRUM ,needs_spectrum() ? ANAL_NEC : ANAL_NOTNEC);
+  setText( ANAL_ECHO ,needs_echo() ? ANAL_NEC : ANAL_NOTNEC);
+  setText( ANAL_RHYTHM ,needs_rhythm() ? ANAL_NEC : ANAL_NOTNEC);
+  setText( ANAL_COMPOSITION ,needs_composition() ? ANAL_NEC : ANAL_NOTNEC);
 }
 
-void QueuedSong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid, 
-int align)
+QueuedSong::QueuedSong(Song * s, QTreeWidget* parent) :
+  TreeWidgetSong(s,parent)
 {
-  if (col!=QUEUED_ANKER && !song)
-    {
-      Q3ListViewItem::paintCell(p,cg,col,wid,align);
-      return;
-    }
-  switch(col)
-    {
-    case QUEUED_ANKER:
-      if (anker)
-	{
-	  QColorGroup ncg(cg);
-	  ncg.setColor(QColorGroup::Window,QColor(255,0,0));
-	  Q3ListViewItem::paintCell(p,ncg,col,wid,align);
-	  return;
-	}
-      else
-	{
-	  QColorGroup ncg(cg);
-	  ncg.setColor(QColorGroup::Window,QColor(255,255,0));
-	  Q3ListViewItem::paintCell(p,ncg,col,wid,align);
-	  return;
-	}
-      break;
-    case QUEUED_CUES:
-      if (Config::color_cues && !song->get_has_cues())
-	{
-	  QColorGroup ncg(cg);
-	  ncg.setColor(QColorGroup::Window,QColor(0,0,255));
-	  Q3ListViewItem::paintCell(p,ncg,col,wid,align);
-	  return;
-	}
-      break;
-      
-    case QUEUED_TEMPO: 
-      break;
-      
-    case QUEUED_TITLE:
-      if (Config::color_played && song->get_played())
-	{
-	  QColorGroup ncg(cg);
-	  ncg.setColor(QColorGroup::Window,Config::get_color_played_song());
-	  Q3ListViewItem::paintCell(p,ncg,col,wid,align);
-	  return;
-	}
-      break;
-      
-    case QUEUED_AUTHOR:
-      { 
-	QColor * color;
-	if ( (color=QSong::colorOfAuthorCol(song)) )
-	  {
-	    QColorGroup ncg(cg);
-	    ncg.setColor(QColorGroup::Window,*color);
-	    Q3ListViewItem::paintCell(p,ncg,col,wid,align);
-	    delete(color);
-	    return;
-	  }
-	break;
-      }
-      
-    case QUEUED_DLINE:
-      {
-	int yellow = 255;
-	QColorGroup ncg(cg);
-	if (distance<=1)
-	  yellow = (int)(distance*255.0);
-	ncg.setColor(QColorGroup::Window,QColor(yellow,255-yellow,0));
-	Q3ListViewItem::paintCell(p,ncg,col,wid,align);
-	return;
-      }
-      
-    case QUEUED_SPECTRUM:
-      if (Config::color_spectrum)
-	if (song->get_spectrum()!=no_spectrum)
-	  {
-	    QColorGroup ncg(cg);
-	    ncg.setColor(QColorGroup::Window,song->get_color());
-	    Q3ListViewItem::paintCell(p,ncg,col,wid,align);
-	    return;
-	  }
-      break;
-    }
-  if (Config::color_ondisk && !song->get_ondisk())
-    {
-      QColorGroup ncg(cg);
-      ncg.setColor(QColorGroup::Window,Config::get_color_unavailable());
-      Q3ListViewItem::paintCell(p,ncg,col,wid,align);
-    }
-  else
-    Q3ListViewItem::paintCell(p,cg,col,wid,align);
-}
-
-QString QueuedSong::text(int i) const
-{
-  if (!song && i != QUEUED_ANKER) 
-    return QString::null;
-  switch (i)
-    {
-    case QUEUED_VERSION : return song->get_version();
-    case QUEUED_TITLE : return song->get_title();
-    case QUEUED_AUTHOR : return song->get_author();
-    case QUEUED_INDEX : return song->get_storedin();
-    case QUEUED_TAGS : return Tags::full_string(song->get_tags());
-    case QUEUED_TIME : return song->get_time();
-    case QUEUED_MD5SUM : return song->get_md5sum();
-    case QUEUED_DLINE : return QString::number(distance,'f',3);
-    case QUEUED_SPECTRUM : return song->get_spectrum_string();
-    case QUEUED_FILE : return song->get_file();
-    case QUEUED_ONDISK :
-      if (song->get_ondisk()) return TRUE_TEXT;
-      else                    return FALSE_TEXT;
-    case QUEUED_CUES :
-      if (song->get_has_cues()) return TRUE_TEXT;
-      else 	return FALSE_TEXT;
-    case QUEUED_ANKER : 
-      return tonumber(pos);
-    }
-  return Q3ListViewItem::text(i);
-}
-
-QueuedSong::QueuedSong(Song * s, Q3ListView* parent) :
-  Q3ListViewItem(parent,"","","","","","","")
-{
-  song = s;
   setText(QUEUED_TEMPO,song->tempo_str());
   anker = true;
   distance = 0; 
   mark = false;
-  pos = parent->childCount();
-  // setAutoFillBackground(true);
+  pos = parent->topLevelItemCount();
+  init();
 }
 
-QueuedSong::QueuedSong(Q3ListView* parent, Q3ListViewItem *after) :
-  Q3ListViewItem(parent,after)
+QueuedSong::QueuedSong(QTreeWidget* parent, QTreeWidgetItem *after) :
+  TreeWidgetSong(NULL,parent,after)
 {
-  song = NULL;
   anker = false;
   distance = -1; 
   mark = false;
-  pos = parent->childCount();
+  pos = parent->topLevelItemCount();
+  init();
 }
 
-QueuedAnalSong::QueuedAnalSong(Q3ListView* parent, Song * s) :
-  Q3ListViewItem(parent), song(s) 
+void QueuedSong::init()
 {
-};
+  setText(QUEUED_ANKER,tonumber(pos));
+  if (anker)
+    setBackground(QUEUED_ANKER,QColor(255,0,0));
+  else
+    setBackground(QUEUED_ANKER,QColor(255,255,0));
+  if (!song) 
+    {
+      for(int i = 0 ; i < columnCount(); i++)
+	if (i!=QUEUED_ANKER)
+	  setText(i,EMPTY);
+      return;
+    }
+  //  if (!song && i != QUEUED_ANKER) 
+  //    return; //   return QString::null;
+  setText(QUEUED_VERSION,song->get_version());
+  setText(QUEUED_TITLE,song->get_title());
+  setText(QUEUED_AUTHOR,song->get_author());
+  setText(QUEUED_INDEX,song->get_storedin());
+  setText(QUEUED_TAGS,Tags::full_string(song->get_tags()));
+  setText(QUEUED_TIME,song->get_time());
+  setText(QUEUED_MD5SUM,song->get_md5sum());
+  setText(QUEUED_DLINE,QString::number(distance,'f',3));
+  setText(QUEUED_SPECTRUM,song->get_spectrum_string());
+  setText(QUEUED_FILE,song->get_file());
+  setText(QUEUED_ONDISK,song->get_ondisk() ? TRUE_TEXT : FALSE_TEXT);
+
+  setText(QUEUED_CUES,song->get_has_cues() ? TRUE_TEXT : FALSE_TEXT);
+  if (Config::color_cues && !song->get_has_cues())
+    setBackground(QUEUED_CUES,QColor(0,0,255));
+  
+  if (Config::color_played && song->get_played())
+    setBackground(QUEUED_TITLE,Config::get_color_played_song());
+  
+  setBackground(QUEUED_AUTHOR,QSong::colorOfAuthorCol(song));
+  
+  int yellow = 255;
+  if (distance<=1)
+    yellow = (int)(distance*255.0);
+  setBackground(QUEUED_DLINE,QColor(yellow,255-yellow,0));
+  
+  if (Config::color_spectrum)
+    if (song->get_spectrum()!=no_spectrum)
+      setBackground(QUEUED_SPECTRUM,song->get_color());
+  
+  if (Config::color_ondisk && !song->get_ondisk())
+    for(int i = 0 ; i < columnCount(); i++)
+      setBackground(i,Config::get_color_unavailable());
+}
 
 void QueuedSong::setSong(Song* s, float8 d)
 {
@@ -219,6 +142,7 @@ void QueuedSong::setSong(Song* s, float8 d)
   distance=d;
   if (song)
     setText(QUEUED_TEMPO, song->tempo_str());
+  init();
 }
 
 QString QueuedAnalSong::getCommand(SongSlot &analyzer)

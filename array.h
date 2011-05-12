@@ -1,6 +1,6 @@
 /****
  Borg4 Data Library
- Copyright (C) 2005-2009 Werner Van Belle
+ Copyright (C) 2005-2010 Werner Van Belle
 
  http://werner.yellowcouch.org/Borg4/group__data.html
 
@@ -45,33 +45,43 @@ template <int D, class T, bool PT, int SM, bool O> class ArrayIterator;
  * @ingroup data
  * @brief multi dimensional arrays
  *
- * Multidimensional arrays were conceived for a number of reasons. In various software we needed some way to handle large 
- * volumes of data while providing different views on the data. Currently, giving the considerations of a read-only memory
- * this library would probably be redefined completely. Nevertheless at that time, my main interest was the 
- * multidimensional operations that were possible and a way to store retrieve them in a platform transparent manner. 
+ * Multidimensional arrays were conceived for a number of reasons. In various
+ * software we needed some way to handle large volumes of data while providing
+ * different views on the data. Currently, giving the considerations of a 
+ * read-only memory this library would probably be redefined completely. 
+ * Nevertheless at that time, my main interest was the multidimensional 
+ * operations that were possible and a way to store retrieve them in a 
+ * platform transparent manner. 
  * Some of the uses:
  *
  * BpmDj
- * - In BpmDj this kind of arrays is used to access audio on disk. There we need to load left/right samples one by one an
- *   put them into an output stream. As such we need a physical addressing of stream length x 2 short integers.
- * - The Fourier transformation that we realize on some of the data chunks works on a channel per channel bases. There we
- *   need an internal representation of 2 x stream length data (doubles) then.
+ * - In BpmDj this kind of arrays is used to access audio on disk. There we
+ *   need to load left/right samples one by one an put them into an output 
+ *   stream. As such we need a physical addressing of stream length x 2 short 
+ *   integers.
+ * - The Fourier transformation that we realize on some of the data chunks
+ *   works on a channel per channel bases. There we need an internal 
+ *   representation of 2 x stream length data (doubles) then.
  *
  * Gel Analysis
  *
- * - In the gel analysis soft we need images that have a number of channels and then the standard x en y coordinates. 
- *   Often the 3 colors are accessed at the same time.
- * - In the gel analysis soft we also need a array handler that transforms the input coordinate system into an orthonormal
- *   basis in which -1:1 always will capture the entire image.
+ * - In the gel analysis soft we need images that have a number of channels
+ *   and then the standard x en y coordinates. Often the 3 colors are accessed
+ *   at the same time.
+ * - In the gel analysis soft we also need a array handler that transforms the
+ *   input coordinate system into an orthonormal basis in which -1:1 always 
+ *   will capture the entire image.
  * 
  * Petri-nets
  * 
- * - In the Petri-Net usage we have tokens that are placed in queues. To this end a general purpose array can be used. 
- *   However, since theoretically tokens must be of a specified type we might as well give a limitation on what kind 
- *   of content can be stored into an array.
+ * - In the Petri-Net usage we have tokens that are placed in queues. To this 
+ *   end a general purpose array can be used. However, since theoretically 
+ *   tokens must be of a specified type we might as well give a limitation on
+ *   what kind of content can be stored into an array.
  * 
- * The problem of cross platform access to data has not yet vanished, as such most of these data expression are still 
- * useful to read data from files and save it if we write our own flow modules. 
+ * The problem of cross platform access to data has not yet vanished, as such
+ * most of these data expression are still useful to read data from files and
+ * save it if we write our own flow modules. 
  */
 template <int D, class T> class Array: public DataClass
 {
@@ -146,9 +156,10 @@ template <int D, class T> class Array: public DataClass
     }
 
   /**
-   * This constructor accepts a SpecialStorage type (see array-storage). It will increase
-   * the reference counter immediately with one, effectively taking ownership of the data
-   * since it will also delete the data when the counter reaches zero.
+   * This constructor accepts a SpecialStorage type (see array-storage). It
+   * will increase the reference counter immediately with one, effectively 
+   * taking ownership of the data since it will also delete the data when the
+   * counter reaches zero.
    */
   Array(SpecialStorage<T> *store, Size<D> sizes)
     {
@@ -156,14 +167,15 @@ template <int D, class T> class Array: public DataClass
     }
       
   /**
-   * this constructor will refer to the same data but assume the array has a different dimensionality
-   * remaining dimensions will be padded with size 1. O must be smaller than T;
+   * this constructor will refer to the same data but assume the array has a
+   * different dimensionality remaining dimensions will be padded with size 1.
+   * O must be smaller than T;
    */
   template <int O> Array(const Array<O,T> &m);
 
   /**
-   * this constructor can be used when O is larger than T. In that case only the selected dimensions
-   * will remain.
+   * this constructor can be used when O is larger than T. In that case only 
+   * the selected dimensions will remain.
    */
   template<int O> Array(const Array<O,T>& other, const Select<D>& selected);
   Array<D,T> &operator =(const Array<D,T> &m);
@@ -406,7 +418,8 @@ template <int D, class T> Array<D,T> &Array<D,T>::operator +=(const T &m)
   return *this;
 }
 
-template <int D, class T> Array<D,T> &Array<D,T>::operator +=(const Array<D,T> &m)
+template <int D, class T> 
+Array<D,T> &Array<D,T>::operator +=(const Array<D,T> &m)
 {
   for(positions v(*this); v.more() ; ++v)
     v+=m[v];
@@ -434,7 +447,8 @@ template <int D, class T> Array<D,T> &Array<D,T>::operator *=(const T &m)
   return *this;
 }
 
-template <int D, class T> bool Array<D,T>::operator ==(const Array<D,T> &m) const
+template <int D, class T> 
+bool Array<D,T>::operator ==(const Array<D,T> &m) const
 {
   if (content==m.content) return true;
   if (content->size!=m.content->size) return false;
@@ -457,7 +471,8 @@ Array<D,T>::Array(const Array<O,T> &m)
   content = new ArrayMeta<D,T>(*m.content);
 }
 
-template <int D, class T> Array<D,T>& Array<D,T>::operator =(const Array<D,T> &m)
+template <int D, class T> 
+Array<D,T>& Array<D,T>::operator =(const Array<D,T> &m)
 {
   m.content->incref();
   deref();

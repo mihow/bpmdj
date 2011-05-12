@@ -1,9 +1,8 @@
 /****
  Active Object compiled file
- Copyright (C) 2006-2009 Werner Van Belle
+ Copyright (C) 2006-2010 Werner Van Belle
  Do not modify. Changes might be lost
  --------------------------------------------
-
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation; either version 2 of the License, or
@@ -13,10 +12,6 @@
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
 #ifndef __SONG_COPIER_H
@@ -42,13 +37,32 @@ class ActiveSongCopier;
 //-------------------------------------
 // Active Object base messaging classes
 //-------------------------------------
+/**
+ * Represents the basic message that is used to queue or deliver a call to 
+ * the true ActiveSongCopier. ActiveSongCopier_msg_ has a run method which is invoked
+ * by ActiveObject whenever it wants to handle the message. For each 
+ * declared method in the active object description, a specific subclass
+ * of ActiveSongCopier_msg_ has been generated. See inheritance diagram.
+ * The message classes are automatically instantiated by the active object
+ * stub SongCopier
+ * The message class is also an instance of ReferenceCount, which makes it 
+ * ideally suited to use within Smart pointers.
+ */
 class ActiveSongCopier_msg_: public ReferenceCount
 {
   public:
-    virtual elementResult run(ActiveSongCopier * /* caller */)
+    /**
+     * Called by ActiveObject to handle this queued message.
+     * %arg caller is the ActiveSongCopier itself.
+     */
+    virtual elementResult run(ActiveSongCopier * caller)
     {
       assert(0);
     }
+    /**
+     * Returns the name of this message. Since this is the message baseclass
+     * it has no identity and will return 'Unknown Message' 
+     */
     virtual string declaration()
     {
       return "Unknown message";
@@ -173,11 +187,31 @@ class ActiveSongCopier_msg_terminate: public ActiveSongCopier_msg_
 //-------------------------------------
 // Active Object wrapper 
 //-------------------------------------
+/**
+ * Represents the stub that will transform each incoming call (method)
+ * to an object subclassed from type ActiveSongCopier_msg_
+ * The stub itself has an instance of the true active object.
+ */
 class SongCopier
 {
   private:
+    /**
+     * The object that is covered for by this stub. The fact that the
+     * stub allocates the object ensures that only one of it exists and that any
+     * interaction must go through the stub. As such it is kept private.
+     */
     ActiveSongCopier object;
   public:
+    /**
+     * The constructor of the stub will also directly initalize the main
+     * object. Because object construction and delayed calls interfere
+     * somewhat we prohibit the actual implementation (and especially use)
+     * of a specialized Active Object constructor. Instead, simply the name
+     * is passed to the object. If you need to initialize the stub, you
+     * should consider adding an init message to the active object and
+     * calling (well sending a message to) it directly when the stub is
+     * generated.
+     */
     SongCopier(string name="SongCopier"): object(this, name) {};
   public:
     void setTarget(QString trgt)

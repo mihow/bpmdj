@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__history_cpp__
 #define __loaded__history_cpp__
@@ -25,7 +27,6 @@ using namespace std;
 #include <unistd.h>
 #include <dirent.h>
 #include <qlabel.h>
-#include <q3listview.h>
 #include <qbytearray.h>
 #include <qlineedit.h>
 #include <assert.h>
@@ -38,12 +39,13 @@ using namespace std;
 #include "scripts.h"
 #include "vector-iterator.h"
 #include "qstring-factory.h"
+#include "selector.h"
 
 Song * History::t_2 = NULL;
 Song * History::t_1 = NULL;
 Song * History::t_0 = NULL;
-init_singleton_var(History,songs_played,int,0);
-Q3ListView * History::log_ui = NULL;
+init_singleton_var(History,songs_played,unsigned4,0);
+QTreeWidget * History::log_ui = NULL;
 FILE *History::file = NULL;
 QByteArray History::filename;
 
@@ -62,13 +64,19 @@ void History::mark_all_played_songs(DataBase *db)
     }
   if (line) 
     bpmdj_deallocate(line);
+  /** 
+   * We place this nicely at the end. Otherwise we ahve an O(n*n) 
+   * insertion operation. Shitty Qt4
+   */
+  selector->playedList->header()->
+    setResizeMode(QHeaderView::ResizeToContents);
 }
 
-void History::init(const QString fname, Q3ListView * putin)
+void History::init(const QString fname, QTreeWidget * putin)
 {
   filename=fname.toAscii();
   log_ui = putin;
-  file=fopen(fname,"ab");
+  file=fopen(filename,"ab");
 }
 
 void History::mark_as_played(DataBase * db, QString s)
@@ -83,25 +91,27 @@ void History::mark_as_played(Song *song)
   song->set_played(true);
   set_songs_played(get_songs_played() + 1);
   if (log_ui)
-    new Q3ListViewItem(log_ui,
-		       tonumber(get_songs_played()),
-		       song->get_title(),
-		       song->get_author());
+    {
+      QStringList a;
+      a << tonumber(get_songs_played()) 
+	<< song->get_title()
+	<< song->get_author();
+      new QTreeWidgetItem(log_ui,a);
+    }
 }
 
 void History::save_history()
 {
-  // ask for filename
-  QString s = QFileDialog::getSaveFileName("","History (*.log)",NULL,
-					   "Save Play History",
-					   "Choose a filename" );
+  QString s = QFileDialog::getSaveFileName(NULL,"Save history to ?", 
+					   "history.log",
+					   "History (*.log)");
   if (s.isNull()) return;
   start_cp(filename,s);
 }
 
 void History::clear_history(DataBase * db)
 {
-  // check user stupidity
+  // Ensure the user is notified that he does something stupid
   if (QMessageBox::question(NULL,"Clear History", 
 			    "Are you sure that you want\n"
 			    "to clear the history ?", 
@@ -156,11 +166,12 @@ void History::this_is_playing(Song * main_now)
 		t_1->get_author()+"]" + t_1->get_version();
 	      QString to_text = t_0->get_title() + "[" + 
 		t_0->get_author() + "]" + t_0->get_version();
-	      QString mixinfo = QInputDialog::getText("How did the mix go ?",
+	      QString mixinfo = QInputDialog::getText(NULL,
+				      "How did the mix go ?",
 				      "From : " + from_text + "\n"+
 				      "To: " + to_text + "\n",
 				      QLineEdit::Normal,info,&ok);
-	      if (ok) f->comment = strdup(mixinfo);
+	      if (ok) f->comment = mixinfo;
 	    }
 	}
       if (t_2) 

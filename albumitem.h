@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,29 +13,28 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__albumitem_h__
 #define __loaded__albumitem_h__
 using namespace std;
 #line 1 "albumitem.h++"
-#include <Qt/q3listview.h>
-#include "config.h"
-#include "cluster.h"
-#include "data.h"
+#include "historysong.h"
 
-#define ALBUM_NR 0
-#define ALBUM_TITLE 1
-#define ALBUM_AUTHOR 2
-#define ALBUM_TIME 3
-#define ALBUM_INDEX 4
-#define ALBUM_FILE 5
+const unsigned4 ALBUM_NR=0;
+const unsigned4 ALBUM_TITLE=1;
+const unsigned4 ALBUM_AUTHOR=2;
+const unsigned4 ALBUM_TIME=3;
+const unsigned4 ALBUM_INDEX=4;
+const unsigned4 ALBUM_FILE=5;
 
-class AlbumItem: public Q3ListViewItem
+class AlbumItem: public TreeWidgetSong
 {
-  accessors(Song*, song, NULL);
- public:
-  AlbumItem(const char* name, Q3ListView * parent);
-  AlbumItem(int nr, Song *song, Q3ListViewItem * parent);
-  void fixNr();
+public:
+  AlbumItem(QString name, QTreeWidget * parent);
+  AlbumItem(unsigned1 nr, Song *song, AlbumItem* parent);
+  void init();
+  void setNr(unsigned1 nr);
 };
 #endif // __loaded__albumitem_h__

@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__bpmdj_h__
 #define __loaded__bpmdj_h__
@@ -30,6 +32,9 @@ using namespace std;
 #include "spectrum-pca.h"
 #include "existence-scanner.h"
 #include "clusterer.h"
+#include "clock-drivers.h"
+#include "ext-clock.h"
+
 #if (DATA_VERSION_MAJOR != 0) || (DATA_VERSION_MINOR != 2)
 #error "DATA has wrong version number"
 #endif
@@ -42,7 +47,8 @@ extern QStatusBar*    status;
  */
 extern FragmentPlayer fragmentPlayer;
 /**
- * The active object that will run a spectrum principal component analysis
+ * The active object that will run a principal component analysis on the 
+ * spectrum property.
  */
 extern SpectrumPca    spectrumPca; 
 /**
@@ -50,7 +56,7 @@ extern SpectrumPca    spectrumPca;
  */
 extern ExistenceScanner existenceScanner;
 /**
- * The active object that clusters songs together
+ * The active object that clusters songs using a maximum distance aggregation
  */
 extern Clusterer clusterer;
 #endif // __loaded__bpmdj_h__

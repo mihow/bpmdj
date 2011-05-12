@@ -1,0 +1,40 @@
+BpmDj: Free Dj Tools
+Copyright (C) 2001-2010 Werner Van Belle
+========================================
+
+Active
+------
+Werner Van Belle <werner@yellowcouch.org>
+  Fathered the entire project
+Bernard Fortz <bernard.fortz@gmail.com>
+  JACK support, Midi bindings, Gentoo packaging
+Toni Graffy <oc2pus@arcor.de>
+  Suse packaging
+
+Passive
+-------
+F. Murtagh <murtagh@scivax.stsci.edu>
+  PCA-code
+Julius O. Smith <http://www-ccrma.stanford.edu/~jos/>
+  Low pass filter
+Detlef: 
+  64 bit support
+Bruce Perens <bruce@pixar.com>
+  Electrif Fence
+Tom Vogt <tom@lemuria.org>
+  Import filter
+James Gerken <phlegm@mib.org>
+  Some minor patches       
+Majc_ <majci888@gmail.com>
+  Slackware packaging
+Pierre Marc Dumuid <pierre.dumuid@adelaide.edu.au>
+  fedora defines
+Mic Tamere <oinike@hotmail.fr>
+  ubuntu defines 64 bit
+bloody.middlefinger@yellowcouch.org
+  Defines for opensuse10.3
+
+Donations
+---------
+Sam Liddicott
+Camille d'Alméras

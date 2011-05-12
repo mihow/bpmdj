@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__rhythm_analyzer_cpp__
 #define __loaded__rhythm_analyzer_cpp__
@@ -719,7 +721,9 @@ void RhythmAnalyzer::calculateRhythmPattern2()
   status_bar->setText("Calibrating");
   for(int slice = 0 ; slice < max_slices ; slice++)
     {
-      Progress->setProgress(slice,max_slices);
+      Progress->setMaximum(max_slices);
+      Progress->setValue(slice);
+
       if (slice==1) status_bar->setText("Processing");
       app->processEvents();
       // read data
@@ -800,14 +804,18 @@ void RhythmAnalyzer::calculateRhythmPattern2()
 	for(int q = 0 ; q < 24 ; q ++)
 	  last_measure[p].set_bark(q,slice_freq[p].get_bark(q));
     }
-  Progress->setProgress(1,1);
+  
+  Progress->setMaximum(1); 
+  Progress->setValue(1);
+  
   fclose(raw);
   
   if (!outfile->text().isEmpty())
     {
       status_bar->setText("Writing out projection");
       app->processEvents();
-      pattern_shaped_test(slice_samples,phases,max_slices,outfile->text());
+      pattern_shaped_test(slice_samples,phases,max_slices,
+			  outfile->text().toAscii());
     }
   
   status_bar->setText("Normalizing");

@@ -1,6 +1,6 @@
 /****
- BpmDj v4.0: Free Dj Tools
- Copyright (C) 2001-2009 Werner Van Belle
+ BpmDj v4.1: Free Dj Tools
+ Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -13,6 +13,8 @@
  but without any warranty; without even the implied warranty of
  merchantability or fitness for a particular purpose.  See the
  GNU General Public License for more details.
+
+ See the authors.txt for a full list of people involved.
 ****/
 #ifndef __loaded__player_core_cpp__
 #define __loaded__player_core_cpp__
@@ -45,6 +47,7 @@ using namespace std;
 #include "capacity.h"
 #include "clock-drivers.h"
 //#include "resampler.h"
+#include "info.h"
 
 /*-------------------------------------------
  *         Constants & Variables
@@ -73,7 +76,8 @@ QString get_rawpath()
 FILE * openCoreRawFile()
 {
   if (!playing) return NULL;
-  return openRawFile(playing,get_rawpath());
+  return openRawFile(playing,
+		     get_rawpath().toAscii().data());
 }
 
 /*-------------------------------------------
@@ -121,8 +125,8 @@ void something_died(int sig, siginfo_t *info, void* hu)
       if (es.pid==-1)
 	{
 	  if (errno==ECHILD) return;
-	  printf("Playercore: error %d during wait: %s\n",
-		 errno,strerror(errno));
+	  Warning("Playercore: error %d during wait: %s\n",
+		  errno,strerror(errno));
 	}
       else if (es.pid==0)
 	return;
@@ -138,7 +142,7 @@ void something_died(int sig, siginfo_t *info, void* hu)
 int wave_open(Index * playing, bool synchronous)
 {
   if (!playing) return err_none;
-  const char * fname = playing->get_filename();
+  const char * fname = strdup(playing->get_filename().toAscii().data());
   int decoder = set_decoder_environment(config,playing);
   if (!decoder) return err_noraw;
   
@@ -164,7 +168,7 @@ int wave_open(Index * playing, bool synchronous)
       writer = bpmdjraw(false,fname,get_rawpath());
       assert(writer);
     }
-  wave_name=getRawFilename(get_rawpath(),fname);
+  wave_name=getRawFilename(get_rawpath().toAscii().data(),fname);
   wave_file=fopen(wave_name,"rb");
   if (synchronous)
     {
@@ -534,6 +538,7 @@ cue_info cues[4] = {0,0,0,0};
 void cue_set()
 {
   cue=x_normalise(y-dsp->latency());
+  ::metronome->cue_set(cue);
 }
 
 void cue_shift(signed8 whence)
@@ -696,8 +701,6 @@ void jumpto(signed8 mes, int txt)
   if (dsp->get_paused())
     {
       unpause_playing();
-      if (metronome) 
-	metronome->cue_start();
       y=y_normalise(cue);
       if (txt) printf("Restarted at cue ");
     }
@@ -719,6 +722,8 @@ void jumpto(signed8 mes, int txt)
       y+=fixeddiff;
       if (txt) printf("Started at cue ");
     }
+  ::metronome->cue_start(cue);
+
   if (txt)
     {
       if (mes)
@@ -782,9 +787,9 @@ void unpause_playing()
 void copyright()
 {
   printf(
-   "BpmDj Player v%s, Copyright (c) 2001-2009 Werner Van Belle\n"
-   "This software is distributed under the GPL2 license. See copyright.txt\n"
-   "--------------------------------------------------------------------\n\n\n",
+ "BpmDj Player v%s, Copyright (c) 2000-2010 Werner Van Belle\n"
+ "This software is distributed under the GPL2 license. See copyright.txt\n"
+ "--------------------------------------------------------------------\n\n\n",
     VERSION);
   fflush(stdout);
   fflush(stderr);
@@ -865,18 +870,25 @@ int core_start(bool ui)
   else
     dsp->start(new bare_source());
 
-  if (metronome) 
-    {
-    }
-  
   msg_playing_state_changed();  
   return err_none;
 }
 
 void core_stop()
 {
+  if (metronome)
+    metronome->detach_clock();
   if(!finished)
     dsp->stop();
   finished = 1;
+}
+
+extern clock_driver* metronome;
+
+void set_normalperiod(quad_period_type newnormalperiod, bool update_on_disk)
+{
+  assert(metronome);
+  metronome->set_normalperiod(newnormalperiod);
+  playing->set_period(newnormalperiod/4,update_on_disk);
 }
 #endif // __loaded__player_core_cpp__
