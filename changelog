@@ -1,89 +1,9 @@
-1.3:
-  ksel  - added renamer menu
-  ksel  - deletion of tags + popupmenu 
-  ksel  - resizability of most dialog boxes
-1.2:
-  kbpm  - starting batch process bpm-counting
-  kbpm  - importing of .mp3's
-  kbpm  - startup 'wizard'
-  kbpm  - tags are updated as player changes them
-  kbpm  - added tempo shifter, reset tapping button, skip box
-  kbpm  - merging player and counter, is easier to handle
-  kplay - added tooltips for keyshortcuts to kplay
-  all   - much faster index access.
-  all   - added clock_freq measure thing in makefile
-  kplay - added tapping tempo counter.
-  kbpm  - automatic start and stop options
-  kbpm  - index file is read if exists. -> tags & cues are kept
-  kbpm  - counter shows autocorrelation plot
-  kplay - added lfo's (metronome, saw, break, pan, revsaw)
-  all   - version.h is now generated, version number in documentation has
-          been removed.
-  kbpm  - started with a QT based BPM counter.
-1.1:
-  kplay - fixed latency bug due to release time of keys.
-  kplay - fixed button color bug when presseing normal/target or when
-          starting at normal tempo.
-  kplay - fixed crashbug at end of kbpm-play
-  all   - moved player core out of kbpm-play and cbpm-play into one file
-  ksel  - righ tclick on empty line crashed
-  all   - merged three directories together (command line version, kde 
-          version and selector)
-  cbpm  - the indexing stuff strips comments out of the files.
-  cbpm  - updated the beatmixing manual to include digital distortion
-  cbpm  - finally removed this hugely oversized autogen library.
-  cbpm  - added -c option to simply create an index file
-  kplay -  added current & total time indicators
-  kplay -  added current & normal tempo indicator
-  kplay -  compiled under gentoo
-  kplay -  mixer added for pcm & main
-  kplay -  removed the libopts dependency
-  kplay -  passive wait in mainloop instead of active (processor consuming) wait
-  kplay -  at the end of the song we simply stop
-  kplay -  when quitting when the player has been stopped, the 
-           application doesn't crash anymore
-  kplay -  when the DSP device cannot be opened the user is informed
-  ksel  - sorting of tags 
-  ksel  - loading of files of disk
-  ksel  - now it is impossible to play two songs in the same monitor.
-  ksel  - mark duplicates
-  ksel  - new handy tool: can scan .mp3 disks and say which songs are 
-          not indexed yet.	  
-1.0:
-  ksel  - initial release of the Qt song selector
-  kplay - initial releasse of the Kde(Qt)-player
-  cbpm  - added md5sum's in the index format
-  cbpm  - you can now change the upper and lower limit of the 
-          BPM-search algorithm
-  cbpm  - added debian binary package
-0.9:
-  cbpm  - fixed bug in '{' (backward movement)
-  cbpm  - fixed .MP3 bug
-  cbpm  - added Thomas configure things
-  cbpm  - added tag support in index module
-0.8:
-  cbpm  - removed some duplicate messages
-  cbpm  - made pause/unpause more logic
-  cbpm  - fixed latency bug in not playing at normal speed
-  cbpm  - added cue's
-  cbpm  - removed some scripts
-  cbpm  - created better .idx format
-0.7:
-  cbpm  - rewind 4mes at end of song and keep on looping
-  cbpm  - added lfo's (panning, break, saw, revsaw)
-  cbpm  - added pausing and unpausing
-  cbpm  - added option parsing for cbpm-period
-  cbpm  - cleanup of the code
-0.6:
-  cbpm  - added option parsing for cpm-player
-  cbpm  - added latency support
-  cbpm  - changed name from DivineIntervention to BpmDj
-  cbpm  - project webpage added at sourceforge.net
-  cbpm  - decoding happens in background and in a smaller format 44100/16/2 is
-          stupid if your soundcard doesn't support it
-  cbpm  - help notice with 'h'
-  cbpm  - beat shifting with ENTER
-0.5: 
-  cbpm  - written documentation
-0.1: 
-  cbpm  - initial tests
+bpmdj (1.4-1) unstable; urgency=low
+
+  * Debian Release.
+
+ -- Werner Van Belle <werner.van.belle@vub.ac.be>  Sat,  1 Jun 2002 12:19:45 +0200
+
+Local variables:
+mode: debian-changelog
+End:
