@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,6 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
+#ifndef __loaded__common_cpp__
+#define __loaded__common_cpp__
 using namespace std;
 #line 1 "common.c++"
 #include <assert.h>
@@ -66,39 +68,6 @@ int clip(int val)
   return 0;
 }
 
-char * tohex(long i)
-{
-  char r[9];
-  r[8]=0;
-  for(int p = 7 ; p >= 0 ; p --)
-    {
-      int d = i%16;
-      i/=16;
-      if (d<10)
-	r[p]='0'+d;
-      else
-	r[p]='a'-10+d;
-    }
-  return strdup(r);
-}
-
-long toint(const char* name)
-{
-  long result = 0;
-  for (int j = 0 ; j < 8 ; j ++)
-    {
-      int c = name[j];
-      if (c>='0' && c <= '9')
-	result = result*16+c-'0';
-      else  if (c>='a' && c<='f')
-	result = result*16+c-'a'+10;
-      else  if (c>='A' && c<='F')
-	result = result*16+c-'A'+10;
-      else assert(0);
-    }
-  return result;
-}
-
 QString readable(unsigned8 L)
 {
   if (L < 1024) return QString::number(L)+" bytes";
@@ -112,3 +81,4 @@ QString readable(unsigned8 L)
   return QString::number(L)+" terrabytes";
 }
 
+#endif // __loaded__common_cpp__

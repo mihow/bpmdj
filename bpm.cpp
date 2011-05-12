@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,6 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
+#ifndef __loaded__bpm_cpp__
+#define __loaded__bpm_cpp__
 using namespace std;
 #line 1 "bpm.c++"
 #include <stdio.h>
@@ -30,13 +32,10 @@ typedef stereo_sample2 sample_type;
 void BpmCounter::init(unsigned4 slen, sample_type *blk, int inrate, double lower_boundary, double higher_boundary)
 {
   /** 
-   * We calculate the length of an analysis block.
-   * We aim to include all frequencies starting from
-   * at least 50 Hz. If we start at 44100 Hz we must
-   * halve the value 11 times. Which means that we 
+   * We calculate the length of an analysis block. We aim to include all frequencies starting from
+   * at least 50 Hz. If we start at 44100 Hz we must halve the value 11 times. Which means that we 
    * must have at least a buffer of 1<<11
    */
-
   block=blk;
   input_rate = inrate;
   measure_rate = 11025;
@@ -70,7 +69,7 @@ void BpmCounter::init(unsigned4 slen, sample_type *blk, int inrate, double lower
   ts = bpmdj_allocate(measured, double);
   co = bpmdj_allocate(measured, double);
   
-  if (log) fprintf(log,"Preparing fourier transform (%ld)\n",measured);
+  if (log) fprintf(log,"Preparing fourier transform (%d)\n",measured);
   forward = fftw_plan_r2r_1d(measured, &(audio[0]), en, FFTW_R2HC, FFTW_MEASURE);
   backward = fftw_plan_r2r_1d(measured, ts, co, FFTW_HC2R, FFTW_MEASURE);
   
@@ -86,7 +85,7 @@ void BpmCounter::init(unsigned4 slen, sample_type *blk, int inrate, double lower
   b1 = 4 * (int)(measure_rate / freq);
   freq = lower_boundary/60.0;
   b2 = 4 * (int)(measure_rate / freq);
-  if (log) fprintf(log,"Search boundaries are %ld to %ld\n",b1,b2);
+  if (log) fprintf(log,"Search boundaries are %d to %d\n",b1,b2);
 }
 
 BpmCounter::~BpmCounter()
@@ -167,7 +166,6 @@ double BpmCounter::measure()
   if (log) fprintf(log,"Find tempo\n");
   double mf = en[0] = 0;
   int pf = 0;
- 
   normalize_abs_max(en,measured);
   normalize_abs_max(co,measured);
 
@@ -206,3 +204,4 @@ double BpmCounter::measure()
   if (log) fprintf(log,"Tempo = %g\n",t);
   return t;
 }
+#endif // __loaded__bpm_cpp__

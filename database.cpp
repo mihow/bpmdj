@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,6 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
+#ifndef __loaded__database_cpp__
+#define __loaded__database_cpp__
 using namespace std;
 #line 1 "database.c++"
 #include <qlabel.h>
@@ -77,7 +79,9 @@ void DataBase::init()
 
 void DataBase::clear()
 {
-  vectorIterator<Song*> i(all); ITERATE_OVER(i) delete i.val(); }
+  vectorIterator<Song*> i(all);
+ITERATE_OVER(i)
+ delete i.val(); }
   all.clear();
   file2song = map<QString,Song*>();
   cache.clear();
@@ -166,7 +170,9 @@ void DataBase::updateCache(SongSelectorLogic* selector)
   rebuild_cache = false;
   copyTags(selector);
   cache.clear();
-  vectorIterator<Song*> song(all); ITERATE_OVER(song)
+  vectorIterator<Song*> song(all);
+ITERATE_OVER(song)
+
     bool vis = tagFilter(song.val());
     if (vis) cache.push_back(song.val());
   }
@@ -216,7 +222,9 @@ int DataBase::get_unheaped_selection(SongSelectorLogic* selector, Song* main, QV
   int itemcount=0;
   updateCache(selector);
   Song ** show = bpmdj_allocate(cache.size(),Song*);
-  vectorIterator<Song*> song(cache); ITERATE_OVER(song)
+  vectorIterator<Song*> song(cache);
+ITERATE_OVER(song)
+
     bool vis = filter(selector,song.val(),main,1.0);
     if (vis) show[itemcount++] = song.val();
   }
@@ -264,7 +272,9 @@ int DataBase::getSelection(SongSelectorLogic* selector, QVectorView* target, int
   updateCache(selector);
   SongHeap heap(count);
   if (Config::limit_indistance) heap.maximum = 1.0;
-  vectorIterator<Song*> song(cache); ITERATE_OVER(song)
+  vectorIterator<Song*> song(cache);
+ITERATE_OVER(song)
+
     bool vis = filter(selector,song.val(),main, heap.maximum);
     if (vis) heap.add(song.val());
   }
@@ -285,7 +295,9 @@ void DataBase::addNewSongs(SongSelectorLogic* selector, QVectorView* target, vec
   if (!newsongs->size()) return;
   Song* show[newsongs->size()];
   unsigned int count=0;
-  vectorIterator<Song*> song(newsongs); ITERATE_OVER(song)
+  vectorIterator<Song*> song(newsongs);
+ITERATE_OVER(song)
+
     add(song.val());  // add it to the total list
     bool vis = tagFilter(song.val());
     if (vis) 
@@ -343,7 +355,9 @@ Song * * DataBase::closestSongs(SongSelectorLogic * selector,
       minima[i]=-1;
     }
   updateCache(selector);
-  vectorIterator<Song*> song(cache); ITERATE_OVER(song)
+  vectorIterator<Song*> song(cache);
+ITERATE_OVER(song)
+
     // standard checks: tags completed and ondisk 
     if (!song.val()->get_ondisk()) continue;
     if (!tagFilter(song.val())) continue;
@@ -368,3 +382,4 @@ Song * * DataBase::closestSongs(SongSelectorLogic * selector,
   }
   return entries;
 }
+#endif // __loaded__database_cpp__

@@ -1,3 +1,7 @@
+#ifndef __loaded__data_io_cpp__
+#define __loaded__data_io_cpp__
+using namespace std;
+#line 1 "data-io.c++"
 /****
  Om-Data
  Copyright (C) 2005-2006 Werner Van Belle
@@ -17,17 +21,14 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#ifdef LINUX
 #include <sys/mman.h>
-#endif
-
 #include <qstring.h>
 #include "symbol.h"
 #include "array.h"
 #include "array-iterator.h"
-#include "token.h"
+#include "data-token.h"
 #include "null.h"
-#include "string.h"
+#include "data-string.h"
 #include "data-io.h"
 #include "version.h"
 
@@ -96,10 +97,17 @@ Data DataIo::read()
 template <int D, class T>
 void DataTexter::visitArray(Array<D,T> & array)
 {
-  int mark = push("<"+QString::number(D)+":");
-  padded(type_name(T())+">\n");
-  if (D>=1) dumpSequence(array);
-  pop(mark,"");
+  if (type_name(T())=="Data" && D==1)
+    {
+      if (D>=1) dumpSequence(array);
+    }
+  else
+    {
+      int mark = push("<"+QString::number(D)+":");
+      padded(type_name(T())+">\n");
+      if (D>=1) dumpSequence(array);
+      pop(mark,"");
+    }
 };
 
 template <class T>
@@ -543,7 +551,12 @@ int DataBinner::read_fileformat_versionnr()
 {
   if (cur_ptr+4>mapped_region+file_size)
     {
+#if QT_VERSION > 0x040000
+
+      QByteArray ba=file_in_use.toAscii();
+#else
       QByteArray ba=file_in_use.ascii();
+#endif
       printf("Could not read fileformat version from file %s\n",(const char*)ba);
       exit(150);
     }
@@ -633,7 +646,11 @@ void DataBinner::read_internal(char * ptre, int size)
 {
   if (cur_ptr+size>mapped_region+file_size)
     {
+#if QT_VERSION > 0x040000
+      QByteArray ba=file_in_use.toAscii();
+#else
       QByteArray ba=file_in_use.ascii();
+#endif
       printf("Could not read full data from file %s\n",(const char*)ba);
       exit(150);
     }
@@ -653,6 +670,7 @@ void DataBinner::visitArray(Array<D,T> & array)
   for(int d = 0 ; d < D ; d++)  
     write_internal((unsigned8)array.size(d));  // D
   for(typename Array<D,T>::ordered element(array) ; element.more() ; ++element)
+
     write_internal((T&)element);  // E
 };
 
@@ -1123,3 +1141,4 @@ QString DataBinner::read_internal_qstring()
   read_internal(str,l+1);       // B
   return QString::fromUtf8(strdup(str));
 }
+#endif // __loaded__data_io_cpp__

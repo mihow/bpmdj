@@ -1,10 +1,10 @@
                                DEPENDENCIES
 
 BpmDj relies on
- - libqt3-mt-dev
- - qt3-designer
- - qt3-dev-tool
- - libqt3c102-mt
+ - libqt4-dev
+ - uic-qt4 and uic-qt3
+ - qt4-designer
+ - qt4-dev-tools
  - fftw3
  - make
  - alsa-headers (for alsa support)

@@ -1,3 +1,7 @@
+#ifndef __loaded__symbol_h__
+#define __loaded__symbol_h__
+using namespace std;
+#line 1 "symbol.h++"
 /****
  Om-Data
  Copyright (C) 2005-2006 Werner Van Belle
@@ -101,3 +105,4 @@ struct symbolLesser
 };
 
 #endif
+#endif // __loaded__symbol_h__

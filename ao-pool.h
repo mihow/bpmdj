@@ -17,8 +17,8 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#ifndef __BORGIV_AO_POOL_H__
-#define __BORGIV_AO_POOL_H__
+#ifndef __loaded__ao_pool_h__
+#define __loaded__ao_pool_h__
 using namespace std;
 #line 1 "ao-pool.h++"
 #include "ao-scheduler.h"
@@ -47,4 +47,4 @@ public:
  * where each active object will be buried
  */
 extern DawnTilDusk *aoPool;
-#endif
+#endif // __loaded__ao_pool_h__

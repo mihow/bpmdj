@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,6 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
+#ifndef __loaded__spectrum_pca_cpp__
+#define __loaded__spectrum_pca_cpp__
 using namespace std;
 #line 1 "spectrum-pca.c++"
 #include "vector-iterator.h"
@@ -31,13 +33,17 @@ elementResult ActiveSpectrumPca::pcaThis(vector<Song*> *songs)
   int count = 0;
   float ** data;
   vector<Song*>&all=*songs;
-  vectorIterator<Song*> song(all); ITERATE_OVER(song)
+  vectorIterator<Song*> song(all);
+ITERATE_OVER(song)
+
     if (song.val()->get_spectrum() != no_spectrum) count++;
   }
   if ( count == 0 ) return Done;
   data = matrix(count,spectrum_size);
   int written = 0;
-  vectorIterator<Song*> svi(all); ITERATE_OVER(svi)
+  vectorIterator<Song*> svi(all);
+ITERATE_OVER(svi)
+
     if (svi.val()->get_spectrum() != no_spectrum)
     {
       assert(written<count);
@@ -82,7 +88,9 @@ elementResult ActiveSpectrumPca::pcaThis(vector<Song*> *songs)
   // 3. modify colors of the selected items
   written = 0;
   {
-    constVectorIterator<Song*> svi2(all); ITERATE_OVER(svi2)
+    constVectorIterator<Song*> svi2(all);
+ITERATE_OVER(svi2)
+
       if (svi2.val()->get_spectrum() != no_spectrum)
       {
 	written++;
@@ -111,3 +119,4 @@ elementResult ActiveSpectrumPca::terminate()
 }
 
 SpectrumPca spectrumPca;
+#endif // __loaded__spectrum_pca_cpp__

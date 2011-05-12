@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,8 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-#ifndef __BPMDJ___MIXERDIALOG_LOGIC_H__
-#define __BPMDJ___MIXERDIALOG_LOGIC_H__
+#ifndef __loaded__mixerdialog_logic_h__
+#define __loaded__mixerdialog_logic_h__
 using namespace std;
 #line 1 "mixerdialog.logic.h++"
 #include <qtimer.h>
@@ -46,4 +46,4 @@ class MixerDialogLogic :
    virtual void accept();
    virtual void reject();
 };
-#endif
+#endif // __loaded__mixerdialog_logic_h__

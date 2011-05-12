@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,6 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
+#ifndef __loaded__bpmmerge_cpp__
+#define __loaded__bpmmerge_cpp__
 using namespace std;
 #line 1 "bpmmerge.c++"
 #include <stdlib.h>
@@ -52,10 +54,13 @@ void options_failure(char* err)
 	 "  --mix         nbr  how many measures should be used to create the mix\n" 
 	 "  --slide       nbr  how many measures should be used to find the best match\n"
 	 "  --temposwitch nbr  how many measures should be used to switch tempos\n" 
-	 "  --dumpraw          dump raw debugging mixes (head.raw, tail.raw, mix.raw)\n"
 	 "  --verbose          print useles information\n"
 	 "  --rescantempo      do a fine scan of the tempo, suited for the mix\n"
 	 "  --accountvolume    do a volume accounting when sliding\n"
+	 "  --startpct    nbr  start the new song at %% of its time\n"
+	 "  --stoppct     nbr  stop each song at %% of its time\n"
+	 "  --startatcue       start the new song at the last cue\n"
+	 "    --beforecue      and make sure the cue appears at the end of the mix\n"
 	 "  --split            splits bpm-mixed.raw to seperate files\n"
 	 "    --beforemix      splits before a mix begins\n"
 	 "    --middlemix      splits in the middle of the mix\n"
@@ -72,8 +77,11 @@ static char * new_index = NULL;
 static int    mix_measures = 8;
 static int    slide_measures = -1;
 static int    tempo_measures = 16;
-static bool   dump_raw = false;
+static int    start_pct = 25;
+static int    stop_pct = 75;
 static bool   verbose = false;
+static bool   use_cue = false;
+static bool   before_cue = false;
 static bool   normalize = false;
 static bool   rescan_tempo = false;
 static bool   account_volume = false;
@@ -96,10 +104,10 @@ void log_entry(unsigned8 position, char* type, char* text, char* text2 = NULL)
       char * tmp2 = strdup(text2);
       tmp2=basename(tmp2);
       tmp2[strlen(tmp2)-4]=0;
-      fprintf(automix_log,"%ld %s %s-%s\n",(unsigned4)position,type, tmp, tmp2);
+      fprintf(automix_log,"%d %s %s-%s\n",(unsigned4)position,type, tmp, tmp2);
     } 
   else
-    fprintf(automix_log,"%ld %s %s\n",(unsigned4)position,type, tmp);
+    fprintf(automix_log,"%d %s %s\n",(unsigned4)position,type, tmp);
 }
 
 void closeLog()
@@ -242,9 +250,7 @@ void process_options(int argc, char* argv[])
 	    options_failure("option neither short nor long");
 	  else arg=argv[i]+1;
 	  // check value
-	  if (strcmp(arg,"dumpraw")==0)
-	    dump_raw=true;
-	  else if (strcmp(arg,"split")==0)
+	  if (strcmp(arg,"split")==0)
 	    split=true;
 	  else if (strcmp(arg,"beforemix")==0)
 	    {
@@ -284,6 +290,20 @@ void process_options(int argc, char* argv[])
 	    normalize = true;
 	  else if (strcmp(arg,"rescantempo")==0)
 	    rescan_tempo = true;
+	  else if (strcmp(arg,"startatcue")==0)
+	    use_cue = true;
+	  else if (strcmp(arg,"beforecue")==0)
+	    before_cue = true;
+	  else if (strcmp(arg,"startpct")==0)
+	    {
+	      if (++i>=argc) options_failure("mix argument scanning error");
+	      start_pct = atoi(argv[i]);
+	    }
+	  else if (strcmp(arg,"stoppct")==0)
+	    {
+	      if (++i>=argc) options_failure("mix argument scanning error");
+	      stop_pct = atoi(argv[i]);
+	    }
 	  else if (strcmp(arg,"mix")==0)
 	    {
 	      if (++i>=argc) 
@@ -332,6 +352,7 @@ void process_options(int argc, char* argv[])
 
 static signed4 period_a;
 static signed4 period_b;
+static signed4 cue_b;
 static char * filename_b;
 static FILE * file_a;
 static FILE * file_b;
@@ -387,21 +408,15 @@ bool createFiles(char* a, char* b)
 {
   Index idx_b(b);
   filename_b = strdup(idx_b.get_filename());
-  period_b = period_to_quad(idx_b.get_period());
-
+  period_b   = period_to_quad(idx_b.get_period());
+  cue_b      = period_to_quad(idx_b.get_cue());
   set_decoder_environment(config,&idx_b);
-  
   printf("Decoding %s\n",b);
-  if (!start_bpmdj_raw("./",filename_b))
-    _exit(100);
-  
+  if (!start_bpmdj_raw("./",filename_b)) _exit(100);
   file_b=openRawFileForWriting(&idx_b, "./");
-  
-  if (normalize)
-    normalize_file();
+  if (normalize) normalize_file();
   
   Index idx_a(a);
-  
   period_a = period_to_quad(idx_a.get_period());
   
   file_a=fopen(BPMMIXED_NAME,"r+b");
@@ -441,9 +456,6 @@ void readTail(signed8 measures)
   printf("Reading tail (%d samples at position %d of length %d)\n",
 	 (int)length_a,(int)position_a,(int)filelength_a);
   readsamples(buffer_a,length_a,file_a);
-  
-  if (dump_raw)  
-    dumpAudio(TAILDUMP_NAME,(unsigned4*)buffer_a,length_a);
 }
 
 static unsigned4 filelength_b;
@@ -453,19 +465,33 @@ static stereo_sample2 *buffer_b; // full new data at the beginning of the new fi
 
 void readHead(signed8 percent, signed8 measures)
 {
-  length_b = (unsigned4)(measures * period_b);
-  buffer_b = bpmdj_allocate(length_b,stereo_sample2);
   filelength_b = fsize(file_b);
-  position_b = filelength_b*percent/100;
+  length_b = (unsigned4)(measures * period_b);
+
+  position_b=0;
+  if (use_cue)
+    {
+      position_b=cue_b;
+      if (!cue_b)
+	printf("Cannot use cue as head since cue does not exist\n");
+      if (before_cue)
+	{
+	  if (length_b>position_b) position_b=0;
+	  else position_b-=length_b;
+	}
+    }
+  else
+    {
+      position_b = filelength_b*percent/100;
+    }
+
   position_b /= 4;
   position_b *= 4;
+  buffer_b = bpmdj_allocate(length_b,stereo_sample2);
   fseek(file_b,position_b,SEEK_SET);
   printf("Reading head (%d samples at position %d of length %d)\n",
 	 (int)length_b,(int)position_b,(int)filelength_b);
   readsamples(buffer_b,length_b,file_b);
-  
-  if (dump_raw) 
-    dumpAudio(HEADDUMP_NAME,(unsigned4*)buffer_b,length_b);
 }
 
 void copySong(signed8 percent)
@@ -541,8 +567,8 @@ void collapseStretchedBuffer()
 signed8 phaseFit(int period, compressed* buffer, int length)
 {
   long c,d;
-  unsigned long mismatch=0;
-  unsigned long prev=mismatch;
+  unsigned4 mismatch=0;
+  unsigned4 prev=mismatch;
   assert(period<length);
   for(c=period;c<length;c++)
     {
@@ -745,8 +771,6 @@ void volumefade(signed8 pos)
     buffer_a[x+pos]=mix(buffer_c[x],buffer_a[x+pos],x,length_c);
   fseek(file_a,start,SEEK_SET);
   writesamples(buffer_a+pos,length_c,file_a);
-  if (dump_raw)
-    dumpAudio(MIXDUMP_NAME,(unsigned4*)buffer_a+pos,length_c);
 }
 
 void tempocopy(unsigned4 target_period)
@@ -793,16 +817,17 @@ void closeFiles()
   remove(rawname);
 }
 
+/**
+ * Two seperate behaviors are offered by this program
+ * - the first is to merge 2 songs together
+ * - the second is to split one large song in seperate pieces
+ */
 int main(int argc, char* argv[])
 {
   openlog();
   process_options(argc,argv);
   config = new PlayerConfig();
   assert(config);
-  
-  // essentially two seperate behaviors are offered by the program
-  // the first is to merge 2 songs together
-  // the second is to split one large song in seperate pieces
   if (split)
     {
       split_raw();
@@ -811,7 +836,7 @@ int main(int argc, char* argv[])
   if (createFiles(old_index,new_index))
     {
       readTail(slide_measures);
-      readHead(25,mix_measures);
+      readHead(start_pct,mix_measures);
       collapseBuffers();
       rescanTempo();
       stretchHead(mix_measures);
@@ -820,8 +845,9 @@ int main(int argc, char* argv[])
       volumefade(position);
       tempofade(tempo_measures);
     }
-  copySong(75);
+  copySong(stop_pct);
   closeFiles();
   closeLog();
   return 0;
 }
+#endif // __loaded__bpmmerge_cpp__

@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,8 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-#ifndef __BPMDJ___RYTHM_ANALYZER_H__
-#define __BPMDJ___RYTHM_ANALYZER_H__
+#ifndef __loaded__rythm_analyzer_h__
+#define __loaded__rythm_analyzer_h__
 using namespace std;
 #line 1 "rythm-analyzer.h++"
 #include "ui-rythm.h"
@@ -40,4 +40,4 @@ public slots:
 };
 
 void write_out_projection(long slice_size, unsigned4 *phases, int maximum_slice, const char * target);
-#endif
+#endif // __loaded__rythm_analyzer_h__

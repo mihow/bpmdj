@@ -17,8 +17,8 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#ifndef __BORGIV_LOCK_H__
-#define __BORGIV_LOCK_H__
+#ifndef __loaded__lock_h__
+#define __loaded__lock_h__
 using namespace std;
 #line 1 "lock.h++"
 #include <string>
@@ -39,6 +39,8 @@ using namespace std;
  * it forces the programmer to think about his locking system.
  * If he needs to avoid locking the same object multiple times then 
  * the performance of the program in general improves.
+ * The lock will remember who currently obtained the lock through a string
+ * that must be passed when locking
  * @see AutoLock for a handy oneliner.
  */
 class Lock
@@ -48,14 +50,17 @@ public:
    * can be used as a boolean. NULL is unlocked, another value otherwise.
    */
   volatile void * locked;
+  string who;
+  bool deleted;
   Lock() : locked(NULL)
   {
+    deleted=false;
   };
 
   /**
    * Will try to lock the object. Returns true under success, false otherwise.
    */
-  bool try_lock();
+  bool try_lock(string w);
   /**
    * Will lock the object, with a complete disregard who asks the lock. 
    * If the lock is asked by the same thread that has the lock then it will still
@@ -65,11 +70,15 @@ public:
    * if wait is false, the lock return true or false depending on a sucessful
    * acquisition.
    */
-  void wait_lock();
+  void wait_lock(string w);
   /**
    * Straightforwardly unlocks the lock.
    */
   void unlock();
+  virtual ~Lock()
+  {
+    deleted=true;
+  }
 };
 
 /**
@@ -88,16 +97,16 @@ public:
   /**
    * waits until lock is locked
    */
-  AutoLock(Lock&lock): lock(lock)
+  AutoLock(Lock&lock, string l): lock(lock)
   {
-    lock.wait_lock();
+    lock.wait_lock(l);
   }
   /**
    * waits until lock is locked
    */
-  AutoLock(Lock*lock): lock(*lock)
+  AutoLock(Lock*lock, string l): lock(*lock)
   {
-    lock->wait_lock();
+    lock->wait_lock(l);
   };
   /**
    * unlocks the underlying lock
@@ -108,6 +117,7 @@ public:
   }
 };
 
-#define Synchronized(a) AutoLock tmp_auto_locker(a)
+#define Synchronized_(a,b,c) AutoLock tmp_auto_locker(a,#a #b)
+#define Synchronized(a) Synchronized_(a,__FILE__, __LINE__)
 
-#endif
+#endif // __loaded__lock_h__

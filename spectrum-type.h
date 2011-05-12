@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,8 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-#ifndef __BPMDJ___SPECTRUM_TYPE_H__
-#define __BPMDJ___SPECTRUM_TYPE_H__
+#ifndef __loaded__spectrum_type_h__
+#define __loaded__spectrum_type_h__
 using namespace std;
 #line 1 "spectrum-type.h++"
 #include <math.h>
@@ -44,7 +44,7 @@ class spectrum_type
   spectrum_freq bark[spectrum_size];
   spectrum_type()
     {
-      for(int i = 0 ; i < spectrum_size; i ++)
+      for(signed4 i = 0 ; i < spectrum_size; i ++)
 	bark[i]=0;
     };
   spectrum_type(Data &d)
@@ -59,21 +59,21 @@ class spectrum_type
     {
       return bark[i];
     };
-  void set_band(int i, spectrum_freq a)
+  void set_band(signed4 i, spectrum_freq a)
     {
       bark[i]=a;
       if (i==spectrum_size-1)
 	translate_mean(bark,spectrum_size);
     }
-  void set_bark(int i, spectrum_freq a)
+  void set_bark(signed4 i, spectrum_freq a)
     {
       bark[i]=a;
     }
-  spectrum_freq get_bark(int i)
+  spectrum_freq get_bark(signed4 i)
     {
       return bark[i];
     }
   Data get_data() const;
   void set_data(Data &data);
 };
-#endif
+#endif // __loaded__spectrum_type_h__

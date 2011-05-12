@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,8 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-#ifndef __BPMDJ___INDEX_H__
-#define __BPMDJ___INDEX_H__
+#ifndef __loaded__index_h__
+#define __loaded__index_h__
 using namespace std;
 #line 1 "index.h++"
 #include <stdio.h>
@@ -87,11 +87,11 @@ class Index
   bool              meta_changed;      // true when data in memory has changed
   // song information
   period_type       index_period;      // the period of the song
-  unsigned long     index_cue;         // cues...
-  unsigned long     index_cue_z;
-  unsigned long     index_cue_x;
-  unsigned long     index_cue_c;
-  unsigned long     index_cue_v;
+  unsigned4         index_cue;         // cues...
+  unsigned4         index_cue_z;
+  unsigned4         index_cue_x;
+  unsigned4         index_cue_c;
+  unsigned4         index_cue_v;
   QString           index_file;           // the mp3 file in the music/ directory
   QString           index_tags;           // a alphabetically sorted tag list
   QString           index_md5sum;         // the md5 sum of the mp3
@@ -110,12 +110,12 @@ class Index
   AlbumField     ** albums;       // list of albums containing this song
   // information only available from v2.6 on
  public:
-  sample4_type       index_min;   // min value (below zero line) of both channels
-  sample4_type       index_max;   // max value 
-  sample4_type       index_mean;  // mean value
-  power_type         index_power; // rms
+  sample4_type      index_min;   // min value (below zero line) of both channels
+  sample4_type      index_max;   // max value 
+  sample4_type      index_mean;  // mean value
+  power_type        index_power; // rms
   // information availble from v2.9 and above
-  capacity_type      index_disabled_capacities;  // disabled capacities for this song
+  capacity_type     index_disabled_capacities;  // disabled capacities for this song
 
   //----------------------------------
   // creation, loading and storing
@@ -513,4 +513,4 @@ class Index
 Index * createNewIndexFor(QString song, QString directory);
 // will prefix the extention of filename with a number until a unique filename is found
 QString findUniqueName(QString directory, QString filename);
-#endif
+#endif // __loaded__index_h__

@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,6 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
+#ifndef __loaded__fragment_player_cpp__
+#define __loaded__fragment_player_cpp__
 using namespace std;
 #line 1 "fragment-player.c++"
 #include "fragment-cache.h"
@@ -31,10 +33,11 @@ elementResult ActiveFragmentPlayer::playChunk(int t)
   checkValidDsp();
   if (!playing || !dsp || finished || stopped) return Done;
   static const int check_every = 44100/3;
+  stereo_sample2 * samples = playing.get_samples();
   for(int i = check_every; i ; i--)
     {
-      dsp->write(playing->samples[curpos++]);
-      curpos%=playing->size;
+      dsp->write(samples[curpos++]);
+      curpos%=playing.get_size();
       if (curpos==0) 
 	{
 	  finished=true;
@@ -44,7 +47,7 @@ elementResult ActiveFragmentPlayer::playChunk(int t)
   return RevisitAfterIncoming;
 };
 
-elementResult ActiveFragmentPlayer::playWave(Fragment fragment)
+elementResult ActiveFragmentPlayer::playWave(FragmentInMemory fragment)
 {
   if (stopped) return Done;
   checkValidDsp();
@@ -99,7 +102,7 @@ void ActiveFragmentPlayer::closeDsp()
       dsp->close(false);
       delete dsp;
       dsp = NULL;
-      playing = Fragment();
+      playing = FragmentInMemory();
       curpos = 0;
       finished = false;
     }
@@ -142,3 +145,4 @@ void wait_for_unpause()
 }
 
 FragmentPlayer fragmentPlayer;
+#endif // __loaded__fragment_player_cpp__

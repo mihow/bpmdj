@@ -4,6 +4,7 @@
 #include <qvariant.h>
 
 
+#include <Qt3Support/Q3MimeSourceFactory>
 #include <QtCore/QVariant>
 #include <QtGui/QAction>
 #include <QtGui/QApplication>
@@ -18,7 +19,6 @@
 #include <QtGui/QSlider>
 #include <QtGui/QSpacerItem>
 #include <QtGui/QVBoxLayout>
-#include <Qt3Support/Q3MimeSourceFactory>
 
 class Ui_MixerDialog
 {
@@ -73,18 +73,20 @@ public:
 
     void setupUi(QDialog *MixerDialog)
     {
-    MixerDialog->setObjectName(QString::fromUtf8("MixerDialog"));
+    if (MixerDialog->objectName().isEmpty())
+        MixerDialog->setObjectName(QString::fromUtf8("MixerDialog"));
+    QSize size(466, 241);
+    size = size.expandedTo(MixerDialog->minimumSizeHint());
+    MixerDialog->resize(size);
     gridLayout = new QGridLayout(MixerDialog);
     gridLayout->setSpacing(6);
     gridLayout->setMargin(11);
     gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
     hboxLayout = new QHBoxLayout();
     hboxLayout->setSpacing(6);
-    hboxLayout->setMargin(0);
     hboxLayout->setObjectName(QString::fromUtf8("hboxLayout"));
     vboxLayout = new QVBoxLayout();
     vboxLayout->setSpacing(6);
-    vboxLayout->setMargin(0);
     vboxLayout->setObjectName(QString::fromUtf8("vboxLayout"));
     textLabel1 = new QLabel(MixerDialog);
     textLabel1->setObjectName(QString::fromUtf8("textLabel1"));
@@ -94,7 +96,6 @@ public:
 
     hboxLayout1 = new QHBoxLayout();
     hboxLayout1->setSpacing(6);
-    hboxLayout1->setMargin(0);
     hboxLayout1->setObjectName(QString::fromUtf8("hboxLayout1"));
     vboxLayout1 = new QVBoxLayout();
     vboxLayout1->setSpacing(0);
@@ -120,7 +121,6 @@ public:
 
     vboxLayout2 = new QVBoxLayout();
     vboxLayout2->setSpacing(0);
-    vboxLayout2->setMargin(0);
     vboxLayout2->setObjectName(QString::fromUtf8("vboxLayout2"));
     Ch2MainText = new QLabel(MixerDialog);
     Ch2MainText->setObjectName(QString::fromUtf8("Ch2MainText"));
@@ -155,7 +155,6 @@ public:
 
     vboxLayout3 = new QVBoxLayout();
     vboxLayout3->setSpacing(6);
-    vboxLayout3->setMargin(0);
     vboxLayout3->setObjectName(QString::fromUtf8("vboxLayout3"));
     textLabel2 = new QLabel(MixerDialog);
     textLabel2->setObjectName(QString::fromUtf8("textLabel2"));
@@ -165,11 +164,9 @@ public:
 
     hboxLayout2 = new QHBoxLayout();
     hboxLayout2->setSpacing(6);
-    hboxLayout2->setMargin(0);
     hboxLayout2->setObjectName(QString::fromUtf8("hboxLayout2"));
     vboxLayout4 = new QVBoxLayout();
     vboxLayout4->setSpacing(0);
-    vboxLayout4->setMargin(0);
     vboxLayout4->setObjectName(QString::fromUtf8("vboxLayout4"));
     Ch1MonitorText = new QLabel(MixerDialog);
     Ch1MonitorText->setObjectName(QString::fromUtf8("Ch1MonitorText"));
@@ -278,7 +275,6 @@ public:
 
     hboxLayout4 = new QHBoxLayout();
     hboxLayout4->setSpacing(6);
-    hboxLayout4->setMargin(0);
     hboxLayout4->setObjectName(QString::fromUtf8("hboxLayout4"));
     modebox = new QComboBox(MixerDialog);
     modebox->setObjectName(QString::fromUtf8("modebox"));
@@ -301,7 +297,6 @@ public:
 
     hboxLayout5 = new QHBoxLayout();
     hboxLayout5->setSpacing(6);
-    hboxLayout5->setMargin(0);
     hboxLayout5->setObjectName(QString::fromUtf8("hboxLayout5"));
     syncbutton = new QPushButton(MixerDialog);
     syncbutton->setObjectName(QString::fromUtf8("syncbutton"));
@@ -321,11 +316,9 @@ public:
 
     hboxLayout6 = new QHBoxLayout();
     hboxLayout6->setSpacing(6);
-    hboxLayout6->setMargin(0);
     hboxLayout6->setObjectName(QString::fromUtf8("hboxLayout6"));
     vboxLayout7 = new QVBoxLayout();
     vboxLayout7->setSpacing(6);
-    vboxLayout7->setMargin(0);
     vboxLayout7->setObjectName(QString::fromUtf8("vboxLayout7"));
     textLabel1_2 = new QLabel(MixerDialog);
     textLabel1_2->setObjectName(QString::fromUtf8("textLabel1_2"));
@@ -356,7 +349,6 @@ public:
 
     vboxLayout8 = new QVBoxLayout();
     vboxLayout8->setSpacing(6);
-    vboxLayout8->setMargin(0);
     vboxLayout8->setObjectName(QString::fromUtf8("vboxLayout8"));
     latency_audio = new QLabel(MixerDialog);
     latency_audio->setObjectName(QString::fromUtf8("latency_audio"));
@@ -397,11 +389,6 @@ public:
     QWidget::setTabOrder(Ch1Monitor, Ch2Monitor);
 
     retranslateUi(MixerDialog);
-
-    QSize size(466, 241);
-    size = size.expandedTo(MixerDialog->minimumSizeHint());
-    MixerDialog->resize(size);
-
     QObject::connect(Ch1Main, SIGNAL(valueChanged(int)), MixerDialog, SLOT(volumesChanged()));
     QObject::connect(Ch2Main, SIGNAL(valueChanged(int)), MixerDialog, SLOT(volumesChanged()));
     QObject::connect(Ch1Monitor, SIGNAL(valueChanged(int)), MixerDialog, SLOT(volumesChanged()));
@@ -428,9 +415,11 @@ public:
     textLabel1_3_3->setText(QApplication::translate("MixerDialog", "Syncing", 0, QApplication::UnicodeUTF8));
     textLabel1_3_2->setText(QApplication::translate("MixerDialog", "Playing", 0, QApplication::UnicodeUTF8));
     modebox->clear();
-    modebox->addItem(QApplication::translate("MixerDialog", "Out L = Main L, Out R = Main R", 0, QApplication::UnicodeUTF8));
-    modebox->addItem(QApplication::translate("MixerDialog", "Out L = Main, Out R = Monitor", 0, QApplication::UnicodeUTF8));
-    modebox->addItem(QApplication::translate("MixerDialog", "Out L = Monitor, Out R = Main", 0, QApplication::UnicodeUTF8));
+    modebox->insertItems(0, QStringList()
+     << QApplication::translate("MixerDialog", "Out L = Main L, Out R = Main R", 0, QApplication::UnicodeUTF8)
+     << QApplication::translate("MixerDialog", "Out L = Main, Out R = Monitor", 0, QApplication::UnicodeUTF8)
+     << QApplication::translate("MixerDialog", "Out L = Monitor, Out R = Main", 0, QApplication::UnicodeUTF8)
+    );
     pushButton2->setText(QApplication::translate("MixerDialog", "Quit", 0, QApplication::UnicodeUTF8));
     syncbutton->setText(QApplication::translate("MixerDialog", "Synchronise", 0, QApplication::UnicodeUTF8));
     balanced->setText(QApplication::translate("MixerDialog", "Balance", 0, QApplication::UnicodeUTF8));

@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,8 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-#ifndef __BPMDJ___DSP_OSS_H__
-#define __BPMDJ___DSP_OSS_H__
+#ifndef __loaded__dsp_oss_h__
+#define __loaded__dsp_oss_h__
 using namespace std;
 #line 1 "dsp-oss.h++"
 #ifdef COMPILE_OSS
@@ -47,4 +47,4 @@ class dsp_oss: public dsp_driver
   void    close(bool flush);
 };
 #endif
-#endif
+#endif // __loaded__dsp_oss_h__

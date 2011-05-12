@@ -1,3 +1,7 @@
+#ifndef __loaded__data_io_h__
+#define __loaded__data_io_h__
+using namespace std;
+#line 1 "data-io.h++"
 /****
  Om-Data
  Copyright (C) 2005-2006 Werner Van Belle
@@ -260,3 +264,4 @@ class DataBinner: public DataIo
 };
 
 #endif
+#endif // __loaded__data_io_h__

@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,6 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
+#ifndef __loaded__bpmcount_cpp__
+#define __loaded__bpmcount_cpp__
 using namespace std;
 #line 1 "bpmcount.c++"
 #include <stdlib.h>
@@ -84,3 +86,4 @@ int main(int argc, char *argv[])
       printf("%g\t%s\n",result.tempo,name);
     }
 }
+#endif // __loaded__bpmcount_cpp__

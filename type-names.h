@@ -1,3 +1,7 @@
+#ifndef __loaded__type_names_h__
+#define __loaded__type_names_h__
+using namespace std;
+#line 1 "type-names.h++"
 /****
  Om-Data
  Copyright (C) 2005-2006 Werner Van Belle
@@ -34,3 +38,4 @@ inline QString type_name(Data ) { return "Data";};
 inline Data    to_data(Data blah) {return blah;};
 inline void    convertTo(const Data& data, Data& target) {target = data;};
 #endif
+#endif // __loaded__type_names_h__

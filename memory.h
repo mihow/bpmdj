@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,8 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-#ifndef __BPMDJ___MEMORY_H__
-#define __BPMDJ___MEMORY_H__
+#ifndef __loaded__memory_h__
+#define __loaded__memory_h__
 using namespace std;
 #line 1 "memory.h++"
 #define bpmdj_allocate(size, type) (type*)myalloc(sizeof(type)*(size), __FILE__, __LINE__)
@@ -29,4 +29,4 @@ void * myalloc(int size, char* file, int line);
 void * myrealloc(void* thing, int size);
 void   myfree(void*);
  
-#endif
+#endif // __loaded__memory_h__

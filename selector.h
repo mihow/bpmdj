@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,8 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-#ifndef __BPMDJ___SELECTOR_H__
-#define __BPMDJ___SELECTOR_H__
+#ifndef __loaded__selector_h__
+#define __loaded__selector_h__
 using namespace std;
 #line 1 "selector.h++"
 #include <qtimer.h>
@@ -38,7 +38,7 @@ using namespace std;
 #include "process-manager.h"
 #include "spectrum-pca.h"
 #include "analyzers-manager.h"
-#include "fragment.h"
+#include "do-fragment.h"
 #include "ui-selector.h"
 
 #define TAGS_TEXT 0
@@ -217,4 +217,4 @@ public slots:
 };
 
 extern SongSelectorLogic * song_selector_window;
-#endif
+#endif // __loaded__selector_h__

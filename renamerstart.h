@@ -5,6 +5,7 @@
 
 
 #include <Qt3Support/Q3ButtonGroup>
+#include <Qt3Support/Q3MimeSourceFactory>
 #include <QtCore/QVariant>
 #include <QtGui/QAction>
 #include <QtGui/QApplication>
@@ -15,7 +16,6 @@
 #include <QtGui/QPushButton>
 #include <QtGui/QRadioButton>
 #include <QtGui/QSpacerItem>
-#include <Qt3Support/Q3MimeSourceFactory>
 
 class Ui_RenamerStart
 {
@@ -35,7 +35,11 @@ public:
 
     void setupUi(QDialog *RenamerStart)
     {
-    RenamerStart->setObjectName(QString::fromUtf8("RenamerStart"));
+    if (RenamerStart->objectName().isEmpty())
+        RenamerStart->setObjectName(QString::fromUtf8("RenamerStart"));
+    QSize size(483, 384);
+    size = size.expandedTo(RenamerStart->minimumSizeHint());
+    RenamerStart->resize(size);
     gridLayout = new QGridLayout(RenamerStart);
     gridLayout->setSpacing(6);
     gridLayout->setMargin(11);
@@ -44,11 +48,13 @@ public:
     buttonGroup1->setObjectName(QString::fromUtf8("buttonGroup1"));
     buttonGroup1->setColumnLayout(0, Qt::Vertical);
     buttonGroup1->layout()->setSpacing(6);
-    buttonGroup1->layout()->setMargin(0);
-    gridLayout1 = new QGridLayout(buttonGroup1->layout());
+    buttonGroup1->layout()->setMargin(11);
+    gridLayout1 = new QGridLayout();
+    QBoxLayout *boxlayout = qobject_cast<QBoxLayout *>(buttonGroup1->layout());
+    if (boxlayout)
+        boxlayout->addLayout(gridLayout1);
     gridLayout1->setAlignment(Qt::AlignTop);
     gridLayout1->setObjectName(QString::fromUtf8("gridLayout1"));
-    gridLayout1->setMargin(0);
     already_indexed = new QRadioButton(buttonGroup1);
     already_indexed->setObjectName(QString::fromUtf8("already_indexed"));
     already_indexed->setChecked(true);
@@ -102,11 +108,6 @@ public:
     QWidget::setTabOrder(not_yet_indexed, pushButton23);
 
     retranslateUi(RenamerStart);
-
-    QSize size(483, 384);
-    size = size.expandedTo(RenamerStart->minimumSizeHint());
-    RenamerStart->resize(size);
-
     QObject::connect(pushButton22, SIGNAL(clicked()), RenamerStart, SLOT(accept()));
     QObject::connect(pushButton23, SIGNAL(clicked()), RenamerStart, SLOT(reject()));
 

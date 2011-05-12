@@ -1,3 +1,7 @@
+#ifndef __loaded__array_creator_cpp__
+#define __loaded__array_creator_cpp__
+using namespace std;
+#line 1 "array-creator.c++"
 /****
  Om-Data
  Copyright (C) 2005-2006 Werner Van Belle
@@ -104,3 +108,4 @@ if (D==dimension && QString(type) == QString(#T)) return createAndFillTarget<D,T
 #undef ARRAY_TYPE
   assert(0);
 }
+#endif // __loaded__array_creator_cpp__

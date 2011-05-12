@@ -1,3 +1,7 @@
+#ifndef __loaded__data_string_cpp__
+#define __loaded__data_string_cpp__
+using namespace std;
+#line 1 "data-string.c++"
 /****
  Om-Data
  Copyright (C) 2005-2006 Werner Van Belle
@@ -17,7 +21,7 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#include "string.h"
+#include "data-string.h"
 #include "data-visitor.h"
 
 //---------------------------------------------------------------
@@ -74,3 +78,4 @@ void String::visit(DataVisitor &v)
 {
   v.visit(*this);
 }
+#endif // __loaded__data_string_cpp__

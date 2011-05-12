@@ -1,3 +1,7 @@
+#ifndef __loaded__types_h__
+#define __loaded__types_h__
+using namespace std;
+#line 1 "types.h++"
 /****
  Om-Data
  Copyright (C) 2005-2006 Werner Van Belle
@@ -48,11 +52,11 @@ template <class T, char L> class FloatClass;
 #define BASIC_TYPES \
 BASIC_TYPE(signed            char, signed1,   Signed1) \
 BASIC_TYPE(signed       short int, signed2,   Signed2) \
-BASIC_TYPE(signed        long int, signed4,   Signed4) \
+BASIC_TYPE(signed             int, signed4,   Signed4) \
 BASIC_TYPE(signed   long long int, signed8,   Signed8) \
 BASIC_TYPE(unsigned          char, unsigned1, Unsigned1) \
 BASIC_TYPE(unsigned     short int, unsigned2, Unsigned2) \
-BASIC_TYPE(unsigned      long int, unsigned4, Unsigned4) \
+BASIC_TYPE(unsigned           int, unsigned4, Unsigned4) \
 BASIC_TYPE(unsigned long long int, unsigned8, Unsigned8) \
 BASIC_TYPE(                 float, float4,    Float4) \
 BASIC_TYPE(                double, float8,    Float8) 
@@ -113,3 +117,4 @@ ARRAY_TYPE(5,Data)      ARRAY_TYPE(6,Data)      ARRAY_TYPE(7,Data)      ARRAY_TY
 #endif
 
 #endif 
+#endif // __loaded__types_h__

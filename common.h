@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,8 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-#ifndef __BPMDJ___COMMON_H__
-#define __BPMDJ___COMMON_H__
+#ifndef __loaded__common_h__
+#define __loaded__common_h__
 using namespace std;
 #line 1 "common.h++"
 #include <stdio.h>
@@ -29,11 +29,8 @@ void   common_init();
 bool   exists(const char* fn);
 double minimum(double a, double b);
 double abs_minimum(double a, double b);
-double atod(const char* str);
 int    clip(int val);
 inline bool option(char* arg, char* name) { return strcmp(arg,name)==0; };
 inline bool option(char* arg, char* namea, char* nameb) { return (strcmp(arg,namea)==0 || strcmp(arg,nameb)==0); };
-char * tohex(long i);
-long   toint(const char* name);
 QString readable(unsigned8);
-#endif
+#endif // __loaded__common_h__

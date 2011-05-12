@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,6 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
+#ifndef __loaded__bpmdj_cpp__
+#define __loaded__bpmdj_cpp__
 using namespace std;
 #line 1 "bpmdj.c++"
 #include <qtimer.h>
@@ -115,7 +117,7 @@ BpmDjSplash::BpmDjSplash(): QDialog(NULL,NULL,FALSE,Qt::SplashScreen)
   QByteArray image_data;
   image_data.setRawData(logo_png,logo_png_size);
   QImage image(image_data);
-  // when deleting the object we don't want to screw our memory
+  // when deleting the object we don't want to screw up our memory
   image_data.resetRawData(logo_png,logo_png_size);
   QPixmap pixmap(image);
   // set the dialog background
@@ -124,7 +126,7 @@ BpmDjSplash::BpmDjSplash(): QDialog(NULL,NULL,FALSE,Qt::SplashScreen)
   // show it
   show();
   QTimer * timer=new QTimer(this);
-  connect(timer,SIGNAL(timeout()), SLOT(close()));
+  connect(timer,SIGNAL(timeout()), this, SLOT(close()));
   timer->start(10000,true);
 }
 
@@ -133,6 +135,14 @@ QStatusBar* status = NULL;
 
 int main(int argc, char* argv[])
 {
+  assert(sizeof(unsigned1)==1);
+  assert(sizeof(unsigned2)==2);
+  assert(sizeof(unsigned4)==4);
+  assert(sizeof(unsigned8)==8);
+  assert(sizeof(signed1)==1);
+  assert(sizeof(signed2)==2);
+  assert(sizeof(signed4)==4);
+  assert(sizeof(signed8)==8);
   init_embedded_files();
   programname = argv[0];
   Tags::init();
@@ -221,3 +231,4 @@ int main(int argc, char* argv[])
   while(true) sleep(1000);
   return result;
 }
+#endif // __loaded__bpmdj_cpp__

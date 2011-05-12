@@ -59,6 +59,7 @@ class ActiveIndexReader_msg_: public ReferenceCount
 class ActiveIndexReader: public ActiveObject<Smart< ActiveIndexReader_msg_ > >
 {
   friend class IndexReader;
+  IndexReader * self;
     virtual elementResult handle(Smart< ActiveIndexReader_msg_> cmd)
       {
         if (cmd) return cmd->run(this);
@@ -74,8 +75,8 @@ class ActiveIndexReader: public ActiveObject<Smart< ActiveIndexReader_msg_ > >
   public: elementResult terminate();
   protected: void queue_terminate();
   protected:
-    ActiveIndexReader(string name="IndexReader"):
-      ActiveObject<Smart< ActiveIndexReader_msg_ > >(name)
+    ActiveIndexReader(IndexReader* s, string name):
+      ActiveObject<Smart< ActiveIndexReader_msg_ > >(name), self(s)
       {
       expected_files =  1;
       reader = NULL;
@@ -155,6 +156,8 @@ class IndexReader
 {
   private:
     ActiveIndexReader object;
+  public:
+    IndexReader(string name="IndexReader"): object(this, name) {};
   public:
     void start(int expected)
     {

@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,8 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-#ifndef __BPMDJ___CAPACITY_H__
-#define __BPMDJ___CAPACITY_H__
+#ifndef __loaded__capacity_h__
+#define __loaded__capacity_h__
 using namespace std;
 #line 1 "capacity.h++"
 #include "om-data.h"
@@ -53,6 +53,7 @@ int capacity_to_prognr(int full_capacity);
 int get_decoder_program(Capacity host_disabled, Capacity ext_disabled, Capacity song_disabled);
 
 // is something an extenstion with capacity ?
+QString extensionList();
 bool goodExtension(QString extension);
 
 // Manage the capacity widget
@@ -65,4 +66,4 @@ class PlayerConfig;
 class Index;
 // Set the environment before calling bpmdjraw
 int set_decoder_environment(PlayerConfig * config, Index * idx);
-#endif
+#endif // __loaded__capacity_h__

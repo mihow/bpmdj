@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,6 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
+#ifndef __loaded__index_cpp__
+#define __loaded__index_cpp__
 using namespace std;
 #line 1 "index.c++"
 /*-------------------------------------------
@@ -537,7 +539,9 @@ public:
   SongInformation * info;
   SongInfoDialog(): QDialog(NULL)
   {
+    QGridLayout *gridLayout = new QGridLayout(this);
     info = new SongInformation(this);
+    gridLayout->addWidget(info);
     info->save->setDefault(true);
   }
 };
@@ -776,3 +780,4 @@ Index* createNewIndexFor(QString filename, QString directory)
   index->set_period(-1,true);
   return index;
 }
+#endif // __loaded__index_cpp__

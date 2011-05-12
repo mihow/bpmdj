@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,8 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-#ifndef __BPMDJ___DIRSCANNER_H__
-#define __BPMDJ___DIRSCANNER_H__
+#ifndef __loaded__dirscanner_h__
+#define __loaded__dirscanner_h__
 using namespace std;
 #line 1 "dirscanner.h++"
 #include <dirent.h>
@@ -82,8 +82,10 @@ protected:
   virtual void checkfile(const QString dir, const QString filename) = 0;
   /**
    * The function used to check whether the extension matches
+   * If the extension does not match the file is not sent to checkfile.
+   * The standard function will check the required_extension.
    */
-  bool matchextension(const QString filename);
+  virtual bool matchextension(const QString filename);
   virtual ~DirectoryScanner()
   {
   };
@@ -116,4 +118,4 @@ public:
    */
   virtual unsigned4 scan();
 };
-#endif
+#endif // __loaded__dirscanner_h__

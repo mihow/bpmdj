@@ -1,4 +1,4 @@
-VERSION = 3.5
+VERSION = 3.6
 BIN = bpmplay bpmdj bpmmerge bpmcount 
 .EXPORT_ALL_VARIABLES:
 all: .link-targets .ui-forms .rc-files .source-creator .depend .compile 
@@ -87,8 +87,9 @@ nens:
 	@~/Administration/bpmdj-to-nens
 
 tuuster: 
-	@scp kbpm-play bpmdj@tuuster:bpmdj/
-	@scp kbpm-dj   bpmdj@tuuster:bpmdj/
+	@scp bpmmerge bpmdj@tuuster:.bin/
+	@scp bpmplay  bpmdj@tuuster:.bin/
+	@scp bpmdj    bpmdj@tuuster:.bin/
 
 website:
 	rsync -e ssh -xavz redirect_documentation/* krubbens@bpmdj.sourceforge.net:/home/groups/b/bp/bpmdj/htdocs/

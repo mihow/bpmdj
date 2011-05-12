@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,8 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-#ifndef __BPMDJ___USER_NOTIFICATION_H__
-#define __BPMDJ___USER_NOTIFICATION_H__
+#ifndef __loaded__user_notification_h__
+#define __loaded__user_notification_h__
 using namespace std;
 #line 1 "user-notification.h++"
 #include <qstring.h>
@@ -44,4 +44,4 @@ public:
   void send();
   virtual void run(SongSelectorLogic * window);
 };
-#endif
+#endif // __loaded__user_notification_h__

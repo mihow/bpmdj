@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,6 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
+#ifndef __loaded__history_cpp__
+#define __loaded__history_cpp__
 using namespace std;
 #line 1 "history.c++"
 #include <stdio.h>
@@ -44,31 +46,31 @@ Song * History::t_1 = NULL;
 Song * History::t_0 = NULL;
 init_singleton_var(History,songs_played,int,0);
 Q3ListView * History::log_ui = NULL;
-FILE *History::f = NULL;
-QString History::history_filename;
+FILE *History::file = NULL;
+QByteArray History::filename;
 
-History::History(const QString filename, DataBase *db, Q3ListView * putin)
+void History::mark_all_played_songs(DataBase *db)
 {
-  QByteArray fname=filename.toAscii();
-  log_ui = putin;
-  if (f) fclose(f);
-  f = fopen(fname,"rb");
-  if (f!=NULL)
+  FILE * f = fopen(filename,"rb");
+  if (!f) return;
+  char  *line = NULL;
+  size_t blen = 0;
+  ssize_t len = 0;
+  while((len=getline(&line,&blen,f))!=-1)
     {
-      char  *line = NULL;
-      size_t blen = 0;
-      ssize_t len = 0;
-      while((len=getline(&line,&blen,f))!=-1)
-	{
-	  line[len-1]=0;
-	  QString s = QStringFactory::create(line);
-	  mark_as_played(db, s);
-	}
-      if (line)
-	bpmdj_deallocate(line);
+      line[len-1]=0;
+      QString s = QStringFactory::create(line);
+      mark_as_played(db, s);
     }
-  history_filename = filename;
-  f=fopen(fname,"ab");
+  if (line) 
+    bpmdj_deallocate(line);
+}
+
+void History::init(const QString fname, Q3ListView * putin)
+{
+  filename=fname.toAscii();
+  log_ui = putin;
+  file=fopen(fname,"ab");
 }
 
 void History::mark_as_played(DataBase * db, QString s)
@@ -84,9 +86,9 @@ void History::mark_as_played(Song *song)
   set_songs_played(get_songs_played() + 1);
   if (log_ui)
     new Q3ListViewItem(log_ui,
-		      tonumber(get_songs_played()),
-		      song->get_title(),
-		      song->get_author());
+		       tonumber(get_songs_played()),
+		       song->get_title(),
+		       song->get_author());
 }
 
 void History::save_history()
@@ -94,7 +96,7 @@ void History::save_history()
   // ask for filename
   QString s = QFileDialog::getSaveFileName("","History (*.log)",NULL,"Save Play History","Choose a filename" );
   if (s.isNull()) return;
-  start_cp(history_filename,s);
+  start_cp(filename,s);
 }
 
 void History::clear_history(DataBase * db)
@@ -109,11 +111,13 @@ void History::clear_history(DataBase * db)
   // clear history view
   log_ui->clear();
   // clear file
-  fclose(f);
-  f=fopen(history_filename,"wb");
+  fclose(file);
+  file=fopen(filename,"wb");
   // clear memory marks
   const vector<Song*> &songs = db->getAllSongs();
-  constVectorIterator<Song*> song(songs); ITERATE_OVER(song)
+  constVectorIterator<Song*> song(songs);
+ITERATE_OVER(song)
+
     if (song.val())
     {
       song.val()->init_played_author_at_time();
@@ -124,11 +128,11 @@ void History::clear_history(DataBase * db)
 
 void History::this_is_playing(Song * main_now)
 {
-  if (main_now && f)
+  if (main_now && file)
     {
       QByteArray name = main_now->get_file().toAscii();
-      fprintf(f,"%s\n",(const char*)name);
-      fflush(f);
+      fprintf(file,"%s\n",(const char*)name);
+      fflush(file);
       mark_as_played(main_now);
     }
   // check the history and update records as necessary...
@@ -162,3 +166,4 @@ void History::this_is_playing(Song * main_now)
       i.write_idx();
     }
 }
+#endif // __loaded__history_cpp__

@@ -15,6 +15,7 @@ BpmDj: Free Dj Tools
  minor patches      : James Gerken <phlegm@mib.org>
  windows port       : Luciano Genero <luciano.genero@softway.it>
  Low pass filter    : Julius O. Smith <http://www-ccrma.stanford.edu/~jos/>
- 64bit support      : Detlef
+ 64bit support      : Detlef & Bernard Fortz <bernard.fortz@mobistarmail.be>
  Electric Fence     : Bruce Perens (bruce@pixar.com)
  Meta import filter : Tom Vogt (tom@lemuria.org)
+ bugfixing          : Bernard Fortz <bernard.fortz@mobistarmail.be>

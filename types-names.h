@@ -1,3 +1,7 @@
+#ifndef __loaded__type_names_h__
+#define __loaded__type_names_h__
+using namespace std;
+#line 1 "type-names.h++"
 /****
  Om-Data
  Copyright (C) 2005-2006 Werner Van Belle
@@ -17,44 +21,21 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#ifndef OM_STRING_H
-#define OM_STRING_H
-#include "data.h"
+#ifndef TYPE_NAMES_H
+#define TYPE_NAMES_H
+#include "numbers.h"
 
 //---------------------------------------------------------------
-//                            String
+//                      Exported
 //---------------------------------------------------------------
-class String: public DataClass
-{
-  QString text;
- protected:
-  virtual QString type_name() const 
-    {
-      return type(); 
-    };
-  virtual DataClass* shallow_copy() const 
-    {
-      return new String(text);
-    };
- public:
-  static QString type()
-    {
-      return "String";
-    }
-  String(QString s) : text(s) 
-    {
-    };
-  QString operator ()() const 
-    {
-      return text;
-    };
-  operator QString() const 
-    {
-      return text;
-    }
-  static String parse(const char *);
- protected:
-  virtual void visit(DataVisitor& v);
-};
-
+#define BASIC_TYPE(WHAT, NAME, CLASS) \
+inline QString type_name(WHAT ) { return #NAME;}; \
+inline Data to_data(WHAT input)     { return CLASS(input);}; \
+inline void convertTo(const Data& data, NAME& target) {target = (CLASS)data;};
+BASIC_TYPES
+#undef BASIC_TYPE
+inline QString type_name(Data ) { return "Data";};
+inline Data    to_data(Data blah) {return blah;};
+inline void    convertTo(const Data& data, Data& target) {target = data;};
 #endif
+#endif // __loaded__type_names_h__

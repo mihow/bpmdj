@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,6 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
+#ifndef __loaded__beatgraph_analyzer_cpp__
+#define __loaded__beatgraph_analyzer_cpp__
 using namespace std;
 #line 1 "beatgraph-analyzer.c++"
 #include <Qt/qapplication.h>
@@ -533,3 +535,4 @@ void BeatGraphAnalyzer::cuesChanged()
   pattern->update();
 }
 
+#endif // __loaded__beatgraph_analyzer_cpp__

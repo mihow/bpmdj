@@ -7,7 +7,7 @@
 #define YYSTYPE Data
 #include "data-syntax.h"
 #include "symbol.h"
-#include "string.h"
+#include "data-string.h"
 #include "numbers.h"
 
 /**

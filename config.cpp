@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,6 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
+#ifndef __loaded__config_cpp__
+#define __loaded__config_cpp__
 using namespace std;
 #line 1 "config.c++"
 #include <qlineedit.h>
@@ -684,3 +686,4 @@ void Config::calc_and_cache()
   SongMetriek::std.set_composition_weight(get_distance_compositionweight());
   SongMetriek::std.prepare();
 }
+#endif // __loaded__config_cpp__

@@ -29,7 +29,11 @@ public:
 
     void setupUi(QDialog *ClusterDialog)
     {
-    ClusterDialog->setObjectName(QString::fromUtf8("ClusterDialog"));
+    if (ClusterDialog->objectName().isEmpty())
+        ClusterDialog->setObjectName(QString::fromUtf8("ClusterDialog"));
+    QSize size(382, 400);
+    size = size.expandedTo(ClusterDialog->minimumSizeHint());
+    ClusterDialog->resize(size);
     gridLayout = new QGridLayout(ClusterDialog);
     gridLayout->setSpacing(6);
     gridLayout->setMargin(11);
@@ -74,11 +78,6 @@ public:
 
 
     retranslateUi(ClusterDialog);
-
-    QSize size(382, 400);
-    size = size.expandedTo(ClusterDialog->minimumSizeHint());
-    ClusterDialog->resize(size);
-
     QObject::connect(pushButton27, SIGNAL(clicked()), ClusterDialog, SLOT(accept()));
     QObject::connect(pushButton28, SIGNAL(clicked()), ClusterDialog, SLOT(reject()));
 

@@ -1,3 +1,7 @@
+#ifndef __loaded__data_visitor_h__
+#define __loaded__data_visitor_h__
+using namespace std;
+#line 1 "data-visitor.h++"
 /****
  Om-Data
  Copyright (C) 2005-2006 Werner Van Belle
@@ -73,3 +77,4 @@ class DataVisitor
 
 #endif
 
+#endif // __loaded__data_visitor_h__

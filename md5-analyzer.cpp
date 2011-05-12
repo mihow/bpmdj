@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,6 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
+#ifndef __loaded__md5_analyzer_cpp__
+#define __loaded__md5_analyzer_cpp__
 using namespace std;
 #line 1 "md5-analyzer.c++"
 #include <stdio.h>
@@ -50,3 +52,4 @@ void Md5Analyzer::analyze()
   fclose(kloink);
   playing->set_md5sum(strdup(s));
 }
+#endif // __loaded__md5_analyzer_cpp__

@@ -1,4 +1,3 @@
-#include "ui-includes.h" // PCH include
 #include "renamer.h"
 
 #include <qvariant.h>

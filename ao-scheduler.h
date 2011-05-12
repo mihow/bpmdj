@@ -17,8 +17,8 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#ifndef __BORGIV_AO_SCHEDULER_H__
-#define __BORGIV_AO_SCHEDULER_H__
+#ifndef __loaded__ao_scheduler_h__
+#define __loaded__ao_scheduler_h__
 using namespace std;
 #line 1 "ao-scheduler.h++"
 #include "lock.h"
@@ -84,4 +84,4 @@ class SpawnWhenActivated: public Scheduler
  public:
   virtual void start(Runnable * torun);
 };
-#endif
+#endif // __loaded__ao_scheduler_h__

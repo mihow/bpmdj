@@ -1,4 +1,3 @@
-/* Automatically generated file, please edit ao-pool.c++ */
 /****
  Borg IV
  Copyright (C) 2006-2007 Werner Van Belle
@@ -18,6 +17,8 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
+#ifndef __loaded__ao_pool_cpp__
+#define __loaded__ao_pool_cpp__
 using namespace std;
 #line 1 "ao-pool.c++"
 #include <iostream>
@@ -80,3 +81,4 @@ public:
 
 DawnTilDusk * aoPool = new StdDawnTilDusk();
 
+#endif // __loaded__ao_pool_cpp__

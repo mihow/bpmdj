@@ -1,3 +1,7 @@
+#ifndef __loaded__set_h__
+#define __loaded__set_h__
+using namespace std;
+#line 1 "set.h++"
 /****
  Om-Data
  Copyright (C) 2005-2006 Werner Van Belle
@@ -134,3 +138,4 @@ class Set
 };
 
 #endif
+#endif // __loaded__set_h__

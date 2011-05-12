@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,13 +16,14 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-#ifndef __BPMDJ___BEATGRAPH_LABEL_H__
-#define __BPMDJ___BEATGRAPH_LABEL_H__
+#ifndef __loaded__beatgraph_label_h__
+#define __loaded__beatgraph_label_h__
 using namespace std;
 #line 1 "beatgraph-label.h++"
 #include <Qt/qtimer.h>
 #include <Qt/qlabel.h>
 #include <Qt/qpainter.h>
+#include <qmutex.h>
 #include "common.h"
 
 /**
@@ -38,6 +39,13 @@ class BeatGraphLabel: public QWidget
 {
   Q_OBJECT
 private:
+  /**
+   * It seems that the drawing can be called in competition with
+   * setting new images. To avoid problems, we must lock the object 
+   * for all the incoming signals. Because various drawing operations 
+   * call each other this is a reentrant lock.
+   */
+  QMutex lock;
   /**
    * Will draw a yellow vertical line at position ox on the resized image.
    * The ox coordinate is given in the _original_ image coordinates. This
@@ -120,4 +128,4 @@ public slots:
   virtual void setImage(QImage, unsigned8 samplespercol);
 };
 
-#endif
+#endif // __loaded__beatgraph_label_h__

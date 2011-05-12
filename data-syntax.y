@@ -2,7 +2,7 @@
 #define YYDEBUG 1
 #include "data.h"
 #include "array-creator.h"
-#include "token.h"
+#include "data-token.h"
 #include "symbol.h"
 #define YYSTYPE Data
 %}

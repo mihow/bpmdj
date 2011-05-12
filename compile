@@ -22,28 +22,35 @@ include .depend
 	flac $<
 
 # BpmDj contains a number of embedded files. Instead of loading images as huge
-# pixmaps that require parsing, we insert the .png and .wav files straight into the
-# data segment of the program.
+# pixmaps that require runtime parsing, we insert the .png and .mp3 files 
+# straight into the data segment of the program.
+# Depending on the architectrue we need different parameters
+ifeq	($(BITS),64)
+OBJCOPYPARMS=-B i386:x86-64 -O elf64-x86-64
+else
+OBJCOPYPARMS=-B i386 -O elf32-i386 
+endif
+
 %-ogg.o: %.ogg
 	@echo "  [obj] "$@
-	@objcopy -I binary -B i386 -O elf32-i386 \
+	@objcopy -I binary $(OBJCOPYPARMS)\
 		 --rename-section .data=.rodata,alloc,load,readonly,data,contents \
 		 $< $@
 
 %-mp3.o: %.mp3
 	@echo "  [obj] "$@
-	@objcopy -I binary -B i386 -O elf32-i386 \
+	@objcopy -I binary $(OBJCOPYPARMS) \
 		 --rename-section .data=.rodata,alloc,load,readonly,data,contents \
 		 $< $@
 
 %-png.o: %.png
-	@echo "  [obj] "$@
-	@objcopy -I binary -B i386 -O elf32-i386 \
+	@echo "  [obj] "$@ 
+	@objcopy -I binary $(OBJCOPYPARMS) \
 		--rename-section .data=.rodata,alloc,load,readonly,data,contents \
 		 $< $@
 
 DATA_OBJECTS = data.o data-lexer.o data-syntax.o data-io.o \
-        data-visitor.o array-creator.o symbol.o token.o string.o \
+        data-visitor.o array-creator.o symbol.o data-token.o data-string.o \
         null.o set.o
 data.a : $(DATA_OBJECTS)
 	@echo "   [ar] data.a"

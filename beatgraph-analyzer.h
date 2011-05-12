@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,8 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-#ifndef __BPMDJ___BEATGRAPH_ANALYZER_H__
-#define __BPMDJ___BEATGRAPH_ANALYZER_H__
+#ifndef __loaded__beatgraph_analyzer_h__
+#define __loaded__beatgraph_analyzer_h__
 using namespace std;
 #line 1 "beatgraph-analyzer.h++"
 #include <Qt/qpainter.h>
@@ -32,11 +32,11 @@ class BeatGraphAnalyzer : public QWidget, public Ui::BeatGraph
   Q_OBJECT
 private: 
   // the signed data is used as input into the energy and haar calculations
-  long audiosize;
+  signed4 audiosize;
   uncompressed * signed_data;
   void readFileSigned();
   // the period under which the beatgraph is being visualized
-  long period;
+  signed4 period;
   void getTempo();
   bool check_visualisation_conditions(bool file_read=true);
   // energy calculation, storage & visualisation
@@ -62,4 +62,4 @@ public slots:
   virtual void changeVisualisation();
   virtual void cuesChanged();
 };
-#endif
+#endif // __loaded__beatgraph_analyzer_h__

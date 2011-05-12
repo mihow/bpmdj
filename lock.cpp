@@ -1,4 +1,3 @@
-/* Automatically generated file, please edit lock.c++ */
 /****
  Borg IV
  Copyright (C) 2006-2007 Werner Van Belle
@@ -18,6 +17,8 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
+#ifndef __loaded__lock_cpp__
+#define __loaded__lock_cpp__
 using namespace std;
 #line 1 "lock.c++"
 #include <string>
@@ -27,29 +28,43 @@ using namespace std;
 #include <vector>
 #include <queue>
 #include <time.h>
+#include <iostream>
 #include "lock.h"
 
-bool Lock::try_lock()
+bool Lock::try_lock(string w)
 {
+  assert(!deleted);
   if (locked) return false;
   // try to set it to what we want 
   void * before = (void*)locked;
   if (cmpxchg(&locked,locked,this)==before)
-    return true;
+    {
+      who=w;
+      return true;
+    }
   return false;
 }
 
-void Lock::wait_lock()
+void Lock::wait_lock(string w)
 {
+  assert(!deleted);
   time_t start_time=time(NULL);
-  while (!try_lock()) 
+  while (!try_lock(w)) 
     if ((time(NULL)-start_time)>60)
-      assert(0);
+      {
+	cerr << "Cannot obtain lock for " << w << "\n"
+	     << "because " << who << " holds it excessively long\n";	
+	fflush(stderr);
+	assert(0);
+      }
 }
 
 void Lock::unlock()
 {
+  assert(!deleted);
   assert(locked);
+  who="";
   locked=NULL;
 }
 
+#endif // __loaded__lock_cpp__

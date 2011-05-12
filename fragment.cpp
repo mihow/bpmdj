@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,12 +16,20 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
+#ifndef __loaded__fragment_cpp__
+#define __loaded__fragment_cpp__
 using namespace std;
 #line 1 "fragment.c++"
 #include "files.h"
-#include "fragment.h"
+#include "do-fragment.h"
 
-FragmentObj::FragmentObj(QString filename)
+FragmentInMemoryData::FragmentInMemoryData()
+{
+  samples=NULL;
+  size=0;
+};
+
+FragmentInMemoryData::FragmentInMemoryData(QString filename)
 {
   FILE * f = fopen(filename.ascii(),"rb");
   if (!f)
@@ -38,3 +46,39 @@ FragmentObj::FragmentObj(QString filename)
   size = readsamples(samples,size,f);
   fclose(f);
 };
+
+FragmentInMemoryData::~FragmentInMemoryData()
+{
+  bpmdj_deallocate(samples);
+}
+
+bool FragmentFileData::isEmpty() 
+{
+  return f.isEmpty();
+};
+
+FragmentFileData::FragmentFileData(): f(""), song(NULL)
+{
+};
+
+FragmentFileData::FragmentFileData(Song *s, QString f): f(f), song(s)
+{
+};
+
+FragmentInMemory FragmentFileData::getFragment()
+{
+  if(f.isEmpty())
+    return FragmentInMemory();
+  return FragmentInMemory(f);
+};
+
+FragmentFileData::~FragmentFileData()
+{
+  if (!f.isEmpty())
+    {
+      QByteArray ba = f.toAscii();
+      remove(ba.data());
+    }
+};
+
+#endif // __loaded__fragment_cpp__

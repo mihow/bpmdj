@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,8 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-#ifndef __BPMDJ___SCRIPTS_H__
-#define __BPMDJ___SCRIPTS_H__
+#ifndef __loaded__scripts_h__
+#define __loaded__scripts_h__
 using namespace std;
 #line 1 "scripts.h++"
 #include <stdio.h>
@@ -27,11 +27,9 @@ using namespace std;
 // adding new extensions can be done in dirscanner.cpp
 #define RAW_EXT ".raw"
 #define IDX_EXT ".idx"
-#define SONG_EXT ".mp3 .ogg"
 #define SHELL_HEADER "#!/bin/bash\n"
 // commands
 #define CDROM "/cdrom"
-#define ENCODE "bladeenc -del *.wav"
 #define RAW2WAV "sox -r 44100 -s -w -c 2 "
 #define BPLAY "bplay -s 44100 -S -b 16 "
 
@@ -77,4 +75,4 @@ void Remote(const char* script,...);
 // necessary, if passing through to a remote shell double escaping might
 // be necessary.
 char * escape(const char * in);
-#endif
+#endif // __loaded__scripts_h__

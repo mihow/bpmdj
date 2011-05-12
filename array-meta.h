@@ -1,3 +1,7 @@
+#ifndef __loaded__array_meta_h__
+#define __loaded__array_meta_h__
+using namespace std;
+#line 1 "array-meta.h++"
 /****
  Om-Data
  Copyright (C) 2005-2006 Werner Van Belle
@@ -266,3 +270,4 @@ template <int D, class T> long ArrayMeta<D,T>::setSize(const Size<D> & s)
 }
 
 #endif
+#endif // __loaded__array_meta_h__

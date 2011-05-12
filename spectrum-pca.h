@@ -60,6 +60,7 @@ class ActiveSpectrumPca_msg_: public ReferenceCount
 class ActiveSpectrumPca: public ActiveObject<Smart< ActiveSpectrumPca_msg_ > >
 {
   friend class SpectrumPca;
+  SpectrumPca * self;
     virtual elementResult handle(Smart< ActiveSpectrumPca_msg_> cmd)
       {
         if (cmd) return cmd->run(this);
@@ -70,8 +71,8 @@ class ActiveSpectrumPca: public ActiveObject<Smart< ActiveSpectrumPca_msg_ > >
   public: elementResult terminate();
   protected: void queue_terminate();
   protected:
-    ActiveSpectrumPca(string name="SpectrumPca"):
-      ActiveObject<Smart< ActiveSpectrumPca_msg_ > >(name)
+    ActiveSpectrumPca(SpectrumPca* s, string name):
+      ActiveObject<Smart< ActiveSpectrumPca_msg_ > >(name), self(s)
       {
       };
 };
@@ -128,6 +129,8 @@ class SpectrumPca
 {
   private:
     ActiveSpectrumPca object;
+  public:
+    SpectrumPca(string name="SpectrumPca"): object(this, name) {};
   public:
     void pcaThis(vector < Song* > * songs)
     {

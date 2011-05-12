@@ -5,7 +5,7 @@ include defines
 
 %.cpp: %.ui3
 	@echo "  [uic] "$@
-	@$(UIC3) -pch ui-includes.h -i `basename $< .ui3`.h -o $@ $<
+	@$(UIC3) -i `basename $< .ui3`.h -o $@ $<
 
 %.h: %.ui3
 	@echo "  [uic] "$@

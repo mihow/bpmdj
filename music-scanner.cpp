@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,6 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
+#ifndef __loaded__music_scanner_cpp__
+#define __loaded__music_scanner_cpp__
 using namespace std;
 #line 1 "music-scanner.c++"
 #include <qtextedit.h>
@@ -29,6 +31,8 @@ using namespace std;
 void MusicScanner::recursing(const QString dirname)
 {
   Log->setText("Importing songs from "+dirname);
+  created->insertPlainText("Entering "+dirname+"\n");
+  ignored->insertPlainText("Entering "+dirname+"\n");
   app->processEvents();
 }
 
@@ -79,3 +83,4 @@ void MusicScanner::checkfile(const QString pathname, const QString filen)
       delete index;
     }
 }
+#endif // __loaded__music_scanner_cpp__

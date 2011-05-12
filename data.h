@@ -1,3 +1,7 @@
+#ifndef __loaded__data_h__
+#define __loaded__data_h__
+using namespace std;
+#line 1 "data.h++"
 /****
  Om-Data
  Copyright (C) 2005-2006 Werner Van Belle
@@ -44,6 +48,37 @@
 #endif
 #endif
 
+/**
+ * @defgroup data Data
+ *
+ * The data layer was written in order to solve a number of annoyances when programming in C++
+ * 
+ * - C++ does not provide automatic serialisation/deserialisation and data compatibility between 
+ *   different hosts and procesess is a modern necessity when writing applications.
+ * - There is no generic 'object' type in C++ and simply implementations (e.g : creating a library/application Object
+ *   root) easily leads to inefficient representations with generic types such as Integers, Floats,... are subclassed
+ *   from such a root. For instance: an array of native integers versus 'object' based integers might be twice as large.
+ * - Many generic dataformats lacks multidimensional arrays, requiring the user to wrap arrays within arrays, which in 
+ *   itself might make specific optimalisations impossible. Traversing through multi- dimensional operations can often be
+ *   optimized by properly sorting the stride, sizes and offsets before iteration. This can lead to efficient use of 
+ *   specialized opeations for lineair blocks of data. E.g MMX optimized array operations. By providing an array data
+ *   type this kind of use has become feasable.
+ * - Often, when working with generic data types in C++, downcasting is a necessity. However, downcasts themselve
+ *   override compiler warnings and bypasisng the typechecking. Since many errors ocucr due to wrong downcasts, it is 
+ *   necessary to integrate a type checking operator into a generic data framework.
+ * - Memory allocation of generic data types is often overlooked, leading to memory leaks or inefficient use of memory. 
+ *   In the Data library memory allocation is performed using reference counting, which leads to one of the more efficient
+ *   implementations as observed by [REF]. The requirement on the aplpication program is not to introduce loops, but this 
+ *   is not a problem, since those clases are aimed to provide an efficient serialisation/deserialisation interface.
+ * - Languages that provide generic data types often also include garbage colelction features. Those languages are often
+ *   too impractical for heavy duty operations such as image processing and sound processing. (however their 'heaviness' 
+ *   is not necesarily linked to the garbage collection as such)
+ * 
+ * @todo We should replace the template array class with the generic message class which still resides in the hatchery. 
+ * There is no need to use this complicated templating since it does not make programs perform much faster. Instead we 
+ * seem to loose a lot of flexibility by using these templates. 
+ */
+
 //===============================================================
 //                            Data 
 //===============================================================
@@ -53,6 +88,8 @@
 //---------------------------------------------------------------
 
 /**
+ * @ingroup data
+ * 
  * This is were the magic happens. All types in Om inherit from 
  * the DataClass. This class includes an allocation_count, which 
  * remembers how many time the object is supposed to be on the heap. 
@@ -122,6 +159,8 @@ class DataClass
 };
 
 /**
+ * @ingroup data
+ * 
  * The class 'Data' represents a generic dataclass. It will take care
  * to count the references of the content it refers to and will deallocate
  * when the referencecounter reaches zero. It will also automatically copy
@@ -295,3 +334,4 @@ class Data
 };
 
 #endif
+#endif // __loaded__data_h__

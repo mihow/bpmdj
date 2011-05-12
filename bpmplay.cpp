@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,6 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
+#ifndef __loaded__bpmplay_cpp__
+#define __loaded__bpmplay_cpp__
 using namespace std;
 #line 1 "bpmplay.c++"
 #include <Qt/qapplication.h>
@@ -101,10 +103,10 @@ template class Haar<double, double, 2>;
 template class Haar<short, double, 2>;
 
 template class SignalIO<signed2,2>;
-template void SignalIO<short, 2>::writeSamples(BasicSignal<double, 2> const&, unsigned long);
-template void SignalIO<short, 2>::readSamples(BasicSignal<double, 2>&, unsigned long);
-template void SignalIO<short, 2>::writeSamples(BasicSignal<signed2, 2> const&, unsigned long);
-template void SignalIO<short, 2>::readSamples(BasicSignal<signed2, 2>&, unsigned long);
+template void SignalIO<short, 2>::writeSamples(BasicSignal<double, 2> const&, unsigned4);
+template void SignalIO<short, 2>::readSamples(BasicSignal<double, 2>&, unsigned4);
+template void SignalIO<short, 2>::writeSamples(BasicSignal<signed2, 2> const&, unsigned4);
+template void SignalIO<short, 2>::readSamples(BasicSignal<signed2, 2>&, unsigned4);
 
 /*-------------------------------------------
  *         Constants & Variables
@@ -340,7 +342,7 @@ void normal_start()
 {
   int err = core_meta_init();
   if (show_error(err, err_needidx, 
-		 "Please enter the index file, not the "SONG_EXT
+		 "Please enter the index file, not the "+extensionList()+
 		 " file\nAn index file can be made with 'bpmplay -c'\n"
 		 "The argument you passed was "+QString(argument)))
     _exit(err);
@@ -530,3 +532,4 @@ int main(int argc, char *argv[])
   delete(app);
   _exit(0);
 }
+#endif // __loaded__bpmplay_cpp__

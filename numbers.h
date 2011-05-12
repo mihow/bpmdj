@@ -1,3 +1,7 @@
+#ifndef __loaded__numbers_h__
+#define __loaded__numbers_h__
+using namespace std;
+#line 1 "numbers.h++"
 /****
  Om-Data
  Copyright (C) 2005-2006 Werner Van Belle
@@ -151,3 +155,4 @@ template <class T, char C> class FloatClass: public DataClass
 };
 
 #endif
+#endif // __loaded__numbers_h__

@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,6 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
+#ifndef __loaded__spectrum_type_cpp__
+#define __loaded__spectrum_type_cpp__
 using namespace std;
 #line 1 "spectrum-type.c++"
 #include <assert.h>
@@ -29,7 +31,7 @@ using namespace std;
 Data spectrum_type::get_data() const
 {
   Array<1,float4> spectrumdata(spectrum_size);
-  for(int i = 0 ; i < spectrum_size ; i++)
+  for(signed4 i = 0 ; i < spectrum_size ; i++)
     spectrumdata[i]=bark[i];
   return spectrumdata;
 }
@@ -37,7 +39,7 @@ Data spectrum_type::get_data() const
 void spectrum_type::set_data(Data &data)
 {
   Array<1,float4> spectrumdata = data;
-  for(int i = 0 ; i < spectrum_size ; i++)
+  for(signed4 i = 0 ; i < spectrum_size ; i++)
     bark[i]=spectrumdata[i];
 }
 
@@ -51,3 +53,4 @@ double barkbounds[barksize+1] =
     6400,7700,9500,12000,
     15500
   };
+#endif // __loaded__spectrum_type_cpp__

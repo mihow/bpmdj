@@ -1,3 +1,7 @@
+#ifndef __loaded__array_creator_h__
+#define __loaded__array_creator_h__
+using namespace std;
+#line 1 "array-creator.h++"
 /****
  Om-Data
  Copyright (C) 2005-2006 Werner Van Belle
@@ -47,3 +51,4 @@ class Creator
 };
 
 #endif
+#endif // __loaded__array_creator_h__

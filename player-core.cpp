@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,6 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
+#ifndef __loaded__player_core_cpp__
+#define __loaded__player_core_cpp__
 using namespace std;
 #line 1 "player-core.c++"
 #include <stdlib.h>
@@ -102,8 +104,8 @@ void writer_died(int sig, siginfo_t *info, void* hu)
   // if it differs from the length in the .ini file we update it
   // get length;
   writing = false;
-  unsigned long long sec = samples2s(wave_max());
-  unsigned long long min; 
+  unsigned8 sec = samples2s(wave_max());
+  unsigned8 min; 
   if (wave_file) 
     {
       min = sec/60;
@@ -807,7 +809,7 @@ void wait_for_unpause()
   Debug("wait_for_unpause(): entered\n");
   fflush(stdout);
 #endif
-  while(paused);
+  while(paused) usleep(10);
 #ifdef DEBUG_WAIT_STATES
   Debug("wait_for_unpause(): finished\n");
   fflush(stdout);
@@ -956,3 +958,4 @@ void core_stop()
   Debug("core_stop(): finished\n");
 #endif
 }
+#endif // __loaded__player_core_cpp__

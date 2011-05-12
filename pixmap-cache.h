@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,8 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-#ifndef __BPMDJ___PIXMAP_CACHE_H__
-#define __BPMDJ___PIXMAP_CACHE_H__
+#ifndef __loaded__pixmap_cache_h__
+#define __loaded__pixmap_cache_h__
 using namespace std;
 #line 1 "pixmap-cache.h++"
 #include <qcache.h>
@@ -36,4 +36,4 @@ class PixmapCache: private QCache<intptr_t,QPixmap>
     PixmapCache();
     QPixmap * find(Song* a, Song* m, int w, int h);
 };
-#endif
+#endif // __loaded__pixmap_cache_h__

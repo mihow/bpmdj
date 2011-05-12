@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,8 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-#ifndef __BPMDJ___BPM_ANALYZER_H__
-#define __BPMDJ___BPM_ANALYZER_H__
+#ifndef __loaded__bpm_analyzer_h__
+#define __loaded__bpm_analyzer_h__
 using namespace std;
 #line 1 "bpm-analyzer.h++"
 #include <qstring.h>
@@ -25,7 +25,7 @@ using namespace std;
 #include "analyzer.h"
 #include "ui-bpmcounter.h"
 
-typedef double fft_type;
+typedef float8 fft_type;
 class SongPlayer;
 
 class BpmAnalyzerDialog : public QWidget, public Ui::CountDialog, public Analyzer
@@ -33,26 +33,26 @@ class BpmAnalyzerDialog : public QWidget, public Ui::CountDialog, public Analyze
   Q_OBJECT
 private:
   // fine scanning
-   unsigned char * audio;
-     signed long   audiosize;
-   unsigned long   audiorate;
-   unsigned long   startbpm, stopbpm;
-   unsigned long   startshift, stopshift;
-   long     int    bufsiz;
+   unsigned1 * audio;
+     signed4   audiosize;
+   unsigned4   audiorate;
+   unsigned4   startbpm, stopbpm;
+   unsigned4   startshift, stopshift;
+     signed4   bufsiz;
 	    // progress indicator fields
-            int    reading_progress;
-            int    processing_progress;
+            signed4    reading_progress;
+            signed4    processing_progress;
 	    // tapping fields
-            int    tapcount;
-            int    starttime;
+            signed4    tapcount;
+            signed4    starttime;
 	    // fft fields
         fft_type * freq;
 	fft_type * peak_bpm;
 	fft_type * peak_energy;
-	    int  * peak_fit;
- 	    int    windowsize;
-	    int    peaks;
-   void          set_measured_period(QString technique, int period);
+	    signed4  * peak_fit;
+ 	    signed4    windowsize;
+	    signed4    peaks;
+   void          set_measured_period(QString technique, signed4 period);
             // Weighted enveloppe and autocorrelation
    void          wec();
 	    // Enveloppe fft's
@@ -60,28 +60,28 @@ private:
    void          autocorrelate_spectrum();
 	    // FFT guidance routines
    void          fft();        // do a quick fft to obtain a set of 'hints'
-   void          fft_draw(QPainter &p, int xs, int ys, int shifter, double bpm_divisor);
-   void          autocorrelate_draw(QPainter &p, int xs, int ys, int shifter);
+   void          fft_draw(QPainter &p, signed4 xs, signed4 ys, signed4 shifter, float8 bpm_divisor);
+   void          autocorrelate_draw(QPainter &p, signed4 xs, signed4 ys, signed4 shifter);
             // finding the error fit of a curve
-   unsigned long phasefit(unsigned long i);
-   unsigned long phasefit(unsigned long i, unsigned long clip);
-   void          rayshoot_scan();
-   void          peak_scan();                    // scan based on fft-peaks
-   void          readAudio();                    // reads the file in memory
-   void          readAudioBlock(int blocksize);  // reads the file in memory divided by blocks
+   unsigned4 phasefit(unsigned4 i);
+   unsigned4 phasefit(unsigned4 i, unsigned4 clip);
+   void rayshoot_scan();
+   void peak_scan();                    // scan based on fft-peaks
+   void readAudio();                    // reads the file in memory
+   void readAudioBlock(signed4 blocksize);  // reads the file in memory divided by blocks
  private:
    void status(QString text);
    void set_labels();
-   void updateReadingProgress(int);
-   void updateProcessingProgress(int);
+   void updateReadingProgress(signed4);
+   void updateProcessingProgress(signed4);
    void updateInfo();
  public:
-   void          setBpmBounds(long start, long stop);
-   void          getMd5();     // retrieves MD5 sum
-   void          writeAudio(); // writes audio to disk
-   void          analyze();
-   void          rangeCheck();
-   void          removeRaw();
+   void setBpmBounds(signed4 start, signed4 stop);
+   void getMd5();     // retrieves MD5 sum
+   void writeAudio(); // writes audio to disk
+   void analyze();
+   void rangeCheck();
+   void removeRaw();
    SongPlayer *  player;
    BpmAnalyzerDialog(QWidget*parent=0);
    virtual void started();
@@ -93,4 +93,4 @@ private:
    virtual void tap();
    virtual void reset();
 };
-#endif
+#endif // __loaded__bpm_analyzer_h__

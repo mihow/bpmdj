@@ -1,6 +1,22 @@
+3.6:
+	- fixed a compilation problem on debian platforms (moc-qt4 vc moc-qt3)
+	- the dsp flag in the fragment_player will no longer lockup optimized compilations
+	- the fragments are removed when the program quits
+	+ if tempo is unknown the player jumps seconds forwards/backwards
+	- song information dialog layout sucked
+	- removed unused functions (tohex, write_idx, toint)
+	+ revised the bpm analyzer to be 64bit compatible
+	- check on the integer sizes and fix of the unsigned4 problem on 64bit processors
+	- some missing files that should never have been refered in the first place have now been 'removed'
+	+ added 'use last cue' to the bpmmerger
+	- removed a bug in song insertion in the queue
+	- the playhistory would not remember a played song while the index was loading
+	- the renamer scanner did not look for proper extensions
+	- the automixer would sort songs in the wrong order; this has been fixed
+	- .mpc files are recognized as well
 3.5:
 	- removed bpmmix, which was a nice idea but in the end not the goal of bpmdj
-	- the history thisisplqying function had a small bug
+	- the history thisisplaying function had a small bug
 	- the data reader will check the boundaries before addressing improper memory due to short files
         + added the location in the song information box
         - removed the similar scanner, since it didn't work that well

@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,6 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
+#ifndef __loaded__fragment_creator_cpp__
+#define __loaded__fragment_creator_cpp__
 using namespace std;
 #line 1 "fragment-creator.c++"
 #include "bpmdj.h"
@@ -54,14 +56,23 @@ elementResult ActiveFragmentCreator::createOneFor(Song* song)
     }
   if (exists(fragment_filename.ascii()))
     {
-      FragmentCreated fc(song, fragment_filename);
+      /** 
+       * to avoid that we create the same fragment multiple
+       * times and thereby needlessly remove the file
+       * we keep track of all the fragments we created already
+       */
+      FragmentFile ff;
+      if (created.find(song)!=created.end())
+	ff=created[song];
+      else
+	created[song]=ff=FragmentFile(song, fragment_filename);
       {
 	Synchronized(this);
-	ready.push_back(fc);
+	ready.push_back(ff);
       }
       if (app)
 	app->postEvent(song_selector_window,
-		       new FragmentCreated(fc));
+		       new FragmentCreated(ff));
     }
   return Done;
 }
@@ -75,10 +86,10 @@ bool ActiveFragmentCreator::handle()
   return !handling.empty();
 }
 
-deque<FragmentCreated> FragmentCreator::getReadyOnes()
+deque<FragmentFile> FragmentCreator::getReadyOnes()
 {
   Synchronized(object);
-  deque<FragmentCreated> result = object.ready;
+  deque<FragmentFile> result = object.ready;
   object.ready.clear();
   return result;
 }
@@ -90,3 +101,4 @@ elementResult ActiveFragmentCreator::terminate()
 }
 
 FragmentCreator fragmentCreator;
+#endif // __loaded__fragment_creator_cpp__

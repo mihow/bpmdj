@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,8 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-#ifndef __BPMDJ___SONG_PROCESS_H__
-#define __BPMDJ___SONG_PROCESS_H__
+#ifndef __loaded__song_process_h__
+#define __loaded__song_process_h__
 using namespace std;
 #line 1 "song-process.h++"
 #include <Qt/qcolor.h>
@@ -43,16 +43,28 @@ class SongProcess: public QObject
   enum kind_type    { player, analyzer };
  private:
   kind_type kind;             // player or analyzer ?
-  int     id;                 // the player or analyzer ID
+  /**
+   * the player or analyzer ID
+   */
+  signed4 id;                 
   QString name;               // the name of this analyzer/player
   command_type cmd;           // the command prefix
   QString remote;             // the remote location of the player, if any
   enabled_type estate;        // true if the user wants to use this process
   QString text;               // thename of the playing / analyzing song
   Song  * song;               // the song being analyzed/played;
-  int     running_time;       // the current running time
-  long    total_running_time; // the cummulated running time
-  int     songs_finished;     // the amount of stopped songs
+  /**
+   * the current running time
+   */
+  signed4 running_time;   
+  /**
+   * the cummulated running time
+   */
+  signed4 total_running_time;
+  /**
+   * the amount of stopped songs
+   */
+  signed4 songs_finished; 
   time_t  started_at;         // start_time when running
   state_type state;           // whether this one is useable, useless or not yet checked
  private:
@@ -208,4 +220,4 @@ class SongProcPrefView: public Q3HBox
  public slots:
    void commandChanged();
 };
-#endif
+#endif // __loaded__song_process_h__

@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,8 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-#ifndef __BPMDJ___FRAGMENT_CACHE_H__
-#define __BPMDJ___FRAGMENT_CACHE_H__
+#ifndef __loaded__fragment_cache_h__
+#define __loaded__fragment_cache_h__
 using namespace std;
 #line 1 "fragment-cache.h++"
 #include <qstring.h>
@@ -26,33 +26,39 @@ using namespace std;
 #include <set>
 #include "bpmdj-event.h"
 #include "song.h"
-#include "fragment.h"
+#include "do-fragment.h"
 
 class FragmentCreated: public BpmDjEvent
 {
-  QString f;
+  FragmentFile cnt;
 public:
-  Song* song;
   bool isEmpty() 
   {
-    return f.isEmpty();
+    return cnt.isEmpty();
   }
-  FragmentCreated(): f(""), song(NULL)
+  FragmentCreated()
   {
   }
-  FragmentCreated(Song *s, QString f=""): f(f), song(s)
+  FragmentCreated(FragmentFile f): cnt(f)
   {
   };
-  Fragment getFragment();
+  Song* get_song()
+  {
+    return cnt.get_song();
+  }
+  FragmentInMemory getFragment()
+  {
+    return cnt.getFragment();
+  }
   virtual void run(SongSelectorLogic * song_selector_window);
 };
 
 class FragmentCache
 {
-  map<Song*,FragmentCreated> song2fragment;
+  map<Song*,FragmentFile> song2fragment;
 public:
   void get(Song* song);
 };
 
 extern FragmentCache fragmentCache;
-#endif
+#endif // __loaded__fragment_cache_h__

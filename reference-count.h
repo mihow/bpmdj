@@ -17,10 +17,11 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#ifndef __BORGIV_REFERENCE_COUNT_H__
-#define __BORGIV_REFERENCE_COUNT_H__
+#ifndef __loaded__reference_count_h__
+#define __loaded__reference_count_h__
 using namespace std;
 #line 1 "reference-count.h++"
+#include <assert.h>
 #include "cmpxchg.h"
 
 /**
@@ -38,10 +39,11 @@ class ReferenceCount
    * 0 if none.
    */
   int reference_count;
-  ReferenceCount(): reference_count(0)
+  bool deleting;
+  ReferenceCount(): reference_count(0), deleting(false)
   {
   }
-  ReferenceCount(const ReferenceCount&): reference_count(0)
+  ReferenceCount(const ReferenceCount&): reference_count(0), deleting(false)
   {
   }
   ReferenceCount& operator =(const ReferenceCount&)
@@ -52,7 +54,7 @@ class ReferenceCount
   /**
    * atomically increases the reference count.
    */
-  void incref()
+  void incref() 
   {
     int before;
     do 
@@ -92,6 +94,7 @@ class ReferenceCount
 template <class ReferenceCountedObject> 
 class Smart
 {
+public:
   ReferenceCountedObject* ptr;
   void incref() const
     {
@@ -100,8 +103,11 @@ class Smart
     }
   void decref() const
     {
-      if (ptr && ptr->decref()==0)
-	delete ptr;
+      if (ptr && ptr->decref()==0 && !ptr->deleting)
+	{
+	  ptr->deleting=true;
+	  delete ptr;
+	}
     }
  public:
   explicit Smart(ReferenceCountedObject* p = 0) : ptr(p)
@@ -166,8 +172,8 @@ class Smart
     }
   template <class AnotherReferenceCountedObject> 
   operator Smart<AnotherReferenceCountedObject>()
-    {
-      return Smart<AnotherReferenceCountedObject>((AnotherReferenceCountedObject*)ptr);
-    }
+  {
+    return Smart<AnotherReferenceCountedObject>((AnotherReferenceCountedObject*)ptr);
+  }
 };
-#endif
+#endif // __loaded__reference_count_h__

@@ -1,4 +1,3 @@
-/* Automatically generated file, please edit ao-tracker.c++ */
 /****
  Borg IV
  Copyright (C) 2006-2007 Werner Van Belle
@@ -18,6 +17,8 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
+#ifndef __loaded__ao_tracker_cpp__
+#define __loaded__ao_tracker_cpp__
 using namespace std;
 #line 1 "ao-tracker.c++"
 #include "ao-tracker.h"
@@ -38,7 +39,13 @@ elementResult ActiveAoTracker::sunset(string s)
 elementResult ActiveAoTracker::sunrise(string s)
 {
   // cerr << "The sun is rising for " << s << "\n";
-  assert(alive.find(s)==alive.end());
+  if (alive.find(s)!=alive.end())
+    {
+      cerr << "Allocating second active object with name " << s 
+	   << " in Active Object Tracker\n";
+      exit(0);
+    }
   alive.insert(s);
   return Done;
 }
+#endif // __loaded__ao_tracker_cpp__

@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,14 +16,33 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
+#ifndef __loaded__beatgraph_label_cpp__
+#define __loaded__beatgraph_label_cpp__
 using namespace std;
 #line 1 "beatgraph-label.c++"
 #include <Qt/qpixmap.h>
 #include <QtGui/QPaintEvent>
+#include <iostream>
 #include "beatgraph-label.h"
 #include "player-core.h"
 
-void BeatGraphLabel::xorLine(int ox, int &x1, int &x2)
+/*
+class AutoMessage
+{
+  QString m;
+public:
+  AutoMessage(QString m2): m(2)
+  {
+    cerr << "entering " << m.toStdString() << "\n";
+  };
+  ~AutoMessage()
+  {
+    cerr << "leaving " << m.toStdString() << "\n";
+  };
+};
+*/
+
+void BeatGraphLabel::xorLine(int ox, int&x1, int&x2)
 {
   int osx = original.width();
   if (ox>=osx) return;
@@ -33,9 +52,10 @@ void BeatGraphLabel::xorLine(int ox, int &x1, int &x2)
   if (osx<=1) return; // div by zero 
   x1 = ox*sx/osx; 
   x2 = ((ox+1)*sx/osx);
-  if (x2>=sx) 
-    x2=sx;
-  assert(x1<x2);
+  if (x1>=sx) x1=sx;
+  if (x2>=sx) x2=sx;
+  if (x1==x2) return;
+  assert(x1<=x2);
   for(int y = 0 ; y < resized.height(); y++)
     {
       QRgb* l = ((QRgb*)resized.scanLine(y));
@@ -58,6 +78,8 @@ void BeatGraphLabel::moveRuler(int &x1, int&x2,int &x3, int &x4)
 
 void BeatGraphLabel::drawCursor()
 {
+  //  AutoMessage("drawCursor");
+  QMutexLocker _ml(&lock);
   int x1,x2,x3,x4;
   moveRuler(x1,x2,x3,x4);
   if (x1==-1)
@@ -115,6 +137,9 @@ void BeatGraphLabel::drawCueText()
 
 void BeatGraphLabel::paintEvent(QPaintEvent *e)
 {
+  // AutoMessage("paintEvent");
+  
+  QMutexLocker _ml(&lock);
   if (resized.isNull())
     {
       QPainter p;
@@ -141,13 +166,17 @@ void BeatGraphLabel::paintEvent(QPaintEvent *e)
 
 void BeatGraphLabel::resizeEvent(QResizeEvent * event)
 {
+  // AutoMessage("resizeEvent");
+  QMutexLocker _ml(&lock);
   cues_changed=true;
   update();
 }
 
 BeatGraphLabel::BeatGraphLabel(QWidget * parent, const char * name) : 
-  QWidget(parent,name), original(), resized()
+  QWidget(parent,name), lock(QMutex::Recursive), original(), resized()
 {
+  // AutoMessage("constructor");
+  QMutexLocker _ml(&lock);
   setAttribute(Qt::WA_OpaquePaintEvent);
   ruler_x=-1;
   cues_changed=false;
@@ -157,6 +186,8 @@ BeatGraphLabel::BeatGraphLabel(QWidget * parent, const char * name) :
 
 void BeatGraphLabel::setImage(QImage image, unsigned8 samplespercol)
 {
+  // AutoMessage("setImage");
+  QMutexLocker _ml(&lock);
   original=image;
   resized=original.scaled(size());
   drawCueText();
@@ -169,3 +200,4 @@ BeatGraphLabel::~BeatGraphLabel()
 {
   timer.stop();
 }
+#endif // __loaded__beatgraph_label_cpp__

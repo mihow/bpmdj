@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,8 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-#ifndef __BPMDJ___TAGS_H__
-#define __BPMDJ___TAGS_H__
+#ifndef __loaded__tags_h__
+#define __loaded__tags_h__
 using namespace std;
 #line 1 "tags.h++"
 #include <qstring.h>
@@ -29,7 +29,7 @@ using namespace std;
 class Tags
 {
  private:
-  static map<QString,int> tree;
+  static map<QString,tag_type> tree;
   static QString   find_tag(tag_type tag);
  public:
   static tag_type  add_tag(QString tag);
@@ -44,4 +44,4 @@ class Tags
   static tags_type parse_tags(QString tag_string);
   static QString   full_string(tags_type tags);
 };
-#endif
+#endif // __loaded__tags_h__

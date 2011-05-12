@@ -1,3 +1,7 @@
+#ifndef __loaded__null_h__
+#define __loaded__null_h__
+using namespace std;
+#line 1 "null.h++"
 /****
  Om-Data
  Copyright (C) 2005-2006 Werner Van Belle
@@ -48,3 +52,4 @@ class Null: public DataClass
 };
 
 #endif
+#endif // __loaded__null_h__

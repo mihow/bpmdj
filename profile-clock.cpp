@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,6 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
+#ifndef __loaded__profile_clock_cpp__
+#define __loaded__profile_clock_cpp__
 using namespace std;
 #line 1 "profile-clock.c++"
 #include <stdio.h>
@@ -23,12 +25,12 @@ using namespace std;
 #include <sys/times.h>
 #include <unistd.h> 
 
-/**
- * since the clock_freq is wrong on some machines we need to test this
- * at compile time. 
- */
 int main(int argc, char**argv)
 {
+  /**
+   * since the clock_freq is wrong on some machines we need to test this
+   * at compile time. 
+   */
   int clock_freq;
   clock_t start,stop;
   start=times(NULL);
@@ -47,5 +49,9 @@ int main(int argc, char**argv)
   printf("#define CLOCK_FREQ (%d)\n",(int)stop);
   clock_freq=stop;
   start=times(NULL);
+  /**
+   * The size of the types must be determined now
+   */
   return 0;
 }
+#endif // __loaded__profile_clock_cpp__

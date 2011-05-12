@@ -1,3 +1,7 @@
+#ifndef __loaded__array_h__
+#define __loaded__array_h__
+using namespace std;
+#line 1 "array.h++"
 /****
  Om-Data
  Copyright (C) 2005-2006 Werner Van Belle
@@ -25,6 +29,7 @@
 #include "array-meta.h"
 #include "type-names.h"
 
+
 //---------------------------------------------------------------
 //                     Forwards
 //---------------------------------------------------------------
@@ -35,9 +40,39 @@
 // do we want and [O]rdered iterator
 template <int D, class T, bool PT, int SM, bool O> class ArrayIterator;
 
-//---------------------------------------------------------------
-//                     Multidimensional Arrays
-//---------------------------------------------------------------
+
+/**
+ * @ingroup data
+ * @brief multi dimensional arrays
+ *
+ * Multidimensional arrays were conceived for a number of reasons. In various software we needed some way to handle large 
+ * volumes of data while providing different views on the data. Currently, giving the considerations of a read-only memory
+ * this library would probably be redefined completely. Nevertheless at that time, my main interest was the 
+ * multidimensional operations that were possible and a way to store retrieve them in a platform transparent manner. 
+ * Some of the uses:
+ *
+ * BpmDj
+ * - In bpmdj this kind of arrays is used to access audio on disk. There we need to load left/right samples one by one an
+ *   put them into an output stream. As such we need a physical addressing of streamlength x 2 short ints.
+ * - The fourier transofmration that we realize on some of the data chunks works on a channel per channel bases. There we
+ *   need an internal representation of 2 x streamlength data (doubles) then.
+ *
+ * Gel Analysis
+ *
+ * - In the gel analysis soft we need images that have a number of channels and then the standard x en y coordinates. 
+ *   Often the 3 colors are accessed at the same time.
+ * - In the gel analysis soft we also need a arrayhandler that transfomrs the input coordinate system into an orthonormal
+ *   basis in which -1:1 always will capture the entire image.
+ * 
+ * Petri-nets
+ * 
+ * - In the petrinet usage we have tokens that are placed in queues. To this end a general purpose array can be used. 
+ *   However, since theoretically tokens must be of a specified type we might as well give a limitation on what kind 
+ *   of content can be stored into an array.
+ * 
+ * The problem of cross platform access to data has not yet vanished, as such most of these data expression are still 
+ * usefull to read data from files and save it if we write our own flow modules. 
+ */
 template <int D, class T> class Array: public DataClass
 {
   // begin import
@@ -403,3 +438,4 @@ Array<D,T> Array<D,T>::operator +(const Array<D,T>& in2) const
 }
 
 #endif
+#endif // __loaded__array_h__

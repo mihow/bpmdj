@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,8 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-#ifndef __BPMDJ___HISTORY_H__
-#define __BPMDJ___HISTORY_H__
+#ifndef __loaded__history_h__
+#define __loaded__history_h__
 using namespace std;
 #line 1 "history.h++"
 #include <stdlib.h>
@@ -29,24 +29,26 @@ using namespace std;
 #include "data.h"
 
 /**
- * A class to represent the song already played
+ * A singleton class to represent the song already played
  */
 class History
 {
 private:
   static Song * t_2;  // T - 2
   static Song * t_1;  // T - 1
-  static Song * t_0;  // T    
-  static FILE* f;
-  static QString history_filename;
+  static Song * t_0;  // T
+  static FILE* file;
+  static QByteArray filename;
   singleton_accessors(int,songs_played);
   static Q3ListView * log_ui;
   static void mark_as_played(DataBase * db, QString s);
   static void mark_as_played(Song *song);
 public:
-  History(const QString filename, DataBase * db, Q3ListView * putin);
+  static void mark_all_played_songs(DataBase * db);
+  static void init(const QString filename, Q3ListView * putin);
+  void init(const QString filename, DataBase * db, Q3ListView * putin);
   static void this_is_playing(Song * main_now);
   static void save_history();
   static void clear_history(DataBase * db);
 };
-#endif
+#endif // __loaded__history_h__

@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,6 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
+#ifndef __loaded__song_information_cpp__
+#define __loaded__song_information_cpp__
 using namespace std;
 #line 1 "song-information.c++"
 #include "index.h"
@@ -53,3 +55,4 @@ void SongInformation::on_save_clicked()
   showing->index_disabled_capacities = get_capacity(capacity);
   showing->meta_changed |= old_disabled_capacity!=showing->index_disabled_capacities;
 }
+#endif // __loaded__song_information_cpp__

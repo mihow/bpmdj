@@ -7,6 +7,7 @@
 #include <Qt3Support/Q3GroupBox>
 #include <Qt3Support/Q3Header>
 #include <Qt3Support/Q3ListView>
+#include <Qt3Support/Q3MimeSourceFactory>
 #include <QtCore/QVariant>
 #include <QtGui/QAction>
 #include <QtGui/QApplication>
@@ -18,7 +19,6 @@
 #include <QtGui/QLineEdit>
 #include <QtGui/QPushButton>
 #include <QtGui/QSpacerItem>
-#include <Qt3Support/Q3MimeSourceFactory>
 
 class Ui_Renamer
 {
@@ -59,7 +59,11 @@ public:
 
     void setupUi(QDialog *Renamer)
     {
-    Renamer->setObjectName(QString::fromUtf8("Renamer"));
+    if (Renamer->objectName().isEmpty())
+        Renamer->setObjectName(QString::fromUtf8("Renamer"));
+    QSize size(667, 471);
+    size = size.expandedTo(Renamer->minimumSizeHint());
+    Renamer->resize(size);
     gridLayout = new QGridLayout(Renamer);
     gridLayout->setSpacing(6);
     gridLayout->setMargin(11);
@@ -79,11 +83,8 @@ public:
 
     TextLabel1 = new QLabel(Renamer);
     TextLabel1->setObjectName(QString::fromUtf8("TextLabel1"));
-    QSizePolicy sizePolicy1(static_cast<QSizePolicy::Policy>(5), static_cast<QSizePolicy::Policy>(1));
-    sizePolicy1.setHorizontalStretch(0);
-    sizePolicy1.setVerticalStretch(0);
-    sizePolicy1.setHeightForWidth(TextLabel1->sizePolicy().hasHeightForWidth());
-    TextLabel1->setSizePolicy(sizePolicy1);
+    sizePolicy.setHeightForWidth(TextLabel1->sizePolicy().hasHeightForWidth());
+    TextLabel1->setSizePolicy(sizePolicy);
     TextLabel1->setWordWrap(false);
 
     gridLayout->addWidget(TextLabel1, 2, 0, 1, 1);
@@ -104,9 +105,7 @@ public:
 
     SubString = new QLineEdit(Renamer);
     SubString->setObjectName(QString::fromUtf8("SubString"));
-    QFont font1;
-    font1.setFamily(QString::fromUtf8("adobe-courier"));
-    SubString->setFont(font1);
+    SubString->setFont(font);
 
     gridLayout->addWidget(SubString, 1, 1, 1, 5);
 
@@ -121,9 +120,7 @@ public:
     NameList->header()->setClickEnabled(true, NameList->header()->count() - 1);
     NameList->header()->setResizeEnabled(true, NameList->header()->count() - 1);
     NameList->setObjectName(QString::fromUtf8("NameList"));
-    QFont font2;
-    font2.setFamily(QString::fromUtf8("adobe-courier"));
-    NameList->setFont(font2);
+    NameList->setFont(font);
     NameList->setFrameShape(QFrame::NoFrame);
     NameList->setSelectionMode(Q3ListView::Extended);
     NameList->setAllColumnsShowFocus(true);
@@ -132,19 +129,20 @@ public:
 
     GroupBox1 = new Q3GroupBox(Renamer);
     GroupBox1->setObjectName(QString::fromUtf8("GroupBox1"));
-    QSizePolicy sizePolicy2(static_cast<QSizePolicy::Policy>(1), static_cast<QSizePolicy::Policy>(5));
-    sizePolicy2.setHorizontalStretch(0);
-    sizePolicy2.setVerticalStretch(0);
-    sizePolicy2.setHeightForWidth(GroupBox1->sizePolicy().hasHeightForWidth());
-    GroupBox1->setSizePolicy(sizePolicy2);
+    QSizePolicy sizePolicy1(static_cast<QSizePolicy::Policy>(1), static_cast<QSizePolicy::Policy>(5));
+    sizePolicy1.setHorizontalStretch(0);
+    sizePolicy1.setVerticalStretch(0);
+    sizePolicy1.setHeightForWidth(GroupBox1->sizePolicy().hasHeightForWidth());
+    GroupBox1->setSizePolicy(sizePolicy1);
     GroupBox1->setColumnLayout(0, Qt::Vertical);
     GroupBox1->layout()->setSpacing(6);
     GroupBox1->layout()->setMargin(11);
-    gridLayout1 = new QGridLayout(GroupBox1->layout());
+    gridLayout1 = new QGridLayout();
+    QBoxLayout *boxlayout = qobject_cast<QBoxLayout *>(GroupBox1->layout());
+    if (boxlayout)
+        boxlayout->addLayout(gridLayout1);
     gridLayout1->setAlignment(Qt::AlignTop);
     gridLayout1->setObjectName(QString::fromUtf8("gridLayout1"));
-    gridLayout1->setMargin(11);
-    gridLayout1->setSpacing(6);
     PushButton5 = new QPushButton(GroupBox1);
     PushButton5->setObjectName(QString::fromUtf8("PushButton5"));
 
@@ -153,11 +151,11 @@ public:
     PushButton101 = new QPushButton(GroupBox1);
     PushButton101->setObjectName(QString::fromUtf8("PushButton101"));
     PushButton101->setEnabled(true);
-    QSizePolicy sizePolicy3(static_cast<QSizePolicy::Policy>(5), static_cast<QSizePolicy::Policy>(0));
-    sizePolicy3.setHorizontalStretch(0);
-    sizePolicy3.setVerticalStretch(0);
-    sizePolicy3.setHeightForWidth(PushButton101->sizePolicy().hasHeightForWidth());
-    PushButton101->setSizePolicy(sizePolicy3);
+    QSizePolicy sizePolicy2(static_cast<QSizePolicy::Policy>(5), static_cast<QSizePolicy::Policy>(0));
+    sizePolicy2.setHorizontalStretch(0);
+    sizePolicy2.setVerticalStretch(0);
+    sizePolicy2.setHeightForWidth(PushButton101->sizePolicy().hasHeightForWidth());
+    PushButton101->setSizePolicy(sizePolicy2);
 
     gridLayout1->addWidget(PushButton101, 1, 0, 1, 1);
 
@@ -177,26 +175,21 @@ public:
 
     GroupBox2 = new Q3GroupBox(Renamer);
     GroupBox2->setObjectName(QString::fromUtf8("GroupBox2"));
-    QSizePolicy sizePolicy4(static_cast<QSizePolicy::Policy>(1), static_cast<QSizePolicy::Policy>(5));
-    sizePolicy4.setHorizontalStretch(0);
-    sizePolicy4.setVerticalStretch(0);
-    sizePolicy4.setHeightForWidth(GroupBox2->sizePolicy().hasHeightForWidth());
-    GroupBox2->setSizePolicy(sizePolicy4);
+    sizePolicy1.setHeightForWidth(GroupBox2->sizePolicy().hasHeightForWidth());
+    GroupBox2->setSizePolicy(sizePolicy1);
     GroupBox2->setColumnLayout(0, Qt::Vertical);
     GroupBox2->layout()->setSpacing(6);
     GroupBox2->layout()->setMargin(11);
-    gridLayout2 = new QGridLayout(GroupBox2->layout());
+    gridLayout2 = new QGridLayout();
+    QBoxLayout *boxlayout1 = qobject_cast<QBoxLayout *>(GroupBox2->layout());
+    if (boxlayout1)
+        boxlayout1->addLayout(gridLayout2);
     gridLayout2->setAlignment(Qt::AlignTop);
     gridLayout2->setObjectName(QString::fromUtf8("gridLayout2"));
-    gridLayout2->setMargin(11);
-    gridLayout2->setSpacing(6);
     PushButton6 = new QPushButton(GroupBox2);
     PushButton6->setObjectName(QString::fromUtf8("PushButton6"));
-    QSizePolicy sizePolicy5(static_cast<QSizePolicy::Policy>(5), static_cast<QSizePolicy::Policy>(0));
-    sizePolicy5.setHorizontalStretch(0);
-    sizePolicy5.setVerticalStretch(0);
-    sizePolicy5.setHeightForWidth(PushButton6->sizePolicy().hasHeightForWidth());
-    PushButton6->setSizePolicy(sizePolicy5);
+    sizePolicy2.setHeightForWidth(PushButton6->sizePolicy().hasHeightForWidth());
+    PushButton6->setSizePolicy(sizePolicy2);
 
     gridLayout2->addWidget(PushButton6, 1, 0, 1, 1);
 
@@ -207,11 +200,8 @@ public:
 
     PushButton13 = new QPushButton(GroupBox2);
     PushButton13->setObjectName(QString::fromUtf8("PushButton13"));
-    QSizePolicy sizePolicy6(static_cast<QSizePolicy::Policy>(5), static_cast<QSizePolicy::Policy>(0));
-    sizePolicy6.setHorizontalStretch(0);
-    sizePolicy6.setVerticalStretch(0);
-    sizePolicy6.setHeightForWidth(PushButton13->sizePolicy().hasHeightForWidth());
-    PushButton13->setSizePolicy(sizePolicy6);
+    sizePolicy2.setHeightForWidth(PushButton13->sizePolicy().hasHeightForWidth());
+    PushButton13->setSizePolicy(sizePolicy2);
 
     gridLayout2->addWidget(PushButton13, 1, 1, 1, 1);
 
@@ -236,31 +226,22 @@ public:
 
     PushButton34 = new QPushButton(Renamer);
     PushButton34->setObjectName(QString::fromUtf8("PushButton34"));
-    QSizePolicy sizePolicy7(static_cast<QSizePolicy::Policy>(5), static_cast<QSizePolicy::Policy>(0));
-    sizePolicy7.setHorizontalStretch(0);
-    sizePolicy7.setVerticalStretch(0);
-    sizePolicy7.setHeightForWidth(PushButton34->sizePolicy().hasHeightForWidth());
-    PushButton34->setSizePolicy(sizePolicy7);
+    sizePolicy2.setHeightForWidth(PushButton34->sizePolicy().hasHeightForWidth());
+    PushButton34->setSizePolicy(sizePolicy2);
 
     gridLayout->addWidget(PushButton34, 5, 3, 1, 1);
 
     PushButton16 = new QPushButton(Renamer);
     PushButton16->setObjectName(QString::fromUtf8("PushButton16"));
-    QSizePolicy sizePolicy8(static_cast<QSizePolicy::Policy>(5), static_cast<QSizePolicy::Policy>(0));
-    sizePolicy8.setHorizontalStretch(0);
-    sizePolicy8.setVerticalStretch(0);
-    sizePolicy8.setHeightForWidth(PushButton16->sizePolicy().hasHeightForWidth());
-    PushButton16->setSizePolicy(sizePolicy8);
+    sizePolicy2.setHeightForWidth(PushButton16->sizePolicy().hasHeightForWidth());
+    PushButton16->setSizePolicy(sizePolicy2);
 
     gridLayout->addWidget(PushButton16, 5, 4, 1, 1);
 
     PushButton35 = new QPushButton(Renamer);
     PushButton35->setObjectName(QString::fromUtf8("PushButton35"));
-    QSizePolicy sizePolicy9(static_cast<QSizePolicy::Policy>(5), static_cast<QSizePolicy::Policy>(0));
-    sizePolicy9.setHorizontalStretch(0);
-    sizePolicy9.setVerticalStretch(0);
-    sizePolicy9.setHeightForWidth(PushButton35->sizePolicy().hasHeightForWidth());
-    PushButton35->setSizePolicy(sizePolicy9);
+    sizePolicy2.setHeightForWidth(PushButton35->sizePolicy().hasHeightForWidth());
+    PushButton35->setSizePolicy(sizePolicy2);
 
     gridLayout->addWidget(PushButton35, 5, 5, 1, 1);
 
@@ -273,58 +254,44 @@ public:
 
     GroupBox3 = new Q3GroupBox(Renamer);
     GroupBox3->setObjectName(QString::fromUtf8("GroupBox3"));
-    QSizePolicy sizePolicy10(static_cast<QSizePolicy::Policy>(1), static_cast<QSizePolicy::Policy>(5));
-    sizePolicy10.setHorizontalStretch(0);
-    sizePolicy10.setVerticalStretch(0);
-    sizePolicy10.setHeightForWidth(GroupBox3->sizePolicy().hasHeightForWidth());
-    GroupBox3->setSizePolicy(sizePolicy10);
+    sizePolicy1.setHeightForWidth(GroupBox3->sizePolicy().hasHeightForWidth());
+    GroupBox3->setSizePolicy(sizePolicy1);
     GroupBox3->setColumnLayout(0, Qt::Vertical);
     GroupBox3->layout()->setSpacing(6);
     GroupBox3->layout()->setMargin(11);
-    gridLayout3 = new QGridLayout(GroupBox3->layout());
+    gridLayout3 = new QGridLayout();
+    QBoxLayout *boxlayout2 = qobject_cast<QBoxLayout *>(GroupBox3->layout());
+    if (boxlayout2)
+        boxlayout2->addLayout(gridLayout3);
     gridLayout3->setAlignment(Qt::AlignTop);
     gridLayout3->setObjectName(QString::fromUtf8("gridLayout3"));
-    gridLayout3->setMargin(11);
-    gridLayout3->setSpacing(6);
     PushButton7 = new QPushButton(GroupBox3);
     PushButton7->setObjectName(QString::fromUtf8("PushButton7"));
-    QSizePolicy sizePolicy11(static_cast<QSizePolicy::Policy>(5), static_cast<QSizePolicy::Policy>(0));
-    sizePolicy11.setHorizontalStretch(0);
-    sizePolicy11.setVerticalStretch(0);
-    sizePolicy11.setHeightForWidth(PushButton7->sizePolicy().hasHeightForWidth());
-    PushButton7->setSizePolicy(sizePolicy11);
+    sizePolicy2.setHeightForWidth(PushButton7->sizePolicy().hasHeightForWidth());
+    PushButton7->setSizePolicy(sizePolicy2);
 
     gridLayout3->addWidget(PushButton7, 0, 0, 1, 1);
 
     PushButton12 = new QPushButton(GroupBox3);
     PushButton12->setObjectName(QString::fromUtf8("PushButton12"));
-    QSizePolicy sizePolicy12(static_cast<QSizePolicy::Policy>(5), static_cast<QSizePolicy::Policy>(0));
-    sizePolicy12.setHorizontalStretch(0);
-    sizePolicy12.setVerticalStretch(0);
-    sizePolicy12.setHeightForWidth(PushButton12->sizePolicy().hasHeightForWidth());
-    PushButton12->setSizePolicy(sizePolicy12);
+    sizePolicy2.setHeightForWidth(PushButton12->sizePolicy().hasHeightForWidth());
+    PushButton12->setSizePolicy(sizePolicy2);
 
     gridLayout3->addWidget(PushButton12, 1, 0, 1, 1);
 
     isMixButton = new QPushButton(GroupBox3);
     isMixButton->setObjectName(QString::fromUtf8("isMixButton"));
     isMixButton->setEnabled(true);
-    QSizePolicy sizePolicy13(static_cast<QSizePolicy::Policy>(5), static_cast<QSizePolicy::Policy>(0));
-    sizePolicy13.setHorizontalStretch(0);
-    sizePolicy13.setVerticalStretch(0);
-    sizePolicy13.setHeightForWidth(isMixButton->sizePolicy().hasHeightForWidth());
-    isMixButton->setSizePolicy(sizePolicy13);
+    sizePolicy2.setHeightForWidth(isMixButton->sizePolicy().hasHeightForWidth());
+    isMixButton->setSizePolicy(sizePolicy2);
 
     gridLayout3->addWidget(isMixButton, 0, 1, 1, 2);
 
     pushButton17 = new QPushButton(GroupBox3);
     pushButton17->setObjectName(QString::fromUtf8("pushButton17"));
     pushButton17->setEnabled(true);
-    QSizePolicy sizePolicy14(static_cast<QSizePolicy::Policy>(5), static_cast<QSizePolicy::Policy>(0));
-    sizePolicy14.setHorizontalStretch(0);
-    sizePolicy14.setVerticalStretch(0);
-    sizePolicy14.setHeightForWidth(pushButton17->sizePolicy().hasHeightForWidth());
-    pushButton17->setSizePolicy(sizePolicy14);
+    sizePolicy2.setHeightForWidth(pushButton17->sizePolicy().hasHeightForWidth());
+    pushButton17->setSizePolicy(sizePolicy2);
 
     gridLayout3->addWidget(pushButton17, 1, 1, 1, 2);
 
@@ -344,11 +311,6 @@ public:
 
 
     retranslateUi(Renamer);
-
-    QSize size(667, 471);
-    size = size.expandedTo(Renamer->minimumSizeHint());
-    Renamer->resize(size);
-
     QObject::connect(PushButton35, SIGNAL(clicked()), Renamer, SLOT(reject()));
     QObject::connect(PushButton5, SIGNAL(clicked()), Renamer, SLOT(smallCapsInWords()));
     QObject::connect(PushButton3, SIGNAL(clicked()), Renamer, SLOT(capitalizeAfterSpace()));

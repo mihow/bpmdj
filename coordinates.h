@@ -1,3 +1,7 @@
+#ifndef __loaded__coordinates_h__
+#define __loaded__coordinates_h__
+using namespace std;
+#line 1 "coordinates.h++"
 /****
  Om-Data
  Copyright (C) 2005-2006 Werner Van Belle
@@ -283,3 +287,4 @@ template <int D> class From:     public _Coordinate<D>
 };
 
 #endif 
+#endif // __loaded__coordinates_h__

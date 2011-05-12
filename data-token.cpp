@@ -1,3 +1,7 @@
+#ifndef __loaded__data_token_cpp__
+#define __loaded__data_token_cpp__
+using namespace std;
+#line 1 "data-token.c++"
 /****
  Om-Data
  Copyright (C) 2005-2006 Werner Van Belle
@@ -17,7 +21,7 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#include "token.h"
+#include "data-token.h"
 #include "data-visitor.h"
 
 //---------------------------------------------------------------
@@ -87,3 +91,4 @@ void Token::visit(DataVisitor&v)
   v.visit(*this);
 }
 
+#endif // __loaded__data_token_cpp__

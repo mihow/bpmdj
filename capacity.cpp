@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,6 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
+#ifndef __loaded__capacity_cpp__
+#define __loaded__capacity_cpp__
 using namespace std;
 #line 1 "capacity.c++"
 #include <qcheckbox.h>
@@ -31,8 +33,14 @@ Capacity get_ext_disabled_capacities(QString ext)
   if (ext.endsWith(".mp3"))  return CAPACITY_OGG123                                                             ;
   if (ext.endsWith(".ogg"))  return                   CAPACITY_MPG123059R | CAPACITY_MPG321;
   if (ext.endsWith(".m4a"))  return CAPACITY_OGG123 | CAPACITY_MPG123059R | CAPACITY_MPG321;
+  if (ext.endsWith(".mpc"))  return CAPACITY_OGG123 | CAPACITY_MPG123059R | CAPACITY_MPG321;
   if (ext.endsWith(".flac")) return                   CAPACITY_MPG123059R | CAPACITY_MPG321;
   return ~0;
+}
+
+QString extensionList()
+{
+  return ".mp3 .ogg .m4a .mpc .flac";
 }
 
 bool goodExtension(QString ext)
@@ -41,6 +49,7 @@ bool goodExtension(QString ext)
   return (ext.endsWith(".mp3") || 
 	  ext.endsWith(".ogg") || 
 	  ext.endsWith(".m4a") || 
+	  ext.endsWith(".mpc") || 
 	  ext.endsWith(".flac"));
 }
 
@@ -138,3 +147,4 @@ int set_decoder_environment(PlayerConfig * config, Index * idx)
   putenv(strdup(environment));
   return decoder;
 }
+#endif // __loaded__capacity_cpp__

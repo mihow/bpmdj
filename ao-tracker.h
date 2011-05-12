@@ -60,6 +60,7 @@ class ActiveAoTracker_msg_: public ReferenceCount
 class ActiveAoTracker: public ActiveObject<Smart< ActiveAoTracker_msg_ > >
 {
   friend class AoTracker;
+  AoTracker * self;
     virtual elementResult handle(Smart< ActiveAoTracker_msg_> cmd)
       {
         if (cmd) return cmd->run(this);
@@ -71,8 +72,8 @@ class ActiveAoTracker: public ActiveObject<Smart< ActiveAoTracker_msg_ > >
   public: elementResult sunrise(string s);
   protected: void queue_sunrise(string s);
   protected:
-    ActiveAoTracker(string name="AoTracker"):
-      ActiveObject<Smart< ActiveAoTracker_msg_ > >(name)
+    ActiveAoTracker(AoTracker* s, string name):
+      ActiveObject<Smart< ActiveAoTracker_msg_ > >(name), self(s)
       {
       };
 };
@@ -129,6 +130,8 @@ class AoTracker
 {
   private:
     ActiveAoTracker object;
+  public:
+    AoTracker(string name="AoTracker"): object(this, name) {};
   public:
     void sunset(string s)
     {

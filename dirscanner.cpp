@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,6 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
+#ifndef __loaded__dirscanner_cpp__
+#define __loaded__dirscanner_cpp__
 using namespace std;
 #line 1 "dirscanner.c++"
 #include <stdio.h>
@@ -144,3 +146,4 @@ void DirectoryScanner::scanfile(const QString dir, const QString filename)
   if (matchextension(filename))
     checkfile(dir,filename);
 }
+#endif // __loaded__dirscanner_cpp__

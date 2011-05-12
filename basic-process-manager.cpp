@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,6 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
+#ifndef __loaded__basic_process_manager_cpp__
+#define __loaded__basic_process_manager_cpp__
 using namespace std;
 #line 1 "basic-process-manager.c++"
 #include <unistd.h>
@@ -71,9 +73,13 @@ void DiedProcesses::check()
     died = died_pids;
     died_pids.clear();
   }
-  simpleSetIterator<int> dead(died); ITERATE_OVER(dead)
+  simpleSetIterator<int> dead(died);
+ITERATE_OVER(dead)
+
     {
-      vectorIterator<BasicProcessManager*> listener(listeners); ITERATE_OVER(listener)
+      vectorIterator<BasicProcessManager*> listener(listeners);
+ITERATE_OVER(listener)
+
 	listener.val()->processDied(dead.val());
       }
     }
@@ -191,3 +197,4 @@ void BasicProcessManager::start(int id,const char* command, QString logname, boo
       _exit(0);
     }
 }
+#endif // __loaded__basic_process_manager_cpp__

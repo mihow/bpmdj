@@ -1,4 +1,3 @@
-#include "ui-includes.h" // PCH include
 #include "mixerdialog.h"
 
 #include <qvariant.h>

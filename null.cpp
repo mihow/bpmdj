@@ -1,3 +1,7 @@
+#ifndef __loaded__null_cpp__
+#define __loaded__null_cpp__
+using namespace std;
+#line 1 "null.c++"
 /****
  Om-Data
   Copyright (C) 2005-2006 Werner Van Belle
@@ -26,3 +30,4 @@ void Null::crash() const
   printf("Action called upon Null\n");
   assert(0);
 }
+#endif // __loaded__null_cpp__

@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,8 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-#ifndef __BPMDJ___BPMDJ_EVENT_H__
-#define __BPMDJ___BPMDJ_EVENT_H__
+#ifndef __loaded__bpmdj_event_h__
+#define __loaded__bpmdj_event_h__
 using namespace std;
 #line 1 "bpmdj-event.h++"
 #include "custom-event.h"
@@ -39,4 +39,4 @@ class BpmDjEvent: public QEvent
   }
   virtual void run(SongSelectorLogic * song_selector) = 0;
 };
-#endif
+#endif // __loaded__bpmdj_event_h__

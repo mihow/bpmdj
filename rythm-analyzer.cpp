@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,6 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
+#ifndef __loaded__rythm_analyzer_cpp__
+#define __loaded__rythm_analyzer_cpp__
 using namespace std;
 #line 1 "rythm-analyzer.c++"
 #include <qapplication.h>
@@ -358,7 +360,7 @@ void write_out_projection(long slice_size, unsigned4* phases, int maximum_slice,
  * In this routine we go through the song window size by window size and 
  * we subtract the energy of x windows ago, we keep the phase as it was. 
  */
-void write_out_projection_hald_working(unsigned long slice_size, unsigned4* phases, int maximum_slice, const char* target)
+void write_out_projection_hald_working(unsigned4 slice_size, unsigned4* phases, int maximum_slice, const char* target)
 {
   int frame_size = higher_power_of_two(2 * WAVRATE / 40);
   Signal<double,2> curr_frame(frame_size);
@@ -1036,3 +1038,4 @@ void RythmAnalyzer::calculateRythmPattern2()
   status_bar->setText("Done");
   free_bark_fft2();
 }
+#endif // __loaded__rythm_analyzer_cpp__

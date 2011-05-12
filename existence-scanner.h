@@ -60,6 +60,7 @@ class ActiveExistenceScanner_msg_: public ReferenceCount
 class ActiveExistenceScanner: public ActiveObject<Smart< ActiveExistenceScanner_msg_ > >
 {
   friend class ExistenceScanner;
+  ExistenceScanner * self;
     virtual elementResult handle(Smart< ActiveExistenceScanner_msg_> cmd)
       {
         if (cmd) return cmd->run(this);
@@ -74,8 +75,8 @@ class ActiveExistenceScanner: public ActiveObject<Smart< ActiveExistenceScanner_
   public: elementResult terminate();
   protected: void queue_terminate();
   protected:
-    ActiveExistenceScanner(string name="ExistenceScanner"):
-      ActiveObject<Smart< ActiveExistenceScanner_msg_ > >(name)
+    ActiveExistenceScanner(ExistenceScanner* s, string name):
+      ActiveObject<Smart< ActiveExistenceScanner_msg_ > >(name), self(s)
       {
       current =  0;
       songs = NULL;
@@ -154,6 +155,8 @@ class ExistenceScanner
 {
   private:
     ActiveExistenceScanner object;
+  public:
+    ExistenceScanner(string name="ExistenceScanner"): object(this, name) {};
   public:
     void start(vector < Song* > * all)
     {

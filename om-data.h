@@ -1,3 +1,7 @@
+#ifndef __loaded__om_data_h__
+#define __loaded__om_data_h__
+using namespace std;
+#line 1 "om-data.h++"
 /****
  Om-Data
  Copyright (C) 2005-2006 Werner Van Belle
@@ -21,8 +25,8 @@
 #define OM_DATA_LOADER_H
 #include "data.h"
 #include "symbol.h"
-#include "token.h"
-#include "string.h"
+#include "data-token.h"
+#include "data-string.h"
 #include "array.h"
 #include "array-storage.h"
 #include "array-meta.h"
@@ -30,3 +34,4 @@
 #include "numbers.h"
 #include "data-io.h"
 #endif
+#endif // __loaded__om_data_h__

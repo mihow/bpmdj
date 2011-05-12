@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,6 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
+#ifndef __loaded__statistics_cpp__
+#define __loaded__statistics_cpp__
 using namespace std;
 #line 1 "statistics.c++"
 #include <assert.h>
@@ -320,7 +322,9 @@ void Statistics::update()
   float * * echo_stack = bpmdj_allocate(all.size(),float *);
   int vec_size = spectrum_size*echo_prop_sx;
   int nr = 0;
-  constVectorIterator<Song*> song(all); ITERATE_OVER(song)
+  constVectorIterator<Song*> song(all);
+ITERATE_OVER(song)
+
     echo_property echo = song.val()->get_histogram();
     if (!echo.empty())
     {
@@ -599,3 +603,4 @@ void SongSelectorLogic::openStatistics()
   Statistics dialog(this,database);
   dialog.exec();
 }
+#endif // __loaded__statistics_cpp__

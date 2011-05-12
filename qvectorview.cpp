@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,6 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
+#ifndef __loaded__qvectorview_cpp__
+#define __loaded__qvectorview_cpp__
 using namespace std;
 #line 1 "qvectorview.c++"
 #include <iostream>
@@ -1340,7 +1342,9 @@ void QVectorView::repaintItem( int item )
 {
   if ( item<0 || item >= item_container->vectorSize() ) return;
   d_dirtyItemTimer->start( 0, TRUE );
-  vectorIterator<int> i(dirty_items); ITERATE_OVER(i)
+  vectorIterator<int> i(dirty_items);
+ITERATE_OVER(i)
+
     if (i.val()==item) return; // its already there
   }
   dirty_items.push_back(item);
@@ -1568,3 +1572,4 @@ void QVectorView::adjustColumn( int col )
 {
   d_h->isStretchEnabled( col );
 }
+#endif // __loaded__qvectorview_cpp__

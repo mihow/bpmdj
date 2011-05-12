@@ -4,6 +4,7 @@
 #include <qvariant.h>
 
 
+#include <Qt3Support/Q3MimeSourceFactory>
 #include <QtCore/QVariant>
 #include <QtGui/QAction>
 #include <QtGui/QApplication>
@@ -11,7 +12,6 @@
 #include <QtGui/QDialog>
 #include <QtGui/QGridLayout>
 #include <QtGui/QLabel>
-#include <Qt3Support/Q3MimeSourceFactory>
 
 class Ui_FrequencyDialog
 {
@@ -22,7 +22,11 @@ public:
 
     void setupUi(QDialog *FrequencyDialog)
     {
-    FrequencyDialog->setObjectName(QString::fromUtf8("FrequencyDialog"));
+    if (FrequencyDialog->objectName().isEmpty())
+        FrequencyDialog->setObjectName(QString::fromUtf8("FrequencyDialog"));
+    QSize size(420, 426);
+    size = size.expandedTo(FrequencyDialog->minimumSizeHint());
+    FrequencyDialog->resize(size);
     gridLayout = new QGridLayout(FrequencyDialog);
     gridLayout->setSpacing(6);
     gridLayout->setMargin(11);
@@ -56,11 +60,6 @@ public:
 
 
     retranslateUi(FrequencyDialog);
-
-    QSize size(420, 426);
-    size = size.expandedTo(FrequencyDialog->minimumSizeHint());
-    FrequencyDialog->resize(size);
-
 
     QMetaObject::connectSlotsByName(FrequencyDialog);
     } // setupUi

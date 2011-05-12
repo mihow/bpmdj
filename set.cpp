@@ -1,3 +1,7 @@
+#ifndef __loaded__set_cpp__
+#define __loaded__set_cpp__
+using namespace std;
+#line 1 "set.c++"
 /****
  Om-Data
  Copyright (C) 2005-2006 Werner Van Belle
@@ -43,3 +47,4 @@ void Set::add(const Data& val)
    content[next_element]=val;
    next_element++;
 }
+#endif // __loaded__set_cpp__

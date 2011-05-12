@@ -1,4 +1,3 @@
-/* Automatically generated file, please edit ao-scheduler.c++ */
 /****
  Borg IV
  Copyright (C) 2006-2007 Werner Van Belle
@@ -18,6 +17,8 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
+#ifndef __loaded__ao_scheduler_cpp__
+#define __loaded__ao_scheduler_cpp__
 using namespace std;
 #line 1 "ao-scheduler.c++"
 #include <string>
@@ -66,3 +67,4 @@ void SpawnWhenActivated::start(Runnable * torun)
     };
   pthread_detach(*y);
 }
+#endif // __loaded__ao_scheduler_cpp__

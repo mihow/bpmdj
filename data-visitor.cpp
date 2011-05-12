@@ -1,3 +1,7 @@
+#ifndef __loaded__data_visitor_cpp__
+#define __loaded__data_visitor_cpp__
+using namespace std;
+#line 1 "data-visitor.c++"
 /****
  Om-Data
  Copyright (C) 2005-2006 Werner Van Belle
@@ -70,3 +74,4 @@ void DataVisitor::visit(Unsigned8 &nr)
   visitUnsignedNumber(nr(),nr.letter());
 };
 
+#endif // __loaded__data_visitor_cpp__

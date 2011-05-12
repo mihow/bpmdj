@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,8 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-#ifndef __BPMDJ___QUEUEDSONG_H__
-#define __BPMDJ___QUEUEDSONG_H__
+#ifndef __loaded__queuedsong_h__
+#define __loaded__queuedsong_h__
 using namespace std;
 #line 1 "queuedsong.h++"
 #include <q3listview.h>
@@ -46,7 +46,6 @@ class QueuedSong:
     virtual void paintCell(QPainter *p, const QColorGroup &cg, int col, int wid, int align);
     virtual QString text(int i) const;
 };
-
 
 #define ANAL_TITLE 0
 #define ANAL_AUTHOR 1
@@ -78,4 +77,4 @@ class QueuedAnalSong:
     virtual QString text(int i) const;
     QString getCommand(SongProcess& p);
 };
-#endif
+#endif // __loaded__queuedsong_h__

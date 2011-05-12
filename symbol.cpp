@@ -1,3 +1,7 @@
+#ifndef __loaded__symbol_cpp__
+#define __loaded__symbol_cpp__
+using namespace std;
+#line 1 "symbol.c++"
 /****
  Om-Data
  Copyright (C) 2005-2006 Werner Van Belle
@@ -45,3 +49,4 @@ void Symbol::visit(DataVisitor& v)
 {
   v.visit(*this);
 };
+#endif // __loaded__symbol_cpp__

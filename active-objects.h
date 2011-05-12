@@ -17,8 +17,8 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#ifndef __BORGIV_ACTIVE_OBJECTS_H__
-#define __BORGIV_ACTIVE_OBJECTS_H__
+#ifndef __loaded__active_objects_h__
+#define __loaded__active_objects_h__
 using namespace std;
 #line 1 "active-objects.h++"
 #include <iostream>
@@ -37,8 +37,54 @@ typedef enum{RevisitLater, Revisit, RevisitAfterIncoming, Done, Interrupt} eleme
 
 /**
  * @defgroup ao Active Objects
+ *
+ * The past few years have seen a growing proliferation of threading
+ * libraries. This has been mainly fueled by the problems of crunching 
+ * more bytes per second. Instead its seems easier for chip fabricants 
+ * to provide parallelism. A second reason, why more parallelism is 
+ * found in programming langauges is that certain libraries force 
+ * multi-threading upon the programmer. Especially Java comes to mind 
+ * here. Another example is Qt, which in release 3 could lead to all 
+ * kinds of interesting concurrency problems. A third readon is the 
+ * growing use of distributed systems, which are inherent concurrent 
+ * systems as well. Given these major driving forces, we find that 
+ * there are still very few useable programming abstractions that shield
+ * the programmer from the intrinsic problems of concurrency. Common 
+ * Threading Problems:
  * 
- * These pages document the active objects as used in Borg4. The active objects are supported by a compact
+ * - concurrent data accses messes up program execution if done improperly
+ *   and slows down program execution if done properly (locking).
+ * - often threads are in an undefined state: is the threath being started, 
+ *   is it stopping ? Can we start it again or will the message that I sent 
+ *   it now really be delivered ?
+ * - Where is the code located that runs in this thread. Or rather how 
+ *   does the thread weave itself througout the program ?
+ *
+ * To remedy these problmems we, you guessed it, developed our own threading/process
+ * library :) In Borg4 all threads are syntactically encapsulated in one file. At runtime they
+ * are isolated in space (memory) and time (messages are delivered asynchronously)
+ *
+ * The entire architecture is build around 'active queues'. These are objects
+ * aimed to faciliate inter thread communication thereby sepearting different
+ * threads in space and time from each other. Next to this they also aim to 
+ * improve performance of typical 'waiting' loops by automatically activating 
+ * those queues where necessary. An active queue consits logically out of a queue
+ * and a message handler inside the queue. The message handler will be called 
+ * when necessary and must return its control flow back to the caller as soon 
+ * as the message is handled. During message handling new information might be
+ * put into the queue. Since this might lead to interesting concurrency 
+ * problems we chose to adapt a 'stable state view' onto the queue, meaning that
+ * during handling of a message the state of the queue will remain stable. This 
+ * is achieved by seperating the internals of an active queue in 3 different 
+ * queues. The first queue is the queue with incoming messages. Anybody wanting
+ * to push data into this queue need to lock the active queue. The second queue
+ * is the handling queue, which is automatically copied from the incoming queue
+ * as soon as new information arrives. The queue's actives side should only access
+ * the handling queue. To allow messages to be passed to other entitites that 
+ * might be interested in receiving data from the queue, an outgoing queue is available.
+ *
+ * These pages document the active objects as used in Borg4. 
+ * The active objects are supported by a compact
  * runtime that allows messages to be queued into objects, which will then in turn be activated as soon as
  * new messages are available. The runtime is mainly accessed through the @ref ActiveObject class.
  * 
@@ -441,4 +487,4 @@ protected:
     return Interrupt;
   }
 };
-#endif
+#endif // __loaded__active_objects_h__

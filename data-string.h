@@ -1,3 +1,7 @@
+#ifndef __loaded__data_string_h__
+#define __loaded__data_string_h__
+using namespace std;
+#line 1 "data-string.h++"
 /****
  Om-Data
  Copyright (C) 2005-2006 Werner Van Belle
@@ -17,27 +21,16 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#ifndef TOKEN_H
-#define TOKEN_H
-#include <vector>
-#include <map>
-#include "symbol.h"
-using namespace std;
+#ifndef OM_STRING_H
+#define OM_STRING_H
+#include "data.h"
 
 //---------------------------------------------------------------
-//                            Token
+//                            String
 //---------------------------------------------------------------
-class Token: public DataClass
+class String: public DataClass
 {
-  struct TokenContent
-  {
-    map<Symbol, Data, symbolLesser> content;
-    int refcount;
-    TokenContent() : content() 
-    {
-      refcount = 1;
-    };
-  } * content;
+  QString text;
  protected:
   virtual QString type_name() const 
     {
@@ -45,46 +38,28 @@ class Token: public DataClass
     };
   virtual DataClass* shallow_copy() const 
     {
-      return new Token(*this);
+      return new String(text);
     };
-  virtual void visit(DataVisitor&v);
  public:
-  static QString type() 
+  static QString type()
     {
-      return "Token";
+      return "String";
     }
-  Token();
-  Token(const Token& dc);
-  Token& operator = (const Token& dc);
-  virtual ~Token();
-
-  int count() const 
+  String(QString s) : text(s) 
     {
-      return content->content.size(); 
     };
-  void define(Symbol key, Data val) 
+  QString operator ()() const 
     {
-      content->content[key]=val;
+      return text;
     };
-  /*
-    Data get(const string s) 
+  operator QString() const 
     {
-    return content->content[Symbol(s)]; 
-    };
-  Data& operator[](const string s) const
-    {
-      return content->content[Symbol(s)]; 
-    };
-  */
-  Data& operator[](Symbol s) const
-    {
-      return content->content[s]; 
-    };
-  Data& operator[](Symbol *s) const
-    {
-      return content->content[*s]; 
-    };
-  vector<Symbol> keys() const;
+      return text;
+    }
+  static String parse(const char *);
+ protected:
+  virtual void visit(DataVisitor& v);
 };
 
 #endif
+#endif // __loaded__data_string_h__

@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,8 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-#ifndef __BPMDJ___LISTVIEW_ITERATOR_H__
-#define __BPMDJ___LISTVIEW_ITERATOR_H__
+#ifndef __loaded__listview_iterator_h__
+#define __loaded__listview_iterator_h__
 using namespace std;
 #line 1 "listview-iterator.h++"
 #include <vector>
@@ -66,4 +66,4 @@ public:
   {
   };
 };
-#endif
+#endif // __loaded__listview_iterator_h__

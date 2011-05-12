@@ -1,3 +1,7 @@
+#ifndef __loaded__array_storage_h__
+#define __loaded__array_storage_h__
+using namespace std;
+#line 1 "array-storage.h++"
 
 /****
  Om-Data
@@ -23,6 +27,9 @@
 //---------------------------------------------------------------
 //                          Array storage
 //---------------------------------------------------------------
+/**
+ * @ingroup data
+ */
 template <class T> class ArrayStorage
 {
  public:
@@ -38,6 +45,9 @@ template <class T> class ArrayStorage
     }
 };
 
+/**
+ * @ingroup data
+ */
 template <class T> class NormalArrayStorage: public ArrayStorage<T>
 {
  public:
@@ -52,8 +62,12 @@ template <class T> class NormalArrayStorage: public ArrayStorage<T>
     }
 };
 
+/**
+ * @ingroup data
+ */
 template <class T> class SpecialStorage: public ArrayStorage<T>
 {
 };
 
 #endif
+#endif // __loaded__array_storage_h__

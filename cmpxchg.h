@@ -17,8 +17,8 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#ifndef __BORGIV_CMPXCHG_H__
-#define __BORGIV_CMPXCHG_H__
+#ifndef __loaded__cmpxchg_h__
+#define __loaded__cmpxchg_h__
 using namespace std;
 #line 1 "cmpxchg.h++"
 /**
@@ -78,4 +78,4 @@ static inline unsigned long __cmpxchg(volatile void *ptr, unsigned long old,
    ((__typeof__(*(ptr)))__cmpxchg((ptr),(unsigned long)(o),\
                                      (unsigned long)(n),sizeof(*(ptr))))
 #endif
-#endif
+#endif // __loaded__cmpxchg_h__

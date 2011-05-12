@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,6 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
+#ifndef __loaded__renamer_logic_cpp__
+#define __loaded__renamer_logic_cpp__
 using namespace std;
 #line 1 "renamer.logic.c++"
 #include <assert.h>
@@ -42,18 +44,17 @@ RenamerLogic::RenamerLogic(QWidget*parent, RenamerChangesFilename *rcf) :
 
 RenamerLogic::~RenamerLogic()
 {
-  if (inform) delete inform;
+  if (inform) 
+    delete inform;
 }
 
 #define FOREACH(operation) {\
   Q3ListViewItemIterator it(NameList);\
-   for(;it.current();++it)\
-     {\
+   for(;it.current();++it) {\
 	Q3ListViewItem * item = it.current();\
 	if (item->isSelected())\
 	  item->setText(0,operation(item->text(0)));\
-     }\
-  }
+     }}
 
 void RenamerLogic::checkfile(const QString  pathname, const QString  filename)
 {
@@ -63,8 +64,7 @@ void RenamerLogic::checkfile(const QString  pathname, const QString  filename)
 
 bool RenamerLogic::matchextension(const QString  filename)
 {
-  return goodExtension(filename) ||
-    filename.contains(".idx",0);
+  return goodExtension(filename) || filename.contains(".idx",0);
 }
 
 void RenamerLogic::add(const QString name, const QString pos)
@@ -520,7 +520,7 @@ void SongSelectorLogic::startRenamer()
   else if (which_renamer.not_yet_indexed->isOn())
 #endif
     {
-      QString text = QFileDialog::getExistingDirectory(NULL,this,NULL,"Specify directory to look for songs with wrong name");
+      QString text = QFileDialog::getExistingDirectory(this,"Specify directory to look for songs with wrong name");
       if (!text.isEmpty())
 	{
 	  if (text.right(1)=="/")
@@ -530,3 +530,4 @@ void SongSelectorLogic::startRenamer()
 	}
     }
 }
+#endif // __loaded__renamer_logic_cpp__

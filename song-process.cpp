@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,6 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
+#ifndef __loaded__song_process_cpp__
+#define __loaded__song_process_cpp__
 using namespace std;
 #line 1 "song-process.c++"
 #include <iostream>
@@ -327,7 +329,7 @@ void SongProcess::startChecking()
   state = checking;
 
   // choose a filename & logname
-  QString basename = QString::number((unsigned long)this,16);
+  QString basename = QString::number((intptr_t)this,16);
   QString filename = basename+".ogg";
   QString indexname = basename+".idx";
   QString path = QString("music/")+filename;
@@ -375,7 +377,7 @@ void SongProcess::checkerDied()
   assert(state==checking);
 
   // check the config file and decide whether it worked out well or not...
-  QString basename = QString::number((unsigned long)this,16);
+  QString basename = QString::number((intptr_t)this,16);
   QString filename = basename+".ogg";
   QString indexname = basename+".idx";
   QString path = QString("music/")+filename;
@@ -602,3 +604,4 @@ void SongProcPrefView::commandChanged()
   song_process->setCommand((SongProcess::command_type)cmd_box->currentItem());
   update_disable_enable();
 }
+#endif // __loaded__song_process_cpp__

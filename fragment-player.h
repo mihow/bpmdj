@@ -26,7 +26,7 @@ using namespace std;
 #include "active-objects.h"
 #include "player-config.h"
 #include "dsp-drivers.h"
-#include "fragment.h"
+#include "do-fragment.h"
 class FragmentPlayer;
 class ActiveFragmentPlayer;
 #ifdef TRACE_MESSAGES
@@ -63,19 +63,20 @@ class ActiveFragmentPlayer_msg_: public ReferenceCount
 class ActiveFragmentPlayer: public ActiveObject<Smart< ActiveFragmentPlayer_msg_ > >
 {
   friend class FragmentPlayer;
+  FragmentPlayer * self;
     virtual elementResult handle(Smart< ActiveFragmentPlayer_msg_> cmd)
       {
         if (cmd) return cmd->run(this);
         else return Done;
       };
-  Fragment playing;
+  FragmentInMemory playing;
   unsigned4 curpos;
   bool finished;
-  dsp_driver* dsp;
+  volatile dsp_driver_ptr dsp;
   int player_slot;
   volatile bool stopped;
-  public: elementResult playWave(Fragment fragment);
-  protected: void queue_playWave(Fragment fragment);
+  public: elementResult playWave(FragmentInMemory fragment);
+  protected: void queue_playWave(FragmentInMemory fragment);
   public: elementResult stopOutput();
   protected: void queue_stopOutput();
   public: elementResult startOutput();
@@ -88,8 +89,8 @@ class ActiveFragmentPlayer: public ActiveObject<Smart< ActiveFragmentPlayer_msg_
   public: elementResult terminate();
   protected: void queue_terminate();
   protected:
-    ActiveFragmentPlayer(string name="FragmentPlayer"):
-      ActiveObject<Smart< ActiveFragmentPlayer_msg_ > >(name)
+    ActiveFragmentPlayer(FragmentPlayer* s, string name):
+      ActiveObject<Smart< ActiveFragmentPlayer_msg_ > >(name), self(s)
       {
       curpos =  0;
       dsp = NULL;
@@ -105,14 +106,14 @@ class ActiveFragmentPlayer: public ActiveObject<Smart< ActiveFragmentPlayer_msg_
 //-------------------------------------
 class ActiveFragmentPlayer_msg_playWave: public ActiveFragmentPlayer_msg_
 {
-    Fragment fragment;
+    FragmentInMemory fragment;
   public:
-    ActiveFragmentPlayer_msg_playWave(Fragment fragment) : fragment(fragment)
+    ActiveFragmentPlayer_msg_playWave(FragmentInMemory fragment) : fragment(fragment)
       {
       };
     virtual string declaration()
     {
-      return "FragmentPlayer::playWave(Fragment fragment)";
+      return "FragmentPlayer::playWave(FragmentInMemory fragment)";
     }
     virtual elementResult run(ActiveFragmentPlayer * ao)
       {
@@ -212,7 +213,9 @@ class FragmentPlayer
   private:
     ActiveFragmentPlayer object;
   public:
-    void playWave(Fragment fragment)
+    FragmentPlayer(string name="FragmentPlayer"): object(this, name) {};
+  public:
+    void playWave(FragmentInMemory fragment)
     {
       object.queue_playWave(fragment);
     };
@@ -246,7 +249,7 @@ class FragmentPlayer
 //-------------------------------------
 // Active Object Methods
 //-------------------------------------
-inline void ActiveFragmentPlayer::queue_playWave(Fragment fragment)
+inline void ActiveFragmentPlayer::queue_playWave(FragmentInMemory fragment)
   {
     push(Smart<ActiveFragmentPlayer_msg_playWave>(
         new ActiveFragmentPlayer_msg_playWave(fragment)));

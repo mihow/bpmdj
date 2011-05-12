@@ -1,4 +1,3 @@
-#include "ui-includes.h" // PCH include
 #include "cluster-dialog.h"
 
 #include <qvariant.h>

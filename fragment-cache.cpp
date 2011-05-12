@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,6 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
+#ifndef __loaded__fragment_cache_cpp__
+#define __loaded__fragment_cache_cpp__
 using namespace std;
 #line 1 "fragment-cache.c++"
 #include <iostream>
@@ -24,7 +26,7 @@ using namespace std;
 #include "map-iterator.h"
 #include "set-iterator.h"
 #include "bpmdj.h"
-#include "fragment.h"
+#include "do-fragment.h"
 #include "fragment-creator.h"
 #include "vector-iterator.h"
 #include "active-objects.h"
@@ -37,30 +39,24 @@ void FragmentCreated::run(SongSelectorLogic * song_selector_window)
     song_selector_window->fragmentCreated(this);
 }
 
-Fragment FragmentCreated::getFragment()
-{
-  if(f.isEmpty())
-    return Fragment();
-  return newFragment(f);
-}
-
 extern FragmentCreator fragmentCreator;
 FragmentCache fragmentCache;
 
 void FragmentCache::get(Song* song)
 {
-  deque<FragmentCreated> ready = fragmentCreator.getReadyOnes();
+  deque<FragmentFile> ready = fragmentCreator.getReadyOnes();
   while (!ready.empty())
     {
-      FragmentCreated fc = ready.front();
+      FragmentFile ff = ready.front();
       ready.pop_front();
-      song2fragment[fc.song]=fc;
+      song2fragment[ff.get_song()]=ff;
     }
-  FragmentCreated fc = song2fragment[song];
-  if (fc.isEmpty())
+  FragmentFile ff = song2fragment[song];
+  if (ff.isEmpty())
     fragmentCreator.createOneFor(song);
   else
     if (app) 
       app->postEvent(song_selector_window,
-		     new FragmentCreated(fc));
+		     new FragmentCreated(ff));
 }
+#endif // __loaded__fragment_cache_cpp__

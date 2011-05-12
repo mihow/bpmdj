@@ -1,3 +1,7 @@
+#ifndef __loaded__data_cpp__
+#define __loaded__data_cpp__
+using namespace std;
+#line 1 "data.c++"
 /****
  Om-Data
  Copyright (C) 2005-2006 Werner Van Belle
@@ -24,8 +28,8 @@
 #include "numbers.h"
 #include "array.h"
 #include "symbol.h"
-#include "string.h"
-#include "token.h"
+#include "data-string.h"
+#include "data-token.h"
 
 //---------------------------------------------------------------
 //                            Data 
@@ -84,6 +88,7 @@ Data::Data()
 
 Data::Data(const Data& other)
 {
+  assert(other.content);
   content = other.content->memory_copy();
 }
 
@@ -161,3 +166,4 @@ void Data::visit(DataVisitor& v)
 };
 
 #endif
+#endif // __loaded__data_cpp__

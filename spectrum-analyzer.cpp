@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,6 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
+#ifndef __loaded__spectrum_analyzer_cpp__
+#define __loaded__spectrum_analyzer_cpp__
 using namespace std;
 #line 1 "spectrum-analyzer.c++"
 #include <qapplication.h>
@@ -256,3 +258,4 @@ void SpectrumAnalyzer::fetchSpectrum_normal()
   bpmdj_deallocate(fft_in);
   bpmdj_deallocate(block);
 }
+#endif // __loaded__spectrum_analyzer_cpp__

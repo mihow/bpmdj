@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,8 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-#ifndef __BPMDJ___CONFIG_H__
-#define __BPMDJ___CONFIG_H__
+#ifndef __loaded__config_h__
+#define __loaded__config_h__
 using namespace std;
 #line 1 "config.h++"
 #include <qlistview.h>
@@ -215,4 +215,4 @@ class Config
   static void save();
   static bool load();
 };
-#endif
+#endif // __loaded__config_h__

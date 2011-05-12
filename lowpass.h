@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,8 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-#ifndef __BPMDJ___LOWPASS_H__
-#define __BPMDJ___LOWPASS_H__
+#ifndef __loaded__lowpass_h__
+#define __loaded__lowpass_h__
 using namespace std;
 #line 1 "lowpass.h++"
 /**
@@ -65,4 +65,4 @@ using namespace std;
  *               10.056  6.4     0.000087  -100
  */
 void LpFilter(double c[], int N, double frq, double Beta, int Num);
-#endif
+#endif // __loaded__lowpass_h__

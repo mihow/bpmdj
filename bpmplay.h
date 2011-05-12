@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,8 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-#ifndef __BPMDJ___BPMPLAY_H__
-#define __BPMDJ___BPMPLAY_H__
+#ifndef __loaded__bpmplay_h__
+#define __loaded__bpmplay_h__
 using namespace std;
 #line 1 "bpmplay.h++"
 #include <Qt/qapplication.h>
@@ -41,4 +41,4 @@ QString get_rawpath();
 bool show_error(int err, int err2, const char*text);
 void msg_playing_state_changed();
 void msg_writing_finished();
-#endif
+#endif // __loaded__bpmplay_h__

@@ -1,3 +1,7 @@
+#ifndef __loaded__array_iterator_h__
+#define __loaded__array_iterator_h__
+using namespace std;
+#line 1 "array-iterator.h++"
 /****
   Om-Data
  Copyright (C) 2005-2006 Werner Van Belle
@@ -20,16 +24,14 @@
 #ifndef OM_ARRAY_ITERATOR_H
 #define OM_ARRAY_ITERATOR_H
 
-//===============================================================
-//                          Iterators
-//===============================================================
-// The array iterator is a very fast but flexible iterator
-// it is used by combining different iterationwalks into one
-// iterator (extend). This is then assigned in the 
-// ArrayIterator.
-// After trying to use this a couple of times it seems that it
-// is somewhat too complex. We might want to rethink this one.
-
+/**
+ * @ingroup data
+ * @brief backend multidimensional iterator
+ * 
+ * The array iterator is a very fast but flexible iterator it is used by combining different iterationwalks into one
+ * iterator (extend). This is then assigned in the ArrayIterator. After trying to use this a couple of times it seems
+ * that it is somewhat too complex. We might want to rethink this one.
+ */
 template <class T, bool PT> class ArrayIteratorBacking
 {
  public:
@@ -117,12 +119,14 @@ template <class T, bool PT> class ArrayIteratorBacking
 };
 
 /**
+ * @ingroup data
+ * @brief fast multidimensional iterator
+ * 
  * The arrayiterator keeps track of the position within a matrix of dimension D
  * The submatrix it returns is of dimension SM
  * position tracking can be enabled with PT, and ordered mode can be
  * selected with ORDERED. The type must be the same for all
  */
-
 template <int D, class T, bool PT, int SM, bool ORDERED>
 class ArrayIterator: public ArrayIteratorBacking<T,PT>
 { 
@@ -160,8 +164,6 @@ class ArrayIterator: public ArrayIteratorBacking<T,PT>
     {
       reset(matrix);
     }
-  
-
   ArrayIterator<D,T,PT,SM,ORDERED>(const Array<D,T> &m, const Select<D-SM> sel)
     {
       setup(m, sel, NULL);
@@ -419,6 +421,5 @@ void ArrayIteratorBacking<T,PT>::print() const
   if (_more) _more->print();
   else printf("-------------------\n");
 }
-
 #endif
-
+#endif // __loaded__array_iterator_h__

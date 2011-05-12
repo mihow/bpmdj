@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,8 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-#ifndef __BPMDJ___BPMDJ_H__
-#define __BPMDJ___BPMDJ_H__
+#ifndef __loaded__bpmdj_h__
+#define __loaded__bpmdj_h__
 using namespace std;
 #line 1 "bpmdj.h++"
 #include <qapplication.h>
@@ -38,10 +38,16 @@ using namespace std;
 extern QApplication * app;
 extern const char*    programname;
 extern QStatusBar*    status;
-// The active object that will play fragments
+/**
+ * The active object that will play fragments
+ */
 extern FragmentPlayer fragmentPlayer;
-// The active object that will run a spectrum principal component analysis
+/**
+ * The active object that will run a spectrum principal component analysis
+ */
 extern SpectrumPca    spectrumPca; 
-// The active object that scans the existence of files
+/**
+ * The active object that scans the existence of files
+ */
 extern ExistenceScanner existenceScanner;
-#endif
+#endif // __loaded__bpmdj_h__

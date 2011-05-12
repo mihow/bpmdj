@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,69 +16,70 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-#ifndef __BPMDJ___TEMPO_TYPE_H__
-#define __BPMDJ___TEMPO_TYPE_H__
+#ifndef __loaded__tempo_type_h__
+#define __loaded__tempo_type_h__
 using namespace std;
 #line 1 "tempo-type.h++"
 #include <qstring.h>
 #include "constants.h"
+#include "types.h"
 
 class tempo_type
 {
- public:
-  float tempo;
-  static const float no_tempo;
-  tempo_type()
-    {
-      tempo = no_tempo;
-    }
-  tempo_type(float p)
-    {
-      tempo = p;
-    }
+public:
+  float4 tempo;
+  /**
+   * no_tempo is the constant -1 (defined in types.c++)
+   */
+  static const float4 no_tempo;
+  tempo_type(): tempo(no_tempo)
+  {
+  }
+  tempo_type(float4 p): tempo(p)
+  {
+  }
   bool valid()
-    {
-      return !none();
-    }
+  {
+    return !none();
+  }
   bool none()
-    {
-      return tempo == no_tempo;
-    }
+  {
+    return tempo == no_tempo;
+  }
   bool in_range()
-    {
-      return tempo > 20.0 && tempo < 400.0;
-    }
-  void write_idx(FILE * f)
-    {
-      fprintf(f,"tempo    : %g\n",tempo);
-    }
+  {
+    return tempo > 20.0 && tempo < 400.0;
+  }
+  signed4 lower(signed4 delta)
+  {
+    return (signed4)tempo-delta;
+  }
+  signed4 higher(signed4 delta)
+  {
+    return (signed4)tempo+delta;
+  }
   char * get_charstr()
-    {
-      char T[500];
-      if (none())
-	return strdup("/");
-      if (tempo>=100.0)
-	sprintf(T,"%g",tempo);
-      else 
-	sprintf(T,"0%g",tempo);
-      return strdup(T);
-    }
-  long lower(float delta)
-    {
-      return (long)(tempo-delta);
-    }
-  long higher(float delta)
-    {
-      return (long)(tempo+delta);
-    }
+  {
+    char T[500];
+    if (none())
+      return strdup("/");
+    if (tempo>=100.0)
+      sprintf(T,"%g",tempo);
+    else 
+      sprintf(T,"0%g",tempo);
+    return strdup(T);
+  }
+  
+  /**
+   * We don't use the factory here because these are only numbers and creating
+   * them would simply fill up the factory for nothing: after their usage
+   * in listviewitems these are destroyed again
+   */
   QString qstring()
-    {
-      // we don't use the factory here because these are only numbers and creating
-      // them would simply fill up the factory for nothing: after their usage
-      // in listviewitems these are destroyed again
-      if (none()) return slash;
-      if (tempo>=100.0) return QString::number(tempo);
-      return zero+QString::number(tempo);
-    }
+  {
+    if (none()) return slash;
+    if (tempo>=100.0) return QString::number(tempo);
+    return zero+QString::number(tempo);
+  }
 };
-#endif
+#endif // __loaded__tempo_type_h__

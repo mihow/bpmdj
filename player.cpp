@@ -1,5 +1,5 @@
 /****
- BpmDj: Free Dj Tools
+ BpmDj v3.6: Free Dj Tools
  Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
@@ -16,6 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
+#ifndef __loaded__player_cpp__
+#define __loaded__player_cpp__
 using namespace std;
 #line 1 "player.c++"
 #include <Qt/qlcdnumber.h>
@@ -448,32 +450,50 @@ void SongPlayer::nudgeMinusHalfB()
 
 void SongPlayer::nudgePlus1M()
 {
-  shift_playpos(+::currentperiod);
+  if (::currentperiod.valid())
+    shift_playpos(+::currentperiod);
+  else
+    shift_playpos(+WAVRATE);
 }
 
 void SongPlayer::nudgeMinus1M()
 {
-  shift_playpos(-::currentperiod);
+  if (::currentperiod.valid())
+    shift_playpos(-::currentperiod);
+  else
+    shift_playpos(-WAVRATE);
 }
 
 void SongPlayer::nudgePlus4M()
 {
-  shift_playpos(+::currentperiod*4);
+  if (::currentperiod.valid())
+    shift_playpos(+::currentperiod*4);
+  else
+    shift_playpos(+4*WAVRATE);
 }
 
 void SongPlayer::nudgeMinus4M()
 {
-  shift_playpos(-::currentperiod*4);
+  if (::currentperiod.valid())
+    shift_playpos(-::currentperiod*4);
+  else
+    shift_playpos(-4*WAVRATE);
 }
 
 void SongPlayer::nudgePlus8M()
 {
-  shift_playpos(+::currentperiod*8);
+  if (::currentperiod.valid())
+    shift_playpos(+::currentperiod*8);
+  else
+    shift_playpos(+8*WAVRATE);
 }
 
 void SongPlayer::nudgeMinus8M()
 {
-  shift_playpos(-::currentperiod*8);
+  if (::currentperiod.valid())
+    shift_playpos(-::currentperiod*8);
+  else
+    shift_playpos(-8*WAVRATE);
 }
 
 void SongPlayer::accept()
@@ -1365,3 +1385,4 @@ void msg_writing_finished()
   if (player_window)
     app->postEvent(player_window,new WritingFinished());
 }
+#endif // __loaded__player_cpp__

@@ -60,20 +60,22 @@ class ActiveFragmentCreator_msg_: public ReferenceCount
 class ActiveFragmentCreator: public ActiveObject<Smart< ActiveFragmentCreator_msg_ > >
 {
   friend class FragmentCreator;
+  FragmentCreator * self;
     virtual elementResult handle(Smart< ActiveFragmentCreator_msg_> cmd)
       {
         if (cmd) return cmd->run(this);
         else return Done;
       };
-  deque < FragmentCreated >  ready;
+  deque < FragmentFile >  ready;
+  map<Song*,FragmentFile> created;
   public: elementResult createOneFor(Song* song);
   protected: void queue_createOneFor(Song* song);
   public: elementResult terminate();
   protected: void queue_terminate();
   bool handle();
   protected:
-    ActiveFragmentCreator(string name="FragmentCreator"):
-      ActiveObject<Smart< ActiveFragmentCreator_msg_ > >(name)
+    ActiveFragmentCreator(FragmentCreator* s, string name):
+      ActiveObject<Smart< ActiveFragmentCreator_msg_ > >(name), self(s)
       {
       };
 };
@@ -131,6 +133,8 @@ class FragmentCreator
   private:
     ActiveFragmentCreator object;
   public:
+    FragmentCreator(string name="FragmentCreator"): object(this, name) {};
+  public:
     void createOneFor(Song* song)
     {
       object.queue_createOneFor(song);
@@ -141,7 +145,7 @@ class FragmentCreator
       object.queue_terminate();
     };
   public:
-    deque < FragmentCreated >  getReadyOnes();
+    deque < FragmentFile >  getReadyOnes();
 };
 
 
