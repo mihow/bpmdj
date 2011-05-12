@@ -18,23 +18,27 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#include "config.h"
+#ifndef _DIRSCANNER_H
+#define _DIRSCANNER_H
 
-class ProcessManager
+#include <stdlib.h>
+#include <qstring.h>
+
+// the checkname below is the prefix that is placed before directories when passed back to the caller
+class DirectoryScanner
 {
+    QString required_extension;
+ protected:
+    virtual void recursing(const QString  dirname);
+    virtual void scanfile(const QString  fullname, const QString  filename);
+    virtual void checkfile(const QString  fullname, const QString  filename) = 0;
+    virtual void scandir(const QString  dirname, const QString  checkname);
+    virtual bool matchextension(const QString  filename);
  public:
-  // WVB -- TOFIX: maybe we should make this whole class static 
-  int monitorpid;
-  static double mainTempo;
-  static QSong* playingInMain;
-  static QSong* playingInMonitor;
- private:
-  int monitorPlayCommand;
-  double monitorTempo;
-  SongSelectorLogic* selector;
- public:
-  ProcessManager(SongSelectorLogic *sel);
-  void clearMonitor();
-  void switchMonitorToMain();
-  void startSong(QSong *song);
+    DirectoryScanner(QString  extension);
+    static bool exists(const QString  filename);
+    virtual void scan(const QString  dirname, const QString  checkname)
+      { scandir(dirname, checkname); };
 };
+
+#endif

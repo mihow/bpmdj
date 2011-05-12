@@ -20,21 +20,32 @@
 
 #include "config.h"
 
-class ProcessManager
+class QSong: 
+  public QListViewItem
 {
- public:
-  // WVB -- TOFIX: maybe we should make this whole class static 
-  int monitorpid;
-  static double mainTempo;
-  static QSong* playingInMain;
-  static QSong* playingInMonitor;
- private:
-  int monitorPlayCommand;
-  double monitorTempo;
-  SongSelectorLogic* selector;
- public:
-  ProcessManager(SongSelectorLogic *sel);
-  void clearMonitor();
-  void switchMonitorToMain();
-  void startSong(QSong *song);
+  public:
+    QString song_title;
+    QString song_author;
+    QString song_version;
+    QString song_tempo;
+    QString song_index;
+    QString song_tags;
+    QString song_file;
+    QString song_time;
+    QString song_md5sum;
+    bool    song_played;
+    bool    song_ondisk;
+    int     has_cues;
+    int     played_author_at_time;
+  private:
+    static QString TRUE_TEXT;
+    static QString FALSE_TEXT;
+    void init(const QString filename, const QString currentpath);
+  public:
+    QSong(QString filename, QString currentpath, QListView* parent);
+    bool obtainTitleAuthor(char * fulltitle);
+    void reread();
+    bool containsTag(const QString which);
+    virtual void paintCell(QPainter *p, const QColorGroup &cg, int col, int wid, int align);
+    virtual QString text(int i) const;
 };

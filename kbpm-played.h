@@ -21,20 +21,23 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <qstring.h>
+
 /**
  * A class to represent the song already played
  */
 
 class Played
 {
- private:
-   static char** names;
-   static int size;
-   static int next;
-   static FILE* f;
-   static void Add(const char* indexname);
- public:
-   Played(const char* filename);
-   static bool IsPlayed(const char* indexname);
-   static void Play(const char* indexname);
+  private:
+    static QString** names;
+    static int size;
+    static int next;
+    static FILE* f;
+    static void Add(QString *indexname);
+  public:
+    static int songs_played;
+    Played(const QString filename);
+    static bool IsPlayed(const QString indexname);
+    static void Play(const QString indexname);
 };

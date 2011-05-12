@@ -18,26 +18,19 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#define LIST_DIR 0
-#define LIST_VERSION 4
-#define LIST_TITLE 1
-#define LIST_AUTHOR 2
-#define LIST_TEMPO 3
-#define LIST_TAGS 5
-#define LIST_FILE 6
-#define LIST_INDEX 7
-#define LIST_ONDISK 8
-#define LIST_MD5SUM 9
-
-class QSongViewItem: public QListViewItem
+class SimilarScanner: public DirectoryScanner
 {
- private:
-   Song* song;
- public:
-   QSongViewItem(QListViewItem* parent, Song* content);
-   QSongViewItem(QListView* parent, Song* content);
-   Song* getSong() {return song;};
-   virtual void paintCell(QPainter *p,const QColorGroup &cg, int col, int wid, int align);
-   virtual QString text(int i) const;
-   void reread() {song->reread();};
+    SongSelectorLogic * selector;
+  protected:
+    virtual void checkfile(const QString pathname, const QString filename)
+      { 
+	QString stripped = filename.left(filename.length()-4);
+	QString fullname = pathname + "/" + filename;
+	selector->findsimilarnames(stripped,fullname); 
+      };
+  public:
+    SimilarScanner(SongSelectorLogic* sroot) : DirectoryScanner(".mp3")
+      { selector = sroot; };
+    virtual void scan(const QString dirname) 
+      { DirectoryScanner::scan(dirname,dirname); };
 };

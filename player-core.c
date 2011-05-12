@@ -247,47 +247,86 @@ static unsigned4 fsize(FILE* wtf)
    return res;
 }
 
+static int writer = -1;
+static int writing = 0;
+void writer_died(int sig,siginfo_t *info, void* hu)
+{
+  char newstr[80];
+  // now we have the complete length of the file...
+  // if it differs from the length in the .ini file we update it
+  // get length;
+  unsigned long long ticks = wave_max();
+  unsigned long long sec = ticks/WAVRATE;
+  unsigned long long min = sec/60;
+  writing = 0;
+  sec=sec%60;
+  sprintf(newstr,"%02d:%02d",(int)min,(int)sec);
+  if (!index_time || (strcmp(newstr,index_time)!=0))
+    {
+      index_time=strdup(newstr);
+      index_changed=1;
+    }
+}
+
 void wave_open(char* fname, int synchronous)
 {
-   char fn[500];
-   // start decoding the file; this means: fork mp3 process
-   // wait 1 second and start reading the file
-   if (synchronous)
-     {
-	char execute[500];
-	sprintf(execute,"glue-mp3raw \"%s\"\n",fname);
-	if (!(system(execute)<=256))
-	  {
-	     printf("Error: couldn't execute glue-mp3raw\n");
-	     exit(100);
-	  }
-     }
-   else 
-     {
-	if (!fork())
-	  {
-	     char execute[500];
-	     sprintf(execute,"glue-mp3raw \"%s\"\n",fname);
-	     if (system(execute)<=256) exit(100);
-	     printf("Error: couldn't execute glue-mp3raw\n");
-	     exit(100);
-	  }
-	sleep(1);
-     }
-   sprintf(fn,"%s.raw",fname);
-   wave_name=strdup(basename(fn));
-   wave_file=fopen(wave_name,"rb");
-   if (!wave_file) 
-     {
-	printf("Error: unable to open %s\n",wave_name);
-	exit(3);
-     }
+  char fn[500];
+  // start decoding the file; this means: fork mp3 process
+  // wait 1 second and start reading the file
+  if (synchronous)
+    {
+      char execute[500];
+      writing = 1;
+      sprintf(execute,"glue-mp3raw \"%s\"\n",fname);
+      if (!(system(execute)<=256))
+	{
+	  printf("Error: couldn't execute glue-mp3raw\n");
+	  exit(100);
+	}
+      writing=0;
+    }
+  else 
+    {
+      // prepare signals
+      struct sigaction *act;
+      act = (struct sigaction*)malloc(sizeof(struct sigaction));
+      assert(act);
+      act->sa_sigaction = writer_died;
+      act->sa_flags = SA_SIGINFO;
+      sigaction(SIGUSR1,act,NULL);
+      // fork and execute, send back signal when done
+      if (!(writer = fork()))
+	{
+	  char execute[500];
+	  sprintf(execute,"glue-mp3raw \"%s\"\n",fname);
+	  if (!(system(execute)<=256)) 
+	    printf("Error: couldn't execute glue-mp3raw\n");
+	  kill(getppid(),SIGUSR1);
+	  exit(100);
+	}
+      writing = 1;
+      sleep(1);
+    }
+  sprintf(fn,"%s.raw",fname);
+  wave_name=strdup(basename(fn));
+  wave_file=fopen(wave_name,"rb");
+  if (!wave_file)
+    {
+      printf("Error: unable to open %s\n",wave_name);
+      exit(3);
+    }
 }
 
 void wave_close()
 {
-   fclose(wave_file);
-   remove(wave_name);
+  fclose(wave_file);
+  if (writing)
+    {
+      // send terminate (well the insisting variant) signal
+      kill(writer,SIGKILL);
+      writing = 0;
+    }
+  remove(wave_name);
 }
 
 unsigned4 wave_max()
@@ -616,7 +655,7 @@ void cue_read()
  *-------------------------------------------*/
 void help();
 
-void      doubleperiod()
+void doubleperiod()
 {
    index_period*=2; index_changed=1;
 }

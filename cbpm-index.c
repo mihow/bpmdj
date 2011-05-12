@@ -110,6 +110,7 @@ char   * index_file;
 char   * index_remark;
 char   * index_tags;
 char   * index_md5sum;
+char   * index_time;
  int     index_changed;
  int     index_bpmcount_from;
  int     index_bpmcount_to;
@@ -118,6 +119,7 @@ unsigned long index_cue_z;
 unsigned long index_cue_x;
 unsigned long index_cue_c;
 unsigned long index_cue_v;
+
 /*-------------------------------------------
  *         Index operations
  *-------------------------------------------*/
@@ -133,10 +135,12 @@ void index_init()
    index_changed=0;
    index_bpmcount_from=-1;
    index_bpmcount_to=-1;
+   index_time=NULL;
    index_cue_z=0;
    index_cue_x=0;
    index_cue_c=0;
    index_cue_v=0;
+   index_cue=0;
 }
 
 void index_setversion()
@@ -157,6 +161,7 @@ void index_free()
    if (index_tempo) free(index_tempo);
    if (index_tags) free(index_tags);
    if (index_md5sum) free(index_md5sum);
+   if (index_time) free(index_time);
 }
 
 void index_write()
@@ -188,21 +193,22 @@ void index_write()
    if (index_bpmcount_to>=0) fprintf(f,"bpmcount-to   : %d\n",index_bpmcount_to);
    if (index_md5sum) fprintf(f,"md5sum : %s\n",index_md5sum);
    if (index_remark) fprintf(f,"remark   : %s\n",index_remark);
+   if (index_time) fprintf(f,"time : %s\n",index_time);
    fclose(f);
 }
 
 char* strip_begin(char*tostrip)
 {
-   while(*tostrip && (*tostrip==' ' || *tostrip=='\t' || *tostrip=='\n')) tostrip++;
-   return tostrip;
+  while(*tostrip && (*tostrip==' ' || *tostrip=='\t' || *tostrip=='\n')) tostrip++;
+  return tostrip;
 }
 
 char* strip_end(char*tostrip,char*theend)
 {
-   int c;
-   while(theend>=tostrip && (c=*theend) && (c==' ' || c=='\t' || c=='\n')) theend--;
-   *(theend+1)=0;
-   return tostrip;
+  int c;
+  while(theend>=tostrip && (c=*theend) && (c==' ' || c=='\t' || c=='\n')) theend--;
+  *(theend+1)=0;
+  return tostrip;
 }
 
 char* strip(char*tostrip, char* theend)
@@ -211,7 +217,7 @@ char* strip(char*tostrip, char* theend)
    return strip_end(tostrip,theend);
 }
 
-void index_read(char* indexn)
+void index_read(const char* indexn)
 {
    char *line=NULL;
    int read;
@@ -250,6 +256,7 @@ void index_read(char* indexn)
 	else if(strcmp(field,"bpmcount-to")==0) index_bpmcount_to=atoi(value);
 	else if(strcmp(field,"bpmcount-from")==0) index_bpmcount_from=atoi(value);
 	else if(strcmp(field,"comment")==0) index_remark=strldup(value,end-value);
+	else if(strcmp(field,"time")==0) index_time=strldup(value,end-value);
 	else if(strcmp(field,"cue")==0) index_cue=atol(value);
 	else if(strcmp(field,"cue-z")==0) index_cue_z=atol(value);
 	else if(strcmp(field,"cue-x")==0) index_cue_x=atol(value);
@@ -286,21 +293,43 @@ void index_read(char* indexn)
      }
    if (index_period==-1)
      {
-	printf("Error: no valid period given\n");
-	exit(40);
+       printf("Error: no valid period given\n");
+       exit(40);
      }
-   // update tempo
+   // check for old versions running 22050 samplerate
+   if ((strcmp(index_version,"BpmDj v1.5")==0)
+       ||(strcmp(index_version,"BpmDj v1.4")==0)
+       ||(strcmp(index_version,"BpmDj v1.3")==0)
+       ||(strcmp(index_version,"BpmDj v1.2")==0)
+       ||(strcmp(index_version,"BpmDj v1.1")==0)
+       ||(strcmp(index_version,"BpmDj v1.0")==0)
+       ||(strcmp(index_version,"BpmDj v0.9")==0)
+       ||(strcmp(index_version,"BpmDj v0.8")==0)
+       ||(strcmp(index_version,"BpmDj v0.7")==0)
+       ||(strcmp(index_version,"BpmDj v0.6")==0)
+       ||(strcmp(index_version,"BpmDj v0.5")==0))
      {
-	char tempo[500];
-	double T=4.0*(double)11025*60.0/(double)index_period;
-	if (T>=100.0)
-	  sprintf(tempo,"%g",T);
-	else 
-	  sprintf(tempo,"0%g",T);
-	if (!index_tempo || strcmp(index_tempo,tempo)!=0)
-	  {
-	     index_tempo=strdup(tempo);
-	     index_changed=1;
-	  }
+       index_cue_z *= 2;
+       index_cue_x *= 2;
+       index_cue_c *= 2;
+       index_cue_v *= 2;
+       index_cue   *= 2; 
+       index_changed = 1;
+       index_setversion();
      }
+   
+   // update tempo
+   {
+     char tempo[500];
+     double T=4.0*(double)11025*60.0/(double)index_period;
+     if (T>=100.0)
+       sprintf(tempo,"%g",T);
+     else 
+       sprintf(tempo,"0%g",T);
+     if (!index_tempo || strcmp(index_tempo,tempo)!=0)
+       {
+	 index_tempo=strdup(tempo);
+	 index_changed=1;
+       }
+   }
 }

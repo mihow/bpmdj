@@ -24,7 +24,7 @@
 #include <ctype.h>
 #include <qdir.h>
 #include <qfiledialog.h>
-#include <qmultilinedit.h>
+#include <qmultilineedit.h>
 #include <qlineedit.h>
 #include <qcheckbox.h>
 #include <assert.h>
@@ -45,9 +45,13 @@
 #include "version.h"
 #include "kbpm-dj.h"
 #include "process-manager.h"
+#include "qsong.h"
 
 ProcessManager* processManager = NULL;
+
 double ProcessManager::mainTempo = 0;
+QSong*  ProcessManager::playingInMain;
+QSong*  ProcessManager::playingInMonitor;
 
 // when a process stops this method is called
 // normally it will immidatelly invoke the one and
@@ -70,8 +74,6 @@ ProcessManager::ProcessManager(SongSelectorLogic * sel)
   processManager = this;
   selector = sel;
   // initialise fields
-  playCommand1=PLAYCOMMAND1;
-  playCommand2=PLAYCOMMAND2;
   monitorPlayCommand=1;
   playingInMain=NULL;
   playingInMonitor=NULL;
@@ -128,12 +130,11 @@ void ProcessManager::switchMonitorToMain()
   selector->updateProcessView();
 }
 
-void ProcessManager::startSong(Song *song)
+void ProcessManager::startSong(QSong *song)
 {
   assert(song);
-  int result;
-  char *player;
-  Song *matchWith;
+  QString player;
+  QSong *matchWith;
   char playercommand[500];
   // if there is still a song playing in the monitor, don't go
   if (monitorpid!=0)
@@ -144,40 +145,20 @@ void ProcessManager::startSong(Song *song)
       return;
     }
   // update monitor fields
-  monitorTempo=atof(song->song_tempo);
+  monitorTempo=atof((const char*)song->song_tempo);
   // create suitable start command
   playingInMonitor=song;
   matchWith=playingInMain;
   if (!matchWith) matchWith=playingInMonitor;
-  player = monitorPlayCommand == 1 ? playCommand1 : playCommand2;
-  sprintf(playercommand, player, matchWith->song_index, playingInMonitor->song_index);
+  player = monitorPlayCommand == 1 ? Config::playCommand1 : Config::playCommand2;
+  sprintf(playercommand, (const char*)player, (const char*)matchWith->song_index, (const char*)playingInMonitor->song_index);
   // fork the command and once the player exists immediatelly stop
   if (!(monitorpid=fork()))
-    {
+    { 
       system(playercommand);
       kill(getppid(),SIGUSR1);
       exit(0);
     }
   // update the process view of course
   selector->updateProcessView();
-}
-
-char* ProcessManager::getPlayCommand(int i)
-{
-  if (i==1) 
-    return playCommand1;
-  else if (i==2)
-    return playCommand2;
-  else
-    assert(0);
-}
-
-void ProcessManager::setPlayCommand(int i, char* cmd)
-{
-  if (i==1)
-    playCommand1=cmd;
-  else if (i==2)
-    playCommand2=cmd;
-  else 
-    assert(0);
 }

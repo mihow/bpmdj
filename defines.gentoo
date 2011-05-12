@@ -1,3 +1,5 @@
+CPP=g++ -O9
+CC=gcc -O9
 LDFLAGS+= -lpthread -lm
 
 CP = cp

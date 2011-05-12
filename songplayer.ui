@@ -1,718 +1,546 @@
-<!DOCTYPE UI><UI>
+<!DOCTYPE UI><UI version="3.1" stdsetdef="1">
 <class>SongPlayer</class>
-<widget>
-    <class>QDialog</class>
-    <property stdset="1">
-        <name>name</name>
+<widget class="QDialog">
+    <property name="name">
         <cstring>SongPlayer</cstring>
     </property>
-    <property stdset="1">
-        <name>geometry</name>
+    <property name="geometry">
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>1046</width>
-            <height>393</height>
+            <width>953</width>
+            <height>311</height>
         </rect>
     </property>
-    <property stdset="1">
-        <name>sizePolicy</name>
+    <property name="sizePolicy">
         <sizepolicy>
             <hsizetype>1</hsizetype>
             <vsizetype>1</vsizetype>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
         </sizepolicy>
     </property>
-    <property stdset="1">
-        <name>caption</name>
+    <property name="caption">
         <string>kBpmPlayer</string>
     </property>
-    <property stdset="1">
-        <name>sizeGripEnabled</name>
+    <property name="sizeGripEnabled">
         <bool>true</bool>
     </property>
     <grid>
-        <property stdset="1">
-            <name>margin</name>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <property name="margin">
             <number>11</number>
         </property>
-        <property stdset="1">
-            <name>spacing</name>
+        <property name="spacing">
             <number>6</number>
         </property>
-        <widget row="1"  column="0"  rowspan="1"  colspan="3" >
-            <class>QLabel</class>
-            <property stdset="1">
-                <name>name</name>
+        <widget class="QLabel" row="1" column="0" rowspan="1" colspan="3">
+            <property name="name">
                 <cstring>PlayingText</cstring>
             </property>
-            <property stdset="1">
-                <name>font</name>
+            <property name="font">
                 <font>
                     <pointsize>18</pointsize>
                 </font>
             </property>
-            <property stdset="1">
-                <name>frameShape</name>
+            <property name="frameShape">
                 <enum>NoFrame</enum>
             </property>
-            <property stdset="1">
-                <name>margin</name>
+            <property name="margin">
                 <number>0</number>
             </property>
-            <property stdset="1">
-                <name>text</name>
+            <property name="text">
                 <string>SongName</string>
             </property>
-            <property stdset="1">
-                <name>scaledContents</name>
+            <property name="scaledContents">
                 <bool>false</bool>
             </property>
-            <property stdset="1">
-                <name>alignment</name>
+            <property name="alignment">
                 <set>AlignCenter</set>
             </property>
-            <property>
-                <name>hAlign</name>
+            <property name="hAlign" stdset="0">
             </property>
         </widget>
-        <widget row="2"  column="0" >
-            <class>QButtonGroup</class>
-            <property stdset="1">
-                <name>name</name>
+        <widget class="QButtonGroup" row="2" column="0">
+            <property name="name">
                 <cstring>ButtonGroup4</cstring>
             </property>
-            <property stdset="1">
-                <name>title</name>
+            <property name="title">
                 <string>Playing</string>
             </property>
-            <property>
-                <name>layoutMargin</name>
+            <property name="layoutMargin" stdset="0">
             </property>
-            <property>
-                <name>layoutSpacing</name>
+            <property name="layoutSpacing" stdset="0">
             </property>
             <grid>
-                <property stdset="1">
-                    <name>margin</name>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <property name="margin">
                     <number>5</number>
                 </property>
-                <property stdset="1">
-                    <name>spacing</name>
+                <property name="spacing">
                     <number>1</number>
                 </property>
-                <widget row="3"  column="0" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QPushButton" row="3" column="0">
+                    <property name="name">
                         <cstring>PushButton8</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
+                    <property name="text">
                         <string>-8M</string>
                     </property>
-                    <property stdset="1">
-                        <name>accel</name>
-                        <number>268435511</number>
+                    <property name="accel">
+                        <string>7</string>
                     </property>
-                    <property>
-                        <name>toolTip</name>
+                    <property name="toolTip" stdset="0">
                         <string>Key: '6'</string>
                     </property>
                 </widget>
-                <widget row="3"  column="1" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QPushButton" row="3" column="1">
+                    <property name="name">
                         <cstring>PushButton7</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
+                    <property name="text">
                         <string>+8M</string>
                     </property>
-                    <property stdset="1">
-                        <name>accel</name>
-                        <number>268435512</number>
+                    <property name="accel">
+                        <string>8</string>
                     </property>
-                    <property>
-                        <name>toolTip</name>
+                    <property name="toolTip" stdset="0">
                         <string>Key: '8'</string>
                     </property>
                 </widget>
-                <widget row="2"  column="1" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QPushButton" row="2" column="1">
+                    <property name="name">
                         <cstring>PushButton5</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
+                    <property name="text">
                         <string>+4M</string>
                     </property>
-                    <property stdset="1">
-                        <name>accel</name>
-                        <number>268435509</number>
+                    <property name="accel">
+                        <string>5</string>
                     </property>
-                    <property>
-                        <name>toolTip</name>
+                    <property name="toolTip" stdset="0">
                         <string>Key: '5'</string>
                     </property>
                 </widget>
-                <widget row="2"  column="0" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QPushButton" row="2" column="0">
+                    <property name="name">
                         <cstring>PushButton6</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
+                    <property name="text">
                         <string>-4M</string>
                     </property>
-                    <property stdset="1">
-                        <name>accel</name>
-                        <number>268435508</number>
+                    <property name="accel">
+                        <string>4</string>
                     </property>
-                    <property>
-                        <name>toolTip</name>
+                    <property name="toolTip" stdset="0">
                         <string>Key: '4'</string>
                     </property>
                 </widget>
-                <widget row="1"  column="0" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QPushButton" row="1" column="0">
+                    <property name="name">
                         <cstring>PushButton4</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
+                    <property name="text">
                         <string>-1M</string>
                     </property>
-                    <property stdset="1">
-                        <name>accel</name>
-                        <number>268435505</number>
+                    <property name="accel">
+                        <string>1</string>
                     </property>
-                    <property>
-                        <name>toolTip</name>
+                    <property name="toolTip" stdset="0">
                         <string>Key: '1'</string>
                     </property>
                 </widget>
-                <widget row="0"  column="0" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QPushButton" row="0" column="0">
+                    <property name="name">
                         <cstring>KeyMinus</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
+                    <property name="text">
                         <string>-</string>
                     </property>
-                    <property stdset="1">
-                        <name>accel</name>
-                        <number>268435501</number>
+                    <property name="accel">
+                        <string>-</string>
                     </property>
-                    <property>
-                        <name>toolTip</name>
+                    <property name="toolTip" stdset="0">
                         <string>Key: '-'</string>
                     </property>
                 </widget>
-                <widget row="0"  column="1" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QPushButton" row="0" column="1">
+                    <property name="name">
                         <cstring>KeyPlus</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
+                    <property name="text">
                         <string>+</string>
                     </property>
-                    <property stdset="1">
-                        <name>accel</name>
-                        <number>268435499</number>
+                    <property name="accel">
+                        <string>+</string>
                     </property>
-                    <property>
-                        <name>toolTip</name>
+                    <property name="toolTip" stdset="0">
                         <string>Key: '+' </string>
                     </property>
                 </widget>
-                <widget row="1"  column="1" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QPushButton" row="1" column="1">
+                    <property name="name">
                         <cstring>PushButton3</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
+                    <property name="text">
                         <string>+1M</string>
                     </property>
-                    <property stdset="1">
-                        <name>accel</name>
-                        <number>268435506</number>
+                    <property name="accel">
+                        <string>2</string>
                     </property>
-                    <property>
-                        <name>toolTip</name>
+                    <property name="toolTip" stdset="0">
                         <string>Key: '2'</string>
                     </property>
                 </widget>
-                <widget row="2"  column="2" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QPushButton" row="2" column="2">
+                    <property name="name">
                         <cstring>PushButton9</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
+                    <property name="text">
                         <string>-1/2B</string>
                     </property>
-                    <property stdset="1">
-                        <name>accel</name>
-                        <number>268435498</number>
+                    <property name="accel">
+                        <string>*</string>
                     </property>
-                    <property>
-                        <name>toolTip</name>
+                    <property name="toolTip" stdset="0">
                         <string>Key: '*'</string>
                     </property>
                 </widget>
-                <widget row="1"  column="2" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QPushButton" row="1" column="2">
+                    <property name="name">
                         <cstring>PushButton25</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
+                    <property name="text">
                         <string>Stop</string>
                     </property>
-                    <property stdset="1">
-                        <name>accel</name>
-                        <number>268435488</number>
+                    <property name="accel">
+                        <string></string>
                     </property>
-                    <property>
-                        <name>toolTip</name>
+                    <property name="toolTip" stdset="0">
                         <string>Key: ' '</string>
                     </property>
                 </widget>
-                <widget row="3"  column="2" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QPushButton" row="3" column="2">
+                    <property name="name">
                         <cstring>PushButton19</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
+                    <property name="text">
                         <string>+1B</string>
                     </property>
-                    <property stdset="1">
-                        <name>accel</name>
-                        <number>268435513</number>
+                    <property name="accel">
+                        <string>9</string>
                     </property>
-                    <property>
-                        <name>toolTip</name>
+                    <property name="toolTip" stdset="0">
                         <string>Key: '9'</string>
                     </property>
                 </widget>
-                <widget row="0"  column="2" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QPushButton" row="0" column="2">
+                    <property name="name">
                         <cstring>PushButton24</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
-                        <string>Back</string>
+                    <property name="text">
+                        <string>Restart</string>
                     </property>
-                    <property stdset="1">
-                        <name>accel</name>
-                        <number>0</number>
+                    <property name="accel">
+                        <string>]</string>
                     </property>
-                    <property>
-                        <name>toolTip</name>
+                    <property name="toolTip" stdset="0">
                         <string>Key: ']'</string>
                     </property>
                 </widget>
             </grid>
         </widget>
-        <widget row="2"  column="1" >
-            <class>QButtonGroup</class>
-            <property stdset="1">
-                <name>name</name>
+        <widget class="QButtonGroup" row="2" column="1">
+            <property name="name">
                 <cstring>ButtonGroup1</cstring>
             </property>
-            <property stdset="1">
-                <name>title</name>
+            <property name="title">
                 <string>LFO</string>
             </property>
-            <property>
-                <name>layoutMargin</name>
+            <property name="layoutMargin" stdset="0">
             </property>
-            <property>
-                <name>layoutSpacing</name>
+            <property name="layoutSpacing" stdset="0">
             </property>
             <grid>
-                <property stdset="1">
-                    <name>margin</name>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <property name="margin">
                     <number>5</number>
                 </property>
-                <property stdset="1">
-                    <name>spacing</name>
+                <property name="spacing">
                     <number>1</number>
                 </property>
-                <widget row="1"  column="0" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QPushButton" row="1" column="0">
+                    <property name="name">
                         <cstring>PushButton28</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
+                    <property name="text">
                         <string>Slow Saw</string>
                     </property>
-                    <property stdset="1">
-                        <name>accel</name>
-                        <number>268435571</number>
+                    <property name="accel">
+                        <string>S</string>
                     </property>
-                    <property>
-                        <name>toolTip</name>
-                        <string>Key:'s'</string>
+                    <property name="toolTip" stdset="0">
+                        <string>Key:'S'</string>
                     </property>
                 </widget>
-                <widget row="1"  column="1" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QPushButton" row="1" column="1">
+                    <property name="name">
                         <cstring>PushButton29</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
+                    <property name="text">
                         <string>Fast Saw</string>
                     </property>
-                    <property stdset="1">
-                        <name>accel</name>
-                        <number>268435539</number>
+                    <property name="accel">
+                        <string>Alt+S</string>
                     </property>
-                    <property>
-                        <name>toolTip</name>
-                        <string>Key: 'S'</string>
+                    <property name="toolTip" stdset="0">
+                        <string>Key: 'ALT-S'</string>
                     </property>
                 </widget>
-                <widget row="2"  column="0" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QPushButton" row="2" column="0">
+                    <property name="name">
                         <cstring>PushButton30</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
+                    <property name="text">
                         <string>Slow rSaw</string>
                     </property>
-                    <property stdset="1">
-                        <name>accel</name>
-                        <number>268435570</number>
+                    <property name="accel">
+                        <string>R</string>
                     </property>
-                    <property>
-                        <name>toolTip</name>
-                        <string>Key: 'r'</string>
-                    </property>
-                </widget>
-                <widget row="2"  column="1" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>PushButton31</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>text</name>
-                        <string>Fast rSaw</string>
-                    </property>
-                    <property stdset="1">
-                        <name>accel</name>
-                        <number>268435538</number>
-                    </property>
-                    <property>
-                        <name>toolTip</name>
+                    <property name="toolTip" stdset="0">
                         <string>Key: 'R'</string>
                     </property>
                 </widget>
-                <widget row="3"  column="1" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QPushButton" row="2" column="1">
+                    <property name="name">
+                        <cstring>PushButton31</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Fast rSaw</string>
+                    </property>
+                    <property name="accel">
+                        <string>Alt+R</string>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Key: 'ALT-R'</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="3" column="1">
+                    <property name="name">
                         <cstring>PushButton39</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
+                    <property name="text">
                         <string>Normal</string>
                     </property>
-                    <property stdset="1">
-                        <name>accel</name>
-                        <number>268435566</number>
+                    <property name="accel">
+                        <string>N</string>
                     </property>
-                    <property>
-                        <name>toolTip</name>
-                        <string>Key: 'n'</string>
+                    <property name="toolTip" stdset="0">
+                        <string>Key: 'N'</string>
                     </property>
                 </widget>
-                <widget row="3"  column="0" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QPushButton" row="3" column="0">
+                    <property name="name">
                         <cstring>PushButton42</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
+                    <property name="text">
                         <string>Break</string>
                     </property>
-                    <property stdset="1">
-                        <name>accel</name>
-                        <number>268435554</number>
+                    <property name="accel">
+                        <string>B</string>
                     </property>
-                    <property>
-                        <name>toolTip</name>
-                        <string>Key: 'b'</string>
+                    <property name="toolTip" stdset="0">
+                        <string>Key: 'B'</string>
                     </property>
                 </widget>
-                <widget row="0"  column="1" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QPushButton" row="0" column="1">
+                    <property name="name">
                         <cstring>PushButton27</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
+                    <property name="text">
                         <string>Fast Pan</string>
                     </property>
-                    <property stdset="1">
-                        <name>accel</name>
-                        <number>268435536</number>
+                    <property name="accel">
+                        <string>Alt+P</string>
                     </property>
-                    <property>
-                        <name>toolTip</name>
-                        <string>Key: 'P'</string>
+                    <property name="toolTip" stdset="0">
+                        <string>Key: 'ALT-P'</string>
                     </property>
                 </widget>
-                <widget row="0"  column="0" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QPushButton" row="0" column="0">
+                    <property name="name">
                         <cstring>PushButton26</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
+                    <property name="text">
                         <string>Slow Pan</string>
                     </property>
-                    <property stdset="1">
-                        <name>accel</name>
-                        <number>268435568</number>
+                    <property name="accel">
+                        <string>P</string>
                     </property>
-                    <property>
-                        <name>toolTip</name>
-                        <string>Key: 'p'</string>
+                    <property name="toolTip" stdset="0">
+                        <string>Key: 'P'</string>
                     </property>
                 </widget>
             </grid>
         </widget>
-        <widget row="2"  column="2" >
-            <class>QButtonGroup</class>
-            <property stdset="1">
-                <name>name</name>
+        <widget class="QButtonGroup" row="2" column="2">
+            <property name="name">
                 <cstring>cueGroup</cstring>
             </property>
-            <property stdset="1">
-                <name>title</name>
+            <property name="title">
                 <string>Cue</string>
             </property>
-            <property>
-                <name>layoutMargin</name>
+            <property name="layoutMargin" stdset="0">
             </property>
-            <property>
-                <name>layoutSpacing</name>
+            <property name="layoutSpacing" stdset="0">
             </property>
             <grid>
-                <property stdset="1">
-                    <name>margin</name>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <property name="margin">
                     <number>5</number>
                 </property>
-                <property stdset="1">
-                    <name>spacing</name>
+                <property name="spacing">
                     <number>1</number>
                 </property>
-                <widget row="0"  column="2"  rowspan="1"  colspan="2" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QPushButton" row="0" column="2" rowspan="1" colspan="2">
+                    <property name="name">
                         <cstring>PushButton10</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
+                    <property name="text">
                         <string>Set Cue</string>
                     </property>
-                    <property stdset="1">
-                        <name>accel</name>
-                        <number>268435503</number>
+                    <property name="accel">
+                        <string>/</string>
                     </property>
-                    <property>
-                        <name>toolTip</name>
+                    <property name="toolTip" stdset="0">
                         <string>Key: '/'</string>
                     </property>
                 </widget>
-                <widget row="1"  column="2" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QPushButton" row="1" column="2">
+                    <property name="name">
                         <cstring>PushButton34</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
+                    <property name="text">
                         <string>- 1/32</string>
                     </property>
-                    <property stdset="1">
-                        <name>accel</name>
-                        <number>268435496</number>
+                    <property name="accel">
+                        <string>(</string>
                     </property>
-                    <property>
-                        <name>toolTip</name>
+                    <property name="toolTip" stdset="0">
                         <string>Key: '('</string>
                     </property>
                 </widget>
-                <widget row="1"  column="3" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QPushButton" row="1" column="3">
+                    <property name="name">
                         <cstring>PushButton33</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
+                    <property name="text">
                         <string>+1/32</string>
                     </property>
-                    <property stdset="1">
-                        <name>accel</name>
-                        <number>268435497</number>
+                    <property name="accel">
+                        <string>)</string>
                     </property>
-                    <property>
-                        <name>toolTip</name>
+                    <property name="toolTip" stdset="0">
                         <string>Key: ')'</string>
                     </property>
                 </widget>
-                <widget row="2"  column="2" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QPushButton" row="2" column="2">
+                    <property name="name">
                         <cstring>PushButton35</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
+                    <property name="text">
                         <string>-8M</string>
                     </property>
-                    <property stdset="1">
-                        <name>accel</name>
-                        <number>268435579</number>
+                    <property name="accel">
+                        <string>{</string>
                     </property>
-                    <property>
-                        <name>toolTip</name>
+                    <property name="toolTip" stdset="0">
                         <string>Key: '{'</string>
                     </property>
                 </widget>
-                <widget row="2"  column="3" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QPushButton" row="2" column="3">
+                    <property name="name">
                         <cstring>PushButton36</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
+                    <property name="text">
                         <string>+8M</string>
                     </property>
-                    <property stdset="1">
-                        <name>accel</name>
-                        <number>268435581</number>
+                    <property name="accel">
+                        <string>}</string>
                     </property>
-                    <property>
-                        <name>toolTip</name>
+                    <property name="toolTip" stdset="0">
                         <string>Key: '}'</string>
                     </property>
                 </widget>
-                <widget row="3"  column="2"  rowspan="1"  colspan="2" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QPushButton" row="3" column="2" rowspan="1" colspan="2">
+                    <property name="name">
                         <cstring>PushButton41</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
+                    <property name="text">
                         <string>Metronome</string>
                     </property>
-                    <property stdset="1">
-                        <name>accel</name>
-                        <number>268435565</number>
+                    <property name="accel">
+                        <string>M</string>
                     </property>
-                    <property>
-                        <name>toolTip</name>
+                    <property name="toolTip" stdset="0">
                         <string>Key: 'm'</string>
                     </property>
                 </widget>
-                <widget row="1"  column="0" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QPushButton" row="1" column="0">
+                    <property name="name">
                         <cstring>PushButton12</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
+                    <property name="text">
                         <string>Retrieve X</string>
                     </property>
-                    <property stdset="1">
-                        <name>accel</name>
-                        <number>268435576</number>
+                    <property name="accel">
+                        <string>X</string>
                     </property>
-                    <property>
-                        <name>toolTip</name>
-                        <string>Key: 'x'</string>
+                    <property name="toolTip" stdset="0">
+                        <string>Key: 'X'</string>
                     </property>
                 </widget>
-                <widget row="2"  column="0" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QPushButton" row="2" column="0">
+                    <property name="name">
                         <cstring>PushButton13</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
+                    <property name="text">
                         <string>Retrieve C</string>
                     </property>
-                    <property stdset="1">
-                        <name>accel</name>
-                        <number>268435555</number>
+                    <property name="accel">
+                        <string>C</string>
                     </property>
-                    <property>
-                        <name>toolTip</name>
-                        <string>Key: 'c'</string>
+                    <property name="toolTip" stdset="0">
+                        <string>Key: 'C'</string>
                     </property>
                 </widget>
-                <widget row="3"  column="0" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QPushButton" row="3" column="0">
+                    <property name="name">
                         <cstring>PushButton14</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
+                    <property name="text">
                         <string>Retrieve V</string>
                     </property>
-                    <property stdset="1">
-                        <name>accel</name>
-                        <number>268435574</number>
+                    <property name="accel">
+                        <string>V</string>
                     </property>
-                    <property>
-                        <name>toolTip</name>
-                        <string>Key: 'v'</string>
+                    <property name="toolTip" stdset="0">
+                        <string>Key: 'V'</string>
                     </property>
                 </widget>
-                <widget row="0"  column="0" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QPushButton" row="0" column="0">
+                    <property name="name">
                         <cstring>PushButton11</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>palette</name>
+                    <property name="palette">
                         <palette>
                             <active>
                                 <color>
@@ -766,9 +594,9 @@
                                     <blue>255</blue>
                                 </color>
                                 <color>
-                                    <red>192</red>
-                                    <green>192</green>
-                                    <blue>192</blue>
+                                    <red>255</red>
+                                    <green>255</green>
+                                    <blue>255</blue>
                                 </color>
                                 <color>
                                     <red>0</red>
@@ -784,6 +612,16 @@
                                     <red>255</red>
                                     <green>255</green>
                                     <blue>255</blue>
+                                </color>
+                                <color>
+                                    <red>0</red>
+                                    <green>0</green>
+                                    <blue>0</blue>
+                                </color>
+                                <color>
+                                    <red>0</red>
+                                    <green>0</green>
+                                    <blue>0</blue>
                                 </color>
                             </active>
                             <disabled>
@@ -818,9 +656,9 @@
                                     <blue>85</blue>
                                 </color>
                                 <color>
-                                    <red>0</red>
-                                    <green>0</green>
-                                    <blue>0</blue>
+                                    <red>128</red>
+                                    <green>128</green>
+                                    <blue>128</blue>
                                 </color>
                                 <color>
                                     <red>255</red>
@@ -838,9 +676,9 @@
                                     <blue>255</blue>
                                 </color>
                                 <color>
-                                    <red>192</red>
-                                    <green>192</green>
-                                    <blue>192</blue>
+                                    <red>255</red>
+                                    <green>255</green>
+                                    <blue>255</blue>
                                 </color>
                                 <color>
                                     <red>0</red>
@@ -856,6 +694,16 @@
                                     <red>255</red>
                                     <green>255</green>
                                     <blue>255</blue>
+                                </color>
+                                <color>
+                                    <red>0</red>
+                                    <green>0</green>
+                                    <blue>0</blue>
+                                </color>
+                                <color>
+                                    <red>0</red>
+                                    <green>0</green>
+                                    <blue>0</blue>
                                 </color>
                             </disabled>
                             <inactive>
@@ -910,9 +758,9 @@
                                     <blue>255</blue>
                                 </color>
                                 <color>
-                                    <red>192</red>
-                                    <green>192</green>
-                                    <blue>192</blue>
+                                    <red>255</red>
+                                    <green>255</green>
+                                    <blue>255</blue>
                                 </color>
                                 <color>
                                     <red>0</red>
@@ -929,530 +777,437 @@
                                     <green>255</green>
                                     <blue>255</blue>
                                 </color>
+                                <color>
+                                    <red>0</red>
+                                    <green>0</green>
+                                    <blue>0</blue>
+                                </color>
+                                <color>
+                                    <red>0</red>
+                                    <green>0</green>
+                                    <blue>0</blue>
+                                </color>
                             </inactive>
                         </palette>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
+                    <property name="text">
                         <string>Retrieve Z</string>
                     </property>
-                    <property stdset="1">
-                        <name>accel</name>
-                        <number>268435578</number>
+                    <property name="accel">
+                        <string>Z</string>
                     </property>
-                    <property>
-                        <name>toolTip</name>
-                        <string>Key: 'z'</string>
+                    <property name="flat">
+                        <bool>false</bool>
                     </property>
-                </widget>
-                <widget row="3"  column="1" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>PushButton18</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>text</name>
-                        <string>Store V</string>
-                    </property>
-                    <property stdset="1">
-                        <name>accel</name>
-                        <number>268435542</number>
-                    </property>
-                    <property>
-                        <name>toolTip</name>
-                        <string>Key: 'V'</string>
-                    </property>
-                </widget>
-                <widget row="2"  column="1" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>PushButton17</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>text</name>
-                        <string>Store C</string>
-                    </property>
-                    <property stdset="1">
-                        <name>accel</name>
-                        <number>268435523</number>
-                    </property>
-                    <property>
-                        <name>toolTip</name>
-                        <string>Key: 'C'</string>
-                    </property>
-                </widget>
-                <widget row="1"  column="1" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>PushButton16</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>text</name>
-                        <string>Store X</string>
-                    </property>
-                    <property stdset="1">
-                        <name>accel</name>
-                        <number>268435544</number>
-                    </property>
-                    <property>
-                        <name>toolTip</name>
-                        <string>Key: 'X'</string>
-                    </property>
-                </widget>
-                <widget row="0"  column="1" >
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>PushButton15</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>text</name>
-                        <string>Store Z</string>
-                    </property>
-                    <property stdset="1">
-                        <name>accel</name>
-                        <number>268435546</number>
-                    </property>
-                    <property>
-                        <name>toolTip</name>
+                    <property name="toolTip" stdset="0">
                         <string>Key: 'Z'</string>
                     </property>
                 </widget>
+                <widget class="QPushButton" row="3" column="1">
+                    <property name="name">
+                        <cstring>PushButton18</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Store V</string>
+                    </property>
+                    <property name="accel">
+                        <string>Alt+V</string>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Key: 'ALT-V'</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="2" column="1">
+                    <property name="name">
+                        <cstring>PushButton17</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Store C</string>
+                    </property>
+                    <property name="accel">
+                        <string>Alt+C</string>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Key: 'ALT-C'</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="1" column="1">
+                    <property name="name">
+                        <cstring>PushButton16</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Store X</string>
+                    </property>
+                    <property name="accel">
+                        <string>Alt+X</string>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Key: 'ALT-X'</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="0" column="1">
+                    <property name="name">
+                        <cstring>PushButton15</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Store Z</string>
+                    </property>
+                    <property name="accel">
+                        <string>Alt+Z</string>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Key: 'ALT+Z'</string>
+                    </property>
+                </widget>
             </grid>
         </widget>
-        <widget row="0"  column="1"  rowspan="1"  colspan="2" >
-            <class>QButtonGroup</class>
-            <property stdset="1">
-                <name>name</name>
+        <widget class="QButtonGroup" row="0" column="1" rowspan="1" colspan="2">
+            <property name="name">
                 <cstring>ButtonGroup3</cstring>
             </property>
-            <property stdset="1">
-                <name>title</name>
+            <property name="title">
                 <string>Tempo</string>
             </property>
             <grid>
-                <property stdset="1">
-                    <name>margin</name>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <property name="margin">
                     <number>11</number>
                 </property>
-                <property stdset="1">
-                    <name>spacing</name>
+                <property name="spacing">
                     <number>6</number>
                 </property>
-                <widget row="0"  column="0" >
-                    <class>QLayoutWidget</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QLayoutWidget" row="0" column="0">
+                    <property name="name">
                         <cstring>Layout8</cstring>
                     </property>
-                    <property>
-                        <name>layoutSpacing</name>
+                    <property name="layoutSpacing" stdset="0">
                     </property>
                     <grid>
-                        <property stdset="1">
-                            <name>margin</name>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <property name="margin">
                             <number>0</number>
                         </property>
-                        <property stdset="1">
-                            <name>spacing</name>
+                        <property name="spacing">
                             <number>5</number>
                         </property>
-                        <widget row="1"  column="2"  rowspan="1"  colspan="3" >
-                            <class>QLCDNumber</class>
-                            <property stdset="1">
-                                <name>name</name>
+                        <widget class="QLCDNumber" row="1" column="2" rowspan="1" colspan="3">
+                            <property name="name">
                                 <cstring>NormalTempoLCD</cstring>
                             </property>
-                            <property stdset="1">
-                                <name>numDigits</name>
+                            <property name="numDigits">
                                 <number>6</number>
                             </property>
                         </widget>
-                        <widget row="0"  column="4"  rowspan="1"  colspan="2" >
-                            <class>QPushButton</class>
-                            <property stdset="1">
-                                <name>name</name>
+                        <widget class="QPushButton" row="0" column="4" rowspan="1" colspan="2">
+                            <property name="name">
                                 <cstring>PushButton37</cstring>
                             </property>
-                            <property stdset="1">
-                                <name>text</name>
+                            <property name="text">
                                 <string>&gt;</string>
                             </property>
                         </widget>
-                        <widget row="0"  column="3" >
-                            <class>QPushButton</class>
-                            <property stdset="1">
-                                <name>name</name>
+                        <widget class="QPushButton" row="0" column="3">
+                            <property name="name">
                                 <cstring>PushButton36_2</cstring>
                             </property>
-                            <property stdset="1">
-                                <name>text</name>
+                            <property name="text">
                                 <string>&gt;&gt;</string>
                             </property>
-                            <property stdset="1">
-                                <name>accel</name>
-                                <number>268435504</number>
+                            <property name="accel">
+                                <string>0</string>
                             </property>
-                            <property>
-                                <name>toolTip</name>
+                            <property name="toolTip" stdset="0">
                                 <string>Key: '0'</string>
                             </property>
                         </widget>
-                        <widget row="0"  column="1"  rowspan="1"  colspan="2" >
-                            <class>QPushButton</class>
-                            <property stdset="1">
-                                <name>name</name>
+                        <widget class="QPushButton" row="0" column="1" rowspan="1" colspan="2">
+                            <property name="name">
                                 <cstring>PushButton22</cstring>
                             </property>
-                            <property stdset="1">
-                                <name>text</name>
+                            <property name="text">
                                 <string>&gt;&gt;&gt;</string>
                             </property>
-                            <property stdset="1">
-                                <name>accel</name>
-                                <number>0</number>
-                            </property>
-                        </widget>
-                        <widget row="1"  column="0"  rowspan="1"  colspan="2" >
-                            <class>QLCDNumber</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>CurrentTempoLCD</cstring>
-                            </property>
-                            <property stdset="1">
-                                <name>numDigits</name>
-                                <number>6</number>
-                            </property>
-                        </widget>
-                        <widget row="1"  column="5"  rowspan="1"  colspan="2" >
-                            <class>QLCDNumber</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>TempoLd</cstring>
-                            </property>
-                            <property stdset="1">
-                                <name>numDigits</name>
-                                <number>6</number>
-                            </property>
-                        </widget>
-                        <widget row="0"  column="0" >
-                            <class>QPushButton</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>PushButton20</cstring>
-                            </property>
-                            <property stdset="1">
-                                <name>text</name>
-                                <string>Target</string>
-                            </property>
-                            <property stdset="1">
-                                <name>accel</name>
-                                <number>268435500</number>
-                            </property>
-                        </widget>
-                        <widget row="0"  column="6" >
-                            <class>QPushButton</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>PushButton21</cstring>
-                            </property>
-                            <property stdset="1">
-                                <name>text</name>
-                                <string>Normal</string>
-                            </property>
-                            <property stdset="1">
-                                <name>accel</name>
-                                <number>268435502</number>
-                            </property>
-                        </widget>
-                    </grid>
-                </widget>
-                <widget row="0"  column="2" >
-                    <class>QLayoutWidget</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>Layout9</cstring>
-                    </property>
-                    <property>
-                        <name>layoutSpacing</name>
-                    </property>
-                    <grid>
-                        <property stdset="1">
-                            <name>margin</name>
-                            <number>0</number>
-                        </property>
-                        <property stdset="1">
-                            <name>spacing</name>
-                            <number>1</number>
-                        </property>
-                        <widget row="1"  column="0" >
-                            <class>QPushButton</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>PushButton32</cstring>
-                            </property>
-                            <property stdset="1">
-                                <name>text</name>
-                                <string>Quit</string>
-                            </property>
-                            <property stdset="1">
-                                <name>accel</name>
-                                <number>268435569</number>
-                            </property>
-                            <property>
-                                <name>toolTip</name>
-                                <string>Key: 'q'</string>
-                            </property>
-                            <property>
-                                <name>whatsThis</name>
+                            <property name="accel">
                                 <string></string>
                             </property>
                         </widget>
-                        <widget row="0"  column="0" >
-                            <class>QPushButton</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>BpmCounter</cstring>
+                        <widget class="QLCDNumber" row="1" column="0" rowspan="1" colspan="2">
+                            <property name="name">
+                                <cstring>CurrentTempoLCD</cstring>
                             </property>
-                            <property stdset="1">
-                                <name>text</name>
-                                <string>&amp;Bpm Counter</string>
+                            <property name="numDigits">
+                                <number>6</number>
                             </property>
-                            <property stdset="1">
-                                <name>accel</name>
-                                <number>276824130</number>
+                        </widget>
+                        <widget class="QLCDNumber" row="1" column="5" rowspan="1" colspan="2">
+                            <property name="name">
+                                <cstring>TempoLd</cstring>
+                            </property>
+                            <property name="numDigits">
+                                <number>6</number>
+                            </property>
+                        </widget>
+                        <widget class="QPushButton" row="0" column="0">
+                            <property name="name">
+                                <cstring>PushButton20</cstring>
+                            </property>
+                            <property name="text">
+                                <string>Target</string>
+                            </property>
+                            <property name="accel">
+                                <string></string>
+                            </property>
+                        </widget>
+                        <widget class="QPushButton" row="0" column="6">
+                            <property name="name">
+                                <cstring>PushButton21</cstring>
+                            </property>
+                            <property name="text">
+                                <string>Normal</string>
+                            </property>
+                            <property name="accel">
+                                <string>.</string>
                             </property>
                         </widget>
                     </grid>
                 </widget>
-                <widget row="0"  column="1" >
-                    <class>Line</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QLayoutWidget" row="0" column="2">
+                    <property name="name">
+                        <cstring>Layout9</cstring>
+                    </property>
+                    <property name="layoutSpacing" stdset="0">
+                    </property>
+                    <grid>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <property name="margin">
+                            <number>0</number>
+                        </property>
+                        <property name="spacing">
+                            <number>1</number>
+                        </property>
+                        <widget class="QPushButton" row="1" column="0">
+                            <property name="name">
+                                <cstring>PushButton32</cstring>
+                            </property>
+                            <property name="text">
+                                <string>Quit</string>
+                            </property>
+                            <property name="accel">
+                                <string>Q</string>
+                            </property>
+                            <property name="toolTip" stdset="0">
+                                <string>Key: 'q'</string>
+                            </property>
+                            <property name="whatsThis" stdset="0">
+                                <string></string>
+                            </property>
+                        </widget>
+                        <widget class="QPushButton" row="0" column="0">
+                            <property name="name">
+                                <cstring>BpmCounter</cstring>
+                            </property>
+                            <property name="text">
+                                <string>&amp;Bpm Counter</string>
+                            </property>
+                            <property name="accel">
+                                <string>Alt+B</string>
+                            </property>
+                        </widget>
+                    </grid>
+                </widget>
+                <widget class="Line" row="0" column="1">
+                    <property name="name">
                         <cstring>Line1</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>orientation</name>
+                    <property name="frameShape">
+                        <enum>VLine</enum>
+                    </property>
+                    <property name="frameShadow">
+                        <enum>Sunken</enum>
+                    </property>
+                    <property name="orientation">
                         <enum>Vertical</enum>
                     </property>
                 </widget>
             </grid>
         </widget>
-        <widget row="0"  column="0" >
-            <class>QGroupBox</class>
-            <property stdset="1">
-                <name>name</name>
+        <widget class="QGroupBox" row="0" column="0">
+            <property name="name">
                 <cstring>Position</cstring>
             </property>
-            <property stdset="1">
-                <name>title</name>
+            <property name="title">
                 <string>Position/Size</string>
             </property>
-            <property>
-                <name>layoutMargin</name>
+            <property name="layoutMargin" stdset="0">
             </property>
-            <property>
-                <name>layoutSpacing</name>
+            <property name="layoutSpacing" stdset="0">
             </property>
             <grid>
-                <property stdset="1">
-                    <name>margin</name>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <property name="margin">
                     <number>11</number>
                 </property>
-                <property stdset="1">
-                    <name>spacing</name>
+                <property name="spacing">
                     <number>5</number>
                 </property>
-                <widget row="1"  column="1" >
-                    <class>QLCDNumber</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QLCDNumber" row="1" column="1">
+                    <property name="name">
                         <cstring>TotalTimeLCD</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>sizePolicy</name>
+                    <property name="sizePolicy">
                         <sizepolicy>
                             <hsizetype>1</hsizetype>
                             <vsizetype>5</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
                         </sizepolicy>
                     </property>
-                    <property stdset="1">
-                        <name>minimumSize</name>
+                    <property name="minimumSize">
                         <size>
                             <width>0</width>
                             <height>40</height>
                         </size>
                     </property>
-                    <property stdset="1">
-                        <name>numDigits</name>
+                    <property name="numDigits">
                         <number>6</number>
                     </property>
-                    <property>
-                        <name>toolTip</name>
+                    <property name="toolTip" stdset="0">
                         <string></string>
                     </property>
                 </widget>
-                <widget row="1"  column="0" >
-                    <class>QLCDNumber</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QLCDNumber" row="1" column="0">
+                    <property name="name">
                         <cstring>CurrentTimeLCD</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>numDigits</name>
+                    <property name="numDigits">
                         <number>6</number>
                     </property>
-                    <property>
-                        <name>toolTip</name>
+                    <property name="toolTip" stdset="0">
                         <string></string>
                     </property>
                 </widget>
-                <widget row="0"  column="0" >
-                    <class>QLCDNumber</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QLCDNumber" row="0" column="0">
+                    <property name="name">
                         <cstring>LcdLeft</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>numDigits</name>
+                    <property name="numDigits">
                         <number>6</number>
                     </property>
-                    <property>
-                        <name>toolTip</name>
+                    <property name="toolTip" stdset="0">
                         <string></string>
                     </property>
                 </widget>
-                <widget row="0"  column="1" >
-                    <class>QLCDNumber</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QLCDNumber" row="0" column="1">
+                    <property name="name">
                         <cstring>LcdRight</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>sizePolicy</name>
+                    <property name="sizePolicy">
                         <sizepolicy>
                             <hsizetype>1</hsizetype>
                             <vsizetype>1</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
                         </sizepolicy>
                     </property>
-                    <property stdset="1">
-                        <name>minimumSize</name>
+                    <property name="minimumSize">
                         <size>
                             <width>0</width>
                             <height>40</height>
                         </size>
                     </property>
-                    <property stdset="1">
-                        <name>numDigits</name>
+                    <property name="numDigits">
                         <number>6</number>
                     </property>
-                    <property>
-                        <name>toolTip</name>
+                    <property name="toolTip" stdset="0">
                         <string></string>
                     </property>
                 </widget>
             </grid>
         </widget>
-        <widget row="0"  column="3"  rowspan="3"  colspan="1" >
-            <class>QGroupBox</class>
-            <property stdset="1">
-                <name>name</name>
+        <widget class="QGroupBox" row="0" column="3" rowspan="3" colspan="1">
+            <property name="name">
                 <cstring>GroupBox1</cstring>
             </property>
-            <property stdset="1">
-                <name>sizePolicy</name>
+            <property name="sizePolicy">
                 <sizepolicy>
                     <hsizetype>5</hsizetype>
                     <vsizetype>5</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
                 </sizepolicy>
             </property>
-            <property stdset="1">
-                <name>title</name>
+            <property name="title">
                 <string>Volumes</string>
             </property>
-            <property>
-                <name>layoutMargin</name>
+            <property name="layoutMargin" stdset="0">
             </property>
-            <property>
-                <name>layoutSpacing</name>
+            <property name="layoutSpacing" stdset="0">
             </property>
             <grid>
-                <property stdset="1">
-                    <name>margin</name>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <property name="margin">
                     <number>5</number>
                 </property>
-                <property stdset="1">
-                    <name>spacing</name>
+                <property name="spacing">
                     <number>2</number>
                 </property>
-                <widget row="0"  column="1" >
-                    <class>QLabel</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QLabel" row="0" column="1">
+                    <property name="name">
                         <cstring>TextLabel2</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
+                    <property name="text">
                         <string>PCM</string>
                     </property>
                 </widget>
-                <widget row="1"  column="1" >
-                    <class>QSlider</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QSlider" row="1" column="1">
+                    <property name="name">
                         <cstring>Slider4</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>orientation</name>
+                    <property name="orientation">
                         <enum>Vertical</enum>
                     </property>
-                    <property stdset="1">
-                        <name>tickmarks</name>
+                    <property name="tickmarks">
                         <enum>Both</enum>
                     </property>
-                    <property stdset="1">
-                        <name>tickInterval</name>
+                    <property name="tickInterval">
                         <number>5</number>
                     </property>
                 </widget>
-                <widget row="0"  column="0" >
-                    <class>QLabel</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QLabel" row="0" column="0">
+                    <property name="name">
                         <cstring>TextLabel1</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
+                    <property name="text">
                         <string>Main</string>
                     </property>
                 </widget>
-                <widget row="1"  column="0" >
-                    <class>QSlider</class>
-                    <property stdset="1">
-                        <name>name</name>
+                <widget class="QSlider" row="1" column="0">
+                    <property name="name">
                         <cstring>Slider3</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>maxValue</name>
+                    <property name="maxValue">
                         <number>100</number>
                     </property>
-                    <property stdset="1">
-                        <name>lineStep</name>
+                    <property name="lineStep">
                         <number>1</number>
                     </property>
-                    <property stdset="1">
-                        <name>orientation</name>
+                    <property name="orientation">
                         <enum>Vertical</enum>
                     </property>
-                    <property stdset="1">
-                        <name>tickmarks</name>
+                    <property name="tickmarks">
                         <enum>Both</enum>
                     </property>
-                    <property stdset="1">
-                        <name>tickInterval</name>
+                    <property name="tickInterval">
                         <number>5</number>
                     </property>
                 </widget>
@@ -1461,6 +1216,12 @@
     </grid>
 </widget>
 <connections>
+    <connection>
+        <sender>BpmCounter</sender>
+        <signal>clicked()</signal>
+        <receiver>SongPlayer</receiver>
+        <slot>openBpmCounter()</slot>
+    </connection>
     <connection>
         <sender>KeyMinus</sender>
         <signal>clicked()</signal>
@@ -1474,142 +1235,10 @@
         <slot>nudgePlus()</slot>
     </connection>
     <connection>
-        <sender>PushButton3</sender>
-        <signal>clicked()</signal>
+        <sender>PushButton10</sender>
+        <signal>pressed()</signal>
         <receiver>SongPlayer</receiver>
-        <slot>nudgePlus1M()</slot>
-    </connection>
-    <connection>
-        <sender>PushButton4</sender>
-        <signal>clicked()</signal>
-        <receiver>SongPlayer</receiver>
-        <slot>nudgeMinus1M()</slot>
-    </connection>
-    <connection>
-        <sender>PushButton5</sender>
-        <signal>clicked()</signal>
-        <receiver>SongPlayer</receiver>
-        <slot>nudgePlus4M()</slot>
-    </connection>
-    <connection>
-        <sender>PushButton6</sender>
-        <signal>clicked()</signal>
-        <receiver>SongPlayer</receiver>
-        <slot>nudgeMinus4M()</slot>
-    </connection>
-    <connection>
-        <sender>PushButton8</sender>
-        <signal>clicked()</signal>
-        <receiver>SongPlayer</receiver>
-        <slot>nudgeMinus8M()</slot>
-    </connection>
-    <connection>
-        <sender>PushButton24</sender>
-        <signal>clicked()</signal>
-        <receiver>SongPlayer</receiver>
-        <slot>shiftBack()</slot>
-    </connection>
-    <connection>
-        <sender>PushButton19</sender>
-        <signal>clicked()</signal>
-        <receiver>SongPlayer</receiver>
-        <slot>nudgePlusB()</slot>
-    </connection>
-    <connection>
-        <sender>PushButton7</sender>
-        <signal>clicked()</signal>
-        <receiver>SongPlayer</receiver>
-        <slot>nudgePlus8M()</slot>
-    </connection>
-    <connection>
-        <sender>PushButton21</sender>
-        <signal>clicked()</signal>
-        <receiver>SongPlayer</receiver>
-        <slot>normalTempo()</slot>
-    </connection>
-    <connection>
-        <sender>PushButton20</sender>
-        <signal>clicked()</signal>
-        <receiver>SongPlayer</receiver>
-        <slot>targetTempo()</slot>
-    </connection>
-    <connection>
-        <sender>PushButton15</sender>
-        <signal>clicked()</signal>
-        <receiver>SongPlayer</receiver>
-        <slot>storeZ()</slot>
-    </connection>
-    <connection>
-        <sender>PushButton16</sender>
-        <signal>clicked()</signal>
-        <receiver>SongPlayer</receiver>
-        <slot>storeX()</slot>
-    </connection>
-    <connection>
-        <sender>PushButton17</sender>
-        <signal>clicked()</signal>
-        <receiver>SongPlayer</receiver>
-        <slot>storeC()</slot>
-    </connection>
-    <connection>
-        <sender>PushButton18</sender>
-        <signal>clicked()</signal>
-        <receiver>SongPlayer</receiver>
-        <slot>storeV()</slot>
-    </connection>
-    <connection>
-        <sender>PushButton34</sender>
-        <signal>clicked()</signal>
-        <receiver>SongPlayer</receiver>
-        <slot>nudgeCueBack()</slot>
-    </connection>
-    <connection>
-        <sender>PushButton33</sender>
-        <signal>clicked()</signal>
-        <receiver>SongPlayer</receiver>
-        <slot>nudgeCueForward()</slot>
-    </connection>
-    <connection>
-        <sender>PushButton35</sender>
-        <signal>released()</signal>
-        <receiver>SongPlayer</receiver>
-        <slot>nudgeCueBack8M()</slot>
-    </connection>
-    <connection>
-        <sender>PushButton36</sender>
-        <signal>clicked()</signal>
-        <receiver>SongPlayer</receiver>
-        <slot>nudgeCueForward8M()</slot>
-    </connection>
-    <connection>
-        <sender>PushButton22</sender>
-        <signal>clicked()</signal>
-        <receiver>SongPlayer</receiver>
-        <slot>fastSwitch()</slot>
-    </connection>
-    <connection>
-        <sender>PushButton36_2</sender>
-        <signal>clicked()</signal>
-        <receiver>SongPlayer</receiver>
-        <slot>mediumSwitch()</slot>
-    </connection>
-    <connection>
-        <sender>PushButton37</sender>
-        <signal>clicked()</signal>
-        <receiver>SongPlayer</receiver>
-        <slot>slowSwitch()</slot>
-    </connection>
-    <connection>
-        <sender>Slider3</sender>
-        <signal>valueChanged(int)</signal>
-        <receiver>SongPlayer</receiver>
-        <slot>mainVolume(int)</slot>
-    </connection>
-    <connection>
-        <sender>Slider4</sender>
-        <signal>valueChanged(int)</signal>
-        <receiver>SongPlayer</receiver>
-        <slot>pcmVolume(int)</slot>
+        <slot>setCue()</slot>
     </connection>
     <connection>
         <sender>PushButton11</sender>
@@ -1636,10 +1265,58 @@
         <slot>retrieveV()</slot>
     </connection>
     <connection>
-        <sender>PushButton10</sender>
-        <signal>pressed()</signal>
+        <sender>PushButton15</sender>
+        <signal>clicked()</signal>
         <receiver>SongPlayer</receiver>
-        <slot>setCue()</slot>
+        <slot>storeZ()</slot>
+    </connection>
+    <connection>
+        <sender>PushButton16</sender>
+        <signal>clicked()</signal>
+        <receiver>SongPlayer</receiver>
+        <slot>storeX()</slot>
+    </connection>
+    <connection>
+        <sender>PushButton17</sender>
+        <signal>clicked()</signal>
+        <receiver>SongPlayer</receiver>
+        <slot>storeC()</slot>
+    </connection>
+    <connection>
+        <sender>PushButton18</sender>
+        <signal>clicked()</signal>
+        <receiver>SongPlayer</receiver>
+        <slot>storeV()</slot>
+    </connection>
+    <connection>
+        <sender>PushButton19</sender>
+        <signal>clicked()</signal>
+        <receiver>SongPlayer</receiver>
+        <slot>nudgePlusB()</slot>
+    </connection>
+    <connection>
+        <sender>PushButton20</sender>
+        <signal>clicked()</signal>
+        <receiver>SongPlayer</receiver>
+        <slot>targetTempo()</slot>
+    </connection>
+    <connection>
+        <sender>PushButton21</sender>
+        <signal>clicked()</signal>
+        <receiver>SongPlayer</receiver>
+        <slot>normalTempo()</slot>
+    </connection>
+    <connection>
+        <sender>PushButton22</sender>
+        <signal>clicked()</signal>
+        <receiver>SongPlayer</receiver>
+        <slot>fastSwitch()</slot>
+    </connection>
+    <connection>
+        <sender>PushButton24</sender>
+        <signal>clicked()</signal>
+        <receiver>SongPlayer</receiver>
+        <slot>restart()</slot>
     </connection>
     <connection>
         <sender>PushButton25</sender>
@@ -1672,16 +1349,10 @@
         <slot>fastSaw()</slot>
     </connection>
     <connection>
-        <sender>PushButton39</sender>
-        <signal>pressed()</signal>
+        <sender>PushButton3</sender>
+        <signal>clicked()</signal>
         <receiver>SongPlayer</receiver>
-        <slot>normalLfo()</slot>
-    </connection>
-    <connection>
-        <sender>PushButton42</sender>
-        <signal>pressed()</signal>
-        <receiver>SongPlayer</receiver>
-        <slot>breakLfo()</slot>
+        <slot>nudgePlus1M()</slot>
     </connection>
     <connection>
         <sender>PushButton30</sender>
@@ -1696,65 +1367,197 @@
         <slot>fastRevSaw()</slot>
     </connection>
     <connection>
+        <sender>PushButton32</sender>
+        <signal>clicked()</signal>
+        <receiver>SongPlayer</receiver>
+        <slot>accept()</slot>
+    </connection>
+    <connection>
+        <sender>PushButton33</sender>
+        <signal>clicked()</signal>
+        <receiver>SongPlayer</receiver>
+        <slot>nudgeCueForward()</slot>
+    </connection>
+    <connection>
+        <sender>PushButton34</sender>
+        <signal>clicked()</signal>
+        <receiver>SongPlayer</receiver>
+        <slot>nudgeCueBack()</slot>
+    </connection>
+    <connection>
+        <sender>PushButton35</sender>
+        <signal>released()</signal>
+        <receiver>SongPlayer</receiver>
+        <slot>nudgeCueBack8M()</slot>
+    </connection>
+    <connection>
+        <sender>PushButton36</sender>
+        <signal>clicked()</signal>
+        <receiver>SongPlayer</receiver>
+        <slot>nudgeCueForward8M()</slot>
+    </connection>
+    <connection>
+        <sender>PushButton36_2</sender>
+        <signal>clicked()</signal>
+        <receiver>SongPlayer</receiver>
+        <slot>mediumSwitch()</slot>
+    </connection>
+    <connection>
+        <sender>PushButton37</sender>
+        <signal>clicked()</signal>
+        <receiver>SongPlayer</receiver>
+        <slot>slowSwitch()</slot>
+    </connection>
+    <connection>
+        <sender>PushButton39</sender>
+        <signal>pressed()</signal>
+        <receiver>SongPlayer</receiver>
+        <slot>normalLfo()</slot>
+    </connection>
+    <connection>
+        <sender>PushButton4</sender>
+        <signal>clicked()</signal>
+        <receiver>SongPlayer</receiver>
+        <slot>nudgeMinus1M()</slot>
+    </connection>
+    <connection>
         <sender>PushButton41</sender>
         <signal>pressed()</signal>
         <receiver>SongPlayer</receiver>
         <slot>metronome()</slot>
     </connection>
     <connection>
-        <sender>BpmCounter</sender>
-        <signal>clicked()</signal>
+        <sender>PushButton42</sender>
+        <signal>pressed()</signal>
         <receiver>SongPlayer</receiver>
-        <slot>openBpmCounter()</slot>
+        <slot>breakLfo()</slot>
     </connection>
     <connection>
-        <sender>PushButton32</sender>
+        <sender>PushButton5</sender>
         <signal>clicked()</signal>
         <receiver>SongPlayer</receiver>
-        <slot>accept()</slot>
+        <slot>nudgePlus4M()</slot>
     </connection>
-    <slot access="public">breakLfo()</slot>
-    <slot access="public">fastPan()</slot>
-    <slot access="public">fastRevSaw()</slot>
-    <slot access="public">fastSaw()</slot>
-    <slot access="public">fastSwitch()</slot>
-    <slot access="public">mainVolume(int)</slot>
-    <slot access="public">mediumSwitch()</slot>
-    <slot access="public">metronome()</slot>
-    <slot access="public">openBpmCounter()</slot>
-    <slot access="public">normalLfo()</slot>
-    <slot access="public">normalTempo()</slot>
-    <slot access="public">nudgeCueBack()</slot>
-    <slot access="public">nudgeCueBack8M()</slot>
-    <slot access="public">nudgeCueForward()</slot>
-    <slot access="public">nudgeCueForward8M()</slot>
-    <slot access="public">nudgeMinus()</slot>
-    <slot access="public">nudgeMinus1M()</slot>
-    <slot access="public">nudgeMinus4M()</slot>
-    <slot access="public">nudgeMinus8M()</slot>
-    <slot access="public">nudgePlus()</slot>
-    <slot access="public">nudgePlus1M()</slot>
-    <slot access="public">nudgePlus4M()</slot>
-    <slot access="public">nudgePlus8M()</slot>
-    <slot access="public">nudgePlusB()</slot>
-    <slot access="public">pcmVolume(int)</slot>
-    <slot access="public">retrieveC()</slot>
-    <slot access="public">retrieveV()</slot>
-    <slot access="public">retrieveX()</slot>
-    <slot access="public">retrieveZ()</slot>
-    <slot access="public">setCue()</slot>
-    <slot access="public">shiftBack()</slot>
-    <slot access="public">slowPan()</slot>
-    <slot access="public">slowRevSaw()</slot>
-    <slot access="public">slowSaw()</slot>
-    <slot access="public">slowSwitch()</slot>
-    <slot access="public">stop()</slot>
-    <slot access="public">storeC()</slot>
-    <slot access="public">storeV()</slot>
-    <slot access="public">storeX()</slot>
-    <slot access="public">storeZ()</slot>
-    <slot access="public">tap()</slot>
-    <slot access="public">targetStep()</slot>
-    <slot access="public">targetTempo()</slot>
+    <connection>
+        <sender>PushButton6</sender>
+        <signal>clicked()</signal>
+        <receiver>SongPlayer</receiver>
+        <slot>nudgeMinus4M()</slot>
+    </connection>
+    <connection>
+        <sender>PushButton7</sender>
+        <signal>clicked()</signal>
+        <receiver>SongPlayer</receiver>
+        <slot>nudgePlus8M()</slot>
+    </connection>
+    <connection>
+        <sender>PushButton8</sender>
+        <signal>clicked()</signal>
+        <receiver>SongPlayer</receiver>
+        <slot>nudgeMinus8M()</slot>
+    </connection>
+    <connection>
+        <sender>Slider3</sender>
+        <signal>valueChanged(int)</signal>
+        <receiver>SongPlayer</receiver>
+        <slot>mainVolume(int)</slot>
+    </connection>
+    <connection>
+        <sender>Slider4</sender>
+        <signal>valueChanged(int)</signal>
+        <receiver>SongPlayer</receiver>
+        <slot>pcmVolume(int)</slot>
+    </connection>
 </connections>
+<tabstops>
+    <tabstop>PushButton25</tabstop>
+    <tabstop>PushButton8</tabstop>
+    <tabstop>PushButton7</tabstop>
+    <tabstop>PushButton5</tabstop>
+    <tabstop>PushButton6</tabstop>
+    <tabstop>PushButton4</tabstop>
+    <tabstop>KeyMinus</tabstop>
+    <tabstop>KeyPlus</tabstop>
+    <tabstop>PushButton3</tabstop>
+    <tabstop>PushButton9</tabstop>
+    <tabstop>PushButton19</tabstop>
+    <tabstop>PushButton24</tabstop>
+    <tabstop>PushButton28</tabstop>
+    <tabstop>PushButton29</tabstop>
+    <tabstop>PushButton30</tabstop>
+    <tabstop>PushButton31</tabstop>
+    <tabstop>PushButton39</tabstop>
+    <tabstop>PushButton42</tabstop>
+    <tabstop>PushButton27</tabstop>
+    <tabstop>PushButton26</tabstop>
+    <tabstop>PushButton10</tabstop>
+    <tabstop>PushButton34</tabstop>
+    <tabstop>PushButton33</tabstop>
+    <tabstop>PushButton35</tabstop>
+    <tabstop>PushButton36</tabstop>
+    <tabstop>PushButton41</tabstop>
+    <tabstop>PushButton12</tabstop>
+    <tabstop>PushButton13</tabstop>
+    <tabstop>PushButton14</tabstop>
+    <tabstop>PushButton11</tabstop>
+    <tabstop>PushButton18</tabstop>
+    <tabstop>PushButton17</tabstop>
+    <tabstop>PushButton16</tabstop>
+    <tabstop>PushButton15</tabstop>
+    <tabstop>PushButton37</tabstop>
+    <tabstop>PushButton36_2</tabstop>
+    <tabstop>PushButton22</tabstop>
+    <tabstop>PushButton20</tabstop>
+    <tabstop>PushButton21</tabstop>
+    <tabstop>PushButton32</tabstop>
+    <tabstop>BpmCounter</tabstop>
+    <tabstop>Slider4</tabstop>
+    <tabstop>Slider3</tabstop>
+</tabstops>
+<slots>
+    <slot>breakLfo()</slot>
+    <slot>fastPan()</slot>
+    <slot>fastRevSaw()</slot>
+    <slot>fastSaw()</slot>
+    <slot>fastSwitch()</slot>
+    <slot>mainVolume(int)</slot>
+    <slot>mediumSwitch()</slot>
+    <slot>metronome()</slot>
+    <slot>openBpmCounter()</slot>
+    <slot>normalLfo()</slot>
+    <slot>normalTempo()</slot>
+    <slot>nudgeCueBack()</slot>
+    <slot>nudgeCueBack8M()</slot>
+    <slot>nudgeCueForward()</slot>
+    <slot>nudgeCueForward8M()</slot>
+    <slot>nudgeMinus()</slot>
+    <slot>nudgeMinus1M()</slot>
+    <slot>nudgeMinus4M()</slot>
+    <slot>nudgeMinus8M()</slot>
+    <slot>nudgePlus()</slot>
+    <slot>nudgePlus1M()</slot>
+    <slot>nudgePlus4M()</slot>
+    <slot>nudgePlus8M()</slot>
+    <slot>nudgePlusB()</slot>
+    <slot>pcmVolume(int)</slot>
+    <slot>retrieveC()</slot>
+    <slot>retrieveV()</slot>
+    <slot>retrieveX()</slot>
+    <slot>retrieveZ()</slot>
+    <slot>setCue()</slot>
+    <slot>restart()</slot>
+    <slot>slowPan()</slot>
+    <slot>slowRevSaw()</slot>
+    <slot>slowSaw()</slot>
+    <slot>slowSwitch()</slot>
+    <slot>stop()</slot>
+    <slot>storeC()</slot>
+    <slot>storeV()</slot>
+    <slot>storeX()</slot>
+    <slot>storeZ()</slot>
+    <slot>tap()</slot>
+    <slot>targetStep()</slot>
+    <slot>targetTempo()</slot>
+</slots>
+<layoutdefaults spacing="6" margin="11"/>
 </UI>

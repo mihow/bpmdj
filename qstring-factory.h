@@ -18,23 +18,16 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#include "config.h"
+class QString;
 
-class ProcessManager
+class QStringFactory
 {
- public:
-  // WVB -- TOFIX: maybe we should make this whole class static 
-  int monitorpid;
-  static double mainTempo;
-  static QSong* playingInMain;
-  static QSong* playingInMonitor;
- private:
-  int monitorPlayCommand;
-  double monitorTempo;
-  SongSelectorLogic* selector;
- public:
-  ProcessManager(SongSelectorLogic *sel);
-  void clearMonitor();
-  void switchMonitorToMain();
-  void startSong(QSong *song);
+  private:
+    static int next;
+    static int size;
+    static QString **content;
+    static QString * lookup(QString *str);
+    static void enlarge();
+  public:
+    static QString create(char* str);
 };

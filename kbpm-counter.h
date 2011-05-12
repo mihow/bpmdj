@@ -50,7 +50,7 @@ class BpmCountDialog : public CountDialog
    void          removeRaw();
    void          stopWorking();
    SongPlayer *  player;
-   BpmCountDialog::BpmCountDialog(SongPlayer*parent=0,const char*name=0, bool modal=FALSE,WFlags f=0);
+   BpmCountDialog(SongPlayer*parent=0, const char * name=0, bool modal=FALSE, WFlags f=0);
  public slots:
    virtual void startAutomaticCounter();
    virtual void timerTick();

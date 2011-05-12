@@ -18,22 +18,23 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#include <stdlib.h>
-#include <stdio.h>
-/**
- * An (obsolote) class to represent the song already played
- */
+#include "scanningprogress.h"
+#include "songselector.logic.h"
+#include "dirscanner.h"
 
-class Sums
+class QString;
+
+class ImportScanner: 
+  public DirectoryScanner,
+  public ScanningProgress
 {
- private:
-   static char** names;
-   static char** sums;
-   static int size;
-   static int next;
-   static FILE* f;
-   static void Add(const char* indexname);
+  SongSelectorLogic * selector;
+ protected:
+  virtual void recursing(const QString dirname);
+  virtual void checkfile(const QString pathname, const QString filename);
  public:
-   Sums(const char* filename);
-   static char* Md5(const char* indexname);
+  ImportScanner(SongSelectorLogic* sroot);
+  virtual void scan(const QString dirname) 
+    { scan(dirname,NULL); };
+  virtual void scan(const QString filename, const QString checkname);
 };

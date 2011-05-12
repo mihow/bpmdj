@@ -6,9 +6,22 @@
 #include <stdio.h>
 #include "renamer.logic.h"
 
-RenamerLogic::RenamerLogic(QWidget*parent,const char*name) :
- Renamer(parent,name)
+RenamerLogic::RenamerLogic(QWidget*parent,const QString name) :
+  Renamer(parent,name),
+  DirectoryScanner("")
 {
+}
+
+void RenamerLogic::checkfile(const QString  pathname, const QString  filename)
+{
+  QString fullname = pathname+"/"+filename;
+  add(filename,fullname);
+}
+
+bool RenamerLogic::matchextension(const QString  filename)
+{
+  return filename.contains(".mp3",0) +
+    filename.contains(".idx",0);
 }
 
 bool RenamerLogic::goodName(QString name)
@@ -34,13 +47,12 @@ bool RenamerLogic::goodName(QString name)
    return true;
 }
 
-void RenamerLogic::add(const char* name, const char* pos)
+void RenamerLogic::add(const QString name, const QString pos)
 {
-   // check whether the filename is good enough
-   if (!goodName(name))
-     new QListViewItem(NameList,name,name,pos);
+  // check whether the filename is good enough
+  if (!goodName(name))
+    new QListViewItem(NameList,name,name,pos);
 }
-   
 
 QString RenamerLogic::smallCapsInWord(QString in)
 {
@@ -81,8 +93,6 @@ QString RenamerLogic::capitalizeAfterSpace(QString in)
      }
    return QString(out);
 }
-
-
 
 QString RenamerLogic::removeSpaces(QString in)
 {
@@ -289,18 +299,6 @@ void RenamerLogic::changeSelection()
    if (!found) 
      gcs="";
    SubString->setText(gcs);
-}
-
-
-bool exists(QString fn)
-{
-   FILE * f = fopen(fn,"rb");
-   if (f)
-     {
-	fclose(f);
-	return true;
-     }
-   return false;
 }
 
 void RenamerLogic::realizeSelection()

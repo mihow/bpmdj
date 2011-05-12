@@ -32,40 +32,43 @@
 #include <stdio.h>
 #include "kbpm-played.h"
 
+int Played::songs_played=0;
 int Played::size=1;
 int Played::next=1;
 FILE *Played::f=NULL;
-char** Played::names=NULL;
+QString** Played::names=NULL;
 
-void Played::Add(const char*filename)
+void Played::Add(QString *filename)
 {
-   /* put line in memory */
-   names[next]=strdup(filename);
-   names[next][strlen(names[next])-1]=0;
-   next++;
-   if (next>=size)
-     {
-	size*=2;
-	names=(char**)realloc(names,size*sizeof(char*));
-     }
+  /* put line in memory */
+  names[next++]=filename;
+  if (next>=size)
+    {
+      size*=2;
+      names=(QString**)realloc(names,size*sizeof(QString*));
+    }
 }
 
-Played::Played(const char* filename)
+Played::Played(const QString filename)
 {
    /* initialise shit */
-   size=1;
+   size=100;
    next=0;
-   names=(char**)malloc(sizeof(char*)*size);
+   names=(QString**)malloc(sizeof(QString*)*size);
    assert(names);
    /* read the file or create it */
    f=fopen(filename,"rb");
    /* read all lines in memory and sort them */
    if (f!=NULL)
      {
-	char *line=NULL;
-	size_t len;
-	while(getline(&line,&len,f)!=-1)
-	  Add(line);
+	char  *line = NULL;
+	size_t blen = 0;
+	ssize_t len = 0;
+	while((len=getline(&line,&blen,f))!=-1)
+	  {
+	    line[len-1]=0;
+	    Add(new QString(line));
+	  }
 	if (line)
 	  free(line);
      }
@@ -73,20 +76,17 @@ Played::Played(const char* filename)
    f=fopen(filename,"ab");
 }
 
-bool Played::IsPlayed(const char * indexname)
+bool Played::IsPlayed(const QString indexname)
 {
-   int i=0;
-   while(i<next)
-     {
-	if (strcmp(names[i],indexname)==0) 
-	  return true;
-	i++;
-     }
-   return false;
+  for(int i = 0 ; i < next ; i++)
+    if (*(names[i])==indexname) 
+      return true;
+  return false;
 }
 
-void Played::Play(const char* indexname)
+void Played::Play(const QString indexname)
 {
-   fprintf(f,"%s\n",indexname);
-   fflush(f);
+  fprintf(f,"%s\n",(const char*)indexname);
+  fflush(f);
+  songs_played++;
 }

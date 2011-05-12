@@ -1,4 +1,4 @@
-VERSION = 1.5
+VERSION = 1.6
 include defines
 
 all: cbpm-count cbpm-play kbpm-play kbpm-dj beatmixing.ps
@@ -46,9 +46,9 @@ clean:
 	$(RM) setupwizard.h setupwizard.cpp
 	$(RM) scanningprogress.h scanningprogress.cpp
 	$(RM) songselector.h songselector.cpp
-	$(RM) about.h about.cpp
+	$(RM) about.h about.cpp legende.h legende.cpp
 	$(RM) bpmbounds.h bpmbounds.cpp
-	$(RM) askinput.h askinput.cpp
+	$(RM) askinput.h askinput.cpp loader.h loader.cpp
 	$(RM) preferences.h preferences.cpp
 	$(RM) profile-clock process_bpm.sh
 	$(RM) renamer.h renamer.cpp
@@ -113,8 +113,13 @@ KCOUNT_OBJECTS = bpmcounter.o\
 	kbpm-count.o\
 	kbpm-count.moc.o
 
-KSEL_OBJECTS = about.o\
+KSEL_OBJECTS = qstring-factory.o\
+	about.o\
 	about.moc.o\
+	legende.o\
+	legende.moc.o\
+	loader.o\
+	loader.moc.o\
 	askinput.o\
 	askinput.moc.o\
 	tagbox.o\
@@ -125,25 +130,31 @@ KSEL_OBJECTS = about.o\
 	bpmbounds.o\
 	songselector.o\
 	songselector.moc.o\
+	dirscanner.o\
+	importscanner.o\
 	songselector.logic.moc.o\
 	songselector.logic.o\
 	process-manager.cpp\
 	preferences.o\
 	preferences.moc.o\
-	qsongviewitem.o\
+	qsong.o\
 	kbpm-index.o\
 	cbpm-index.o\
 	kbpm-played.o\
 	setupwizard.moc.o\
 	setupwizard.o\
 	kbpm-dj.o\
-	kbpm-md5.o\
 	edit-distance.o\
 	renamer.o\
 	renamer.moc.o\
 	renamer.logic.o\
-	renamer.logic.moc.o
+	renamer.logic.moc.o\
+	config.o
 
+process-manager.cpp: process-manager.h
+importscanner.h: dirscanner.h
+dirscanner.o: dirscanner.h dirscanner.cpp
+importscanner.o: importscanner.cpp importscanner.h dirscanner.h
 renamer.logic.h: renamer.h
 renamer.logic.cpp: renamer.logic.h
 renamer.cpp: renamer.h
@@ -157,6 +168,8 @@ songselector.logic.cpp: songselector.logic.h about.h tagbox.h askinput.h\
 preferences.logic.h: preferences.h version.h
 preferences.logic.cpp: preferences.logic.h version.h
 about.cpp: about.h version.h
+legende.cpp: legende.h
+loader.cpp: loader.h
 askinput.cpp: askinput.h version.h
 kbpm-dj.cpp: setupwizard.h
 songplayer.cpp songplayer.h: songplayer.ui version.h
@@ -190,6 +203,8 @@ directories: mrproper
 source.tgz-dist: directories
 	$(CP) -f * bpmdj-$(VERSION); exit 0
 	$(CP) -fR debian bpmdj-$(VERSION); exit 0
+	$(RM) -fR bpmdj-$(VERSION)/debian/tmp; exit 0
+	$(RM) -fR bpmdj-$(VERSION)/*.listing
 	$(TAR) -cvzf bpmdj-$(VERSION).source.tgz bpmdj-$(VERSION)
 	$(MV) *.tgz ..
 	$(RM) -r bpmdj-$(VERSION); exit 0
@@ -220,7 +235,7 @@ deb-install: all
 
 
 
-### CODE BELOW WRITTEN BY tsteudten@users.sourceforge.net #################################################################
+### CODE BELOW WRITTEN BY tsteudten@users.sourceforge.net ###################
 # Setup for make redhat-dist 
 #############################################################################
 

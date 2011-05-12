@@ -28,42 +28,46 @@
 #include "setupwizard.h"
 #include "songselector.logic.h"
 #include "kbpm-played.h"
-#include "kbpm-md5.h"
+#include "kbpm-index.h"
 
 QApplication *app;
 
 int main(int argc, char* argv[])
 {
-   SongIndex *songIndex;
-   app = new QApplication(argc,argv);
-   SongSelectorLogic test;
-   app->setMainWidget(&test);
-   // are the two necessary directories available ?
-   DIR * mdir;
-   DIR * idir;
-   do
-     {
-	mdir = opendir(MUSIC_DIR);
-	idir = opendir(INDEX_DIR);
-	if (mdir == NULL || idir == NULL)
-	  {
-	     SetupWizard *sw = new SetupWizard(0,0,true);
-	     sw->setFinishEnabled(sw->lastpage,true);
-	     int res = sw->exec();
-	     if (res == QDialog::Rejected)
-	       {
-		  exit(0);
-	       }
-	  }
-     }
-   while (mdir==NULL || idir==NULL);
-   // read already played indices
-   new Played("played.log");
-   // create the index in memory
-   songIndex=new SongIndex();
-   // put it in the dataview
-   test.injectDataSet(songIndex);
-   // start the test app
-   test.show();
-   return app->exec();
+  SongIndex *songIndex;
+  app = new QApplication(argc,argv);
+  SongSelectorLogic test;
+  app->setMainWidget(&test);
+  // are the two necessary directories available ?
+  DIR * mdir;
+  DIR * idir;
+  do
+    {
+      mdir = opendir(MusicDir);
+      idir = opendir(IndexDir);
+      if (mdir == NULL || idir == NULL)
+	{
+	  SetupWizard *sw = new SetupWizard(0,0,true);
+	  sw->setFinishEnabled(sw->lastpage,true);
+	  int res = sw->exec();
+	  if (res == QDialog::Rejected)
+	    exit(0);
+	}
+    }
+  while (mdir==NULL || idir==NULL);
+  // read already played indices
+  new Played("played.log");
+  // read the configuration
+  Config::load();
+  // create the index in memory
+  songIndex=new SongIndex(test.songList);
+  Config::file_count=songIndex->total_files;
+  delete(songIndex);
+  // put it in the dataview
+  test.findAllTags();
+  // start the test app
+  test.show();
+  int result = app->exec();
+  Config::save();
+  return result;
 }

@@ -1,16 +1,21 @@
-LDFLAGS+= -lpthread -lm
+CPP=g++ -O9
+CC=gcc -O9
 
 CP = cp
 MV = mv
 TAR = tar
+UIC = uic
+MOC = moc
 LYX = lyx
 LATEX = latex
 DVIPS = dvips
 MKDIR = mkdir
-UIC = uic
-MOC = moc
 STRIP = strip
 
-QT_INCLUDE_PATH= -I ${QTDIR}/include/
-QT_LIBRARY_PATH= -L ${QTDIR}/lib/
-QT_LIBS= -lqt
+CFLAGS+=
+LDFLAGS+= -lpthread -lm
+
+QT_INCLUDE_PATH=-I/usr/include/qt3/
+QT_LIBRARY_PATH=
+QT_LIBS= -lqt-mt
+

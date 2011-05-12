@@ -24,7 +24,8 @@
 
 class BpmCountDialog;
 
-class SongPlayerLogic : public SongPlayer
+class SongPlayerLogic : 
+  public SongPlayer
 {
    Q_OBJECT
  private:
@@ -52,6 +53,7 @@ class SongPlayerLogic : public SongPlayer
    virtual void nudgeMinus8M();
    virtual void nudgePlusB();
    virtual void shiftBack();
+   virtual void restart();
    // cues
    virtual void setCue();
    virtual void retrieveZ();

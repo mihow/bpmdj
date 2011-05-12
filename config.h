@@ -18,23 +18,34 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#include "config.h"
+#ifndef _CONFIG_H
+#define _CONFIG_H
 
-class ProcessManager
+// constants that should not be modified
+const QString MusicDir = "./music";
+const QString IndexDir = "./index";
+
+#define MAXTAGSPERCOL 17
+#define MAXTAGS (MAXTAGSPERCOL*5)
+
+class Config
 {
+  public:
+    static int  file_count;   // the number of .idx files present 
+    static int  yellowTime;   
+    static int  orangeTime;
+    static int  authorDecay;
+    static int  redTime;
+    static int  filterBpm;
+    static bool color_range;
+    static bool color_played;
+    static bool color_authorplayed;
+    static QString playCommand1;
+    static QString playCommand2;
  public:
-  // WVB -- TOFIX: maybe we should make this whole class static 
-  int monitorpid;
-  static double mainTempo;
-  static QSong* playingInMain;
-  static QSong* playingInMonitor;
- private:
-  int monitorPlayCommand;
-  double monitorTempo;
-  SongSelectorLogic* selector;
- public:
-  ProcessManager(SongSelectorLogic *sel);
-  void clearMonitor();
-  void switchMonitorToMain();
-  void startSong(QSong *song);
+    static void openUi();
+    static void save();
+    static void load();
 };
+
+#endif

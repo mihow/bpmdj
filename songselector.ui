@@ -1,623 +1,517 @@
-<!DOCTYPE UI><UI>
+<!DOCTYPE UI><UI version="3.1" stdsetdef="1">
 <class>SongSelector</class>
-<widget>
-    <class>QDialog</class>
-    <property stdset="1">
-        <name>name</name>
+<widget class="QDialog">
+    <property name="name">
         <cstring>SongSelector</cstring>
     </property>
-    <property stdset="1">
-        <name>geometry</name>
+    <property name="geometry">
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>921</width>
+            <width>917</width>
             <height>681</height>
         </rect>
     </property>
-    <property stdset="1">
-        <name>sizePolicy</name>
+    <property name="sizePolicy">
         <sizepolicy>
             <hsizetype>5</hsizetype>
             <vsizetype>5</vsizetype>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
         </sizepolicy>
     </property>
-    <property stdset="1">
-        <name>caption</name>
+    <property name="caption">
         <string>kBpmDj File Selector</string>
     </property>
-    <property stdset="1">
-        <name>sizeGripEnabled</name>
+    <property name="sizeGripEnabled">
         <bool>true</bool>
     </property>
     <grid>
-        <property stdset="1">
-            <name>margin</name>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <property name="margin">
             <number>11</number>
         </property>
-        <property stdset="1">
-            <name>spacing</name>
+        <property name="spacing">
             <number>6</number>
         </property>
-        <spacer row="0"  column="0" >
-            <property>
-                <name>name</name>
+        <spacer row="0" column="0">
+            <property name="name">
                 <cstring>Spacer5</cstring>
             </property>
-            <property stdset="1">
-                <name>orientation</name>
+            <property name="orientation">
                 <enum>Vertical</enum>
             </property>
-            <property stdset="1">
-                <name>sizeType</name>
+            <property name="sizeType">
                 <enum>Fixed</enum>
             </property>
-            <property>
-                <name>sizeHint</name>
+            <property name="sizeHint">
                 <size>
                     <width>20</width>
                     <height>30</height>
                 </size>
             </property>
         </spacer>
-        <widget row="1"  column="0" >
-            <class>QLayoutWidget</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>Layout10</cstring>
+        <widget class="QTabWidget" row="1" column="0">
+            <property name="name">
+                <cstring>tabWidget3</cstring>
             </property>
-            <hbox>
-                <property stdset="1">
-                    <name>margin</name>
-                    <number>0</number>
+            <widget class="QWidget">
+                <property name="name">
+                    <cstring>tab</cstring>
                 </property>
-                <property stdset="1">
-                    <name>spacing</name>
-                    <number>6</number>
+                <attribute name="title">
+                    <string>Files</string>
+                </attribute>
+                <grid>
+                    <property name="name">
+                        <cstring>unnamed</cstring>
+                    </property>
+                    <widget class="QLayoutWidget" row="0" column="0">
+                        <property name="name">
+                            <cstring>Layout6</cstring>
+                        </property>
+                        <vbox>
+                            <property name="name">
+                                <cstring>unnamed</cstring>
+                            </property>
+                            <property name="margin">
+                                <number>0</number>
+                            </property>
+                            <property name="spacing">
+                                <number>6</number>
+                            </property>
+                            <widget class="QLayoutWidget">
+                                <property name="name">
+                                    <cstring>Layout8</cstring>
+                                </property>
+                                <hbox>
+                                    <property name="name">
+                                        <cstring>unnamed</cstring>
+                                    </property>
+                                    <property name="margin">
+                                        <number>0</number>
+                                    </property>
+                                    <property name="spacing">
+                                        <number>6</number>
+                                    </property>
+                                    <widget class="QGroupBox">
+                                        <property name="name">
+                                            <cstring>GroupBox1</cstring>
+                                        </property>
+                                        <property name="sizePolicy">
+                                            <sizepolicy>
+                                                <hsizetype>5</hsizetype>
+                                                <vsizetype>0</vsizetype>
+                                                <horstretch>0</horstretch>
+                                                <verstretch>0</verstretch>
+                                            </sizepolicy>
+                                        </property>
+                                        <property name="title">
+                                            <string>Playing in Main</string>
+                                        </property>
+                                        <grid>
+                                            <property name="name">
+                                                <cstring>unnamed</cstring>
+                                            </property>
+                                            <property name="margin">
+                                                <number>11</number>
+                                            </property>
+                                            <property name="spacing">
+                                                <number>6</number>
+                                            </property>
+                                            <widget class="QLabel" row="2" column="1">
+                                                <property name="name">
+                                                    <cstring>mainAuthor</cstring>
+                                                </property>
+                                                <property name="text">
+                                                    <string>.</string>
+                                                </property>
+                                            </widget>
+                                            <widget class="QLabel" row="3" column="1">
+                                                <property name="name">
+                                                    <cstring>mainMix</cstring>
+                                                </property>
+                                                <property name="text">
+                                                    <string>.</string>
+                                                </property>
+                                            </widget>
+                                            <widget class="QLabel" row="1" column="0">
+                                                <property name="name">
+                                                    <cstring>TextLabel2</cstring>
+                                                </property>
+                                                <property name="text">
+                                                    <string>Title</string>
+                                                </property>
+                                            </widget>
+                                            <widget class="QLabel" row="2" column="0">
+                                                <property name="name">
+                                                    <cstring>TextLabel3</cstring>
+                                                </property>
+                                                <property name="text">
+                                                    <string>Author</string>
+                                                </property>
+                                            </widget>
+                                            <widget class="QLabel" row="3" column="0">
+                                                <property name="name">
+                                                    <cstring>TextLabel4</cstring>
+                                                </property>
+                                                <property name="text">
+                                                    <string>Index</string>
+                                                </property>
+                                            </widget>
+                                            <widget class="QLabel" row="1" column="1">
+                                                <property name="name">
+                                                    <cstring>mainTitle</cstring>
+                                                </property>
+                                                <property name="text">
+                                                    <string>.</string>
+                                                </property>
+                                            </widget>
+                                            <widget class="QLabel" row="0" column="0">
+                                                <property name="name">
+                                                    <cstring>TextLabel1_2</cstring>
+                                                </property>
+                                                <property name="text">
+                                                    <string>Tempo</string>
+                                                </property>
+                                            </widget>
+                                            <widget class="QLabel" row="0" column="1">
+                                                <property name="name">
+                                                    <cstring>mainTempoText</cstring>
+                                                </property>
+                                                <property name="text">
+                                                    <string>.</string>
+                                                </property>
+                                            </widget>
+                                        </grid>
+                                    </widget>
+                                    <widget class="QGroupBox">
+                                        <property name="name">
+                                            <cstring>GroupBox3</cstring>
+                                        </property>
+                                        <property name="sizePolicy">
+                                            <sizepolicy>
+                                                <hsizetype>5</hsizetype>
+                                                <vsizetype>0</vsizetype>
+                                                <horstretch>0</horstretch>
+                                                <verstretch>0</verstretch>
+                                            </sizepolicy>
+                                        </property>
+                                        <property name="title">
+                                            <string>Playing in Monitor</string>
+                                        </property>
+                                        <grid>
+                                            <property name="name">
+                                                <cstring>unnamed</cstring>
+                                            </property>
+                                            <property name="margin">
+                                                <number>11</number>
+                                            </property>
+                                            <property name="spacing">
+                                                <number>6</number>
+                                            </property>
+                                            <widget class="QLabel" row="1" column="1">
+                                                <property name="name">
+                                                    <cstring>monitorTitle</cstring>
+                                                </property>
+                                                <property name="text">
+                                                    <string>.</string>
+                                                </property>
+                                            </widget>
+                                            <widget class="QLabel" row="3" column="0">
+                                                <property name="name">
+                                                    <cstring>TextLabel3_2</cstring>
+                                                </property>
+                                                <property name="text">
+                                                    <string>Index</string>
+                                                </property>
+                                            </widget>
+                                            <widget class="QLabel" row="1" column="0">
+                                                <property name="name">
+                                                    <cstring>TextLabel2_2</cstring>
+                                                </property>
+                                                <property name="text">
+                                                    <string>Title</string>
+                                                </property>
+                                            </widget>
+                                            <widget class="QLabel" row="2" column="1">
+                                                <property name="name">
+                                                    <cstring>monitorAuthor</cstring>
+                                                </property>
+                                                <property name="text">
+                                                    <string>.</string>
+                                                </property>
+                                            </widget>
+                                            <widget class="QLabel" row="2" column="0">
+                                                <property name="name">
+                                                    <cstring>TextLabel1_3</cstring>
+                                                </property>
+                                                <property name="text">
+                                                    <string>Author</string>
+                                                </property>
+                                            </widget>
+                                            <widget class="QLabel" row="3" column="1">
+                                                <property name="name">
+                                                    <cstring>monitorMix</cstring>
+                                                </property>
+                                                <property name="text">
+                                                    <string>.</string>
+                                                </property>
+                                            </widget>
+                                            <widget class="QLabel" row="0" column="1">
+                                                <property name="name">
+                                                    <cstring>mainTempoText_2</cstring>
+                                                </property>
+                                                <property name="text">
+                                                    <string>.</string>
+                                                </property>
+                                            </widget>
+                                            <widget class="QLabel" row="0" column="0">
+                                                <property name="name">
+                                                    <cstring>TextLabel1_2_2</cstring>
+                                                </property>
+                                                <property name="text">
+                                                    <string>Tempo</string>
+                                                </property>
+                                            </widget>
+                                        </grid>
+                                    </widget>
+                                </hbox>
+                            </widget>
+                            <widget class="QListView">
+                                <column>
+                                    <property name="text">
+                                        <string>Title</string>
+                                    </property>
+                                    <property name="clickable">
+                                        <bool>true</bool>
+                                    </property>
+                                    <property name="resizable">
+                                        <bool>true</bool>
+                                    </property>
+                                </column>
+                                <column>
+                                    <property name="text">
+                                        <string>Author</string>
+                                    </property>
+                                    <property name="clickable">
+                                        <bool>true</bool>
+                                    </property>
+                                    <property name="resizable">
+                                        <bool>true</bool>
+                                    </property>
+                                </column>
+                                <column>
+                                    <property name="text">
+                                        <string>Tempo</string>
+                                    </property>
+                                    <property name="clickable">
+                                        <bool>true</bool>
+                                    </property>
+                                    <property name="resizable">
+                                        <bool>true</bool>
+                                    </property>
+                                </column>
+                                <column>
+                                    <property name="text">
+                                        <string>Version</string>
+                                    </property>
+                                    <property name="clickable">
+                                        <bool>true</bool>
+                                    </property>
+                                    <property name="resizable">
+                                        <bool>true</bool>
+                                    </property>
+                                </column>
+                                <column>
+                                    <property name="text">
+                                        <string>Tags</string>
+                                    </property>
+                                    <property name="clickable">
+                                        <bool>true</bool>
+                                    </property>
+                                    <property name="resizable">
+                                        <bool>true</bool>
+                                    </property>
+                                </column>
+                                <column>
+                                    <property name="text">
+                                        <string>Time</string>
+                                    </property>
+                                    <property name="clickable">
+                                        <bool>true</bool>
+                                    </property>
+                                    <property name="resizable">
+                                        <bool>true</bool>
+                                    </property>
+                                </column>
+                                <column>
+                                    <property name="text">
+                                        <string>Index</string>
+                                    </property>
+                                    <property name="clickable">
+                                        <bool>true</bool>
+                                    </property>
+                                    <property name="resizable">
+                                        <bool>true</bool>
+                                    </property>
+                                </column>
+                                <column>
+                                    <property name="text">
+                                        <string>OnDisk</string>
+                                    </property>
+                                    <property name="clickable">
+                                        <bool>true</bool>
+                                    </property>
+                                    <property name="resizable">
+                                        <bool>true</bool>
+                                    </property>
+                                </column>
+                                <column>
+                                    <property name="text">
+                                        <string>Md5</string>
+                                    </property>
+                                    <property name="clickable">
+                                        <bool>true</bool>
+                                    </property>
+                                    <property name="resizable">
+                                        <bool>true</bool>
+                                    </property>
+                                </column>
+                                <column>
+                                    <property name="text">
+                                        <string>Cues</string>
+                                    </property>
+                                    <property name="clickable">
+                                        <bool>true</bool>
+                                    </property>
+                                    <property name="resizable">
+                                        <bool>true</bool>
+                                    </property>
+                                </column>
+                                <property name="name">
+                                    <cstring>songList</cstring>
+                                </property>
+                                <property name="sizePolicy">
+                                    <sizepolicy>
+                                        <hsizetype>5</hsizetype>
+                                        <vsizetype>5</vsizetype>
+                                        <horstretch>0</horstretch>
+                                        <verstretch>0</verstretch>
+                                    </sizepolicy>
+                                </property>
+                                <property name="frameShape">
+                                    <enum>Panel</enum>
+                                </property>
+                                <property name="resizePolicy">
+                                    <enum>Manual</enum>
+                                </property>
+                                <property name="selectionMode">
+                                    <enum>Extended</enum>
+                                </property>
+                                <property name="allColumnsShowFocus">
+                                    <bool>true</bool>
+                                </property>
+                            </widget>
+                            <widget class="QLayoutWidget">
+                                <property name="name">
+                                    <cstring>Layout5</cstring>
+                                </property>
+                                <hbox>
+                                    <property name="name">
+                                        <cstring>unnamed</cstring>
+                                    </property>
+                                    <property name="margin">
+                                        <number>0</number>
+                                    </property>
+                                    <property name="spacing">
+                                        <number>6</number>
+                                    </property>
+                                    <widget class="QLineEdit">
+                                        <property name="name">
+                                            <cstring>searchLine</cstring>
+                                        </property>
+                                    </widget>
+                                    <widget class="QPushButton">
+                                        <property name="name">
+                                            <cstring>PushButton2</cstring>
+                                        </property>
+                                        <property name="text">
+                                            <string>Search</string>
+                                        </property>
+                                    </widget>
+                                    <widget class="QLCDNumber">
+                                        <property name="name">
+                                            <cstring>countLcd</cstring>
+                                        </property>
+                                    </widget>
+                                    <widget class="QLCDNumber">
+                                        <property name="name">
+                                            <cstring>mainLCD</cstring>
+                                        </property>
+                                        <property name="sizePolicy">
+                                            <sizepolicy>
+                                                <hsizetype>1</hsizetype>
+                                                <vsizetype>1</vsizetype>
+                                                <horstretch>0</horstretch>
+                                                <verstretch>0</verstretch>
+                                            </sizepolicy>
+                                        </property>
+                                    </widget>
+                                    <spacer>
+                                        <property name="name">
+                                            <cstring>Spacer3</cstring>
+                                        </property>
+                                        <property name="orientation">
+                                            <enum>Horizontal</enum>
+                                        </property>
+                                        <property name="sizeType">
+                                            <enum>Expanding</enum>
+                                        </property>
+                                        <property name="sizeHint">
+                                            <size>
+                                                <width>20</width>
+                                                <height>20</height>
+                                            </size>
+                                        </property>
+                                    </spacer>
+                                    <widget class="QPushButton">
+                                        <property name="name">
+                                            <cstring>PushButton3</cstring>
+                                        </property>
+                                        <property name="text">
+                                            <string>&amp;Switch</string>
+                                        </property>
+                                    </widget>
+                                </hbox>
+                            </widget>
+                        </vbox>
+                    </widget>
+                </grid>
+            </widget>
+            <widget class="QWidget">
+                <property name="name">
+                    <cstring>Tags</cstring>
                 </property>
-                <widget>
-                    <class>QGroupBox</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>GroupBox2</cstring>
+                <attribute name="title">
+                    <string>Tags</string>
+                </attribute>
+                <grid>
+                    <property name="name">
+                        <cstring>unnamed</cstring>
                     </property>
-                    <property stdset="1">
-                        <name>sizePolicy</name>
-                        <sizepolicy>
-                            <hsizetype>1</hsizetype>
-                            <vsizetype>1</vsizetype>
-                        </sizepolicy>
-                    </property>
-                    <property stdset="1">
-                        <name>title</name>
-                        <string>Tags</string>
-                    </property>
-                </widget>
-                <widget>
-                    <class>QLayoutWidget</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>Layout9</cstring>
-                    </property>
-                    <vbox>
-                        <property stdset="1">
-                            <name>margin</name>
-                            <number>0</number>
+                    <widget class="QGroupBox" row="0" column="0">
+                        <property name="name">
+                            <cstring>GroupBox2</cstring>
                         </property>
-                        <property stdset="1">
-                            <name>spacing</name>
-                            <number>6</number>
+                        <property name="title">
+                            <string></string>
                         </property>
-                        <widget>
-                            <class>QLayoutWidget</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>Layout8</cstring>
-                            </property>
-                            <hbox>
-                                <property stdset="1">
-                                    <name>margin</name>
-                                    <number>0</number>
-                                </property>
-                                <property stdset="1">
-                                    <name>spacing</name>
-                                    <number>6</number>
-                                </property>
-                                <widget>
-                                    <class>QGroupBox</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>GroupBox1</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>sizePolicy</name>
-                                        <sizepolicy>
-                                            <hsizetype>5</hsizetype>
-                                            <vsizetype>0</vsizetype>
-                                        </sizepolicy>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>title</name>
-                                        <string>Playing in Main</string>
-                                    </property>
-                                    <grid>
-                                        <property stdset="1">
-                                            <name>margin</name>
-                                            <number>11</number>
-                                        </property>
-                                        <property stdset="1">
-                                            <name>spacing</name>
-                                            <number>6</number>
-                                        </property>
-                                        <widget row="2"  column="1" >
-                                            <class>QLabel</class>
-                                            <property stdset="1">
-                                                <name>name</name>
-                                                <cstring>mainAuthor</cstring>
-                                            </property>
-                                            <property stdset="1">
-                                                <name>text</name>
-                                                <string>.</string>
-                                            </property>
-                                        </widget>
-                                        <widget row="3"  column="1" >
-                                            <class>QLabel</class>
-                                            <property stdset="1">
-                                                <name>name</name>
-                                                <cstring>mainMix</cstring>
-                                            </property>
-                                            <property stdset="1">
-                                                <name>text</name>
-                                                <string>.</string>
-                                            </property>
-                                        </widget>
-                                        <widget row="1"  column="0" >
-                                            <class>QLabel</class>
-                                            <property stdset="1">
-                                                <name>name</name>
-                                                <cstring>TextLabel2</cstring>
-                                            </property>
-                                            <property stdset="1">
-                                                <name>text</name>
-                                                <string>Title</string>
-                                            </property>
-                                        </widget>
-                                        <widget row="2"  column="0" >
-                                            <class>QLabel</class>
-                                            <property stdset="1">
-                                                <name>name</name>
-                                                <cstring>TextLabel3</cstring>
-                                            </property>
-                                            <property stdset="1">
-                                                <name>text</name>
-                                                <string>Author</string>
-                                            </property>
-                                        </widget>
-                                        <widget row="3"  column="0" >
-                                            <class>QLabel</class>
-                                            <property stdset="1">
-                                                <name>name</name>
-                                                <cstring>TextLabel4</cstring>
-                                            </property>
-                                            <property stdset="1">
-                                                <name>text</name>
-                                                <string>Index</string>
-                                            </property>
-                                        </widget>
-                                        <widget row="1"  column="1" >
-                                            <class>QLabel</class>
-                                            <property stdset="1">
-                                                <name>name</name>
-                                                <cstring>mainTitle</cstring>
-                                            </property>
-                                            <property stdset="1">
-                                                <name>text</name>
-                                                <string>.</string>
-                                            </property>
-                                        </widget>
-                                        <widget row="0"  column="0" >
-                                            <class>QLabel</class>
-                                            <property stdset="1">
-                                                <name>name</name>
-                                                <cstring>TextLabel1_2</cstring>
-                                            </property>
-                                            <property stdset="1">
-                                                <name>text</name>
-                                                <string>Tempo</string>
-                                            </property>
-                                        </widget>
-                                        <widget row="0"  column="1" >
-                                            <class>QLabel</class>
-                                            <property stdset="1">
-                                                <name>name</name>
-                                                <cstring>mainTempoText</cstring>
-                                            </property>
-                                            <property stdset="1">
-                                                <name>text</name>
-                                                <string>.</string>
-                                            </property>
-                                        </widget>
-                                    </grid>
-                                </widget>
-                                <widget>
-                                    <class>QGroupBox</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>GroupBox3</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>sizePolicy</name>
-                                        <sizepolicy>
-                                            <hsizetype>5</hsizetype>
-                                            <vsizetype>0</vsizetype>
-                                        </sizepolicy>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>title</name>
-                                        <string>Playing in Monitor</string>
-                                    </property>
-                                    <grid>
-                                        <property stdset="1">
-                                            <name>margin</name>
-                                            <number>11</number>
-                                        </property>
-                                        <property stdset="1">
-                                            <name>spacing</name>
-                                            <number>6</number>
-                                        </property>
-                                        <widget row="1"  column="1" >
-                                            <class>QLabel</class>
-                                            <property stdset="1">
-                                                <name>name</name>
-                                                <cstring>monitorTitle</cstring>
-                                            </property>
-                                            <property stdset="1">
-                                                <name>text</name>
-                                                <string>.</string>
-                                            </property>
-                                        </widget>
-                                        <widget row="3"  column="0" >
-                                            <class>QLabel</class>
-                                            <property stdset="1">
-                                                <name>name</name>
-                                                <cstring>TextLabel3_2</cstring>
-                                            </property>
-                                            <property stdset="1">
-                                                <name>text</name>
-                                                <string>Index</string>
-                                            </property>
-                                        </widget>
-                                        <widget row="1"  column="0" >
-                                            <class>QLabel</class>
-                                            <property stdset="1">
-                                                <name>name</name>
-                                                <cstring>TextLabel2_2</cstring>
-                                            </property>
-                                            <property stdset="1">
-                                                <name>text</name>
-                                                <string>Title</string>
-                                            </property>
-                                        </widget>
-                                        <widget row="2"  column="1" >
-                                            <class>QLabel</class>
-                                            <property stdset="1">
-                                                <name>name</name>
-                                                <cstring>monitorAuthor</cstring>
-                                            </property>
-                                            <property stdset="1">
-                                                <name>text</name>
-                                                <string>.</string>
-                                            </property>
-                                        </widget>
-                                        <widget row="2"  column="0" >
-                                            <class>QLabel</class>
-                                            <property stdset="1">
-                                                <name>name</name>
-                                                <cstring>TextLabel1_3</cstring>
-                                            </property>
-                                            <property stdset="1">
-                                                <name>text</name>
-                                                <string>Author</string>
-                                            </property>
-                                        </widget>
-                                        <widget row="3"  column="1" >
-                                            <class>QLabel</class>
-                                            <property stdset="1">
-                                                <name>name</name>
-                                                <cstring>monitorMix</cstring>
-                                            </property>
-                                            <property stdset="1">
-                                                <name>text</name>
-                                                <string>.</string>
-                                            </property>
-                                        </widget>
-                                        <widget row="0"  column="1" >
-                                            <class>QLabel</class>
-                                            <property stdset="1">
-                                                <name>name</name>
-                                                <cstring>mainTempoText_2</cstring>
-                                            </property>
-                                            <property stdset="1">
-                                                <name>text</name>
-                                                <string>.</string>
-                                            </property>
-                                        </widget>
-                                        <widget row="0"  column="0" >
-                                            <class>QLabel</class>
-                                            <property stdset="1">
-                                                <name>name</name>
-                                                <cstring>TextLabel1_2_2</cstring>
-                                            </property>
-                                            <property stdset="1">
-                                                <name>text</name>
-                                                <string>Tempo</string>
-                                            </property>
-                                        </widget>
-                                    </grid>
-                                </widget>
-                            </hbox>
-                        </widget>
-                        <widget>
-                            <class>QListView</class>
-                            <column>
-                                <property>
-                                    <name>text</name>
-                                    <string>Dir</string>
-                                </property>
-                                <property>
-                                    <name>clickable</name>
-                                    <bool>true</bool>
-                                </property>
-                                <property>
-                                    <name>resizeable</name>
-                                    <bool>true</bool>
-                                </property>
-                            </column>
-                            <column>
-                                <property>
-                                    <name>text</name>
-                                    <string>Title</string>
-                                </property>
-                                <property>
-                                    <name>clickable</name>
-                                    <bool>true</bool>
-                                </property>
-                                <property>
-                                    <name>resizeable</name>
-                                    <bool>true</bool>
-                                </property>
-                            </column>
-                            <column>
-                                <property>
-                                    <name>text</name>
-                                    <string>Author</string>
-                                </property>
-                                <property>
-                                    <name>clickable</name>
-                                    <bool>true</bool>
-                                </property>
-                                <property>
-                                    <name>resizeable</name>
-                                    <bool>true</bool>
-                                </property>
-                            </column>
-                            <column>
-                                <property>
-                                    <name>text</name>
-                                    <string>Tempo</string>
-                                </property>
-                                <property>
-                                    <name>clickable</name>
-                                    <bool>true</bool>
-                                </property>
-                                <property>
-                                    <name>resizeable</name>
-                                    <bool>true</bool>
-                                </property>
-                            </column>
-                            <column>
-                                <property>
-                                    <name>text</name>
-                                    <string>Version</string>
-                                </property>
-                                <property>
-                                    <name>clickable</name>
-                                    <bool>true</bool>
-                                </property>
-                                <property>
-                                    <name>resizeable</name>
-                                    <bool>true</bool>
-                                </property>
-                            </column>
-                            <column>
-                                <property>
-                                    <name>text</name>
-                                    <string>Tags</string>
-                                </property>
-                                <property>
-                                    <name>clickable</name>
-                                    <bool>true</bool>
-                                </property>
-                                <property>
-                                    <name>resizeable</name>
-                                    <bool>true</bool>
-                                </property>
-                            </column>
-                            <column>
-                                <property>
-                                    <name>text</name>
-                                    <string>File</string>
-                                </property>
-                                <property>
-                                    <name>clickable</name>
-                                    <bool>true</bool>
-                                </property>
-                                <property>
-                                    <name>resizeable</name>
-                                    <bool>true</bool>
-                                </property>
-                            </column>
-                            <column>
-                                <property>
-                                    <name>text</name>
-                                    <string>Index</string>
-                                </property>
-                                <property>
-                                    <name>clickable</name>
-                                    <bool>true</bool>
-                                </property>
-                                <property>
-                                    <name>resizeable</name>
-                                    <bool>true</bool>
-                                </property>
-                            </column>
-                            <column>
-                                <property>
-                                    <name>text</name>
-                                    <string>OnDisk</string>
-                                </property>
-                                <property>
-                                    <name>clickable</name>
-                                    <bool>true</bool>
-                                </property>
-                                <property>
-                                    <name>resizeable</name>
-                                    <bool>true</bool>
-                                </property>
-                            </column>
-                            <column>
-                                <property>
-                                    <name>text</name>
-                                    <string>Md5</string>
-                                </property>
-                                <property>
-                                    <name>clickable</name>
-                                    <bool>true</bool>
-                                </property>
-                                <property>
-                                    <name>resizeable</name>
-                                    <bool>true</bool>
-                                </property>
-                            </column>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>songList</cstring>
-                            </property>
-                            <property stdset="1">
-                                <name>sizePolicy</name>
-                                <sizepolicy>
-                                    <hsizetype>5</hsizetype>
-                                    <vsizetype>5</vsizetype>
-                                </sizepolicy>
-                            </property>
-                            <property stdset="1">
-                                <name>frameShape</name>
-                                <enum>Panel</enum>
-                            </property>
-                            <property stdset="1">
-                                <name>resizePolicy</name>
-                                <enum>Manual</enum>
-                            </property>
-                            <property stdset="1">
-                                <name>selectionMode</name>
-                                <enum>Extended</enum>
-                            </property>
-                            <property stdset="1">
-                                <name>allColumnsShowFocus</name>
-                                <bool>true</bool>
-                            </property>
-                        </widget>
-                        <widget>
-                            <class>QLayoutWidget</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>Layout7</cstring>
-                            </property>
-                            <hbox>
-                                <property stdset="1">
-                                    <name>margin</name>
-                                    <number>0</number>
-                                </property>
-                                <property stdset="1">
-                                    <name>spacing</name>
-                                    <number>6</number>
-                                </property>
-                                <widget>
-                                    <class>QLabel</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>TextLabel1</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>text</name>
-                                        <string>Search</string>
-                                    </property>
-                                </widget>
-                                <widget>
-                                    <class>QLineEdit</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>searchLine</cstring>
-                                    </property>
-                                </widget>
-                                <widget>
-                                    <class>QLCDNumber</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>countLcd</cstring>
-                                    </property>
-                                </widget>
-                                <widget>
-                                    <class>QLCDNumber</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>mainLCD</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>sizePolicy</name>
-                                        <sizepolicy>
-                                            <hsizetype>1</hsizetype>
-                                            <vsizetype>1</vsizetype>
-                                        </sizepolicy>
-                                    </property>
-                                </widget>
-                                <spacer>
-                                    <property>
-                                        <name>name</name>
-                                        <cstring>Spacer3</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>orientation</name>
-                                        <enum>Horizontal</enum>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>sizeType</name>
-                                        <enum>Expanding</enum>
-                                    </property>
-                                    <property>
-                                        <name>sizeHint</name>
-                                        <size>
-                                            <width>20</width>
-                                            <height>20</height>
-                                        </size>
-                                    </property>
-                                </spacer>
-                                <widget>
-                                    <class>QPushButton</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>PushButton3</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>text</name>
-                                        <string>&amp;Switch</string>
-                                    </property>
-                                </widget>
-                            </hbox>
-                        </widget>
-                    </vbox>
-                </widget>
-            </hbox>
+                    </widget>
+                </grid>
+            </widget>
         </widget>
     </grid>
 </widget>
@@ -646,24 +540,34 @@
         <receiver>SongSelector</receiver>
         <slot>selectSong(QListViewItem*)</slot>
     </connection>
-    <slot access="public">checkDisc()</slot>
-    <slot access="public">doAbout()</slot>
-    <slot access="public">doFilterChanged()</slot>
-    <slot access="public">doLock()</slot>
-    <slot access="public">doMarkDups()</slot>
-    <slot access="public">doPreferences()</slot>
-    <slot access="public">doSongEdit(QListViewItem*)</slot>
-    <slot access="public">exportPlayList()</slot>
-    <slot access="public">fetchSelection()</slot>
-    <slot access="public">selectionMenu()</slot>
-    <slot access="public">quitButton()</slot>
-    <slot access="public">selectSong(QListViewItem*)</slot>
-    <slot access="public">selectionAddTags()</slot>
-    <slot access="public">switchMonitorToMain()</slot>
+    <connection>
+        <sender>PushButton2</sender>
+        <signal>clicked()</signal>
+        <receiver>SongSelector</receiver>
+        <slot>doFilterChanged()</slot>
+    </connection>
 </connections>
 <tabstops>
     <tabstop>songList</tabstop>
-    <tabstop>PushButton3</tabstop>
     <tabstop>searchLine</tabstop>
+    <tabstop>PushButton2</tabstop>
+    <tabstop>PushButton3</tabstop>
 </tabstops>
+<slots>
+    <slot>checkDisc()</slot>
+    <slot>doAbout()</slot>
+    <slot>doFilterChanged()</slot>
+    <slot>doLock()</slot>
+    <slot>doMarkDups()</slot>
+    <slot>doPreferences()</slot>
+    <slot>doSongEdit(QListViewItem*)</slot>
+    <slot>exportPlayList()</slot>
+    <slot>fetchSelection()</slot>
+    <slot>selectionMenu()</slot>
+    <slot>quitButton()</slot>
+    <slot>selectSong(QListViewItem*)</slot>
+    <slot>selectionAddTags()</slot>
+    <slot>switchMonitorToMain()</slot>
+</slots>
+<layoutdefaults spacing="6" margin="11"/>
 </UI>

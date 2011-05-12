@@ -15,8 +15,8 @@ After creating such a file be sure to send it to me
 (werner.van.belle@vub.ac.be) so I can include it in the next release.
 
 Requirements:
-  - qt2.3.2
-  - qt-designer
+  - qt3-mt
+  - qt3-designer
   - mpg123
   - gcc
   - make

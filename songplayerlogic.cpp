@@ -268,6 +268,13 @@ void SongPlayerLogic::shiftBack()
    ::y=y_normalise(cue)+dsp_latency();
 }
 
+void SongPlayerLogic::restart()
+{
+  ::y=0;
+  if (::paused)
+    ::paused=0;
+}
+
 void SongPlayerLogic::stop()
 {
    if (!::paused)

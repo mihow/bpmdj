@@ -15,7 +15,7 @@ STRIP = strip
 CFLAGS+=
 LDFLAGS+= -lpthread -lm
 
-QT_INCLUDE_PATH=-I/usr/include/qt/
+QT_INCLUDE_PATH=-I/usr/include/qt3/
 QT_LIBRARY_PATH=
-QT_LIBS= -lqt
+QT_LIBS= -lqt-mt
 

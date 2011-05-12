@@ -18,43 +18,23 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
+#include "dirscanner.h"
+#include "loader.h"
 
-#define MUSIC_DIR "./music"
-#define INDEX_DIR "./index"
+class SongSelectorLogic;
+class QSong;
+class QListView;
 
-#include <qlistview.h>
-class Song
+class SongIndex:
+  public DirectoryScanner,
+  public Loader
 {
- public:
-   Song* next;
-   char *song_title;
-   char *song_author;
-   char *song_version;
-   char *song_tempo;
-   char *song_index;
-   char *song_tags;
-   char *song_file;
-   char *song_md5sum;
-   bool song_played;
-   bool song_ondisk;
- public:
-   Song();
-   Song(char*filename,char* currentpath);
-   bool obtainTitleAuthor(char * fulltitle);
-   virtual void reread();
-   virtual bool isIndex() {return false;};
-   bool containsTag(const char* which);
-};
-
-class SongIndex: public Song
-{
- public:
-   char *song_id;
-   Song *list;
-   void add(Song*t);
-   SongIndex() : Song() { scanDir("/", INDEX_DIR); };
-   SongIndex(char * filename, char * dirname) : Song() {scanDir(filename, dirname);};
-   void scanDir(char * filename, char * dirname);
-   virtual void reread() {return;};
-   virtual bool isIndex() {return true;};
+  public: 
+    int total_files;
+  protected:
+    virtual void checkfile(const QString prefix, const QString filename);
+    QListView* view;
+  public:
+    SongIndex(QListView * lv);
+    void add(QSong* newsong);
 };

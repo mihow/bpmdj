@@ -1,13 +1,19 @@
 #include <qlistview.h>
 #include <qwidget.h>
+#include "kbpm-index.h"
 #include "renamer.h"
 
-class RenamerLogic: public Renamer
+class RenamerLogic: 
+  public Renamer, 
+  public DirectoryScanner
 {
    Q_OBJECT
  public:
-   RenamerLogic(QWidget* parent=0,const char* name=0);
-   void add(const char* name, const char* pos);
+   RenamerLogic(QWidget* parent=0, const QString name=0);
+   void add(const QString name, const QString pos);
+ protected:
+   virtual void checkfile(const QString fullname, const QString filename);
+   virtual bool matchextension(const QString filename);
  private:
    bool    goodName(QString name);
    QString smallCapsInWord(QString in);

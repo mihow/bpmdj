@@ -32,6 +32,7 @@ extern           int      index_changed;
 extern           int      index_bpmcount_from;
 extern           int      index_bpmcount_to;
 extern           char   * index_md5sum;
+extern           char   * index_time;
 extern unsigned long      index_cue;
 extern unsigned long      index_cue_z;
 extern unsigned long      index_cue_x;
@@ -41,6 +42,6 @@ extern unsigned long      index_cue_v;
        void     index_init       ();
        void     index_setversion ();
        void     index_write      ();
-       void     index_read       (char*);
+       void     index_read       (const char*);
        void     index_free       ();
 

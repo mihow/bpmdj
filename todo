@@ -1,58 +1,56 @@
-all
-  - next time compile for a lower libc
-  - sourceforge logo is er precies ergens afgevallen ??
-
-cbpm-play:
-  - sometimes the mp3 file is not written completely... -- hu hu ?
-  
 kbpm-play:
-  - als de file al bestaat en we moeten correleren onmiddelijk 
-    binnen 10BPM bounds zoeken
-  - toelaten dat vanalles en nog wat geediteerd wordt 
-    binnen deze window, waaronder ook de indexname ??
+  - als de file al bestaat en we moeten correleren onmiddelijk binnen 10BPM bounds zoeken
+  - toelaten dat vanalles en nog wat geediteerd wordt binnen deze window, waaronder ook de indexname ??
   - eerst een volledige high energy scan doen over gans het tempo bereik
   - target tempo zetten laat de percent indicator niet volgen
-  - kernel scheduling latency in acht nemen bij het meten
   - als tempo = inf deftige errormelding geven
   - cue shifting beyond zero should lock down to zero (or produce somthing 'okay')
   - tempo changer in player
-  - tempo down en upscalen
   - should show remaining time instead of total time
   - checking of de cue points persistent blijven over tempo verschillen heen
     (en eventueel fixen als dat fout is)
-  - when quitting the program with the quitapp button it should quit in a sane way.
-  - quitting while still writing the file, should result in killing the writing process.
+  - when quitting the program with the quitapp window-button it should quit in a sane way
   - loop support in player
-  
+  - when changing an lfo the current phase should remain the same.
+  - reverse playing of certain measures
+
 documentation:
   - logfile doc schrijven
   - documentation for the browser
-  - text schrijven over het begin van de 8 maten...
-  - aanpassen van de lyx file met automatische insertie correct versienummer
+  - text schrijven over begin phrases
 
 kbpm-dj:
+  - nieuw tempo zou geen 132.4 moeten zijn maar iets gelijk unk
+  - in de renamer box kunnen we normaal een aantal routines buiten haakskes brengen
+  - nog eens een memorycheck erop los laten...
   - een player moet geindiceerd worden in een kleur
+    - gray: invalid
     - blue: playing
     - yellow: this is the main playing song
     - green: free
-  - when starting and wizarding, dsp parameters should be obtained
   - setup on a remote machine should be possible.
   - nfs-mounten ? Copying the same data ??
-  - before importing:
-    + select directory
-    + fix filenames
-      - .MP3 -> .mp3
-      - alle spaties verwijderen, de eerste letters na de spaties hoofdletters van maken
-    + find similar songs
-    + remove trash
-    + group one cd
-    + burn to disk
-    + import trash
-  - selector should show the filesize
-  - selector should show available cues
   - multiple players (asus, cubical, tnm etc ...) & automatically setup player on other machine
-  - automatic sorting of tags in tagline / song
-  - automatic removal of duplicate tags in taglines / song
-  - focus houden binnen bepaalde directory
-  - marking similar songs as 'played'
-  - keep focus on certain songs after reorganizing the thing
+  - play songs at fixed given tempo instead of the tempo of the next song
+  - renamer: de zaken voor de - beschouwen als author and naar achter moven 
+
+  - startup of program:
+    - loading box: 
+       - informatie laten geven over the played files
+       - informatie laten geven over de configuratiefile die gelezen wordt
+       - indien er .raw files achtergebleven zijn deze laten zien met de mogelijkheid tot deletion
+    - wizard
+       - DSP-parameters verzamelen wanneer gestart wordt
+       - Directories maken als het enigzins mogelijk is
+       - Laten selecteren van de directory waar de interesante file steken
+
+  - there is still a race condition in the process-manager when a signal arrives. This should be solved in a decent way. When doing so we can immediatelly add a number of extra players.
+
+  - Memory stuff:
+    - remove duplicate strings (see qstring-factory.h/.cpp
+    - version count should be a number instead of a QString
+    - tempo should be a float instead of a QString
+    - automatic removal of duplicate tags in taglines / song
+    - automatic sorting of tags in tagline / song
+    - importing mp3's can faster by copying the list and removing every item we found to match
+ 
