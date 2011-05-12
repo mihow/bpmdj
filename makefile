@@ -1,10 +1,14 @@
-VERSION = 1.8
+VERSION = 1.9
 include defines
 
-all: cbpm-count cbpm-play kbpm-play kbpm-dj
+BIN = cbpm-play kbpm-play kbpm-dj merger bpmdj-raw rbpm-play xmms-play
+DOC = authors changelog copyright todo readme ${shell ls *.html *.png}
+UIS = ${shell ls *.ui}
+
+all: $(BIN)
 
 #############################################################################
-# Rulesets
+# Rules
 #############################################################################
 %.o: %.c
 	$(CC) -c $< $(CFLAGS) -o $@
@@ -36,8 +40,11 @@ all: cbpm-count cbpm-play kbpm-play kbpm-dj
 #############################################################################
 # Cleanup section
 #############################################################################
-clean:
-	$(RM) a.out core *.o *.log *.tex.dep *.toc *.dvi *.aux *.raw 
+rc: 
+	$(RM) *.raw
+
+clean: rc
+	$(RM) a.out core *.o *.log *.tex.dep *.toc *.dvi *.aux
 	$(RM) plot.ps gmon.out toplot.dat build sum.tmp fetchfiles.sh
 	$(RM) cbpm-count cbpm-play kbpm-play kbpm-dj kbpm-count
 	$(RM) *.moc.cpp *.ui.cpp *.ui.h
@@ -49,6 +56,7 @@ clean:
 	$(RM) about.h about.cpp legende.h legende.cpp
 	$(RM) bpmbounds.h bpmbounds.cpp
 	$(RM) askinput.h askinput.cpp loader.h loader.cpp
+	$(RM) merger-dialog.h merger-dialog.cpp
 	$(RM) preferences.h preferences.cpp
 	$(RM) profile-clock process_bpm.sh process_spectrum.sh
 	$(RM) renamer.h renamer.cpp
@@ -58,137 +66,99 @@ clean:
 
 mrproper: clean
 	$(RM) *~ playlist.xmms played.log
-	$(RM) debian/*~
+	$(RM) debian/*~ depends
 
 #############################################################################
-# Documentation
+# Installation & Documentation
 #############################################################################
-beatmixing.html: beatmixing.tex
+.PHONY: website install uninstall all clean directories
 
-allhtml: beatmixing.html
-	$(RM) beatmixing/index.html
-	$(CP) index.html beatmixing/index.html
-	$(CP) mixingdesk.jpg beatmixing/
+install: 
+	for bin in $(BIN); do $(INSTALL) -D -m 755 $$bin ${DESTDIR}/usr/bin/$$bin; done
+	for doc in $(DOC); do $(INSTALL) -D -m 755 $$doc ${DESTDIR}/usr/share/doc/bpmdj/$$doc; done
 
-.PHONY: website allhtml all clean 
+uninstall: 
+	for bin in $(BIN); do $(RM) ${DESTDIR}/usr/bin/$$bin; done
+	for doc in $(DOC); do $(RM) ${DESTDIR}/usr/share/doc/bpmdj/$$doc; done
+
 website: 
 	scp *.html *.png krubbens@bpmdj.sourceforge.net:/home/groups/b/bp/bpmdj/htdocs/
 
 #############################################################################
-# Command line version
+# Dependencies
 #############################################################################
 version.h: profile-clock
 	echo "#define VERSION \""$(VERSION)"\"" >version.h
 	./profile-clock >>version.h
 
-cbpm-index.c: cbpm-index.h version.h
-cbpm-play.c: cbpm-index.h version.h
-cbpm-count.c: cbpm-index.h version.h
+depend: $(UIS:%.ui=%.h) $(UIS:%.ui=%.cpp) version.h
+	$(CPP) $(QT_INCLUDE_PATH) $(QT_LIBRARY_PATH) -MM *.cpp *.c >depend
+include depend
 
-cbpm-count: cbpm-index.o cbpm-count.o
-	$(CC) $^ -o $@
-
-cbpm-play: cbpm-play.o cbpm-index.o player-core.o
-	$(CC) $(LDFLAGS) $^ -o $@
 
 #############################################################################
-# Kde version
+# Objects
 #############################################################################
-KPLAY_OBJECTS = about.o\
-	about.moc.o\
-	songplayer.o\
-	songplayer.moc.o\
+KPLAY_OBJECTS = about.o about.moc.o\
+	songplayer.o songplayer.moc.o\
 	player-core.o\
 	cbpm-index.o\
 	kbpm-play.o\
-	songplayer.logic.o\
-	songplayer.logic.moc.o\
-	bpmcounter.o\
-	bpmcounter.moc.o\
-	kbpm-counter.o\
-	spectrumanalyzer.o\
-	spectrumanalyzer.moc.o\
-	spectrumanalyzer.logic.o\
-	spectrumanalyzer.logic.moc.o\
-	kbpm-counter.moc.o\
+	songplayer.logic.o songplayer.logic.moc.o\
+	bpmcounter.o bpmcounter.moc.o\
+	kbpm-counter.o kbpm-counter.moc.o\
+	spectrumanalyzer.o spectrumanalyzer.moc.o\
+	spectrumanalyzer.logic.o spectrumanalyzer.logic.moc.o\
+	patternanalyzer.o patternanalyzer.moc.o\
+	patternanalyzer.logic.o patternanalyzer.logic.moc.o\
 	fourierd.o\
-	fftmisc.o
+	fftmisc.o\
+	common.o\
+	scripts.o
 
-KCOUNT_OBJECTS = bpmcounter.o\
-	bpmcounter.moc.o\
+KCOUNT_OBJECTS = bpmcounter.o bpmcounter.moc.o\
 	cbpm-index.o\
-	kbpm-count.o\
-	kbpm-count.moc.o
+	kbpm-count.o kbpm-count.moc.o\
+	scripts.o\
+	merger.o
 
-KSEL_OBJECTS = qstring-factory.o\
-	spectrum.o\
-	cluster.o\
-	pca.o\
-	about.o\
-	about.moc.o\
-	loader.o\
-	loader.moc.o\
-	askinput.o\
-	askinput.moc.o\
-	tagbox.o\
-	tagbox.moc.o\
-	scanningprogress.moc.o\
-	scanningprogress.o\
-	bpmbounds.moc.o\
-	bpmbounds.o\
-	songselector.o\
-	songselector.moc.o\
+KSEL_OBJECTS = qstring-factory.o spectrum.o\
+	scripts.o cluster.o pca.o\
+	about.o about.moc.o\
+	loader.o loader.moc.o\
+	askinput.o askinput.moc.o\
+	tagbox.o tagbox.moc.o\
+	scanningprogress.o scanningprogress.moc.o\
+	bpmbounds.o bpmbounds.moc.o\
+	database.o\
 	dirscanner.o\
 	importscanner.o\
-	songselector.logic.moc.o\
-	songselector.logic.o\
+	songselector.o songselector.moc.o songselector.logic.o songselector.logic.moc.o\
 	process-manager.o\
-	preferences.o\
-	preferences.moc.o\
+	preferences.o preferences.moc.o\
+	song.o\
 	qsong.o\
-	kbpm-index.o\
+	queuedsong.o\
+	index-reader.o\
 	cbpm-index.o\
 	kbpm-played.o\
 	setupwizard.moc.o\
 	setupwizard.o\
 	kbpm-dj.o\
 	edit-distance.o\
-	renamer.o\
-	renamer.moc.o\
-	renamer.logic.o\
-	renamer.logic.moc.o\
-	similars.o\
-	similars.moc.o\
-	similarscanner.o\
-	similarscanner.moc.o\
-	config.o
+	renamer.o renamer.moc.o renamer.logic.o renamer.logic.moc.o\
+	similars.o similars.moc.o similarscanner.o similarscanner.moc.o\
+	config.o\
+	merger-dialog.o merger-dialog.moc.o\
+	common.o
 
-spectrumanalyzer.logic.h: spectrumanalyzer.h
-process-manager.cpp: process-manager.h
-importscanner.h: dirscanner.h
-dirscanner.o: dirscanner.h dirscanner.cpp
-importscanner.o: importscanner.cpp importscanner.h dirscanner.h
-similarscanner.h: similars.h
-similars.cpp: similars.h	
-renamer.logic.h: renamer.h
-renamer.logic.cpp: renamer.logic.h
-renamer.cpp: renamer.h
-kbpm-play.cpp: bpmcounter.h version.h
-bpmcounter.cpp: bpmcounter.h version.h
-songselector.cpp: songselector.h version.h renamer.logic.h similarscanner.h
-tagbox.cpp: tagbox.h
-songselector.logic.h: songselector.h version.h
-songselector.logic.cpp: songselector.logic.h about.h tagbox.h askinput.h\
-	preferences.h version.h scanningprogress.h bpmbounds.h
-preferences.logic.h: preferences.h version.h
-preferences.logic.cpp: preferences.logic.h version.h
-about.cpp: about.h version.h
-loader.cpp: loader.h
-askinput.cpp: askinput.h version.h
-kbpm-dj.cpp: setupwizard.h
-songplayer.cpp songplayer.h: songplayer.ui version.h spectrumanalyzer.logic.h
-	$(UIC) -o songplayer.h songplayer.ui
-	$(UIC) -i songplayer.h -o songplayer.cpp songplayer.ui
+MERGER_OBJECTS = merger.o cbpm-index.o common.o scripts.o
+
+#############################################################################
+# Binaries
+#############################################################################
+cbpm-play: cbpm-play.o cbpm-index.o player-core.o common.o scripts.o
+	$(CC) $(LDFLAGS) $^ -o $@
 
 kbpm-play: $(KPLAY_OBJECTS)
 	$(CC) $(KPLAY_OBJECTS) -o kbpm-play\
@@ -198,15 +168,14 @@ kbpm-dj: $(KSEL_OBJECTS) songselector.cpp songselector.h
 	$(CC) $(KSEL_OBJECTS) -o kbpm-dj\
 	  $(LDFLAGS) $(QT_INCLUDE_PATH) $(QT_LIBRARY_PATH) $(QT_LIBS)
 
+merger: $(MERGER_OBJECTS)
+	$(CC) $(MERGER_OBJECTS) -o merger\
+	  $(LDFLAGS) $(QT_INCLUDE_PATH) $(QT_LIBRARY_PATH) $(QT_LIBS)
+
 #############################################################################
 # Distributions
 #############################################################################
-DOC = authors changelog copyright todo beatmixing.ps readme
-BIN  = cbpm-count cbpm-play kbpm-play kbpm-dj glue-bpmraw glue-mp3raw\
-	rbpm-play xmms-play
 GOALS = $(DOC) $(BIN)
-
-.PHONY: directories
 
 directories: mrproper
 	$(RM) -r bpmdj-$(VERSION); exit 0
@@ -246,57 +215,3 @@ deb-install: all
 	$(MKDIR) $(DESTDIR)/usr/share/doc/bpmdj; exit 0
 	$(CP) $(BIN) $(DESTDIR)/usr/bin/
 	$(CP) $(DOC) $(DESTDIR)/usr/share/doc/bpmdj/
-
-
-
-### CODE BELOW WRITTEN BY tsteudten@users.sourceforge.net ###################
-# Setup for make redhat-dist 
-#############################################################################
-
-RPM_BASE = /usr/src/redhat
-
-#############################################################################
-# Phony targets
-#############################################################################
-
-install: install_bin install_doc
-
-install_bin:
-	for  bin in $(TARGETS) $(INST_TARGETS); do \
-	   $(INSTALL) -D -m 755 $$bin ${ROOT}$(BINDIR)/$$bin; \
-	done
-
-install_doc: 
-	for doc in $(DOC); do \
-	   $(INSTALL) -D -m 755 $$doc ${ROOT}$(DOCDIR)/$$doc; \
-	done
-
-uninstall: 
-	for bin in $(TARGETS) $(INST_TARGETS); do \
-	   $(RM) ${ROOT}$(BINDIR)/$$bin; \
-	done \
-	for doc in $(DOC); do \
-	   $(RM) ${ROOT}$(DOCDIR)/$$doc; \
-	done
-
-#############################################################################
-# redhat distribution alpha and x86
-#############################################################################
-
-redhat-dist:
-	@for dir in RPMS SRPMS BUILD SOURCES SPECS; do \
-		if [ ! -w $(RPM_BASE)/$$dir ]; then \
-			$(ECHO) "$(RPM_BASE)/$$dir is not writable for you. Maybe try as root."; \
-			exit; \
-		fi; \
-	done ; \
-	$(MAKE) clean; \
-	$(MKDIR) bpmdj-$(VERSION); \
-	[ -f $(TAR_ARCH) ] && $(RM) $(TAR_ARCH); \
-	$(CP) `find . -maxdepth 1 -type f -print` bpmdj-$(VERSION) ; \
-	$(CAT) bpmdj.spec | \
-		$(SED) "s/_VERSION_/$(VERSION)/g" > bpmdj-$(VERSION)/bpmdj.spec; \
-	$(TAR) --exclude "CVS" -cvzf $(TAR_ARCH) bpmdj-$(VERSION) ; \
-	$(RM) -r bpmdj-$(VERSION); \
-	$(RPM) --clean -ta  $(TAR_ARCH); \
-	[ -f $(TAR_ARCH) ] && $(RM) $(TAR_ARCH)

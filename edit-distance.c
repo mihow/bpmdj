@@ -18,113 +18,113 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
+#include <string.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include "common.h"
 #include <assert.h>
 
 static int * * d;
 
 int repl(char a, char b)
 {
-   if (a==b) return 0;
-   return 1;
+  if (a==b) return 0;
+  return 1;
 }
 
 int min3(int a, int b, int c)
 {
-   if (a<=b && a<=c) return a;
-   if (b<=a && b<=c) return b;
-   if (c<=a && c<=b) return c;
-   assert(0);
+  if (a<=b && a<=c) return a;
+  if (b<=a && b<=c) return b;
+  if (c<=a && c<=b) return c;
+  assert(0);
 }
 
 void dist_init()
 {
-   int i = 0;
-   int j = 0;
-   int m = 128;
-   int n = 128;
-   // create empty distance matrix
-   d = ( int * * ) malloc ( sizeof ( int * ) * ( m + 1 ) ) ;
-   assert(d);
-   for ( i = 0 ; i <= m ; i ++ )
-     {
-	d [ i ] = ( int * ) malloc ( sizeof ( int ) * ( n + 1 ) ) ;
-	assert ( d [ i ] ) ;
-     }
-   // set startrows
-   for ( i = 0 ; i <= m ; i ++ )
-     d [ i ] [ 0 ] = i ;
-   for ( j = 0 ; j <= n ; j ++ )
-     d [ 0 ] [ j ] = j ;
+  int i = 0;
+  int j = 0;
+  int m = 128;
+  int n = 128;
+  // create empty distance matrix
+  d = allocate (  m + 1 , int * ) ;
+  for ( i = 0 ; i <= m ; i ++ )
+    d [ i ] = allocate( n + 1 , int ) ;
+  // set startrows
+  for ( i = 0 ; i <= m ; i ++ )
+    d [ i ] [ 0 ] = i ;
+  for ( j = 0 ; j <= n ; j ++ )
+    d [ 0 ] [ j ] = j ;
 }
 
 void dist_done()
 {
-   int i = 0;
-   // free everything
-   for ( i = 0 ; i <= 128 ; i ++ )
-     free ( d [ i ] ) ;
-   free ( d ) ;
+  int i = 0;
+  // free everything
+  for ( i = 0 ; i <= 128 ; i ++ )
+    free ( d [ i ] ) ;
+  free ( d ) ;
 }
 
 int edist(char* x, char* y)
 {
-   int m = strlen ( x ) ;
-   int n = strlen ( y ) ;
-   int i = 0;
-   int j = 0;
-   assert(m<128);
-   assert(n<128);
-   // loop matrix
-   for( i = 1 ; i <= m ; i++ )
-     for( j = 1 ; j <= n ; j++ )
-       d[i][j]=min3(d[i-1][j-1] + repl(x[i-1],y[j-1]),
-		    d[i-1][j] + 1,
-		    d[i][j-1] + 1);
-   // return ...
-   return d [ m ] [ n ] ;
+  int m = strlen ( x ) ;
+  int n = strlen ( y ) ;
+  int i = 0;
+  int j = 0;
+  assert(m<128);
+  assert(n<128);
+  // loop matrix
+  for( i = 1 ; i <= m ; i++ )
+    for( j = 1 ; j <= n ; j++ )
+      d[i][j]=min3(d[i-1][j-1] + repl(x[i-1],y[j-1]),
+		   d[i-1][j] + 1,
+		   d[i][j-1] + 1);
+  // return ...
+  return d [ m ] [ n ] ;
 }
 
 char* strupperdup(const char* in)
 {
-   int l = strlen(in);
-   char* out = (char*)malloc(l+1);
-   int r,w;
-   for(r=0, w=0; r<l; r++)
-     {
-	if (isalnum(in[r]))
-	  out[w++]=toupper(in[r]);
-     }
-   out[w]=0;
-   return out;
+  int l = strlen(in);
+  char* out = allocate(l+1,char);
+  int r,w;
+  for(r=0, w=0; r<l; r++)
+    {
+      if (isalnum(in[r]))
+	out[w++]=toupper(in[r]);
+    }
+  out[w]=0;
+  return out;
 }
 
 int ndist(const char* title, const char* author, const char* other)
 {
-   int tl = strlen ( title ) ;
-   int al = strlen ( author ) ;
-   char * x1 = (char*) malloc(tl+al+1);
-   char * x2 = (char*) malloc(tl+al+1);
-   char * x3 = (char*) malloc(tl+1);
-   char * y1, * y2, * y3;
-   char * z = strupperdup(other);
-   int result;
-   strcpy ( x1 , title ) ;
-   strcpy ( x1 + tl, author ) ;
-   strcpy ( x2 , author ) ;
-   strcpy ( x2 + al, title ) ;
-   strcpy ( x3 , title ) ;
-   y1=strupperdup(x1);
-   y2=strupperdup(x2);
-   y3=strupperdup(x3);
-   result=min3(edist(y1,z),
-	       edist(y2,z),
-	       edist(y3,z));
-   free(z);
-   free(y1);
-   free(y2);
-   free(y3);
-   free(x1);
-   free(x2);
-   free(x3);
-   return result;
+  int tl = strlen ( title ) ;
+  int al = strlen ( author ) ;
+  char * x1 = allocate( tl + al + 1, char );
+  char * x2 = allocate( tl + al + 1, char );
+  char * x3 = allocate( tl + 1, char );
+  char * y1, * y2, * y3;
+  char * z = strupperdup(other);
+  int result;
+  strcpy ( x1 , title ) ;
+  strcpy ( x1 + tl, author ) ;
+  strcpy ( x2 , author ) ;
+  strcpy ( x2 + al, title ) ;
+  strcpy ( x3 , title ) ;
+  y1=strupperdup(x1);
+  y2=strupperdup(x2);
+  y3=strupperdup(x3);
+  result=min3(edist(y1,z),
+	      edist(y2,z),
+	      edist(y3,z));
+  free(z);
+  free(y1);
+  free(y2);
+  free(y3);
+  free(x1);
+  free(x2);
+  free(x3);
+  return result;
 }

@@ -1,5 +1,5 @@
-CPP=g++ -O9 
-CC=gcc -O9
+CPP=g++ -O9 -Wall 
+CC=gcc -O9 -Wall
 #CPP=g++ -O9 -fbranch-probabilities
 #CC=gcc -O9 -fbranch-probabilities
 #CPP=g++ -O9 -fprofile-arcs
@@ -16,6 +16,7 @@ MKDIR = mkdir
 UIC = uic
 MOC = moc
 STRIP = strip
+INSTALL = install
 
 QT_INCLUDE_PATH= -I ${QTDIR}/include/
 QT_LIBRARY_PATH= -L ${QTDIR}/lib/

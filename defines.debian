@@ -11,6 +11,7 @@ LATEX = latex
 DVIPS = dvips
 MKDIR = mkdir
 STRIP = strip
+INSTALL = install
 
 CFLAGS+=
 LDFLAGS+= -lpthread -lm

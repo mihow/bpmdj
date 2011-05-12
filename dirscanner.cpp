@@ -24,6 +24,52 @@
 #include <string.h>
 #include "dirscanner.h"
 
+bool DirectoryScanner::songExtension(QString ext)
+{
+  return goodExtension(ext.lower());
+}
+
+bool DirectoryScanner::goodExtension(QString ext)
+{
+  // important !!!
+  // opgelet met extenties langer dan 4 tekens !!!
+  return (ext.endsWith(".mp3") || 
+	  ext.endsWith(".ogg"));
+}
+
+bool DirectoryScanner::goodName(QString name)
+{
+  // must end on .idx or a song extension
+  QString trail = name.right(4);
+  if (!goodExtension(trail) && trail!=".idx")
+    return false;
+  // no spaces or any special characters
+  // should occur anywhere in the filename
+  if (name.contains(" ")) return false;
+  if (name.contains("_")>1) return false;
+  if (name.contains("_")==1)
+    {
+      int pos = name.findRev("_");
+      int pos2 = name.find("[");
+      if ((pos2-pos>3) || (pos<2))
+	return false;
+    }
+  if (name.contains("'")) return false;
+  if (name.contains("-")) return false;
+  if (name.contains("[")!=1) return false;
+  if (name.contains("]")!=1) return false;
+  int leftbrace=name.find("[");
+  if (leftbrace>name.find("]")) return false;
+  if (name.at(leftbrace+1).isLetter())
+    {
+      char c = name.at(leftbrace+1).latin1();
+      if (c<'A' || c>'Z')
+	return false;
+    }
+  return true;
+}
+
+
 DirectoryScanner::DirectoryScanner(QString  extension)
 { 
   required_extension=extension; 
@@ -51,7 +97,7 @@ void DirectoryScanner::scandir(const QString dirname, const QString prefix)
   DIR * dir=opendir(dirname);
   if (!dir) return;
   recursing(dirname);
-  while (entry=readdir(dir))
+  while ( (entry=readdir(dir)) )
     {
       if (strcmp(entry->d_name,".")==0 ||
 	  strcmp(entry->d_name,"..")==0) continue;

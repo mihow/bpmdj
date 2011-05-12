@@ -20,7 +20,6 @@
 
 #include <fcntl.h>
 #include <stdlib.h>
-#include <malloc.h>
 #include <unistd.h>
 #include <dirent.h>
 #include <assert.h>
@@ -28,16 +27,18 @@
 #include <qlistview.h>
 #include <qlabel.h>
 #include <qprogressbar.h>
-#include "kbpm-index.h"
+#include "index-reader.h"
 #include "kbpm-dj.h"
 #include "qsong.h"
 #include "config.h"
 #include "spectrum.h"
+#include "database.h"
 
-SongIndex::SongIndex(Loader *l, QListView *lv) : 
+
+IndexReader::IndexReader(Loader *l, DataBase * db) : 
   DirectoryScanner(".idx")
 { 
-  view = lv;
+  database = db;
   loader = l;
   total_files = 0;
   loader->progressBar1->setTotalSteps(Config::file_count);
@@ -47,9 +48,10 @@ SongIndex::SongIndex(Loader *l, QListView *lv) :
 };
 
 
-void SongIndex::checkfile(const QString prefix, const QString  filename)
+void IndexReader::checkfile(const QString prefix, const QString  filename)
 {
-  new QSong(filename,prefix,view);
+  Song * song = new Song(filename,prefix);
+  database->add(song);
   ++total_files;
   if (total_files%10 == 0)
     {

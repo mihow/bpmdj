@@ -57,8 +57,8 @@ extern "C"
 {
 #include "cbpm-index.h"
 #include "version.h"
-#include "common.h"
 #include "player-core.h"
+#include "scripts.h"
 }
 
 BpmCountDialog::BpmCountDialog(SongPlayer*parent, const char*name, bool modal, WFlags f) :
@@ -105,34 +105,18 @@ BpmCountDialog::BpmCountDialog(SongPlayer*parent, const char*name, bool modal, W
     Md5Label->setText(index_md5sum);
   // set song 
   if (index_file)
-     Mp3Label->setText(index_file);
+    SongLabel->setText(index_file);
 }
 
 
-unsigned long BpmCountDialog::phasefit(long i)
+unsigned long BpmCountDialog::phasefit(unsigned long i)
 {
-   long c,d;
-   unsigned long mismatch=0;
-   unsigned long prev=mismatch;
-   assert(i<audiosize);
-   for(c=i;c<audiosize;c++)
-     {
-	d=abs((long)audio[c]-(long)audio[c-i]);
-	prev=mismatch;
-	mismatch+=d;
-	// WVB -- removed wegens waarschijnlijk vertragende factor
-	// assert(mismatch>=prev);
-     }
-   return mismatch;
-}
-
-long fsize(FILE * f)
-{
-  long answer;
-  fseek(f,0,SEEK_END);
-   answer=ftell(f);
-   fseek(f,0,SEEK_SET);
-   return answer;
+  unsigned long c;
+  unsigned long mismatch=0;
+  assert(i<audiosize);
+  for(c=i;c<audiosize;c++)
+    mismatch+=abs((long)audio[c]-(long)audio[c-i]);
+  return mismatch;
 }
 
 void BpmCountDialog::setBpmBounds(long start, long stop)
@@ -141,9 +125,9 @@ void BpmCountDialog::setBpmBounds(long start, long stop)
    char tmp2[500];
    startbpm=start;
    stopbpm=stop;
-   sprintf(tmp,"%d",startbpm);
+   sprintf(tmp,"%d",(int)startbpm);
    FromBpmEdit->setText(tmp);
-   sprintf(tmp2,"%d",stopbpm);
+   sprintf(tmp2,"%d",(int)stopbpm);
    ToBpmEdit->setText(tmp2);
 }
 
@@ -163,139 +147,101 @@ void BpmCountDialog::setPercentBounds(long startper, long stopper)
 
 void BpmCountDialog::getMd5()
 {
-   char d[500];
-   // first we look up the md5sum !
-   sprintf(d,"Obtaining md5sum for %s",argument);
-   StatusLabel->setText(d);
-   sprintf(d,"md5sum \"%s\" | awk '{printf $1}' >sum.tmp\n",argument);
-   if (system(d)>256)
-     {
-	printf("Error: md5sum failed");
-	exit(101);
-     }
-   else
-     {
-	FILE * kloink=fopen("sum.tmp","r");
-	char s[40];
-	int i=0;
-	while(i<32)
-	  {
-	     int c = getc(kloink);
-	     s[i]=c;
-	     i++;
-	  }
-	s[32]=0;
-	index_md5sum=strdup(s);
-	fclose(kloink);
-     }
-   sprintf(d,"%s",index_md5sum);
-   StatusLabel->setText("");
-   Md5Label->setText(d);
+  char d[500];
+  // first we look up the md5sum !
+  sprintf(d,"Obtaining md5sum for %s",argument);
+  StatusLabel->setText(d);
+  index_md5sum = ::getMd5(argument);
+  sprintf(d,"%s",index_md5sum);
+  StatusLabel->setText("");
+  Md5Label->setText(d);
 }
 
 void BpmCountDialog::timerTick()
 {
-   ReadingBar->setProgress(reading_progress);
-   CountingBar->setProgress(processing_progress);
+  ReadingBar->setProgress(reading_progress);
+  CountingBar->setProgress(processing_progress);
 }
 
 void BpmCountDialog::readAudio()
 {
-   FILE * raw;
-   char d[500];
-   // the filename of the file to read is the basename 
-   // suffixed with .raw
-   sprintf(d,"%s.raw",basename(index_file));
-   raw=fopen(d,"rb");
-   if (!raw)
-     {
- 	printf("Error: Unable to open %s\n",argument);
-	exit(3);
-     }
-   // read complete file shrunken down into memory
-   audiosize=fsize(raw);
-   long startpercent=(long)((long long)audiosize*(long long)index_bpmcount_from/(long long)100);
-   startpercent-=startpercent%4;
-   long stoppercent=(long)((long long)audiosize*(long long)index_bpmcount_to/(long long)100);
-   stoppercent-=stoppercent%4;
-   audiosize=stoppercent-startpercent;
-   audiosize/=(4*(WAVRATE/audiorate));
-   audio=(unsigned char*)malloc(audiosize+1);
-   if (!audio)
-     {
-	printf("Error: unable to allocate audio buffer\n");
-	exit(4);
-     }
-   
-   // reading in memory
-   StatusLabel->setText("Reading");
-   long pos=0, count, redux, i;
-   signed short buffer[bufsiz];
-   fseek(raw,startpercent,SEEK_SET);
-   while(pos<audiosize && !stop_signal)
-     {
-	count=fread(buffer,sizeof(signed short),bufsiz,raw);
-	reading_progress = pos*100/audiosize;
-	for (i=0;i<count;i+=2*(WAVRATE/audiorate))
-	  {
-	     signed long int left, right,mean;
-	     left=abs(buffer[i]);
-	     right=abs(buffer[i+1]);
-	     mean=(left+right)/2;
-	     redux=abs(mean)/128;
-	     if (pos+i/(2*(WAVRATE/audiorate))>=audiosize) break;
-	     assert(pos+i/(2*(WAVRATE/audiorate))<audiosize);
-	     audio[pos+i/(2*(WAVRATE/audiorate))]=(unsigned char)redux;
-	  }
-	pos+=count/(2*(WAVRATE/audiorate));
-     }
-   fclose(raw);
-   if (stop_signal)
-     {
+  FILE * raw = openRawFile();
+  
+  // read complete file shrunken down into memory
+  audiosize=fsize(raw);
+  long startpercent=(long)((long long)audiosize*(long long)index_bpmcount_from/(long long)100);
+  startpercent-=startpercent%4;
+  long stoppercent=(long)((long long)audiosize*(long long)index_bpmcount_to/(long long)100);
+  stoppercent-=stoppercent%4;
+  audiosize=stoppercent-startpercent;
+  audiosize/=(4*(WAVRATE/audiorate));
+  audio=allocate(audiosize+1,unsigned char);
+  
+  // reading in memory
+  StatusLabel->setText("Reading");
+  unsigned long pos=0;
+  long count, redux, i;
+  signed short buffer[bufsiz];
+  fseek(raw,startpercent,SEEK_SET);
+  while(pos<audiosize && !stop_signal)
+    {
+      // we read in bufsize samples 
+      // als hem 1000 zegt hebben we dus eigenlijk 2000 samples binnen gekregen
+      count=readsamples((unsigned4*)buffer,bufsiz/2,raw);
+      reading_progress = pos*100/audiosize;
+      for (i = 0 ; i < count * 2 ; i += 2 * (WAVRATE/audiorate) )
+	{
+	  signed long int left, right,mean;
+	  left=abs(buffer[i]);
+	  right=abs(buffer[i+1]);
+	  mean=(left+right)/2;
+	  redux=abs(mean)/128;
+	  if (pos+i/(2*(WAVRATE/audiorate))>=audiosize) break;
+	  assert(pos+i/(2*(WAVRATE/audiorate))<audiosize);
+	  audio[pos+i/(2*(WAVRATE/audiorate))]=(unsigned char)redux;
+	}
+      pos+=count/(WAVRATE/audiorate);
+    }
+  fclose(raw);
+  if (stop_signal)
+    {
+      free(audio);
+      audio=NULL;
+      audiosize=0;
+      StatusLabel->setText("Canceled while reading");
+      return;
+    }
+  reading_progress = 100;
+}
+
+void BpmCountDialog::rangeCheck()
+  {
+    unsigned long int val;
+    bool changed = false;
+    val = atoi(FromPercentEdit->text());
+    if (changed |= (unsigned)index_bpmcount_from != val) 
+      index_bpmcount_from=val;
+    val = atoi(ToPercentEdit->text());
+    if (changed |= (unsigned)index_bpmcount_to != val) 
+      index_bpmcount_to=val;
+    val = atoi(FromBpmEdit->text());
+    if (startbpm != val)
+      startbpm=val;
+    val = atoi(ToBpmEdit->text());
+    if (stopbpm != val)
+      stopbpm=val;
+    if (changed && audio)
+      {
 	free(audio);
 	audio=NULL;
 	audiosize=0;
-	StatusLabel->setText("Canceled while reading");
-	return;
-     }
-   reading_progress = 100;
-}
-   
-void BpmCountDialog::rangeCheck()
-  {
-     unsigned long int val;
-     bool changed = false;
-     val = atoi(FromPercentEdit->text());
-     if (changed |= index_bpmcount_from != val) 
-       index_bpmcount_from=val;
-     val = atoi(ToPercentEdit->text());
-     if (changed |= index_bpmcount_to != val) 
-       index_bpmcount_to=val;
-     val = atoi(FromBpmEdit->text());
-     if (startbpm != val)
-       startbpm=val;
-     val = atoi(ToBpmEdit->text());
-     if (stopbpm != val)
-       stopbpm=val;
-     
-     // in this case we need to remove the current audio buffer
-     if (changed)
-       {
-	  if (audio)
-	    {
-	       free(audio);
-	       audio=NULL;
-	       audiosize=0;
-	    }
-       }
+      }
   }
 
 void BpmCountDialog::doit()
 {
-   char statustext[1024];
-   char * tmp,d[500];
-   int res2;
-   long count,pos,i,redux;
+   char d[500];
+   unsigned long i;
    
    getMd5();
    
@@ -312,11 +258,12 @@ void BpmCountDialog::doit()
    // now process the sucker 
    StatusLabel->setText("Finding best autocorrelation");
    sprintf(d," ");
+
    stopshift=audiorate*60*4/startbpm;
    startshift=audiorate*60*4/stopbpm;
      {
 	unsigned long foutat[stopshift-startshift];
-	unsigned long fout, minimumfout=0, maximumfout,minimumfoutat,left,right;
+	unsigned long fout, minimumfout=0, maximumfout=(unsigned)-1,minimumfoutat=0,left,right;
 	memset(&foutat,0,sizeof(foutat));
 	
 	// how many times wil we execute phasefit ???
@@ -325,24 +272,22 @@ void BpmCountDialog::doit()
 	int o = 0;
 	for(i=startshift;i<stopshift && !stop_signal;i+=50)
 	  {
-	     fout=phasefit(i);
-	     o++;
-	     processing_progress = o*100/O;
-	     foutat[i-startshift]=fout;
-	     //	     printf(d,"# %d: %ld (%g BPM)\n",i,fout,
-	     //		    4.0*(double)audiorate*60.0/(double)i);
-	     if (minimumfout==0) maximumfout=minimumfout=fout;
+	    fout=phasefit(i);
+	    o++;
+	    processing_progress = o*100/O;
+	    foutat[i-startshift]=fout;
+	    if (minimumfout==0) maximumfout=minimumfout=fout;
 	     if (fout<minimumfout) 
 	       {
-		  minimumfout=fout;
-		  minimumfoutat=i;
+		 minimumfout=fout;
+		 minimumfoutat=i;
 	       }
 	     if (fout>maximumfout) maximumfout=fout;
 	  }
 	if (stop_signal)
 	  {
-	     StatusLabel->setText("Canceled while autocorrelating");
-	     return;
+	    StatusLabel->setText("Canceled while autocorrelating");
+	    return;
 	  }
 	if (minimumfoutat>=100) left=minimumfoutat-100;
 	else left=0;
@@ -438,18 +383,6 @@ void BpmCountDialog::doit()
      }
 }
 
-#define barksize 24
-static double barkbounds[barksize+1] =
-  {
-    0,100,200,300,
-    400,510,630,770,
-    920,1080,1270,1480,
-    1720,2000,2380,2700,
-    3150,3700,4400,5300,
-    6400,7700,9500,12000,
-    15500	
-  };
-
 void BpmCountDialog::doitwrapper()
 {
    doit();
@@ -460,96 +393,54 @@ void BpmCountDialog::doitwrapper()
 
 void* doit(void* dialog)
 {
-   ((BpmCountDialog*)dialog)->doitwrapper();
+  ((BpmCountDialog*)dialog)->doitwrapper();
+  return NULL;
 }
 
 void BpmCountDialog::startAutomaticCounter()
 {
-   if (working)
-     {
-	stopWorking();
-     }
-   else
-     {
-	StartButton->setText("&Stop");
-	BusyToggle->toggle();
-	working=true;
-	stop_signal=false;
-	pthread_t y;
-	pthread_create(&y,NULL,::doit,(void*)this);
-     }
+  if (working)
+    {
+      stopWorking();
+    }
+  else
+    {
+      StartButton->setText("&Stop");
+      BusyToggle->toggle();
+      working=true;
+      stop_signal=false;
+      pthread_t y;
+      pthread_create(&y,NULL,::doit,(void*)this);
+    }
 }
 
-void BpmCountDialog::removeRaw()
-  {
-     char d[500];
-     // remove the old file
-     sprintf(d,"%s.raw",basename(index_file));
-     remove(d);
-  }
-
 void BpmCountDialog::stopWorking()
-  {
-     if (working)
-       {
-	  StatusLabel->setText("Canceling...");
-	  stop_signal=true;
-	  while(working) ;
-       }
-  }
+{
+  if (working)
+    {
+      StatusLabel->setText("Canceling...");
+      stop_signal=true;
+      while(working) ;
+    }
+}
 
 void BpmCountDialog::finish()
 {
-   stopWorking();
-   if (strcmp(index_readfrom,IdxEdit->text())!=0)
-     {
-	index_changed=1;
-	index_readfrom=strdup(IdxEdit->text());
-     }
-   if (strcmp(index_tags,TagEdit->text())!=0)
-     {
-	index_tags=strdup(TagEdit->text());
-	index_changed=1;
-     }
-   accept();
+  stopWorking();
+  if (strcmp(index_readfrom,IdxEdit->text())!=0)
+    {
+      index_changed=1;
+      index_readfrom=strdup(IdxEdit->text());
+    }
+  if (strcmp(index_tags,TagEdit->text())!=0)
+    {
+      index_tags=strdup(TagEdit->text());
+      index_changed=1;
+    }
+  if (index_changed)
+    index_write();
+  accept();
 }
-
-/*int main(int argc, char *argv[])
-{
-   // input all information into the dialog
- * // het zetten van deze bounds gaat nog plezant worden. Nadat de applicatie gestart is is daar niet veel meer
- * aan te doen in essentie. Buiten de values vanuit de index file aan te passen
- * hetzelfde voor de bpm bounds
- 
-   dialog->setPercentBounds(arg_from,arg_to);
-   dialog->setBpmBounds(arg_low,arg_high);
-   // de index_file is de naam van de file met het volledige pad binnen 
-   // de music directory. Dit wil zeggen dat we de music er af moeten strippen
-   index_file=strdup(argument);
-   if (strstr(index_file,"music/")==index_file) index_file+=strlen("music/");
-   else if (strstr(index_file,"./music/")==index_file) index_file+=strlen("./music/");
-   else printf("Warning: song not in music/ or ./music/ directory\n");
-   dialog->setMp3File(index_file);
-   // de file die we wegschrijven is de songname met .idx ipv .mp3
-   // deze data wordt in de huidige direcotry geschreven, tenzij anders 
-   // opgegeven natuurlijk
-   char * tmp;
-   if (opt_write)
-     index_readfrom=strdup(arg_write);
-   else
-     {
-	index_readfrom=strdup(basename(index_file));
-	tmp=strstr(index_readfrom,".mp3");
-	if (!tmp) tmp=strstr(index_readfrom,".MP3");
-	strcpy(tmp,".idx");
-     }
-   // this one will also read the given data
-   dialog->setIndexFile(index_readfrom);
-   // now insert widget and execute the thing
-   app->setMainWidget(dialog);
-   dialog->show();
-}
-*/
 
 void BpmCountDialog::reset()
 {
@@ -586,9 +477,7 @@ void BpmCountDialog::tap()
 	if (index_tempo)
 	  free(index_tempo);
 	index_tempo=strdup(d);
-	// printf("tempo = %s\n",index_tempo);
 	index_changed=1;
-	// update bounds
 	setBpmBounds((long)(tempo-10.0),(long)(tempo+10.0));
      }
    TapLcd->display(tapcount);

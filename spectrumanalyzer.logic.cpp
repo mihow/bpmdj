@@ -59,8 +59,7 @@ extern "C"
 {
 #include "cbpm-index.h"
 #include "version.h"
-#include "common.h"
-#include "player-core.h"
+#include "scripts.h"
 }
 
 static double barkbounds[barksize+1] =
@@ -73,8 +72,6 @@ static double barkbounds[barksize+1] =
     6400,7700,9500,12000,
     15500	
   };
-
-extern long fsize(FILE * f);
 
 SpectrumDialogLogic::SpectrumDialogLogic(SongPlayer*parent, const char*name, bool modal, WFlags f) :
   SpectrumDialog(0,name,modal,f)
@@ -132,114 +129,102 @@ void SpectrumDialogLogic::fetchSpectrum()
   signed short *data;
   double *barkscale;
   int bark;
-  barkscale=(double*)malloc(sizeof(double)*barksize);
-  fftdata=(double*)malloc(sizeof(double)*(blocksize+slidesize));
-  fftwindowfreq=(double*)malloc(sizeof(double)*blocksize);
-  fftfreq=(double*)malloc(sizeof(double)*(blocksize/2));
-  fftfreqi=(double*)malloc(sizeof(double)*blocksize);
+  barkscale = allocate(barksize,double);
+  fftdata = allocate(blocksize+slidesize,double);
+  fftwindowfreq = allocate(blocksize,double);
+  fftfreq = allocate(blocksize/2,double);
+  fftfreqi = allocate(blocksize,double);
   // hieronder x 2 omdat we zowel links als rechts binnen krijgen
-  data=(signed short*)malloc(sizeof(signed short)*(blocksize+slidesize)*2);
-  assert(data);
-
-  FILE * raw;
-  char d[500];
-  // the filename of the file to read is the basename 
-  // suffixed with .raw
-  sprintf(d,"%s.raw",basename(index_file));
-  raw=fopen(d,"rb");
-  if (!raw)
-    {
-      printf("Error: Unable to open %s\n",argument);
-      exit(3);
-    }
-
+  data=allocate((blocksize+slidesize)*2 ,signed short);
+  FILE * raw = openRawFile();
   // reset the fftfreq
   long pos;
   for(pos=0;pos<blocksize/2;pos++)
     fftwindowfreq[pos]=0.0;
-  
   // position file
-  unsigned long long int audiosize=fsize(raw)/4;
-  long startpos = cue*4;
-  // printf("Fetching spectrum at position = %ld\n",startpos);
-  fseek(raw,startpos,SEEK_SET);
-  
-  // read in memory
-  pos=0;
-  while(pos<blocksize+slidesize)
+  long startpos = cue ? cue * 4 : fsize(raw)/2;
+  // printf("fsize = %d\n (blocksize+slidesize) * 2 = %d k\n",(int)fsize(raw),(int)(blocksize+slidesize)*2/1024);
+  if (startpos+(blocksize+slidesize)*2<=fsize(raw))
     {
-      long count=fread(data+pos*2,2*sizeof(signed short),blocksize+slidesize-pos,raw);
-      assert(count>0);
-      pos+=count;
-    }
-  // shrink down
-  for(pos=0;pos<blocksize+slidesize;pos++)
-    fftdata[pos]=(double)data[pos*2];
-  // cummulate different windows
-  for(slide=0;slide<slidesize;slide+=slidesize/100)
-    {
-      Progress->setProgress(slide,slidesize);
+      // printf("Fetching spectrum at position = %d\n",(int)cue);
+      fseek(raw,startpos,SEEK_SET);
+      // read in memory
+      pos=0;
+      while(pos<blocksize+slidesize)
+	pos += readsamples((unsigned4*)(data+pos),(blocksize+slidesize-pos)/2,raw)*2;
+      // shrink down
+      for(pos=0;pos<blocksize+slidesize;pos++)
+	fftdata[pos]=(double)data[pos*2];
+      // cummulate different windows
+      for(slide=0;slide<slidesize;slide+=slidesize/100)
+	{
+	  Progress->setProgress(slide,slidesize);
+	  app->processEvents();
+	  // do an fft on that position and normalize the result
+	  fft_double(blocksize,0,fftdata+slide,NULL,fftwindowfreq,fftfreqi);
+	  for(pos=0;pos<blocksize/2;pos++)
+	    fftfreq[pos]+=fftwindowfreq[pos];
+	}
+      Progress->setProgress(slidesize,slidesize);
       app->processEvents();
-      // do an fft on that position and normalize the result
-      fft_double(blocksize,0,fftdata+slide,NULL,fftwindowfreq,fftfreqi);
+      fclose(raw);
+      // normalize the result
+      double max = 0;
       for(pos=0;pos<blocksize/2;pos++)
-	fftfreq[pos]+=fftwindowfreq[pos];
-    }
-  Progress->setProgress(slidesize,slidesize);
-  app->processEvents();
-  fclose(raw);
-  // normalize the result
-  double max = 0;
-  for(pos=0;pos<blocksize/2;pos++)
-    // fftfreq[pos]=fabsl(fftfreq[pos]*(double)pos/((double)blocksize*10.0));
-    fftfreq[pos]=fabsl(fftfreq[pos]);
-  for(pos=0;pos<blocksize/2;pos++)
-    if (fftfreq[pos]>max) 
-      max=fftfreq[pos];
-  for(pos=0;pos<blocksize/2;pos++)
-    fftfreq[pos]=fftfreq[pos]*100.0/max;
-  
-  // bring all frequency relatively to the bark-scales
-  for(bark=0;bark<barksize;bark++)
-    barkscale[bark]=0;
-  for(pos=0;pos<blocksize/2;pos++)
-    {
-      double freq = Index_to_frequency(blocksize,pos)*(double)WAVRATE;
+	// fftfreq[pos]=fabs(fftfreq[pos]*(double)pos/((double)blocksize*10.0));
+	fftfreq[pos]=fabs(fftfreq[pos]);
+      for(pos=0;pos<blocksize/2;pos++)
+	if (fftfreq[pos]>max) 
+	  max=fftfreq[pos];
+      for(pos=0;pos<blocksize/2;pos++)
+	fftfreq[pos]=fftfreq[pos]*100.0/max;
+      
+      // bring all frequency relatively to the bark-scales
       for(bark=0;bark<barksize;bark++)
-	if (freq>barkbounds[bark] &&
-	    freq<barkbounds[bark+1])
-	  {
-	    double length = barkbounds[bark+1]-barkbounds[bark];
-	    double barkcentre = barkbounds[bark]+length/2.0;
-	    double dist = fabsl(freq-barkcentre)*2.0/length;
-	    double scale = 1.0 - dist;
-	    assert(scale>=0.0);
-	    barkscale[bark]+=fftfreq[pos]*scale;
-	    assert(barkscale[bark]>=0.0);
-	  }
+	barkscale[bark]=0;
+      for(pos=0;pos<blocksize/2;pos++)
+	{
+	  double freq = Index_to_frequency(blocksize,pos)*(double)WAVRATE;
+	  for(bark=0;bark<barksize;bark++)
+	    if (freq>barkbounds[bark] &&
+		freq<barkbounds[bark+1])
+	      {
+		double length = barkbounds[bark+1]-barkbounds[bark];
+		double barkcentre = barkbounds[bark]+length/2.0;
+		double dist = fabs(freq-barkcentre)*2.0/length;
+		double scale = 1.0 - dist;
+		assert(scale>=0.0);
+		barkscale[bark]+=fftfreq[pos]*scale;
+		assert(barkscale[bark]>=0.0);
+	      }
+	}
+      // rescale bark information..
+      // the first entry in the scale is always halved because this is the bass level
+      barkscale[0]/=2.0;
+      max=0;
+      for(bark=0;bark<barksize;bark++)
+	if (barkscale[bark]>max)
+	  max=barkscale[bark];
+      for(bark=0;bark<barksize;bark++)
+	{
+	  barkscale[bark]=barkscale[bark]*99.0/max;
+	  assert(barkscale[bark]>=0.0);
+	}
+      // update the meters...
+      for(pos=0;pos<barksize;pos++)
+	meters[pos]->setValue((int)barkscale[pos]);
+      // write out values...
+      char spectrum[barksize+1];
+      for(pos=0;pos<barksize;pos++)
+	spectrum[pos]='a'+(char)(barkscale[pos]/4);
+      spectrum[barksize]=0;
+      index_spectrum=strdup(spectrum);
+      index_changed=1;
     }
-  // rescale bark information..
-  // the first entry in the scale is always halved because this is the bass level
-  barkscale[0]/=2.0;
-  max=0;
-  for(bark=0;bark<barksize;bark++)
-    if (barkscale[bark]>max)
-      max=barkscale[bark];
-  for(bark=0;bark<barksize;bark++)
+  else
     {
-      barkscale[bark]=barkscale[bark]*99.0/max;
-      assert(barkscale[bark]>=0.0);
+      printf("Could not measure spectrum because there is not enough data at position (bytes) %d\n",(int)startpos);
     }
-  // update the meters...
-  for(pos=0;pos<barksize;pos++)
-    meters[pos]->setValue((int)barkscale[pos]);
-  // write out values...
-  char spectrum[barksize+1];
-  for(pos=0;pos<barksize;pos++)
-    spectrum[pos]='a'+(char)(barkscale[pos]/4);
-  spectrum[barksize]=0;
-  index_spectrum=strdup(spectrum);
-  index_changed=1;
   // free everything involved
   free(fftwindowfreq);
   free(fftfreq);

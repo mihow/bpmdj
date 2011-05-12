@@ -31,16 +31,21 @@ extern "C"
 
 void ImportScanner::recursing(const QString  dirname)
 {
-  Log->insertLine("Importing mp3s from "+dirname);
+  Log->insertLine("Importing songs from "+dirname);
   Log->setCursorPosition(Log->numLines(),1);
   app->processEvents();
 }
 
 ImportScanner::ImportScanner(SongSelectorLogic* root) : 
-  ScanningProgress(),
-  DirectoryScanner(".mp3")
+  DirectoryScanner(NULL),
+  ScanningProgress()
 {
   selector = root;
+}
+
+bool ImportScanner::matchextension(const QString filename)
+{
+  return goodExtension(filename);
 }
 
 void ImportScanner::scan(const QString dirname, const QString checkname)
@@ -93,7 +98,6 @@ void ImportScanner::checkfile(const QString pathname, const QString filen)
       index_free();
       
       // inform dataroot of new file
-      QSong * ns = new QSong((const QString )halfindexname,IndexDir,selector->songList);
-      selector->parseTags(ns->song_tags);
+      selector -> acceptNewSong( new Song( ( const QString ) halfindexname, IndexDir ) );
     }
 }

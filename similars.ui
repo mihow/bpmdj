@@ -8,9 +8,17 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>865</width>
-            <height>727</height>
+            <width>751</width>
+            <height>536</height>
         </rect>
+    </property>
+    <property name="sizePolicy">
+        <sizepolicy>
+            <hsizetype>5</hsizetype>
+            <vsizetype>3</vsizetype>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+        </sizepolicy>
     </property>
     <property name="caption">
         <string>Similar Name Scanner</string>
@@ -25,65 +33,26 @@
         <property name="spacing">
             <number>6</number>
         </property>
-        <widget class="QPushButton" row="3" column="3">
-            <property name="name">
-                <cstring>pushButton17</cstring>
-            </property>
-            <property name="text">
-                <string>Finished</string>
-            </property>
-            <property name="toolTip" stdset="0">
-                <string></string>
-            </property>
-        </widget>
-        <widget class="QPushButton" row="3" column="2">
-            <property name="name">
-                <cstring>PushButton101</cstring>
-            </property>
-            <property name="enabled">
-                <bool>true</bool>
-            </property>
-            <property name="text">
-                <string>&amp;Ignore</string>
-            </property>
-            <property name="toolTip" stdset="0">
-                <string>Don't know yet, ignore for later</string>
-            </property>
-        </widget>
-        <widget class="QPushButton" row="3" column="1">
-            <property name="name">
-                <cstring>PushButton3</cstring>
-            </property>
-            <property name="text">
-                <string>&amp;Fetch</string>
-            </property>
-            <property name="toolTip" stdset="0">
-                <string>Probably a new song</string>
-            </property>
-        </widget>
-        <widget class="QPushButton" row="3" column="0">
-            <property name="name">
-                <cstring>PushButton5</cstring>
-            </property>
-            <property name="text">
-                <string>&amp;Delete</string>
-            </property>
-            <property name="toolTip" stdset="0">
-                <string>Already have the song, delete it</string>
-            </property>
-        </widget>
-        <widget class="QLabel" row="0" column="0" rowspan="1" colspan="4">
+        <widget class="QLabel" row="0" column="0" rowspan="1" colspan="2">
             <property name="name">
                 <cstring>textLabel1</cstring>
             </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>5</hsizetype>
+                    <vsizetype>1</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
             <property name="text">
-                <string>In the box below songs will appear that are maybe songs that are already in the database. If a song is already in the database, you can press 'already have'. If a song is new, you can press 'fech', or if you don't know what to do yet, press 'ignore'.</string>
+                <string>In the box below songs will appear that are maybe songs that are already in the database. If you already have the song, you can press 'delete'. If a song is new, you can press 'fech', or if you don't know what to do yet, press 'ignore'.</string>
             </property>
             <property name="alignment">
                 <set>WordBreak|AlignVCenter</set>
             </property>
         </widget>
-        <widget class="QListView" row="2" column="0" rowspan="1" colspan="4">
+        <widget class="QListView" row="5" column="0" rowspan="7" colspan="1">
             <column>
                 <property name="text">
                     <string>Songname</string>
@@ -142,22 +111,116 @@
             <property name="name">
                 <cstring>NameList</cstring>
             </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>7</hsizetype>
+                    <vsizetype>3</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
             <property name="font">
                 <font>
-                    <family>adobe-courier</family>
+                    <family>Charter</family>
                 </font>
             </property>
             <property name="frameShape">
                 <enum>NoFrame</enum>
             </property>
             <property name="selectionMode">
-                <enum>Single</enum>
+                <enum>Extended</enum>
             </property>
             <property name="allColumnsShowFocus">
                 <bool>true</bool>
             </property>
         </widget>
-        <widget class="QLayoutWidget" row="1" column="0" rowspan="1" colspan="4">
+        <widget class="QPushButton" row="8" column="1">
+            <property name="name">
+                <cstring>ignoreButton</cstring>
+            </property>
+            <property name="enabled">
+                <bool>true</bool>
+            </property>
+            <property name="text">
+                <string>&amp;Ignore</string>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>Don't know yet, ignore for later</string>
+            </property>
+        </widget>
+        <widget class="QPushButton" row="7" column="1">
+            <property name="name">
+                <cstring>fetchButton</cstring>
+            </property>
+            <property name="text">
+                <string>&amp;Fetch</string>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>Probably a new song</string>
+            </property>
+        </widget>
+        <widget class="QPushButton" row="11" column="1">
+            <property name="name">
+                <cstring>finishedButton</cstring>
+            </property>
+            <property name="text">
+                <string>Finished</string>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string></string>
+            </property>
+        </widget>
+        <widget class="Line" row="9" column="1">
+            <property name="name">
+                <cstring>line1</cstring>
+            </property>
+            <property name="frameShape">
+                <enum>HLine</enum>
+            </property>
+            <property name="frameShadow">
+                <enum>Sunken</enum>
+            </property>
+            <property name="orientation">
+                <enum>Horizontal</enum>
+            </property>
+        </widget>
+        <widget class="QPushButton" row="10" column="1">
+            <property name="name">
+                <cstring>startStopButton</cstring>
+            </property>
+            <property name="text">
+                <string>Start</string>
+            </property>
+        </widget>
+        <widget class="QPushButton" row="6" column="1">
+            <property name="name">
+                <cstring>deleteButton</cstring>
+            </property>
+            <property name="text">
+                <string>&amp;Delete</string>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>Already have the song, delete it</string>
+            </property>
+        </widget>
+        <spacer row="5" column="1">
+            <property name="name">
+                <cstring>spacer1</cstring>
+            </property>
+            <property name="orientation">
+                <enum>Vertical</enum>
+            </property>
+            <property name="sizeType">
+                <enum>Expanding</enum>
+            </property>
+            <property name="sizeHint">
+                <size>
+                    <width>20</width>
+                    <height>40</height>
+                </size>
+            </property>
+        </spacer>
+        <widget class="QLayoutWidget" row="1" column="0" rowspan="1" colspan="2">
             <property name="name">
                 <cstring>layout3</cstring>
             </property>
@@ -238,7 +301,7 @@
                             <property name="sizePolicy">
                                 <sizepolicy>
                                     <hsizetype>7</hsizetype>
-                                    <vsizetype>5</vsizetype>
+                                    <vsizetype>1</vsizetype>
                                     <horstretch>0</horstretch>
                                     <verstretch>0</verstretch>
                                 </sizepolicy>
@@ -251,38 +314,75 @@
                 </widget>
             </hbox>
         </widget>
+        <widget class="Line" row="2" column="0" rowspan="1" colspan="2">
+            <property name="name">
+                <cstring>line2</cstring>
+            </property>
+            <property name="frameShape">
+                <enum>HLine</enum>
+            </property>
+            <property name="frameShadow">
+                <enum>Sunken</enum>
+            </property>
+            <property name="orientation">
+                <enum>Horizontal</enum>
+            </property>
+        </widget>
+        <widget class="QCheckBox" row="4" column="0" rowspan="1" colspan="2">
+            <property name="name">
+                <cstring>conformingFilesOnly</cstring>
+            </property>
+            <property name="text">
+                <string>Only investigate conforming filenames</string>
+            </property>
+        </widget>
+        <widget class="QCheckBox" row="3" column="0" rowspan="1" colspan="2">
+            <property name="name">
+                <cstring>autoFetch</cstring>
+            </property>
+            <property name="text">
+                <string>Automatically rename really unknown songs to *.tofetch</string>
+            </property>
+        </widget>
     </grid>
 </widget>
 <connections>
     <connection>
-        <sender>PushButton5</sender>
-        <signal>clicked()</signal>
-        <receiver>Similars</receiver>
-        <slot>alreadyHave()</slot>
-    </connection>
-    <connection>
-        <sender>PushButton3</sender>
+        <sender>fetchButton</sender>
         <signal>clicked()</signal>
         <receiver>Similars</receiver>
         <slot>goFetch()</slot>
     </connection>
     <connection>
-        <sender>PushButton101</sender>
+        <sender>ignoreButton</sender>
         <signal>clicked()</signal>
         <receiver>Similars</receiver>
         <slot>ignore()</slot>
     </connection>
     <connection>
-        <sender>pushButton17</sender>
+        <sender>finishedButton</sender>
         <signal>clicked()</signal>
         <receiver>Similars</receiver>
         <slot>accept()</slot>
     </connection>
+    <connection>
+        <sender>startStopButton</sender>
+        <signal>clicked()</signal>
+        <receiver>Similars</receiver>
+        <slot>startStop()</slot>
+    </connection>
+    <connection>
+        <sender>deleteButton</sender>
+        <signal>clicked()</signal>
+        <receiver>Similars</receiver>
+        <slot>alreadyHave()</slot>
+    </connection>
 </connections>
 <slots>
-    <slot>alreadyHave()</slot>
+    <slot>startStop()</slot>
     <slot>goFetch()</slot>
     <slot>ignore()</slot>
+    <slot>alreadyHave()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

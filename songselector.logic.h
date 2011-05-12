@@ -29,7 +29,9 @@
 #include <qlineedit.h>
 #include <qmenubar.h>
 #include "songselector.h"
+#include "song.h"
 #include "config.h"
+#include "database.h"
 
 class ProcessManager;
 class QSong;
@@ -42,12 +44,8 @@ class SongSelectorLogic:
     ProcessManager *processManager;
     QTimer *timer;
     int mainTicks;
-    int nextTagLine;
-    QLabel *tagLines[MAXTAGS];
-    QCheckBox *tagInclude[MAXTAGS];
-    QCheckBox *tagExclude[MAXTAGS];
-    QPopupMenu *view;
     QPopupMenu *selection;
+    QPopupMenu *queuemenu;
     // colors
     int coloralreadyplayed_item;
     int colorauthorplayed_item;
@@ -56,17 +54,24 @@ class SongSelectorLogic:
     int colorcues_item;
     int colordcolor_item;
     int colorspectrum_item;
-    // display
     int notyetplayed_item;
     int onlyuptemporange_item;
     int onlydowntemporange_item;
     int temporange_item;
     int onlyondisk_item;
     int onlyindistance_item;
-    static int itemcount;
+    int onlynonplayedauthors_item;
+    QPopupMenu *view;
   public:
+    DataBase *database;
+    // display
+    int nextTagLine;
+    QLabel *tagLines[MAXTAGS];
+    QCheckBox *tagInclude[MAXTAGS];
+    QCheckBox *tagExclude[MAXTAGS];
     SongSelectorLogic(QWidget*parent=0, const QString name=0);
     void findAllTags();
+    void acceptNewSong(Song* song);
     void addTag(const QString tag);
     bool lookfor(const QString w);
     // timer functions
@@ -81,14 +86,13 @@ class SongSelectorLogic:
     void updateItemList();
     void toggleItem(int which);
     QListViewItem *filterView(QListViewItem * who, QListViewItem * parent);
-    bool doFilter(QSong * item);
     void setColor(QColor color);
     void setPlayerColor(QGroupBox *player, QColor color);
     void songAddTag(QListViewItem * song, const QString & tag);
     void songDelTag(QListViewItem * song, const QString & tag);
     void songEdit(QListViewItem* song);
-  protected:
-    bool filter(QSong * item);
+    void queueFindAndRename(int oldpos, int newpos);
+    void queueOrder();
   public slots:
     virtual void selectAllButTagged();
     // a signal from the UI to notify a forced switch
@@ -111,6 +115,7 @@ class SongSelectorLogic:
     virtual void selectionPlayIn4th();
     virtual void selectionSetMainSong();
     virtual void selectionDelTags();
+    virtual void selectionAddQueue();
     virtual void doMarkDups();
     virtual void quitButton();
     virtual void playersChanged();
@@ -130,18 +135,35 @@ class SongSelectorLogic:
     virtual void toggle_temporange();
     virtual void toggle_onlyondisk();
     virtual void toggle_onlyindistance();
+    virtual void toggle_onlynonplayedauthors();
 
     virtual void invertSpectrum();
     virtual void findsimilarnames();
     virtual void findallsimilarnames();
-    virtual void importMp3s();
+    virtual void importSongs();
     virtual void measureBpms();
     virtual void measureSpectra();
-    virtual void doHelp();
     virtual void doOnlineHelp();
+    virtual void doAutoMix();
     virtual void selectionMenu();
+    virtual void openQueueMenu();
     virtual void findWrongIdxNames();
-    virtual void findWrongMp3Names();
+    virtual void findWrongSongNames();
+
+    // queue actions
+    virtual void playQueueSong(QListViewItem *);
+    virtual void queueShiftUp();
+    virtual void queueShiftDown();
+    virtual void queueDelete();
+    virtual void queueInsert();
+    void queueInsert(int count);
+    virtual void queueRandom(bool);
+    virtual void queueRandom();
+    bool rejectQueueProposal(Song * song, int position);
+    void filterProposedList(Song ** list, int &count, int position);
+    virtual void queueSelectSong();
+    virtual void queueCopySongs();
+    virtual void queueAnker();
 };
 
 #endif

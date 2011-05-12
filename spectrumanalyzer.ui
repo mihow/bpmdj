@@ -344,7 +344,6 @@
     <slot>audioRangeChanged()</slot>
     <slot>bpmRangeChanged()</slot>
     <slot>cancel()</slot>
-    <slot>finish()</slot>
     <slot>incBpm()</slot>
     <slot>decBpm()</slot>
     <slot>play()</slot>

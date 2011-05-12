@@ -21,13 +21,22 @@
 #ifndef CLUSTER_H
 #define CLUSTER_H
 
+extern "C" {
 #include "common.h"
+}
+
+class Metriek
+{
+ public:
+  Metriek() {};
+};
 
 class Point
 {
   public:
     Point();
-    virtual float distance(Point * other) {return 0;};
+    virtual float distance(Point * other, Metriek * dp) {return 0;};
+    virtual Point* percentToward(Point * other, Metriek * dp, float percent) {return NULL;};
     virtual void simpledump(int d) {};
     virtual void determine_color(float hue_min, float hue_max, int depth, int stopat) {}
     void prefix(int d);
@@ -51,10 +60,10 @@ class Couple: public Point
   int second;
  public:
   Couple(int a, int b);
-  float distance2point(int idx);
+  float distance2point(int idx, Metriek* metriek);
   virtual void simpledump(int d);
   virtual void determine_color(float hue_min, float hue_max, int depth, int stopat);
-  float distance(Couple * other);
+  float distance(Couple * other, Metriek * metriek);
 };
 
 class Cluster
@@ -77,7 +86,7 @@ class Cluster
     static Position * * next;
     // the similarity matrix
     Cluster();
-    static float distance(int x, int y);
+    static float distance(int x, int y, Metriek * metriek);
     // adds an index or a point to this cluster
     void add(int idx);
     void addPoint(Point* p);
@@ -86,7 +95,7 @@ class Cluster
     static int addcontent(Point * p);
     static int addpoint(Point * p);
     static int addcouple(Couple* c);
-    Couple* agglomerate();
+    Couple* agglomerate(Metriek * metriek);
     void dumpConnectionMatrix();
 };
 #endif

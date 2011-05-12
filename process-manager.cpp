@@ -47,10 +47,13 @@
 #include "process-manager.h"
 #include "qsong.h"
 
+extern "C" {
+#include "scripts.h"
+}
+
 ProcessManager* processManager = NULL;
 
-double ProcessManager::mainTempo = 0;
-QSong* ProcessManager::playing_songs[4] = {NULL,NULL,NULL,NULL};
+Song* ProcessManager::playing_songs[4] = {NULL,NULL,NULL,NULL};
 
 // when a process stops this method is called
 // normally it will immidatelly invoke the one and
@@ -76,7 +79,6 @@ ProcessManager::ProcessManager(SongSelectorLogic * sel)
   selector = sel;
   // initialise fields
   monitorPlayCommand=1;
-  mainTempo=0;
   for(int i =0; i <4;i++)
     {
       died_pids[i]=-1;
@@ -85,8 +87,7 @@ ProcessManager::ProcessManager(SongSelectorLogic * sel)
     }
   // catch signals
   struct sigaction *act;
-  act=(struct sigaction*)malloc(sizeof(struct sigaction));
-  assert(act);
+  act=allocate(1,struct sigaction);
   act->sa_sigaction=ToSwitchOrNotToSwitchSignal;
   act->sa_flags=SA_SIGINFO;
   sigaction(SIGUSR1,act,NULL);
@@ -94,10 +95,9 @@ ProcessManager::ProcessManager(SongSelectorLogic * sel)
   signal(SIGCHLD,SIG_IGN);
 };
 
-void ProcessManager::setMainSong(QSong* song)
+void ProcessManager::setMainSong(Song* song)
 {
   playing_songs[0]=song;
-  mainTempo=atof((const char*)song->song_tempo);
   selector->updateProcessView();
 }
 
@@ -135,7 +135,7 @@ void ProcessManager::clearPlayer(int id, bool update)
   // reread the song that was playing
   playing_songs[id]->reread();
   // WVB - this should be done automatically
-  selector->parseTags(playing_songs[id]->song_tags);
+  selector->parseTags(playing_songs[id]->tags);
   player_pids[id] = 0;
   playing_songs[id]=NULL;
   if (update)
@@ -146,54 +146,51 @@ void ProcessManager::switchMonitorToMain()
 {
   // clear the playing song
   clearPlayer(0,false);
-  // set the new tempo
-  mainTempo = monitorTempo;
   // clear the monitor
-  monitorTempo = 0;
   player_pids[0]=player_pids[1];
   player_pids[1]=0;
-  // the song is already playing, now use the next command next time */
+  // the song is already playing, now use the next command next time
   monitorPlayCommand=(monitorPlayCommand == 1 ? 2 : 1);
   playing_songs[0]=playing_songs[1];
   playing_songs[1]=NULL;
   // write playing sucker to disk
   if (playing_songs[0])
     {
-      Played::Play(playing_songs[0]->song_index);
-      playing_songs[0]->song_played=true;
+      Played::Play(playing_songs[0]->index);
+      playing_songs[0]->played=true;
     }
   selector->resetCounter();
   selector->updateProcessView();
 }
 
-void ProcessManager::startExtraSong(int id, QSong *song)
+void ProcessManager::startExtraSong(int id, Song *song)
 {
   char playercommand[500];
   // create suitable start command
-  QSong *matchWith=playingInMain();
+  Song *matchWith=playingInMain();
   if (!matchWith) 
     matchWith=song;
   playing_songs[id]=song;
   sprintf(playercommand, 
 	  (const char*)(id == 3 ? Config::playCommand3
 			: Config::playCommand4),
-	  (const char*)matchWith->song_index, 
-	  (const char*)song->song_index);
+	  (const char*)matchWith->index, 
+	  (const char*)song->index);
   // fork the command and once the player exists immediatelly stop
   if (!(player_pids[id]=fork()))
     { 
-      system(playercommand);
+      execute(playercommand);
       kill(getppid(),SIGUSR1);
       exit(0);
     }
   selector->updateProcessView();
 }
 
-void ProcessManager::startSong(QSong *song)
+void ProcessManager::startSong(Song *song)
 {
   assert(song);
   QString player;
-  QSong *matchWith;
+  Song *matchWith;
   char playercommand[500];
   // if there is still a song playing in the monitor, don't go
   if (player_pids[1]!=0)
@@ -203,18 +200,16 @@ void ProcessManager::startSong(QSong *song)
       QMessageBox::critical(NULL,a,b,QMessageBox::Ok,0,0);
       return;
     }
-  // update monitor fields
-  monitorTempo=atof((const char*)song->song_tempo);
   // create suitable start command
   playing_songs[1]=song;
   matchWith=playingInMain();
   if (!matchWith) matchWith=playing_songs[1];
   player = monitorPlayCommand == 1 ? Config::playCommand1 : Config::playCommand2;
-  sprintf(playercommand, (const char*)player, (const char*)matchWith->song_index, (const char*)playing_songs[1]->song_index);
+  sprintf(playercommand, (const char*)player, (const char*)matchWith->index, (const char*)playing_songs[1]->index);
   // fork the command and once the player exists immediatelly stop
   if (!(player_pids[1]=fork()))
     { 
-      system(playercommand);
+      execute(playercommand);
       kill(getppid(),SIGUSR1);
       exit(0);
     }

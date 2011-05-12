@@ -19,24 +19,27 @@
 /*********************************************************************/
 // WVB -- modified by Werner van belle to incorporate it into bpmdj
 // WVB -- added DUMP_INFO variable to print out data
+// WVB -- modified malloc to allocatre
 
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include "common.h"
 
 #define SIGN(a, b) ( (b) < 0 ? -fabs(a) : fabs(a) )
 
 // WVB -- this function is a modified version of the original code
-// data will be modified
+// !!! data will be modified !!!
 void do_pca(int n, int m, float** data)
 {
-  FILE *stream;
   int  i, j, k, k2;
   float **matrix(), **symmat, **symmat2, *vector(), *evals, *interm;
   void free_matrix(), free_vector(), corcol(), covcol(), scpcol();
   void tred2(), tqli();
-  float in_value;
-  
+
   symmat = matrix(m, m);  /* Allocation of correlation (etc.) matrix */
   
   /* Look at analysis option; branch in accordance with this. */
@@ -217,7 +220,7 @@ int old_main(int argc, char *argv[])
       */
       break;
     default:
-      printf("Option: %s\n",option);
+      printf("Option: %c\n",option);
       printf("For option, please type R, V, or S\n");
       printf("(upper or lower case).\n");
       printf("Exiting to system.\n");
@@ -304,7 +307,8 @@ int old_main(int argc, char *argv[])
   free_matrix(symmat2, m, m);
   free_vector(evals, m);
   free_vector(interm, m);
-  
+
+  return 0; // WVB -- the main must return something to avoid a warning
 }
 
 /**  Correlation matrix: creation  ***********************************/
@@ -499,12 +503,8 @@ int n;
 /* Allocates a float vector with range [1..n]. */
 {
 
-    float *v;
-
-    v = (float *) malloc ((unsigned) n*sizeof(float));
-    if (!v) erhand("Allocation failure in vector().");
-    return v-1;
-
+  float * v = allocate(n,float);
+  return v-1;
 }
 
 /**  Allocation of float matrix storage  *****************************/
@@ -517,14 +517,13 @@ int n, m;
     float **mat;
 
     /* Allocate pointers to rows. */
-    mat = (float **) malloc((unsigned) (n)*sizeof(float*));
-    if (!mat) erhand("Allocation failure 1 in matrix().");
+    mat = allocate(n, float*);
     mat -= 1;
-
+    
     /* Allocate rows and set pointers to them. */
     for (i = 1; i <= n; i++)
-        {
-        mat[i] = (float *) malloc((unsigned) (m)*sizeof(float));
+      {
+        mat[i] = allocate(m,float);
         if (!mat[i]) erhand("Allocation failure 2 in matrix().");
         mat[i] -= 1;
         }

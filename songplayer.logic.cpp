@@ -21,7 +21,6 @@
 #include <qlcdnumber.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <malloc.h>
 #include <qpushbutton.h>
 #include <qcolor.h>
 #include <qlabel.h>
@@ -33,6 +32,7 @@
 #include "songplayer.logic.h"
 #include "kbpm-counter.h"
 #include "spectrumanalyzer.logic.h"
+#include "patternanalyzer.logic.h"
 #include "about.h"
 
 extern "C" 
@@ -54,6 +54,7 @@ SongPlayerLogic::SongPlayerLogic(QWidget*parent,const char*name, bool modal,WFla
    timer->start(1000);
    tempo_fade=-1;
    fade_time=0;
+   wantedcurrentperiod=0;
    redrawCues();
 
    // set caption
@@ -242,16 +243,16 @@ void SongPlayerLogic::timerTick()
    // LcdLeft->display((double)((int)(x_normalise(::y)*1000/m))/(double)10);
    // LcdRight->display((int)(m/1024));
    // times are displayed with respect to the current tempo
-   unsigned4 totaltime=y_normalise(m)/WAVRATE;
-   unsigned4 currenttime=::y/WAVRATE;
+   unsigned4 totaltime=samples2s(y_normalise(m));
+   unsigned4 currenttime=samples2s(::y);
    char totalstr[20], currentstr[20];
-   sprintf(totalstr,"%02d:%02d",totaltime/60,totaltime%60);
-   sprintf(currentstr,"%02d:%02d",currenttime/60,currenttime%60);
+   sprintf(totalstr,"%02d:%02d",(int)totaltime/60,(int)totaltime%60);
+   sprintf(currentstr,"%02d:%02d",(int)currenttime/60,(int)currenttime%60);
    CurrentTimeLCD -> display(currentstr);
    TotalTimeLCD -> display(totalstr);
    // show current tempo
-   double  T0=4.0*(double)WAVRATE*60.0/(double)currentperiod;
-   double  T1=4.0*(double)WAVRATE*60.0/(double)normalperiod;
+   double  T0 = mperiod2bpm(currentperiod);
+   double  T1 = mperiod2bpm(normalperiod);
    if (currentperiod<-1) T0=0;
    if (normalperiod<-1) T1=0;
    CurrentTempoLCD -> display(T0);
@@ -340,17 +341,60 @@ void SongPlayerLogic::storeV()
    redrawCues();
 }
 
+#define knick 15
+void SongPlayerLogic::changeTempo(int p)
+{
+  wantedcurrentperiod = p;
+  int pos = tempoSlider->value();
+  if (pos <= 0)
+    {
+      if (pos<-50)
+	{	                    // target = 100 - knick <-> 50
+	  pos+=50;                  // pos = 0 <-> -50   
+	  pos *= 100 - knick - 50;  // pos = 0 <-> (100 - knick - 50) * -50
+	  pos /= 50;                // pos = 0 <-> -100 + knick + 50
+	  pos += 100 - knick;       // pos = 100 - knick <-> 50
+	}
+      else 
+	{                           // target = 100 <-> 100 - knick
+	                            // pos = 0 <-> - 50
+	  pos *= knick;             // pos = 0 <-> knick * -50
+	  pos /= 50;                // pos = 0 <-> - knick
+	  pos += 100;               // pos = 100 <-> 100 - knick
+	}
+    }
+  else if (pos > 0)
+    {
+      if (pos>50)
+	{                           // target = 100 + knick <-> 200
+	  pos-=50;                  // pos = 0 <-> 50   
+	  pos *= 100 - knick;       // pos = 0 <-> (100 - knick) * 50
+	  pos /= 50;                // pos = 0 <-> 100 - knick
+	  pos += 100 + knick;       // pos = 100 + knick <-> 200
+	}
+      else
+	{                           // target = 100 <-> 100 + knick
+	                            // pos = 0 <-> 50
+	  pos *= knick;             // pos = 0 <-> knick * 50
+	  pos /= 50;                // pos = 0 <-> knick
+	  pos += 100;               // pos = 100 <-> 100 + knick
+	}
+    }
+  p*=100;
+  p/=pos;
+  changetempo(p);
+  TempoLd->display(100.0*(double)normalperiod/(double)currentperiod);
+}
+
 void SongPlayerLogic::targetTempo()
 {
-  changetempo(targetperiod);
-  TempoLd->display(100.0*(double)normalperiod/(double)currentperiod);
+  changeTempo(targetperiod);
   normalReached(false);
 }
 
 void SongPlayerLogic::normalTempo()
 {
-  changetempo(normalperiod);
-  TempoLd->display(100.0*(double)normalperiod/(double)currentperiod);
+  changeTempo(normalperiod);
   normalReached(true);
 }
 
@@ -368,14 +412,14 @@ void SongPlayerLogic::mediumSwitch()
 
 void SongPlayerLogic::slowSwitch()
 {
-   fade_time=60;
-   tempo_fade=0;
+  fade_time=60;
+  tempo_fade=0;
 }
 
 void SongPlayerLogic::normalReached(bool t)
 {
   setColor(PushButton22,t);	
-  setColor(PushButton36_2,t);
+  setColor(switcherButton,t);
   setColor(PushButton37,t);
 }
 
@@ -387,21 +431,33 @@ void SongPlayerLogic::targetStep()
       tempo_fade=0;
       fade_time=0;
       normalReached(true);
+      switcherButton->setText("Normal Switch");
       return;
     }
   if (tempo_fade==1)
     {
       normalReached(false);
     }
+  if (tempo_fade>0)
+    {
+      switcherButton->setText(QString::number(fade_time-tempo_fade));
+    }
   
   /**
-   * Another enhancement is that we dont change the period lineary !
+   * We dont change the period lineary !
    */
   double result;
   result = (double)targetperiod*pow((double)normalperiod/(double)targetperiod,(double)tempo_fade/(double)fade_time);
-  changetempo((int)result);
-  TempoLd->display(100.0*(double)normalperiod/(double)currentperiod);
+  changeTempo((int)result);
 }
+
+void SongPlayerLogic::tempoChanged()
+{
+  if (wantedcurrentperiod == 0 )
+    wantedcurrentperiod = currentperiod;
+  changeTempo(wantedcurrentperiod);
+}
+
 
 void SongPlayerLogic::nudgeCueBack()
 {
@@ -491,6 +547,12 @@ void SongPlayerLogic::openBpmCounter()
 void SongPlayerLogic::openSpectrumAnalyzer()
 {
   SpectrumDialogLogic analyzer;
+  analyzer.exec();
+}
+
+void SongPlayerLogic::openPatternAnalyzer()
+{
+  PatternAnalyzerLogic analyzer;
   analyzer.exec();
 }
 

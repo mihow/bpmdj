@@ -32,6 +32,7 @@ class ImportScanner:
  protected:
   virtual void recursing(const QString dirname);
   virtual void checkfile(const QString pathname, const QString filename);
+  virtual bool matchextension(const QString filename);
  public:
   ImportScanner(SongSelectorLogic* sroot);
   virtual void scan(const QString dirname) 

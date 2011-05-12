@@ -62,7 +62,7 @@
                     <cstring>tab</cstring>
                 </property>
                 <attribute name="title">
-                    <string>Files</string>
+                    <string>Songs</string>
                 </attribute>
                 <grid>
                     <property name="name">
@@ -677,6 +677,269 @@
                     </widget>
                 </grid>
             </widget>
+            <widget class="QWidget">
+                <property name="name">
+                    <cstring>tab</cstring>
+                </property>
+                <attribute name="title">
+                    <string>Queue</string>
+                </attribute>
+                <grid>
+                    <property name="name">
+                        <cstring>unnamed</cstring>
+                    </property>
+                    <widget class="QPushButton" row="2" column="4">
+                        <property name="name">
+                            <cstring>pushButton2</cstring>
+                        </property>
+                        <property name="text">
+                            <string>Fullly automatic mix !!!</string>
+                        </property>
+                    </widget>
+                    <widget class="QListView" row="0" column="0" rowspan="1" colspan="5">
+                        <column>
+                            <property name="text">
+                                <string>Nr°</string>
+                            </property>
+                            <property name="clickable">
+                                <bool>false</bool>
+                            </property>
+                            <property name="resizable">
+                                <bool>true</bool>
+                            </property>
+                        </column>
+                        <column>
+                            <property name="text">
+                                <string>Match</string>
+                            </property>
+                            <property name="clickable">
+                                <bool>false</bool>
+                            </property>
+                            <property name="resizable">
+                                <bool>true</bool>
+                            </property>
+                        </column>
+                        <column>
+                            <property name="text">
+                                <string>Tempo</string>
+                            </property>
+                            <property name="clickable">
+                                <bool>false</bool>
+                            </property>
+                            <property name="resizable">
+                                <bool>true</bool>
+                            </property>
+                        </column>
+                        <column>
+                            <property name="text">
+                                <string>Spectrum</string>
+                            </property>
+                            <property name="clickable">
+                                <bool>false</bool>
+                            </property>
+                            <property name="resizable">
+                                <bool>true</bool>
+                            </property>
+                        </column>
+                        <column>
+                            <property name="text">
+                                <string>Time</string>
+                            </property>
+                            <property name="clickable">
+                                <bool>false</bool>
+                            </property>
+                            <property name="resizable">
+                                <bool>true</bool>
+                            </property>
+                        </column>
+                        <column>
+                            <property name="text">
+                                <string>Cues</string>
+                            </property>
+                            <property name="clickable">
+                                <bool>false</bool>
+                            </property>
+                            <property name="resizable">
+                                <bool>true</bool>
+                            </property>
+                        </column>
+                        <column>
+                            <property name="text">
+                                <string>Title</string>
+                            </property>
+                            <property name="clickable">
+                                <bool>false</bool>
+                            </property>
+                            <property name="resizable">
+                                <bool>true</bool>
+                            </property>
+                        </column>
+                        <column>
+                            <property name="text">
+                                <string>Author</string>
+                            </property>
+                            <property name="clickable">
+                                <bool>false</bool>
+                            </property>
+                            <property name="resizable">
+                                <bool>true</bool>
+                            </property>
+                        </column>
+                        <column>
+                            <property name="text">
+                                <string>Version</string>
+                            </property>
+                            <property name="clickable">
+                                <bool>false</bool>
+                            </property>
+                            <property name="resizable">
+                                <bool>true</bool>
+                            </property>
+                        </column>
+                        <column>
+                            <property name="text">
+                                <string>Tags</string>
+                            </property>
+                            <property name="clickable">
+                                <bool>false</bool>
+                            </property>
+                            <property name="resizable">
+                                <bool>true</bool>
+                            </property>
+                        </column>
+                        <column>
+                            <property name="text">
+                                <string>OnDisk</string>
+                            </property>
+                            <property name="clickable">
+                                <bool>false</bool>
+                            </property>
+                            <property name="resizable">
+                                <bool>true</bool>
+                            </property>
+                        </column>
+                        <column>
+                            <property name="text">
+                                <string>Index</string>
+                            </property>
+                            <property name="clickable">
+                                <bool>false</bool>
+                            </property>
+                            <property name="resizable">
+                                <bool>true</bool>
+                            </property>
+                        </column>
+                        <column>
+                            <property name="text">
+                                <string>Md5</string>
+                            </property>
+                            <property name="clickable">
+                                <bool>false</bool>
+                            </property>
+                            <property name="resizable">
+                                <bool>true</bool>
+                            </property>
+                        </column>
+                        <column>
+                            <property name="text">
+                                <string>Filename on disk</string>
+                            </property>
+                            <property name="clickable">
+                                <bool>false</bool>
+                            </property>
+                            <property name="resizable">
+                                <bool>true</bool>
+                            </property>
+                        </column>
+                        <property name="name">
+                            <cstring>queue</cstring>
+                        </property>
+                        <property name="sizePolicy">
+                            <sizepolicy>
+                                <hsizetype>5</hsizetype>
+                                <vsizetype>5</vsizetype>
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                            </sizepolicy>
+                        </property>
+                        <property name="frameShape">
+                            <enum>Panel</enum>
+                        </property>
+                        <property name="resizePolicy">
+                            <enum>Manual</enum>
+                        </property>
+                        <property name="selectionMode">
+                            <enum>Extended</enum>
+                        </property>
+                        <property name="allColumnsShowFocus">
+                            <bool>true</bool>
+                        </property>
+                        <property name="showSortIndicator">
+                            <bool>true</bool>
+                        </property>
+                        <property name="rootIsDecorated">
+                            <bool>false</bool>
+                        </property>
+                    </widget>
+                    <spacer row="1" column="0">
+                        <property name="name">
+                            <cstring>spacer3</cstring>
+                        </property>
+                        <property name="orientation">
+                            <enum>Horizontal</enum>
+                        </property>
+                        <property name="sizeType">
+                            <enum>Expanding</enum>
+                        </property>
+                        <property name="sizeHint">
+                            <size>
+                                <width>40</width>
+                                <height>20</height>
+                            </size>
+                        </property>
+                    </spacer>
+                    <widget class="QLabel" row="1" column="1" rowspan="1" colspan="3">
+                        <property name="name">
+                            <cstring>textLabel1</cstring>
+                        </property>
+                        <property name="text">
+                            <string>Number of extra songs to insert when adding a song to the queue</string>
+                        </property>
+                    </widget>
+                    <widget class="QSpinBox" row="1" column="4">
+                        <property name="name">
+                            <cstring>extraSongs</cstring>
+                        </property>
+                    </widget>
+                    <widget class="QCheckBox" row="2" column="0" rowspan="1" colspan="2">
+                        <property name="name">
+                            <cstring>autoPopQueue</cstring>
+                        </property>
+                        <property name="text">
+                            <string>Automatically pop when monitor is free</string>
+                        </property>
+                    </widget>
+                    <widget class="QCheckBox" row="2" column="2">
+                        <property name="name">
+                            <cstring>weighDuplicateAuthors</cstring>
+                        </property>
+                        <property name="text">
+                            <string>No duplicate authors</string>
+                        </property>
+                        <property name="checked">
+                            <bool>true</bool>
+                        </property>
+                    </widget>
+                    <widget class="QCheckBox" row="2" column="3">
+                        <property name="name">
+                            <cstring>weighTempo</cstring>
+                        </property>
+                        <property name="text">
+                            <string>Weigh tempo</string>
+                        </property>
+                    </widget>
+                </grid>
+            </widget>
         </widget>
     </grid>
 </widget>
@@ -705,6 +968,24 @@
         <receiver>SongSelector</receiver>
         <slot>doFilterChanged()</slot>
     </connection>
+    <connection>
+        <sender>pushButton2</sender>
+        <signal>clicked()</signal>
+        <receiver>SongSelector</receiver>
+        <slot>doAutoMix()</slot>
+    </connection>
+    <connection>
+        <sender>queue</sender>
+        <signal>rightButtonClicked(QListViewItem*,const QPoint&amp;,int)</signal>
+        <receiver>SongSelector</receiver>
+        <slot>openQueueMenu()</slot>
+    </connection>
+    <connection>
+        <sender>queue</sender>
+        <signal>doubleClicked(QListViewItem*)</signal>
+        <receiver>SongSelector</receiver>
+        <slot>playQueueSong(QListViewItem*)</slot>
+    </connection>
 </connections>
 <tabstops>
     <tabstop>songList</tabstop>
@@ -712,22 +993,24 @@
     <tabstop>PushButton2</tabstop>
 </tabstops>
 <slots>
-    <slot>checkDisc()</slot>
+    <slot>doAutoMix()</slot>
     <slot>doAbout()</slot>
     <slot>doFilterChanged()</slot>
     <slot>doLock()</slot>
     <slot>doMarkDups()</slot>
     <slot>doPreferences()</slot>
-    <slot>doSongEdit(QListViewItem*)</slot>
+    <slot>doSongEdit( QListViewItem * )</slot>
     <slot>exportPlayList()</slot>
     <slot>fetchSelection()</slot>
     <slot>selectionMenu()</slot>
     <slot>quitButton()</slot>
-    <slot>selectSong(QListViewItem*)</slot>
+    <slot>selectSong( QListViewItem * )</slot>
     <slot>selectionAddTags()</slot>
     <slot>switchMonitorToMain()</slot>
     <slot>playersChanged()</slot>
     <slot>selectionIsTargetColor()</slot>
+    <slot>openQueueMenu()</slot>
+    <slot>playQueueSong(QListViewItem*)</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

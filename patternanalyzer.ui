@@ -1,0 +1,271 @@
+<!DOCTYPE UI><UI version="3.1" stdsetdef="1">
+<class>PatternDialog</class>
+<widget class="QDialog">
+    <property name="name">
+        <cstring>PatternDialog</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>674</width>
+            <height>437</height>
+        </rect>
+    </property>
+    <property name="sizePolicy">
+        <sizepolicy>
+            <hsizetype>1</hsizetype>
+            <vsizetype>1</vsizetype>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+        </sizepolicy>
+    </property>
+    <property name="caption">
+        <string>Pattern Analyzer</string>
+    </property>
+    <property name="sizeGripEnabled">
+        <bool>true</bool>
+    </property>
+    <grid>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <property name="margin">
+            <number>11</number>
+        </property>
+        <property name="spacing">
+            <number>6</number>
+        </property>
+        <widget class="QSlider" row="1" column="8">
+            <property name="name">
+                <cstring>periodDelta</cstring>
+            </property>
+            <property name="minValue">
+                <number>-100</number>
+            </property>
+            <property name="maxValue">
+                <number>100</number>
+            </property>
+            <property name="orientation">
+                <enum>Vertical</enum>
+            </property>
+            <property name="tickmarks">
+                <enum>Left</enum>
+            </property>
+            <property name="tickInterval">
+                <number>100</number>
+            </property>
+        </widget>
+        <spacer row="2" column="3">
+            <property name="name">
+                <cstring>spacer1</cstring>
+            </property>
+            <property name="orientation">
+                <enum>Horizontal</enum>
+            </property>
+            <property name="sizeType">
+                <enum>Expanding</enum>
+            </property>
+            <property name="sizeHint">
+                <size>
+                    <width>110</width>
+                    <height>20</height>
+                </size>
+            </property>
+        </spacer>
+        <widget class="QSlider" row="1" column="9">
+            <property name="name">
+                <cstring>periodDelta10</cstring>
+            </property>
+            <property name="minValue">
+                <number>-1000</number>
+            </property>
+            <property name="maxValue">
+                <number>1000</number>
+            </property>
+            <property name="lineStep">
+                <number>10</number>
+            </property>
+            <property name="pageStep">
+                <number>100</number>
+            </property>
+            <property name="orientation">
+                <enum>Vertical</enum>
+            </property>
+            <property name="tickmarks">
+                <enum>Left</enum>
+            </property>
+            <property name="tickInterval">
+                <number>100</number>
+            </property>
+        </widget>
+        <widget class="QLabel" row="2" column="0" rowspan="1" colspan="2">
+            <property name="name">
+                <cstring>textLabel1</cstring>
+            </property>
+            <property name="text">
+                <string>Measures</string>
+            </property>
+        </widget>
+        <widget class="QLabel" row="1" column="1" rowspan="1" colspan="7">
+            <property name="name">
+                <cstring>pattern</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>5</hsizetype>
+                    <vsizetype>2</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="frameShape">
+                <enum>Panel</enum>
+            </property>
+            <property name="scaledContents">
+                <bool>true</bool>
+            </property>
+        </widget>
+        <widget class="QSlider" row="3" column="2" rowspan="1" colspan="8">
+            <property name="name">
+                <cstring>color</cstring>
+            </property>
+            <property name="maxValue">
+                <number>255</number>
+            </property>
+            <property name="pageStep">
+                <number>5</number>
+            </property>
+            <property name="orientation">
+                <enum>Horizontal</enum>
+            </property>
+        </widget>
+        <widget class="QLabel" row="3" column="0" rowspan="1" colspan="2">
+            <property name="name">
+                <cstring>textLabel1_2</cstring>
+            </property>
+            <property name="text">
+                <string>Balance</string>
+            </property>
+        </widget>
+        <widget class="QPushButton" row="2" column="6">
+            <property name="name">
+                <cstring>pushButton4</cstring>
+            </property>
+            <property name="text">
+                <string>Set Tempo</string>
+            </property>
+        </widget>
+        <widget class="QPushButton" row="2" column="7" rowspan="1" colspan="3">
+            <property name="name">
+                <cstring>pushButton2</cstring>
+            </property>
+            <property name="text">
+                <string>Ok</string>
+            </property>
+        </widget>
+        <widget class="QLabel" row="1" column="0">
+            <property name="name">
+                <cstring>projection</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>0</hsizetype>
+                    <vsizetype>2</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="maximumSize">
+                <size>
+                    <width>20</width>
+                    <height>32767</height>
+                </size>
+            </property>
+            <property name="scaledContents">
+                <bool>true</bool>
+            </property>
+        </widget>
+        <widget class="QPushButton" row="2" column="4">
+            <property name="name">
+                <cstring>pushButton51</cstring>
+            </property>
+            <property name="text">
+                <string>Update</string>
+            </property>
+        </widget>
+        <widget class="QSpinBox" row="2" column="2">
+            <property name="name">
+                <cstring>measures</cstring>
+            </property>
+            <property name="maxValue">
+                <number>32</number>
+            </property>
+            <property name="minValue">
+                <number>1</number>
+            </property>
+        </widget>
+        <widget class="QLabel" row="0" column="0" rowspan="1" colspan="10">
+            <property name="name">
+                <cstring>textLabel1_3</cstring>
+            </property>
+            <property name="text">
+                <string>Horinzontally, this graph shows the measures of the song. Vertically, the content of one such measure is visualized. If the tempo of the song is correct, the song should contain distinctive visual horizontal lines. If the tempo is slightly incorrect these lines should be slanted. By using the two sliders at the right, the tempo of the song can be fine tuned. When this is done select 'set Tempo'. </string>
+            </property>
+            <property name="alignment">
+                <set>WordBreak|AlignVCenter</set>
+            </property>
+        </widget>
+    </grid>
+</widget>
+<connections>
+    <connection>
+        <sender>pushButton51</sender>
+        <signal>clicked()</signal>
+        <receiver>PatternDialog</receiver>
+        <slot>showPattern()</slot>
+    </connection>
+    <connection>
+        <sender>pushButton2</sender>
+        <signal>clicked()</signal>
+        <receiver>PatternDialog</receiver>
+        <slot>accept()</slot>
+    </connection>
+    <connection>
+        <sender>periodDelta</sender>
+        <signal>valueChanged(int)</signal>
+        <receiver>PatternDialog</receiver>
+        <slot>slantChanged()</slot>
+    </connection>
+    <connection>
+        <sender>pushButton4</sender>
+        <signal>clicked()</signal>
+        <receiver>PatternDialog</receiver>
+        <slot>setTempo()</slot>
+    </connection>
+    <connection>
+        <sender>periodDelta10</sender>
+        <signal>valueChanged(int)</signal>
+        <receiver>PatternDialog</receiver>
+        <slot>slantChanged()</slot>
+    </connection>
+    <connection>
+        <sender>color</sender>
+        <signal>valueChanged(int)</signal>
+        <receiver>PatternDialog</receiver>
+        <slot>balanceChanged()</slot>
+    </connection>
+</connections>
+<slots>
+    <slot>slantChanged()</slot>
+    <slot>showPattern()</slot>
+    <slot>cancel()</slot>
+    <slot>finish()</slot>
+    <slot>startAutomaticCounter()</slot>
+    <slot>tap()</slot>
+    <slot>fixPhases()</slot>
+    <slot>setTempo()</slot>
+    <slot>balanceChanged()</slot>
+</slots>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

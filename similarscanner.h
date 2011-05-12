@@ -23,7 +23,7 @@
 #include "songselector.logic.h"
 
 class SimilarScanner:
-public Similars,
+  public Similars,
   public DirectoryScanner
 {
     Q_OBJECT
@@ -33,14 +33,17 @@ public Similars,
     void findSimilarNames(QString text, QString fullname);
     void similarNameFound(QString name, QString similar, QString fullname, QString fullsimilar, int dist);
     void getRidOff(QString fullname);
+    virtual bool matchextension(const QString filename);
     void goFetch(QString name);
   protected:
     virtual void checkfile(const QString pathname, const QString filename);
   public:
     SimilarScanner(SongSelectorLogic* sroot);
     virtual void scan(const QString dirname);
+    void setRoot(QString w);
   public slots:
     virtual void alreadyHave();
     virtual void ignore();
     virtual void goFetch();
+    virtual void startStop();
 };

@@ -1,0 +1,357 @@
+/****
+ BpmDj: Free Dj Tools
+ Copyright (C) 2001 Werner Van Belle
+ See 'BeatMixing.ps' for more information
+
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+****/
+
+#include <stdio.h>
+#include <assert.h>
+#include <math.h>
+#include <stdlib.h>
+#include "qstring-factory.h"
+#include "songselector.logic.h"
+#include "qsong.h"
+#include "process-manager.h"
+#include "kbpm-played.h"
+#include "dirscanner.h"
+#include "spectrum.h"
+
+#define LIST_DCOLOR 2
+#define LIST_TITLE 5
+#define LIST_AUTHOR 6
+#define LIST_TEMPO 0
+#define LIST_TIME 3
+#define LIST_CUES 4
+#define LIST_VERSION 7
+#define LIST_TAGS 8
+#define LIST_ONDISK 9
+#define LIST_SPECTRUM 1
+#define LIST_INDEX 10
+#define LIST_MD5SUM 11
+#define LIST_FILE 12
+
+extern "C"
+{
+#include "cbpm-index.h"
+}
+
+//float SongMetriek::tempo_scale = 0.06; 
+//float SongMetriek::spectrum_scale = 1.0/512.0;
+SongMetriek SongMetriek::SPECTRUM(false,false,true);
+SongMetriek SongMetriek::TEMPO(true,true,false);
+SongMetriek SongMetriek::ALL(true,true,true);
+SongMetriek SongMetriek::ALL_WITHOUT_TEMPO_WEIGHT(true,false,true);
+
+void Song::reread()
+{
+  index_read((const char*)index);
+  /* when the index changes immediately (new version and so on)
+   * write it out again
+   */
+  if (index_changed)
+    index_write();
+  /* copy everything to object */
+  tempo = index_tempo;
+  file = index_file;
+  tags = index_tags;
+  time = index_time;
+  md5sum = index_md5sum;
+  spectrum = index_spectrum;
+  /* are there any cues stored */
+  has_cues = index_cue_z + index_cue_x + index_cue_c + index_cue_v;
+  /* free all */
+  index_free();
+  /* try to open the song */
+  QString songfilename = MusicDir + "/" + file;
+  ondisk = DirectoryScanner::exists(songfilename);
+}
+
+void Song::init(const QString filename, const QString currentpath) 
+{
+  char *fulltitle;
+  int len = filename.length();
+  /* check for .idx at the end */
+  assert(filename.contains(".idx"));
+  /* full index file */
+  index = currentpath+"/"+filename;
+  /* retrieve fullname without .idx */
+  fulltitle=strdup(filename);
+  assert(fulltitle);
+  fulltitle[len-4]=0;
+  /* get all data */
+  if (!obtainTitleAuthor(fulltitle))
+    {
+      title = fulltitle;
+      author = "";
+      version = "";
+    }
+  free(fulltitle);
+  /* read the index file */
+  reread();
+  /* set played flag */
+  played=Played::IsPlayed(index);
+  played_author_at_time = -100;
+  color_distance = 0;
+  spectrum_string = "";
+  distance_string = "";
+}
+
+bool Song::obtainTitleAuthor(char * fulltitle)
+{
+  char * tmp_author, * the_version;
+  /* find '[' */
+  tmp_author=fulltitle;
+  while(*tmp_author && (*tmp_author!='[')) 
+    tmp_author++;
+  if (!*tmp_author)
+    return false;
+  *tmp_author=0;
+  tmp_author++;
+  /* version is everything after the last ] */
+  the_version=tmp_author;
+  while(*the_version && (*the_version!=']')) 
+    the_version++;
+  if (!*the_version) 
+    return false;
+  *the_version=0;
+  the_version++;
+  if (!*the_version) 
+    the_version="1";
+  /* succeeded, assign and return */
+  title = fulltitle;
+  author = tmp_author;
+  version = the_version;
+  return true;
+}
+
+bool Song::containsTag(const QString tag)
+{
+  if (!tags) 
+    return false;
+  return tags.contains(tag)>0;
+}
+
+
+Song::Song()
+{
+  title = "";
+  author = "";
+  version = "";
+  tempo = "";
+  index = "";
+  tags = "";
+  file = "";
+  time = "";
+  md5sum = "";
+  spectrum = "";
+  color.setRgb(127,127,127);
+  spectrum_string = "";
+  distance_string = "";
+  played = false;
+  ondisk = true;
+  has_cues = false;
+  played_author_at_time = 0;
+}
+
+Song::Song(QString a, QString b)
+{
+  init(a,b);
+  newSpectrum(spectrum);
+}
+
+QString tonumber(const int b)
+{
+  return ( b < 10 ?
+	   QString("00")+QString::number(b) :
+	   ( b < 100 ?
+	     QString("0")+QString::number(b) :
+	     QString::number(b)));
+}
+
+QString tonumber(const float f)
+{
+  return QString::number(f);
+}
+
+void Song::invertColor(bool r, bool g, bool b)
+{
+  QColor c;
+  c.setRgb(r ? 255-color.red(): color.red(),
+	   g ? 255-color.green() : color.green(),
+	   b ? 255-color.blue() : color.blue());
+  setColor(c);
+}
+
+void Song::setColor(QColor transfer)
+{
+  color = transfer;
+  spectrum_string = ( !color.isValid() ? QString::null :
+		      color.name());
+}
+
+void Song::simpledump(int d)
+{
+}
+
+void Song::determine_color(float hue, float dummy, int dummy2, int dummy3)
+{
+  color.setHsv((int)hue,255,255);
+  spectrum_string = tonumber((int)hue);
+}
+
+float Song::tempo_distance(Song* song)
+{
+  bool ta = tempo==QString::null;
+  bool tb = song->tempo==QString::null;
+  if (ta || tb)
+    return 1000;
+  float fa = atof((const char*)tempo);
+  float fb = atof((const char*)song->tempo);
+  float sa = fa * Config::distance_temposcale;
+  float sb = fb * Config::distance_temposcale;
+  float s = (sa < sb ? sa : sb);
+  float d = fabs(fa-fb);
+  d/=s;
+  return d;
+}
+
+QString Song::tempo_between(Song* song,  float percent)
+{
+  float ta = atof(tempo);
+  float tb = atof(song->tempo);
+  float t  = (tb-ta)*percent+ta;
+  return QString::number(t);
+}
+
+float Song::spectrum_distance(Song* song)
+{
+  bool as = spectrum.isNull();
+  bool bs = song->spectrum.isNull();
+  if (as || bs)
+    return 1000000;
+  QString b = song->spectrum;
+  float distance=0;
+  for (int i = 0; i<24;i++)
+    {
+      char letter1 = spectrum.at(i).latin1();
+      char letter2 = b.at(i).latin1();
+      float mismatch=letter1-letter2;
+      mismatch*=scales[i];
+      mismatch*=mismatch;
+      distance+=mismatch;
+    }
+  return distance*Config::distance_spectrumscale/512.0;
+}
+
+QString Song::spectrum_between(Song* song, float percent)
+{
+  QString result="                        ";
+  QString b = song->spectrum;
+  for (int i = 0; i<24;i++)
+    {
+      char letter1 = spectrum.at(i).latin1();
+      char letter2 = b.at(i).latin1();
+      char letter3 = (letter1+letter2)/2;
+      result.at(i)=letter3;
+    }
+  return result;
+}
+
+QColor Song::color_between(Song* song, float percent)
+{
+  QColor a = color;
+  QColor b = song->color;
+  QColor result;
+  int r1,g1,b1;
+  int r2,g2,b2;
+  a.rgb(&r1,&g1,&b1);
+  b.rgb(&r2,&g2,&b2);
+  float R1,G1,B1;
+  float R2,G2,B2;
+  float R3,G3,B3;
+  R1=r1;
+  G1=g1;
+  B1=b1;
+  R2=r2;
+  B2=b2;
+  G2=g2;
+  R3=(R2-R1)*percent+R1;
+  G3=(G2-G1)*percent+G1;
+  B3=(B2-B1)*percent+B1;
+  // printf("%g %g %g  // %g %g %g // %g %g %g\n",R1,G1,B1,R2,G2,B2,R3,G3,B3);
+  result.setRgb((int)R3,(int)G3,(int)B3);
+  return result;
+}
+
+float Song::distance(Point* point, Metriek* dp)
+{
+  Song *song = (Song*)point;
+  SongMetriek *measure = (SongMetriek*)dp;
+  float sum = 0, d;
+  if (measure->tempo)
+    {
+      d=tempo_distance(song);
+      if (measure->tempo_weight)
+	sum+=d*d;
+      else sum += d>1 ? 1 : 0;
+    }
+  if (measure->spectrum)
+    {
+      d=spectrum_distance(song);
+      sum+=d*d;
+    }
+  return sum;
+}
+
+Point* Song::percentToward(Point * other, Metriek * dp, float percent)
+{
+  Song * song = (Song*)other;
+  SongMetriek * measure = (SongMetriek*)dp;
+  assert(other);
+  assert(measure);
+  Song * result = new Song();
+  if (measure->tempo)
+    result->tempo = tempo_between(song,percent);
+  if (measure->spectrum)
+    {
+      result->spectrum = spectrum_between(song,percent);
+      result->setColor(color_between(song,percent));
+    }
+  return result;
+}
+
+bool Song::getDistance()
+{
+  color_distance=255;
+  if (!spectrum.isNull())
+    if (ProcessManager::playingInMain())
+      {
+	float d = distance(ProcessManager::playingInMain(),&SongMetriek::SPECTRUM);
+	d*=256;
+	if (d<255) 
+	  color_distance = (int)d;
+      }
+  if (color_distance==255)
+    distance_string = QString::null;
+  else
+    distance_string = tonumber(color_distance);
+  return color_distance<255;
+}
+
+Song::~Song()
+{
+}

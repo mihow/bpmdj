@@ -1,3 +1,32 @@
+1.9:
+  ksel  - spectrumanalyzer was using fabsl (useles function)
+  kplay + tempo updates are immediatelly stored on disk, makes error correcting tempos
+	  much easier because the next playing song will automatically play at the 
+	  newly assigned tempo, not at the 'old remembered' tempo.
+  kplay + added visual feedback for automatic tempo switches	 
+  kplay + added tempo-slider with non-lineair behavior
+  kplay - fetch spectrum werkte niet op heel korte nummers
+  ksel  + added scales for tempo-range and spectrum-range
+  ksel  + added the possibility to fetch a set of songs and put them in one directory
+  ksel  + faster update of songlist (cached)
+  kplay + improved error mesages when starting
+  ksel  + similar name scanner: added two options: mark unknown songs and 
+	  only investigate conforming filenames + start button) 
+  kplay + better .raw file reading, also work under heavy load	 
+  ksel  + added auto-queue
+  ksel  + program can automatically select 'transition'-songs	 
+  kplay + setting latency of DSP device (thx to rasto)	 
+  ksel  + divided qsong again into a datapart (song) and a view (qsong)	 
+  ksel  + support for .ogg
+  kplay + support for .ogg
+  ksel  + code cleanup; (-Wall, longtrick, malloc/realloc, asserts, fread/fsize/fwrite
+	  wrapperd, WAVRATE convertion, system-calls, mount/umount, cp/mv/rm, md5sums)
+  ksel  + added pattern scanner
+  ksel  + improved the similar scanner
+  ksel  - fixed the no-selection->crash bug in the similar name scanner
+  ksel  + added automatic mixer, works surprisingly well
+  ksel  - fixed two bugs in 1.8 release: panning was wrong functionality 
+	  and beatmixing.ps is no longer available, hance no check is necessary	 
 1.8:
   kplay + added ui for spectrum analyzer
   ksel  - can handle songs with 'inf' tempo or songs with no tempo	

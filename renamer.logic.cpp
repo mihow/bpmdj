@@ -1,3 +1,23 @@
+/****
+ BpmDj: Free Dj Tools
+ Copyright (C) 2001 Werner Van Belle
+ See 'BeatMixing.ps' for more information
+
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+****/
+
 #include <assert.h>
 #include <ctype.h>
 #include <qlineedit.h>
@@ -5,6 +25,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "renamer.logic.h"
+
+extern "C" {
+#include "scripts.h"
+}
 
 RenamerLogic::RenamerLogic(QWidget*parent,const QString name) :
   Renamer(parent,name),
@@ -30,40 +54,8 @@ void RenamerLogic::checkfile(const QString  pathname, const QString  filename)
 
 bool RenamerLogic::matchextension(const QString  filename)
 {
-  return filename.contains(".mp3",0) +
+  return goodExtension(filename) ||
     filename.contains(".idx",0);
-}
-
-bool RenamerLogic::goodName(QString name)
-{
-   // must end on .idx or .mp3
-   QString trail = name.right(4);
-   if (trail!=".mp3" && trail!=".idx")
-     return false;
-   // no spaces or any special characters
-   // should occur anywhere in the filename
-   if (name.contains(" ")) return false;
-   if (name.contains("_")>1) return false;
-   if (name.contains("_")==1)
-     {
-	int pos = name.findRev("_");
-	int pos2 = name.find("[");
-	if ((pos2-pos>3) || (pos<2))
-	  return false;
-     }
-   if (name.contains("'")) return false;
-   if (name.contains("-")) return false;
-   if (name.contains("[")!=1) return false;
-   if (name.contains("]")!=1) return false;
-   int leftbrace=name.find("[");
-   if (leftbrace>name.find("]")) return false;
-   if (name.at(leftbrace+1).isLetter())
-     {
-       char c = name.at(leftbrace+1).latin1();
-       if (c<'A' || c>'Z')
-	 return false;
-     }
-   return true;
 }
 
 void RenamerLogic::add(const QString name, const QString pos)
@@ -184,8 +176,8 @@ QString RenamerLogic::removeSpecials(QString in)
 	if (isalnum(out[i]) || out[i]=='&'
 	    || out[i]=='(' || out[i]==')'
 	    || out[i]=='[' || out[i]==']'
-	    || out[i]=='{' || out[i]=='}'
-	    || (out[i]=='.' && i == in.length()-4))
+	    || out[i]=='{' || out[i]=='}' 
+	    || (out[i]=='.' && i == (signed)in.length()-4))
 	  {
 	     out[j]=out[i];
 	     j++;
@@ -239,7 +231,7 @@ QString RenamerLogic::beforeMinusIsAuthor(QString in)
 QString RenamerLogic::fixExtention(QString in)
 {
   QString ext = in.right(4).lower();
-  if (ext==".mp3" || ext==".idx")
+  if (goodExtension(ext) || ext==".idx")
     return in.replace(in.length()-4,4,ext);
   return in;
 }
@@ -267,15 +259,13 @@ QString RenamerLogic::subStringIsAuthor(QString txt)
 QString RenamerLogic::subStringIsMix(QString txt)
 {
   printf("Not Implemented Yet...\n");
+  return txt;
 }
 
 void RenamerLogic::betweenBracesIsMix() 
 { 
   printf("Not Implemented Yet\n"); 
 }
-
-
-
 
 void RenamerLogic::replaceSubString()
   FOREACH(replaceSubString);
@@ -334,7 +324,7 @@ void RenamerLogic::changeSelection()
        if (item->isSelected())
 	 {
 	   QString txt = item->text(0);
-	   if (l==-1 || txt.length()<l)
+	   if (l==-1 || (signed)txt.length()<l)
 	     {
 	       l=txt.length();
 	       key=txt;
@@ -406,9 +396,9 @@ void RenamerLogic::realizeSelection()
 		  while (exists(nto));
 		  to=nto;
 		}
-	      sprintf(fullcommand,"mv -i \"%s\" \"%s\"",((const char*)from),((const char*)to));
+	      sprintf(fullcommand,MV"\"%s\" \"%s\"",((const char*)from),((const char*)to));
 	      printf("Executing %s\n",fullcommand);
-	      system(fullcommand);
+	      execute(fullcommand);
 	    }
 	  // benieuwd of het dees gaat werken...
 	  delete item;
@@ -429,6 +419,5 @@ void RenamerLogic::ignoreSelection()
       else ++it;
     }
 }
-
 
 // eens de selectie weg is kunnen we ergens proberen ene groep te selecteren van zaken die

@@ -1,3 +1,0 @@
-#!/bin/bash
-rawname=`basename "$1"`.raw
-mpg123 -s "$1" >./"$rawname" 2>/dev/null

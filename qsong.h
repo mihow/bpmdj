@@ -18,47 +18,48 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
+#include <qlistview.h>
 #include "config.h"
 #include "cluster.h"
+#include "song.h"
 
 class QSong: 
-  public QListViewItem,
-  public Point
+  public QListViewItem
 {
-  public:
-    QString song_title;
-    QString song_author;
-    QString song_version;
-    QString song_tempo;
-    QString song_index;
-    QString song_tags;
-    QString song_file;
-    QString song_time;
-    QString song_md5sum;
-    QString song_spectrum;
-    QColor  color;
-    QString spectrum_string;
-    QString distance_string;
-    int     color_distance;
-    bool    song_played;
-    bool    song_ondisk;
-    int     has_cues;
-    int     played_author_at_time;
   private:
+    Song * song;
     static QString TRUE_TEXT;
     static QString FALSE_TEXT;
-    void init(const QString filename, const QString currentpath);
   public:
-    QSong(QString filename, QString currentpath, QListView* parent);
-    bool obtainTitleAuthor(char * fulltitle);
-    void reread();
-    void setColor(QColor c);
-    void invertColor(bool r, bool g, bool b);
-    bool getDistance();
-    bool containsTag(const QString which);
+    // Constructor
+    QSong(Song * s, QListView* parent);
+    // Accessor
+    Song *  songEssence() const {return song;};
+    QString tags() const {return song->tags;};
+    QString md5sum() const {return song->md5sum;};
+    QString spectrum() const {return song->spectrum;};
+    QString index() const {return song->index;};
+    QString title() const {return song->title;};
+    QString author() const {return song->author;};
+    bool    ondisk() const {return song->ondisk;};
+    void    ondisk(bool b) const {song->ondisk=b;};
+    bool    played() const {return song->played;};
+    void    played(bool b) const {song->played=b;};
+    QColor  color() const {return song->color;};
+    QString file() const {return song->file;};
+    QString tempo() const {return song->tempo;};
+    void    playedAuthorAtTime(int t) const {song->played_author_at_time = t;};
+    // Inherited
+    void reread() 
+      { song->reread(); };
+    void invertColor(bool r, bool g, bool b) 
+      { song->invertColor(r,g,b); };
+    void setColor(QColor transfer) 
+      { song->setColor(transfer); };
+    bool getDistance() 
+      { return song->getDistance(); };
+    bool containsTag(const QString which) 
+      { return song->containsTag(which); };
     virtual void paintCell(QPainter *p, const QColorGroup &cg, int col, int wid, int align);
     virtual QString text(int i) const;
-    virtual float distance(Point* point);
-    virtual void simpledump(int d);
-    virtual void determine_color(float hue, float, int, int);
 };

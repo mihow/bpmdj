@@ -28,9 +28,9 @@
 #include <fcntl.h>
 #include <libgen.h>
 #include <linux/soundcard.h>
+#include <ctype.h>
 #include <signal.h>
 #include <time.h>
-#include <assert.h>
 #include "common.h"
 #include "version.h"
 
@@ -47,8 +47,7 @@ static void buffer_init(FILE * stream)
    // read new buffer
    fseek(stream,0,SEEK_END);
    buffer_size=ftell(stream);
-   buffer=malloc(buffer_size+1);
-   assert(buffer);
+   buffer = allocate(buffer_size+1,char);
    // read file
    fseek(stream,0,SEEK_SET);
    fread(buffer,buffer_size,1,stream);
@@ -94,7 +93,7 @@ ssize_t fast_getline(char **lineptr)
 
 char* strldup(char* str, int l)
 {
-  char * result = malloc(l+1);
+  char * result = allocate(l+1,char);
   strncpy(result,str,l+1);
   return result;
 }
@@ -154,7 +153,6 @@ void index_setversion()
 
 void index_free()
 {
-   int i;
    if (index_readfrom) free(index_readfrom);
    index_readfrom=NULL;
    if (index_version) free(index_version);
@@ -169,7 +167,6 @@ void index_free()
 
 void index_write()
 {
-   int i;
    FILE*f;
    if (!index_readfrom)
      {
@@ -256,7 +253,7 @@ int fix_tagline()
   // now sort them 
   qsort(words,nextword,sizeof(char*),strcompare);
   // remove duplicates and create result
-  new_tags = malloc(length+1);
+  new_tags = allocate(length+1,char);
   runner = new_tags;
   lastword = "";
   for(i = 0 ; i <nextword ; i ++)
@@ -359,8 +356,6 @@ void index_read(const char* indexn)
   // check for old non-versioned files
   if (!index_version)
     {
-      char * y;
-      int idx;
       printf("Error: too old index file %s\n",basename(index_readfrom));
       exit(40);
     }

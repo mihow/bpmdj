@@ -18,9 +18,33 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
+#ifndef COMMON_H
+#define COMMON_H
+
+#include <stdio.h>
 typedef signed   long long  int signed8;
 typedef unsigned long long  int unsigned8;
 typedef signed        long  int signed4;
 typedef unsigned      long  int unsigned4;
 typedef signed        short int signed2;
 typedef unsigned      short int unsigned2;
+
+typedef union
+{
+  unsigned4 value;
+  struct 
+  {
+    signed short int left;
+    signed short int right;
+  } leftright;
+} longtrick;
+
+#define allocate(size, type) (type*)myalloc(sizeof(type)*(size), __FILE__, __LINE__)
+#define reallocate(thing, size, type) (type*)myrealloc(thing,sizeof(type)*(size))
+void  common_init();
+void* myalloc(int size, char* file, int line);
+void* myrealloc(void* thing, int size);
+long  fsize(FILE * f);
+long  readsamples(void* target, int count, FILE* file);
+long  writesamples(void* target, int count, FILE* file);
+#endif

@@ -31,9 +31,12 @@
 #include "setupwizard.h"
 #include "songselector.logic.h"
 #include "kbpm-played.h"
-#include "kbpm-index.h"
+#include "index-reader.h"
 #include "version.h"
 #include "dirscanner.h"
+extern "C" {
+#include "scripts.h"
+}
 
 QApplication *app;
 
@@ -58,7 +61,7 @@ public:
   QString result;
   bool entered;
   int number;
-  RawScanner() : DirectoryScanner(".raw") 
+  RawScanner() : DirectoryScanner(RAW_EXT) 
   {
     result = QString::null;
     entered=false;
@@ -97,42 +100,30 @@ int main(int argc, char* argv[])
   while (mdir==NULL || idir==NULL);
   // 1.b check the availability of programs/the PATH evironment variabe...
   //     we only check the existence of kbpm-play to guide the user. 
-  int value;
-  while ((value=system("kbpm-play 2>/dev/null >/dev/null"))>256)
+  if(!(execute("kbpm-play 2>/dev/null >/dev/null")))
     {
       QMessageBox::warning(NULL,"Missing kbpm-play",
 			   "Could not start kbpm-play.\n" 
 			   "Make sure the correct version of the\n"
-			   "program is installed in your PATH (err="+QString::number(value)+")");
+			   "program is installed in your PATH");
       exit(0);
     }
-  // 1.c checking left over .raw files
+  // 1.c checking left over raw files
   RawScanner raw;
   raw.scan();
   if (!raw.result.isNull())
-    if (QMessageBox::warning(NULL,".raw files check",
-			     "There are some left over .raw files. These are:\n"+raw.result,
+    if (QMessageBox::warning(NULL,RAW_EXT " files check",
+			     "There are some left over "RAW_EXT" files. These are:\n"+raw.result,
 			     "Remove", "Ignore", 0, 0, 1)==0)
-      system("rm -- *.raw");
-  // 1.d find out where the documentation is located
-/*  while (! DirectoryScanner::exists("/usr/share/doc/bpmdj/beatmixing.ps")
-	 && ! DirectoryScanner::exists("/usr/share/doc/bpmdj/beatmixing.ps.gz")
-	 && ! DirectoryScanner::exists("./beatmixing.ps")
-	 && ! DirectoryScanner::exists("./beatmixing.ps.gz"))
-    {
-      QMessageBox::warning(NULL,"I cannot find the documentation,\n",
-			   "please place the documentation in the current directory\n"
-			   "or in /usr/shar/doc/bpmdj/");
-    }
-*/
-   
+      removeAllRaw();
+  
   // 2. read the configuration
   loader->config->setEnabled(true);
   app->processEvents();
   Config::load();
   
   // 3. read all the files in memory
-  SongIndex *songIndex;
+  IndexReader *indexReader;
   SongSelectorLogic test;
   app->setMainWidget(&test);
   // read already played indices
@@ -141,9 +132,9 @@ int main(int argc, char* argv[])
   loader->loading->setEnabled(true);
   loader->progressBar1->setEnabled(true);
   loader->readingFile->setEnabled(true);
-  songIndex=new SongIndex(loader,test.songList);
-  Config::file_count=songIndex->total_files;
-  delete(songIndex);
+  indexReader=new IndexReader(loader,test.database);
+  Config::file_count=indexReader->total_files;
+  delete(indexReader);
   
   // 4. Retrieve tags and spectra
   loader->scanning->setEnabled(true);
@@ -153,6 +144,13 @@ int main(int argc, char* argv[])
   // start the test app
   test.show();
   int result = app->exec();
+  if (!Config::shown_aboutbox)
+    {
+      Config::shown_aboutbox=true;
+      QMessageBox::message(NULL,"If you like this software please consider putting a\n"
+			   "link to http://bpmdj.sourceforge.net/ on your webpage\n"
+			   "(together with some nice words of course :)");
+    }
   Config::save();
   return result;
 }

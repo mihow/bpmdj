@@ -34,11 +34,14 @@ class DirectoryScanner
     virtual void checkfile(const QString  fullname, const QString  filename) = 0;
     virtual void scandir(const QString  dirname, const QString  checkname);
     virtual bool matchextension(const QString  filename);
+    virtual ~DirectoryScanner() {};
  public:
     DirectoryScanner(QString  extension);
     static bool exists(const QString  filename);
+    static bool goodName(QString name);
+    static bool songExtension(QString extension);
+    static bool goodExtension(QString extension);
     virtual void scan(const QString  dirname, const QString  checkname)
       { scandir(dirname, checkname); };
 };
-
 #endif

@@ -30,20 +30,31 @@
 #include <linux/soundcard.h>
 #include <signal.h>
 #include <time.h>
-#include <assert.h>
 #include <math.h>
+#include <unistd.h>
 #include "player-core.h"
+#include "scripts.h"
 
 /*-------------------------------------------
  *         Constants & Variables
  *-------------------------------------------*/
 void help();
 
+void printpos(char* text)
+{
+   unsigned4 m=wave_max();
+   printf("%s: %d %% (%d/%d)\n",text,
+	  (int)(x_normalise(y)*100/m),
+	  (int)x_normalise(y)/1024,
+	  (int)m/1024);
+}
+
 void useraction(int neglect)
 {
    static unsigned4      time_mark=0;        // the clock time mark
    static   signed8 tempo_fade=0;            // 0 = targetperiod; 10 = normalperiod
-   int c=0,nr=read(0,&c,1);
+   int c=0;
+   read(0,&c,1);
    switch (c)
      {
       case  0  :  return;
@@ -77,10 +88,10 @@ void useraction(int neglect)
         /* tempo changes */
       case '>' :
       case '0' :  if (tempo_fade<10) tempo_fade=tempo_fade+1;
-	          printf("Tempo fade %d ",tempo_fade);
+	          printf("Tempo fade %d ",(int)tempo_fade);
   	          changetempo(targetperiod+(normalperiod - targetperiod)*tempo_fade/10); break;
       case '<' :  if (tempo_fade>0) tempo_fade=tempo_fade-1;
- 	          printf("Tempo fade %d ",tempo_fade);
+ 	          printf("Tempo fade %d ",(int)tempo_fade);
 	          changetempo(targetperiod+(normalperiod - targetperiod)*tempo_fade/10); break;
       case '.' :  changetempo(normalperiod);  printf("Tempo normal\n");  break;
       case ',' :  changetempo(targetperiod);  printf("Tempo target\n");  break;
@@ -112,7 +123,7 @@ void useraction(int neglect)
       case 'v' :  cue_retrieve("V-",3); jumpto(0,0); break;
 	/* misc */
       case 't' :  if (time_mark)
-	            printf("Seconds elapsed sinds mark %d\n",time(NULL)-time_mark);
+	            printf("Seconds elapsed sinds mark %d\n",(int)(time(NULL)-time_mark));
 	          else
 	            {
 		       printf("Time marked\n");
@@ -228,7 +239,7 @@ void help()
 	  "     { : Beginning of song at normal tempo\n"
 	  "4) Misc\n"
 	  "     t : marks/shows time\n"
-	  "     % : current position and name\n"
+	  "     %% : current position and name\n"
 	  "     q : quit the program\n"
 	  "     h or ? : This help\n"
 	  "     c : Copyrigth notice\n"
@@ -308,12 +319,43 @@ void process_options(int argc, char* argv[])
 
 int main(int argc, char *argv[])
 {
+   int err;
    process_options(argc,argv);
-   core_init(0);
-   core_open();
+
+   // initialize core
+   err = core_init(0);
+   if (err == err_needidx)
+     {
+       printf("Error: please enter the index file, not the "SONG_EXT" file\n");
+       printf("       an index file can be made with 'kbpm-play -c'\n");
+       exit(err);
+     }
+   else if (err == err_noraw)
+     {
+       printf("Error: No raw file found\n");
+       exit(err);
+     }
+   else if (err == err_nospawn)
+     {
+       printf("Error: unable to start decoding process. Check your PATH\n");
+       exit(err);
+     }
+   // open core 
+   err = core_open();
+   if (err == err_mixer)
+     {
+       printf("Unable to open mixer device %s\n",arg_mixer);
+       exit(err);
+     }
+   else if (err == err_dsp)
+     {
+       printf("Unable to open dsp device %s\n",arg_dsp);
+       exit(err);
+     }
    terminal_start();
    core_play();
    terminal_stop();
    core_close();
    core_done();
+   return 0;
 }

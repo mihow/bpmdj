@@ -95,7 +95,6 @@ void fft_double (
         double cm1 = cos ( -delta_angle );
         double w = 2 * cm1;
         double ar[3], ai[3];
-        double temp;
 
         for ( i=0; i < NumSamples; i += BlockSize )
         {

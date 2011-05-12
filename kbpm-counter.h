@@ -34,7 +34,7 @@ class BpmCountDialog : public CountDialog
             int  reading_progress;
             int  processing_progress;
             bool stop_signal;
-   unsigned long phasefit(long i);
+   unsigned long phasefit(unsigned long i);
    int tapcount;
    int starttime;
  public:

@@ -26,20 +26,19 @@ class ProcessManager
     // WVB -- TOFIX: maybe we should make this whole class static 
     int player_pids[4];
     int died_pids[4];
-    static QSong* playing_songs[4];
-    static double mainTempo;
+    static Song* playing_songs[4];
   private:
     int monitorPlayCommand;
-    double monitorTempo;
     void processDied(int pid);
     SongSelectorLogic* selector;
   public:
-    static inline QSong* playingInMain() {return playing_songs[0];}
+    static inline Song* playingInMain() {return playing_songs[0];};
+    static inline bool monitorFree() {return playing_songs[1]==NULL;};
     ProcessManager(SongSelectorLogic *sel);
     void clearPlayer(int id, bool update=true);
     void switchMonitorToMain();
-    void setMainSong(QSong * song);
+    void setMainSong(Song * song);
     void checkSignals();
-    void startSong(QSong *song);
-    void startExtraSong(int id, QSong *song);
+    void startSong(Song *song);
+    void startExtraSong(int id, Song *song);
 };

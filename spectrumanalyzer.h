@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Form interface generated from reading ui file 'spectrumanalyzer.ui'
 **
-** Created: Wed Jun 11 20:13:47 2003
+** Created: Wed Jul 9 19:18:38 2003
 **      by: The User Interface Compiler ($Id: qt/main.cpp   3.1.2   edited Dec 19 11:45 $)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -62,7 +62,6 @@ public slots:
     virtual void audioRangeChanged();
     virtual void bpmRangeChanged();
     virtual void cancel();
-    virtual void finish();
     virtual void incBpm();
     virtual void decBpm();
     virtual void play();

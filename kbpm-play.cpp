@@ -49,8 +49,8 @@
 extern "C"
 {
 #include "cbpm-index.h"
-#include "common.h"
 #include "player-core.h"
+#include "scripts.h"
 }
 
 /*-------------------------------------------
@@ -69,9 +69,10 @@ static int   arg_high=160;
  *-------------------------------------------*/
 QApplication *app;
 void * go(void* neglect)
-  {
-     app->exec();
-  }
+{
+  app->exec();
+  return neglect;
+}
 
 void msg_slowdown(int change)
 {
@@ -102,19 +103,21 @@ void options_failure(char* err)
 {
    // print options
    printf("Usage:  kbpm-play <options> argument\n\n"
-//	  "   -w          --debuglatency      debugs latency of the player\n"
-          "   -c          --create            create an index file if none exists\n"
-	  "   -q          --quiet             be quiet\n"
-	  "   -d arg      --dsp arg           dsp device to use (default = /dev/dsp)\n" 
-	  "   -x arg      --mixer arg         mixer device to use (default = /dev/mixer)\n"
-	  "   -m arg      --match arg         song to match tempo with\n"
-	  "   -L nbr      --latency nbr       required latency in ms (default = 744)\n"
-	  "   -p nbr nbr  --position nbr nbr  position to place the window\n"
-	  "   -b          --batch             immediatelly obtain bpmcount, no sound, quit immidiatelly\n"
-	  "   -l nbr      --low nbr           lowest bpm to look for (default = 120)\n"
-	  "   -h nbr      --high nbr          highest bpm to look for (default = 160)\n"
-	  "   -s          --spectrum          immediatelly obtain color at cue-point, no sound, quit imm\n"
-	  "   argument                        the index file of the song to handle\n\n%s\n\n",err);
+          "   -c          --create              create an index file if none exists\n"
+	  "   -q          --quiet               be quiet\n"
+	  "   -d arg      --dsp arg             dsp device to use (default = /dev/dsp)\n" 
+	  "   -x arg      --mixer arg           mixer device to use (default = /dev/mixer)\n"
+	  "   -m arg      --match arg           song to match tempo with\n"
+	  "   -v          --verbose             be verbose with respect to latency\n"
+	  "   -L nbr      --latency nbr         required latency in ms (default = 744)\n"
+	  "   -F nbr      --fragments nbr       the number of fragments used to play audio.\n" 
+	  "   -X          --nolatencyaccounting does not take into account the latency when marking a cue\n"
+	  "   -p nbr nbr  --position nbr nbr    position to place the window\n"
+	  "   -b          --batch               immediatelly obtain bpmcount, no sound, quit immidiatelly\n"
+	  "   -l nbr      --low nbr             lowest bpm to look for (default = 120)\n"
+	  "   -h nbr      --high nbr            highest bpm to look for (default = 160)\n"
+	  "   -s          --spectrum            immediatelly obtain color at cue-point, no sound, quit imm\n"
+	  "   argument                          the index file of the song to handle\n\n%s\n\n",err);
    exit(1);
 }
 
@@ -139,6 +142,9 @@ void process_options(int argc, char* argv[])
 	  else if (strcmp(arg,"batch")==0 ||
 		   strcmp(arg,"b")==0)
 	    opt_batch=1;
+	  else if (strcmp(arg,"verbose")==0 ||
+		   strcmp(arg,"v")==0)
+	    opt_dspverbose=1;
 	  else if (strcmp(arg,"create")==0 ||
 		   strcmp(arg,"c")==0)
 	    opt_create=1;
@@ -182,6 +188,17 @@ void process_options(int argc, char* argv[])
 		options_failure("latency argument scanning error");
 	      arg_latency=argv[i];
 	    }
+	  else if (strcmp(arg,"fragments")==0 ||
+		   strcmp(arg,"F")==0)
+	    {
+	      opt_fragments=1;
+	      if (++i>=argc)
+		options_failure("fragments argument scanning error");
+	      arg_fragments = argv[i];
+	    }
+	  else if (strcmp(arg,"nolatencyaccounting")==0 ||
+		   strcmp(arg,"L")==0)
+	    opt_nolatencyaccounting=1;
 	  else if (strcmp(arg,"mixer")==0 ||
 		   strcmp(arg,"x")==0)
 	    {
@@ -210,21 +227,35 @@ void process_options(int argc, char* argv[])
   
 }
 
-void show_error(char*text)
+void show_error(int err, int err2, const char*text)
 {
-   const QString a=QString("Error");
-   const QString b=QString(text);
-   QMessageBox::critical(NULL,a,b,QMessageBox::Ok,0,0);
+  if (err==err2)
+    {
+      const QString a=QString("Error");
+      const QString b=QString(text);
+      QMessageBox::critical(NULL,a,b,QMessageBox::Ok,0,0);
+      exit(err);
+    }
 }
 
-bool checkRaw()
-  {
-    FILE * raw;
-    char d[500];
-    // the filename of the file to read is the basename 
-    // suffixed with .raw
-    sprintf(d,"%s.raw",basename(index_file));
-  }
+void normal_start()
+{
+  int err;
+  err = core_init(0);
+  show_error(err, err_needidx, "Please enter the index file, not the "SONG_EXT" file\nAn index file can be made with 'kbpm-play -c'\n");
+  show_error(err, err_noraw, "No raw file to be read. Probably the .mp3 is broken.\n");
+  show_error(err, err_nospawn, "Unable to spawn decoding process.\nPlease check your PATH environment variable\n");
+
+  err = core_open();
+  show_error(err, err_dsp, "Unable to open dsp device\n");
+  show_error(err, err_mixer, "Unable to open mixer device\n");
+  
+  terminal_start();
+  core_play();
+  terminal_stop();
+  core_close();
+  core_done();
+}
 
 int main(int argc, char *argv[])
 {
@@ -234,14 +265,13 @@ int main(int argc, char *argv[])
   // if we need to create an index file we'll make it.
   if (opt_create)
     {
-      // argument aindigt normaal op .mp3 of iets in dien trend...
       char newname[500];
       strcpy(newname,argument);
       int len = strlen(newname);
       if (len>=4 && newname[len-4]=='.')
 	strcpy(newname+len-3,"idx");
       else
-	options_failure("Sorry, mp3 must end on .mp3");
+	options_failure("Sorry, song must end on " SONG_EXT);
       // create index and write it..
       index_init();
       index_setversion();
@@ -277,18 +307,9 @@ int main(int argc, char *argv[])
       // initialize the count dialog
       SpectrumDialogLogic *counter = new SpectrumDialogLogic();
       counter->fetchSpectrum();
-      counter->finish();
       printf("Fetching Color done\n");
       core_done();
     }
   else
-    {
-      core_init(0);
-      core_open();
-      terminal_start();
-      core_play();
-      terminal_stop();
-      core_close();
-      core_done();
-    }
+    normal_start();
 }

@@ -21,6 +21,9 @@
 #include <qtimer.h>
 #include <qbutton.h>
 #include "songplayer.h"
+extern "C" {
+#include "player-core.h"
+}
 
 class BpmCountDialog;
 
@@ -32,6 +35,7 @@ class SongPlayerLogic :
    QTimer *timer;
    int tempo_fade;
    int fade_time;
+   signed8 wantedcurrentperiod;
    void setColor(QButton *button, bool enabled);
    void redrawCues();
    void normalReached(bool yes);
@@ -72,13 +76,15 @@ class SongPlayerLogic :
    virtual void nudgeCueForward8M();
    // starting and stopping
    virtual void stop();
-   // frequency shifts
+   // tempo shifts
    virtual void targetTempo();
    virtual void normalTempo();
    virtual void fastSwitch();
    virtual void mediumSwitch();
    virtual void slowSwitch();
    virtual void targetStep();
+   virtual void tempoChanged();
+   void changeTempo(int p);
    // finish window
    virtual void accept();
    // volumes
@@ -96,6 +102,7 @@ class SongPlayerLogic :
    virtual void fastRevSaw();
    virtual void openBpmCounter();
    virtual void openSpectrumAnalyzer();
+   virtual void openPatternAnalyzer();
    virtual void openAbout();
    // loop functionality
    virtual void toggleNoLoop();

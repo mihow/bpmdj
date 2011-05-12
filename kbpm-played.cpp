@@ -25,12 +25,14 @@
 #include <string.h>
 #include <fcntl.h>
 #include <stdlib.h>
-#include <malloc.h>
 #include <unistd.h>
 #include <dirent.h>
 #include <assert.h>
 #include <stdio.h>
 #include "kbpm-played.h"
+extern "C" {
+#include "common.h"
+}
 
 int Played::songs_played=0;
 int Played::size=1;
@@ -45,7 +47,7 @@ void Played::Add(QString *filename)
   if (next>=size)
     {
       size*=2;
-      names=(QString**)realloc(names,size*sizeof(QString*));
+      names=reallocate(names,size,QString*);
     }
 }
 
@@ -54,8 +56,7 @@ Played::Played(const QString filename)
    /* initialise shit */
    size=100;
    next=0;
-   names=(QString**)malloc(sizeof(QString*)*size);
-   assert(names);
+   names=allocate(size,QString*);
    /* read the file or create it */
    f=fopen(filename,"rb");
    /* read all lines in memory and sort them */

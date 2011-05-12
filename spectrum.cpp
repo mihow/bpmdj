@@ -44,14 +44,5 @@ void lastSpectrum()
     {
       scales[i]=(float)spectra/(float)sums[i];
       scales[i]*=5;
-      /*
-	float factor = ((i-12.0)/12.0);
-	factor= s
-	factor*=factor;
-	factor+=5;
-	scales[i]*=factor;
-      */
-      
-      //      printf("%d  %g\n",i,scales[i]);
     }
 }

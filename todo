@@ -1,63 +1,106 @@
-============================
-1.9:
+2.0:
+- Q: dubbel klikken als de monitor nog aan het spelen is brengt het nieuwe nummer in de queue
+  Q: als de queue leeg is nemen we natuurlijk de huidige main-song.
+     dan kunnen we een aantal songs er tussen proppen die
+  - similar name scanner 
+    - stop button
+  - renamer:
+    - isMix in orde brengen
+    - fast wizards laten werken
+  - weigh tags toevoegen aan de distance metriek zodat het selecteren van songs
+    weer iets eenvoudiger wordt..
+  - BUG: fetch spectrum crashed op "102_AllYouNeedIsLove[Beatles].mp3"
+  - automixer
+    - percentage waar de mix moet invallen
+    - bug verwijderen als het nemen van de head verder gaat dan het einde van het nummer 
+    - bug verwijderen als het nemen van de tail verder gaat dan het einde van de tempofade
+    - rekening houden met hoe lang de song moet spelen...
+    - gebruik van cues of niet
+    - maximum-tijd dat een liedje speelt..
+  - SEL: Locked mode derbij proppen zodat we een song op een vast tempo kunnen spelen
+  - WWW: sectie over cluster detectie
+  - cluster detector:
+    - clustering werkt niet meer...
+    - add cluster detection thing
+    - memory check doen
+    - when disposing the object, all the subobjects meenemen...
+    - dialog creeeren om de cluster selectie beter te kunnen controleren...
+      - colors
+      - cancel
+      - depth
+      - metriek
+    - performantie nog eens verder bekijken... Volgens mij wordt er nog iets te veel geheugen gebruikt...
+    - verschillende distance methoden erin steken
+  - auto-menu
+    - AUTOMATIC inversion when main song too dark
+    - AUTOMATIC scanning of spectrum and tags when starting
+    - PCA - analysis when starting
+    - inversion of song-colors when too dark
+    - pop Queue when monitor empty
+  - de toggle troep centraliseren door ze in een kanon van een define te proppen..
+  - fetch brol from disk...
+  - qsong uitbreiden met een extra kolom die de cluster beschrijft..
+  - opkuisen code 
+    - tonumber centraliseren
+    - min/max operators centraliseren
+    - inlezen van files in een buffer...
+    - barkbounds in eigen file proppen
+    - centralizeren van de vervelende bash-scripts...
+    - inlezen van de volledige file en het compressen
+    - kbpm-counter.cpp kbpm-counter.h CountDialog en BpmCountDialog beter consistentere namen geven..
+    - merge index_file creation into cbpm-index (kbpm-play.c bevat dergelijke code en import-scanner.cpp)
+  - libmd5 gebruiken...
+  - automatisch verzamelen van de mp3s die in de Q zitten...
+  - opzetten mailinglist...
+  - automatisch scannen van spectrum en tags a16zetten en de boel cachen in de index files
+  - Misschien beter een optie maken van het cdrom device ???
+  - een eenvoudige tool malken die de code pretty-fied op basis van de tokens...
+  - FAQ: Why the access through disk ???
+  - FAQ: Why not using channels ?
+  - FAQ: Why no tempo-modifier in the player ?
+  - multi-language support...
+  - sneller importeren van mp3's door beide lijsten eerst te sorteren en dan de gekende er reeds uitgooien...
+  - pause veld verwijderen als variable en als functie toevoegen..
+  - player zou eigen thread moeten starten...
+  - een eenvoudige tool die alle source files pakt en de gelijkenissen visualiseert
+  - automatisch opstellen van playlist aan de hand van een aantal maten:
+  - tempo, spectrum, dcolor
+  - impulse response meten... volgens mij kan dat gebruikt worden om het 'soort muziek te meten', net zoals het gebruikt moet kunnen worden om in 
+    hogere frequenties de rest te meten... 
+  - Pattern recognizer der in proppen
+  - folding derin steken... en op disk schrijven waar gepast...
+    eens zien hoe de cluster detetctie daarmee overweeg kan..
+    normaal gesproken zou dit wel eens een serieus tijdje kunnen duren, daar de afstandsmaat
+    toch wat rekenwerk vraagt..
+    in elk geval we moeten er wat mee experimenteren
+  - Automatisch playlist genereren aan de hand van een randm walk doorheen
+    de kleuren en stijlen...
+    daarentegen kunnen we toch al een 'target' color ergens opgeven, zodat we we  - IDX: switchen naar een meer binair formaat zodat ze binnenkort tenminste een sample 
+         kunnen stokeren zonder al te veel bytes te moeten verspelen...
+  - Path tag toevoegen. This box should contain ' a number of entries. Every entry is either 
+    het volledig automatisch laten gebeuren is nog niet voor vandaag... 
+ten naar welke
+    waarde we streven. Eens we dit weten, kunnen we ook de spectrum analyse limiteren to de zaken 
+    die in de correcte richting gaan...
+  - beter resample filter der in steken
+  - genereren van data tussen twee punten... ???
+  - MERGER: progressbar zou weer eens verschrikkelijk handig zijn...
   - SELECTOR: als de .raw file al bestaat voordat we hem gaan creeeren moet hier ook iets mee aangevangen worden
-  - kbpm-counter.cpp kbpm-counter.h CountDialog en BpmCountDialog beter consistentere namen geven..
-  - merge index_file creation into cbpm-index (kbpm-play.c bevat dergelijke code en import-scanner.cpp)
-  - PLAYER: dsp parameters die niet gezet kunnen worden moeten gemeld worden vanuit een QT-box
+  - Helpen in automatisch afhalen van songs:
   - na een tofetch list opgesteld te hebben moeten we de songs afhalen.
     - tar appenden is geen goed systeem
     - we zouden ook beter direct zorgen dat de namen correct zijn
-CLUSTER SELECTIE
-  - when disposing the object, all the subobjects meenemen...
-  - dialog creeeren om de cluster selectie beter te kunnen controleren...
-  - qsong uitbreiden met een extra kolom die de cluster beschrijft..
-    CPS kan worden gebruikt als navigatiemiddel om van A naar B te geraken zonder al
-    te messy overgangen te moeten nemen... De CPS
-  - performantie nog eens verder bekijken... Volgens mij wordt er nog iets te veel geheugen gebruikt...
-  - verschillende distance methoden erin steken
-  - Path tag toevoegen. This box should contain 
-    ' a number of entries. Every entry is either 
-    het volledig automatisch laten gebeuren is nog niet voor vandaag... 
-    daarentegen kunnen we toch al een 'target' color ergens opgeven, zodat we weten naar welke
-    waarde we streven. Eens we dit weten, kunnen we ook de spectrum analyse limiteren to de zaken 
-    die in de correcte richting gaan...
-- folding derin steken... en op disk schrijven waar gepast...
-  eens zien hoe de cluster detetctie daarmee overweeg kan..
-  normaal gesproken zou dit wel eens een serieus tijdje kunnen duren, daar de afstandsmaat
-  toch wat rekenwerk vraagt..
-  in elk geval we moeten er wat mee experimenteren
-- Locked mode derbij proppen zodat we een song op een vast tempo kunnen spelen
-- AUTOMATIC inversion when main song too dark..
-- Impulse detection/impulse response meten
-- automatische mixer der in steken
-- visualisatie box van stijl/positie der in stoppen...
-- color path finder derin steken
-- mix export erin steken
-- ogg support
-- color buttons dark as long as they cannot be used..
-- impulse response meten... volgens mij kan dat gebruikt worden om het 'soort muziek te meten', net zoals het gebruikt moet kunnen worden om in 
-  hogere frequenties de rest te meten... 
-WEBSITE:
-  - flashier maken (donker en meer uitleg...)
-  - overview maken van de vorige layouts... ik ben eigenlijk benieuwd naar de evolutie...
-SIMILAR NAME SCANNER: 
-- checkbox om ongekende onmiddelijk te markeren
-- checkbox om exacte matches onmiddelijk te deleten
-- start-button
-- in de similar find box moeten we natuurlijk nog aankruisen dat we diegene die we zeker niet kennen behouden als .mp3 of onmiddelijk willen markeren als 'gofetch'
-- ogg support erin steken voor zover dat dat mogelijk is natuurlijk :)
-- automatisch opstellen van playlist aan de hand van een aantal maten:
-  - tempo, spectrum, dcolor
-  - ook toelaten van een overgang van het ene nummer naar het andere te berekenen
-RENAMER BOX:
-  - isMix in orde brengen
-  - fast wizards laten werken
-KBPM PLAYER:
-  - loop support debuggen (of der uit gooien)
-  - manual tempo changing
-  - changelog: kplay + reorganized layout/added loop support and manual tempo changing
-  - visible counter vlag weghalen
-- populaire halen van cd16--60
+  - WEBSITE: overview maken van de vorige layouts... ik ben eigenlijk benieuwd naar de evolutie...
+  - Impulse detection/impulse response meten
+  - Player: automatische fade-out erin steken
+  - color path finder derin steken
+  - visualisatie box van stijl/positie der in stoppen...
+  - pattern recognizer mergen met BPM-detector en eventueel onmiddelijk direct de spectrum scanner der uit
+    gooien ? Hmmm... Is nogal useless als ge het mij vraagt. Misschien beter aparte zaken houden..
+    redesign van dat zooitje..
+
+
+- populaire halen van cd16: FeelTheFire... --60
 =====================================
 kbpm-play:
   - als de file al bestaat en we moeten correleren onmiddelijk binnen 10BPM bounds zoeken
@@ -65,14 +108,11 @@ kbpm-play:
   - target tempo zetten laat de percent indicator niet volgen
   - als tempo = inf deftige errormelding geven
   - cue shifting beyond zero should lock down to zero (or produce somthing 'okay')
-  - tempo changer in player
   - should show remaining time instead of total time
   - checking of de cue points persistent blijven over tempo verschillen heen
     (en eventueel fixen als dat fout is)
-  - loop support in player
   - when changing an lfo the current phase should remain the same.
   - reverse playing of certain measures
-  - tempo changer
 
 documentation:
   - logfile doc schrijven
@@ -85,7 +125,6 @@ kbpm-dj:
   - nfs-mounten ? Copying the same data ??
   - multiple players (asus, cubical, tnm etc ...) & automatically setup player on other machine
   - play songs at fixed given tempo instead of the tempo of the next song
-  - renamer: de zaken voor de - beschouwen als author and naar achter moven 
   - setup - wizard
        - DSP-parameters verzamelen wanneer gestart wordt
        - Directories maken als het enigzins mogelijk is

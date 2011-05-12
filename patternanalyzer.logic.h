@@ -18,23 +18,26 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#include "dirscanner.h"
-#include "loader.h"
+#include "songplayer.h"
+#include "patternanalyzer.h"
 
-class SongSelectorLogic;
-class QSong;
-class QListView;
+#define barksize 24
 
-class SongIndex:
-  public DirectoryScanner
+typedef unsigned char compressed;
+class PatternAnalyzerLogic : public PatternDialog
 {
-  public: 
-    int total_files;
-  protected:
-    Loader * loader;
-    virtual void checkfile(const QString prefix, const QString filename);
-    QListView* view;
-  public:
-    SongIndex(Loader * l, QListView * lv);
-    void add(QSong* newsong);
+  Q_OBJECT
+public:
+  long period;
+  long audiosize;
+  int  *phases;
+  int  phasesize;
+  compressed * data;
+  PatternAnalyzerLogic(SongPlayer*parent=0, const char * name=0, bool modal=FALSE, WFlags f=0);
+public slots:
+  virtual void showPattern();
+  virtual void balanceChanged();
+  virtual void slantChanged();
+  virtual void fixPhases();
+  virtual void setTempo();
 };

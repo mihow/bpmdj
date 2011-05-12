@@ -21,12 +21,12 @@
 
 // TODO -- memorycheck is toch wel eens nodig Vooral bij het releasen van couple's
 // TODO -- static classe is niet zo fijn, zou ze liever wat meer lokaal hebben.
-// TODO -- eens kijken hoeveel maal de memoized functionality effectief gebruikt wordt. Indien niet, ze der uit gooien.
+// TODO -- eens kijken hoeveel maal de memoized functionality effectief 
+//         gebruikt wordt. Indien niet, ze der uit gooien.
+
 #include <stdlib.h>
 #include <stdio.h>
-#include <malloc.h>
 #include <assert.h>
-#include "common.h"
 #include "cluster.h"
 
 float ** Cluster::similarity = NULL;
@@ -58,28 +58,27 @@ Couple::Couple(int a, int b) : Point()
   second = b;
 }
 
-float Couple::distance2point(int idx)
+float Couple::distance2point(int idx, Metriek * metriek)
 {
   // the distance from this cluster to another point is determined
-  float max = Cluster::distance(first,idx);
-  float d = Cluster::distance(second,idx);
+  float max = Cluster::distance(first,idx,metriek);
+  float d = Cluster::distance(second,idx,metriek);
   if (d>max)
     return d;
   else
     return max;
 }
 
-float Couple::distance(Couple * other)
+float Couple::distance(Couple * other, Metriek * metriek)
 {
-  int i, j;
-  float max = Cluster::distance(first,other->first);
-  float d = Cluster::distance(first,other->second);
+  float max = Cluster::distance(first,other->first, metriek);
+  float d = Cluster::distance(first,other->second, metriek);
   if (d>max) 
     max=d;
-  d = Cluster::distance(second,other->first);
+  d = Cluster::distance(second,other->first, metriek);
   if (d>max) 
     max=d;
-  d = Cluster::distance(second,other->second);
+  d = Cluster::distance(second,other->second, metriek);
   if (d>max) 
     return d;
   else
@@ -118,7 +117,7 @@ Cluster::Cluster()
 {
   totalsize=2;
   size=0;
-  pointstocluster=(int*)malloc(2*sizeof(int));
+  pointstocluster=allocate(2,int);
 }
 
 void Cluster::add(int t)
@@ -127,12 +126,12 @@ void Cluster::add(int t)
   if(size>totalsize)
     {
       totalsize*=2;
-      pointstocluster=(int*)realloc(pointstocluster,totalsize*sizeof(int));
+      pointstocluster=reallocate(pointstocluster,totalsize,int);
     }
   pointstocluster[size-1]=t;
 }
 
-float Cluster::distance(int xidx, int yidx)
+float Cluster::distance(int xidx, int yidx, Metriek * metriek)
 {
   // assert(xidx!=yidx);
   // assert(xidx<realcontentsize);
@@ -160,21 +159,21 @@ float Cluster::distance(int xidx, int yidx)
     {
       Couple* X = (Couple*)(x);
       Couple* Y = (Couple*)(y);
-      result = X->distance(Y);
+      result = X->distance(Y, metriek);
     }
   else if (tx && !ty)
     {
       Couple* Y = (Couple*)(y);
-      result = Y -> distance2point(xidx);
+      result = Y -> distance2point(xidx, metriek);
     }
   else if (!tx && ty)
     {
       Couple* X = (Couple*)(x);
-      result = X->distance2point(yidx);
+      result = X->distance2point(yidx, metriek);
     }
   else if (tx && ty)
     {
-      result = x->distance(y);
+      result = x->distance(y, metriek);
     }
   // store comparison
   similarity[xidx][yidx]=result;
@@ -189,11 +188,10 @@ inline bool Cluster::isPoint(int idx)
 
 void Cluster::dumpConnectionMatrix()
 {
-  int **matrix;
-  matrix=(int**)malloc(sizeof(int*)*realcontentsize);
+  int **matrix = allocate(realcontentsize,int*);
   for(int i=0;i<realcontentsize;i++)
     {
-      matrix[i]=(int*)malloc(sizeof(int)*realcontentsize);
+      matrix[i]=allocate(realcontentsize,int);
       for (int j = 0 ; j < realcontentsize ; j++)
 	matrix[i][j]=0;
     }
@@ -262,24 +260,24 @@ int compareposition(const void* a, const void *b)
     return 1;
 }
 
-Couple *Cluster::agglomerate()
+Couple *Cluster::agglomerate(Metriek * metriek)
 {
   int x, y;
   type_mark = realcontentsize;
   // 1. create initial set of comparisons.
   int entriestosort = ((size-1)*(size))/2;
   int entry=0;
-  Position *entries = (Position*)malloc(entriestosort*sizeof(struct Position));
+  Position *entries = allocate(entriestosort,Position);
   assert(entries);
   printf("%d entries to create...\n",entriestosort);
   
   for (x = 1 ; x < size; x ++)
     for (y = 0; y < x ; y ++)
       {
-	 entries[entry].distance=distance(x,y);
-	 entries[entry].x=x;
-	 entries[entry].y=y;
-	 entry++;
+	entries[entry].distance=distance(x,y,metriek);
+	entries[entry].x=x;
+	entries[entry].y=y;
+	entry++;
       }
 
   printf("Similarity set created...(%d)\nBegin sorting\n",entry);
@@ -354,7 +352,7 @@ Couple *Cluster::agglomerate()
 	  int i = pointstocluster[j];
 	  if (i==z) 
 	    continue;
-	  float d = distance(z,i);
+	  float d = distance(z,i,metriek);
 	  // nu bepalen we welke positie deruit gaat uit de gesorteerde lijst. 
 	  // en welke verhuist naar een andere locatie (z,i)
 	  Position relocate;
@@ -431,14 +429,12 @@ Couple *Cluster::agglomerate()
 void Cluster::reset()
 {
   realcontenttotalsize = 1;
-  realcontent=(Point **)malloc(sizeof(Point*)*realcontenttotalsize);
-  assert(realcontent);
+  realcontent=allocate(realcontenttotalsize,Point*);
   realcontentsize=0;
-  similarity=(float**)malloc(sizeof(float*)*realcontenttotalsize);
-  assert(similarity);
+  similarity=allocate(realcontenttotalsize,float*);
   // the previous and next matrices
-  prev = (Position**)malloc(sizeof(Position*)*realcontenttotalsize);
-  next = (Position**)malloc(sizeof(Position*)*realcontenttotalsize);
+  prev = allocate(realcontenttotalsize,Position*);
+  next = allocate(realcontenttotalsize,Position*);
 }
 
 int Cluster::addcontent(Point* p)
@@ -447,14 +443,10 @@ int Cluster::addcontent(Point* p)
   if (realcontentsize>=realcontenttotalsize)
     {
       realcontenttotalsize*=2;
-      realcontent=(Point **)realloc(realcontent,sizeof(Point*)*realcontenttotalsize);
-      assert(realcontent);
-      similarity=(float**)realloc(similarity,sizeof(float*)*realcontenttotalsize);
-      assert(similarity);
-      prev = (Position**)realloc(prev, sizeof(Position*)*realcontenttotalsize);
-      assert(prev);
-      next = (Position**)realloc(next, sizeof(Position*)*realcontenttotalsize);
-      assert(next);
+      realcontent = reallocate(realcontent,realcontenttotalsize,Point*);
+      similarity = reallocate(similarity,realcontenttotalsize,float*);
+      prev = reallocate(prev, realcontentsize,Position*);
+      next = reallocate(next, realcontenttotalsize, Position *);
     }
   int id = realcontentsize++;
   realcontent[id] = p;
@@ -462,8 +454,8 @@ int Cluster::addcontent(Point* p)
   if (id==0)
     {
       similarity[id]=NULL;
-      prev[id]=(Position*)malloc(sizeof(Position));
-      next[id]=(Position*)malloc(sizeof(Position));
+      prev[id]=allocate(1,Position);
+      next[id]=allocate(1,Position);
       prev[id][0].x=-1;
       prev[id][0].y=-1;
       next[id][0].x=-1;
@@ -471,9 +463,9 @@ int Cluster::addcontent(Point* p)
     }
   else
     {
-      similarity[id]=(float*)malloc(sizeof(float)*id);
-      prev[id]=(Position*)malloc(sizeof(Position)*id);
-      next[id]=(Position*)malloc(sizeof(Position)*id);
+      similarity[id]=allocate(id,float);
+      prev[id]=allocate(id,Position);
+      next[id]=allocate(id,Position);
       for(int j = 0 ; j < id ; j++)
 	{
 	  similarity[id][j]=-1;
@@ -543,14 +535,16 @@ int old_main()
   printf("Data Created\n");
   fflush(stdout);
   // Agglomerate
-  all->agglomerate();
+  // WVB -- deze null is niet ok, maar kan me momenteel
+  // weinig schelen
+  all->agglomerate(NULL);
   printf("Agglomeration Done\n");
   fflush(stdout);
   // print out
   // all->simpledump(0);
   // all->determine_color(0,360,0,0);
+  return 0;
 }
-
 
 // 1000 = 3.830
 // 2000 = 17.760

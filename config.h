@@ -31,15 +31,21 @@ const QString IndexDir = "./index";
 class Config
 {
   public:
-    static int  file_count;   // the number of .idx files present 
+    // version 1.6
+    static int  file_count;
     static int  yellowTime;   
     static int  orangeTime;
-    static int  authorDecay;
     static int  redTime;
     static int  filterBpm;
     static bool color_range;
     static bool color_played;
     static bool color_authorplayed;
+    static int  authorDecay;
+    static QString playCommand1;
+    static QString playCommand2;
+    // version 1.7
+    static QString playCommand3;
+    static QString playCommand4;
     static bool color_ondisk;
     static bool color_cues;
     static bool color_dcolor;
@@ -49,10 +55,13 @@ class Config
     static bool limit_uprange;
     static bool limit_downrange;
     static bool limit_indistance;
-    static QString playCommand1;
-    static QString playCommand2;
-    static QString playCommand3;
-    static QString playCommand4;
+    // version 1.8
+    //   removed limit_inspectrum from version 1.7
+    // version 1.9
+    static float distance_temposcale;
+    static float distance_spectrumscale;
+    static bool limit_authornonplayed;
+    static bool shown_aboutbox;
  public:
     static void openUi();
     static void save();

@@ -1,5 +1,7 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <sys/times.h>
+#include <unistd.h> 
 
 /**
  * since the clock_freq is wrong on some machines we need to test this
@@ -21,27 +23,16 @@ int main(int argc, char**argv)
      stop = 100;
    else
      {
-	printf("#error CLOCK_FREQ could not be determined = %d\n",stop);
-	return;
+       printf("#error CLOCK_FREQ could not be determined = %d\n",(int)stop);
+       return 1;
      }
-   printf("#define CLOCK_FREQ %d\n",stop);
+   printf("#define CLOCK_FREQ %d\n",(int)stop);
    clock_freq=stop;
    // measure nanosleeptime..
    // we measure how many full seconds we need to sleep to reach 5 seconds...
    
    start=times(NULL);
    loops=0;
-/*   while(times(NULL)-start < clock_freq*5)
-     {
-	struct timespec req;
-	struct timespec rem;
-	req.tv_sec=0;
-	req.tv_nsec=999999999;
-	nanosleep(&req,&rem);
-	loops++;
-     }
- */  
    printf("// loops = %d\n",loops);
    return 0;
-
 }

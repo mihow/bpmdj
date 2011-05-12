@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
  Copyright (C) 2001 Werner Van Belle
- See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -32,11 +31,11 @@
 #include <linux/soundcard.h>
 #include <time.h>
 #include <sys/times.h>
-#include <assert.h>
 #include <math.h>
 #include "player-core.h"
 #include "cbpm-index.h"
 #include "version.h"
+#include "scripts.h"
 
 // WVB -- testing variable for the impulse characeteristic
 //#define IMPULSE_PANNING
@@ -51,14 +50,17 @@ volatile int paused = 0;
 signed8 targetperiod;
 signed8 currentperiod;
 signed8 normalperiod;
-signed8 latency;
 signed8 y,x=0;
 int     opt_quiet = 0;
 char*   arg_dsp = "/dev/dsp";
 int     opt_match = 0;
 char*   arg_match = 0;
 int     opt_latency = 0;
-char*   arg_latency = "777";
+int     opt_fragments = 0;
+char*   arg_fragments = "16";
+int     opt_dspverbose = 0;
+int     opt_nolatencyaccounting = 0;
+char*   arg_latency = "300";
 char*   arg_mixer = "/dev/mixer";
 char*   argument;
 
@@ -73,130 +75,172 @@ void clock_start()
 
 signed8 clock_ticks()
 {
-   // clock ticks are expressed in WAVRATE resolution
-   signed8 ticks=(signed8)times(NULL)-(signed8)starttick;
-   signed8 answer=ticks*(signed8)WAVRATE/(signed8)CLOCK_FREQ;
-   assert(answer>=0);
-   return answer;
+  // clock ticks are expressed in WAVRATE resolution
+  signed8 ticks=(signed8)times(NULL)-(signed8)starttick;
+  signed8 answer=ticks*(signed8)WAVRATE/(signed8)CLOCK_FREQ;
+  assert(answer>=0);
+  return answer;
 }
 
 /*-------------------------------------------
  *         Dsp operations
  *-------------------------------------------*/ 
-static    int dsp;
-static signed8 dsp_writecount=0;
+static int            dsp;
+static signed8        dsp_writecount=0;
+static audio_buf_info latency;
 
 void dsp_start()
 {
-   dsp_writecount=0;
+  dsp_writecount=0;
 }
 
 signed8 dsp_playcount()
 {
-   count_info cnt;
-   ioctl(dsp,SNDCTL_DSP_GETOPTR,&cnt);
-   return cnt.bytes/4;
+  count_info cnt;
+  //  audio_errinfo err;
+  if (ioctl(dsp,SNDCTL_DSP_GETOPTR,&cnt)==-1)
+    return dsp_writecount+(latency.bytes/2);
+  // if (ioctl(dsp,SNDCTL_DSP_GETERRORS,&err)!=-1)
+  // if (err.play_underruns>0)
+  // cnt.bytes-=err.play_underruns;
+  if (cnt.bytes<0)
+    cnt.bytes=0;
+  return cnt.bytes/4;
 }
 
 void dsp_pause()
 {
-   ioctl(dsp,SNDCTL_DSP_RESET);
-   while(paused);
-   dsp_writecount=0;
+  ioctl(dsp,SNDCTL_DSP_RESET);
+  while(paused);
+  dsp_writecount=0;
 }
 
 void dsp_write(unsigned4 *value)
 {
-   dsp_writecount++;
-   write(dsp,value,4);
+  dsp_writecount++;
+  write(dsp,value,4);
 }
 
 signed8 dsp_latency()
-{ 
-   return dsp_writecount-dsp_playcount();
+{
+  if (opt_nolatencyaccounting)
+    return dsp_writecount - (latency.bytes/4);
+  else
+    return dsp_writecount - dsp_playcount();
 }
 
-void dsp_error(int ignore)
+void dsp_catch(int ignore)
 {
-   char msg[256];
-   sprintf(msg,"Failed to open %s",arg_dsp);
-   show_error(msg);
-   exit(2);
+  printf("Failed to open (alarm timeout) %s",arg_dsp);
+  exit(0);
 }
 
-void dsp_open()
+int dsp_open()
 {
-   int p;
-   double latency;
-   audio_buf_info ab;
-   // start alarm before opening...
-   signal(SIGALRM,dsp_error);
-   alarm(1);
-   // now open it
-   dsp=open(arg_dsp,O_WRONLY);
-   if (dsp==-1)
-     {
-	alarm(0);
-	dsp_error(1);
-     }
-   // cancel alarm
-   alarm(0);
-   // set file parameters
-   p=16;
-   ioctl(dsp,SOUND_PCM_WRITE_BITS,&p);
-   p=2;
-   ioctl(dsp,SOUND_PCM_WRITE_CHANNELS,&p);
-   p=WAVRATE;
-   ioctl(dsp,SOUND_PCM_WRITE_RATE,&p);
-   ioctl(dsp,SNDCTL_DSP_GETOSPACE,&ab);
-   // check latency if necessary
-   latency=(double)ab.bytes;
-   latency/=4.0;
-   latency/=(double)WAVRATE;
-   latency*=1000.0;
-   dsp_start();
-   clock_start();
-//    sleep(1);
-//     {
-//	signed8 l = clock_ticks();
-//	if (l-WAVRATE>100) 
-//	  {
-//	     printf("Dsp device has %d bytes: latency = %g ms\n",ab.bytes,latency);
-//	     printf("LOCK_FREQ is wrong (again!) please inform the author !!!\n(werner.van.belle@vub.ac.be)\n");
-//	     printf("Clock gives %d ticks (should be around %d)\n",(long)l,WAVRATE);
-//	  }
-//    }
+  int p;
+  // start alarm before opening...
+  // open int, and if it doesn't answer in time kill it
+  signal(SIGALRM,dsp_catch);
+  alarm(1);
+  dsp=open(arg_dsp,O_WRONLY);
+  if (dsp==-1)
+    {
+      alarm(0);
+      return err_dsp;
+    }
+  alarm(0);
+  
+  // set dsp parameters
+  p=AFMT_S16_LE;
+  if (ioctl(dsp,SNDCTL_DSP_SETFMT,&p)==-1)
+    printf("dsp: setting dsp to standard 16 bit failed\n");
+  p=2;
+  if (ioctl(dsp,SNDCTL_DSP_CHANNELS,&p)==-1)
+    printf("dsp: setting dsp to 2 channels failed\n");
+  p=WAVRATE;
+  if (ioctl(dsp,SNDCTL_DSP_SPEED,&p)==-1)
+    {
+      printf("dsp: setting dsp speed (%d) failed\n",p++);
+      if (ioctl(dsp,SNDCTL_DSP_SPEED,&p)==-1)
+	{
+	  printf("dsp: setting dsp speed (%d) failed\n",p);
+	  p+=2;
+	  if (ioctl(dsp,SNDCTL_DSP_SPEED,&p)==-1)
+	    printf("dsp: setting dsp speed (%d) failed\n",p);
+	}
+    }
+  
+  // set fragement size
+  // opt_latency bevat de gevraagde latency. Dus dit omzetten naar
+  // hiervan moeten we natuurlijk het logaritme nemen..
+  // zie OSS manual
+
+  {
+    int latency_setter;
+    int latency_checker;
+    p = atoi(arg_fragments) << 16;
+    latency_setter  = ms2bytes(atoi(arg_latency));
+    latency_setter /= atoi(arg_fragments);
+    latency_checker = atoi(arg_fragments);
+    printf("dsp: setting latency to %s ms\n",arg_latency);
+    while(latency_setter>=1)
+      {
+	latency_setter/=2;
+	latency_checker*=2;
+	p++;
+	// printf("  setter = %d , checker = %d, p == %x\n",latency_setter, latency_checker, p);
+      }
+    ioctl(dsp,SNDCTL_DSP_SETFRAGMENT,&p);
+    ioctl(dsp,SNDCTL_DSP_GETOSPACE,&latency);
+    latency_setter = bytes2ms(latency.bytes);
+    printf("     actually latency will be %d ms\n",latency_setter);
+    if (latency.bytes != latency_checker)
+      printf("dsp: impossible to set the required latency\n");
+    if (opt_dspverbose)
+      {
+	printf("     fragments = %d\n", latency.fragments);
+	printf("     fragsize = %d ms\n", bytes2ms(latency.fragsize));
+	printf("     bytes = %d ms\n", bytes2ms(latency.bytes));
+      }
+    
+    // now get the capacities
+    ioctl(dsp,SNDCTL_DSP_GETCAPS,&p);
+    if (opt_dspverbose)
+      printf("dsp: realtime capability = %s\n"
+	     "     batch limitation = %s\n"
+	     "     mmap capability = %s\n",
+	     (p & DSP_CAP_REALTIME) ? "yes" : "no",
+	     (p & DSP_CAP_BATCH) ? "yes" : "no",
+	     (p & DSP_CAP_MMAP) ? "yes" : "no");
+  }
+  
+  // here we goo..
+  dsp_start();
+  clock_start();
+  return err_none;
 }
 
 void dsp_flush()
 {
-   ioctl(dsp,SNDCTL_DSP_SYNC);
+  ioctl(dsp,SNDCTL_DSP_SYNC);
 }
 
 void dsp_close()
 {
-   close(dsp);
+  close(dsp);
 }
 
 /*-------------------------------------------
  *         Mixer operations
  *-------------------------------------------*/
 static int mixer=-1;
-
-void mixer_error()
+int mixer_open()
 {
-   char msg[256];
-   sprintf(msg,"Failed to open %s",arg_mixer);
-   show_error(msg);
-   exit(3);
-}
-
-void mixer_open()
-{
-   if (mixer>-1) return;
-   mixer=open(arg_mixer,O_RDWR);
-   if (mixer==-1)
-     mixer_error();
+  if (mixer>-1) return err_none;
+  mixer=open(arg_mixer,O_RDWR);
+  if (mixer==-1)
+    return err_mixer;
+  return err_none;
 }
 
 void mixer_close()
@@ -215,7 +259,7 @@ int mixer_get_main()
 }
 
 int mixer_get_pcm()
-{
+ {
    int volume=0;
    ioctl(mixer,SOUND_MIXER_READ_PCM,&volume);
    return volume&0xff;
@@ -241,15 +285,6 @@ unsigned4 wave_buffer[wave_bufsize];
 FILE * wave_file;
 unsigned4 wave_bufferpos=wave_bufsize;
 
-static unsigned4 fsize(FILE* wtf)
-{
-   unsigned4 res;
-   fseek(wtf,0,SEEK_END);
-   res=ftell(wtf);
-   fseek(wtf,0,SEEK_SET);
-   return res;
-}
-
 static int writer = -1;
 static int writing = 0;
 void writer_died(int sig,siginfo_t *info, void* hu)
@@ -258,11 +293,13 @@ void writer_died(int sig,siginfo_t *info, void* hu)
   // now we have the complete length of the file...
   // if it differs from the length in the .ini file we update it
   // get length;
-  unsigned long long ticks = wave_max();
-  unsigned long long sec = ticks/WAVRATE;
-  unsigned long long min = sec/60;
+  unsigned long long sec;
+  unsigned long long min; 
   writing = 0;
-  sec=sec%60;
+  if (!wave_file) return;
+  sec = samples2s(wave_max());
+  min = sec/60;
+  sec = sec%60;
   sprintf(newstr,"%02d:%02d",(int)min,(int)sec);
   if (!index_time || (strcmp(newstr,index_time)!=0))
     {
@@ -271,53 +308,46 @@ void writer_died(int sig,siginfo_t *info, void* hu)
     }
 }
 
-void wave_open(char* fname, int synchronous)
+int wave_open(char* fname, int synchronous)
 {
   char fn[500];
-  // start decoding the file; this means: fork mp3 process
+  // start decoding the file; this means: fork bpmdj-raw process
   // wait 1 second and start reading the file
   if (synchronous)
     {
-      char execute[500];
       writing = 1;
-      sprintf(execute,"glue-mp3raw \"%s\"\n",fname);
-      if (!(system(execute)<=256))
-	{
-	  printf("Error: couldn't execute glue-mp3raw\n");
-	  exit(100);
-	}
+      if (!vexecute(CREATERAW_CMD,fname))
+	return err_nospawn;
       writing=0;
     }
   else 
     {
       // prepare signals
-      struct sigaction *act;
-      act = (struct sigaction*)malloc(sizeof(struct sigaction));
-      assert(act);
+      struct sigaction *act = allocate(1,struct sigaction);
       act->sa_sigaction = writer_died;
       act->sa_flags = SA_SIGINFO;
       sigaction(SIGUSR1,act,NULL);
-      // fork and execute, send back signal when done
+      // fork and execute, send back signal when done 
+      writing = 1;
       if (!(writer = fork()))
 	{
-	  char execute[500];
-	  sprintf(execute,"glue-mp3raw \"%s\"\n",fname);
-	  if (!(system(execute)<=256)) 
-	    printf("Error: couldn't execute glue-mp3raw\n");
+	  vexecute(CREATERAW_CMD,fname);
 	  kill(getppid(),SIGUSR1);
-	  exit(100);
+	  exit(0);
 	}
-      writing = 1;
-      sleep(1);
     }
   sprintf(fn,"%s.raw",fname);
   wave_name=strdup(basename(fn));
-  wave_file=fopen(wave_name,"rb");
-  if (!wave_file)
+  int tries = 5;
+  do
     {
-      printf("Error: unable to open %s\n",wave_name);
-      exit(3);
+      wave_file=fopen(wave_name,"rb");
+      sleep(1);
     }
+  while (wave_file==NULL && tries-->0);
+  if (!wave_file)
+    return err_noraw;
+  return err_none;
 }
 
 void wave_close()
@@ -334,7 +364,7 @@ void wave_close()
 
 unsigned4 wave_max()
 {
-   return fsize(wave_file)/4;
+  return fsize(wave_file)/4;
 }
 
 int wave_read(unsigned4 pos, unsigned4 *val)
@@ -362,37 +392,27 @@ void jumpto(signed8, int);
 
 void lfo_set(char* name, _lfo_ l, unsigned8 freq, unsigned8 phase)
 {
-   /* if paused, unpause and choose own phase */
-   lfo_period=4*currentperiod/freq;
-   lfo_do=l;
-   if (paused)
-     {
-	jumpto(0,0);
-	lfo_phase=y;
-	paused=0;
-	printf("Restarted with %s lfo at 4M/%d\n",name,freq);
-     }
-   else
-     {
-	lfo_phase=phase;
-	printf("Switched to %s lfo at 4M/%d\n",name,freq);
-     }
+  /* if paused, unpause and set phase */
+  lfo_period=4*currentperiod/freq;
+  lfo_do=l;
+  if (paused)
+    {
+      jumpto(0,0);
+      lfo_phase=y;
+      paused=0;
+      printf("Restarted with %s lfo at 4M/%d\n",name,(int)freq);
+    }
+  else
+    {
+      lfo_phase=phase;
+      printf("Switched to %s lfo at 4M/%d\n",name,(int)freq);
+    }
 }
 
 unsigned4 lfo_no(unsigned4 x)
 {
-   return x;
+  return x;
 }
-
-typedef union
-{
-   unsigned4 value;
-   struct 
-     {
-	signed short int left;
-	signed short int right;
-     } leftright;
-} longtrick;
 
 unsigned4 lfo_volume(unsigned4 x, signed4 multiplierleft, signed4 divisorleft, signed4 multiplierright,signed4 divisorright)
 {
@@ -416,8 +436,6 @@ unsigned4 lfo_metronome(unsigned4 x)
    double val;
    signed8 diff;
    longtrick lt;
-   signed4 left;
-   signed4 right;
    diff=(signed8)y-(signed8)lfo_phase;
    diff=diff%lfo_period;
    /* say ping */
@@ -445,8 +463,6 @@ unsigned4 lfo_difference(unsigned4 x)
    static signed8 histrength=1L;
    static signed8 leftlo, lefthi, rightlo, righthi;
    static signed8 oldeststrengthat=0;
-   double val;
-   signed8 diff;
    longtrick lt;
    signed4 left;
    signed4 right;
@@ -506,8 +522,8 @@ void pan_init()
 {
   int i;
   DIFF = normalperiod;
-  prevl=(float*)malloc(DIFF*sizeof(float));
-  prevr=(float*)malloc(DIFF*sizeof(float));
+  prevl = allocate(DIFF,float);
+  prevr = allocate(DIFF,float);
   
   for(i = 0 ; i < DIFF ; i ++)
     {
@@ -583,16 +599,18 @@ unsigned4 lfo_break(unsigned4 x)
 
 unsigned4 lfo_revsaw(unsigned4 x)
 {
-   signed8 diff;
-   diff=(signed8)y-(signed8)lfo_phase;
-   diff=diff%lfo_period;
-   diff=lfo_period-diff;
-   return lfo_volume(x,diff,lfo_period,diff,lfo_period);
+  signed8 diff;
+  diff=(signed8)y-(signed8)lfo_phase;
+  while (diff<0 && lfo_period) 
+    diff+=lfo_period;
+  diff=diff%lfo_period;
+  diff=lfo_period-diff;
+  return lfo_volume(x,diff,lfo_period,diff,lfo_period);
 }
 
 void lfo_init()
 {
-   lfo_do=lfo_no;
+  lfo_do=lfo_no;
 }
 
 /*-------------------------------------------
@@ -604,12 +622,12 @@ void lfo_init()
 
 unsigned8 x_normalise(unsigned8 y)
 {
-   return y*normalperiod/currentperiod;
+  return y*normalperiod/currentperiod;
 }
 
 unsigned8 y_normalise(unsigned8 x)
 {
-   return x*currentperiod/normalperiod;
+  return x*currentperiod/normalperiod;
 }
 
 static cue_info cue_before = 0;
@@ -765,100 +783,75 @@ void changetempo(signed8 period)
    
 }
 
-void printpos(char* text)
-{
-   unsigned4 m=wave_max();
-   printf("%s: %d % (%d/%d)\n",text,
-	  (long)(x_normalise(y)*100/m),
-	  (long)x_normalise(y)/1024,
-	  (long)m/1024);
-}
-
 void jumpto(signed8 mes, int txt)
 {
-   if (paused)
-     {
-	paused=0;
-	y=y_normalise(cue);
-	if (txt) printf("Restarted at cue ");
-     }
-   else
-     {
-	// - first we have the position which _should_ be playing 'NOW'
-	// - second, we have the data which is now queued
-	// - third we have the latency
-	// - if we subtract the latency from the data being queued, we have the real playing position
-	// - if we subtract what should be playing with what is playing, we have a difference
-	// - we can fixed this difference to fit a measure
-	// - this fixed difference is added to gotopos.
-	signed8 gotopos=y_normalise(cue)-currentperiod*mes;
-	signed8 difference=gotopos-y+dsp_latency();
-	signed8 fixeddiff=(difference/currentperiod)*currentperiod;
-	y+=fixeddiff;
-	if (txt) printf("Started at cue ");
-     }
-   if (txt)
-     {
-	if (mes)
-	  printf("-%d measures\n",mes);
-	else
-	  printf("\n");
-     }
+  if (paused)
+    {
+      paused=0;
+      y=y_normalise(cue);
+      if (txt) printf("Restarted at cue ");
+    }
+  else
+    {
+      // - first we have the position which _should_ be playing 'NOW'
+      // - second, we have the data which is now queued
+      // - third we have the latency
+      // - if we subtract the latency from the data being queued, we have the real playing position
+      // - if we subtract what should be playing with what is playing, we have a difference
+      // - we can fix this difference to fit a measure
+      // - this fixed difference is added to gotopos.
+      signed8 gotopos=y_normalise(cue)-currentperiod*mes;
+      // signed8 difference=gotopos-y+dsp_latency();
+      signed8 difference=gotopos-y;
+      signed8 fixeddiff=(difference/currentperiod)*currentperiod;
+      y+=fixeddiff;
+      if (txt) printf("Started at cue ");
+    }
+  if (txt)
+    {
+      if (mes)
+	printf("-%d measures\n",(int)mes);
+      else
+	printf("\n");
+    }
 }
 
 void read_write_loop()
 {
-   signed8   cc;
-   signed8   selfplaycount=-latency;
-   signed8   latencycheck;
-   struct timespec waiting;
-   unsigned4 value[1];
-   lfo_init();
-   dsp_start();
-   clock_start();
-   while(!stop)
-     {
-	// wait for pause
-	if (paused) 
-	  {
-	     dsp_pause();
-	     clock_start();
-	     selfplaycount=-latency;
-	  }
-	// calculate value
-	x=y*normalperiod/currentperiod;
-	if (x>loop_at)
-	  loop_jump();
-	if (wave_read(x,value)<0)
-	  {
-	    printf("End of song, pausing\n");
-	    paused = 1;
-	    value[0] = 0L;
-	  };
-	value[0]=lfo_do(value[0]);
-	y=y+1;
-	// wait before writing
-	while(selfplaycount>(cc=clock_ticks()))
-	  {
-	     // sleeptime is uitgedrukt in WAVRATE ticks. 
-	     unsigned8 sleeptime = selfplaycount - cc;
-	     // how many seconds
-	     waiting.tv_sec = sleeptime / WAVRATE;
-	     // how many ticks at WAVRATE remain ?
-	     sleeptime = sleeptime % WAVRATE;
-	     // convert to nanoseconds
-	     sleeptime *= (unsigned8)1000000000L/(unsigned8)WAVRATE;
-	     // store the sleeptime in the structure
-	     waiting.tv_nsec=sleeptime;
-	     nanosleep(&waiting,NULL);
-	  };
-	selfplaycount++;
-	// write value
-	dsp_write(value);
-     }
-   latencycheck=dsp_playcount();
-   dsp_flush();
-   printf("Actual playing latency = %d ms\n",(long)((clock_ticks()-latencycheck)*(signed8)1000/(signed8)WAVRATE));
+  signed8   latencycheck;
+  unsigned4 value[1];
+  lfo_init();
+  dsp_start();
+  clock_start();
+  while(!stop)
+    {
+      // wait for pause
+      if (paused) 
+	{
+	  dsp_pause();
+	  clock_start();
+	}
+      // calculate value
+      x=y*normalperiod/currentperiod;
+      if (x>loop_at)
+	loop_jump();
+      if (wave_read(x,value)<0)
+	{
+	  printf("End of song, pausing\n");
+	  paused = 1;
+	  value[0] = 0L;
+	};
+      value[0]=lfo_do(value[0]);
+      y=y+1;
+      
+      // write value
+      dsp_write(value);
+    }
+  
+  latencycheck=clock_ticks();
+  dsp_flush();
+  if (opt_dspverbose)
+    printf("dsp: fluffy-measured playing latency = %d ms\n",samples2ms(clock_ticks()-latencycheck));
 }
 
 /*-------------------------------------------
@@ -866,7 +859,7 @@ void read_write_loop()
  *-------------------------------------------*/ 
 void line()
 {
-   printf("--------------------------------------------------------------------\n");
+  printf("--------------------------------------------------------------------\n");
 }
 
 void copyright()
@@ -877,67 +870,59 @@ void copyright()
    line();
 }
 
-void core_init(int sync)
+int core_init(int sync)
 {
-   copyright();
-   assert(sizeof(signed2)==2);
-   assert(sizeof(int)==4);
-   assert(sizeof(signed4)==4);
-   assert(sizeof(signed8)==8);
-   // Parsing the arguments
-   if (opt_match)
-     {
-	index_read(arg_match);
-	targetperiod=index_period*4;
-	index_free();
-     }
-   if (strstr(argument,".mp3"))
-     if (strcmp(strstr(argument,".mp3"),".mp3")==0)
-       {
-	  printf("Error: please enter the index file, not the mp3 file\n");
-	  printf("       an index file can be made with 'kbpm-play -c'\n");
-	  exit(30);
-       }
-   index_read(argument);
-   normalperiod=index_period*4;
-   if (!opt_match) targetperiod=normalperiod;
-   currentperiod=targetperiod;
-   latency=atoi(arg_latency);
-   latency*=WAVRATE;
-   latency/=1000;
-   if (WAVRATE==22050)
-     {
-	currentperiod/=2;
-	normalperiod/=2;
-	targetperiod/=2;
-     }
-   if (!opt_quiet)
-     {
-	double normaltempo;
-	double targettempo;
-	normaltempo=4.0*(double)WAVRATE*60.0/(double)normalperiod;
-	targettempo=4.0*(double)WAVRATE*60.0/(double)targetperiod;
-	if (normaltempo>0)
-	  printf("Normal tempo = %g BPM\n",normaltempo);
-	else
-	  printf("No normal tempo known\n");
-	if (targettempo>0)
-	  printf("Target tempo = %g BPM",targettempo);
-	else
-	  printf("No Target tempo known\n");
-	printf(" speed(%g)\n",(double)normalperiod/(double)currentperiod);
-     }
-   cue_read();
+  int err;
+  copyright();
+  common_init();
+  // Parsing the arguments
+  if (opt_match)
+    {
+      index_read(arg_match);
+      targetperiod=index_period*4;
+      index_free();
+    }
+  if (strstr(argument,".idx")==NULL || strcmp(strstr(argument,".idx"),".idx")!=0)
+    return err_needidx;
+  index_read(argument);
+  normalperiod=index_period*4;
+  if (!opt_match) targetperiod=normalperiod;
+  currentperiod=targetperiod;
+  if (WAVRATE==22050)
+    {
+      currentperiod/=2;
+      normalperiod/=2;
+      targetperiod/=2;
+    }
+  if (!opt_quiet)
+    {
+      double normaltempo = mperiod2bpm(normalperiod);
+      double targettempo = mperiod2bpm(targetperiod);
+      if (normaltempo>0)
+	printf("Normal tempo = %g BPM\n",normaltempo);
+      else
+	printf("No normal tempo known\n");
+      if (targettempo>0)
+	printf("Target tempo = %g BPM",targettempo);
+      else
+	printf("No Target tempo known\n");
+      printf(" speed(%g)\n",(double)normalperiod/(double)currentperiod);
+    }
+  cue_read();
 #ifdef IMPULSE_PANNING
-   pan_init();
+  pan_init();
 #endif
-   wave_open(index_file,sync);
+  err = wave_open(index_file,sync);
+  return err;
 }
 
-void core_open()
+int core_open()
 {
-   mixer_open();
-   dsp_open();
+  int err;
+  err = mixer_open();
+  if (err) return err;
+  err = dsp_open();
+  return err;
 }
 
 void core_play()
@@ -957,9 +942,9 @@ void core_done()
    cue_write();
    if (index_changed)
      {
-	if (!opt_quiet)
-	  printf("Updating index file\n");
-	index_write();
+       if (!opt_quiet)
+	 printf("Updating index file\n");
+       index_write();
      }
    index_free();
    finished = 1;

@@ -20,6 +20,7 @@
 
 #include <qlabel.h>
 #include <qstring.h>
+#include <qlistview.h>
 #include "similarscanner.h"
 #include "qsong.h"
 #include "kbpm-dj.h"
@@ -27,6 +28,7 @@
 extern "C"
 {
 #include "edit-distance.h"
+#include "scripts.h"
 }
 
 #define LIST_SONGNAME 0
@@ -50,99 +52,126 @@ void SimilarScanner::getRidOff(QString fullname)
 
 void SimilarScanner::alreadyHave()
 {
-  QListViewItem *selected = NameList->selectedItem();
-  QString fullname = selected -> text(LIST_FULLSONGNAME);
-  char fullcommand[2048];
-  sprintf(fullcommand,"rm -- \"%s\"",(const char*)fullname);
-  printf("Executing %s\n",fullcommand);
-  system(fullcommand);
-  getRidOff(fullname);
+  bool reset = true;
+  while(reset)
+    {
+      reset = false;
+      QListViewItemIterator it(NameList);
+      while(it.current())
+	{
+	  QListViewItem * selected = (QListViewItem*)it.current();
+	  if (selected->isSelected())
+	    {
+	      QString fullname = selected -> text(LIST_FULLSONGNAME);
+	      vexecute(RM" \"%s\"",(const char*)fullname);
+	      getRidOff(fullname);
+	      reset=true;
+	      break;
+	    }
+	  ++it;
+	}
+    }
 }
 
 void SimilarScanner::ignore()
 {
-  QListViewItem * selected = NameList->selectedItem();
-  QString fullname = selected -> text(LIST_FULLSONGNAME);
-  printf("Ignoring %s\n",(const char*)fullname);
-  getRidOff(fullname);
+  QListViewItemIterator it(NameList);
+  while(it.current())
+    {
+      QListViewItem * selected = (QListViewItem*)it.current();
+      if (selected->isSelected())
+	{
+	  QString fullname = selected -> text(LIST_FULLSONGNAME);
+	  printf("Ignoring %s\n",(const char*)fullname);
+	  getRidOff(fullname);
+	}
+      ++it;
+    }
 }
 
 void SimilarScanner::goFetch()
 {
-  QListViewItem * selected = NameList -> selectedItem();
-  QString fullname = selected -> text(LIST_FULLSONGNAME);
-  goFetch(fullname);
-  getRidOff(fullname);
+  QListViewItemIterator it(NameList);
+  while(it.current())
+    {
+      QListViewItem * selected = (QListViewItem*)it.current();
+      if (selected->isSelected())
+	{
+	  QString fullname = selected -> text(LIST_FULLSONGNAME);
+	  goFetch(fullname);
+	  getRidOff(fullname);
+	}
+      ++it;
+    }
 }
 
 void SimilarScanner::goFetch(QString fullname)
 {
-  char fullcommand[2048];
-  QString newname = fullname;
-  newname.replace(".mp3",".tofetch");
-  sprintf(fullcommand,"mv -i -- \"%s\" \"%s\" ",(const char*)fullname,(const char*)newname);
-  printf("Executing %s\n",fullcommand);
-  system(fullcommand);
+  QString newname = fullname+".tofetch";
+  vexecute(MV" \"%s\" \"%s\" ",(const char*)fullname,(const char*)newname);
 }
 
 void SimilarScanner::checkfile(const QString pathname, const QString filename)
 { 
+  if (conformingFilesOnly->isChecked())
+    if (!goodName(filename))
+      return ;
   QString stripped = filename.left(filename.length()-4);
   QString fullname = pathname + "/" + filename;
   currentFile->setText(stripped);
   findSimilarNames(stripped,fullname);
   if (!similarnames)
-    goFetch(fullname);
+    if (autoFetch->isChecked())
+      goFetch(fullname);
 };
 
 void SimilarScanner::similarNameFound(QString name, QString similar, QString fullname, QString fullsimilar, int dist)
 {
-  similarnames=true;
+  similarnames = true;
   new QListViewItem(NameList,
 		    name, similar,
 		    QString::number(dist),
 		    fullname, fullsimilar);
-  /**
-   * WVB -- a piece of code to decode the files
-    if (!fullname.isEmpty())
-    {
-    system("mpg123 -0 -4 -t \""+fullname
-    +"\" 2>/tmp/p; grep kbit /tmp/p; tail -n 1 /tmp/p");
-    system("mpg123 -0 -4 -t \"./music/"+song->song_file
-    +"\" 2>/tmp/p; grep kbit /tmp/p; tail -n 1 /tmp/p");
-    printf("\n");
-    }
-  */
 }
 
 void SimilarScanner::findSimilarNames(QString text, QString fullname)
 {
   QListView *songList = selector->songList;
   QListViewItemIterator it1(songList);
-  similarnames=false;
+  similarnames = false;
+  char exact[1024];
   for(;it1.current();++it1)
     {
       app->processEvents();
       QSong * song = (QSong*)it1.current();
       if (song)
 	{
-	  const char * t = song->song_title;
-	  const char * a = song->song_author;
-	  int val=ndist(t,a,text);
+	  const char * t = song->title();
+	  const char * a = song->author();
+	  unsigned int val=ndist(t,a,text);
 	  if ( val < (text.length()/10)+3)
-	    similarNameFound(text,song->song_title+"["+song->song_author+"]",
-			     fullname,song->song_file,
-			     val);
+	    {
+	      sprintf(exact,"%s[%s]",t,a);
+	      similarNameFound(text,song->title()+"["+song->author()+"]",
+			       fullname,song->file(),
+			       (strcasecmp(exact,(const char*)text)==0) ? 
+			       ((strcmp(a,"")==0) ? -1 : -2) : val);
+	    }
 	}
     }
 }
 
 SimilarScanner::SimilarScanner(SongSelectorLogic* sroot) :  
-  DirectoryScanner(".mp3")
+  DirectoryScanner(NULL)
 { 
   selector = sroot; 
   show();
 };
+
+bool SimilarScanner::matchextension(const QString filename)
+{
+  return goodExtension(filename);
+}
 
 void SimilarScanner::scan(const QString dirname) 
 { 
@@ -151,3 +180,16 @@ void SimilarScanner::scan(const QString dirname)
   DirectoryScanner::scan(dirname,dirname); 
   dist_done();
 };
+
+void SimilarScanner::setRoot(QString w)
+{
+  root->setText(w);
+}
+
+void SimilarScanner::startStop()
+{
+  startStopButton->setEnabled(false);
+  scan(root->text());
+  startStopButton->setEnabled(true);
+}
+
