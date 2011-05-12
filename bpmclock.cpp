@@ -20,6 +20,7 @@
 #define __loaded__bpmclock_cpp__
 using namespace std;
 #line 1 "bpmclock.c++"
+#include <sys/stat.h>
 #include <cstdio>
 #include <fcntl.h>
 #include <errno.h>
