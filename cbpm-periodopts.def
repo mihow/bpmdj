@@ -32,6 +32,22 @@ flag = {
   };
 
 flag = {
+  name = lowestbpm;
+  descrip = "Measuring from bpm";
+  value = l;
+  arg_type = number;
+  arg_default = 120;
+  };
+
+flag = {
+  name = highestbpm;
+  descrip = "Measure to bpm";
+  value = h;
+  arg_type = number;
+  arg_default = 160;
+  };
+
+flag = {
   name = writeto;
   descrip = "Write .idx to (filename)";
   value = w;

@@ -1,6 +1,6 @@
 /*
 ** Change this to update the version information (see GNUmakefile.in)
 **
-** $Id: version.h,v 1.2 2002/02/03 17:36:53 krubbens Exp $
+** $Id: version.h,v 1.3 2002/03/11 16:20:47 krubbens Exp $
 */
-VERSION=0.9
+VERSION=1.0

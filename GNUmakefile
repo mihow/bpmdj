@@ -1,6 +1,6 @@
 # Note:  Makefile is built automatically from Makefile.in
 #
-# $Id: GNUmakefile.in,v 1.4 2002/02/03 19:38:25 krubbens Exp $
+# $Id: GNUmakefile,v 1.6 2002/06/02 10:57:21 krubbens Exp $
 #
 # Written by Thomas Steudten <thomas@steudten.com>
 # January 25, 2002
@@ -23,7 +23,13 @@
 # or write to the Free Software Foundation, Inc., 59
 # Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Log: GNUmakefile.in,v $
+# $Log: GNUmakefile,v $
+# Revision 1.6  2002/06/02 10:57:21  krubbens
+# schrijffout in 1 van de rules
+#
+# Revision 1.5  2002/06/02 10:22:04  krubbens
+# Sometimes (well most of the time)I find those configure things really a pain in the ***.
+#
 # Revision 1.4  2002/02/03 19:38:25  krubbens
 # - cbpm-period moved to cbpm-count
 # - cbpm-player moved to cbpm-play
@@ -158,7 +164,7 @@ allhtml: beatmixing.html
 	$(CP) index.html beatmixing/index.html
 
 website: allhtml
-	$(SCP beatmixing/* krubbens@bpmdj.sourceforge.net:/home/groups/b/bp/bpmdj/htdocs
+	$(SCP) beatmixing/* krubbens@bpmdj.sourceforge.net:/home/groups/b/bp/bpmdj/htdocs
 
 #############################################################################
 # Phony targets
@@ -204,8 +210,8 @@ clean-bin:
 	$(RM) $(TARGETS) 
 
 clean:
-	$(RM) a.out core *.o *.log *.tex *.tex.dep *.toc *.dvi *.aux *.raw toplot.dat
-	$(RM) plot.ps gmon.out  
+	$(RM) a.out core *.o *.log *.tex *.tex.dep *.toc *.dvi *.aux *.raw
+	$(RM) plot.ps gmon.out build toplot.dat sum.tmp
 	$(RM) $(AUTOGEN_FILES:.def=.c) $(AUTOGEN_FILES:.def=.h) 
 	$(RM) beatmixing
 
@@ -284,6 +290,14 @@ $(AUTOGEN_FILES3:.def=.c) $(AUTOGEN_FILES3:.def=.h): $(AUTOGEN_FILES3)
 GOALS=cbpm-count cbpm-play glue-bpmraw glue-mp3raw README COPYRIGHT AUTHORS\
 	ChangeLog INSTALL TODO cbpm-plot beatmixing.ps
 	
+deb-install:
+	$(MAKE) all beatmixing.ps
+	cp cbpm-count $(DESTDIR)/usr/bin/
+	cp cbpm-play $(DESTDIR)/usr/bin/
+	cp glue-bpmraw $(DESTDIR)/usr/bin/
+	cp glue-mp3raw $(DESTDIR)/usr/bin/
+	cp beatmixing.ps $(DESTDIR)/usr/share/doc/cbpmdj/
+	
 directories: clean
 	$(RM) -r $(PROJECT)-$(VERSION); exit 0
 	$(MKDIR) $(PROJECT)-$(VERSION)
@@ -315,3 +329,6 @@ tgz-dist:
 	$(MAKE) source.tgz-dist 
 	$(MAKE) shared.bin.tgz-dist 
 	$(MAKE) static.bin.tgz-dist
+
+deb-dist: 
+	fakeroot debian/rules binary

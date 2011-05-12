@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
    index_file=strdup(argv[optct]);
    if (strstr(index_file,"music/")==index_file) index_file+=strlen("music/");
    else if (strstr(index_file,"./music/")==index_file) index_file+=strlen("./music/");
-   else printf("Warning: song not in music/ or ./music/ direcotry\n");
+   else printf("Warning: song not in music/ or ./music/ directory\n");
    // de file die we wegschrijven is de songname met .idx ipv .mp3
    // deze data wordt in de huidige direcotry geschreven, tenzij anders 
    // opgegeven natuurlijk
@@ -129,9 +129,35 @@ int main(int argc, char *argv[])
    // ingevuld worden
    index_bpmcount_from=startpercent;
    index_bpmcount_to=stoppercent;
+   startbpm=OPT_VALUE_LOWESTBPM;
+   stopbpm=OPT_VALUE_HIGHESTBPM;
+   // first we look up the md5sum !
+   if (HAVE_OPT(VERBOSE))
+     printf("Obtaining md5sum for %s\n",argv[optct]);
+   sprintf(d,"md5sum \"%s\" | awk '{printf $1}' >sum.tmp\n",argv[optct]);
+   if (system(d)>256)
+     {
+	printf("Error: md5sum failed");
+	exit(101);
+     }
+   else
+     {
+	FILE * kloink=fopen("sum.tmp","r");
+	char s[40];
+	int i=0;
+	while(i<32)
+	  {
+	     int c = getc(kloink);
+	     s[i]=c;
+	     i++;
+	  }
+	s[32]=0;
+	index_md5sum=strdup(s);
+	fclose(kloink);
+     }
    // now we have to create a raw mp3 file
    if (HAVE_OPT(VERBOSE))
-     printf("Writing %s.raw\n",index_file);
+     printf("md5sum = %s\nWriting %s.raw\n",index_md5sum,index_file);
    sprintf(d,"glue-bpmraw \"%s\"\n",argv[optct]);
    if (system(d)>256)
      {
@@ -162,6 +188,7 @@ int main(int argc, char *argv[])
      {
 	printf("Reading from %ldk to %ldk ",startpercent/1024,stoppercent/1024);
 	printf("(audiosize = %dk)\n",audiosize/1024);
+	printf("Looking for tempo between %d and %d\n",startbpm,stopbpm);
      }
    audio=malloc(audiosize+1);
    if (!audio)

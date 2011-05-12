@@ -1,11 +1,9 @@
 #!/bin/bash
 cd index
-cd goodnames
 # filter all names which are not .*[.*].idx
 ls --color=no | 
 grep -v \.*\\[\.*\\]\.idx |
 grep -v \.*\\[\.*\\]\[0-9\]\.idx
-
 
 ls --color=no | grep " "
 ls --color=no | grep "'"

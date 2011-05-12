@@ -1,0 +1,3994 @@
+#LyX 1.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 218
+\textclass amsart
+\language british
+\inputencoding auto
+\fontscheme default
+\graphics default
+\paperfontsize default
+\spacing single 
+\papersize Default
+\paperpackage widemarginsa4
+\use_geometry 0
+\use_amsmath 0
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\quotes_times 2
+\papercolumns 1
+\papersides 2
+\paperpagestyle plain
+\bullet 0
+	0
+	31
+	-1
+\end_bullet
+\bullet 3
+	0
+	35
+	-1
+\end_bullet
+
+\layout Title
+
+How to do Beat Mixing with an Mp3-player
+\newline 
+How to measure Beats Per Minute: BPM Counting
+\newline 
+How to use BpmDj v1.0
+\layout Author
+
+Van Belle Werner
+\newline 
+werner.van.belle@vub.ac.be
+\newline 
+Tel: +32 486 68 84 48; Fax: +32 2 629 35 25
+\newline 
+Frans Vekemansstraat 146
+\newline 
+1160 Neder Over Heembeek; Belgium
+\newline 
+http://bpmdj.sourceforge.net/
+\layout Abstract
+
+This text describes my own experience with playing music for an audience:
+ Things to do and things to avoid.
+ The text goes from the very basics: how to match your volumes, how to use
+ the PFL and so on, to advanced things like beat mixing with mp3's and measuring
+ BPM's.
+ This text does not deal with vinyl and turn tables.
+ At the end of the text, I introduce my own DJ-tools, called BpmDj.
+\layout Standard
+
+
+\latex latex 
+
+\backslash 
+newpage
+\layout Standard
+
+
+\latex latex 
+
+\backslash 
+hrule
+\backslash 
+vskip 6 pt
+\layout Standard
+\align right 
+
+\size footnotesize 
+Copyright (c) December 2001 Werner Van Belle 
+\layout Standard
+\align right 
+
+\size footnotesize 
+Permission is granted to copy, distributed and/or modify this document under
+ the terms of the GNU Free Document License, version 1.1 with the Invariant
+ Sections being all except section 
+\begin_inset LatexCommand \ref{Usage}
+
+\end_inset 
+
+, with the Front-Cover Texts being the first page, and with no Back-Cover
+ Texts.
+ A copy of the licence is included in the section entitled 
+\begin_inset Quotes eld
+\end_inset 
+
+Free Documentation
+\begin_inset Quotes erd
+\end_inset 
+
+
+\layout Standard
+
+
+\latex latex 
+
+\backslash 
+newpage
+\layout Standard
+
+
+\begin_inset LatexCommand \tableofcontents{}
+
+\end_inset 
+
+
+\layout Standard
+
+
+\latex latex 
+
+\backslash 
+newpage
+\layout Section
+
+Introduction
+\layout Standard
+
+First we give an overview of a typical audience, what they expect and how
+ they react.
+ Everything mentioned here is obvious, but is worth remembering.
+ Afterwards we give a set of recurring, but wrong, ideas about 'DJ-ing'.
+ Also very obvious, but also worth mentioning.
+ 
+\layout Standard
+
+From then on, we explain the importance of an index, some technical terms
+ and how to use a PFL, and some rules to follow when playing popular music.
+ From chapter 
+\begin_inset LatexCommand \ref{BeatMixing}
+
+\end_inset 
+
+ on we explain how to do basic beat mixing.
+ Chapter 
+\begin_inset LatexCommand \ref{BPMS}
+
+\end_inset 
+
+ explains in too much detail the nature of 'Beats per Minute'.
+ This section also explains how to measure BPM's very accurately.
+\layout Standard
+
+In chapter 
+\begin_inset LatexCommand \ref{Usage}
+
+\end_inset 
+
+ we give a manual to the usage of BpmDj.
+\layout Subsection
+
+The Audience
+\layout Standard
+
+The audience is the most important of all.
+ They are the final judge of what you're doing.
+ A party without people is no party.
+ It is as simple as that.
+ People can be at a party for a number of reasons:
+\layout Itemize
+
+To drink & forget their problems.
+\begin_float footnote 
+\layout Standard
+
+
+\size footnotesize 
+As the night goes on, people will become drunk or stoned (or both at the
+ same time :) If you want them to drink more later on the evening, throw
+ salt over the floor before people come in.
+
+\size default 
+ 
+\end_float 
+\layout Itemize
+
+For social contact.
+\layout Itemize
+
+To take pictures of the room (I hate the Japanese tendency to run around
+ with half a ton of lenses and photo machinery)
+\layout Itemize
+
+To dance and have a good time.
+ These people are the ones which will be your judge.
+\layout Standard
+
+People can also be there because they came along with other people.
+ These people aren't expecting anything.
+ So don't expect anything from them.
+ And the most obvious reason: They are there because they are organising
+ the party.
+ So, a party is not that difficult at all.
+ Nevertheless some DJ's have quite a strange picture of what's going on
+ at parties.
+\layout Subsection
+
+Some Recurring Misconceptions
+\layout Standard
+
+A number of DJ's have the tendency to act as if they are god.
+ This is wrong, they are not.
+ A number of these wrong attitudes are stated below.
+\begin_float footnote 
+\layout Standard
+
+
+\size footnotesize 
+God is not a DJ, and a DJ is not God.
+\end_float 
+\layout Itemize
+
+Playing music is not only using your intuition.
+ The times you have an 
+\emph on 
+aha
+\emph default 
+-
+\emph on 
+erlebnis
+\emph default 
+ and you know what to play will be very small.
+ If you play 300 songs overnight, 90% will be based on ratio.
+ Only 10% on 'feeling'.
+ Especially because sometimes you will be nervous and will need to fall
+ back to your technical skills.
+\layout Itemize
+
+Do not expect everybody likes what you are playing.
+ Often DJ's are very strong about the music they like and the music they
+ don't like.
+ Don't be like that.
+ It is not because you are 
+\emph on 
+playing
+\emph default 
+ music, that other music is bad, also don't insult somebody if he doesn't
+ like what you like.
+ You are not the centre from which music comes.
+ (technically this is true, but it doesn't go any further than that).
+ There will be songs which you like, which nobody else will ever like, try
+ to detect these and cut the crap, how painfully it might be to play a night
+ without your favourite songs.
+\layout Itemize
+
+Learn different styles, except for the styles you absolutely dislike (Eg:
+ Rap music in my case).
+ New influences are absolutely welcome for a DJ.
+\layout Itemize
+
+For most DJ's the following holds true: you are playing for the audience,
+ the audience isn't there for you.
+ So, look at how people react to your music.
+ You are playing music either for money, for personal reward or because
+ nobody else wants to do it.
+ In any case the result: 'the audience stays and is happy' is the most important.
+\layout Subsection
+
+The Correct State of Mind 
+\layout Standard
+
+On top of these strange attitudes, we have DJ's who wants to use certain
+ drugs to play.
+ They probably think it is cool to be high (or down, or slow or fast).
+ Below are a number of drugs with a reason why you should or shouldn't use
+ them.
+\layout Itemize
+
+
+\series bold 
+Alcohol
+\series default 
+: don't use it, you won't see when people don't like the music.
+\layout Itemize
+
+
+\series bold 
+Marihuana, Weed
+\series default 
+: don't use it: you will loose your focus.
+\layout Itemize
+
+
+\series bold 
+Cocaine, Speed, Heroine
+\series default 
+: don't use it unless your playing in a hardcore club at +160 BPM.
+ It's too fast and too driven.
+\layout Itemize
+
+
+\series bold 
+Psilocybin
+\series default 
+: don't use it: you will have a good focus, but often you will be distracted
+ by other things than playing, and when you get bored, you will feel very
+ bored.
+\layout Itemize
+
+
+\series bold 
+Nitrous
+\series default 
+: don't think about it.
+ A DJ with spasms on the mixing desk is maybe funny, but maybe he ends up
+ in the clinic :)
+\layout Itemize
+
+
+\series bold 
+GHB
+\series default 
+: if you're not going into coma this might help, but I wouldn't risk it.
+ 
+\layout Itemize
+
+
+\series bold 
+Coca Cola
+\series default 
+: will give you a sugar rush.
+ The tendency with this product is to feel very nervous after drinking cola
+ for 4/5 hours.
+\layout Itemize
+
+
+\series bold 
+Coffee
+\series default 
+: helps for some hours.
+ Don't drink too much coffee you will be unbelievable nervous.
+\layout Itemize
+
+
+\series bold 
+Nicotine
+\series default 
+: despite the fact that I stopped smoking (23 may 2000), I know from experience
+ that smoking helps for calming down when DJ'ing.
+ It helps you to relax and look at a distant to what's happening.
+ Nevertheless, I won't advice to start smoking when you start DJ'ing.
+\layout Itemize
+
+
+\series bold 
+Vitamin C
+\series default 
+: is maybe not a drug but it is a marvellous product because it keeps time
+ synchronised.
+ Time goes forward quick and smooth.
+\layout Standard
+
+I can easily wrap my advice up as follows: stay sober.
+ The essence of whatever you are doing is to 
+\series bold 
+feel good
+\series default 
+.
+ If you don't you will not have enough focus to do what you are payed for.
+ But, let's now skip this 'how-fucked-up-is-the-DJ-exactly' crap.
+ Let's continue with the real work: 
+\layout Section
+
+Indexing Your Music
+\layout Standard
+
+Whether you have CD's, vinyl or mp3's, have an index at hand, sorted by
+ style, annotate with the BPM and marked with the 'soundcolor'.
+ This list should contain cross references between styles: 'switch to this
+ style using this song'.
+ On top of this style list, also have a full index by name available every
+ time you play.
+\layout Standard
+
+Creating such a list takes time, a lot of time.
+ You can easily spend weeks to create it, but when you have such a list
+ it is your treasure.
+ This will be half the money you make with DJ'ing.
+ So never give this away.
+\layout Standard
+
+A mistake often made is only to exploit the index and not to explore anymore.
+ This is wrong because you might encounter better mixes.
+ It's also wrong because you're definitely not looking at the audience,
+ and above all it's wrong because DJ'ing isn't fun anymore this way.
+\layout Section
+
+Basic Mixing Techniques
+\layout Standard
+
+Now, let's start with the basics.
+ The mixing table.
+ A normal mixing table has a number of mono and stereo channels.
+ We are only interested in stereo channels.
+ Every channel has
+\layout Itemize
+
+A 
+\series bold 
+gain.
+ 
+\series default 
+This can be found on all mixing devices.
+ This changes the pre-amplification of the signal before it goes to the
+ volume fader.
+ The gain should be set as high as possible without clipping or distorting
+ the music.
+\layout Itemize
+
+An 
+\series bold 
+equaliser.
+ 
+\series default 
+Depending on the mixing table it is a parametric or non-parametric equaliser.
+ A non parametric equaliser is a filter which weakens or strengthens a signal
+ in a certain frequency range.
+ E.g, if a mixing table has three knobs, one with 11kHz, one with 3kHz and
+ one with 100Hz it is a non-parametric equaliser.
+ On the other hand if we have a mixing table with 4 knobs, 11kHz, 100Hz
+ and a knob which let you choose the frequency and another knob which let
+ you choose the strength of that frequency then it is a parametric equaliser.
+ When changing the equalising, the gain has to be changed too.
+ Eg, when cutting down the bass, the gain can be raised.
+
+\emph on 
+\lang english
+ 
+\newline 
+
+\newline 
+A word of warning: the human ear becomes accustomed to a certain frequency
+ spectrum.
+ So, avoid the trap of equalising everything too sharp.
+ If you see (you won't 
+\series bold 
+hear
+\series default 
+ it) that your equalising is completely out of balance fix it slowly.
+ In fact not that many (modern) songs need equalising anymore.
+\layout Itemize
+
+A 
+\series bold 
+volume
+\series default 
+ slider, which allows you to change the volume which goes to the main mix.
+ Most mixing tables can go to +15 dB, but there is no use in that.
+ Avoid the trap of raising the volume relatively to each other until the
+ two songs are playing at +15 dB and you can't get higher.
+ Volume 0 should be the maximum volume you apply.
+\layout Itemize
+
+A 
+\series bold 
+PFL 
+\series default 
+button.
+ PFL stands for pre-fader-listening.
+ If you push this button, regardless of the volume fader you will get the
+ complete signal in your headphone/monitors.
+\layout Itemize
+
+A 
+\series bold 
+monitor
+\series default 
+ is a set of boxes next to you which gives you what you hear in your headphones.
+\layout Itemize
+
+A 
+\series bold 
+balance
+\series default 
+.
+ Which lets you choose whether you hear the left or the right channel for
+ stereo channels.
+ For mono channels the balance is replaced by a pan, which lets you direct
+ the signal to the left or to the right.
+ For mixing purposes a balance is not necessary.
+ Just don't forget to place it in the centre :)
+\layout Itemize
+
+Eventually 
+\series bold 
+aux sends
+\series default 
+.
+ These are buttons to change the volume of the channels going to an effect
+ unit.
+ These can be pre-fader or post-fader and are often no use for a DJ without
+ an effect unit.
+\layout Itemize
+
+A 
+\series bold 
+mute
+\series default 
+ button, which mutes the sound completely: nothing is send out over the
+ aux sends, nothing is send to the main mix and sometimes nothing is send
+ to the prelistener.
+ The latter depends on the kind of mixing table.
+\layout Standard
+
+Aside from all these things for every channel we have 
+\layout Itemize
+
+A 
+\series bold 
+volume
+\series default 
+ 
+\series bold 
+indicator
+\series default 
+ which shows you the prelistening signal, or if there is nothing to prelisten
+ the main-signal.
+ 
+\layout Itemize
+
+A 
+\series bold 
+main
+\series default 
+ 
+\series bold 
+volume
+\series default 
+, which changes the volume in the room.
+ This typically builds up as the room gets filled.
+ But shouldn't be touched normally.
+ If you want to change the volume, change the channel-volume, or gain if
+ it was set too low.
+\layout Itemize
+
+A 
+\series bold 
+phones
+\series default 
+ 
+\series bold 
+volume
+\series default 
+, which changes the volume send to your headphone.
+\layout Itemize
+
+A 
+\series bold 
+monitor
+\series default 
+ 
+\series bold 
+volume, 
+\series default 
+which changes the volume of the speakers next to you.
+\layout Itemize
+
+A 
+\series bold 
+cross fader
+\series default 
+ between two channels.
+\layout Standard
+
+So, when we want to throw in a new song (song B),
+\layout Enumerate
+
+We place the volume slider of 
+\emph on 
+channel B to zero
+\layout Enumerate
+
+We set the gain of 
+\emph on 
+channel B to zero
+\layout Enumerate
+
+We push the 
+\emph on 
+PFL
+\emph default 
+ button of
+\emph on 
+ channel B
+\emph default 
+.
+ Be sure that the PFL of channel A is off.
+\layout Enumerate
+
+We change the 
+\emph on 
+gain
+\emph default 
+ until we have 
+\emph on 
+maximum signal
+\emph default 
+ without clipping.
+ Do not touch the volume slider.
+ If you do this the audience will hear what you are planning to play.
+\layout Enumerate
+
+Now change the 
+\emph on 
+equalising
+\emph default 
+ if necessary.
+ For most songs not much equalising is needed, unless you are playing very
+ old songs of course.
+ Don't equalise everything too sharp.
+ It is quite easy to hear nothing at all if you don't boost the high frequencies.
+ Don't do this.
+ Change the volume of the headphones or increase the gain if possible.
+\layout Enumerate
+
+
+\series bold 
+After equalising, 
+\emph on 
+maximise the gain again
+\emph default 
+.
+ If you cut the frequencies, the gain is not maximum anymore.
+ 
+\layout Enumerate
+
+Now the real work can begin, look for a good position to kick the song in,
+ match the beats if necessary.
+ (which can take some time)
+\layout Enumerate
+
+While sliding down channel A, slide up channel B.
+\layout Standard
+
+Technically this is not difficult at all.
+\layout Section
+
+Playing Different Kinds of Popular Music
+\layout Standard
+
+When playing different kinds of popular music, the most important is to
+ know what is popular with the audience.
+ On top of this there are a number of rules.
+ 
+\layout Itemize
+
+Play every song between 2.0 - 2.5 minutes.
+ If you play songs longer people will find it boring.
+ If you play songs too short people will become irritated.
+ Of course, a mistake in the 'short' direction is not 
+\emph on 
+that
+\emph default 
+ bad.
+\layout Itemize
+
+Minimum 4 songs of the same style in a row.
+\layout Itemize
+
+Work your tempo 
+\series bold 
+down
+\series default 
+ until you reach a suitable tempo for a slow.
+\layout Itemize
+
+Always play 
+\emph on 
+two
+\emph default 
+ slows.
+ After the first not everybody has the girl he wants.
+ After a slow, kick in a beat again.
+ No point in messing around with a 'good' build-up.
+ Some (lonely) people are 
+\emph on 
+waiting
+\emph default 
+ to dance, and the people slowing will leave the floor anyway when you switch
+ to a non-slow.
+\layout Itemize
+
+In the beginning of the night choose your end style of music.
+ After 3:00, 4:00 o'clock people go home when you switch style, so stay
+ to the same style after that.
+\layout Standard
+
+Switching from song A to B
+\layout Itemize
+
+Can be done when A has the same connotation as B.
+ Eg.
+ Red Zebra after the Sisters of Mercy is quite possible in Belgium for people
+ who likes Gothic.
+\layout Itemize
+
+Can be done when A has the same 'colour' as B.
+\layout Itemize
+
+Can be done when A has the same 'tempo and style' as B.
+\layout Itemize
+
+Is done with a cross fading over 5 to 10 seconds.
+ Don't try to mix the beats when you don't have the skills.
+ Nothing is more irresponsible and insane than a DJ in an ether binge.
+ Euhm....
+ I mean...
+ Nothing is more irritating than two non matching songs over each other
+ with the bass drums interleaved and a DJ trying to fix that live.
+ If you ever happen to be in such a situation (which will occur) just cut
+ one of both songs.
+ The audience will be 
+\emph on 
+happy
+\emph default 
+ if you do that.
+ When you cut one of both songs you will be disappointed, just remember
+ that it was too late for a subtle mix anyhow.
+\layout Standard
+
+At every time have a list of the three/four/five next songs you will play,
+ this should ensure continuity.
+ If people ask something, don't switch immediately, put them at the end
+ of your list, and eventually adapt your list.
+ Trusts people's opinion 
+\emph on 
+only
+\emph default 
+ when they are happy.
+ Otherwise neglect them.
+\layout Standard
+
+Don't play killer music.
+ Killer music is music where you loose a lot of people.
+ For example.
+ If you have 32 diagonal spread, seriously drunk people with 16 man and
+ 16 woman, at 6:00 'o clock in the morning do 
+\emph on 
+not
+\emph default 
+ play a slow.
+ They 
+\emph on 
+will
+\emph default 
+ go home afterwards.
+ (Okay maybe that was the intention :).
+ Another example is a blues-party
+\begin_float footnote 
+\layout Standard
+
+
+\size footnotesize 
+Hmm...
+ no point in partying if your girlfriend has left, you are broke, your car
+ has been stolen and you are inconstipated...
+ Still wondering how fucked up people are when they go to blues-'parties'.
+\end_float 
+; if you play at 3 o'clock a techno-song (even if it is a good one), they
+ will throw beer at you and drag you away.
+ Knowing what an audience 
+\emph on 
+likes
+\emph default 
+ is as important as knowing what the audience absolutely 
+\emph on 
+dislikes
+\emph default 
+.
+ You don't want to play a killer song, not even by accident.
+\layout Section
+
+Playing One Style Whole Night
+\layout Standard
+
+Essentially, it is much easier to play the same style (Techno, House, Acid,
+ and so on) whole night than playing different styles.
+ Of course, you have to know the style before you even think of playing.
+ E.g: don't play Salsa if you don't know shit about it.
+\layout Itemize
+
+Build your music tempo 
+\series bold 
+up
+\series default 
+, instead of playing it down.
+ Tempo breaks are long ambient passages, not slower songs.
+\layout Itemize
+
+Breaks can be found in 
+\begin_deeper 
+\layout Itemize
+
+lyrics, where a nice lady tells us she is horny (or something like that)
+\layout Itemize
+
+or ambient passages without a bass drum 
+\layout Itemize
+
+or snare-rolls which builds up
+\end_deeper 
+\layout Itemize
+
+If you are playing techno whole night you might want to surprise your audience
+ by 
+\emph on 
+slowly
+\emph default 
+ removing the bass drum and afterwards kicking it in again.
+ Removing the bass drum and kicking it in is better than boosting the bass
+ drum because most installations cut the mid and high frequencies when you
+ boost the bass too much.
+ Cutting the bass should be done slowly.
+ 
+\layout Itemize
+
+If you are playing techno, you can build your own buildup if you have a
+ parametric equaliser.
+ Set the frequency low, cut everything out at the right moment and start
+ changing the frequency.
+ Be sure to kick in the complete sound at the right moment.
+ (This can be tricky :) Before you do this practice on the installation
+ in the beginning of the evening.
+\layout Section
+
+
+\begin_inset LatexCommand \label{BeatMixing}
+
+\end_inset 
+
+Beat Mixing
+\layout Standard
+
+Now, something more difficult: Beat Mixing.
+ 
+\layout Standard
+
+Beat mixing is mixing two beats exactly over each other during a certain
+ period.
+ The difficulty with this is that different songs have different tempos.
+ In the upcoming discussion we refer to song B as the one which will be
+ mixed over song A.
+ Synchronising B with A is the first problem, keeping them synchronised
+ is the second.
+ This discussion is aimed at mp3-players.
+\layout Subsection
+
+Hitting the 
+\emph on 
+start
+\emph default 
+ button
+\layout Standard
+
+Most beginners think that the real problem of playing with mp3's lies in
+ the start of the beat
+\begin_float footnote 
+\layout Standard
+
+
+\size footnotesize 
+This can be especially frustrating if you are used to work with turn tables.
+ With turn tables it is easy to get two beats started on top of each other.
+ You listen to song B and at the moment of a beat you stop the song.
+ Now you listen to A and let B go at a beat.
+\end_float 
+.
+ They think that if two beats didn't match, they started at the wrong position.
+ This conclusion is correct because most players have a 
+\emph on 
+huge
+\emph default 
+ latency between 'hitting the button' and either 'stopping' or 'starting'.
+ Nevertheless fixing this start problem won't solve anything.
+ If you have a player which responds immediately you still will encounter
+ the problem of
+\layout Itemize
+
+human latency which is between 0 msec and 200 msec
+\layout Itemize
+
+tempo problems; two songs need the same tempo to stay in touch.
+ A rough tempo (expressed in BPM) is far from good to keep them synchronised
+ even during 1 measure.
+\layout Standard
+
+If your only concern is to get two beats in synchronised with each other
+ if the two songs have the same tempo (measured accurately enough) you can
+ count on your good luck.
+ Most of the time after 4 to 8 tries you can position an mp3 at the right
+ place.
+ Of course if you want the beats at the beginning of every measure to match
+ you need to push your luck and try 16 to 64 times to have it right.
+ So, maybe we need a way to slide a song a bit.
+\layout Subsection
+
+Hitting the 
+\emph on 
+nudge
+\emph default 
+ button
+\layout Standard
+
+Nudging is sliding a song a bit forward or backward.
+ A nudge typically consists of shifting the song 5 to 10 msec.
+ This is around 1/64 note.
+ So instead of starting the song at the right position we simply throw it
+ in and start nudging until two beats overlap each other.
+ After that, we still need to continue nudging to keep the tempos in sync.
+\layout Standard
+
+This gives rise to two problems: the DJ can nudge 
+\emph on 
+forward
+\emph default 
+ or 
+\emph on 
+backward
+\emph default 
+.
+ If song B is going a little bit too slow he can nudge it forward.
+ If the song is going a little bit too fast he can nudge it backward.
+ The tricky question is which beat is going too fast.
+ Whether song B is going too fast or too slow, the bass drum will sound
+ the same.
+ 
+\layout Standard
+
+A pragmatic way to solve this, is by nudging forward until the two beats
+ overlap, now wait until the two beats sound double.
+ Nudge forward.
+ If it becomes better, you should keep on nudging forward since the second
+ song is going a bit too slow.
+ If it becomes worse you should nudge 2 times backward and conclude that
+ the second song is going a bit too fast.
+ To be workable a DJ should maximally nudge every 4 beats, otherwise he
+ has simply a wrong tempo and should change the tempo of one of both.
+\layout Subsection
+
+Cross fading
+\layout Standard
+
+When you finally have the two beats exactly over each other in your headphones
+ you want to switch slowly to song B.
+ Before you do this be sure to cut off the bass drum with the equaliser.
+ Otherwise you get a very nasty (and ugly) flanging effect on the bass drums.
+ If the volume is good, switch off song A's bass drum while you turn on
+ songs B's bass drum.
+ This way it will go unnoticed.
+ If you need to nudge to keep the tempo up during fading, watch the hi hats,
+ not the bass drum, you won't hear it.
+\layout Subsection
+
+The beginning 
+\layout Standard
+
+When you finally have mastered a technique to keep both songs in sync, another
+ problem will arise: even two songs of the same color and rhythm will sound
+ often wrong.
+ The reason for this is that two beats can be perfect matched but the beginning
+ of measures are not matched.
+ In that case it will sound wrong.
+ Therefore we need a 'start'-button which does work, and not something which
+ takes 0.7 s before responding.
+ Or we need a way to shift measures forth and back.
+ Both problems will be addressed in the section 
+\begin_inset LatexCommand \ref{Usage}
+
+\end_inset 
+
+.
+\layout Section
+
+
+\begin_inset LatexCommand \label{BPMS}
+
+\end_inset 
+
+Measuring Beats/Minute: BPM Counting
+\layout Standard
+
+Beats per minute are defined as the number of beats (bass drums) encountered
+ per minute.
+ There are a lot of BPM measure programs at hand, (either automatic or semi-auto
+matic).
+ In any case, they're not good.
+ 
+\layout Standard
+
+Trying to match two songs with the same BPM, as reported by these programs,
+ is impossible.
+ The reason therefore is that BPM's can be an unbelievable inaccurate way
+ of measuring the tempo of music.
+ 
+\layout Subsection
+
+How accurate should we measure the BPM's ?
+\layout Standard
+
+
+\latex latex 
+
+\backslash 
+def
+\backslash 
+beat {
+\backslash 
+hbox{
+\backslash 
+ beat
+\backslash 
+ }}
+\layout Standard
+
+
+\latex latex 
+
+\backslash 
+def
+\backslash 
+min {
+\backslash 
+hbox{
+\backslash 
+ min
+\backslash 
+ }}
+\layout Standard
+
+
+\latex latex 
+
+\backslash 
+def
+\backslash 
+sec {
+\backslash 
+hbox{
+\backslash 
+ sec
+\backslash 
+ }}
+\layout Standard
+
+
+\latex latex 
+
+\backslash 
+def
+\backslash 
+msec {
+\backslash 
+hbox{
+\backslash 
+ msec
+\backslash 
+ }}
+\layout Standard
+
+This of course depends on how long you want to play two songs over each
+ other.
+ Let's say that we need 20 seconds to switch and 10 seconds for 'matching'
+ the beats.
+ So, over 30 seconds we don't want any audible tempo-shifts.
+ 
+\layout Standard
+
+In the upcoming discussion: time 0, measure 0, is always the moment at which
+ you finally got two beats on top of each other.
+ If we have a small error 
+\latex latex 
+$
+\backslash 
+epsilon$
+\latex default 
+ in the BPM measurement in both songs we have with every measure a possible
+ difference of 
+\latex latex 
+$2
+\backslash 
+epsilon$
+\latex default 
+.
+ This error becomes larger with every beat, so after 
+\latex latex 
+$n$
+\latex default 
+ beats we have a total error of 
+\latex latex 
+$2n
+\backslash 
+epsilon$
+\latex default 
+.
+ 
+\layout Standard
+
+Assume, we have a song of 
+\latex latex 
+$x$
+\latex default 
+ BPM's.
+ People recognise 
+\latex latex 
+$1/64$
+\latex default 
+ notes.
+ So the maximum tempo shift can only be 
+\latex latex 
+$1/16$
+\latex default 
+ beat (at 
+\latex latex 
+$x$
+\latex default 
+ BPM).
+ Over 30 seconds we have 
+\latex latex 
+$x/2$
+\latex default 
+ beats, this means that we only have a mismatch of
+\layout Standard
+
+
+\latex latex 
+$$
+\backslash 
+epsilon = {
+\backslash 
+hbox{1/16 beat at x BPM} 
+\backslash 
+over x/2} $$
+\layout Standard
+
+Expressed in milliseconds this is 
+\layout Standard
+
+
+\latex latex 
+$$ {{x 
+\backslash 
+beat}
+\backslash 
+over {1 
+\backslash 
+min}} = {{x 
+\backslash 
+beat}
+\backslash 
+over {60
+\backslash 
+sec}} = {{x
+\backslash 
+beat}
+\backslash 
+over {60000
+\backslash 
+msec}} ~ {{60000
+\backslash 
+msec} 
+\backslash 
+over {x 
+\backslash 
+beat}} $$
+\backslash 
+vskip 6pt
+\layout Standard
+
+The period for one beat is
+\layout Standard
+
+
+\latex latex 
+$$p={60000 
+\backslash 
+msec
+\backslash 
+over x}$$
+\backslash 
+vskip6pt
+\layout Standard
+
+So, 1 beat takes 
+\latex latex 
+$60000 
+\backslash 
+msec / x$
+\latex default 
+ time; 1/16 beat takes 
+\latex latex 
+$3750/x 
+\backslash 
+msec$
+\latex default 
+.
+ Hence, 
+\layout Standard
+
+
+\latex latex 
+$$
+\backslash 
+epsilon = {7500 
+\backslash 
+msec 
+\backslash 
+over x*x} $$
+\backslash 
+vskip 6pt
+\layout Standard
+\align center 
+120\SpecialChar ~
+BPM 7500 / 14400 = 
+\series bold 
+0.52
+\series default 
+ msec
+\layout Standard
+\align center 
+130\SpecialChar ~
+BPM 7500 / 16900 = 
+\series bold 
+0.44
+\series default 
+ msec
+\layout Standard
+\align center 
+140\SpecialChar ~
+BPM 7500 / 19600 = 
+\series bold 
+0.38
+\series default 
+ msec
+\layout Standard
+\align center 
+150\SpecialChar ~
+BPM 7500 / 22500 = 
+\series bold 
+0.33
+\series default 
+ msec
+\layout Standard
+\align center 
+160\SpecialChar ~
+BPM 7500 / 25600 = 
+\series bold 
+0.29
+\series default 
+ msec
+\latex latex 
+
+\backslash 
+vskip 6pt
+\layout Standard
+
+These values are very small.
+ If we want these errors we need to measure the 
+\emph on 
+BPM with an accuracy of 0.0625
+\emph default 
+ BPM.
+ This is very small.
+ Translated to some more understandable language:
+\begin_float footnote 
+\layout Standard
+
+
+\size footnotesize 
+Measure BPM's to 0.1 accuracy, or if you can to 0.05 accurate
+\end_float 
+\layout Itemize
+
+If you measure raw BPM's to 
+\series bold 
+1
+\series default 
+ BPM accurate, two songs will stay synchronised during 
+\series bold 
+1.875
+\begin_inset Quotes erd
+\end_inset 
+
+
+\series default 
+, practically this is useless, since this is barely a measure.
+\layout Itemize
+
+If you measure BPM's to 
+\series bold 
+0.1
+\series default 
+ accurate, two songs will stay synchronised during 
+\series bold 
+18.75
+\begin_inset Quotes erd
+\end_inset 
+
+
+\series default 
+, still requires some nudging.
+\layout Itemize
+
+If you measure BPM's to 
+\series bold 
+0.05
+\series default 
+ accurate, two songs will stay synchronised during 
+\series bold 
+37.5
+\begin_inset Quotes erd
+\end_inset 
+
+
+\series default 
+, normally you don't have to nudge with this since song A is removed before
+ song B is going out of sync.
+\layout Itemize
+
+If you measure BPM's to 
+\series bold 
+0.01
+\series default 
+ accurate, two songs will stay synchronised during 
+\series bold 
+3', 7.5
+\begin_inset Quotes erd
+\end_inset 
+
+
+\series default 
+, an accuracy where you don't have to nudge anymore :)
+\layout Standard
+
+Of course, now we can conclude that measuring BPM's up to this tempo solves
+ all our problems.
+ This is not true, when measuring BPM's to 0.05 or even 0.01 accurate, we
+ will encounter some technical problems.
+\layout Itemize
+
+Some music has a changing rhythm.
+\layout Itemize
+
+Not all music is accurate to 0.05 BPM, even if it is the intention.
+\layout Standard
+
+We will now go into details of measuring beats per minute.
+ The first technique is 'tapping the beat'
+\layout Subsection
+
+Tapping the Beat
+\layout Standard
+
+This technique is a semi-automatic technique where a listener hits the space-bar
+ every time a beat sounds.
+ The program marks the start time, the stop time and counts the number of
+ total beats.
+ 
+\layout Standard
+
+Most synthesisers have a 'tap' button, where you can tap 
+\emph on 
+three
+\emph default 
+ times and the synthesiser will synchronise to this tempo.
+ This form of measurement is unbelievable inaccurate.
+ I really wonder why they add stupid useless features like this.
+ Let's assume that the human latency is small to 200 msec.
+ The first beat is marked on time 
+\latex latex 
+$T_0$
+\latex default 
+.
+ The moment at which the user hits 'tap' is 
+\latex latex 
+$T_0
+\backslash 
+pm
+\backslash 
+epsilon$
+\latex default 
+, where 
+\latex latex 
+$0 < 
+\backslash 
+epsilon < 200 
+\backslash 
+msec$
+\latex default 
+.
+ The second third second and third tap will be more accurate since it is
+ a sequence.
+ Lets say we have an error of 50 msec at the last tap.
+ The third beat is placed at time 
+\latex latex 
+$T_1
+\backslash 
+pm
+\backslash 
+gamma$
+\latex default 
+, where 
+\latex latex 
+$0<
+\backslash 
+gamma<50
+\backslash 
+msec$
+\latex default 
+.
+ The largest error which can occur is thus 
+\latex latex 
+$250
+\backslash 
+msec$
+\latex default 
+ for two beats.
+ For one beat this is
+\latex latex 
+ $125
+\backslash 
+msec$
+\latex default 
+.
+ Now assume, we're matching a 138BPM song.
+ The period of a beat = 434.8 msec.
+ The period we will measure lies between 
+\latex latex 
+$309.8$
+\latex default 
+ and 
+\latex latex 
+$559.8$
+\latex default 
+.
+ Translated to BPM's this is between 193.7 BPM and 107.2BPM.
+ 
+\emph on 
+We have an estimated accuracy of 86.5 BPM.
+ Bwaargh..
+
+\emph default 
+ In practice it's a bit better, lets say, an accuracy of 10 BPM.
+\layout Standard
+
+So, lets forget these 3-tap buttons because they simply do not work.
+ Let's look at another branch of programs.
+ Programs in which you hit beat after beat.
+ With every beat the accuracy becomes better.
+ Let's do an estimation as above.
+ The total error is reduced by half to 
+\latex latex 
+$125
+\backslash 
+msec$
+\latex default 
+.
+ (so, the user has a latency of only 100 msec, which is less).
+ Let's say we are working at 
+\latex latex 
+$x$
+\latex default 
+ BPM.
+ The period of a beat at this tempo is
+\layout Standard
+
+
+\latex latex 
+$$p={60000 
+\backslash 
+msec 
+\backslash 
+over x}$$
+\backslash 
+vskip6pt
+\layout Standard
+
+If we have tapped n times, we have a total time of 
+\latex latex 
+$n.p$
+\latex default 
+.
+ If we add the error we get 
+\latex latex 
+$n.p
+\backslash 
+pm125
+\backslash 
+msec$
+\latex default 
+.
+ Per beat this error is 
+\latex latex 
+$125/n$
+\latex default 
+ Switching back to BPM's gives
+\layout Standard
+
+
+\latex latex 
+$$x={60000 
+\backslash 
+msec 
+\backslash 
+over {p
+\backslash 
+pm{125
+\backslash 
+over n}
+\backslash 
+msec}}$$
+\backslash 
+vskip6pt
+\layout Standard
+
+Table 
+\begin_inset LatexCommand \ref{TapAccuracy}
+
+\end_inset 
+
+ shows how accurate we can get with such a tool.
+ The results are not even close to the required results.
+ An extra disadvantage of this method are jumps in the stream.
+ If there is a gap in the dataflow (scratch on the CD or break in the music)
+ the measurement will be even more inaccurate.
+ 
+\begin_float tab 
+\layout Standard
+\align center 
+
+\begin_inset  Tabular
+<lyxtabular version="2" rows="11" columns="5">
+<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+x BPM
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+n-1 taps
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+min
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+max
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+accuracy
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+120
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+10
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+117
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+123
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+6
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+120
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+50
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+119
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+121
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+1.2
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+120
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+100
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+119.7
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+120.3
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+0.6
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+130
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+100
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+129.6
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+130.4
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+0.7
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+140
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+100
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+139.6
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+140.4
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+0.82
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+150
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+100
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+149.5
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+150.5
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+0.94
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+160
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+100
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+159.5
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+160.5
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+1.06
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+150
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+150
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+149.7
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+150.3
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+0.63
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+150
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+200
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+149.8
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+150.2
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+0.47
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+150
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+250
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+149.8
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+150.2
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+0.38
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Caption
+
+
+\begin_inset LatexCommand \label{TapAccuracy}
+
+\end_inset 
+
+accuracy of the BPM measurement with n-1 taps at x BPM.
+\end_float 
+\layout Subsection
+
+Marking the Beat
+\layout Standard
+
+A possibility to measure BPM's more accurately is pointing out a start &
+ stop beat in a sample.
+ In these kind of programs the sample-data is shown on the screen.
+ The user can scroll trough the song and place start & stop markers at the
+ beginning of phrases (8 measures).
+ After this is done the program shows other markers at 8-measure (and eventually
+ 4) positions.
+ If these are correct the BPM's can be calculated.
+ 
+\layout Standard
+
+This method is very 
+\emph on 
+accurate, 
+\emph default 
+if
+\emph on 
+ 
+\emph default 
+the
+\emph on 
+ 
+\emph default 
+user has some accuracy of course.
+ The disadvantage of this method are the difficulties with gaps in the music.
+\layout Subsection
+
+Filtering the Beat
+\layout Standard
+
+Automatic BPM Counting programs are programs which do a fast Fourier transform
+ (FFT) upon the input signal and try to develop a peak response to the lower
+ frequencies (eventually with a trained neural net).
+ The problem with these automatic programs is that the are 
+\emph on 
+never
+\emph default 
+ free and don't work too well.
+\begin_float footnote 
+\layout Standard
+
+
+\size footnotesize 
+The first person offering me a GPL-ed and good working BPM finder which
+ uses only an FFT with peak detector will be mentioned.
+\end_float 
+ A major disadvantage of these programs is their complete lack of feeling
+ for bass drums.
+ If a fill in occurs these programs often fail.
+ If there is a break in which their is no bass drum, they fail, and so on..
+ Most of the time they are not even remotely correct.
+ 
+\layout Standard
+
+An extra problem with them is their lack of accuracy.
+ If they use a 256 sample buffer they place a beat somewhere in a time slice
+ of 5.8 msec.
+ Which is at least 10 times larger than the accuracy we need.
+\layout Standard
+
+My opinion (which a lot of people wont like) about these programs is that
+ they are inaccurate, and have a very low result to no-result ratio.
+\layout Subsection
+
+Phase Shifting the Beat
+\layout Standard
+
+A much much better technique I invented is based upon phase shifting the
+ music.
+ With this technique we take the complete sample and shift it 4 beats over
+ itself at 120BPM.
+ Afterwards we shift it over 4 beats at 120.01BPM, and so on until we reach
+ 160BPM.
+ With every shift we measure the difference between the shift and the original.
+ The absolute differences over the whole sample are added and stored.
+ At the end of the process we have a list of BPM's and how well they match,
+ as can be seen in 
+\begin_inset LatexCommand \ref{PeriodMismatch}
+
+\end_inset 
+
+.
+\layout Standard
+
+\begin_float fig 
+\layout Standard
+\align center 
+
+\begin_inset Figure size 340 283
+file periodgraph.ps
+width 1 12
+height 1 10
+angle 270
+flags 9
+
+\end_inset 
+
+
+\layout Caption
+
+
+\begin_inset LatexCommand \label{PeriodMismatch}
+
+\end_inset 
+
+Normalised mismatch at a certain period expressed in BPM.
+\end_float 
+\layout Standard
+
+Some technicities for people who want to implement this:
+\layout Itemize
+
+reduce two channels to 1 channel
+\layout Itemize
+
+reduce 16 bits to 8 bits
+\layout Itemize
+
+remove the sign of the resulting byte
+\layout Standard
+
+The advantages of this technique are 
+\layout Itemize
+
+Correct in 95% of the songs.
+\layout Itemize
+
+Works fully automatically, absolutely no human interaction required.
+\layout Itemize
+
+Works even in passages where there is no bass drum
+\layout Itemize
+
+An accuracy of 0.02 msec which is 10 times more accurate than required.
+\layout Itemize
+
+Can handle gaps and jumps in the music very well !!!
+\layout Itemize
+
+Tempo changes at the beginning or the end of the music will be neglected.
+\layout Standard
+
+The disadvantage of this technique is 
+\layout Itemize
+
+The algorithm cannot say 
+\emph on 
+where
+\emph default 
+ a bass drum is placed.
+\layout Section
+
+Playing the Music
+\layout Subsection
+
+Playing Mp3's
+\layout Standard
+
+Now that we understand what BPM's are and how accurate they are, now that
+ we know what nudging is and how to use it, we will discuss how we can play
+ the music.
+ 
+\layout Standard
+
+If you want to play mp3's, be sure to have 
+\emph on 
+two
+\emph default 
+ PC's at hand.
+ One PC with two sound cards is possible but you risk operating system failure,
+ or hardware failure.
+ Use a good sound card, with a good sound quality.
+ Don't use a Macintosh.
+ The bastards at apple have added some exciter to their DSP which you cannot
+ switch off.
+ Your music will sound like Donald Duck in Wonderland.
+ So, fuck them.
+\layout Standard
+
+Have all music on both PC's (if one fails you can continue with the second
+ PC), connect them with a small hub if you want.
+ Also, have CD's at hand to continue when both PC's fail.
+\layout Standard
+
+When playing mp3's, using Winamp
+\layout Itemize
+
+There is a Winamp cross fading output if you are forced to work with one
+ PC.
+\layout Itemize
+
+have a suitable CD inserted in a CD-player at any time.
+ Windows has the nasty tendency to offer you a blue screen of death.
+ In that case immediately' switch to the CD, which should be ready.
+ 
+\layout Standard
+
+When playing mp3's, using Linux
+\layout Itemize
+
+Be sure to switch of crond if you have a slow machine.
+\layout Itemize
+
+Xmms has also a cross fading output.
+\layout Itemize
+
+A serious advice: use Linux when playing with computers !
+\layout Subsection
+
+Changing The Tempo
+\layout Standard
+
+If you want to do beat mixing you need a way to change the tempo of your
+ music.
+ Since this is done by stretching or shrinking the time the music plays,
+ the music will also change in pitch.
+ If we stretch the music the pitch will go lower, if we shrink the music
+ the pitch will rise.
+ The question now is whether the standard pitch shifting software is good
+ enough ? 
+\layout Subsection
+
+Accuracy of Pitch Shifters
+\layout Standard
+
+We need BPM's with an accuracy of 0.05 BPM.
+ At 160BPM this requires us the ability to shift the pitch with 0.0003125
+ %.
+ At 120BPM this requires us the ability to shift the pitch with 0.00041666...
+ %
+\layout Standard
+
+The best pitch shifter I encountered till now is AlsaPlayer.
+ This program can shift the pitch of music with 0.01% with is definitely
+ not good enough !
+\layout Subsection
+
+An Easy Made Error
+\layout Standard
+
+Now, even if they are not accurately enough, it is possible you want to
+ use things like AlsaPlayer (it is good software after all).
+ If that is the case, I want to warn for one thing.
+\layout Standard
+
+Suppose we have song B at tempo 140 and song A at tempo 135.
+ We want to match those two songs.
+ Therefore we calculate the pitch-shift, but instead of dividing 135 by
+ 140, we divide 140 by 135.
+ We see a number (1.03703...) larger than one, while we expected a number lesser
+ than one.
+ As such we take the difference with one (0.03703...) and subtract it from 1,
+ which gives 0.962962...
+ (Not so) Strangely, this is another result than 135 divided by 140, which
+ is 0.964285.
+\layout Section
+
+
+\begin_inset LatexCommand \label{Usage}
+
+\end_inset 
+
+Using cBpmDj
+\layout Standard
+
+Momenterally BpmDj is a DJ-tool which can 
+\layout Itemize
+
+Measure BPM's of your music
+\layout Itemize
+
+Play and stretch your music
+\layout Standard
+
+Some (known) disadvantages are
+\layout Itemize
+
+BpmDj relies on mpg123
+\layout Itemize
+
+If you really want to mix you need two PC's, if you want to mix with one
+ card, you will be frustrated
+\layout Itemize
+
+The program has only a command line interface.
+ Of course this is an advantage since I only have to drag one monitor around
+ :)
+\layout Standard
+
+If people want to help developing this program they are absolutely welcome
+ !! Please contact me at my email address (werner.van.belle@vub.ac.be)
+\layout Subsection
+
+Setting Up The Directory Structure
+\layout Enumerate
+
+Extract cBpmDj.tgz in your home directory ~ with tar -xvzf cBpmDj.tgz.
+ It will create a directory cBpmDj
+\layout Enumerate
+
+Copy all your music to ~/cBpmDj/Music.
+ Do not use subdirectories.
+ Place all mp3's in one place.
+ Another possibility is to remove the music directory and create a symbolic
+ link to the place where your mp3's are stored.
+\layout Enumerate
+
+The directory ~/cBpmDj/Index contains all the index files.
+ For every song in the music directory there should be an .idx file in the
+ index directory.
+ These .idx files can be created with cbpm-count.
+\layout Subsection
+
+Unpacking, Installing, Compiling, ...
+\layout Subsubsection
+
+Compiling from source
+\layout Standard
+
+If you want to compile the software you will need 
+\layout Itemize
+
+libopts9
+\layout Itemize
+
+autogen
+\layout Itemize
+
+the linux soundcard headers
+\layout Standard
+
+Get the source (the .tgz file).
+ Compile the program by typing make all.
+\layout Subsection
+
+BPM Counting
+\layout Standard
+
+'cbpm-count' is a program which should be started in the directory where
+ your music and index directory are.
+ It requires one parameter: an mp3 file from the music directory.
+ It will output an .idx file in the current directory.
+ Move these .idx files to the index directory before proceeding.
+ 
+\layout Standard
+
+Example:
+\layout Standard
+
+
+\emph on 
+cbpm-count music/test.mp3
+\layout Standard
+
+will create a file test.idx
+\layout Standard
+
+
+\emph on 
+mv test.idx index
+\layout Standard
+
+If you want to see the tempo graph use 
+\emph on 
+cbpm-plot test.idx
+\begin_float footnote 
+\layout Standard
+
+You need gnuplot to make this work
+\end_float 
+\layout Subsubsection
+
+cbpm-count command line switches
+\layout List
+\labelwidthstring 00.00.0000
+
+-v Verbose
+\layout List
+\labelwidthstring 00.00.0000
+
+-t To, autocorrelate the music only till 'to' % of the song.
+ Normally this value is 100
+\layout List
+\labelwidthstring 00.00.0000
+
+-f From, autocorrelate the music only from 'from' % of the song.
+ Normally this value is 0
+\layout List
+\labelwidthstring 00.00.0000
+
+-l Lowest bpm
+\layout List
+\labelwidthstring 00.00.0000
+
+-h Highest bpm.
+ The best mathcing bpm is looked for between the lowest and the highest
+ bpm.
+\layout List
+\labelwidthstring 00.00.0000
+
+<argument> 
+\layout Subsection
+
+Playing
+\layout Standard
+
+The player can be started with ./cbpm-play.
+ Normally, the program plays the songs at its normal tempo.
+ If given the -m (match tempo to) argument, the program will change the
+ tempo of the song to play to the tempo of the -m song.
+ The tempo of the song to match to is called the 
+\emph on 
+target
+\emph default 
+ tempo.
+ The tempo of the song to play is the 
+\emph on 
+normal
+\emph default 
+ tempo.
+\layout Subsubsection
+
+Command line options
+\layout List
+\labelwidthstring 00.00.0000
+
+-w Latency debugging information.
+ If the players stutters while playing, use this option and verify the actual
+ latency with the expected latency.
+ This should normally only be used to debug the program.
+\layout List
+\labelwidthstring 00.00.0000
+
+-q Be quiet.
+\layout List
+\labelwidthstring 00.00.0000
+
+-d Device selection.
+ Add a string to this to choose your DSP-device.
+ Eg.
+ -d /dev/dsp1
+\layout List
+\labelwidthstring 00.00.0000
+
+-t The targetperiod.
+ This is expressed in sample ticks for one beat.
+\layout List
+\labelwidthstring 00.00.0000
+
+-n The normal period of the song.
+ This is expressed in sample ticks for one beat.
+\layout List
+\labelwidthstring 00.00.0000
+
+-l The latency expressed in milliseconds.
+ A large latency is difficult to handle, but a very low latency (lets say
+ 1 msec) will stutter a lot.
+ The default latency is 700msec.
+\layout Standard
+
+After the command line options the name of a raw file should be supplied.
+ This header less WAV-file will be played at the target tempo.
+\layout Standard
+
+Inside the program you can always use 'h' to see all features.
+ 
+\layout Subsubsection
+
+Nudging
+\layout List
+\labelwidthstring 00.00.0000
+
++ 1/32 note forward
+\layout List
+\labelwidthstring 00.00.0000
+
+- 1/32 note backward
+\layout List
+\labelwidthstring 00.00.0000
+
+* 1/8 note forward.
+ This is useful if you have the two beats interleaving each other.
+ 
+\layout List
+\labelwidthstring 00.00.0000
+
+ENTER 1 beat forward
+\layout Subsubsection
+
+Shifting Measures
+\layout List
+\labelwidthstring 00.00.0000
+
+2 One measure forward
+\layout List
+\labelwidthstring 00.00.0000
+
+1 One measure backward
+\layout List
+\labelwidthstring 00.00.0000
+
+5 Four measures forward
+\layout List
+\labelwidthstring 00.00.0000
+
+4 Four measures backward
+\layout List
+\labelwidthstring 00.00.0000
+
+8 Eight measures forward
+\layout List
+\labelwidthstring 00.00.0000
+
+7 Eight measures backward
+\layout Subsubsection
+
+Changing Tempo
+\layout List
+\labelwidthstring 00.00.0000
+
+, Selects the target tempo of the song
+\layout List
+\labelwidthstring 00.00.0000
+
+.
+ Selects the normal tempo of the song
+\layout List
+\labelwidthstring 00.00.0000
+
+0,\SpecialChar ~
+> Goes 1/10th of the way to the normal tempo.
+ Pushing 10 times 0 is the same as using .
+\layout List
+\labelwidthstring 00.00.0000
+
+< Goes 1/10th of the way back to the target tempo.
+ Pushing 10 times < is the same as using ,
+\layout List
+\labelwidthstring 00.00.0000
+
+l shifts the pitch of the song 1/2 note up
+\layout List
+\labelwidthstring 00.00.0000
+
+k shifts the pitch of the song 1/2 note down
+\layout Subsubsection
+
+Miscellaneous Features
+\layout List
+\labelwidthstring 00.00.0000
+
+t The first time pressed: starts a timer; otherwise prints the elapsed time
+ since timer-start.
+\layout List
+\labelwidthstring 00.00.0000
+
+% Shows the name of the song and the current playing position in the song
+\layout List
+\labelwidthstring 00.00.0000
+
+{ Restarts the song at its beginning, with a normal tempo.
+\layout List
+\labelwidthstring 00.00.0000
+
+c prints copyright information
+\layout List
+\labelwidthstring 00.00.0000
+
+h,\SpecialChar ~
+? prints help information
+\layout Subsubsection
+
+Advanced Features
+\layout List
+\labelwidthstring 00.00.0000
+
+/ marks the current position - 8 measures.
+\layout List
+\labelwidthstring 00.00.0000
+
+9 Restarts to play at the marked position (even if the song is paused)
+\layout List
+\labelwidthstring 00.00.0000
+
+6 Restarts to play at the marked position - 8 measures.
+ With this two keys it is possible to mark the start of a phrase (/) and
+ start at the snare roll in front of it.
+ At the start of a phrase in the playing song we press 9 and slowly fade
+ in the new song.
+ In 8 measures the player will be at the marked position !
+\layout List
+\labelwidthstring 00.00.0000
+
+3 Restart the song at the marked position - 16 measures.
+ Use this if you need some larger snare-roll :)
+\layout List
+\labelwidthstring 00.00.0000
+
+[ Marks the start of eight measures in the new song
+\layout List
+\labelwidthstring 00.00.0000
+
+] Marks the start of eight measures in the current playing song.
+ If ] is pressed the difference with the master-mark is calculated and the
+ measures are shifted accordingly.
+\layout List
+\labelwidthstring 00.00.0000
+
+p\SpecialChar ~
+'\SpecialChar ~
+' pauses and unpauses playing of the song.
+\layout Subsubsection
+
+LFO's
+\layout List
+\labelwidthstring 00.00.0000
+
+s Slow saw up LFO
+\layout List
+\labelwidthstring 00.00.0000
+
+S Fast saw up LFO
+\layout List
+\labelwidthstring 00.00.0000
+
+r Slow saw down LFO
+\layout List
+\labelwidthstring 00.00.0000
+
+R Fast saw down LFO
+\layout List
+\labelwidthstring 00.00.0000
+
+b Break LFO (try it)
+\layout List
+\labelwidthstring 00.00.0000
+
+p Slow panning LFO (mid, right, mid, left)
+\layout List
+\labelwidthstring 00.00.0000
+
+P Fast panning LFO (mid, right, mid left)
+\layout List
+\labelwidthstring 00.00.0000
+
+d Differentiator.
+ Lowcut at 11Khz.
+\layout List
+\labelwidthstring 00.00.0000
+
+m Metronome.
+\layout Subsection
+
+Example 1: Simple Beatmixing
+\layout Standard
+
+Before we can even think of playing we need to generate the index files:
+\layout Enumerate
+
+Go to the cBpmDj-0.x directory.
+ Be sure all your music is in ./music and that a directory ./index exists.
+ If this is the case continue
+\layout Enumerate
+
+Enter 'cbpm-count music/A.mp3'
+\layout Enumerate
+
+Enter 'cbpm-count music/B.mp3'
+\layout Enumerate
+
+Move both .idx files to ./index
+\layout Standard
+
+A first song is playing, called A.mp3.
+ We now want to switch to the second song (B.mp3)
+\layout Enumerate
+
+Be sure to switch of the gain of channel B and turn the volume down of channel
+ B.
+\layout Enumerate
+
+Enter 'cbpm-play -m index/A.idx index/B.mp3' on the computer.
+ If both index files exist he will automatically start playing at the target
+ tempo (the tempo of song A)
+\layout Enumerate
+
+Listen to song B in your headphone (push PFL of channel B) and press '
+\series bold 
+[
+\series default 
+' or '
+\series bold 
+/
+\series default 
+' at the beginning of a phrase.
+\layout Enumerate
+
+Now listen to song A in your headphone (push PFL of channel A).
+ Press '
+\series bold 
+]
+\series default 
+' at the beginning of a phrase.
+ Now song B will jump back to the first mark.
+ Hence, both songs should be synchronised.
+ Of course this is not the case
+\layout Enumerate
+
+Slide song B a bit from left to right with '
+\series bold 
++
+\series default 
+', '
+\series bold 
+-
+\series default 
+'.
+ If the beats match listen a while longer to see which direction you have
+ to nudge to keep them in sync.
+ You can listen two both songs together by pushing the PFL of channel A
+ and channel B.
+\layout Enumerate
+
+Jump back or forth in song B till you are where you want to be with '
+\series bold 
+7
+\series default 
+' and '
+\series bold 
+8
+\series default 
+'.
+\layout Enumerate
+
+Switch all PFL's off.
+ Increase the volume of channel B until maximum.
+ Remove the bass drum of channel A with the low band filter.
+\layout Enumerate
+
+Slowly remove channel A (or remove channel A abruptly when appropriate)
+\layout Subsection
+
+Example 2: cue's
+\layout Standard
+
+Of course not all music should be beat mixed.
+ Sometimes a switch can be done by kicking in song B at the right moment.
+ This requires the ability to start song B where we want.
+ 
+\layout Enumerate
+
+Listen to song B, hit '
+\series bold 
+/
+\series default 
+' or '
+\series bold 
+[
+\series default 
+' at the position you want to start the song.
+\layout Enumerate
+
+Push ' ' (space bar).
+ The music will stop.
+ If you now push '
+\series bold 
+9
+\series default 
+' (or ' ') the music will immediately start at the cue.
+ If the position is wrong.
+ Push '
+\series bold 
+(
+\series default 
+' (or '
+\series bold 
+)
+\series default 
+') to shift the cue forward and backward.
+ You can shift the cue 8 lmeasures at a time by using '
+\series bold 
+{
+\series default 
+' and '
+\series bold 
+}
+\series default 
+'.
+ 
+\layout Enumerate
+
+Hit ' ' again.
+ Turn on the volume of channel B and at the right moment push '
+\series bold 
+9
+\series default 
+' again.
+ 
+\layout Standard
+
+There are 4 different cues, which are saved to disk.
+ These are called the Z-cue, the X-cue, the C-cue and the V-cue.
+ Setting a cue to the curernt cue is done by pushing the capital Z, X, C
+ or V.
+ Retrieving a cue is done by pushing a small x, c, v or z.
+ When retrieving a cue the program will immeditally jump to that position.
+ If you leave the program, the cue-configuration will be saved to disk for
+ the next time you start that song.
+ If you are playing a lot of music you might want to develop your own standards
+ for this.
+ 
+\layout Subsection
+
+Example 3: Using stored cues to do a fast beatmix
+\layout Standard
+
+Suppose we have a song with a number of cues.
+ Which have been stored to disk.
+ If we want to mix this song at this position over another song we start
+ the song at the right tempo (cbpm-play -m).
+ We load the corrent cue by pushing the small letter (
+\series bold 
+z
+\series default 
+ for example).
+ If this is done we listen to the playing song and at the right moment (the
+ start of a prhase) we push '
+\series bold 
+]
+\series default 
+'.
+ The beats should be 
+\emph on 
+slightly
+\emph default 
+ off.
+ This is due to a latency in the transmittion of the keypress and the arrival
+ of the keypress at the program (hence, I can't solve this problem).
+ Now start nudging ('
+\series bold 
++
+\series default 
+' and '
+\series bold 
+-
+\series default 
+') until the beats are good.
+\layout Subsection
+
+Example 4: LFO's
+\layout Standard
+
+Some extra fun can be done by using a number of LFO's.
+\layout Enumerate
+
+At the top of a beat push '
+\series bold 
+p
+\series default 
+'.
+ You will now hear the music spinning from left to right.
+ If you are tired of this effect, push '
+\series bold 
+n
+\series default 
+'
+\layout Enumerate
+
+At the beginning of a phrase push '
+\series bold 
+b
+\series default 
+'.
+ In 4 measures a sound break will occur right before the 5th measure.
+\layout Subsection
+
+Example 5: Using the metronome
+\layout Standard
+
+You can use a build in metronome to check wether your cue's are positioned
+ at the beginning of a measure.
+ To do this load the corect cue (press 
+\series bold 
+z
+\series default 
+, 
+\series bold 
+x
+\series default 
+, 
+\series bold 
+c
+\series default 
+ or 
+\series bold 
+v
+\series default 
+) and press '
+\series bold 
+m
+\series default 
+' to start the metronome.
+ Now pause the song by pressing spacebar: ' '.
+ Press spacebar again to start at the current cue.
+ The metronome will also restart at its beginning.
+ If the cue is correct the metronome should sound together with a beat.
+ If this isn't the case press '
+\series bold 
+(
+\series default 
+' or '
+\series bold 
+)
+\series default 
+' to shift the cue a bit back or forth.
+ When you press one of those, you the music will stop.
+ Press spacebar ' ' again to start at the new position.
+ Repeat this process until the beats match the metronome.
+ 
+\layout Standard
+
+At last, store the cue in one of the 4 positions.
+\layout Section
+
+Using kBpmDj
+\layout Standard
+
+Currently there is also a kbpm-player, which you can start with kbpm-play.
+ The keys are the same as with cbpm-play, with some minor differences.
+ Metronomes are not supported yet and probably some other features that
+ i don't use often.
+\layout Section
+
+Some Final hints
+\layout Itemize
+
+Practice: Have a small mixing device at home.
+ (not a krupps kind of mixing device :)
+\layout Itemize
+
+Learn from other DJ's: Listen to them and what they do, as well for the
+ global picture, the songs they are playing as the small shifts they make.
+ Listen also at the faults they make and how they could have avoid it.
+ Beware: the better you become, the more frustrating it is to go to parties
+ :)
+\layout Itemize
+
+The day(s) before you play, listen to old, boring music.
+ Music to which you have no affection.
+ Good results guaranteed !
+\layout Itemize
+
+Take enough sound-cables, power-cables and so on with you.
+ Don't expect something will be available.
+ Also take a mirror with you.
+ Some mixing tables are that fixed and unreachable that you will need a
+ way to see.
+\layout Itemize
+
+Don't forget a lamp.
+\layout Itemize
+
+Tape your sessions and listen to them afterwards.
+\layout Acknowledgement*
+
+I am grateful to the author of 
+\emph on 
+mpg123
+\emph default 
+.
+ Without his source code I would've never known how to set the DSP-parameters
+ of /dev/dsp.
+ Further there is one important tool I saw 4 months ago.
+ It was a tool which made a matrix from music.
+ On both axes fragments of the music were placed.
+ The colour of a position in the matrix depends on the distance between
+ the two fragments.
+ On this matrix the tempo was visualised indirectly.
+ The problem with this program was its memory usage and its slow response.
+ From this sprung the idea of phase shifting the music.
+ If I see this tool again I will give the guy credit, but for now I really
+ don't have a clue where I got it, nor what the name of the author was.
+\layout Acknowledgement*
+
+
+\latex latex 
+
+\backslash 
+newpage
+\layout Section
+
+Free Documentation
+\layout Standard
+\noindent \align right 
+
+\size tiny 
+\lang english
+GNU Free Documentation License
+\layout Standard
+\noindent \align right 
+
+\size tiny 
+\lang english
+Version 1.1, March 2000
+\layout Standard
+\noindent \align right 
+
+\size tiny 
+\lang english
+Copyright (C) 2000\SpecialChar ~
+ Free Software Foundation, Inc.
+\layout Standard
+\noindent \align right 
+
+\size tiny 
+\lang english
+59 Temple Place, Suite 330, Boston, MA\SpecialChar ~
+ 02111-1307\SpecialChar ~
+ USA 
+\layout Standard
+\noindent \align right 
+
+\size tiny 
+\lang english
+Everyone is permitted to copy and distribute verbatim copies of this license
+ document, but changing it is not allowed.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+0.
+ PREAMBLE
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+The purpose of this License is to make a manual, textbook, or other written
+ document "free" in the sense of freedom: to assure everyone the effective
+ freedom to copy and redistribute it, with or without modifying it, either
+ commercially or noncommercially.\SpecialChar ~
+ Secondarily, this License preserves for
+ the author and publisher a way to get
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+credit for their work, while not being considered responsible for modifications
+ made by others.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+This License is a kind of "copyleft", which means that derivative works
+ of the document must themselves be free in the same sense.\SpecialChar ~
+ It complements
+ the GNU General Public License, which is a copyleft license designed for
+ free software.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+We have designed this License in order to use it for manuals for free software,
+ because free software needs free documentation: a free program should come
+ with manuals providing the same freedoms that the software does.\SpecialChar ~
+ But this
+ License is not limited to software manuals; it can be used for any textual
+ work, regardless of subject matter or
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+whether it is published as a printed book.\SpecialChar ~
+ We recommend this License principally
+ for works whose purpose is instruction or reference.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+1.
+ APPLICABILITY AND DEFINITIONS
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+This License applies to any manual or other work that contains a notice
+ placed by the copyright holder saying it can be distributed under the terms
+ of this License.\SpecialChar ~
+ The "Document", below, refers to any such manual or work.\SpecialChar ~
+
+ Any member of the public is a licensee, and is addressed as "you".
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+A "Modified Version" of the Document means any work containing the Document
+ or a portion of it, either copied verbatim, or with modifications and/or
+ translated into another language.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+A "Secondary Section" is a named appendix or a front-matter section of the
+ Document that deals exclusively with the relationship of the publishers
+ or authors of the Document to the Document's overall subject (or to related
+ matters) and contains nothing that could fall directly within that overall
+ subject.\SpecialChar ~
+ (For example, if the Document is in part a textbook of mathematics,
+ a Secondary Section may not explain any mathematics.)\SpecialChar ~
+ The relationship could
+ be a matter of historical connection with the subject or with related matters,
+ or of legal, commercial, philosophical, ethical or political position regarding
+ them.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+The "Invariant Sections" are certain Secondary Sections whose titles are
+ designated, as being those of Invariant Sections, in the notice that says
+ that the Document is released under this License.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+The "Cover Texts" are certain short passages of text that are listed, as
+ Front-Cover Texts or Back-Cover Texts, in the notice that says that the
+ Document is released under this License.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+A "Transparent" copy of the Document means a machine-readable copy, represented
+ in a format whose specification is available to the general public, whose
+ contents can be viewed and edited directly and straightforwardly with generic
+ text editors or (for images composed of pixels) generic paint programs
+ or (for drawings) some widely available drawing editor, and that is suitable
+ for input to text formatters or for automatic translation to a variety
+ of formats suitable for input to text formatters.\SpecialChar ~
+ A copy made in an otherwise
+ Transparent file format whose markup has been designed to thwart or discourage
+ subsequent modification by readers is not Transparent.\SpecialChar ~
+ A copy that is not
+ "Transparent" is called "Opaque".
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+Examples of suitable formats for Transparent copies include plain ASCII
+ without markup, Texinfo input format, LaTeX input format, SGML or XML using
+ a publicly available DTD, and standard-conforming simple HTML designed
+ for human modification.\SpecialChar ~
+ Opaque formats include PostScript, PDF, proprietary
+ formats that can be read and edited only by proprietary word processors,
+ SGML or XML for which the DTD and/or processing tools are not generally
+ available, and the machine-generated HTML produced by some word processors
+ for output purposes only.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+The "Title Page" means, for a printed book, the title page itself, plus
+ such following pages as are needed to hold, legibly, the material this
+ License requires to appear in the title page.\SpecialChar ~
+ For works in formats which
+ do not have any title page as such, "Title Page" means the text near the
+ most prominent appearance of the work's title, preceding the beginning
+ of the body of the text.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+2.
+ VERBATIM COPYING
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+You may copy and distribute the Document in any medium, either commercially
+ or noncommercially, provided that this License, the copyright notices,
+ and the license notice saying this License applies to the Document are
+ reproduced in all copies, and that you add no other conditions whatsoever
+ to those of this License.\SpecialChar ~
+ You may not use technical measures to obstruct
+ or control the reading or further copying of the copies you make or distribute.\SpecialChar ~
+
+ However, you may accept compensation in exchange for copies.\SpecialChar ~
+ If you distribute
+ a large enough number of copies you must also follow the conditions in
+ section 3.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+You may also lend copies, under the same conditions stated above, and you
+ may publicly display copies.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+3.
+ COPYING IN QUANTITY
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+If you publish printed copies of the Document numbering more than 100, and
+ the Document's license notice requires Cover Texts, you must enclose the
+ copies in covers that carry, clearly and legibly, all these Cover Texts:
+ Front-Cover Texts on the front cover, and Back-Cover Texts on the back
+ cover.\SpecialChar ~
+ Both covers must also clearly and legibly identify you as the publisher
+ of these copies.\SpecialChar ~
+ The front cover must present the full title with all words
+ of the title equally prominent and visible.\SpecialChar ~
+ You may add other material on
+ the covers in addition.
+ Copying with changes limited to the covers, as long as they preserve the
+ title of the Document and satisfy these conditions, can be treated as verbatim
+ copying in other respects.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+If the required texts for either cover are too voluminous to fit legibly,
+ you should put the first ones listed (as many as fit reasonably) on the
+ actual cover, and continue the rest onto adjacent pages.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+If you publish or distribute Opaque copies of the Document numbering more
+ than 100, you must either include a machine-readable Transparent copy along
+ with each Opaque copy, or state in or with each Opaque copy a publicly-accessib
+le computer-network location containing a complete Transparent copy of the
+ Document, free of added material, which the general network-using public
+ has access to download anonymously at no charge using public-standard network
+ protocols.\SpecialChar ~
+ If you use the latter option, you must take reasonably prudent
+ steps, when you begin distribution of Opaque copies in quantity, to ensure
+ that this Transparent copy will remain thus accessible at the stated location
+ until at least one year after the last time you distribute an Opaque copy
+ (directly or through your agents or retailers) of that edition to the public.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+It is requested, but not required, that you contact the authors of the Document
+ well before redistributing any large number of copies, to give them a chance
+ to provide you with an updated version of the Document.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+4.
+ MODIFICATIONS
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+You may copy and distribute a Modified Version of the Document under the
+ conditions of sections 2 and 3 above, provided that you release the Modified
+ Version under precisely this License, with the Modified Version filling
+ the role of the Document, thus licensing distribution and modification
+ of the Modified Version to whoever possesses a copy of it.\SpecialChar ~
+ In addition,
+ you must do these things in the Modified Version:
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+A.
+ Use in the Title Page (and on the covers, if any) a title distinct from
+ that of the Document, and from those of previous versions (which should,
+ if there were any, be listed in the History section of the Document).\SpecialChar ~
+ You
+ may use the same title as a previous version if the original publisher
+ of that version gives permission.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+B.
+ List on the Title Page, as authors, one or more persons or entities responsible
+ for authorship of the modifications in the Modified Version, together with
+ at least five of the principal authors of the Document (all of its principal
+ authors, if it has less than five).
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+C.
+ State on the Title page the name of the publisher of the Modified Version,
+ as the publisher.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+D.
+ Preserve all the copyright notices of the Document.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+E.
+ Add an appropriate copyright notice for your modifications adjacent to
+ the other copyright notices.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+F.
+ Include, immediately after the copyright notices, a license notice giving
+ the public permission to use the Modified Version under the terms of this
+ License, in the form shown in the Addendum below.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+G.
+ Preserve in that license notice the full lists of Invariant Sections and
+ required Cover Texts given in the Document's license notice.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+H.
+ Include an unaltered copy of this License.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+I.
+ Preserve the section entitled "History", and its title, and add to it an
+ item stating at least the title, year, new authors, and publisher of the
+ Modified Version as given on the Title Page.
+ If there is no section entitled "History" in the Document, create one stating
+ the title, year, authors, and publisher of the Document as given on its
+ Title Page, then add an item describing the Modified Version as stated
+ in the previous sentence.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+J.
+ Preserve the network location, if any, given in the Document for public
+ access to a Transparent copy of the Document, and likewise the network
+ locations given in the Document for previous versions it was based on.\SpecialChar ~
+ These
+ may be placed in the "History" section.
+ You may omit a network location for a work that was published at least
+ four years before the Document itself, or if the original publisher of
+ the version it refers to gives permission.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+K.
+ In any section entitled "Acknowledgements" or "Dedications", preserve the
+ section's title, and preserve in the section all the substance and tone
+ of each of the contributor acknowledgements and/or dedications given therein.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+L.
+ Preserve all the Invariant Sections of the Document, unaltered in their
+ text and in their titles.\SpecialChar ~
+ Section numbers or the equivalent are not considered
+ part of the section titles.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+M.
+ Delete any section entitled "Endorsements".\SpecialChar ~
+ Such a section may not be included
+ in the Modified Version.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+N.
+ Do not retitle any existing section as "Endorsements" or to conflict in
+ title with any Invariant Section.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+If the Modified Version includes new front-matter sections or appendices
+ that qualify as Secondary Sections and contain no material copied from
+ the Document, you may at your option designate some or all of these sections
+ as invariant.\SpecialChar ~
+ To do this, add their titles to the list of Invariant Sections
+ in the Modified Version's license notice.
+ These titles must be distinct from any other section titles.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+You may add a section entitled "Endorsements", provided it contains nothing
+ but endorsements of your Modified Version by various parties--for example,
+ statements of peer review or that the text has been approved by an organization
+ as the authoritative definition of a standard.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+You may add a passage of up to five words as a Front-Cover Text, and a passage
+ of up to 25 words as a Back-Cover Text, to the end of the list of Cover
+ Texts in the Modified Version.\SpecialChar ~
+ Only one passage of Front-Cover Text and
+ one of Back-Cover Text may be added by (or through arrangements made by)
+ any one entity.\SpecialChar ~
+ If the Document already includes a cover text for the same
+ cover, previously added by you or by arrangement made by the same entity
+ you are acting on behalf of, you may not add another; but you may replace
+ the old one, on explicit permission from the previous publisher that added
+ the old one.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+The author(s) and publisher(s) of the Document do not by this License give
+ permission to use their names for publicity for or to assert or imply endorseme
+nt of any Modified Version.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+5.
+ COMBINING DOCUMENTS
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+You may combine the Document with other documents released under this License,
+ under the terms defined in section 4 above for modified versions, provided
+ that you include in the combination all of the Invariant Sections of all
+ of the original documents, unmodified, and list them all as Invariant Sections
+ of your combined work in its license notice.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+The combined work need only contain one copy of this License, and multiple
+ identical Invariant Sections may be replaced with a single copy.\SpecialChar ~
+ If there
+ are multiple Invariant Sections with the same name but different contents,
+ make the title of each such section unique by adding at the end of it,
+ in parentheses, the name of the original author or publisher of that section
+ if known, or else a unique number.
+ Make the same adjustment to the section titles in the list of Invariant
+ Sections in the license notice of the combined work.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+In the combination, you must combine any sections entitled "History" in
+ the various original documents, forming one section entitled "History";
+ likewise combine any sections entitled "Acknowledgements", and any sections
+ entitled "Dedications".\SpecialChar ~
+ You must delete all sections entitled "Endorsements."
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+6.
+ COLLECTIONS OF DOCUMENTS
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+You may make a collection consisting of the Document and other documents
+ released under this License, and replace the individual copies of this
+ License in the various documents with a single copy that is included in
+ the collection, provided that you follow the rules of this License for
+ verbatim copying of each of the documents in all other respects.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+You may extract a single document from such a collection, and distribute
+ it individually under this License, provided you insert a copy of this
+ License into the extracted document, and follow this License in all other
+ respects regarding verbatim copying of that document.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+7.
+ AGGREGATION WITH INDEPENDENT WORKS
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+A compilation of the Document or its derivatives with other separate and
+ independent documents or works, in or on a volume of a storage or distribution
+ medium, does not as a whole count as a Modified Version of the Document,
+ provided no compilation copyright is claimed for the compilation.\SpecialChar ~
+ Such a
+ compilation is called an "aggregate", and this License does not apply to
+ the other self-contained works thus compiled with the Document, on account
+ of their being thus compiled, if they are not themselves derivative works
+ of the Document.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+If the Cover Text requirement of section 3 is applicable to these copies
+ of the Document, then if the Document is less than one quarter of the entire
+ aggregate, the Document's Cover Texts may be placed on covers that surround
+ only the Document within the aggregate.
+ Otherwise they must appear on covers around the whole aggregate.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+8.
+ TRANSLATION
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+Translation is considered a kind of modification, so you may distribute
+ translations of the Document under the terms of section 4.
+ Replacing Invariant Sections with translations requires special permission
+ from their copyright holders, but you may include translations of some
+ or all Invariant Sections in addition to the original versions of these
+ Invariant Sections.\SpecialChar ~
+ You may include a translation of this License provided
+ that you also include the original English version of this License.\SpecialChar ~
+ In case
+ of a disagreement between the translation and the original English version
+ of this License, the original English version will prevail.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+9.
+ TERMINATION
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+You may not copy, modify, sublicense, or distribute the Document except
+ as expressly provided for under this License.\SpecialChar ~
+ Any other attempt to copy,
+ modify, sublicense or distribute the Document is void, and will automatically
+ terminate your rights under this License.\SpecialChar ~
+ However, parties who have received
+ copies, or rights, from you under this License will not have their licenses
+ terminated so long as such parties remain in full compliance.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+10.
+ FUTURE REVISIONS OF THIS LICENSE
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+The Free Software Foundation may publish new, revised versions of the GNU
+ Free Documentation License from time to time.\SpecialChar ~
+ Such new versions will be
+ similar in spirit to the present version, but may differ in detail to address
+ new problems or concerns.\SpecialChar ~
+ See http://www.gnu.org/copyleft/.
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+\SpecialChar ~
+
+\layout Standard
+\noindent 
+
+\size tiny 
+\lang english
+Each version of the License is given a distinguishing version number.
+ If the Document specifies that a particular numbered version of this License
+ "or any later version" applies to it, you have the option of following
+ the terms and conditions either of that specified version or of any later
+ version that has been published (not as a draft) by the Free Software Foundatio
+n.\SpecialChar ~
+ If the Document does not specify a version number of this License, you
+ may choose any version ever published (not as a draft) by the Free Software
+ Foundation.
+\layout Standard
+
+
+\lang english
+.
+\the_end

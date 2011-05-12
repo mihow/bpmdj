@@ -18,65 +18,43 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-/*-------------------------------------------
- *         Headers
- *-------------------------------------------*/
-#include "config.h"
-
-#ifdef HAVE_STDLIB_H
+#include <qapplication.h>
+#include <qlistview.h>
+#include <qlcdnumber.h>
+#include <qheader.h>
+#include <qgroupbox.h>
 #include <stdlib.h>
-#endif /* HAVE_STDLIB_H */
-
-#ifdef HAVE_STRING_H
-#include <string.h>
-#endif /* HAVE_STRING_H */
-
-#ifdef HAVE_STDIO_H
+#include "songplayerlogic.h"
+#include <stdlib.h>
 #include <stdio.h>
-#endif /* HAVE_STDIO_H */
-
-#ifdef HAVE_TERMIOS_H
-#include <termios.h>
-#endif /* HAVE_TERMIOS_H */
-
-#ifdef HAVE_FCNTL_H
-#include <fcntl.h>
-#endif /* HAVE_FCNTL_H */
-
-#ifdef HAVE_LIBGEN_H
-#include <libgen.h>
-#endif /* HAVE_LIBGEN_H */
-
-#ifdef HAVE_LINUX_SOUNDCARD_H
-#include <linux/soundcard.h>
-#endif /* HAVE_LINUX_SOUNDCARD_H */
-
-#ifdef HAVE_SIGNAL_H
-#include <signal.h>
-#endif /* HAVE_SIGNAL_H */
-
-#ifdef HAVE_TIME_H
-#include <time.h>
-#endif /* HAVE_TIME_H */
-
-#ifdef HAVE_ASSERT_H
 #include <assert.h>
-#endif /* HAVE_ASSERT_H */
-
-#ifdef HAVE_MATH_H
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <fcntl.h>
+#include <signal.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
+#include <libgen.h>
+#include <linux/soundcard.h>
+#include <time.h>
+#include <sys/times.h>
+#include <assert.h>
 #include <math.h>
-#endif /* HAVE_MATH_H */
-
-#include "cbpm-index.h"
-#include "cbpm-playeropts.h"
-
+#include <pthread.h>
+#include "kbpm-play.h"
+extern "C"
+{
+#include "../cBpmDj/cbpm-index.h"
+#include "kbpm-playeropts.h"
 #include "common.h"
+}
 
 /*-------------------------------------------
  *         Constants & Variables
  *-------------------------------------------*/
 #define  WAVRATE  (22050)
-#define  wave_bufsize (32*1024)
+#define  wave_bufsize (32L*1024L)
   signed8 targetperiod;
   signed8 currentperiod;
   signed8 normalperiod;
@@ -197,7 +175,7 @@ void dsp_close()
 char * wave_name=NULL;
 unsigned4 wave_buffer[wave_bufsize];
 FILE * wave_file;
-unsigned4 wave_bufferpos=-wave_bufsize;
+unsigned4 wave_bufferpos=wave_bufsize;
 
 static unsigned4 fsize(FILE* wtf)
 {
@@ -353,7 +331,7 @@ unsigned4 lfo_difference(unsigned4 x)
    static signed8 lostrength=1L;
    static signed8 histrength=1L;
    static signed8 leftlo, lefthi, rightlo, righthi;
-   static oldeststrengthat=0;
+   static signed8 oldeststrengthat=0;
    double val;
    signed8 diff;
    longtrick lt;
@@ -471,8 +449,8 @@ void lfo_init()
 
 typedef unsigned8 cue_info;
 static cue_info cue_before = 0;
-static cue_info cue = 0;
-static cue_info cues[4] = {0,0,0,0};
+cue_info cue = 0;
+cue_info cues[4] = {0,0,0,0};
 
 void cue_set()
 {
@@ -618,103 +596,36 @@ void jumpto(signed8 mes, int txt)
      }
 }
 
-void useraction(int neglect)
+/*-------------------------------------------
+ *         Parsing arguments 
+ *-------------------------------------------*/
+void line()
 {
-   static unsigned4      time_mark=0;        // the clock time mark
-   static   signed8 tempo_fade=0;       // 0 = targetperiod; 10 = normalperiod
-   int c=0,nr=read(0,&c,1);
-   switch (c)
-     {
-      case  0  :  return;
-	/* forward backward movement */
-      case '*' :  y+=currentperiod/(8);  break;
-      case '\n':  y+=currentperiod/(4);  break;
-      case '+' :  y-=currentperiod/(4*32);  break;
-      case '-' :  y+=currentperiod/(4*32);  break;
-      case '1' :  y-=currentperiod;  printpos("-1 Measure");  break;
-      case '2' :  y+=currentperiod;  printpos("+1 Measure");  break;
-      case '4' :  y-=currentperiod*4; printpos("-4 Measure"); break;
-      case '5' :  y+=currentperiod*4; printpos("+4 Measure"); break;
-      case '7' :  y-=currentperiod*8; printpos("-8 Measure"); break;
-      case '8' :  y+=currentperiod*8; printpos("+8 Measure"); break;
-	/* lfo's */
-      case 'n' :  lfo_set("No",lfo_no,4,y-dsp_latency());  break;
-      case 's' :  lfo_set("Saw",lfo_saw,8,y-dsp_latency());  break;
-      case 'p' :  lfo_set("Pan",lfo_pan,8,y-dsp_latency());  break;
-      case 'S' :  lfo_set("Saw",lfo_saw,16,y-dsp_latency());  break;
-      case 'P' :  lfo_set("Pan",lfo_pan,16,y-dsp_latency());  break;
-      case 'b' :  lfo_set("Break",lfo_break,1,y-dsp_latency());  break;
-      case 'r' :  lfo_set("Reverse saw",lfo_revsaw,8,y-dsp_latency());  break;
-      case 'R' :  lfo_set("Reverse saw",lfo_revsaw,16,y-dsp_latency());  break;
-      case 'D' :  lfo_set("Differentiator",lfo_difference,16,0); break;
-	/* placing cues */
-      case 'm' :  lfo_set("Metronome",lfo_metronome,16,y-dsp_latency()); break;
-      case 'd' :  index_period*=2; index_changed=1; 
-	          printf("Doubled the current period\n"); break;
-      case 'u' :  index_period/=2; index_changed=1;
-	          printf("Halved the current period\n"); break;
-        /* tempo changes */
-      case '>' :
-      case '0' :  if (tempo_fade<10) tempo_fade=tempo_fade+1;
-	          printf("Tempo fade %d ",tempo_fade);
-  	          changetempo(targetperiod+(normalperiod - targetperiod)*tempo_fade/10); break;
-      case '<' :  if (tempo_fade>0) tempo_fade=tempo_fade-1;
- 	          printf("Tempo fade %d ",tempo_fade);
-	          changetempo(targetperiod+(normalperiod - targetperiod)*tempo_fade/10); break;
-      case '.' :  changetempo(normalperiod);  printf("Tempo normal\n");  break;
-      case ',' :  changetempo(targetperiod);  printf("Tempo target\n");  break;
-      case 'l' :  changetempo(currentperiod/1.05946);  break;
-      case 'k' :  changetempo(currentperiod*1.05946);  break;
-	/* marking and jumping */
-      case '[' :
-      case '/' :  cue_set(); break;
-      case ']' :  y=y_normalise(cue)+dsp_latency();
-	          printf("Bringing cue at hit\n"); break;
-      case ' ' :  if (!paused)
-	             {
-			if (!cue) cue_set();
-			paused=1;
-		     }
-	          else jumpto(0,0);
-	          break;
-      case '9' :  jumpto(0,1); break;
-      case '6' :  jumpto(8,1); break;
-      case '3' :  jumpto(16,1); break;
-	/* cue's */
-      case 'Z' :  cue_store("Z-",0); break;
-      case 'X' :  cue_store("X-",1); break;
-      case 'C' :  cue_store("C-",2); break;
-      case 'V' :  cue_store("V-",3); break;
-      case 'z' :  cue_retrieve("Z-",0); jumpto(0,0); break;
-      case 'x' :  cue_retrieve("X-",1); jumpto(0,0); break;
-      case 'c' :  cue_retrieve("C-",2); jumpto(0,0); break;
-      case 'v' :  cue_retrieve("V-",3); jumpto(0,0); break;
-	/* misc */
-      case 't' :  if (time_mark)
-	            printf("Seconds elapsed sinds mark %d\n",time(NULL)-time_mark);
-	          else
-	            {
-		       printf("Time marked\n");
-		       time_mark=time(NULL);
-		    }
-       	          break;
-      case '{' :  cue_shift("Shifting cue 8 measure backward",-8*normalperiod); break;
-      case '}' :  cue_shift("Shifting cue 8 measure forward",8*normalperiod); break;
-      case '(' :  cue_shift("Shifting cue 1/32 note backward",-normalperiod/128); break;
-      case ')' :  cue_shift("Shifting cue 1/32 note forward",+normalperiod/128); break;
-      case '%' :  printf("Song: %s\n",wave_name);  printpos("Current position: "); break;
-      case '?' :
-      case 'h' :  help(); break;
-      case 'q' :  stop=1; paused=0; break;
-      default  :
-     }
-   
-   if (y<0)
-     {
-	printf("y underflow, setting to zero\n");
-	y=0;
-     }
-   useraction(neglect);
+   printf("--------------------------------------------------------------------\n");
+}
+
+void copyright()
+{
+   printf("kBpmDj Player v%d.%d, Copyright (c) 2001 Werner Van Belle\n",MAJOR_VERSION,MINOR_VERSION);
+   printf("This software is distributed under the GPL2 license. See copyright.txt for\n");
+   printf("details. Press 'h' for Help. See beatmixing.ps for details\n");
+   line();
+}
+
+
+QApplication *app;
+void * go(void* neglect)
+  {
+     app->exec();
+  }
+
+void terminal_start()
+{
+   pthread_t y;
+   SongPlayerLogic *test=new SongPlayerLogic();
+   app->setMainWidget(test);
+   test->show();
+   pthread_create(&y,NULL,go,NULL);
 }
 
 void read_write_loop()
@@ -758,109 +669,14 @@ void read_write_loop()
      }
 }
 
-/*-------------------------------------------
- *         Terminal routines  
- *-------------------------------------------*/
-void (*oldio)(int);
-void (*oldhup)(int);
-void (*oldurg)(int);
-
-void terminal_blurb(int Reset)
-{
-   static struct termios old;
-   struct termios new;
-   if (Reset == 0)
-     {(void) tcgetattr (0, &old);
-	new = old;
-	new.c_lflag &= ~(ECHO | ICANON);
-	new.c_iflag &= ~(ISTRIP | INPCK);
-	(void) tcsetattr (0, TCSANOW, &new);}
-   else (void) tcsetattr (0, TCSANOW, &old);
-}
-
-void stopsignal(int n)
-{
-   stop=1;
-}
-
-void terminal_start()
-{
-   long i;
-   terminal_blurb(0);
-   fcntl(0,F_SETFL,O_ASYNC | O_NONBLOCK);
-   i=getpid();
-   fcntl(0,F_SETOWN,i);
-   oldio=signal(SIGIO, useraction);
-   oldurg=signal(SIGURG, useraction);
-   oldhup=signal(SIGHUP, stopsignal);
-}
-
 void terminal_stop()
 {
-   terminal_blurb(1);
-   signal(SIGIO, oldio);
-   signal(SIGURG, oldurg);
-   signal(SIGHUP, oldhup);
-}
-
-/*-------------------------------------------
- *         Parsing arguments 
- *-------------------------------------------*/
-void line()
-{
-   printf("--------------------------------------------------------------------\n");
-}
-
-void copyright()
-{
-   printf("cBpmDj Player v%d.%d, Copyright (c) 2001 Werner Van Belle\n",MAJOR_VERSION,MINOR_VERSION);
-   printf("This software is distributed under the GPL2 license. See copyright.txt for\n");
-   printf("details. Press 'h' for Help. See beatmixing.ps for details\n");
-   line();
-}
-
-void help()
-{
-   line();
-   printf("1) Movement\n"
-	  "     1 : -1M                   2 : +1M\n"
-	  "     4 : -4M                   5 : +4M\n"
-	  "     7 : -8M                   8 : +8M\n"
-	  "     + : -1/32N                - : +1/32N    \n"
-	  "     * : -1/2B           <ENTER> : +1B \n"
-	  "2) Positioning\n"
-	  "     p or ' ' : pause\n"
-	  "     [ or / : mark position in song\n"
-	  "     ] : set monitorred song to _difference_ with mark\n"
-	  "     9 : Go to position mark or unpause at mark\n"
-	  "     6 : Go to position mark -8M\n"
-	  "     3 : Go to position mark -16M\n"
-	  "     Z, X, C, V: Store current cue\n"
-	  "     z, x, c, v: Retrieve cue and jump to it\n"
-	  "3) Tempo: change it to normal\n"
-	  "     l : Pitch += 1/2   \n"       
-	  "     k : Pitch -= 1/2\n"
-	  "     , : Tempo = target tempo  \n"
-	  "     . : Tempo = normal tempo \n"
-	  "     0 or > : Tempostep to normal tempo\n"
-	  "     < : Tempostep to target tempo\n"
-	  "     { : Beginning of song at normal tempo\n"
-	  "4) Misc\n"
-	  "     t : marks/shows time\n"
-	  "     % : current position and name\n"
-	  "     q : quit the program\n"
-	  "     h or ? : This help\n"
-	  "     c : Copyrigth notice\n"
-	  "5) Lfo\n"
-	  "     s or S : slow or fast saw (///)\n"
-	  "     r or R : slow or fast reversed saw (\\\\\\)\n"
-	  "     p or P : slow or fast pan lfo\n"
-	  "     b : break (----_)\n");
-   line();
+   delete(app);
 }
 
 int main(int argc, char *argv[])
 {
+   app=new QApplication(argc,argv);
    int optct;
    copyright();
    assert(sizeof(signed2)==2);
@@ -868,7 +684,7 @@ int main(int argc, char *argv[])
    assert(sizeof(signed4)==4);
    assert(sizeof(signed8)==8);
    // Parsing the arguments
-   optct=optionProcess(&cbpmplayerOptions,argc,argv);
+   optct=optionProcess(&kbpmplayerOptions,argc,argv);
    if (argc-optct!=1) USAGE(EXIT_FAILURE);
    if (HAVE_OPT(MATCH))
      {
@@ -905,10 +721,10 @@ int main(int argc, char *argv[])
 	printf("Target tempo = %g BPM",targettempo);
 	printf(" speed(%g)\n",(double)normalperiod/(double)currentperiod);
      }
-   terminal_start();
    cue_read();
    dsp_open();
    wave_open(index_file);
+   terminal_start();
    read_write_loop();
    dsp_close();
    wave_close();

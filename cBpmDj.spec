@@ -1,8 +1,8 @@
-Summary: AutoGen - The Automated Program Generator. 
+Summary: BpmDj - Free DJ tools. 
 Vendor: http://bpmdj.sourceforge.net/
 Name: cBpmDj 
 Version: _VERSION_ 
-Release: 1
+Release: 2
 Source: http://bpmdj.sourceforge.net/%{name}-%{version}.tar.gz
 Packager: Thomas Steudten <thomas@steudten.com>
 Copyright: GPL
@@ -20,7 +20,7 @@ Prefix: %{__prefix}
 %description
 BpmDj: Free Dj tools, contains a _very_ accurate BPM Counter and a player which
 can nudge, change the tempo and shift the song by measures. Persistent cue's,
-multiple dsp's are supported. The index format is readable text
+multiple dsp's are supported. The index format is readable text.
 
 %prep
 %setup  
@@ -53,5 +53,9 @@ make ROOT=$RPM_BUILD_ROOT install
 %doc AUTHORS COPYRIGHT ChangeLog README TODO INSTALL index.html
 
 %changelog
+
+* Sun Mar 10 2002  Thomas Steudten <thomas@steudten.com>
+- Fix Summary line.
+
 * Fri Jan 25 2002 Thomas Steudten <thomas@steudten.com>
 - Rel. 1: First package version

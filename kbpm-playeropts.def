@@ -1,0 +1,41 @@
+Autogen Definitions options;
+prog_name  = kbpmplayer;
+prog_title = "kBpm-player";
+long_opts;
+
+flag = {
+  name = debuglatency;
+  descrip = "Debug latency";
+  value = w;
+};
+
+flag = {
+  name = quiet;
+  descrip = "Be quiet";
+  value = q;
+};
+
+flag = {
+  name = device;
+  descrip = "Dsp device to use";
+  value = d;
+  arg_type = string;
+  arg_default = "/dev/dsp";
+  };
+
+flag = {	
+  name = match;
+  descrip = "Song to match tempo to (.idx file)";
+  value = m;
+  arg_type = string;
+  };
+
+flag = {
+  name = latency;
+  descrip = "Fix latency (ms)";
+  value = l;
+  arg_type = string;
+  arg_default = "744";
+  };
+
+argument=string;  

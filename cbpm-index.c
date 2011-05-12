@@ -77,6 +77,7 @@ char   * index_tempo;
 char   * index_file;
 char   * index_remark;
 char   * index_tags;
+char   * index_md5sum;
  int     index_changed;
  int     index_bpmcount_from;
  int     index_bpmcount_to;
@@ -97,6 +98,7 @@ void index_init()
    index_period=-1;
    index_file=0;
    index_tags=NULL;
+   index_md5sum=NULL;
    index_tempo=0;
    index_remark=0;
    index_changed=0;
@@ -121,6 +123,7 @@ void index_free()
    for(i=0;i<index_nextcomment;i++)
      if (index_comments[i]) free(index_comments[i]);
    if (index_comments) free(index_comments);
+   if (index_md5sum) free(index_md5sum);
 }
 
 void index_write()
@@ -150,6 +153,7 @@ void index_write()
    if (index_cue_v>0) fprintf(f,"cue-v    : %ld\n",index_cue_v);
    if (index_bpmcount_from>=0) fprintf(f,"bpmcount-from : %d\n",index_bpmcount_from);
    if (index_bpmcount_to>=0) fprintf(f,"bpmcount-to   : %d\n",index_bpmcount_to);
+   if (index_md5sum) fprintf(f,"md5sum : %s\n",index_md5sum);
    if (index_remark) fprintf(f,"remark   : %s\n",index_remark);
    for(i=0;i<index_nextcomment;i++) fprintf(f,"%s\n",index_comments[i]);
    fclose(f);
@@ -240,6 +244,7 @@ void index_read(char* indexn)
 	else if(strcasecmp(field,"cue-x")==0) index_cue_x=atol(value);
 	else if(strcasecmp(field,"cue-c")==0) index_cue_c=atol(value);
 	else if(strcasecmp(field,"cue-v")==0) index_cue_v=atol(value);
+	else if(strcasecmp(field,"md5sum")==0) index_md5sum=strdup(value);
 	else if(strcasecmp(field,"tag")==0) 
 	  {
 	     if (!index_tags) index_tags=strdup(value);

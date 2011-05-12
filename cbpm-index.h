@@ -33,6 +33,7 @@ extern           char   * index_tags;
 extern           int      index_changed;
 extern           int      index_bpmcount_from;
 extern           int      index_bpmcount_to;
+extern           char   * index_md5sum;
 extern unsigned long      index_cue;
 extern unsigned long      index_cue_z;
 extern unsigned long      index_cue_x;

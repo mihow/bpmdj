@@ -1,3 +1,8 @@
+1.0:
+  - initial releasse of the Kde(Qt)-player
+  - added md5sum's in the index format
+  - you can now change the upper and lower limit of the BPM-search algorithm
+  - added debian binary package
 0.9:
   - fixed bug in '{' (backward movement)
   - fixed .MP3 bug
