@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001 Werner Van Belle
+ Copyright (C) 2001-2004 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -135,8 +135,6 @@ void ProcessManager::clearPlayer(int id, bool update)
 {
   if(!playing_songs[id]) return;
   playing_songs[id]->reread();
-  // WVB - this should be done automatically
-  selector->parseTags(playing_songs[id]->tags);
   player_pids[id] = 0;
   playing_songs[id]=NULL;
   if (update)

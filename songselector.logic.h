@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001 Werner Van Belle
+ Copyright (C) 2001-2004 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -34,7 +34,8 @@
 #include "config.h"
 #include "database.h"
 #include "albumitem.h"
-			
+#include "qvectorview.h"
+#include "freq-mapping.h"
 #define TAGS_TEXT 0
 #define TAGS_OR 1
 #define TAGS_AND 2
@@ -52,6 +53,7 @@ class SongSelectorLogic:
 {
     Q_OBJECT
   private:
+    FrequencyDialog *frequency_dialog;
     ProcessManager *processManager;
     QTimer *timer;
     int mainTicks;
@@ -78,11 +80,12 @@ class SongSelectorLogic:
     QPopupMenu *view;
     QPopupMenu *autom;
   public:
+    QVectorView* songList;
     DataBase *database;
     // display
     SongSelectorLogic(QWidget*parent=0, const QString name=0);
     virtual ~SongSelectorLogic();
-    void findAllTags();
+    void findAllAlbums();
     void acceptNewSong(Song* song);
     void addTag(const QString tag);
     // timer functions
@@ -90,10 +93,11 @@ class SongSelectorLogic:
     // process functions
     void updateProcessView();
     // tag functionality
-    void parseTags(QString tags);
     void findsimilarnames(const QString & name, const QString & fullname);
+    void initialize_using_config();
   private:
-    void insertSongInAlbum(QListViewItem *, const QString & a, int nr);
+    void parse_tags();
+    void insertSongInAlbum(Song*, const QString & a, int nr);
     void deleteSongFromAlbum(AlbumItem *);
     void doAbout(int pg);
     void updateItemList();
@@ -103,9 +107,9 @@ class SongSelectorLogic:
     QListViewItem *filterView(QListViewItem * who, QListViewItem * parent);
     void setColor(QColor color);
     void setPlayerColor(QLabel *player, QColor color);
-    void songAddTag(QListViewItem * song, const QString & tag);
-    void songDelTag(QListViewItem * song, const QString & tag);
-    void songEditInfo(QListViewItem * song);
+    void songAddTag(Song * song, const QString & tag);
+    void songDelTag(Song * song, const QString & tag);
+    void songEditInfo(Song * song);
     void queueFindAndRename(int oldpos, int newpos);
     void queueOrder();
   public slots:
@@ -114,14 +118,13 @@ class SongSelectorLogic:
     virtual void switchMonitorToMain();
   
     virtual void timerTick();
-    virtual void selectSong(QListViewItem* song);
+    virtual void selectSong(int i);
     virtual void doPreferences();
     virtual void openMixer();
     virtual void openRecorder();
     virtual void openRecordMixer();
     virtual void openReplay();
     virtual void doAbout();
-    virtual void doLegende();
     virtual void doLicense();
     virtual void doFilterChanged();
     virtual void searchLineEntered();
@@ -129,7 +132,7 @@ class SongSelectorLogic:
     virtual void fetchSelection();
     virtual void checkDisc();
     virtual void exportPlayList();
-    virtual void doSpectrumPca(bool fulldatabase = false);
+    virtual void doSpectrumPca(bool fulldatabase = false, bool update_process_view = true);
     virtual void doSpectrumClustering();
     virtual void selectionAddTags();
     virtual void selectionPlayIn3th();
@@ -165,6 +168,8 @@ class SongSelectorLogic:
     virtual void toggle_askmix();
     virtual void toggle_openmixer();
     
+    virtual void show_freq_shaping_dialog();
+
     virtual void findsimilarnames();
     virtual void findallsimilarnames();
     virtual void importSongs();

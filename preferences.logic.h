@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001 Werner Van Belle
+ Copyright (C) 2001-2004 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -24,12 +24,27 @@ class PreferencesLogic :
   public PreferencesDialog
 {
    Q_OBJECT
+ private:
+   void fixColorOf(QWidget *p);
+   QString getCommand();
  public:
    PreferencesLogic::PreferencesLogic(QWidget*parent=0,const char*name=0, bool modal=FALSE,WFlags f=0);
-   QString getCommand();
  public slots:
    virtual void createPlayerOne();
    virtual void createPlayerTwo();
    virtual void createPlayerThree();
    virtual void createPlayerFour();
+   virtual void modifyTempo44Color();
+   virtual void modifyTempo54Color();
+   virtual void modifyTempo64Color();
+   virtual void modifyTempo74Color();
+   virtual void modifyTempo84Color();
+   virtual void modifyGreenTime();
+   virtual void modifyYellowTime();
+   virtual void modifyOrangeTime();
+   virtual void modifyRedTime();
+   virtual void modifyPlayedColor();
+   virtual void modifyAuthorColor();
+   virtual void modifyUnavailableColor();
+   virtual void modifydColorCol();
 };

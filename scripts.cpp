@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001 Werner Van Belle
+ Copyright (C) 2001-2004 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -45,7 +45,7 @@ FILE * openRawFile(Index* index, const char * rawpath)
       printf("Error: Unable to open %s\n",name);
       exit(3);
     }
-  free(name);
+  deallocate(name);
   return raw;
 }
 
@@ -60,7 +60,7 @@ FILE * openRawFileForWriting(Index* index, const char *d)
       printf("Error: Unable to open %s\n",name);
       exit(3);
     }
-  free(name);
+  deallocate(name);
   return raw;
 }
 
@@ -68,7 +68,7 @@ void removeRaw(Index* index, char* d)
 {
   char * name = getRawFilename(d,index->get_filename());
   remove(name);
-  free(name);
+  deallocate(name);
 }
 
 void removeAllRaw(const char* d)

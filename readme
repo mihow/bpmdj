@@ -6,12 +6,9 @@ selector that offers the possibility to manage a large amount of mp3's.
 Probably, you will need to compile the package yourself. To do so, read 
 compile.txt. If you encounter any difficulties please contact me.
 
-There is a complete manual 
-online at http://bpmdj.sourceforge.net/
-in the documentation directory 
-in /usr/share/doc/bpmdj/
+There is a complete manual online at http://bpmdj.sourceforge.net/
+In case you don't have internet access, download the documentation package
+and unzip it.
 
-if you try to read this documentation in the debian documentation directory
-make sure to unpack all appropriate files (gunzip *.gz)
 --
 author: werner.van.belle@itek.norut.no

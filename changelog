@@ -1,31 +1,90 @@
+all files should have a tag:
+	- include in source
+	- include in distribution
+
+2.5:	! segfaults on exit (why this time ???)
+	! tagging system heeft nog een aantal belangrijk errors zie asus, sometimes ' ' tags appear in the taglist
+	  waarschinlijk bij tags die meer dan 1 spatie hebben...
+	! crash op pattern scanning van bepaalde songs...
+  ksel  - importing songs gave until the next reload the wrong title/author information
+  ksel  + saving of songlist header, tags and other new preferences
+  kplay + increased response speed of measure shift buttons and connect -1/2B button
+  kplay + metronome can be switched of by clicking the same button again	
+  kplay + fixed metronome distortion problem	
+  tool  + added the electric fence library but with selective protection checks
+  kplay - removed subtle pointer bug from rayshoot technique (overflow :)
+  ksel  + when starting, automatic selection empty tag when no other is selected
+  ksel  + selectallbuttagged modified to avoid removing ' ' tag.
+  ksel  + improved layout of songselector
+  ksel  ~ fixed dates of copyright	
+  ksel  ~ removed unimportant features such as the filter creation	
+  kplay - when error 'cannot open DSP device', raw file was not removed
+  ksel  + added frequency dialog that shows how to map the old to the new frequency to the new	
+  ksel  + added clustering algorithm
+  kplay + added bpmdj version check to avoid interface mismatches between bpmdj and bpmplay
+  kplay - removed useless COMPILE_NONE option
+  kplay - removed bug in option scanning. Without supplying a DSP device the thing crashes
+  kplay + improved beatgraph using haar wavelet and written a little documentation about it
+  kplay + added fragment sequencer
+  ksel  + added GrowingArray to avoid code duplication
+  ksel  + improved internal tag representation
+  ksel  + added splitter to enable hiding of current status
+  ksel  + replaced QListView with own QVectorview. This will probably give
+          problems later on. The reason I do this is because the qlistview
+	  takes too much memory and is in general too slow. I must mold my
+	  entire program around the listview, which is getting quite
+	  redicilous. A cache, with song pointers to qsongs, which again links to
+	  the songs to find the differences between what should be shown and
+	  what is shown within the qlistview ...
+  ksel  + added more version information when loading
+  ksel  + added modification of dColor column color
+  ksel  + added configuration colors for played author/song and unavailable
+  ksel  - increased size of jugglig set for findclosestsongs in database
+  ksel  + added weighing criteria to choose automatically new songs
+  ksel  - when automatically inserting new songs, keep track of the correct 
+          metric
+  ksel  - removed distance bug in song-space
+  ksel  - removed PCA startup bug: not all songs were investigated
+  ksel  + improved spectrum matching substantially
+  ksel  + modified internal spectrum type to speed up dataaccess
+  ksel  + modified internal tempo type to speed up dataaccess
+  ksel  - removed bug in View menu, state did not reflect actual state after 
+          startup
+  ksel  + improved layout of preferences box
+  ksel  + possibility to select harmonic tempos and unknown tempos
 2.4:
   ksel  - removed bug in database cache	
   ksel  + added possibility to select bpm measure algorithm	 
   ksel  + made splash screen smaller
-  kplay + added pattern analyzer to measure strength of 1/4th, 1/8th, 1/16th notes are present
+  kplay + added pattern analyzer to measure strength of 1/4th, 1/8th, 1/16th 
+          notes are present
   ksel  + added xmms queueing support	 
   tool  + created duploc to find duplicate code lines.	
   doc   + added report on a comparison between 3 different techniques
-  kplay - removed total_files scanning bug. If files smaller than 100 -> floating point exception
-  kplay + improved the autocorrelation technique substantailly	 
-  ksel  - removed bug in process-maanger: player 3 and 4 were inverted.
-  kplay + added the 'none' audio driver.
+  kplay - removed total_files scanning bug. If files smaller than 
+          100 -> floating point exception
+  kplay + improved the autocorrelation technique substantially
+  ksel  - removed bug in process-mananger: player 3 and 4 were inverted
+  kplay + added the 'none' audio driver
   kplay - removed manual dispatching in dsp_drivers.cpp	
   kplay - removed bad md5-scanning bug
   ksel  + reduced memory usage by avoiding allocations of similar strings	
   ksel  - removed useless .ui files and replaced them with simply QInputDialogs
-  ksel  - a index file also present in the .bib was not automatically updated.	 
+  ksel  - a index file also present in the .bib was not automatically updated.
   ksel  + added record functionality (if you have enough sound cards of
           course:)
 2.3:
-  ksel  - removed ***ing bug from PCA analysis... 
-          If you don't write it yourself... You're fucked..
+  ksel  - removed another ***ing bug from PCA analysis
+          If you don't write it yourself...
   ksel  + modified the shortcut of Song Management
-  ksel  - added some 'free' and 'delete' code.. It seems XLib wastes memory with regard to pixmaps
+  ksel  - added some 'free' and 'delete' code.. It seems XLib wastes memory 
+          with regard to pixmaps
   ksel  - removed useless ondisk check when a kbpm-play returns	 
-  kplay + to avoid version confusion, the player follows the splash screen color
-  ksel  + added compaction of the index directory. (+/- 33 % faster when everything 
-	  in memory, otherwise this issues an even better improvement)
+  kplay + to avoid version confusion, the player follows the splash screen 
+          color
+  ksel  + added compaction of the index directory. (+/- 33 % faster when
+          everything in memory, otherwise this issues an even better 
+	  improvement)
   ksel  - removed modification time information	
   kplay - fixed the QThread after QThreadStorage QT warning	
   ksel  - fixed zombie bug	 
@@ -44,22 +103,26 @@
   kplay + all tempo updates are written immediatelly to disk
   kplay - no raw data on disk, beat graph crashes... 	 
   ksel  + added 'how did the mix go' question
-  ksel  + turned brightness button up for all spectrumcolor and removed invertion of pca color
+  ksel  + turned brightness button up for all spectrumcolor and removed 
+          invertion of pca color
   ksel  + added persistent history view
   kplay - bug removed in batch analyzer
   kplay + improved bpm-detection algorithm substantially
   kplay + modified layout (again), added pixmaps for LFO's
-  kplay + double race condition in application cleanup (destructors and stop signalling)
+  kplay + double race condition in application cleanup (destructors and stop 
+          signalling)
   cplay - removed console player from compilation
-  idx   + .idx files are always upgraded to the latest version every time they are written out	
+  idx   + .idx files are always upgraded to the latest version every time they 
+          are written out
   idx   + added title/autor/remix/Version info in .idx files
   kplay - the playing length was not shown when no normal period was known
 2.1:
   ksel  + removed some important bugs...	 
   ksel  + added a player command creator wizard
   kplay + added native alsa driver	 
-  kplay + removed mixer interface, because this is essentially useless and a whole bunch of other (and better) 
-	  programs exist to manipûlate the volumes of a mixer device
+  kplay + removed mixer interface, because this is essentially useless and a
+          whole bunch of other (and better) programs exist to manipulate the 
+	  volumes of a mixer device
   kplay + added -r command line switch
   ksel  + added tmp_directory	 
   www   + added faq: port to windows ?	 
@@ -72,18 +135,18 @@
   ksel  + improved analyzer code
   ksel  + improved import scanner. very very fast now
   ksel  - when tempo was zero the index_file was always rewritten
-  ksel  - fixed serious import bug.
+  ksel  - fixed serious import bug
   ksel  + added better tag selection system
 1.9:
   ksel  - spectrumanalyzer was using fabsl (useles function)
-  kplay + tempo updates are immediatelly stored on disk, makes error correcting tempos
-	  much easier because the next playing song will automatically play at the 
-	  newly assigned tempo, not at the 'old remembered' tempo.
+  kplay + tempo updates are immediatelly stored on disk, makes error correcting
+          tempos much easier because the next playing song will automatically
+	  play at the newly assigned tempo, not at the 'old remembered' tempo.
   kplay + added visual feedback for automatic tempo switches	 
   kplay + added tempo-slider with non-lineair behavior
   kplay - fetch spectrum werkte niet op heel korte nummers
   ksel  + added scales for tempo-range and spectrum-range
-  ksel  + added the possibility to fetch a set of songs and put them in one directory
+  ksel  + added the possibility to fetch a set of songs and put them in one dir
   ksel  + faster update of songlist (cached)
   kplay + improved error mesages when starting
   ksel  + similar name scanner: added two options: mark unknown songs and 
@@ -92,17 +155,18 @@
   ksel  + added auto-queue
   ksel  + program can automatically select 'transition'-songs	 
   kplay + setting latency of DSP device (thx to rasto)	 
-  ksel  + divided qsong again into a datapart (song) and a view (qsong)	 
+  ksel  + divided qsong again into a datapart (song) and a view (qsong)
   ksel  + support for .ogg
   kplay + support for .ogg
-  ksel  + code cleanup; (-Wall, longtrick, malloc/realloc, asserts, fread/fsize/fwrite
-	  wrapperd, WAVRATE convertion, system-calls, mount/umount, cp/mv/rm, md5sums)
+  ksel  + code cleanup; (-Wall, longtrick, malloc/realloc, asserts,
+          fread/fsize/fwrite, wrapperd, WAVRATE convertion, system-calls, 
+	  mount/umount, cp/mv/rm, md5sums)
   ksel  + added pattern scanner
   ksel  + improved the similar scanner
   ksel  - fixed the no-selection->crash bug in the similar name scanner
   ksel  + added automatic mixer, works surprisingly well
   ksel  - fixed two bugs in 1.8 release: panning was wrong functionality 
-	  and beatmixing.ps is no longer available, hance no check is necessary	 
+	  and beatmixing.ps is no longer available, hance no check is necessary
 1.8:
   kplay + added ui for spectrum analyzer
   ksel  - can handle songs with 'inf' tempo or songs with no tempo	
@@ -134,19 +198,21 @@
   ksel  - fixed bugs in loading and saving of the configuration file	 
   ksel  + added measurement of sound color/spectrum
   ksel  - mpeg3 decoding happens with nice value of 20
-  ksel  - race condition in signal handling. Solved.
+  ksel  - race condition in signal handling
 1.6: 
   ksel  + added showing of cues and length of a song
-  ksel  + added legend, restart button, up/down tempo range selection	 
-  ksel  - when quiting before wave is written entirly, the wave was not removed 
+  ksel  + added legend, restart button, up/down tempo range selection
+  ksel  - when quiting before wave is written entirly, the wave was not removed
   ksel  + saving/loading configuration data	
   ksel  + moved tag buttons to seperate tab
-  ksel  + code cleanup: char* -> QString; removal of DT_REG, merge of SongView and Song	  
+  ksel  + cleanup: char* -> QString; removal of DT_REG, merge of SongView 
+          and Song
   ksel  + removed visible index directory structure  
   ksel  - fixed a fetchfromcdrom bug
   kplay - smaller start-size. Necessary for QT3
   ksel  + same authors are colored in a decayeing orange
-  ksel  - added a search button. This was necessary due to a QT3/QT2 incompatibility
+  ksel  - added a search button. This was necessary due to a QT3/QT2 
+          incompatibility
   ksel  - cue convertion from 22050 samplerate naar 44100 samplerate
 1.5:
   ksel  + switched to QT3

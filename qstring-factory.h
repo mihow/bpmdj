@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001 Werner Van Belle
+ Copyright (C) 2001-2004 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -21,6 +21,18 @@
 #include <qstring.h>
 #include "avltree.h"
 
+extern const QString TRUE_TEXT;
+extern const QString FALSE_TEXT;
+extern const QString TAG_TRUE; 
+extern const QString TAG_FALSE;
+extern const QString zero;
+extern const QString zeroo;
+extern const QString slash;
+extern const QString EMPTY;
+
+QString tonumber(const int b);
+QString tonumber(const float f);
+
 class QStringFactory
 {
   private:
@@ -28,6 +40,7 @@ class QStringFactory
     static AvlTree<QString> tree;
     static QString * lookup(QString *str);
   public:
+    // WVB -- try to majke this const char *str)
     static QString create(char* str);
     static void kill();
 };

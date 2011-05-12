@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001 Werner Van Belle
+ Copyright (C) 2001-2004 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -31,6 +31,11 @@ class SongPlayerLogic :
    Q_OBJECT
  private:
    QTimer *timer;
+   map_data map;
+   int mapin_up;
+   int mapin_down;
+   int map_size;
+   int map_scale;
    int tempo_fade;
    int fade_time;
    signed8 wantedcurrentperiod;
@@ -41,14 +46,23 @@ class SongPlayerLogic :
  protected:
    virtual void done(int r);
    void checkCueNonZero();
+   void update_map_pixmaps();
+   void update_inmap_pixmap();
+   void update_speedmap_pixmap();
+   void update_volumemap_pixmap();
+   void update_map_scale_box();
  public:
    SongPlayerLogic::SongPlayerLogic(QWidget*parent=0,const char*name=0, bool modal=FALSE,WFlags f=0);
  public slots:
+   virtual void mousePressEvent(QMouseEvent * e);
+   virtual void mouseReleaseEvent(QMouseEvent * e);
+   virtual void mouseMoveEvent(QMouseEvent * e);
    // screen update and tempo slides
    virtual void timerTick();
    // phase shifts
    virtual void nudgePlus();
    virtual void nudgeMinus();
+   virtual void nudgeMinusHalfB();
    virtual void nudgePlus1M();
    virtual void nudgeMinus1M();
    virtual void nudgePlus4M();
@@ -89,6 +103,14 @@ class SongPlayerLogic :
    // volumes
    //   virtual void pcmVolume(int volume);
    //   virtual void mainVolume(int volume);
+   // Map functions
+   virtual void mapStart();
+   virtual void mapStop();
+   virtual void mapLoopChange();
+   virtual void mapLengthChanged(int i);
+   virtual void mapScaleChanged(int i);
+   virtual void loadMap();
+   virtual void saveMap();
    // LFO functions
    virtual void fastSaw();
    virtual void slowSaw();
@@ -104,9 +126,4 @@ class SongPlayerLogic :
    virtual void openPatternAnalyzer();
    virtual void openInfo();
    virtual void openAbout();
-   // loop functionality
-   virtual void toggleNoLoop();
-   virtual void toggleBeatLoop();
-   virtual void toggleMeasureLoop();
-   virtual void toggle4MeasureLoop();
 };

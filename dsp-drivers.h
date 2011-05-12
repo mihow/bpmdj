@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001 Werner Van Belle
+ Copyright (C) 2001-2004 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -23,13 +23,10 @@
 
 #ifndef COMPILE_OSS
 #ifndef COMPILE_ALSA
-#ifndef COMPILE_NONE
 #error -------------------------------------------
 #error Should at least compile one dsp driver !!! 
 #error Try using -D COMPILE_OSS, -D COMPILE_ALSA 
-#error        or -D COMPILE_NONE
 #error -------------------------------------------
-#endif
 #endif
 #endif
 

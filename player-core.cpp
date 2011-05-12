@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001 Werner Van Belle
+ Copyright (C) 2001-2004 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -165,13 +165,18 @@ int wave_read(unsigned4 pos, unsigned4 *val)
 
 
 /*-------------------------------------------
- *         Synth operations
+ *         Volume Synth operations
  *-------------------------------------------*/
 unsigned8   lfo_phase=0;
 signed8   lfo_period=0;
 _lfo_   lfo_do;
 
 void jumpto(signed8, int);
+
+_lfo_ lfo_get()
+{
+  return lfo_do;
+}
 
 void lfo_set(char* name, _lfo_ l, unsigned8 freq, unsigned8 phase)
 {
@@ -192,27 +197,14 @@ void lfo_set(char* name, _lfo_ l, unsigned8 freq, unsigned8 phase)
     }
 }
 
-//#define ABSTEST
+static signed4 volume = 100;
 unsigned4 lfo_no(unsigned4 x)
 {
-#ifdef ABSTEST
-  static signed leftmax = 0, rightmax = 0;
   longtrick lt;
   lt.value=x;
-  
-  lt.leftright.left=abs(lt.leftright.left);
-  if (lt.leftright.left>leftmax)
-    leftmax=lt.leftright.left;
-  lt.leftright.left-=leftmax/2;
-  
-  lt.leftright.right=abs(lt.leftright.right);
-  if (lt.leftright.right>rightmax)
-    rightmax=lt.leftright.right;
-  lt.leftright.right-=rightmax/2;
-
+  lt.leftright.left=((signed4)lt.leftright.left)*volume/100;
+  lt.leftright.right=((signed4)lt.leftright.right)*volume/100;
   return lt.value;
-#endif
-  return x;
 }
 
 unsigned4 lfo_volume(unsigned4 x, signed4 multiplierleft, signed4 divisorleft, signed4 multiplierright,signed4 divisorright)
@@ -243,6 +235,8 @@ unsigned4 lfo_metronome(unsigned4 x)
    val=sin(6.28*diff*(double)(WAVRATE)/440.0)*4096.0*(1.0-(double)diff/(double)lfo_period);
    /* mix them */
    lt.value=x;
+   lt.leftright.left=((long)lt.leftright.left)*7/8;
+   lt.leftright.right=((long)lt.leftright.right)*7/8;
    lt.leftright.left+=(signed short)val;
    lt.leftright.right+=(signed short)val;
    return lt.value;
@@ -412,6 +406,145 @@ unsigned4 lfo_revsaw(unsigned4 x)
 void lfo_init()
 {
   lfo_do=lfo_no;
+}
+
+
+/*-------------------------------------------
+ *         Mapping Synth operations
+ *-------------------------------------------*/
+unsigned8   map_start_pos = 0;
+unsigned8   map_stop_pos = 0;
+bool        map_loop = false;
+signed8     map_exit_pos = 0;
+bool        map_do;
+map_data    map = NULL;
+signed2     map_size = 0;
+
+void map_loop_set(bool l)
+{
+  map_loop=l;
+}
+
+unsigned8 map_active(unsigned8 a)
+{
+  // out of range ?
+  if (a<map_start_pos) return a;
+  if (a>=map_stop_pos) 
+    {
+      if (map_loop)
+	{
+	  a=map_start_pos;
+	  x = map_start_pos;
+	  y = y_normalise(x);
+	}
+      else
+	{
+	  volume = 100;
+	  if (map_exit_pos == map_exit_stop)
+	    {
+	      x = map_start_pos;
+	      paused = true;
+	    }
+	  if (map_exit_pos == map_exit_restart)
+	    x = map_start_pos;
+	  else if (map_exit_pos == map_exit_continue)
+	    x = map_stop_pos;
+	  else 
+	    x = map_exit_pos;
+	  y = y_normalise(x);
+	  map_set(0,NULL,0,map_exit_restart,false);
+	  return x;
+	}
+    }
+
+  // determine fine grained relative position of 'wants to play'
+  unsigned8 dx = a - map_start_pos;
+  // determine segment of 'wants to play'
+  signed2 segment = dx*map_size/(map_stop_pos-map_start_pos);
+#ifdef DEBUG_SEGSEQ
+  static int last_segment = -1;
+  if (segment!=last_segment)
+    {
+      last_segment=segment;
+      printf("segment = %d\n",segment);
+    }
+  assert(segment<map_size);
+#endif
+  // determine offset wrt actual segment start
+  unsigned8 segment_start = segment * (map_stop_pos-map_start_pos) / map_size;
+  unsigned8 segment_offset = dx - segment_start;
+  // obtain segment of new postion
+  signed2 new_segment = map[segment].take_from;
+  
+  // calculate speed
+  segment_offset = ((signed4)segment_offset) 
+    * ((signed4)map[segment].speed_mult) 
+    / ((signed4)map[segment].speed_div);
+  if (new_segment < 0)
+    return map_stop_pos;
+  // transfer volume
+  volume = map[segment].volume;
+  // obtain new segment start position
+  unsigned8 new_segment_start = new_segment * (map_stop_pos-map_start_pos) / map_size;
+  // fix should play position with actual map_start_pos and fine grained segment offset
+  return new_segment_start+segment_offset+map_start_pos;
+}
+  
+void map_stop()
+{
+  x = map_active(x);
+  y = y_normalise(x);
+  map_do=false;
+  if (map) deallocate(map);
+  map=NULL;
+}
+
+void map_set(signed2 size, map_data inmap, unsigned8 msize, signed8 mexit, bool l)
+{
+  // if paused we start at the last cue position
+  unsigned8 mstart;
+  unsigned8 mstop;
+  if (size > 0  && paused)
+    mstart = cue;
+  else
+    mstart = x_normalise(::y - dsp->latency());
+  mstop = mstart + msize;
+  map_exit_pos = mexit;
+  map_data old_map = map;
+  // should we inactivate it ?
+  if (size<=0) map_do=false;
+  // should we modify first the size or the data ?
+  // this is important because the map is still in use !
+  if (size>map_size)
+    {
+      map_start_pos = mstart;
+      map_stop_pos = mstop;
+      map=inmap;
+      map_size=size;
+    }
+  else
+    {
+      map_start_pos = mstart;
+      map_stop_pos = mstop;
+      map_size=size;
+      map=inmap;
+    }
+  map_loop = l;
+  // should we now activate it ?
+  map_do = size > 0;
+  // free old map ?
+  if (old_map) deallocate(old_map);
+  // unpause ?
+  if (paused)
+    {
+      jumpto(0,0);
+      paused=0;
+    }
+}
+
+void map_init()
+{
+  map_do=false;
 }
 
 /*-------------------------------------------
@@ -594,7 +727,9 @@ void jumpto(signed8 mes, int txt)
 void read_write_loop()
 {
   unsigned4 value[1];
+  unsigned8 m;
   lfo_init();
+  map_init();
   dsp->start();
   while(!stop)
     {
@@ -602,10 +737,14 @@ void read_write_loop()
       if (paused)
 	dsp->pause();
       // calculate value
-      x=y*normalperiod/currentperiod;
+      x = y * normalperiod/currentperiod;
       if (x>loop_at)
 	loop_jump();
-      if (wave_read(x,value)<0)
+      if (map_do)
+	m = map_active( x );
+      else
+	m = x;
+      if (wave_read(m,value)<0)
 	{
 	  printf("End of song, pausing\n");
 	  paused = 1;
@@ -629,9 +768,8 @@ void line()
 
 void copyright()
 {
-   printf("BpmDj Player v%s, Copyright (c) 2001 Werner Van Belle\n",VERSION);
+   printf("BpmDj Player v%s, Copyright (c) 2001-2004 Werner Van Belle\n",VERSION);
    printf("This software is distributed under the GPL2 license. See copyright.txt\n");
-   printf("Press 'h' for Help. See beatmixing.ps for details\n");
    line();
 }
 

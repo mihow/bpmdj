@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001 Werner Van Belle
+ Copyright (C) 2001-2004 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -22,27 +22,23 @@
 #include <stdio.h>
 #include "spectrum.h"
 
-float scales[24] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
-int sums[24] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+spectrum_freq scales[spectrum_size] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
+spectrum_freq sums[spectrum_size] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 static int spectra=0;
 
-void newSpectrum(QString spectrum)
+void new_spectrum(spectrum_type spectrum)
 {
-  if (spectrum.isNull()) return;
+  if (spectrum==no_spectrum) return;
   spectra++;
-  for(int i =0 ;i <24;i++)
-    {
-      char letter = spectrum.at(i).latin1();
-      int value = letter- 'a';
-      sums[i]+=value;
-    }
+  for(int i = 0 ;i < spectrum_size; i ++ )
+    sums[i]+=spectrum[i];
 }
 
-void lastSpectrum()
+void last_spectrum()
 {
-  for(int i=0;i<24;i++)
+  for(int i = 0 ; i < spectrum_size ; i ++ )
     {
+      // printf("mean of frequency band %d is %g\n",i,sums[i]/(float)spectra);
       scales[i]=(float)spectra/(float)sums[i];
-      scales[i]*=5;
     }
 }

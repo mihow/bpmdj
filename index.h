@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001 Werner Van Belle
+ Copyright (C) 2001-2004 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -86,7 +86,6 @@ class Index
  private:
   // some conversion functions from old versions
   bool fix_tagline();
-  bool fix_tar_info();
   bool fix_tempo_fields();
   bool split_field_value(char * start, char*&field, char*&value);
   void add_history(HistoryField **&, HistoryField *);
@@ -99,12 +98,11 @@ class Index
   // reading an index (.idx)
   void read_idx(const char*);
   // reading an index stored in a .bib (.bib)
-  char* tohex(long);
-  long  toint(const char*);
   void read_v23_field();
   void read_bib_field(const char* name);
   void write_v23_field(FILE * file);
  public:
+  bool fix_tar_info();
   static void init_bib_batchread(const char* name);
   static void done_bib_batchread();
   long read_bib_field(long position, const char* meta_shortname = NULL);
@@ -135,7 +133,7 @@ class Index
   // tempo accessors
   int              get_period()             { return index_period; };
   void             set_period(int t, bool update_on_disk = true);
-  double           get_tempo()              { return index_period > 0 ? 4.0*11025.0*60.0/(double)index_period : -1; };
+  double           get_tempo()              { return index_period > 0 ? 4.0*11025.0*60.0/(double)index_period : no_tempo; };
   char           * get_tempo_str()          { return index_tempo; };
   // album accessors
   void             add_album(AlbumField *);
@@ -176,7 +174,8 @@ class Index
   int              get_bpmcount_to()        { return index_bpmcount_to; };
   // spectrum accessors       
   void             set_spectrum(char*s)     { if (!index_spectrum || strcmp(index_spectrum,s)!=0) {index_spectrum = s; meta_changed=true; } };
-  char           * get_spectrum()           { return index_spectrum; };
+  // char           * get_spectrum()           { return index_spectrum; };
+  spectrum_type    get_spectrum_copy();
 };
 
 #endif

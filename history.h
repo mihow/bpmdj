@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001 Werner Van Belle
+ Copyright (C) 2001-2004 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <qstring.h>
 #include "song.h"
+#include "growing-array.h"
 
 /**
  * A class to represent the song already played
@@ -33,12 +34,9 @@ class Played
   private:
     static Song * t_2;  // T - 2
     static Song * t_1;  // T - 1
-    static Song * t_0;  // the current main
-    static QString** names;
-    static int size;
-    static int next;
+    static Song * t_0;  // T: the current main
+    static GrowingArray<QString> names;
     static FILE* f;
-    static void Add(QString *indexname);
   public:
     static int songs_played;
     Played(const QString filename);

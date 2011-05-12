@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001 Werner Van Belle
+ Copyright (C) 2001-2004 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -31,6 +31,7 @@
 #include "dirscanner.h"
 #include "spectrum.h"
 #include "historysong.h"
+#include "tags.h"
 
 #define HISTORY_MAINRELATION 0
 #define HISTORY_COMMENT 1
@@ -50,6 +51,7 @@
  */
 void HistorySong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid, int align)
 {
+  QColor * color;
   switch(col)
     {
     case HISTORY_CUES:
@@ -65,62 +67,52 @@ void HistorySong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid,
     case HISTORY_TEMPO: 
       {
 	Song * main = ProcessManager::playingInMain();
-	if (Config::color_range && main && song->tempo)
+	if (color=QSong::colorOfTempoCol(main,song))
 	  {
-	    int nogreen_value = 255;
-	    double d = song->tempo_distance(main);
-	    if (d<1) nogreen_value=(int)(d*255.0);
 	    QColorGroup ncg(cg);
-	    ncg.setColor(QColorGroup::Base,QColor(nogreen_value,255,nogreen_value));
+	    ncg.setColor(QColorGroup::Base,*color);
 	    QListViewItem::paintCell(p,ncg,col,wid,align);
+	    delete(color);
 	    return;
-	}
+	  }
+	break;
       }
-      break;
-      
+
     case HISTORY_TITLE:
       if (Config::color_played && song->played)
 	{
 	  QColorGroup ncg(cg);
-	  ncg.setColor(QColorGroup::Base,QColor(255,0,0));
+	  ncg.setColor(QColorGroup::Base,Config::color_played_song);
 	  QListViewItem::paintCell(p,ncg,col,wid,align);
 	  return;
 	}
       break;
       
     case HISTORY_AUTHOR:
-      {
-	if (Config::color_authorplayed)
-	  {
-	    int played_author_songs_ago = Played::songs_played - song->played_author_at_time;
-	    if (played_author_songs_ago < Config::authorDecay)
-	      {
-		QColorGroup ncg(cg);
-		ncg.setColor(QColorGroup::Base,
-			     QColor(255,150+(255-150)*played_author_songs_ago/Config::authorDecay
-				    ,255*played_author_songs_ago/Config::authorDecay));
-		QListViewItem::paintCell(p,ncg,col,wid,align);
-		return;
-	      }
-	  }
-	break;
-      }
+      if (color=QSong::colorOfAuthorCol(song))
+	{
+	  QColorGroup ncg(cg);
+	  ncg.setColor(QColorGroup::Base,*color);
+	  QListViewItem::paintCell(p,ncg,col,wid,align);
+	  delete(color);
+	  return;
+	}
+      break;
       
     case HISTORY_DCOLOR:
-      {
-	if (Config::color_dcolor)
-	  {
-	    QColorGroup ncg(cg);
-	    ncg.setColor(QColorGroup::Base,QColor(255,255,song->color_distance));
-	    QListViewItem::paintCell(p,ncg,col,wid,align);
-	    return;
-	  }
-	break;
-      }
+      if (color=QSong::colorOfdColorCol(song))
+	{
+	  QColorGroup ncg(cg);
+	  ncg.setColor(QColorGroup::Base,*color);
+	  QListViewItem::paintCell(p,ncg,col,wid,align);
+	  delete(color);
+	  return;
+	}
+      break;
       
     case HISTORY_SPECTRUM:
       if (Config::color_spectrum)
-	if (!song->spectrum.isNull())
+	if (song->spectrum!=no_spectrum)
 	  {
 	    QColorGroup ncg(cg);
 	    ncg.setColor(QColorGroup::Base,song->color);
@@ -128,19 +120,16 @@ void HistorySong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid,
 	    return;
 	  }
       break;
-      
-    case HISTORY_ONDISK:
-      if (Config::color_ondisk && !song->ondisk)
-	{
-	  QColorGroup ncg(cg);
-	  ncg.setColor(QColorGroup::Base,QColor(0,0,255));
-	  QListViewItem::paintCell(p,ncg,col,wid,align);
-	  return;
-	}
-      break;
     }
   
-  QListViewItem::paintCell(p,cg,col,wid,align);
+  if (Config::color_ondisk && !song->ondisk)
+    {
+      QColorGroup ncg(cg);
+      ncg.setColor(QColorGroup::Base,Config::color_unavailable);
+      QListViewItem::paintCell(p,ncg,col,wid,align);
+    }
+  else
+    QListViewItem::paintCell(p,cg,col,wid,align);
 }
 
 QString HistorySong::text(int i) const
@@ -152,8 +141,8 @@ QString HistorySong::text(int i) const
     case HISTORY_VERSION : return song->version;
     case HISTORY_TITLE : return song->title;
     case HISTORY_AUTHOR : return song->author;
-    case HISTORY_TEMPO : return song->tempo;
-    case HISTORY_TAGS : return song->tags;
+    case HISTORY_TEMPO : return song->tempo_str();
+    case HISTORY_TAGS : return Tags::full_string(song->tags);
     case HISTORY_TIME : return song->time;
     case HISTORY_DCOLOR : return song->distance_string;
     case HISTORY_SPECTRUM : return song->spectrum_string;
@@ -179,5 +168,3 @@ HistorySong::HistorySong(Song * s, QString r, QString c, QListView* parent) :
   comment = c;
 }
 
-QString HistorySong::TRUE_TEXT("Yes");
-QString HistorySong::FALSE_TEXT("No");

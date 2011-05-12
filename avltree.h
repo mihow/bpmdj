@@ -102,6 +102,7 @@ template <class Key> class AvlTree
   void PurgeAll(Node<Key>* root);
  public:
   AvlTree();
+  void init();
   virtual ~AvlTree();
   void add(Node<Key>* who)     { root = AddAvlNode(root,who); };
   Node<Key>* search(Key watte) { return root->search(watte)->toAnswer();};

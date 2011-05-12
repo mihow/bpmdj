@@ -25,6 +25,9 @@ Some compile time flags:
     add to the CFLAGS '-D COMPILE_ALSA' to include native support for alsalib. 
     Don't forget to add -lasound to the LDFLAGS !
 
+These defines files proably include distcc and ccache. These two programs are 
+of course not striclt necesasry. Removing these words from the defines file 
+should still work.
 
 PS: I don't want to use automake configure like things because they are simply
 too difficult to use. Makefiles become unreadable, configuring for KDE

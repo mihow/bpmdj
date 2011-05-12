@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001 Werner Van Belle
+ Copyright (C) 2001-2004 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -20,13 +20,6 @@
 
 #include "songtree.h"
 #include "avltree.cpp"
-
-int clip(int val)
-{
-  if (val<0) return -1;
-  if (val>0) return +1;
-  return 0;
-}
 
 int QStringSortedNode::compareAddData(Node<QString>* n)
 {

@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001 Werner Van Belle
+ Copyright (C) 2001-2004 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -68,7 +68,7 @@ void ImportScanner::checkfile(const QString pathname, const QString filen)
       char * indexname = findUniqueName(filename);
       Index *index = new Index();
       index->set_storedin(indexname);
-      free(indexname);
+      deallocate(indexname);
       
       char log[500];
       sprintf(log,"Writing %s",index->get_storedin());
@@ -79,6 +79,7 @@ void ImportScanner::checkfile(const QString pathname, const QString filen)
       
       index->set_filename(strdup(filename));
       index->set_tags(strdup("New"));
+      index->fix_tar_info();  // to fix filenames that had the correct name
       index->set_period(-1);  // writes immediatelly to disk
       Song * song = new Song(index,true,true,true);
       delete index;

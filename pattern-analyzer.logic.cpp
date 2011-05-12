@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001 Werner Van Belle
+ Copyright (C) 2001-2004 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -60,6 +60,7 @@
 #include "scripts.h"
 
 #define COLLAPSE 4
+#define COLLAPSE_HAAR 4
 #define sample_freq ((double)WAVRATE/(double)COLLAPSE)
 
 PatternAnalyzerLogic::PatternAnalyzerLogic(bool showreaderprogress, SongPlayer*parent, const char*name, bool modal, WFlags f) :
@@ -67,8 +68,7 @@ PatternAnalyzerLogic::PatternAnalyzerLogic(bool showreaderprogress, SongPlayer*p
 {
   period=normalperiod;
   data = NULL;
-  filter = NULL;
-  filtersize = 0;
+  signed_data = NULL;
   readFile(showreaderprogress);
   show();
   showPattern();
@@ -137,20 +137,79 @@ void PatternAnalyzerLogic::readFile(bool showreaderprogress)
     data[i]=(signed8)data[i]*(signed8)255/maximum;
 }
 
-void PatternAnalyzerLogic::showPattern()
+void PatternAnalyzerLogic::readFileSigned(bool showreaderprogress)
+{
+  if (data) 
+    {
+      deallocate(data);
+      data = NULL;
+    }
+  if (signed_data)
+    return;
+  long int bufsize = 65536;
+  longtrick buffer[bufsize];
+
+  // read in memory and shrink it 
+  FILE * raw=openRawFile(playing,arg_rawpath);
+  audiosize=fsize(raw)/4;
+  if (audiosize == 0) return;
+  signed4 pos = 0;
+  fseek(raw,pos,SEEK_SET);
+  signed_data = allocate(audiosize/COLLAPSE_HAAR,uncompressed);
+  
+  QProgressDialog * progress = NULL;
+  if (showreaderprogress) 
+    {
+      progress = new QProgressDialog();
+      progress->setTotalSteps(audiosize/bufsize);
+      progress->show();
+    }
+  
+  while(pos<audiosize)
+    {
+      long toread = audiosize - pos;
+      if (toread>bufsize) toread = bufsize;
+      long count=readsamples((unsigned4*)buffer,toread,raw);
+      
+      if (progress) progress->setProgress(pos/bufsize);
+      app->processEvents();
+
+      for(int i = 0 ; i < count/COLLAPSE_HAAR; i++)
+	{
+	  uncompressed sum=0;
+	  for(int j = 0 ; j < COLLAPSE_HAAR ; j++)
+	    {
+	      assert(i*COLLAPSE_HAAR+j<count);
+	      sum+=buffer[i*COLLAPSE_HAAR+j].leftright.left;
+	      sum+=buffer[i*COLLAPSE_HAAR+j].leftright.right;
+	    }
+	  sum /= COLLAPSE_HAAR*2;
+	  assert(i + pos/COLLAPSE_HAAR < audiosize/COLLAPSE_HAAR);
+	  signed_data[i+pos/COLLAPSE_HAAR]=sum;
+	}
+      pos+=count;
+    }
+  
+  fclose(raw);
+  delete(progress);
+  
+  // normalize the audio
+  uncompressed maximum = 0;
+  for(int i = 0 ; i < audiosize/COLLAPSE_HAAR ; i++)
+    if (signed_data[i]>maximum)
+      maximum=signed_data[i];
+  if (maximum==0)
+    {
+      audiosize=0;
+      return;
+    }
+  for(int i = 0 ; i < audiosize/COLLAPSE_HAAR ; i++)
+    signed_data[i]/=maximum;
+}
+
+
+void PatternAnalyzerLogic::showPatternVersion1()
 { 
-  readFile(false);
-  if (!audiosize)
-    {
-      QMessageBox::warning(this,"Fragment too small","There is simply no raw data on disk,\nHence, I can't display the beat graph");
-      return;
-    }
-  if (!period)
-    {
-      QMessageBox::warning(this,"No period estimate","No period estimate, hence cannot show the beat graph.\n"
-			   "Please go to the bpm counter and measure the tempo first");
-      return;
-    }
   int beats_per_column = beats->value() ;
   unsigned4 collapsed_period = period  / COLLAPSE ;
   collapsed_period *= beats_per_column;
@@ -221,58 +280,653 @@ void PatternAnalyzerLogic::showPattern()
   projection->setPixmap(*sm);
 }
 
-/*void PatternAnalyzerLogic::run()
+
+void PatternAnalyzerLogic::showHaarVersion1()
 { 
-  unsigned int row, beats_per_column = beats->value() ;
-  unsigned4 collapsed_period = period;
+  unsigned4 collapsed_size = audiosize / COLLAPSE_HAAR ;
+  
+  int window_xsize = pattern->contentsRect().height();
+  int window_ysize = pattern->contentsRect().height();
+  assert(window_ysize>0);
+  assert(window_xsize>0);
+  
+  QPixmap *pm = new QPixmap(window_xsize,window_ysize);
+  QPainter p;
+  p.begin(pm);
+  
+  array(means, window_xsize, signed8*);
+  for(int x = 0 ; x < window_xsize ; x ++)
+    {
+      means[x]=allocate(window_ysize,signed8);
+      assert(means[x]);
+      for(int y = 0 ; y < window_ysize ; y++)
+	means[x][y]=0;
+    }
+  
+  int fragment_size = collapsed_size / window_xsize;
+  for(int y = 0 ; y <  window_ysize ; y ++)
+    {
+      // calculate windowsize and position
+      // if y = 1 then we take the entire fragment_size log_2 = 0
+      // if y = 2,3 we take half of it                  trunc(log_2) = 1
+      // if y = 4,5,6,7 we take a fourth                trunc(loh
+      int window_size = fragment_size;
+      if (y>0)
+	{
+	  for(int p = y + 1 ; p>1 ; )
+	    {
+	      window_size/=2;
+	      p/=2;
+	    }
+	  if (window_size<1) window_size = 1;
+	}
+      int window_position = y + 1 -  fragment_size / window_size ;
+      printf("row %d, windowsize = %d, position %d\n",y,window_size, window_position);
+      // calculate entire row
+      for(int x = 0 ; x < window_xsize ; x ++)
+	{
+	  signed8 sum = 0;
+	  for(int i = 0 ; i < window_size ; i++)
+	    sum+=data[x*fragment_size+window_position*window_size+i];
+	  means[x][y]=sum/window_size-means[x][y/2];
+	}
+      // find maximum uitslag
+      signed8 max_amplitude = 0;
+      for(int x = 0 ; x < window_xsize ; x ++)
+	if (labs(means[x][y])>max_amplitude)
+	  max_amplitude = labs(means[x][y]);
+      // draw row
+      for(int x = 0 ; x < window_xsize ; x ++)
+	{
+	  int val = labs(means[x][y])*255/max_amplitude;
+	  p.setPen(QColor(val,val,val));
+	  p.drawPoint(x,y);
+	}
+      // modify scale for next step
+    }
+  p.end(); 
+  pattern->setPixmap(*pm);
+}
+
+const int maxslice = 8;
+// maxslice 10 with HAAR_COLLAPSE 4: blokes van 1024 samples, samplerate van 11025, measured frequency = 10 Hz
+// maxslice 8  with HAAR_COLLAPSE 4: blokes van 256 samples, samplerate van 11025, measured frequency = 40 Hz
+
+void getBandColor(int band, QColor &color, float val)
+{
+  if (band<0)
+    color.setRgb(0,0,0);
+  else
+    {
+      float p = 240.0*(float)band/(float)maxslice;
+      color.setHsv((int)p,255, 255);
+      int r,g,b;
+      color.getRgb(&r,&g,&b);
+      float d;
+      if (p<120)
+	d = r*r+g*g;
+      else
+	d = g*g+b*b;
+      d = 255.0*(val > 1.0 ? 1 : val) / sqrt(d);
+      r=(int)(((float)r)*d);
+      g=(int)(((float)g)*d);
+      b=(int)(((float)b)*d);
+      //assert(r<256);
+      //assert(g<256);
+      //assert(b<256);
+      //printf("color = %d,%d,%d\n",r,g,b);
+      color.setRgb(r,g,b);
+    }
+}
+
+void PatternAnalyzerLogic::showHaarVersion2()
+{ 
+  // we should have sopme technique to reduce the smoothness of things. We want to increase
+  // the contrast level of most signals...
+  int beats_per_column = beats->value() ;
+  unsigned4 collapsed_period = period  / COLLAPSE_HAAR ;
   collapsed_period *= beats_per_column;
-  collapsed_period /= 4 * COLLAPSE;
+  collapsed_period /= 4;
+  unsigned4 collapsed_size = audiosize / COLLAPSE_HAAR ;
+  int window_xsize = collapsed_size / collapsed_period - 1 ;
+  int window_ysize = pattern->contentsRect().height();
+  int dc = color->value();
+  assert(window_ysize>0);
+  QPixmap *pm = new QPixmap(window_xsize,window_ysize);
+  QPainter p;
+  p.begin(pm);
+  // first we calculate a number of layers, based on the audio-stream...
+  // in every step we will modify the signed_data set by subtracting the current mean...
+  array(bank,maxslice+1,float*);
+  array(bank_energy,maxslice+1,double);
+  bool th = treshold->isChecked();
+  bool th2 = treshold2->isChecked();
+  for(int filter = maxslice ; filter >= 0 ; filter --)
+    {
+      // calculate content of entry 'filter' of filterbank 'bank'
+      int window_size = 1 << filter;
+      int haar_size = collapsed_size / window_size;
+      float * filtered = NULL;
+      if (!filter)
+	filtered = bank[filter] = signed_data;
+      else
+	{
+	  filtered = bank[filter] = allocate(haar_size+1, float);
+	  filtered[haar_size]=0;
+	  for(int y = 0 ; y < haar_size ; y ++)
+	    {
+	      int d = y * window_size;
+	      float mean = 0;
+	      for(int x = 0 ; x < window_size ; x++)
+		mean += signed_data[x+d];
+	      mean /= (float)window_size;
+	      filtered[y] = mean;
+	      for(int x = 0 ; x < window_size ; x++)
+		signed_data[x+d]-=mean;
+	    }
+	}
+
+      for(int y = 0 ; y < haar_size ; y++)
+	filtered[y]=fabs(filtered[y]);
+      
+      if (logarithmic->isChecked())
+	{
+	  float l2d = log(2);
+	  for(int y = 0 ; y < haar_size ; y++)
+	    {
+	      float r = 10.0*log(filtered[y])/l2d;
+	      if (r<-120) r=-120;
+	      filtered[y]=(r+120.0)/120.0;
+	    }
+	}
+
+      // smooth entry ?
+      /*for(int y = 0 ; y < haar_size - 1; y++)
+		{
+	  float sum = 0;
+	  for(int x = 0 ; x < 1 ; x++)
+	    sum+=filtered[y+x];
+	  filtered[y]=sum;
+	}
+      */
+      
+      if (decay->isChecked())
+	{
+	  float decay = 0.95;
+	  float last = 0;
+	  //for(int y = 0 ; y < haar_size; y++)
+	  //last = (filtered[y] += decay * last);
+	  for(int y = 0 ; y < haar_size; y++)
+	    last = filtered[y] += 1 - exp(-last);
+	}
+      
+      if (smear->isChecked())
+	{
+	  int ml = 2*(maxslice-filter);
+	  if (ml>0)
+	    for(int y = haar_size ; y > ml; y--)
+	      {
+		float sum = 0;
+		for(int x = 0 ; x < ml ; x++)
+		  {
+		    float v = filtered[y-x];
+		    if (v>sum)
+		      sum=v;
+		  }
+		filtered[y]=sum;
+	      }
+	}
+      
+      // find the mean of this bank entry
+      double mean=0;
+      double max =0;
+      for(int y = 0 ; y < haar_size ; y++)
+	{
+	  float v = filtered[y];
+	  mean += v;
+	  if (v>max)
+	    max = v;
+	}
+      mean/=haar_size;
+      
+      if (th2)
+	{
+	  float mean2=0;
+	  int m2c=0;
+	  for(int y = 0 ; y < haar_size ; y++)
+	    {
+	      float v = filtered[y];
+	      if (v>mean)
+		{
+		  mean2+=v;
+		  m2c++;
+		}
+	    }
+	  mean2/=m2c;
+	  mean=mean2;
+	}
+
+      // find the std dev of this bank entry
+      double dev = 0;
+      int devcnt = 0;
+
+      bank_energy[filter] = 0;
+      for(int row = 0 ; row < haar_size ; row++)
+	{
+	  float v = filtered[row];
+	  if (th)
+	    {
+	      if (v>mean)
+		{
+		  bank_energy[filter]+=v;
+		  dev+=fabs(v-mean);
+		  devcnt++;
+		}
+	    }
+	  else
+	    {
+	      bank_energy[filter]+=v;
+	      dev+=fabs(v-mean);
+	      devcnt++;
+	    }
+	}
+      bank_energy[filter]*=window_size;
+      dev/=devcnt;
+
+      printf("Slice %d has mean energy of %g and deviation of %g and max of %g\n",filter,mean,dev,max);
+      if (dev>0)
+	for(int y = 0 ; y < haar_size ; y++)
+	  {
+	    float v = filtered[y];
+	    if (th && v<mean) v=0;
+	    else
+	      {
+		v-=mean;
+		v/=dev;
+		v+=0.5;
+		if (th2) v+=0.5;
+		if (v>1) v=1;
+		if (v<0) v=0;
+	      }
+	    filtered[y]=v;
+	  }
+    }
+  
+  signed_data = NULL;
+
+  // normalize bank_energy
+  double maxe=0;
+  for(int i = 0 ; i <= maxslice ; i++)
+    if (bank_energy[i]>maxe)
+      maxe=bank_energy[i];
+  if (maxe>0)
+    for(int i = 0 ; i <= maxslice ; i++)
+      bank_energy[i]/=maxe;
+  for(int i = 0 ; i <= maxslice ; i++)
+    printf("bank entry %d has %g energy\n",i,bank_energy[i]);
+
+  // show
+  float yscale = collapsed_period - 1 ;
+  yscale /= window_ysize;
+  for(int column = 0 ; column < window_xsize ; column++)
+    {
+      int co = column * collapsed_period;
+      for(int row = 0 ; row < window_ysize ; row++)
+	{
+	  QColor c;
+	  int ro = co + (int)((float)row*yscale);
+	  int r = 0, g = 0, b = 0;
+	  //int dc = color->value();
+	  for(int slice = maxslice; slice>=0 ; slice --)
+	    {
+	      int x1 = ro >> slice;
+	      int x2 = (ro+1) >> slice;
+	      float value = 0;
+	      if (x2>x1)
+		for(int x = x1 ; x < x2 ; x ++)
+		  value += bank[slice][x] / (float)(x2 - x1);
+	      else
+		value = bank[slice][x1];
+	      // we _DELEN_ door de bankenerrgy. De redenering hier is dat na de normalisatie elke
+	      // band even zichtbaar zou moeten zijn
+	      // als een band dan weinig energie heeft wilt dat zeggen dat deze vooral in pieken
+	      // werkt. Om deze dan zichtbaar te maken is het nodig deze te vergoten, hence te delen
+	      // getBandColor(maxslice-slice,c,value/bank_energy[slice]);
+	      getBandColor(maxslice-slice,c,value);
+	      r+=c.red();
+	      g+=c.green();
+	      b+=c.blue();
+	    }
+	  r*=2;
+	  g*=2;
+	  b*=2;
+	  r/=maxslice+1;
+	  g/=maxslice+1;
+	  b/=maxslice+1;
+	  if (r>255) r = 255;
+	  if (g>255) g = 255;
+	  if (b>255) b = 255;
+	  c.setRgb(r,g,b);
+	  p.setPen(c);
+	  p.drawPoint(column,row);
+	}
+    }
+
+  // show the alignation data for every slice
+  // if (allign->isChecked())
+  if(0)
+    for(int column = 0 ; column < window_xsize ; column++)
+      {
+	int x1 = column * collapsed_period;
+	int x2 = (column+1) * collapsed_period;
+	QColor c;
+	double shift = 0;
+	for(int slice = maxslice; slice>=0 ; slice --)
+	  {
+	    double accu = 0;
+	    double weight = 0;
+	    int x3 = x1 >> slice;
+	    int x4 = x2 >> slice;
+	    int xl = x4 - x3;
+	    int xm = (x4 + x3) / 2;
+	    for(int x = x1 >> slice ; x < x2 >> slice ; x ++)
+	      {
+		double v = bank[slice][x];
+		weight += v;
+		accu += v*(xm-x);
+	      }
+	    //accu*=xl
+	    accu/=weight;
+	    accu/=xl;
+	    printf("phase = %g\n",accu);
+	    accu*=window_ysize;
+	    accu/=2;
+	    accu+=window_ysize/2;
+	    shift+=accu;
+	    // we _DELEN_ door de bankenerrgy. De redenering hier is dat na de normalisatie elke
+	    // band even zichtbaar zou moeten zijn
+	    // als een band dan weinig energie heeft wilt dat zeggen dat deze vooral in pieken
+	    // werkt. Om deze dan zichtbaar te maken is het nodig deze te vergoten, hence te delen
+	    getBandColor(maxslice-slice,c,1);
+	    p.setPen(c);
+	    int row = (int)accu;
+	    p.drawPoint(column,row);
+	    p.setPen(QColor(0,0,0));
+	    p.drawPoint(column,row-1);
+	    p.drawPoint(column,row+1);
+	  }
+	shift/=maxslice;
+	p.setPen(QColor(255,255,255));
+	p.drawPoint(column,(int)shift);
+      }
+  
+  p.setPen(QColor(0,(128+dc)%256,0));
+  for(int row = 0 ; row < window_ysize ; row+=window_ysize/8)
+    p.drawLine(0,row,window_xsize-1,row);
+  p.end(); 
+  pattern->setPixmap(*pm);
+  signed4 maximum=0;
+  //  for(int row = 0 ; row < window_ysize ; row ++)
+    //if (project[row]>maximum)
+    //  maximum=project[row];
+  //  for(int row = 0 ; row < window_ysize ; row ++)
+  //    project[row]=((signed8)project[row])*(signed8)255/(signed8)maximum;
+  QPixmap *sm = new QPixmap(1,window_ysize);
+  QPainter l;
+  l.begin(sm);
+  //  for(int row = 0 ; row < window_ysize ; row++)
+  //    {
+  //      int val;
+  //      val = project[row];
+  //      l.setPen(QColor(val,val,val));
+  //      l.drawPoint(0,row);
+  //    }
+  l.end();
+  //  projection->setPixmap(*sm);
+}
+
+void PatternAnalyzerLogic::showHaarVersion3()
+{ 
+  int beats_per_column = beats->value() ;
+  const int maxslice = 8;
+  unsigned4 collapsed_period = period  / COLLAPSE_HAAR ;
+  collapsed_period *= beats_per_column;
+  collapsed_period /= 4;
+  unsigned4 collapsed_size = audiosize / COLLAPSE_HAAR ;
+  int window_xsize = collapsed_size * (maxslice+1) / collapsed_period - 1 ;
+  int window_ysize = pattern->contentsRect().height();
+  int dc = color->value();
+  assert(window_ysize>0);
+  QPixmap *pm = new QPixmap(window_xsize,window_ysize);
+  QPainter p;
+  p.begin(pm);
+  float yscale = collapsed_period - 1 ;
+  yscale /= window_ysize;
+  // array(project, window_ysize, signed4);
+  //for(int row =  0 ; row < window_ysize ; row ++)
+  // project[row]=0;
+  for(int column = 0 ; column < window_xsize / (maxslice + 1); column++)
+    {
+      array(slices,maxslice+1,float*);
+      for(int slice = maxslice ; slice >= 0 ; slice --)
+	{
+	  int window_size = 1 << slice;
+	  int haar_size = collapsed_period / window_size;
+	  slices[slice] = allocate(haar_size+1, float);
+	  slices[slice][haar_size]=0;
+	  for(int row = 0 ; row < haar_size ; row ++)
+	    {
+	      slices[slice][row]=0;
+	      int offset = column*collapsed_period + row * window_size;
+	      for(int x = 0 ; x < window_size ; x++)
+		slices[slice][row] += signed_data[x+offset];
+	      slices[slice][row]/=(float)window_size;
+	    }
+	  if (slice<maxslice)
+	    for(int lower_freq = slice + 1 ; lower_freq <= maxslice ; lower_freq++)
+	      for(int row = 0 ;row < haar_size ; row++)
+		slices[slice][row]-=slices[lower_freq][row>>(lower_freq-slice)];
+	}
+      // normalize mean values to range [0..1];
+      for(int slice = maxslice ; slice >=0 ; slice --)
+	{
+	  int window_size = 1 << slice;
+	  int haar_size = collapsed_period / window_size;
+	  float sum=0;
+	  float max=0;
+	  for(int row = 0 ; row < haar_size ; row++)
+	    {
+	      slices[slice][row]=fabs(slices[slice][row]);
+	      sum += slices[slice][row];
+	      if (slices[slice][row]>max)
+		max=slices[slice][row];
+	    }
+	  sum/=haar_size;
+	  //	  printf("Slice %d has mean energy of %g and maximum of %g\n",slice,sum,max);
+	  if (max>0)
+	    {
+	      float p = slice/maxslice;
+	      p *= p;
+	      p *= 2;
+	      p += 0.5;
+	      for(int row = 0 ; row < haar_size ; row++)
+		slices[slice][row]= pow(slices[slice][row]/max,p);
+	    }
+	}
+      // visualize content by selecting maximum energy within range
+
+      for(int slice = maxslice; slice>=0 ; slice --)
+	{
+	  int window_size = 1 << slice;
+	  int haar_size = collapsed_period / window_size;
+	  for(int row = 0 ; row < window_ysize ; row++)
+	    {
+	      QColor c;
+	      int r = 0, g = 0, b = 0;
+	      int x1 = row * haar_size / window_ysize;
+	      int x2 = (row+1) * haar_size / window_ysize;
+	      float value = 0;
+	      if (x2>x1)
+		for(int x = x1 ; x < x2 ; x ++)
+		  value += slices[slice][x] / (float)(x2 - x1);
+	      else
+		value = slices[slice][x1];
+	      int val = (int)(value*255.0);
+	      if (val>255)
+		val = 255;
+	      c.setHsv(240*(maxslice-slice)/maxslice,255,val);
+	      p.setPen(c);
+	      p.drawPoint(column*(maxslice+1)+slice,row);
+	    }
+	}
+    }
+  p.setPen(QColor(0,(128+dc)%256,0));
+  for(int row = 0 ; row < window_ysize ; row+=window_ysize/8)
+    p.drawLine(0,row,window_xsize-1,row);
+  p.end(); 
+  pattern->setPixmap(*pm);
+  signed4 maximum=0;
+  //  for(int row = 0 ; row < window_ysize ; row ++)
+    //if (project[row]>maximum)
+    //  maximum=project[row];
+  //  for(int row = 0 ; row < window_ysize ; row ++)
+  //    project[row]=((signed8)project[row])*(signed8)255/(signed8)maximum;
+  QPixmap *sm = new QPixmap(1,window_ysize);
+  QPainter l;
+  l.begin(sm);
+  //  for(int row = 0 ; row < window_ysize ; row++)
+  //    {
+  //      int val;
+  //      val = project[row];
+  //      l.setPen(QColor(val,val,val));
+  //      l.drawPoint(0,row);
+  //    }
+  l.end();
+  //  projection->setPixmap(*sm);
+}
+
+void PatternAnalyzerLogic::showPattern()
+{
+  if (!period)
+    {
+      QMessageBox::warning(this,"No period estimate",
+			   "No period estimate, hence cannot show the beat graph.\n"
+			   "Please go to the bpm counter and measure the tempo first");
+      return;
+    }
+  
+  if (haar->isChecked())
+    readFileSigned(false);
+  else
+    readFile(false);
+
+  if (!audiosize)
+    {
+      QMessageBox::warning(this,"Fragment too small",
+			   "There is simply no raw data on disk,\n"
+			   "Hence, I can't display the beat graph");
+      return;
+    }
+
+  if (haar->isChecked())
+    showHaarVersion2();
+  else
+    showPatternVersion1();
+}
+
+void PatternAnalyzerLogic::showPatternVersion2()
+{ 
+  int beats_per_column = beats->value() ;
+  unsigned4 collapsed_period = period  / COLLAPSE ;
+  collapsed_period *= beats_per_column;
+  collapsed_period /= 4;
   unsigned4 collapsed_size = audiosize / COLLAPSE ;
-  array(pattern,collapsed_period, double);
-  for(row =  0 ; row < collapsed_period ; row ++)
-    pattern[row]=0;
-  for(unsigned4 pos = 0 ; pos < collapsed_size ; pos ++)
-    pattern[pos%collapsed_period]+=data[pos];
-  double maximum = 0;
-  for(row = 0 ; row < collapsed_period ; row ++)
-    if (fabs(pattern[row])>maximum) maximum = fabs(pattern[row]);
-  for(row = 0 ; row < collapsed_period ; row ++)
-    pattern[row]=fabs(pattern[row]*255.0/maximum);
-  for(row = 0 ; row < collapsed_period ; row ++)
-    if (pattern[row]==255.0)
-      break;
-  int phase = row;
-*/
-  // hier zitten we met het probleem van de boel op te slaan op disk...
-  // we willen dat zo klein mogelijk...
-  // en toch zoveel mogelijk nuttige informatie behouden...
-  // die textfiles 
-  // in karakters kan ik het misschien der nog bijproppen
-/*  array(pattern_for_index,collapsed_period , unsigned char);
-  for(row = 0 ; row < collapsed_period ; row ++)
-    pattern_for_index[row]=(unsigned char)pattern[(phase+row)%collapsed_period];
-  index_pattern = pattern_for_index;
-  index_pattern_size = collapsed_period;
-  index_changed = 1;
-  index_write();
+  int window_xsize = collapsed_size / collapsed_period - 1 ;
+  int window_ysize = pattern->contentsRect().height();
+  int dc = color->value();
+  assert(window_ysize>0);
+  QPixmap *pm = new QPixmap(window_xsize,window_ysize);
+  QPainter p;
+  p.begin(pm);
+  float yscale = collapsed_period - 1 ;
+  yscale /= window_ysize;
+  array(project, window_ysize, signed4);
+  for(int row =  0 ; row < window_ysize ; row ++)
+    project[row]=0;
+  unsigned4 last_red;
+  for(int column = 0 ; column < window_xsize ; column++)
+    {
+      unsigned4 idx = column * collapsed_period;
+      if (::x/(normalperiod*beats_per_column/4) == column)
+	for(int row = 0 ; row < window_ysize ; row++)
+	  {
+	    unsigned4 idx2 = (int)((float)row*yscale);
+	    assert(idx+idx2<collapsed_size);
+	    int val = data[idx+idx2];
+	    project[row]+=val;
+	    val+=dc;
+	    val%=256;
+	    p.setPen(QColor(val,val,val));
+	    last_red = val;
+	    p.drawPoint(column,row);
+	  }
+      else
+	for(int row = 0 ; row < window_ysize ; row++)
+	  {
+	    unsigned4 idx2 = (int)((float)row*yscale);
+	    assert(idx+idx2<collapsed_size);
+	    int val = data[idx+idx2];
+	    project[row]+=val;
+	    val+=dc;
+	    val%=256;
+	    int yel = abs(val - last_red);
+	    last_red = val;
+	    p.setPen(QColor(val,yel,0));
+	    p.drawPoint(column,row);
+	  }
+    }
+  p.setPen(QColor(0,(128+dc)%256,0));
+  for(int row = 0 ; row < window_ysize ; row+=window_ysize/8)
+    p.drawLine(0,row,window_xsize-1,row);
+  p.end(); 
+  pattern->setPixmap(*pm);
+  signed4 maximum=0;
+  for(int row = 0 ; row < window_ysize ; row ++)
+    if (project[row]>maximum)
+      maximum=project[row];
+  for(int row = 0 ; row < window_ysize ; row ++)
+    project[row]=((signed8)project[row])*(signed8)255/(signed8)maximum;
+  QPixmap *sm = new QPixmap(1,window_ysize);
+  QPainter l;
+  l.begin(sm);
+  for(int row = 0 ; row < window_ysize ; row++)
+    {
+      int val;
+      val = project[row];
+      l.setPen(QColor(val,val,val));
+      l.drawPoint(0,row);
+    }
+  l.end();
+  projection->setPixmap(*sm);
 }
 
-void PatternAnalyzerLogic::dumpPatternToIdx()
+void PatternAnalyzerLogic::settogrey()
 {
-  run();
+  if (haar->isChecked())
+    haar->setChecked(false);
 }
-
-*/
-
-void PatternAnalyzerLogic::slantChanged()
-{
-  period=normalperiod+periodDelta->value()+periodDelta10->value();
+  
+ void PatternAnalyzerLogic::slantChanged()
+   {
+     settogrey();
+     period=normalperiod+periodDelta->value()+periodDelta10->value();
   if (period<=0) period=1;
   showPattern();
 }
 
 void PatternAnalyzerLogic::balanceChanged()
 {
+  settogrey();
   showPattern();
 }
 
@@ -284,489 +938,4 @@ void PatternAnalyzerLogic::setTempo()
   periodDelta->setValue(0);
   periodDelta10->setValue(0);
   playing->set_period(normalperiod/4);
-}
-
-
-//---------------------------------------------------------------------
-//
-//  creation of an ultra accurate filter
-//
-//---------------------------------------------------------------------
-double PatternAnalyzerLogic::getGain(double f)
-{
-  if (f<0) return getGain(-f);
-  if (f >= lo && f <= hi) return 1.0;
-  else return 0.0;
-}
-
-double PatternAnalyzerLogic::inverseDtft(double n, double resolution)
-{
-  double x=0,y=0;
-  for (double w = -M_PI ; w <= M_PI ; w += M_PI / resolution )
-    {
-      double g = getGain(sample_freq*w/(2.0*M_PI));
-      x+=g*cos(w*n);
-      y+=g*sin(w*n);
-    }
-  return (x+y)/(M_PI);
-}
-
-double * PatternAnalyzerLogic::doubleFilter(double * coef, int& nr)
-{
-  double *newcoef = allocate(nr*2,double);
-  for(int i = 0 ; i < 2*nr; i++)
-    newcoef[i]=0;
-  for(int i = 0 ; i < nr ; i ++)
-    for(int j = 0 ; j < nr; j ++)
-      newcoef[i+j]+=coef[i]*coef[j];
-  nr*=2;
-  free(coef);
-  return newcoef;
-}
-
-void PatternAnalyzerLogic::createFilter()
-{
-  // eerst creeeren we een filter met de grootte filtersize/stacksize;
-  // deze delen we door twee omdat de filter in 2 richtingen gedefinieerd wordt;
-  int i, nr = filtersize / (2 * stacking->value());
-  assert(nr);
-  double * coef = allocate(nr*2,double);
-  for(i = - nr + 1 ; i < nr; i++)
-    coef [ i + nr - 1 ] = inverseDtft(i, nr) * 2.0 / (float)nr;
-  nr*=2;
-  nr--;
-  // now double the filter stacksize - 1 times
-  i = stacking->value();
-  while( i-- > 1 ) coef = doubleFilter(coef,nr);
-  free(filter);
-  filter = coef;
-  filtersize = nr;
-  // find the maximum gain within the pass band and divide all coefficients
-  // by it..
-  double max=0;
-  for(double freq = lo ; freq<hi; freq += (hi-lo)/10.0 )
-    {
-      double g = g_frequency_response(freq);
-      if (g>max) max=g;
-    }
-  if (max>0)
-    for(int i = 0 ; i < filtersize; i ++)
-      filter[i]/=max;
-}
-
-//---------------------------------------------------------------------
-//
-//  filter display
-//
-//---------------------------------------------------------------------
-const double db_top = 3;
-const double db_bottom = -140;
-
-// WVB -- according to me the dynamic range of 16 bits is only 45 dB.
-//        to exaplin this consider the maximu msignal amplitude 32768 (2^15)
-//        to convert this to dB we take 10*log_10(32768)= 45.15 dB
-//        therefore we simply cut the graphic at -50 dB
-void PatternAnalyzerLogic::showFilter()
-{
-  int window_xsize = filterImage->contentsRect().width();
-  int window_ysize = filterImage->contentsRect().height();
-  assert(window_ysize > 0 && window_xsize > 0);
-  QPixmap *pm = new QPixmap(window_xsize,window_ysize);
-  QPainter p;
-  p.begin(pm);
-  p.fillRect(QRect(0,0,window_xsize,window_ysize),Qt::white);
-  double yscale = (db_bottom-db_top)/(float)window_ysize;
-  // wegkleuren van de zones die niet gefilterd kunnen worden. 
-  // dit is vanaf sample_freq/2 tot en met the end...
-  double nyquist = sample_freq/2.0;
-  for(int i = 0 ; i < barksize ; i ++)
-    {
-      if (barkbounds[i]>nyquist)
-	{
-	  i--;
-	  double lower = barkbounds[i];
-	  double higher = i > barksize ? 22050 : barkbounds[i+1];
-	  float  posa = (i * window_xsize / (barksize + 1));
-	  float  posb = ((i+1) * window_xsize/(barksize+1));
-	  float  pos = posa + (nyquist - lower) * (posb - posa) / (higher - lower);
-	  p.fillRect(QRect((int)pos,0,window_xsize-1,window_ysize-1),QColor(192,192,192));
-	  break;
-	}
-    }
-  // uitzetten van de 24 barklines
-  p.setPen(QColor(128,128,128));
-  for(int i = 0 ; i <= barksize ; i ++)
-    {
-      int pos = i * window_xsize/(barksize+1);
-      p.drawLine(pos,0,pos,window_ysize-1);
-      p.drawText(pos,window_ysize-1,QString::number(i));
-    }
-  // uitzetten van de dB lines op 0, 20, 40, 60, 80, 100, 120 & 140
-  for(float i = 0 ; i > db_bottom ; i-=20)
-    {
-      float row = i/yscale;
-      p.drawLine(0,(int)row,window_xsize-1,(int)row);
-      p.drawText(0,(int)row,QString::number(i));
-    }
-  float row= -45.1/yscale;
-  p.setPen(QColor(0,255,0));
-  p.drawLine(0,(int)row,window_xsize-1,(int)row);
-  p.setPen(QColor(255,0,0));
-  float oco=0,oro=window_ysize-1;
-  for(int column = 0 ; column < window_xsize ; column++)
-    {
-      // eerst uitvissen in welk segment we zitten. 
-      int segment = column * (barksize + 1) / window_xsize;
-      assert(segment>=0 && segment <= barksize+1);
-      double lower = barkbounds[segment];
-      double higher = segment > barksize ? 22050 : barkbounds[segment+1];
-      float  posa = (segment * window_xsize / (barksize + 1));
-      float  posb = ((segment+1) * window_xsize/(barksize+1));
-      float  freq = lower + (column-posa) * (higher-lower) / (posb-posa);
-      // float freq = (float)column*sample_freq/(2.0*(float)window_xsize);
-      float resp = db_frequency_response(freq,db_bottom);
-      float row = (resp-db_top)/yscale;
-      p.drawLine((int)oco,(int)oro,column,(int)row);
-      oco=column;
-      oro=row;
-      // p.drawPoint(column,(int)row);
-    }
-  
-  p.end(); 
-  filterImage->setPixmap(*pm);
-}
-
-double PatternAnalyzerLogic::g_frequency_response(double freq)
-{
-  double xs=0;
-  double ys=0;
-  for(int i=0;i<filtersize;i++)
-    {
-      xs+=filter[i] * cos( freq * M_PI *2.0 * (double)i / sample_freq );
-      ys+=filter[i] * sin( freq * M_PI *2.0 * (double)i / sample_freq );
-    }
-  return sqrt(xs*xs+ys*ys);
-}
-
-double PatternAnalyzerLogic::db_frequency_response(double freq, double clip)
-{
-  double result = g_frequency_response(freq);
-  result = (log(result)/log(10))*10;
-  if (result<clip) result=clip;
-  return result;
-}
-
-void PatternAnalyzerLogic::filterChanged()
-{
-  // fetch values 
-  bool change = false;
-  lo = atof(locut->currentText());
-  hi = atof(hicut->currentText());
-  if (lo<0) lo = 0;
-  if (hi>WAVRATE/2) hi = WAVRATE / 2;
-  if (lo>=hi) lo = 0; change = true; 
-  if (hi<=lo) hi = WAVRATE / 2;
-  filtersize = atoi(order->text());
-  // build new filter and show image...
-  createFilter();
-  showFilter();
-  // release data so it will be read later on..
-  free(data);
-  data=NULL;
-  audiosize=0;
-}
-
-
-//---------------------------------------------------------------------
-//
-//  rythm analysis
-//
-//---------------------------------------------------------------------
-// The rythm analysis contains 6 parts
-// red & blue : fourier analysis of the signal
-// green & yellow : autocorrelation sequence
-
-void PatternAnalyzerLogic::calculateRythmPattern()
-{
-  int **** data; // make sure shadowing happens
-  int **** audiosize;
-  int shrinker = COLLAPSE;
-  signed8 samples;
-  long int bufsize = 65536;
-  longtrick buffer[bufsize];
-  FILE * raw=openRawFile(playing,arg_rawpath);
-  samples=fsize(raw)/4;
-  if (samples == 0) return;
-  signed4 pos = 0;
-  fseek(raw,pos,SEEK_SET);
-  signed8 length = 2;
-  for(signed8 shifter = samples ; shifter > 1 ; shifter/=2, length*=2);
-  assert(length>=samples);
-  length/=shrinker;
-  double * audio = allocate(length,double);
-  printf("Pattern-Analyzer: allocated data-store with size %d for %d samples\n",(int)length,(int)samples);
-
-  QProgressDialog * progress = NULL;
-  progress = new QProgressDialog();
-  progress->setTotalSteps(samples/bufsize);
-  progress->show();
-  
-  while(pos<samples)
-    {
-      signed8 toread = samples - pos;
-      if (toread>bufsize) toread = bufsize;
-      long count=readsamples((unsigned4*)buffer,toread,raw);
-      
-      if (progress) progress->setProgress(pos/bufsize);
-      app->processEvents();
-      
-      for(int i = 0 ; i < count; i++)
-	audio[(pos+i)/shrinker]=(buffer[i].leftright.left)+(buffer[i].leftright.right);
-      pos+=count;
-    }
-  printf("Pattern-Analyzer: Reading %ld samples\n",samples);
-  samples/=shrinker;
-  
-  fclose(raw);
-  delete(progress);
-  
-  // centralize the audio
-  double total = 0;
-  for(int i = 0 ; i < samples ; i++)
-    total+=audio[i];
-  total/=samples;
-  if (total!=0)
-    for(int i = 0 ; i < samples ; i++)
-      audio[i]-=total;
-  printf("Pattern-Analyzer: Removed DC offset %g\n",total);
-
-  // clear the remainder of the array
-  for(int i = samples ; i < length ; i ++)
-    audio[i]=0;
-  
-  // normalize the audio
-  double maximum = 0;
-  for(int i = 0 ; i < samples ; i++)
-    {
-      double sample = fabs(audio[i]);
-      if (sample>maximum)
-	maximum=sample;
-    }
-  if (maximum==0) return;
-  for(int i = 0 ; i < samples ; i++)
-    audio[i]/=maximum;
-  printf("Pattern-Analyzer: Normalized audio %g\n",maximum);
-
-  // create the enveloppe
-  array(env,length,double);
-  for(int i = 0 ; i < length ; i ++)
-    env[i]=fabs(audio[i]);
-  printf("Pattern-Analyzer: Created audio enveloppe\n");
-  
-  // do the fourier transformation of the enveloppe
-  double * env_fr = allocate(length,double);
-  double * env_fi = allocate(length,double);
-  fft_double(length,false,env,NULL,env_fr, env_fi);
-  for(int i = 0 ; i < length ; i ++)
-    {
-      double re = env_fr[i];
-      double im = env_fi[i];
-      env_fr[i]=sqrt(re*re+im*im);
-      env_fi[i]=atan2(im,re);
-    }
-  printf("Pattern-Analyzer: Obtained enveloppe spectrum\n");
-  
-  // obtain beat information
-  array(notes_energy,64,double);
-  array(notes_phase,64,double);
-  // the normaperiod is the length of onbe measure, 
-  // which is assumed to be 4 beats
-  double beat_freq_in_bpm = mperiod2bpm(normalperiod);
-  double measures_per_sec = beat_freq_in_bpm/(4.0*60.0);
-  // notes[i] contains the strength of 1/i notes, or the frequency tempo/i
-  // measures[i] contains the strength of 32/i notes
-  for(int x = 0 ; x < 32 ; x ++)
-    {
-      // calculate the right part
-      double startfreq = measures_per_sec*(((double)(x+1))-0.1);
-      double stopfreq = measures_per_sec*(((double)(x+1))+0.1);
-      double start_index = startfreq * length / (double)WAVRATE;
-      double stop_index = stopfreq * length / (double)WAVRATE;
-      double energy = 0;
-      double phase = 0;
-      for(int i = start_index ; i < stop_index ; i ++)
-	{
-	  energy+=env_fr[i];
-	  phase+=env_fi[i];
-	}
-      energy/=(stop_index-start_index);
-      phase/=(stop_index-start_index);
-      while (phase<0) phase+=2*M_PI;
-      notes_energy[x+32]=log(energy);
-      notes_phase[x+32]=phase;
-      
-      // calculate the left part
-      startfreq /= (32.0-x);
-      stopfreq /= (32.0-x);
-      start_index = startfreq * length / (double)WAVRATE;
-      stop_index = stopfreq * length / (double)WAVRATE;
-      energy = phase = 0;
-      for(int i = start_index ; i < stop_index ; i ++)
-	{
-	  energy+=env_fr[i];
-	  phase+=env_fi[i];
-	}
-      energy/=(stop_index-start_index);
-      phase/=(stop_index-start_index);
-      while (phase<0) phase+=2*M_PI;
-      notes_energy[x]=log(energy);
-      notes_phase[x]=phase;
-    }
-  
-  // do the autocorrelation
-  double * tmp_fr = env_fr; env_fr = NULL;  // reuse array
-  double * tmp_fi = env_fi; env_fi = NULL;  // reuse array
-  fft_double(length, false, audio, NULL, tmp_fr, tmp_fi);
-  printf("Pattern-Analyzer: Autocorrelation forward transform\n");
-  for(int i = 0 ; i < length ; i ++)
-    tmp_fr[i]=tmp_fr[i]*tmp_fr[i]+tmp_fi[i]*tmp_fi[i];
-  printf("Pattern-Analyzer: Noramlised for the next step\n");
-  double * cor_r = audio; audio = NULL; // reuse array
-  double * cor_i = env; env = NULL; // reuse array
-  fft_double(length,true,tmp_fr, NULL, cor_r, cor_i);
-  free(tmp_fr);
-  free(tmp_fi);  
-  free(cor_i);
-  // env   audio
-  // env   audio env_fr env_fi
-  // env   audio tmp_fr tmp_fi
-  // cor_i cor_r tmp_fr tmp_fi
-  printf("Pattern-Analyzer: Calculated autocorrelation\n");
-  
-  // obtain beat information based on autocorrelation
-  array(notes_cor,64,double);
-  // the length of a beat can be calculated based on 
-  double note_period = normalperiod;  // normalperiod is expressed in measures
-  for(int x = 0 ; x < 32 ; x ++)
-    {
-      // the right part
-      double start_index = note_period/(((double)x)+1.1);
-      double stop_index = note_period/(((double)x)+0.9);
-      double energy = 0;
-      for(int i = start_index ; i < stop_index ; i ++)
-	if (cor_r[i] > energy) energy=cor_r[i];
-      notes_cor[x+32]=energy;
-      
-      // the left part
-      start_index *= (32-x);
-      stop_index *= (32-x);
-      energy = 0;
-      for(int i = start_index ; i < stop_index ; i ++)
-	if (cor_r[i] > energy) energy=cor_r[i];
-      notes_cor[x]=energy;
-    }
-
-  // normalize differente ranges
-  double minimum = notes_energy[32];
-  for(int i = 0 ; i < 64 ; i ++)
-    if (notes_energy[i]<minimum)
-      minimum=notes_energy[i];
-  for(int i = 0 ; i < 64 ; i ++)
-    notes_energy[i]-=minimum;
-  maximum = 0;
-  for(int i = 0 ; i < 64 ; i ++)
-    if (notes_energy[i]>maximum)
-      maximum=notes_energy[i];
-  if (maximum>0)
-    for(int i = 0 ; i < 64 ; i ++)
-      notes_energy[i]/=maximum;
-
-  minimum = notes_cor[32];
-  for(int i = 0 ; i < 64 ; i ++)
-    if (notes_cor[i]<minimum)
-      minimum=notes_cor[i];
-  for(int i = 0 ; i < 64 ; i ++)
-    notes_cor[i]-=minimum;
-  maximum = 0 ;
-  for(int i = 0 ; i < 64 ; i ++)
-    if (notes_cor[i]>maximum)
-      maximum=notes_cor[i];
-  if (maximum>0)
-    for(int i = 0 ; i < 64 ; i ++)
-      notes_cor[i]/=maximum;
-  
-  for(int i = 32 ; i < 64 ; i ++)
-    {
-      double phase = notes_phase[i]-notes_phase[32];
-      while (phase<0) phase += 2*M_PI;
-      while (phase>M_PI) phase -= 2*M_PI;
-      notes_phase[i]=phase;
-    }
-  notes_phase[32]=0;
-  
-  // draw everything
-  int demo_size_x = 400;
-  int demo_size_y = 64;
-  QPixmap *pm1 = new QPixmap(40,100);
-  QPixmap *pm2 = new QPixmap(demo_size_x,demo_size_y);
-  QPainter p, d;
-  p.begin(pm1);
-  d.begin(pm2);
-  QRect r(0,0,40,100), s(0,0,demo_size_x,demo_size_y);
-  p.fillRect(r,Qt::white);
-  d.fillRect(s,Qt::white);
-  for(int i = 63 ; i >=24 ; i --)
-    {
-      int x = (i - 24);
-      double mean_energy=(notes_energy[i]+notes_cor[i])/2;
-      p.setPen(Qt::gray);
-      p.drawLine(x,99,x,(int)(99.0-(mean_energy*99.0)));
-      p.setPen(Qt::green);
-      p.drawPoint(x,(int)(99.0-(notes_energy[i]*99.0)));
-      p.setPen(Qt::yellow);
-      p.drawPoint(x,(int)(99.0-(notes_cor[i]*99.0)));
-      if (i==32)
-	{
-	  p.setPen(Qt::black);
-	  p.drawPoint(x,0);
-	  p.drawPoint(x,99);
-	}
-      if (i>31)
-	{
-	  p.setPen(Qt::blue);
-	  p.drawPoint(x,(int)(50.0-(notes_phase[i]*49.0/M_PI)));
-	}
-    }
-  p.end();
-  rythm_pattern->setPixmap(*pm1);
-  
-  d.setPen(Qt::gray);
-  for(int i = 0 ; i < 8 ; i ++)
-    {
-      int x = i * demo_size_x / 8;
-      d.drawLine(x,0,x,63);
-    }
-  
-  d.setPen(Qt::black);
-  for(double x = 0 ; x < demo_size_x ; x +=1.0)
-    {
-      double amplitude = 0;
-      double rx = x*2.0*M_PI/((double)demo_size_x);
-      for(int i = 0 ; i < 32 ; i ++)
-	{
-	  double energy = (notes_energy[i+32]+notes_cor[i+32])/2;
-	  double sine = cos((rx+notes_phase[i+32])*(i+1));
-	  if (sine > 0.98)
-	    amplitude += sine*energy/(double)(i+5); // +5 flattens the exponential curve by goign more towards its tail
-	}
-      int y=demo_size_y-1-demo_size_y*amplitude*3;
-      d.drawPoint((int)x,y);
-    }
-  d.end();
-  
-  pattern_demo->setPixmap(*pm2);
-  
-  free(notes_phase);
-  free(notes_cor);
-  free(notes_energy);
 }

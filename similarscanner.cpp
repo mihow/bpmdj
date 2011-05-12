@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001 Werner Van Belle
+ Copyright (C) 2001-2004 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -21,6 +21,7 @@
 #include <qlabel.h>
 #include <qstring.h>
 #include <qlistview.h>
+#include "qvectorview.h"
 #include "similarscanner.h"
 #include "qsong.h"
 #include "kbpm-dj.h"
@@ -132,24 +133,23 @@ void SimilarScanner::similarNameFound(QString name, QString similar, QString ful
 
 void SimilarScanner::findSimilarNames(QString text, QString fullname)
 {
-  QListView *songList = selector->songList;
-  QListViewItemIterator it1(songList);
+  QVectorView *songList = selector->songList;
   similarnames = false;
   char exact[1024];
-  for(;it1.current();++it1)
+  for(int it1 = 0 ; it1 < QSong::song_count ; it1 ++)
     {
       app->processEvents();
-      QSong * song = (QSong*)it1.current();
+      Song * song = QSong::songEssence(it1);
       if (song)
 	{
-	  const char * t = song->title();
-	  const char * a = song->author();
+	  const char * t = song->title;
+	  const char * a = song->author;
 	  unsigned int val=ndist(t,a,text);
 	  if ( val < (text.length()/10)+3)
 	    {
 	      sprintf(exact,"%s[%s]",t,a);
-	      similarNameFound(text,song->title()+"["+song->author()+"]",
-			       fullname,song->file(),
+	      similarNameFound(text,song->title+"["+song->author+"]",
+			       fullname,song->file,
 			       (strcasecmp(exact,(const char*)text)==0) ? 
 			       ((strcmp(a,"")==0) ? -1 : -2) : val);
 	    }

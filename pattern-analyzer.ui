@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>795</width>
-            <height>461</height>
+            <width>710</width>
+            <height>451</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -36,785 +36,279 @@
         <property name="spacing">
             <number>6</number>
         </property>
-        <widget class="QTabWidget" row="0" column="0">
+        <widget class="QSlider" row="4" column="2" rowspan="1" colspan="9">
             <property name="name">
-                <cstring>tabWidget2</cstring>
+                <cstring>color</cstring>
             </property>
-            <widget class="QWidget">
+            <property name="maxValue">
+                <number>255</number>
+            </property>
+            <property name="pageStep">
+                <number>5</number>
+            </property>
+            <property name="orientation">
+                <enum>Horizontal</enum>
+            </property>
+        </widget>
+        <widget class="QLabel" row="4" column="0" rowspan="1" colspan="2">
+            <property name="name">
+                <cstring>textLabel1_2</cstring>
+            </property>
+            <property name="text">
+                <string>Balance</string>
+            </property>
+        </widget>
+        <widget class="QLabel" row="2" column="0" rowspan="1" colspan="2">
+            <property name="name">
+                <cstring>textLabel1</cstring>
+            </property>
+            <property name="text">
+                <string>Beats</string>
+            </property>
+        </widget>
+        <widget class="QSpinBox" row="2" column="2">
+            <property name="name">
+                <cstring>beats</cstring>
+            </property>
+            <property name="maxValue">
+                <number>32</number>
+            </property>
+            <property name="minValue">
+                <number>1</number>
+            </property>
+            <property name="value">
+                <number>4</number>
+            </property>
+        </widget>
+        <spacer row="2" column="3">
+            <property name="name">
+                <cstring>spacer1</cstring>
+            </property>
+            <property name="orientation">
+                <enum>Horizontal</enum>
+            </property>
+            <property name="sizeType">
+                <enum>Expanding</enum>
+            </property>
+            <property name="sizeHint">
+                <size>
+                    <width>22</width>
+                    <height>20</height>
+                </size>
+            </property>
+        </spacer>
+        <widget class="QSlider" row="1" column="9">
+            <property name="name">
+                <cstring>periodDelta</cstring>
+            </property>
+            <property name="minValue">
+                <number>-100</number>
+            </property>
+            <property name="maxValue">
+                <number>100</number>
+            </property>
+            <property name="orientation">
+                <enum>Vertical</enum>
+            </property>
+            <property name="tickmarks">
+                <enum>NoMarks</enum>
+            </property>
+            <property name="tickInterval">
+                <number>100</number>
+            </property>
+        </widget>
+        <widget class="QSlider" row="1" column="10">
+            <property name="name">
+                <cstring>periodDelta10</cstring>
+            </property>
+            <property name="minValue">
+                <number>-1000</number>
+            </property>
+            <property name="maxValue">
+                <number>1000</number>
+            </property>
+            <property name="lineStep">
+                <number>10</number>
+            </property>
+            <property name="pageStep">
+                <number>100</number>
+            </property>
+            <property name="orientation">
+                <enum>Vertical</enum>
+            </property>
+            <property name="tickmarks">
+                <enum>NoMarks</enum>
+            </property>
+            <property name="tickInterval">
+                <number>100</number>
+            </property>
+        </widget>
+        <widget class="QLabel" row="0" column="0" rowspan="1" colspan="11">
+            <property name="name">
+                <cstring>textLabel1_3</cstring>
+            </property>
+            <property name="font">
+                <font>
+                    <pointsize>10</pointsize>
+                </font>
+            </property>
+            <property name="text">
+                <string>Horinzontally, this graph shows the measures of the song. Vertically, the content of one such measure is visualized. If the tempo of the song is correct, the song should contain distinctive visual horizontal lines. If the tempo is slightly incorrect these lines should be slanted. By using the two sliders at the right, the tempo of the song can be fine tuned. When this is done select 'set Tempo'. </string>
+            </property>
+            <property name="alignment">
+                <set>WordBreak|AlignVCenter</set>
+            </property>
+        </widget>
+        <widget class="QLabel" row="1" column="1" rowspan="1" colspan="8">
+            <property name="name">
+                <cstring>pattern</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>5</hsizetype>
+                    <vsizetype>2</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="frameShape">
+                <enum>Panel</enum>
+            </property>
+            <property name="scaledContents">
+                <bool>true</bool>
+            </property>
+        </widget>
+        <widget class="QLabel" row="1" column="0">
+            <property name="name">
+                <cstring>projection</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>0</hsizetype>
+                    <vsizetype>2</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="maximumSize">
+                <size>
+                    <width>20</width>
+                    <height>32767</height>
+                </size>
+            </property>
+            <property name="text">
+                <string></string>
+            </property>
+            <property name="scaledContents">
+                <bool>true</bool>
+            </property>
+        </widget>
+        <widget class="QLayoutWidget" row="2" column="5" rowspan="2" colspan="1">
+            <property name="name">
+                <cstring>layout4</cstring>
+            </property>
+            <vbox>
                 <property name="name">
-                    <cstring>tab</cstring>
+                    <cstring>unnamed</cstring>
                 </property>
-                <attribute name="title">
-                    <string>Beat Graph</string>
-                </attribute>
-                <grid>
+                <widget class="QCheckBox">
                     <property name="name">
-                        <cstring>unnamed</cstring>
+                        <cstring>treshold2</cstring>
                     </property>
-                    <widget class="QSlider" row="1" column="7">
-                        <property name="name">
-                            <cstring>periodDelta</cstring>
-                        </property>
-                        <property name="minValue">
-                            <number>-100</number>
-                        </property>
-                        <property name="maxValue">
-                            <number>100</number>
-                        </property>
-                        <property name="orientation">
-                            <enum>Vertical</enum>
-                        </property>
-                        <property name="tickmarks">
-                            <enum>NoMarks</enum>
-                        </property>
-                        <property name="tickInterval">
-                            <number>100</number>
-                        </property>
-                    </widget>
-                    <widget class="QSlider" row="1" column="8">
-                        <property name="name">
-                            <cstring>periodDelta10</cstring>
-                        </property>
-                        <property name="minValue">
-                            <number>-1000</number>
-                        </property>
-                        <property name="maxValue">
-                            <number>1000</number>
-                        </property>
-                        <property name="lineStep">
-                            <number>10</number>
-                        </property>
-                        <property name="pageStep">
-                            <number>100</number>
-                        </property>
-                        <property name="orientation">
-                            <enum>Vertical</enum>
-                        </property>
-                        <property name="tickmarks">
-                            <enum>NoMarks</enum>
-                        </property>
-                        <property name="tickInterval">
-                            <number>100</number>
-                        </property>
-                    </widget>
-                    <widget class="QLabel" row="2" column="0" rowspan="1" colspan="2">
-                        <property name="name">
-                            <cstring>textLabel1</cstring>
-                        </property>
-                        <property name="text">
-                            <string>Beats</string>
-                        </property>
-                    </widget>
-                    <widget class="QSlider" row="3" column="2" rowspan="1" colspan="7">
-                        <property name="name">
-                            <cstring>color</cstring>
-                        </property>
-                        <property name="maxValue">
-                            <number>255</number>
-                        </property>
-                        <property name="pageStep">
-                            <number>5</number>
-                        </property>
-                        <property name="orientation">
-                            <enum>Horizontal</enum>
-                        </property>
-                    </widget>
-                    <widget class="QLabel" row="3" column="0" rowspan="1" colspan="2">
-                        <property name="name">
-                            <cstring>textLabel1_2</cstring>
-                        </property>
-                        <property name="text">
-                            <string>Balance</string>
-                        </property>
-                    </widget>
-                    <widget class="QPushButton" row="2" column="5">
-                        <property name="name">
-                            <cstring>pushButton4</cstring>
-                        </property>
-                        <property name="text">
-                            <string>Set Tempo</string>
-                        </property>
-                    </widget>
-                    <widget class="QPushButton" row="2" column="6" rowspan="1" colspan="3">
-                        <property name="name">
-                            <cstring>pushButton2</cstring>
-                        </property>
-                        <property name="text">
-                            <string>Ok</string>
-                        </property>
-                    </widget>
-                    <widget class="QPushButton" row="2" column="4">
-                        <property name="name">
-                            <cstring>updateButton</cstring>
-                        </property>
-                        <property name="text">
-                            <string>Update</string>
-                        </property>
-                    </widget>
-                    <widget class="QSpinBox" row="2" column="2">
-                        <property name="name">
-                            <cstring>beats</cstring>
-                        </property>
-                        <property name="maxValue">
-                            <number>32</number>
-                        </property>
-                        <property name="minValue">
-                            <number>1</number>
-                        </property>
-                        <property name="value">
-                            <number>4</number>
-                        </property>
-                    </widget>
-                    <spacer row="2" column="3">
-                        <property name="name">
-                            <cstring>spacer1</cstring>
-                        </property>
-                        <property name="orientation">
-                            <enum>Horizontal</enum>
-                        </property>
-                        <property name="sizeType">
-                            <enum>Expanding</enum>
-                        </property>
-                        <property name="sizeHint">
-                            <size>
-                                <width>239</width>
-                                <height>20</height>
-                            </size>
-                        </property>
-                    </spacer>
-                    <widget class="QLabel" row="0" column="0" rowspan="1" colspan="9">
-                        <property name="name">
-                            <cstring>textLabel1_3</cstring>
-                        </property>
-                        <property name="text">
-                            <string>Horinzontally, this graph shows the measures of the song. Vertically, the content of one such measure is visualized. If the tempo of the song is correct, the song should contain distinctive visual horizontal lines. If the tempo is slightly incorrect these lines should be slanted. By using the two sliders at the right, the tempo of the song can be fine tuned. When this is done select 'set Tempo'. </string>
-                        </property>
-                        <property name="alignment">
-                            <set>WordBreak|AlignVCenter</set>
-                        </property>
-                    </widget>
-                    <widget class="QLabel" row="1" column="1" rowspan="1" colspan="6">
-                        <property name="name">
-                            <cstring>pattern</cstring>
-                        </property>
-                        <property name="sizePolicy">
-                            <sizepolicy>
-                                <hsizetype>5</hsizetype>
-                                <vsizetype>2</vsizetype>
-                                <horstretch>0</horstretch>
-                                <verstretch>0</verstretch>
-                            </sizepolicy>
-                        </property>
-                        <property name="frameShape">
-                            <enum>Panel</enum>
-                        </property>
-                        <property name="scaledContents">
-                            <bool>true</bool>
-                        </property>
-                    </widget>
-                    <widget class="QLabel" row="1" column="0">
-                        <property name="name">
-                            <cstring>projection</cstring>
-                        </property>
-                        <property name="sizePolicy">
-                            <sizepolicy>
-                                <hsizetype>0</hsizetype>
-                                <vsizetype>2</vsizetype>
-                                <horstretch>0</horstretch>
-                                <verstretch>0</verstretch>
-                            </sizepolicy>
-                        </property>
-                        <property name="maximumSize">
-                            <size>
-                                <width>20</width>
-                                <height>32767</height>
-                            </size>
-                        </property>
-                        <property name="text">
-                            <string></string>
-                        </property>
-                        <property name="scaledContents">
-                            <bool>true</bool>
-                        </property>
-                    </widget>
-                </grid>
-            </widget>
-            <widget class="QWidget">
+                    <property name="enabled">
+                        <bool>true</bool>
+                    </property>
+                    <property name="text">
+                        <string>treshold2</string>
+                    </property>
+                </widget>
+                <widget class="QCheckBox">
+                    <property name="name">
+                        <cstring>logarithmic</cstring>
+                    </property>
+                    <property name="enabled">
+                        <bool>true</bool>
+                    </property>
+                    <property name="text">
+                        <string>logarithmic</string>
+                    </property>
+                </widget>
+            </vbox>
+        </widget>
+        <widget class="QLayoutWidget" row="2" column="6" rowspan="2" colspan="1">
+            <property name="name">
+                <cstring>layout2</cstring>
+            </property>
+            <vbox>
                 <property name="name">
-                    <cstring>TabPage</cstring>
+                    <cstring>unnamed</cstring>
                 </property>
-                <attribute name="title">
-                    <string>Pattern</string>
-                </attribute>
-                <grid>
+                <widget class="QCheckBox">
                     <property name="name">
-                        <cstring>unnamed</cstring>
+                        <cstring>smear</cstring>
                     </property>
-                    <widget class="QPushButton" row="3" column="1">
-                        <property name="name">
-                            <cstring>pushButton4_2</cstring>
-                        </property>
-                        <property name="text">
-                            <string>Calculate</string>
-                        </property>
-                    </widget>
-                    <spacer row="3" column="0">
-                        <property name="name">
-                            <cstring>spacer2</cstring>
-                        </property>
-                        <property name="orientation">
-                            <enum>Horizontal</enum>
-                        </property>
-                        <property name="sizeType">
-                            <enum>Expanding</enum>
-                        </property>
-                        <property name="sizeHint">
-                            <size>
-                                <width>460</width>
-                                <height>20</height>
-                            </size>
-                        </property>
-                    </spacer>
-                    <widget class="QLabel" row="2" column="0" rowspan="1" colspan="2">
-                        <property name="name">
-                            <cstring>pattern_demo</cstring>
-                        </property>
-                        <property name="sizePolicy">
-                            <sizepolicy>
-                                <hsizetype>5</hsizetype>
-                                <vsizetype>1</vsizetype>
-                                <horstretch>0</horstretch>
-                                <verstretch>0</verstretch>
-                            </sizepolicy>
-                        </property>
-                        <property name="minimumSize">
-                            <size>
-                                <width>0</width>
-                                <height>64</height>
-                            </size>
-                        </property>
-                        <property name="frameShape">
-                            <enum>Panel</enum>
-                        </property>
-                        <property name="scaledContents">
-                            <bool>true</bool>
-                        </property>
-                    </widget>
-                    <widget class="QLabel" row="0" column="0" rowspan="1" colspan="2">
-                        <property name="name">
-                            <cstring>rythm_pattern</cstring>
-                        </property>
-                        <property name="sizePolicy">
-                            <sizepolicy>
-                                <hsizetype>5</hsizetype>
-                                <vsizetype>2</vsizetype>
-                                <horstretch>0</horstretch>
-                                <verstretch>0</verstretch>
-                            </sizepolicy>
-                        </property>
-                        <property name="frameShape">
-                            <enum>Panel</enum>
-                        </property>
-                        <property name="scaledContents">
-                            <bool>true</bool>
-                        </property>
-                    </widget>
-                    <widget class="QLayoutWidget" row="1" column="0" rowspan="1" colspan="2">
-                        <property name="name">
-                            <cstring>layout5</cstring>
-                        </property>
-                        <hbox>
-                            <property name="name">
-                                <cstring>unnamed</cstring>
-                            </property>
-                            <widget class="QLabel">
-                                <property name="name">
-                                    <cstring>textLabel2_2_3</cstring>
-                                </property>
-                                <property name="text">
-                                    <string>8</string>
-                                </property>
-                            </widget>
-                            <spacer>
-                                <property name="name">
-                                    <cstring>spacer3_2</cstring>
-                                </property>
-                                <property name="orientation">
-                                    <enum>Horizontal</enum>
-                                </property>
-                                <property name="sizeType">
-                                    <enum>Expanding</enum>
-                                </property>
-                                <property name="sizeHint">
-                                    <size>
-                                        <width>110</width>
-                                        <height>20</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                            <widget class="QLabel">
-                                <property name="name">
-                                    <cstring>textLabel2_2_4</cstring>
-                                </property>
-                                <property name="text">
-                                    <string>1</string>
-                                </property>
-                            </widget>
-                            <spacer>
-                                <property name="name">
-                                    <cstring>spacer3_4</cstring>
-                                </property>
-                                <property name="orientation">
-                                    <enum>Horizontal</enum>
-                                </property>
-                                <property name="sizeType">
-                                    <enum>Expanding</enum>
-                                </property>
-                                <property name="sizeHint">
-                                    <size>
-                                        <width>70</width>
-                                        <height>20</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                            <widget class="QLabel">
-                                <property name="name">
-                                    <cstring>textLabel2_2</cstring>
-                                </property>
-                                <property name="text">
-                                    <string>1/8</string>
-                                </property>
-                            </widget>
-                            <spacer>
-                                <property name="name">
-                                    <cstring>spacer3</cstring>
-                                </property>
-                                <property name="orientation">
-                                    <enum>Horizontal</enum>
-                                </property>
-                                <property name="sizeType">
-                                    <enum>Expanding</enum>
-                                </property>
-                                <property name="sizeHint">
-                                    <size>
-                                        <width>80</width>
-                                        <height>20</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                            <widget class="QLabel">
-                                <property name="name">
-                                    <cstring>textLabel2_2_2_2</cstring>
-                                </property>
-                                <property name="text">
-                                    <string>1/16</string>
-                                </property>
-                            </widget>
-                            <spacer>
-                                <property name="name">
-                                    <cstring>spacer3_3</cstring>
-                                </property>
-                                <property name="orientation">
-                                    <enum>Horizontal</enum>
-                                </property>
-                                <property name="sizeType">
-                                    <enum>Expanding</enum>
-                                </property>
-                                <property name="sizeHint">
-                                    <size>
-                                        <width>46</width>
-                                        <height>20</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                            <widget class="QLabel">
-                                <property name="name">
-                                    <cstring>textLabel2_2_2</cstring>
-                                </property>
-                                <property name="text">
-                                    <string>1/24</string>
-                                </property>
-                            </widget>
-                            <spacer>
-                                <property name="name">
-                                    <cstring>spacer3_3_2</cstring>
-                                </property>
-                                <property name="orientation">
-                                    <enum>Horizontal</enum>
-                                </property>
-                                <property name="sizeType">
-                                    <enum>Expanding</enum>
-                                </property>
-                                <property name="sizeHint">
-                                    <size>
-                                        <width>90</width>
-                                        <height>20</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                            <widget class="QLabel">
-                                <property name="name">
-                                    <cstring>textLabel2_2_2_3</cstring>
-                                </property>
-                                <property name="text">
-                                    <string>1/32</string>
-                                </property>
-                            </widget>
-                        </hbox>
-                    </widget>
-                </grid>
-            </widget>
-            <widget class="QWidget">
-                <property name="name">
-                    <cstring>tab</cstring>
-                </property>
-                <attribute name="title">
-                    <string>Filters</string>
-                </attribute>
-                <grid>
+                    <property name="enabled">
+                        <bool>true</bool>
+                    </property>
+                    <property name="text">
+                        <string>smear</string>
+                    </property>
+                </widget>
+                <widget class="QCheckBox">
                     <property name="name">
-                        <cstring>unnamed</cstring>
+                        <cstring>treshold</cstring>
                     </property>
-                    <widget class="QLabel" row="0" column="0" rowspan="1" colspan="4">
-                        <property name="name">
-                            <cstring>filterImage</cstring>
-                        </property>
-                        <property name="scaledContents">
-                            <bool>true</bool>
-                        </property>
-                    </widget>
-                    <widget class="QLabel" row="1" column="0">
-                        <property name="name">
-                            <cstring>textLabel1_4</cstring>
-                        </property>
-                        <property name="text">
-                            <string>Lo cutoff frequency</string>
-                        </property>
-                    </widget>
-                    <widget class="QLabel" row="2" column="0">
-                        <property name="name">
-                            <cstring>textLabel2</cstring>
-                        </property>
-                        <property name="text">
-                            <string>Hi cutoff frequency</string>
-                        </property>
-                    </widget>
-                    <widget class="QLabel" row="2" column="2">
-                        <property name="name">
-                            <cstring>textLabel4</cstring>
-                        </property>
-                        <property name="text">
-                            <string>Stacking</string>
-                        </property>
-                    </widget>
-                    <widget class="QLabel" row="1" column="2">
-                        <property name="name">
-                            <cstring>textLabel3</cstring>
-                        </property>
-                        <property name="text">
-                            <string>Order</string>
-                        </property>
-                    </widget>
-                    <widget class="QComboBox" row="2" column="1">
-                        <item>
-                            <property name="text">
-                                <string>0</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>100</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>200</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>300</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>400</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>510</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>630</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>770</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>920</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>1080</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>1270</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>1480</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>1720</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>2000</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>2380</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>2700</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>3150</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>3700</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>4400</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>5300</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>6400</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>7700</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>9500</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>12000</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>15500</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>22050</string>
-                            </property>
-                        </item>
-                        <property name="name">
-                            <cstring>hicut</cstring>
-                        </property>
-                        <property name="currentItem">
-                            <number>25</number>
-                        </property>
-                    </widget>
-                    <widget class="QComboBox" row="1" column="1">
-                        <item>
-                            <property name="text">
-                                <string>0</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>100</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>200</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>300</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>400</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>510</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>630</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>770</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>920</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>1080</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>1270</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>1480</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>1720</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>2000</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>2380</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>2700</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>3150</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>3700</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>4400</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>5300</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>6400</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>7700</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>9500</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>12000</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>15500</string>
-                            </property>
-                        </item>
-                        <item>
-                            <property name="text">
-                                <string>22050</string>
-                            </property>
-                        </item>
-                        <property name="name">
-                            <cstring>locut</cstring>
-                        </property>
-                        <property name="currentItem">
-                            <number>0</number>
-                        </property>
-                    </widget>
-                    <widget class="QLineEdit" row="1" column="3">
-                        <property name="name">
-                            <cstring>order</cstring>
-                        </property>
-                        <property name="text">
-                            <string>256</string>
-                        </property>
-                    </widget>
-                    <widget class="QSpinBox" row="2" column="3">
-                        <property name="name">
-                            <cstring>stacking</cstring>
-                        </property>
-                        <property name="maxValue">
-                            <number>8</number>
-                        </property>
-                        <property name="minValue">
-                            <number>1</number>
-                        </property>
-                        <property name="value">
-                            <number>1</number>
-                        </property>
-                    </widget>
-                </grid>
-            </widget>
+                    <property name="enabled">
+                        <bool>true</bool>
+                    </property>
+                    <property name="text">
+                        <string>treshold</string>
+                    </property>
+                </widget>
+            </vbox>
+        </widget>
+        <widget class="QPushButton" row="2" column="7">
+            <property name="name">
+                <cstring>updateButton</cstring>
+            </property>
+            <property name="text">
+                <string>Update</string>
+            </property>
+        </widget>
+        <widget class="QPushButton" row="2" column="8" rowspan="1" colspan="3">
+            <property name="name">
+                <cstring>pushButton4</cstring>
+            </property>
+            <property name="text">
+                <string>Set Tempo</string>
+            </property>
+        </widget>
+        <widget class="QPushButton" row="3" column="7" rowspan="1" colspan="4">
+            <property name="name">
+                <cstring>pushButton2</cstring>
+            </property>
+            <property name="text">
+                <string>Ok</string>
+            </property>
+        </widget>
+        <widget class="QCheckBox" row="2" column="4">
+            <property name="name">
+                <cstring>decay</cstring>
+            </property>
+            <property name="enabled">
+                <bool>true</bool>
+            </property>
+            <property name="text">
+                <string>decay</string>
+            </property>
+        </widget>
+        <widget class="QCheckBox" row="3" column="0" rowspan="1" colspan="5">
+            <property name="name">
+                <cstring>haar</cstring>
+            </property>
+            <property name="text">
+                <string>Wavelet based</string>
+            </property>
         </widget>
     </grid>
 </widget>
@@ -861,43 +355,8 @@
         <receiver>PatternDialog</receiver>
         <slot>slantChanged()</slot>
     </connection>
-    <connection>
-        <sender>locut</sender>
-        <signal>activated(const QString&amp;)</signal>
-        <receiver>PatternDialog</receiver>
-        <slot>filterChanged()</slot>
-    </connection>
-    <connection>
-        <sender>hicut</sender>
-        <signal>activated(const QString&amp;)</signal>
-        <receiver>PatternDialog</receiver>
-        <slot>filterChanged()</slot>
-    </connection>
-    <connection>
-        <sender>order</sender>
-        <signal>returnPressed()</signal>
-        <receiver>PatternDialog</receiver>
-        <slot>filterChanged()</slot>
-    </connection>
-    <connection>
-        <sender>stacking</sender>
-        <signal>valueChanged(int)</signal>
-        <receiver>PatternDialog</receiver>
-        <slot>filterChanged()</slot>
-    </connection>
-    <connection>
-        <sender>pushButton4_2</sender>
-        <signal>clicked()</signal>
-        <receiver>PatternDialog</receiver>
-        <slot>calculateRythmPattern()</slot>
-    </connection>
 </connections>
 <tabstops>
-    <tabstop>locut</tabstop>
-    <tabstop>hicut</tabstop>
-    <tabstop>order</tabstop>
-    <tabstop>stacking</tabstop>
-    <tabstop>tabWidget2</tabstop>
     <tabstop>periodDelta</tabstop>
     <tabstop>periodDelta10</tabstop>
     <tabstop>color</tabstop>

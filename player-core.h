@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001 Werner Van Belle
+ Copyright (C) 2001-2004 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -93,9 +93,24 @@ unsigned4 lfo_difference(unsigned4 x);
 unsigned4 lfo_revsaw(unsigned4 x);
 unsigned4 lfo_metronome(unsigned4 x);
 typedef unsigned4 (*_lfo_)(unsigned4 x);
-void lfo_set(char* name, _lfo_ l, unsigned8 freq, unsigned8 phase);
-// the jumpback is expressed at the normal speed of playing
-int  loop_set(unsigned8 jumpback);
+void  lfo_set(char* name, _lfo_ l, unsigned8 freq, unsigned8 phase);
+_lfo_ lfo_get();
+
+typedef struct t_segment {
+  signed2 take_from;
+  signed2 speed_mult;
+  signed2 speed_div;
+  signed2 volume; // per 100
+} map_segment;
+typedef map_segment* map_data;
+
+#define map_exit_restart -1
+#define map_exit_continue -2
+#define map_exit_stop -1000
+// the exit is expressed at the normal speed of playing
+void map_set(signed2 map_size, map_data m, unsigned8 size, signed8 exit, bool loop);
+void map_loop_set(bool l);
+void map_stop();
 
 extern int   opt_quiet;
 extern int   opt_match;

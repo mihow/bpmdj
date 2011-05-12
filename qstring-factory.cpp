@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001 Werner Van Belle
+ Copyright (C) 2001-2004 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -23,10 +23,33 @@
 #include "qstring-factory.h"
 #include "songtree.h"
 
+const QString TRUE_TEXT("Yes");
+const QString FALSE_TEXT("No");
+const QString TAG_TRUE("Yes"); 
+const QString TAG_FALSE("___");
+const QString zero("0");
+const QString zeroo("00");
+const QString slash("/");
+const QString EMPTY("");
+
+QString tonumber(const int b)
+{
+  return ( b < 10 ?
+	   zeroo+QString::number(b) :
+	   ( b < 100 ?
+	     zero+QString::number(b) :
+	     QString::number(b)));
+}
+
+QString tonumber(const float f)
+{
+  return QString::number(f);
+}
+
 AvlTree<QString> QStringFactory::tree;
 bool QStringFactory::killed = false;
 
-unsigned long winst = 0;
+// unsigned long winst = 0;
 QString QStringFactory::create(char*  str)
 {
   if (str==NULL) return QString::null;
@@ -35,7 +58,7 @@ QString QStringFactory::create(char*  str)
   QStringNode * found = (QStringNode*) tree.search(newly_allocated);
   if (found)
     {
-      winst+=found->content.length()*2+1;
+      // winst+=found->content.length()*2+1;
       return found->content;
       // the newly allocated string will be destroyed at the moment
       // this function returns. The data stored in the found content

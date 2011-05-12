@@ -474,7 +474,7 @@ float **matrix(int n,int m)
 /* Free a float vector allocated by vector(). */
 static void free_vector(float *v, int n)
 {
-   free((char*) (v+1));
+   deallocate((char*) (v+1));
 }
 
 /**  Deallocate float matrix storage  ***************************/
@@ -484,10 +484,8 @@ void free_matrix(float ** mat, int n, int m)
    int i;
 
    for (i = n; i >= 1; i--)
-       {
-       free ((char*) (mat[i]+1));
-       }
-   free ((char*) (mat+1));
+     deallocate ((char*) (mat[i]+1));
+   deallocate ((char*) (mat+1));
 }
 
 /**  Reduce a real, symmetric matrix to a symmetric, tridiag. matrix. */

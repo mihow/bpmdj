@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001 Werner Van Belle
+ Copyright (C) 2001-2004 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -22,30 +22,25 @@
 #define DATABASE_H
 
 #include "avltree.h"
+#include "growing-array.h"
 
 class Song;
 class SongMetriek;
 class SongSelectorLogic;
-class QListView;
+class QVectorView;
 
 class DataBase
 {
   private:
-    Song * *    all;
-    int         all_size;
-    int         all_count;
-    Song * *    cache;
-    int         cache_size;
-    int         cache_count;
+    GrowingArray<Song*> all;
+    GrowingArray<Song*> cache;
     bool *      and_include;
     bool *      or_include;
     bool        and_includes_checked;
     bool        excludes_checked;
     bool *      exclude;
-    QString *   tag;
+    tag_type *  tag;
     int         tag_size;
-    void clearCache();
-    void addToCache(Song*);
     bool cacheValid(SongSelectorLogic * selector);
     void copyTags(SongSelectorLogic * selector);
     bool tagFilter(Song*);
@@ -59,11 +54,11 @@ class DataBase
     virtual ~DataBase();
     void     reset();
     void     add(Song*);
-    void     del(Song*);
+    // void     del(Song*);
     Song *   find(QString song_filename);
     // bool     lookfor(const QString z);
-    int      getSelection(SongSelectorLogic* selector, Song* main, QListView* target);
-    Song * * getAllSongs(int &cnt) {cnt=all_count; return all;};
+    int      getSelection(SongSelectorLogic* selector, Song* main, QVectorView* target);
+    GrowingArray<Song*> * getAllSongs() { return &all;};
     AvlTree<QString> * getFileTreeRef();
     AvlTree<QString> * getFileTreeCopy();
     Song * * closestSongs(SongSelectorLogic * selector, Song * target, SongMetriek * metriek, int maximum, int &count);

@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001 Werner Van Belle
+ Copyright (C) 2001-2004 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -31,6 +31,7 @@
 #include "dirscanner.h"
 #include "spectrum.h"
 #include "queuedsong.h"
+#include "tags.h"
 
 #define QUEUED_ANKER 0
 #define QUEUED_DLINE 1
@@ -93,26 +94,22 @@ void QueuedSong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid, 
       if (Config::color_played && song->played)
 	{
 	  QColorGroup ncg(cg);
-	  ncg.setColor(QColorGroup::Base,QColor(255,0,0));
+	  ncg.setColor(QColorGroup::Base,Config::color_played_song);
 	  QListViewItem::paintCell(p,ncg,col,wid,align);
 	  return;
 	}
       break;
       
     case QUEUED_AUTHOR:
-      {
-	if (Config::color_authorplayed)
+      { 
+	QColor * color;
+	if (color=QSong::colorOfAuthorCol(song))
 	  {
-	    int played_author_songs_ago = Played::songs_played - song->played_author_at_time;
-	    if (played_author_songs_ago < Config::authorDecay)
-	      {
-		QColorGroup ncg(cg);
-		ncg.setColor(QColorGroup::Base,
-			     QColor(255,150+(255-150)*played_author_songs_ago/Config::authorDecay
-				    ,255*played_author_songs_ago/Config::authorDecay));
-		QListViewItem::paintCell(p,ncg,col,wid,align);
-		return;
-	      }
+	    QColorGroup ncg(cg);
+	    ncg.setColor(QColorGroup::Base,*color);
+	    QListViewItem::paintCell(p,ncg,col,wid,align);
+	    delete(color);
+	    return;
 	  }
 	break;
       }
@@ -130,7 +127,7 @@ void QueuedSong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid, 
       
     case QUEUED_SPECTRUM:
       if (Config::color_spectrum)
-	if (!song->spectrum.isNull())
+	if (song->spectrum!=no_spectrum)
 	  {
 	    QColorGroup ncg(cg);
 	    ncg.setColor(QColorGroup::Base,song->color);
@@ -138,19 +135,16 @@ void QueuedSong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid, 
 	    return;
 	  }
       break;
-      
-    case QUEUED_ONDISK:
-      if (Config::color_ondisk && !song->ondisk)
-	{
-	  QColorGroup ncg(cg);
-	  ncg.setColor(QColorGroup::Base,QColor(0,0,255));
-	  QListViewItem::paintCell(p,ncg,col,wid,align);
-	  return;
-	}
-      break;
     }
   
-  QListViewItem::paintCell(p,cg,col,wid,align);
+  if (Config::color_ondisk && !song->ondisk)
+    {
+      QColorGroup ncg(cg);
+      ncg.setColor(QColorGroup::Base,Config::color_unavailable);
+      QListViewItem::paintCell(p,ncg,col,wid,align);
+    }
+  else
+    QListViewItem::paintCell(p,cg,col,wid,align);
 }
 
 QString QueuedSong::text(int i) const
@@ -162,9 +156,8 @@ QString QueuedSong::text(int i) const
     case QUEUED_VERSION : return song->version;
     case QUEUED_TITLE : return song->title;
     case QUEUED_AUTHOR : return song->author;
-    case QUEUED_TEMPO : return song->tempo;
     case QUEUED_INDEX : return song->storedin;
-    case QUEUED_TAGS : return song->tags;
+    case QUEUED_TAGS : return Tags::full_string(song->tags);
     case QUEUED_TIME : return song->time;
     case QUEUED_MD5SUM : return song->md5sum;
     case QUEUED_DLINE : return QString::number(distance,'f',3);
@@ -183,13 +176,14 @@ QString QueuedSong::text(int i) const
     case QUEUED_ANKER : 
       return tonumber(pos);
     }
-  return QString::null;
+  return QListViewItem::text(i);
 }
 
-QueuedSong::QueuedSong(QSong * s, QListView* parent) :
+QueuedSong::QueuedSong(Song * s, QListView* parent) :
   QListViewItem(parent,"","","","","","","")
 {
-  song = s->songEssence();
+  song = s;
+  setText(QUEUED_TEMPO,song->tempo_str());
   anker = true;
   distance = 0; 
   mark = false;
@@ -206,5 +200,11 @@ QueuedSong::QueuedSong(QListView* parent, QListViewItem *after) :
   pos = parent->childCount();
 }
 
-QString QueuedSong::TRUE_TEXT("Yes");
-QString QueuedSong::FALSE_TEXT("No");
+void QueuedSong::setSong(Song* s, double d)
+{
+  song=s; 
+  distance=d;   
+  if (song)
+    setText(QUEUED_TEMPO, song->tempo_str()); 
+}
+

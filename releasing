@@ -1,0 +1,3 @@
+to release the software
+- make check [-bin,-doc]
+- make tgz

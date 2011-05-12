@@ -10,24 +10,29 @@
 #  - make
 #  - alsa-headers (for alsa support)
 
-CPP = ccache g++ -O3
-CC = ccache gcc -O3
+# full optimalisations
+CPP = distcc g++ -O3
+CC = distcc gcc -O3
+# CPP = distcc g++ -O0 -g -pg
+# CC = distcc gcc -O0 -g -pg 
 
-#CPP = distcc g++ -O0 -g -pg
-#CC = distcc gcc -O0 -g -pg 
-
-CP = cp
-MV = mv
-TAR = tar
 UIC = uic
 MOC = moc
-MKDIR = mkdir
 STRIP = strip
 INSTALL = install
 
-CFLAGS+= -D COMPILE_ALSA -D COMPILE_OSS -D COMPILE_NONE
+# -D COMPILE_OSS = include OSS drivers
+# -D COMPILE_ALSA = include ALSA drivers
+# -D EFENCE = include electric fence debugging code
+CFLAGS+= -D COMPILE_OSS -D COMPILE_ALSA 
 LDFLAGS+= -lpthread -lm -lasound
-
 QT_INCLUDE_PATH=-I/usr/include/qt3/
 QT_LIBRARY_PATH=
 QT_LIBS= -lqt-mt
+
+RM = rm
+CD = cd
+CP = cp
+MV = mv
+TAR = tar
+MKDIR = mkdir

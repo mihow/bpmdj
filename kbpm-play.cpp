@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001 Werner Van Belle
+ Copyright (C) 2001-2004 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -105,41 +105,44 @@ void terminal_stop()
 
 void options_failure(char* err)
 {
-   // print options
-   printf("Usage:  kbpm-play <options> argument\n\n"
-          "   -c          --create              create an index file if none exists\n"
-	  "   -q          --quiet               be quiet\n"
-	  "   -m arg      --match arg           song to match tempo with\n"
-	  "   -p nbr nbr  --position nbr nbr    position to place the window\n"
-	  "   -v          --verbose             be verbose with respect to latency\n"
-	  "   -L nbr      --latency nbr         required latency in ms (default = 744)\n"
+  QMessageBox::critical(NULL,
+			"Command line arguments",
+			QString(err),
+			QMessageBox::Ok,QMessageBox::NoButton);
+  
+  // print options
+  printf("Usage:  kbpm-play <options> argument\n\n"
+	 "   -c          --create              create an index file if none exists\n"
+	 "   -q          --quiet               be quiet\n"
+	 "   -m arg      --match arg           song to match tempo with\n"
+	 "   -p nbr nbr  --position nbr nbr    position to place the window\n"
+	 "   -v          --verbose             be verbose with respect to latency\n"
+	 "   -L nbr      --latency nbr         required latency in ms (default = 744)\n"
 #ifdef COMPILE_OSS
-	  "  --oss-driver---------------------------------\n"
-          "               --oss                 use OSS driver (default)\n"
-	  "   -d arg      --dsp arg             dsp device to use (default = /dev/dsp)\n" 
-	  //	  "   -x arg      --mixer arg           mixer device to use (default = /dev/mixer)\n"
-	  "   -F nbr      --fragments nbr       the number of fragments used to play audio.\n" 
-	  "   -X          --nolatencyaccounting does not take into account the latency when marking a cue\n"
+	 "  --oss-driver---------------------------------\n"
+	 "               --oss                 use OSS driver\n"
+	 "   -d arg      --dsp arg             dsp device to use (default = /dev/dsp)\n" 
+	 //	  "   -x arg      --mixer arg           mixer device to use (default = /dev/mixer)\n"
+	 "   -F nbr      --fragments nbr       the number of fragments used to play audio.\n" 
+	 "   -X          --nolatencyaccounting does not take into account the latency when marking a cue\n"
 #endif 
-#ifdef COMPILE_NONE
-	  "  --none-driver---------------------------------\n"
-          "               --none                 use no sound driver\n"
-#endif
+	 "  --none-driver---------------------------------\n"
+	 "               --none                 use no sound driver\n"
 #ifdef COMPILE_ALSA
-	  "  --alsa-driver---------------------------------\n"
-          "               --alsa                 use OSS driver (default)\n"
-	  "               --dev arg              device to use (default = hw:0,0)\n" 
+	 "  --alsa-driver---------------------------------\n"
+	 "               --alsa                 use ALSA sound driver\n"
+	 "               --dev arg              device to use (default = hw:0,0)\n" 
 #endif
-	  "  --analysis------------------------------------\n"
-	  "   -b          --batch               no ui output, md5sum is automatically checked\n"
-	  "               --bpm [1,2,3,4]       measure bpm with specified technique (default = 1)\n"
-	  //	  "               --pattern             dump pattern\n"
-	  "   -l nbr      --low nbr             lowest bpm to look for (default = 120)\n"
-	  "   -h nbr      --high nbr            highest bpm to look for (default = 160)\n"
-	  "               --spectrum            obtain color at cue-point, no sound, quit imm\n"
-	  "   -r arg      --rawpath arg         path that .raw temp files are stored in\n"
-	  "   argument                          the index file of the song to handle\n\n%s\n\n",err);
-   exit(1);
+	 "  --analysis------------------------------------\n"
+	 "   -b          --batch               no ui output, md5sum is automatically checked\n"
+	 "               --bpm [1,2,3,4]       measure bpm with specified technique (default = 1)\n"
+	 //	  "               --pattern             dump pattern\n"
+	 "   -l nbr      --low nbr             lowest bpm to look for (default = 120)\n"
+	 "   -h nbr      --high nbr            highest bpm to look for (default = 160)\n"
+	 "               --spectrum            obtain color at cue-point, no sound, quit imm\n"
+	 "   -r arg      --rawpath arg         path that .raw temp files are stored in\n"
+	 "   argument                          the index file of the song to handle\n\n%s\n\n",err);
+  exit(1);
 }
 
 void process_options(int argc, char* argv[])
@@ -212,12 +215,10 @@ void process_options(int argc, char* argv[])
 	      dsp = new dsp_oss();
 	    }
 #endif
-#ifdef COMPILE_NONE
 	  else if (strcmp(arg,"none")==0)
 	    {
 	      dsp = new dsp_none();
 	    }
-#endif
 #ifdef COMPILE_ALSA
 	  else if (strcmp(arg,"dev")==0)
 	    {
@@ -258,6 +259,20 @@ void process_options(int argc, char* argv[])
 		options_failure("high argument scanning error");
 	      arg_high=atoi(argv[i]);
 	    }
+	  else if (strcmp(arg,"check-version")==0)
+	    {
+	      if (++i>=argc)
+		options_failure("impossible to check version");
+	      if (strcmp(argv[i],VERSION)!=0)
+		{
+		  char err[5000];
+		  sprintf(err,"version mismatch\nkbpm-play is version "VERSION
+			  "\nkbpm-dj is version %s",argv[i]);
+		  options_failure(err);
+		  exit(1);
+		}
+	      exit(0);
+	    }
 	  else if (strcmp(arg,"match")==0 ||
 		   strcmp(arg,"m")==0)
 	    {
@@ -292,35 +307,43 @@ void process_options(int argc, char* argv[])
     {
       options_failure("requires at least one argument");
     }
+  if (!dsp)
+    {
+      dsp = new dsp_none();
+    }
   if ((opt_color || opt_bpm) && !opt_batch)
     {
       options_failure("to start an analyzer, you need to supply the --batch option");
     }
 }
 
-void show_error(int err, int err2, const char*text)
+bool show_error(int err, int err2, const char*text)
 {
   if (err==err2)
     {
       const QString a=QString("Error");
       const QString b=QString(text);
       QMessageBox::critical(NULL,a,b,QMessageBox::Ok,0,0);
-      exit(err);
+      return true;
     }
+  return false;
 }
 
 void normal_start()
 {
   int err;
   err = core_init(0);
-  show_error(err, err_needidx, "Please enter the index file, not the "SONG_EXT" file\nAn index file can be made with 'kbpm-play -c'\n");
-  show_error(err, err_noraw, "No raw file to be read. Probably the .mp3 is broken.\n");
-  show_error(err, err_nospawn, "Unable to spawn decoding process.\nPlease check your PATH environment variable\n");
+  if (show_error(err, err_needidx, "Please enter the index file, not the "SONG_EXT" file\nAn index file can be made with 'kbpm-play -c'\n")
+      || show_error(err, err_noraw, "No raw file to be read. Probably the .mp3 is broken.\n")
+      || show_error(err, err_nospawn, "Unable to spawn decoding process.\nPlease check your PATH environment variable\n"))
+    exit(err);
   
   err = core_open();
-  show_error(err, err_dsp, "Unable to open dsp device\n");
-  //  show_error(err, err_mixer, "Unable to open mixer device\n");
-  
+  if (show_error(err, err_dsp, "Unable to open dsp device\n"))
+    {
+      core_done();
+      exit(err);
+    }
   terminal_start();
   core_play();
   terminal_stop();
@@ -374,9 +397,8 @@ void batch_start()
 
 int main(int argc, char *argv[])
 {
-  process_options(argc,argv);
-  // create an application
   app = new QApplication(argc,argv);
+  process_options(argc,argv);
   // if we need to create an index file we'll make it.
   if (opt_create)
     {

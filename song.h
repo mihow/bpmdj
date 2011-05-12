@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001 Werner Van Belle
+ Copyright (C) 2001-2004 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -24,24 +24,15 @@
 #include <time.h>
 #include <qcolor.h>
 #include <qpixmap.h>
+//#include <qlistview.h>
+#include "qvectorview.h"
 #include "config.h"
 #include "cluster.h"
 #include "index.h"
 
-#define LIST_DCOLOR 2
-#define LIST_TITLE 5
-#define LIST_AUTHOR 6
-#define LIST_TEMPO 0
-#define LIST_TIME 3
-#define LIST_CUES 4
-#define LIST_VERSION 7
-#define LIST_TAGS 8
-#define LIST_ONDISK 9
-#define LIST_SPECTRUM 1
-#define LIST_INDEX 10
-#define LIST_MD5SUM 11
-#define LIST_FILE 12
+//#define SONGLIST_SET 0
 
+class QSong;
 QString tonumber(const int b);
 
 class SongMetriek:
@@ -49,46 +40,36 @@ class SongMetriek:
 {
   public: 
     // which properties needs to be taken into account
-    bool tempo;
-    bool pattern;
-    bool tempo_weight;
-    bool spectrum;  
-    // standard metrics
-    static SongMetriek SPECTRUM;
-    static SongMetriek TEMPO;
-    static SongMetriek PATTERN;
-    static SongMetriek ALL;
-    static SongMetriek ALL_WITHOUT_TEMPO_WEIGHT;
-    // constructor
-    SongMetriek(bool t, bool t2, bool s, bool p)
+    float tempo;
+    float spectrum;
+    SongMetriek(float tw, float sw)
       {
-	tempo = t;
-	tempo_weight = t2;
-	spectrum = s;
-	pattern  = p;
+	tempo = tw;
+	spectrum = sw;
       };
 };
 
 class Song: public Point
 {
-  public:
+ public:
     // stored in the index files
     QString title;
     QString author;
     QString version;
-    QString tempo;
     QString storedin;
-    QString tags;
     QString file;
     QString time;
     QString md5sum;
-    QString spectrum;
+    tempo_type    tempo;
+    spectrum_type spectrum;
+    tags_type     tags;
+    
     // calculated as necessary
     QColor  color;
-    QString spectrum_string;
-    QString distance_string;
-    AlbumField ** albums;
-    int     color_distance;
+    QString spectrum_string;  // the spectrum column text
+    QString distance_string;  // the dcolor column text
+    float   color_distance;   // the dcolor distance value
+    AlbumField ** albums;     
     bool    played;
     bool    ondisk;
     int     has_cues;
@@ -96,6 +77,8 @@ class Song: public Point
   private:
     void init(const QString fullname, bool checkondisk);
     void clearFloatingFields();
+  public: // accessors
+    QString  tempo_str();
   public:
     Song();
     Song(Index* idx, bool allow_write, bool checkondisk, bool account_spectrum);
@@ -107,18 +90,21 @@ class Song: public Point
     void setColor(QColor c);
     QString getDisplayTitle();
     bool getDistance();
-    bool containsTag(const QString which);
-    QString tempo_between(Song*, float);
+    bool contains_tag(const tag_type which);
+    tempo_type tempo_between(Song*, float);
+    float   tempo_n_distance(float harmonic, Song* song); // without taking the abs value
+    float   tempo_distance(float harmonic, Song* song);
     float   tempo_distance(Song* song);
-    QString spectrum_between(Song*, float);
+    spectrum_type spectrum_between(Song*, float);
     QColor  color_between(Song* song, float percent);
     float   spectrum_distance(Song* song);
-    virtual float   distance(Point* point, Metriek* dp);
+    virtual float   distance(Point* point, Metriek * dp);
     virtual Point* percentToward(Point * other, Metriek * dp, float percent);
     virtual void simpledump(int d);
     virtual void determine_color(float hue, float, int, int);
+    virtual void color_sub_elements(int a, int b, float d);
     virtual ~Song();
-    bool modifiedOnDisk();
+    bool    modifiedOnDisk();
 };
 
 #endif

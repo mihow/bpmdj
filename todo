@@ -1,30 +1,12 @@
-- bug: rename some index files using the 'find wrong index files' thing, afterward do a 'comapction of the index directoryt'. Clearly, the modified index files should also modify the song list, or else we should reread the index directory after modifying these files
-
-
-- die PCA analyse is eigenlijk niet zooo goed. HEtzelfde geld voor die dColor scale... We kunnen waarschijnlijk ook argumenteren dat de PCA analyse net de grootste variabiliteit vind en dat deze zaken variabel zijn omdat ze nu net niet zo belangrijk zijn...
 - fix the license of the BPM counting algorithm
-- Q: dubbel klikken als de monitor nog aan het spelen is brengt het nieuwe nummer in de queue
-- add xmms --queue in creation command
-- add extra version information in this release
-- compile under gentoo
 - logfile doc schrijven
-  history documentation
-- centralizeren van een aantal funxties:
-  - song.cpp: tonumber serie
+- centralizeren van een aantal functies:
   - index.cpp: toint & tohex
 - create full command line counter using the same codebase
-- alles representeren met QStrings ? ? ? 
-- selection menu hotkeys toevoegen... 
-  hotkeys toevoegen...
+- selection menu hotkeys toevoegen... hotkeys toevoegen...
 
 LATER
-- BUG: fetch spectrum crashed op "102_AllYouNeedIsLove[Beatles].mp3"
 - ervoor zorgen dat de bpm-analyzer min of meer correcte info weergeeft...
-- zrogen dat hem rapper van disk leest (blokje per blokje kan wel wat traag zijn op het einde)
-- fix pattern analyzer to use differnt colors for three different frequency bands...
-  red for low, yellow for high pass filter. Benieuwd of dit duidelijker gaat zijn ?
-- de renamerbox is eigenlijk nog een probleem dan... Hoewel eigenlijk ook niet..
-  als we renamen moeten we eigenlijk ook gewoon de inhoud van de files up to date
   brengen (hebben we een speciale button voor nodig ???
 - remote adding of queue laten marcheren...
 
@@ -60,15 +42,8 @@ LATER
     - performantie nog eens verder bekijken... Volgens mij wordt er nog iets te veel geheugen gebruikt...
     - verschillende distance methoden erin steken
   - de toggle troep centraliseren door ze in een kanon van een define te proppen..
-  - fetch brol from disk...
   - qsong uitbreiden met een extra kolom die de cluster beschrijft..
-  - opkuisen code
-    - tonumber centraliseren
-    - min/max operators centraliseren
-    - inlezen van files in een buffer...
-    - centralizeren van de vervelende bash-scripts...
-    - inlezen van de volledige file en het compressen
-    - merge index_file creation into cbpm-index (kbpm-play.c bevat dergelijke code en import-scanner.cpp)
+  - merge index_file creation into cbpm-index (kbpm-play.c bevat dergelijke code en import-scanner.cpp)
   - libmd5 gebruiken...
   - opzetten mailinglist...
   - automatisch scannen van spectrum en tags afzetten en de boel cachen in de index files
@@ -88,21 +63,30 @@ LATER
   - na een tofetch list opgesteld te hebben moeten we de songs afhalen.
     - tar appenden is geen goed systeem
     - we zouden ook beter direct zorgen dat de namen correct zijn
-  - Impulse detection/impulse response meten
   - Player: automatische fade-out erin steken
-  - color path finder derin steken
   - visualisatie box van stijl/positie der in stoppen...
-  - pattern recognizer mergen met BPM-detector en eventueel onmiddelijk direct de spectrum scanner der uit
-    gooien ? Hmmm... Is nogal useless als ge het mij vraagt. Misschien beter aparte zaken houden..
-    redesign van dat zooitje..
 
 
 - populaire halen van cd20 ForTheRoses - Deus -- 70
+
+Future: 
+  impl  - investigate do_spectrum_pca, both datatypes are the same, so this could be reduced to something smaller
+  desgn - tag systeem gebruiken om nieuwe files t eimporteren en hun originele locatie te onthouden
+  featr - allign feature in wavelet analysis
+  desgn - pattern analysiation is becoming crucial
+  featr - .tlp files exporteren
+  bug   - rename some index files using the 'find wrong index files' thing,
+          afterward do a 'comapaction of the index directoryt'. Clearly, the 
+	  modified index files should also modify the song list, or else we should 
+	  reread the index directory after modifying these files
+  featr - dubbel klikken als de monitor nog aan het spelen is brengt het nieuwe nummer in de queue
+  bug   - fetch spectrum crashed op "102_AllYouNeedIsLove[Beatles].mp3"
+  featr - help system moet beter marcheren. We moeten onmiddelijk nen browser open doen...
+
 =====================================
 kbpm-play:
   - als de file al bestaat en we moeten correleren onmiddelijk binnen 10BPM bounds zoeken
   - target tempo zetten laat de percent indicator niet volgen
-  - als tempo = inf deftige errormelding geven
   - cue shifting beyond zero should lock down to zero (or produce somthing 'okay')
   - should show remaining time instead of total time
   - when changing an lfo the current phase should remain the same.

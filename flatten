@@ -1,6 +1,0 @@
-#!/bin/bash
-find . -type d >~/.flatten
-gawk '{print "mv -i \""$0"\"/* . "}' <~/.flatten >~/.flatcmd
-chmod 755 ~/.flatcmd
-. ~/.flatcmd
-rmdir *

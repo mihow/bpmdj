@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001 Werner Van Belle
+ Copyright (C) 2001-2004 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -34,36 +34,19 @@
 #include <qinputdialog.h>
 #include "history.h"
 #include "common.h"
+#include "growing-array.cpp"
 
 int Played::songs_played = 0;
-int Played::size = 1;
-int Played::next = 1;
 Song * Played::t_2 = NULL;
 Song * Played::t_1 = NULL;
 Song * Played::t_0 = NULL;
 FILE *Played::f = NULL;
-QString** Played::names = NULL;
-
-void Played::Add(QString *filename)
-{
-  /* put line in memory */
-  names[next++]=filename;
-  if (next>=size)
-    {
-      size*=2;
-      names=reallocate(names,size,QString*);
-    }
-}
+GrowingArray<QString> Played::names;
 
 Played::Played(const QString filename)
 {
-  /* initialise */
-  size=100;
-  next=0;
-  names=allocate(size,QString*);
-  /* read the file or create it */
+  names.init();
   f=fopen(filename,"rb");
-  /* read all lines in memory and sort them */
   if (f!=NULL)
     {
       char  *line = NULL;
@@ -72,19 +55,18 @@ Played::Played(const QString filename)
       while((len=getline(&line,&blen,f))!=-1)
 	{
 	  line[len-1]=0;
-	  Add(new QString(line));
+	  names.add(QString(line));
 	}
       if (line)
-	free(line);
+	deallocate(line);
     }
-  /* open file for appending */
   f=fopen(filename,"ab");
 }
 
 bool Played::IsPlayed(Song * which)
 {
-  for(int i = 0 ; i < next ; i++)
-    if (*(names[i])==which->file) 
+  for(int i = 0 ; i < names.count ; i++)
+    if (names.elements[i]==which->file) 
       return true;
   return false;
 }

@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001 Werner Van Belle
+ Copyright (C) 2001-2004 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -18,6 +18,9 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
+// modify: move similarity out of distance...
+// compare not based on index buyt on pointer value of this. This should help somewhat
+// removal of elements from the list can be done through reverse mapping elements
 
 // TODO -- memorycheck is toch wel eens nodig Vooral bij het releasen van couple's
 // TODO -- static classe is niet zo fijn, zou ze liever wat meer lokaal hebben.
@@ -29,16 +32,16 @@
 #include <assert.h>
 #include "cluster.h"
 
-float ** Cluster::similarity = NULL;
+float    ** Cluster::similarity = NULL;
 Position ** Cluster::next;
 Position ** Cluster::prev;
-Point ** Cluster::realcontent;
-int Cluster::type_mark;
-int Cluster::realcontentsize=0;
-int Cluster::realcontenttotalsize=0;
-int Cluster::totalsize=0;
-int * Cluster::pointstocluster;
-int Cluster::size;
+Point    ** Cluster::realcontent;
+int         Cluster::type_mark;
+int         Cluster::realcontentsize=0;
+int         Cluster::realcontenttotalsize=0;
+int         Cluster::totalsize=0;
+int *       Cluster::pointstocluster;
+int         Cluster::size;
 
 // Abstract definition of points
 Point::Point()
@@ -103,14 +106,163 @@ void Couple::determine_color(float hue_min, float hue_max, int depth, int stopat
   else
     {
       Cluster::realcontent[first]->determine_color(hue_min + (hue_max-hue_min)*0.0/3.0,
-					  hue_min + (hue_max-hue_min)*1.0/3.0,
-					  depth+1, stopat);
+						   hue_min + (hue_max-hue_min)*1.0/3.0,
+						   depth+1, stopat);
       Cluster::realcontent[second]->determine_color(hue_min + (hue_max-hue_min)*2.0/3.0,
-					   hue_min + (hue_max-hue_min)*3.0/3.0,
-					   depth+1,
-					   stopat);
+						    hue_min + (hue_max-hue_min)*3.0/3.0,
+						    depth+1,
+						    stopat);
     }
 }
+
+int Couple::cluster_elements()
+{
+  return Cluster::realcontent[first]->cluster_elements() + 
+    Cluster::realcontent[second]->cluster_elements();
+}
+
+int Couple::clusters_with_size(int min_size, int max_size, float &min_internal_distance, float& max_internal_distance)
+{
+  int nr = cluster_elements();
+  if (nr<min_size) return 0;
+  if (nr>=min_size && nr<=max_size) 
+    {
+      float d = Cluster::distance_memory(first,second);
+      if (d<min_internal_distance || min_internal_distance<0)
+	min_internal_distance = d;
+      if (d>max_internal_distance || max_internal_distance<0)
+	max_internal_distance = d;
+      return 1;
+    }
+  if (nr>max_size) return 
+		     Cluster::realcontent[first]->clusters_with_size(min_size,max_size,min_internal_distance,max_internal_distance)+
+		     Cluster::realcontent[second]->clusters_with_size(min_size,max_size,min_internal_distance,max_internal_distance);
+}
+
+void Couple::color_sub_elements(int a, int b, float d)
+{
+  Cluster::realcontent[first]->color_sub_elements(a,b,d);
+  Cluster::realcontent[second]->color_sub_elements(a,b,d);
+}
+
+void Couple::color_clusters_with_size(int min_size, int max_size)
+{
+  float min_distance = -1;
+  float max_distance = -1;
+  int nr_of_such_clusters = clusters_with_size(min_size,max_size,min_distance,max_distance);
+  if (nr_of_such_clusters==0) 
+    color_sub_elements(-1,-1,0);
+  else
+    color_clusters_with_size(min_size,max_size,0,nr_of_such_clusters,min_distance,max_distance);
+}
+
+int Couple::color_clusters_with_size(int min_size, int max_size, int cluster_nr, int nr_of_such_clusters, float min_dist, float max_dist)
+{
+  int nr = cluster_elements();
+  // if this cluster falls in range then we simply color it entirily and return the next cluster number
+  if (nr>=min_size && nr<=max_size)
+    {
+      color_sub_elements(cluster_nr,nr_of_such_clusters,
+			 (Cluster::distance_memory(first,second) - min_dist)
+			 / (max_dist-min_dist));
+      return cluster_nr+1;
+    }
+  // if there are too few elements, then we also avoid coloring it
+  if (nr<min_size)
+    {
+      color_sub_elements(-1,-1,0);
+      return cluster_nr;
+    }
+  // if there are too many elements, then we go into the two sub trees
+  cluster_nr = Cluster::realcontent[first]->color_clusters_with_size(min_size,max_size,cluster_nr,nr_of_such_clusters,min_dist,max_dist);
+  return Cluster::realcontent[second]->color_clusters_with_size(min_size,max_size,cluster_nr,nr_of_such_clusters,min_dist,max_dist);
+}
+
+float Couple::intra_distance()
+{
+  return Cluster::distance_memory(first,second);
+}
+
+void Couple::color_clusters_dw()
+{
+  color_clusters_dw(0.0,240.0,Cluster::distance_memory(first,second),Cluster::distance_memory(first,second));
+}
+
+void Couple::color_clusters_dw(float hue_min, float hue_max, float max_dist, float last_dist)
+{
+  float dc = intra_distance(); // this detmines the hue afterward
+  if (dc == 0) 
+    {
+      Point::color_clusters_dw(hue_min,hue_max,max_dist,last_dist);
+      return;
+    }
+  float da = Cluster::realcontent[first]->intra_distance();
+  float db = Cluster::realcontent[second]->intra_distance();
+  // depending on the different distances, another color is given
+  float tc;
+  if (da+db>dc)
+    tc = da+db;
+  else 
+    tc=dc;
+  float hal = hue_min;
+  float har = hue_min+(hue_max-hue_min)*da/tc;
+  float hbl = hue_min+(hue_max-hue_min)*(tc-db)/tc;
+  float hbr = hue_max;
+  Cluster::realcontent[first]->color_clusters_dw(hal,har,max_dist,dc);
+  Cluster::realcontent[second]->color_clusters_dw(hbl,hbr,max_dist,dc);
+}
+
+void Point::color_clusters_dw(float hue_min, float hue_max, float max_dist, float last_dist)
+{
+  color_sub_elements((int)hue_min,360,last_dist/max_dist);
+}
+
+
+int Couple::get_min_maxdepth(int &min, int &max, int depth)
+{
+  return 
+    Cluster::realcontent[first]->get_min_maxdepth(min,max,depth+1)+
+    Cluster::realcontent[second]->get_min_maxdepth(min,max,depth+1);
+}
+
+int Point::get_min_maxdepth(int &min, int &max,int depth)
+{
+  if (depth>max || max<0) max = depth;
+  if (depth<min || min<0) min = depth;
+  return 1;
+}
+
+void Couple::color_clusters_dw2()
+{
+  // get nr of elements
+  // get minimum depth
+  // get maximum depth
+  int a  = -1;
+  int b  = -1;
+  get_min_maxdepth(a,b,0);
+  printf("minimum depth = %d, maximum depth = %d\n",a,b);
+  color_clusters_dw2(0.0,240.0,a,b,0);
+}
+
+
+void Couple::color_clusters_dw2(float hue_min, float hue_max, int min_depth, int max_depth, int depth)
+{
+  int nr = cluster_elements();
+  int a = Cluster::realcontent[first]->cluster_elements();
+  int b = Cluster::realcontent[second]->cluster_elements();
+  float h = hue_min+(hue_max-hue_min)*(float)a/(float)(a+b);
+  Cluster::realcontent[first]->color_clusters_dw2(hue_min,h,min_depth,max_depth,depth+1);
+  Cluster::realcontent[second]->color_clusters_dw2(h,hue_max,min_depth,max_depth,depth+1);
+}
+
+void Point::color_clusters_dw2(float hue_min, float hue_max, int min_depth, int max_depth, int depth)
+{
+  float d = ((float)(max_depth-depth)/(float)(1+max_depth-min_depth));
+  assert(d>=0.0 && d <=1.0);
+  color_sub_elements((int)hue_min,360,d);
+}
+
+
 
 // Cluster main class
 Cluster::Cluster()
@@ -131,6 +283,29 @@ void Cluster::add(int t)
   pointstocluster[size-1]=t;
 }
 
+float Cluster::distance_calculate(int xidx, int yidx, Metriek * metriek)
+{
+  assert(xidx>yidx);
+  Point* x = realcontent[xidx];
+  Point* y = realcontent[yidx];
+  float result = x->distance(y, metriek);
+  similarity[xidx][yidx]=result;
+  return result;
+}
+
+float Cluster::distance_memory(int x, int y)
+{
+  if (x<y)
+    {
+      int t = x;
+      x = y;
+      y = t;
+    }
+  float result = similarity[x][y];
+  assert(result>=0);
+  return result;
+}
+
 float Cluster::distance(int xidx, int yidx, Metriek * metriek)
 {
   // assert(xidx!=yidx);
@@ -143,7 +318,7 @@ float Cluster::distance(int xidx, int yidx, Metriek * metriek)
       xidx = yidx;
       yidx = tidx;
     }
-  // is there a memory available
+  // is there a memory available 
   float result;
   result = similarity[xidx][yidx];
   if (result>=0)
@@ -229,7 +404,7 @@ void Cluster::dumpConnectionMatrix()
 	  else 
 	    printf("*");
 	}
-      free(matrix[i]);
+      deallocate(matrix[i]);
       printf("\n");
     }
   printf("====================================\n");
@@ -274,12 +449,12 @@ Couple *Cluster::agglomerate(Metriek * metriek)
   for (x = 1 ; x < size; x ++)
     for (y = 0; y < x ; y ++)
       {
-	entries[entry].distance=distance(x,y,metriek);
+	entries[entry].distance=distance_calculate(x,y,metriek);
 	entries[entry].x=x;
 	entries[entry].y=y;
 	entry++;
       }
-
+  
   printf("Similarity set created...(%d)\nBegin sorting\n",entry);
   // 2. sort the entries
   qsort(entries,entriestosort,sizeof(struct Position),compareposition);
@@ -302,14 +477,13 @@ Couple *Cluster::agglomerate(Metriek * metriek)
    prev[0][0]=c;
    next[c.x][c.y].x=0;
    next[c.x][c.y].y=0;
-   free(entries);
+   deallocate(entries);
    printf("Prev/next filled with correct data...\n");
    //dumpConnectionMatrix();
    printf("Begin agglomerating elements...\n");
    // 4. As long as there is data in the list, traverse it
    while(size>1)
     {
-      //   dumpConnectionMatrix();
       // a. check stop condition
       Position first;
       first = next[0][0];
@@ -319,22 +493,32 @@ Couple *Cluster::agglomerate(Metriek * metriek)
       Position second;
       second.x = next[first.x][first.y].x;
       second.y = next[first.x][first.y].y;
+      //if (!first.distance<=second.distance)
+      //{
+      //printf("first.distance = %g\n second.distance = %g\n",first.distance,second.distance);
+      //fflush(stdout);
+      //assert(0);
+      //}
       // b. merge the first
       Couple* n  = new Couple(x=first.x,y=first.y);
       // printf("Merging %d and %d, distance = %g\n",first.x,first.y,similarity[first.x][first.y]);
       int z =addcouple(n);
+      
       // nu moeten we de beide elementen verwijderen uit de content set. 
-      for(int i=0;i<size;i++)
+      for( int i = 0 ; i < size ; i ++ )
 	{
-	  if (pointstocluster[i]==first.x)
-	    pointstocluster[i]=z;
+	  if (pointstocluster[i] == first.x)
+	     {
+	       pointstocluster[i] = z;
+	       break;
+	     }
 	}
       for(int i = 0 ; i < size ; i ++)
 	{
-	  if (pointstocluster[i]==first.y)
+	  if ( pointstocluster [ i ] == first . y )
 	    {
-	      pointstocluster[i]=pointstocluster[size-1];
-	      size--;
+	      pointstocluster [ i ] = pointstocluster [ --size  ] ;
+	      break;
 	    }
 	}
       // c. fix the linked list stuff...
@@ -350,10 +534,9 @@ Couple *Cluster::agglomerate(Metriek * metriek)
       for (int j = 0 ; j < size; j++)
 	{
 	  int i = pointstocluster[j];
-	  if (i==z) 
-	    continue;
+	  if (i==z) continue;
 	  float d = distance(z,i,metriek);
-	  // nu bepalen we welke positie deruit gaat uit de gesorteerde lijst. 
+	  // nu bepalen we welke posities deruit gaat uit de gesorteerde lijst. 
 	  // en welke verhuist naar een andere locatie (z,i)
 	  Position relocate;
 	  Position remove;
@@ -443,10 +626,10 @@ int Cluster::addcontent(Point* p)
   if (realcontentsize>=realcontenttotalsize)
     {
       realcontenttotalsize*=2;
-      realcontent = reallocate(realcontent,realcontenttotalsize,Point*);
-      similarity = reallocate(similarity,realcontenttotalsize,float*);
-      prev = reallocate(prev, realcontentsize,Position*);
-      next = reallocate(next, realcontenttotalsize, Position *);
+      realcontent = reallocate(realcontent,realcontenttotalsize, Point*);
+      similarity  = reallocate(similarity, realcontenttotalsize, float*);
+      prev        = reallocate(prev,       realcontenttotalsize, Position *);
+      next        = reallocate(next,       realcontenttotalsize, Position *);
     }
   int id = realcontentsize++;
   realcontent[id] = p;

@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001 Werner Van Belle
+ Copyright (C) 2001-2004 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -18,47 +18,48 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#include <qlistview.h>
+#include <qcolor.h>
+#include "qvectorview.h"
 #include "config.h"
 #include "cluster.h"
 #include "song.h"
 
-class QSong: 
-  public QListViewItem
+#define LIST_TEMPO 0
+#define LIST_DCOLOR 2
+#define LIST_TITLE 5
+#define LIST_AUTHOR 6
+#define LIST_TIME 3
+#define LIST_CUES 4
+#define LIST_VERSION 7
+#define LIST_TAGS 8
+#define LIST_ONDISK 9
+#define LIST_SPECTRUM 1
+#define LIST_INDEX 10
+#define LIST_MD5SUM 11
+#define LIST_FILE 12
+
+class QSong: public QVectorViewData
 {
-  private:
-    Song * song;
-    static QString TRUE_TEXT;
-    static QString FALSE_TEXT;
   public:
-    // Constructor
-    QSong(Song * s, QListView* parent);
-    // Accessors
-    Song *  songEssence() const {return song;};
-    QString tags() const {return song->tags;};
-    QString md5sum() const {return song->md5sum;};
-    QString spectrum() const {return song->spectrum;};
-    QString stored_in() const {return song->storedin;};
-    QString title() const {return song->title;};
-    QString author() const {return song->author;};
-    bool    ondisk() const {return song->ondisk;};
-    void    ondisk(bool b) const {song->ondisk=b;};
-    bool    played() const {return song->played;};
-    void    played(bool b) const {song->played=b;};
-    QColor  color() const {return song->color;};
-    QString file() const {return song->file;};
-    QString tempo() const {return song->tempo;};
-    // QPixmap *getPixmap(int width, int height, const QColorGroup &cg) const {return song->getPixmap(width, height, cg);}
-    void    playedAuthorAtTime(int t) const {song->played_author_at_time = t;};
-    // Inherited
-    void reread() 
-      { song->reread(); };
-    void setColor(QColor transfer) 
-      { song->setColor(transfer); };
-    bool getDistance() 
-      { return song->getDistance(); };
-    bool containsTag(const QString which) 
-      { return song->containsTag(which); };
-    virtual void paintCell(QPainter *p, const QColorGroup &cg, int col, int wid, int align);
-    virtual QString text(int i) const;
+    static bool *selected;
+    static int compare_col;
+    static bool compare_asc;
+    static QSong * global;
+    virtual int vectorSize() const;
+    static void setVector(Song** arr, int cnt);
+    static Song **songs;
+    static int song_count;
+    virtual bool isSelected(int i) const { return selected[i]; };
+    virtual void setSelected(int i, bool val=true) {selected[i]=val;};
+    virtual void sort(int col, bool ascending);
+    static  void Sort();
+    QSong();
+    static Song * songEssence(int i);
+    static QColor * colorOfTempoCol(Song* main, Song* song);
+    static QColor * colorOfAuthorCol(Song* song);
+    static QColor * QSong::colorOfdColorCol(Song* song);
+    static void playedAuthorAtTime(int i, int t) {songs[i]->played_author_at_time = t;};
+    virtual void paintCell(QVectorView* vv, int i, QPainter *p, const QColorGroup &cg, int col, int wid, int align);
+    virtual QString text(int j, int i) const { return Text(songs[j],i); };
+    static QString Text(Song * j, int i);
 };

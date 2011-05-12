@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001 Werner Van Belle
+ Copyright (C) 2001-2004 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -21,16 +21,36 @@
 #include <assert.h>
 #include <errno.h>
 #include <string.h>
+#include <math.h>
 #include "malloc.h"
 #include "dirscanner.h"
 #include "common.h"
+#include "efence.h"
+
+void myfree(void* a)
+{
+#ifdef EFENCE
+  if (!efence_free(a))
+#endif
+    free(a);
+}
 
 void* myalloc(int length, char* file, int line)
 {
   void * result;
   // printf("%s(%d): allocating %d bytes\n",file,line,length);
   assert(length>=0);
+#ifdef EFENCE
+  result = efence_malloc(length);
+#else
   result = malloc(length);
+#endif
+#ifdef COUNT_ALLOCATIONS
+  static int nrallocs = 0;
+  nrallocs++;
+  if (nrallocs%100==0)
+    printf("%d allocs ",nrallocs);
+#endif
   if (!result)
     printf("Error: %s(%d): unable to allocate %d bytes \n",file,line,length);
   assert(result);
@@ -41,7 +61,11 @@ void* myrealloc(void* thing, int size)
 {
   void * result;
   assert(size);
+#ifdef EFENCE
+  result = efence_realloc(thing,size);
+#else
   result = realloc(thing,size);
+#endif
   assert(result);
   return result;
 }
@@ -139,3 +163,63 @@ bool exists(const char* fn)
   return false;
 }
 
+double minimum(double a, double b)
+{
+  if ( a < b ) return a;
+  else return b;
+}
+
+double abs_minimum(double a, double b)
+{
+  if ( fabs(a) < fabs(b) ) return a;
+  else return b;
+}
+
+static int atof_called=0;
+double atod(const char* str)
+{
+  if ((++atof_called%10000)==0)
+    printf("atof calls %d\n",atof_called);
+  return atof(str);
+}
+
+char * tohex(long i)
+{
+  char r[9];
+  r[8]=0;
+  for(int p = 7 ; p >= 0 ; p --)
+    {
+      int d = i%16;
+      i/=16;
+      if (d<10)
+	r[p]='0'+d;
+      else
+	r[p]='a'-10+d;
+    }
+  return strdup(r);
+}
+
+long toint(const char* name)
+{
+  long result = 0;
+  for (int j = 0 ; j < 8 ; j ++)
+    {
+      int c = name[j];
+      if (c>='0' && c <= '9')
+	result = result*16+c-'0';
+      else  if (c>='a' && c<='f')
+	result = result*16+c-'a'+10;
+      else  if (c>='A' && c<='F')
+	result = result*16+c-'A'+10;
+      else assert(0);
+    }
+  return result;
+}
+
+
+int clip(int val)
+{
+  if (val<0) return -1;
+  if (val>0) return +1;
+  return 0;
+}

@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001 Werner Van Belle
+ Copyright (C) 2001-2004 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -62,8 +62,8 @@ void dist_done()
   int i = 0;
   // free everything
   for ( i = 0 ; i <= 128 ; i ++ )
-    free ( d [ i ] ) ;
-  free ( d ) ;
+    deallocate ( d [ i ] ) ;
+  deallocate ( d ) ;
 }
 
 int edist(char* x, char* y)
@@ -119,12 +119,12 @@ int ndist(const char* title, const char* author, const char* other)
   result=min3(edist(y1,z),
 	      edist(y2,z),
 	      edist(y3,z));
-  free(z);
-  free(y1);
-  free(y2);
-  free(y3);
-  free(x1);
-  free(x2);
-  free(x3);
+  deallocate(z);
+  deallocate(y1);
+  deallocate(y2);
+  deallocate(y3);
+  deallocate(x1);
+  deallocate(x2);
+  deallocate(x3);
   return result;
 }

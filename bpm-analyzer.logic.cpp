@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001 Werner Van Belle
+ Copyright (C) 2001-2004 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -269,7 +269,7 @@ void BpmAnalyzerDialog::readAudio()
   fclose(raw);
   if (stop_signal)
     {
-      free(audio);
+      deallocate(audio);
       audio=NULL;
       audiosize=0;
       StatusLabel->setText("Canceled while reading");
@@ -323,7 +323,7 @@ void BpmAnalyzerDialog::readAudioBlock(int blocksize)
   
   if (stop_signal)
     {
-      free(audio);
+      deallocate(audio);
       audio=NULL;
       audiosize=0;
       StatusLabel->setText("Canceled while reading");
@@ -351,7 +351,7 @@ void BpmAnalyzerDialog::rangeCheck()
       stopbpm=val;
     if (changed && audio)
       {
-	free(audio);
+	deallocate(audio);
 	audio=NULL;
 	audiosize=0;
       }
@@ -578,8 +578,8 @@ void BpmAnalyzerDialog::fft()
 	}
     }
   
-  free(freqi);
-  free(audio);
+  deallocate(freqi);
+  deallocate(audio);
 }
 
 void BpmAnalyzerDialog::enveloppe_spectrum()
@@ -692,8 +692,8 @@ void BpmAnalyzerDialog::enveloppe_spectrum()
 	}
     }
   
-  free(freqi);
-  free(audio);
+  deallocate(freqi);
+  deallocate(audio);
 }
 
 void BpmAnalyzerDialog::autocorrelate_spectrum()
@@ -733,20 +733,21 @@ void BpmAnalyzerDialog::autocorrelate_spectrum()
   fft_type *freq_tmp  = allocate(windowsize,fft_type);
   fft_type *freqi_tmp = allocate(windowsize,fft_type);
   ::fft(windowsize,false,audio,NULL,freq_tmp,freqi_tmp);
-  free(audio);
+  deallocate(audio);
   printf("Forward FFT has been done\n");
 
   // 2. modify freq[i]=abs(freq[i]);
   for(int i = 0 ; i < windowsize; i ++)
-    freq_tmp[i]=freq_tmp[i]*freq_tmp[i]+freqi_tmp[i]*freqi_tmp[i];
+    freq_tmp[i] = freq_tmp[i] * freq_tmp[i]
+      + freqi_tmp[i] * freqi_tmp[i];
   printf("Copy has been made\n");
   
   // 3. do an inverse fourier transform of freq[i]
   freq  = allocate(windowsize,fft_type);
   ::fft(windowsize,true,freq_tmp,NULL,freq,freqi_tmp);
   
-  free(freq_tmp);
-  free(freqi_tmp);
+  deallocate(freq_tmp);
+  deallocate(freqi_tmp);
   printf("Backward FFT has been done\n");
 
   // 4. rescale & find peaks 
@@ -939,7 +940,7 @@ void BpmAnalyzerDialog::rayshoot_scan()
     }
   while(blockshifter>=blockshifter_min && ! stop_signal)
     {
-      unsigned long blocksize = 1<<blockshifter;
+      unsigned long blocksize = 1 << blockshifter;
       // first read audio
       readAudioBlock(blocksize);
       // calculate all mismatches
@@ -949,6 +950,8 @@ void BpmAnalyzerDialog::rayshoot_scan()
       if (blockshifter < blockshifter_max)
 	{
 	  prev_mismatch = mismatch_array[blockshifter+1] - startshift;
+	  // the mismatch array goes always from 0 to stophift-startshift-1
+	  // the prev_mismatch  hence goes from  startshift to stopshift - 1
 	  prev_maximum = mean[blockshifter+1]; 
 	}
       StatusLabel->setText("Scanning "+QString::number(blockshifter_max-blockshifter)
@@ -978,6 +981,7 @@ void BpmAnalyzerDialog::rayshoot_scan()
 	      if (store!=i) continue;
 	      unsigned prev_store = ((phase / 2) * 2) << blockshifter;
 	      unsigned next_store = (((phase / 2) + 1 ) * 2) << blockshifter;
+	      if (next_store >= stopshift ) break;
 	      unsigned prev_val = prev_mismatch[prev_store]; // sign is important !
 	      unsigned next_val = prev_mismatch[next_store]; // sign is important !
 	      if (prev_val < prev_maximum || next_val < prev_maximum)
@@ -997,6 +1001,7 @@ void BpmAnalyzerDialog::rayshoot_scan()
 	      // dus de vorige was op - en + blocksize *2
 	      unsigned prev_store = ((phase / 2) * 2) << blockshifter;
 	      unsigned next_store = (((phase / 2) + 1 ) * 2) << blockshifter;
+	      if (next_store >= stopshift ) break;
 	      unsigned prev_val = prev_mismatch[prev_store]; // sign is important !
 	      unsigned next_val = prev_mismatch[next_store]; // sign is important !
 	      if (prev_val < prev_maximum || next_val < prev_maximum)

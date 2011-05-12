@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001 Werner Van Belle
+ Copyright (C) 2001-2004 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -741,8 +741,8 @@ void tempocopy(unsigned4 target_period)
     buffer_c[i]=buffer_b[(signed8)i*(signed8)period_b/(signed8)target_period];
   signed4 written = writesamples(buffer_c, target_period, file_a);
   assert(written == (signed)target_period);
-  free(buffer_b);
-  free(buffer_c);
+  deallocate(buffer_b);
+  deallocate(buffer_c);
 }
 
 void tempofade(int time)

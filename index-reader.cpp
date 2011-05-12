@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001 Werner Van Belle
+ Copyright (C) 2001-2004 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -59,7 +59,7 @@ IndexReader::IndexReader(QProgressBar * b, QLabel *l, DataBase * db) :
   scan(IndexDir,IndexDir);
   // printf("Debug: %d songs already in database when scanning .idx files\n",songs_already_in_database);
   progress -> setProgress(total_files);
-  lastSpectrum();  
+  last_spectrum();  
   QStringFactory::kill();
 }
 
@@ -81,6 +81,7 @@ void IndexReader::add(Song * song)
 
 void IndexReader::checkfile(const QString prefix, const QString  filename)
 {
+  int meta_version;
   QString fullname = prefix + "/" + filename;
   if (reading_bib)
     {

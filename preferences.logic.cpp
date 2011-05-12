@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001 Werner Van Belle
+ Copyright (C) 2001-2004 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -21,8 +21,11 @@
 #include <qlineedit.h>
 #include <qcheckbox.h>
 #include <qmessagebox.h>
+#include <qcolordialog.h>
+#include <qpushbutton.h>
 #include "preferences.logic.h"
 #include "playercommandwizard.h"
+
 PreferencesLogic::PreferencesLogic(QWidget*parent,const char*name, bool modal, WFlags f):
   PreferencesDialog(parent,name,modal,f)
 {
@@ -55,6 +58,79 @@ void PreferencesLogic::createPlayerFour()
   if (command.isNull()) return;
   playerCommand4->setText(command);
 }
+
+void PreferencesLogic::fixColorOf(QWidget *p)
+{
+  QColor c = p->paletteBackgroundColor();
+  c = QColorDialog::getColor(c,this);
+  p->setPaletteBackgroundColor(c);
+}
+
+void PreferencesLogic::modifyTempo44Color()
+{
+  fixColorOf(colorTempo44);
+}
+
+void PreferencesLogic::modifyTempo54Color()
+{
+  fixColorOf(colorTempo54);
+}
+
+void PreferencesLogic::modifyTempo64Color()
+{
+  fixColorOf(colorTempo64);
+}
+
+void PreferencesLogic::modifyTempo74Color()
+{
+  fixColorOf(colorTempo74);
+}
+
+void PreferencesLogic::modifyTempo84Color()
+{
+  fixColorOf(colorTempo84);
+}
+
+void PreferencesLogic::modifyGreenTime()
+{
+  fixColorOf(greenTimeColor);
+}
+
+void PreferencesLogic::modifyYellowTime()
+{
+  fixColorOf(yellowTimeColor);
+}
+
+void PreferencesLogic::modifyOrangeTime()
+{
+  fixColorOf(orangeTimeColor);
+}
+
+void PreferencesLogic::modifyRedTime()
+{
+  fixColorOf(redTimeColor);
+}
+
+void PreferencesLogic::modifyPlayedColor()
+{
+  fixColorOf(colorPlayedSong);
+}
+
+void PreferencesLogic::modifyAuthorColor()
+{
+  fixColorOf(colorPlayedAuthor);
+}
+
+void PreferencesLogic::modifyUnavailableColor()
+{
+  fixColorOf(colorUnavailableSong);
+}
+
+void PreferencesLogic::modifydColorCol()
+{
+  fixColorOf(colordColorCol);
+}
+
 
 QString PreferencesLogic::getCommand()
 {

@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001 Werner Van Belle
+ Copyright (C) 2001-2004 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -39,16 +39,40 @@ typedef union
   } leftright;
 } longtrick;
 
+// memory
 #define allocate(size, type) (type*)myalloc(sizeof(type)*(size), __FILE__, __LINE__)
 #define array(name,size,type) type * name = allocate(size,type)
 #define reallocate(thing, size, type) (type*)myrealloc(thing,sizeof(type)*(size))
-void  common_init();
-void* myalloc(int size, char* file, int line);
-void* myrealloc(void* thing, int size);
-long  fsize(FILE * f);
-long  readsamples(void* target, int count, FILE* file);
-long  writesamples(void* target, int count, FILE* file);
-bool  strxeq(const char* a, const char* b); // also works when a or b or NULL
-char* findUniqueName(const char* filename); // will prefix the extention of filename with a number until a unique filename is found
-bool exists(const char* fn);
+#define deallocate(thing) myfree(thing);
+
+// tempo typering
+typedef         float   tempo_type;
+const      tempo_type   no_tempo = -1;
+// spectrum typering
+const             int   spectrum_size=24;
+typedef         float   spectrum_freq;
+typedef spectrum_freq * spectrum_type;
+const   spectrum_type   no_spectrum = NULL;
+#define                 allocate_spectrum() allocate(spectrum_size,float)
+// tag typering
+typedef   signed char   tag_type;
+typedef      tag_type * tags_type;
+const        tag_type   tag_end = 0;
+
+void   common_init();
+void * myalloc(int size, char* file, int line);
+void * myrealloc(void* thing, int size);
+void   myfree(void*);
+long   fsize(FILE * f);
+long   readsamples(void* target, int count, FILE* file);
+long   writesamples(void* target, int count, FILE* file);
+bool   strxeq(const char* a, const char* b); // also works when a or b or NULL
+char * findUniqueName(const char* filename); // will prefix the extention of filename with a number until a unique filename is found
+bool   exists(const char* fn);
+double minimum(double a, double b);
+double abs_minimum(double a, double b);
+double atod(const char* str);
+char * tohex(long i);
+long   toint(const char* name);
+int    clip(int val);
 #endif

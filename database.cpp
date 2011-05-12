@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001 Werner Van Belle
+ Copyright (C) 2001-2004 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -26,8 +26,17 @@
 #include "process-manager.h"
 #include "songtree.h"
 #include "avltree.cpp"
+#include "growing-array.cpp"
+#include "tags.h"
 
-DataBase::DataBase()
+/**
+ * The database makes use of some optimalisations
+ * - The cache contains items that are visible if only taking the taglist into account
+ * - Every song itself also keeps track of its associated qsong (if any), this avoids
+ *   unneccessary Qsong deletion and creation.
+ */
+
+DataBase::DataBase() : all(), cache()
 {
   init();
 }
@@ -45,11 +54,8 @@ void DataBase::reset()
 
 void DataBase::init()
 {
-  all_size = 1;
-  all_count = 0;
-  all = allocate(all_size,Song*);
-  cache = NULL;
-  clearCache();
+  all.reset();
+  cache.reset();
   and_include = NULL;
   or_include = NULL;
   exclude = NULL;
@@ -60,25 +66,20 @@ void DataBase::init()
 
 void DataBase::clear()
 {
-  for(int i = 0 ; i < all_count ; i ++)
-    delete all[i];
-  free(all);
-  free(cache);
-  free(and_include);
-  free(or_include);
-  free(exclude);
+  for(int i = 0 ; i < all.count ; i ++)
+    delete all.elements[i];
+  all.reset();
+  cache.reset();
+  deallocate(and_include);
+  deallocate(or_include);
+  deallocate(exclude);
   delete[] tag;
   delete file_tree;
 }
 
 void DataBase::add(Song* song)
 {
-  if (all_count==all_size)
-    {
-      all_size *= 2;
-      all = reallocate(all,all_size,Song*);
-    }
-  all[all_count++]=song;
+  all.add(song);
   if (file_tree->search(song->file))
     {
       printf("Fatal: The song %s occurs at least two times in different index files\n",(const char*)song->file);
@@ -97,25 +98,6 @@ Song * DataBase::find(QString song_filename)
   return ssbf->song;
 }
 
-void DataBase::addToCache(Song * song)
-{
-  if (cache_count==cache_size)
-    {
-      cache_size*=2;
-      cache = reallocate(cache,cache_size,Song*);
-    }
-  cache[cache_count++]=song;
-}
-
-void DataBase::clearCache()
-{
-  if (cache)
-    free(cache);
-  cache_size = 1;
-  cache_count = 0;
-  cache = allocate(cache_size,Song*);
-}
-
 bool DataBase::cacheValid(SongSelectorLogic * selector)
 {
   if (selector->tagList->childCount() != tag_size)
@@ -125,7 +107,8 @@ bool DataBase::cacheValid(SongSelectorLogic * selector)
   while(it.current())
     {
       QListViewItem *t = it.current();
-      if ( (t->text(TAGS_TEXT) != tag[i]) ||
+      tag_type ta = Tags::find_tag(t->text(TAGS_TEXT));
+      if ( (ta != tag[i]) ||
 	   (t->text(TAGS_AND) == TAG_TRUE) != and_include[i] ||
 	   (t->text(TAGS_OR)  == TAG_TRUE) != or_include[i] ||
 	   (t->text(TAGS_NOT) == TAG_TRUE) != exclude[i])
@@ -138,15 +121,15 @@ bool DataBase::cacheValid(SongSelectorLogic * selector)
 
 void DataBase::copyTags(SongSelectorLogic * selector)
 {
-  if (and_include) free(and_include);
-  if (or_include) free(or_include);
-  if (exclude) free(exclude);
+  if (and_include) deallocate(and_include);
+  if (or_include) deallocate(or_include);
+  if (exclude) deallocate(exclude);
   if (tag) delete[](tag);
   tag_size    = selector->tagList->childCount();
   and_include = allocate(tag_size,bool);
   or_include  = allocate(tag_size,bool);
   exclude     = allocate(tag_size,bool);
-  tag         = new QString[tag_size];
+  tag         = new tag_type[tag_size];
   and_includes_checked = false;
   excludes_checked = false;
   QListViewItemIterator it(selector->tagList);
@@ -154,7 +137,8 @@ void DataBase::copyTags(SongSelectorLogic * selector)
   while(it.current())
     {
       QListViewItem * t = it.current();
-      tag[i] = t->text(TAGS_TEXT);
+      tag[i] = Tags::find_tag(t->text(TAGS_TEXT));
+      // printf("%s = %d\n",(const char*) t->text(TAGS_TEXT),tag[i]);
       or_include[i] = t->text(TAGS_OR) == TAG_TRUE;
       and_includes_checked |= and_include[i] = t->text(TAGS_AND) == TAG_TRUE;
       excludes_checked     |= exclude[i] = t->text(TAGS_NOT) == TAG_TRUE;
@@ -169,35 +153,34 @@ bool DataBase::tagFilter(Song* item)
   // first we check the or_include tags
   for (int i = 0; !matched && i < tag_size; i++)
     if (or_include[i])
-      if (item->containsTag(tag[i]))
+      if (item->contains_tag(tag[i]))
 	matched=true;
   if (!matched) return false;
   // now we check the and_include tags
   if (and_includes_checked)
     for(int i = 0; i < tag_size ; i ++)
       if(and_include[i])
-	if (!item->containsTag(tag[i]))
+	if (!item->contains_tag(tag[i]))
 	  return false;
   // now we check the exclusion tags
   if (excludes_checked)
     for (int i=0; i < tag_size; i++)
       if (exclude[i])
-	if (item->containsTag(tag[i]))
+	if (item->contains_tag(tag[i]))
 	  return false;
   return matched;
 }
 
 void DataBase::updateCache(SongSelectorLogic* selector)
 {
-  if (cacheValid(selector))
-    return;
+  if (cacheValid(selector)) return;
   copyTags(selector);
-  clearCache();
-  for(int i = 0 ; i < all_count ; i ++)
+  cache.reset();
+  for(int i = 0 ; i < all.count ; i ++)
     {
-      Song * song = all[i];
+      Song * song = all.elements[i];
       bool vis = tagFilter(song);
-      if (vis) addToCache(song);
+      if (vis) cache.add(song);
     }
 }
 
@@ -225,19 +208,46 @@ bool DataBase::filter(SongSelectorLogic* selector, Song *item, Song* main)
   if (Config::limit_authornonplayed && 
       Played::songs_played - item->played_author_at_time < Config::authorDecay)
     return false;
-  // tempo 
-  if (item->tempo && (Config::limit_uprange || Config::limit_downrange))
+  
+  if (item->tempo && main && (Config::limit_uprange || Config::limit_downrange))
     {
-      double t=atof(item->tempo);
-      double mt=0;
-      if (main) mt=atof(main->tempo);
-      if (!Config::limit_downrange)
-	if (t<mt) return false;
-      if (!Config::limit_uprange)
-	if (t>mt) return false;
-      if (main && main->tempo_distance(item)>1)
-	return false;
+      double d = item->tempo_n_distance(1,main);
+      if (Config::show_unknown_tempo && d == 1000) goto tempo_has_reason_to_show;
+      if (Config::limit_uprange   && d >= 0 && d <= 1) goto tempo_has_reason_to_show; // we have a reason to show this item
+      if (Config::limit_downrange && d <= 0 && d >= -1) goto tempo_has_reason_to_show;
+      
+      if (Config::show_tempo54)
+	{
+	  d = abs_minimum(item->tempo_n_distance(5.0/4.0,main), item->tempo_n_distance(4.0/5.0,main));
+	  if (Config::limit_uprange   && d >= 0 && d <= 1) goto tempo_has_reason_to_show;
+	  if (Config::limit_downrange && d <= 0 && d >= -1) goto tempo_has_reason_to_show;
+	}
+      
+      if (Config::show_tempo64)
+	{
+	  d = abs_minimum (item->tempo_n_distance(6.0/4.0,main),item->tempo_n_distance(4.0/6.0,main));
+	  if (Config::limit_uprange   && d >= 0 && d <= 1) goto tempo_has_reason_to_show;
+	  if (Config::limit_downrange && d <= 0 && d >= -1) goto tempo_has_reason_to_show;
+	}
+      
+      if (Config::show_tempo74)
+	{
+	  d = abs_minimum (item->tempo_n_distance(7.0/4.0,main),item->tempo_n_distance(4.0/7.0,main));
+	  if (Config::limit_uprange   && d >= 0 && d <= 1) goto tempo_has_reason_to_show;
+	  if (Config::limit_downrange && d <= 0 && d >= -1) goto tempo_has_reason_to_show;
+	}
+      
+      if (Config::show_tempo84)
+	{
+	  d = abs_minimum ( item->tempo_n_distance(8.0/4.0,main), item->tempo_n_distance(4.0/8.0,main));
+	  if (Config::limit_uprange   && d >= 0 && d <= 1) goto tempo_has_reason_to_show;
+	  if (Config::limit_downrange && d <= 0 && d >= -1) goto tempo_has_reason_to_show;
+	}
+      
+      return false; // there is no reason to show the song with this tempo;
     }
+  
+ tempo_has_reason_to_show:
   // search
   const QString lookingfor = selector -> searchLine -> text();
   if (strcmp(lookingfor,"")!=0)
@@ -253,9 +263,9 @@ bool DataBase::filter(SongSelectorLogic* selector, Song *item, Song* main)
 AvlTree<QString>* DataBase::getFileTreeCopy()
 {
   AvlTree<QString> * file_tree = new AvlTree<QString>();
-  for(int i = 0 ; i < all_count ; i ++)
-    if (!file_tree->search(all[i]->file))
-      file_tree->add(new SongSortedByFile(all[i]));
+  for(int i = 0 ; i < all.count ; i ++)
+    if (!file_tree->search(all.elements[i]->file))
+      file_tree->add(new SongSortedByFile(all.elements[i]));
   return file_tree;
 }
 
@@ -264,20 +274,27 @@ AvlTree<QString>* DataBase::getFileTreeRef()
   return file_tree;
 }
 
-int DataBase::getSelection(SongSelectorLogic* selector, Song* main, QListView* target)
+int DataBase::getSelection(SongSelectorLogic* selector, Song* main, QVectorView* target)
 {
   int itemcount=0;
   updateCache(selector);
-  for(int i = 0; i < cache_count ; i ++)
+  Song * * show = allocate(cache.count,Song*);
+  for(int i = 0; i < cache.count ; i ++)
     {
-      Song *song = cache[i];
+      Song *song = cache.elements[i];
       bool vis = filter(selector,song,main);
       if (vis)
-	{
-	  new QSong(song,target);
-	  itemcount++;
-	}
+	show[itemcount++] = song;
     }
+  if (itemcount)
+    show = reallocate(show, itemcount, Song*);
+  else
+    {
+      show = NULL;
+      deallocate(show);
+    }
+  QSong::setVector(show,itemcount);
+  target->vectorChanged();
   return itemcount;
 }
 
@@ -293,9 +310,9 @@ Song * * DataBase::closestSongs(SongSelectorLogic * selector, Song * target, Son
       minima[i]=-1;
     }
   updateCache(selector);
-  for(i = 0 ; i < cache_count; i ++)
+  for(i = 0 ; i < cache.count; i ++)
     {
-      Song * song = cache[i];
+      Song * song = cache.elements[i];
       // standard checks: tags completed and ondisk 
       if (!song->ondisk) continue;
       if (!tagFilter(song)) continue;
@@ -320,35 +337,4 @@ Song * * DataBase::closestSongs(SongSelectorLogic * selector, Song * target, Son
 	}
     }
   return entries;
-}
-
-void DataBase::del(Song* which)
-{
-  for (int i = 0 ; i < all_count ; i ++)
-    {
-      if (all[i]==which)
-	{
-	  while(i<all_count - 1)
-	    {
-	      all[i]=all[i+1];
-	      i++;
-	    }
-	  all_count -- ;
-	  break;
-	}
-    }
-  for (int i = 0 ; i < cache_count ; i ++)
-    {
-      if (cache[i]==which)
-	{
-	  while(i<cache_count - 1)
-	    {
-	      cache[i]=cache[i+1];
-	      i++;
-	    }
-	  cache_count -- ;
-	  break;
-	}
-    }
-  file_tree->del(which->title);
 }

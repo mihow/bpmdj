@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001 Werner Van Belle
+ Copyright (C) 2001-2004 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -26,20 +26,17 @@ class QueuedSong:
 {
   private:
     Song * song;
-    int  pos;
+    int    pos;
     double distance;
     bool anker;
   public:
     bool mark;
-  private:
-    static QString TRUE_TEXT;
-    static QString FALSE_TEXT;
   public:
-    void setSong(Song* s, double d) {song=s; distance=d;};
+    void setSong(Song* s, double d);
     Song* getSong() {return song;};
     void setPos(int p) {pos=p;};
     int getPos() {return pos;};
-    QueuedSong(QSong *song, QListView* parent);
+    QueuedSong(Song *song, QListView* parent);
     QueuedSong(QListView* parent, QListViewItem* after);
     bool ankered() {return anker;};
     void setAnkered(bool b) {anker = b; if (anker) distance=0;};

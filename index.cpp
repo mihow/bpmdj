@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001 Werner Van Belle
+ Copyright (C) 2001-2004 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -110,7 +110,7 @@ static char* buffer_strdup()
 
 static void buffer_done()
 {
-  free(buffer);
+  deallocate(buffer);
   buffer=NULL;
   buffer_size=0;
   buffer_file=NULL;
@@ -172,20 +172,20 @@ void Index::init()
 
 void Index::free()
 {
-  if (meta_filename) ::free(meta_filename);
+  if (meta_filename) ::deallocate(meta_filename);
   meta_filename=NULL;
-  if (index_remark)   ::free(index_remark);
-  if (index_file)     ::free(index_file);
-  if (index_tempo)    ::free(index_tempo);
-  if (index_tags)     ::free(index_tags);
-  if (index_md5sum)   ::free(index_md5sum);
-  if (index_time)     ::free(index_time);
-  if (index_spectrum) ::free(index_spectrum);
-  // if (index_pattern) free(index_pattern);
-  if (title)   ::free(title);
-  if (author)  ::free(author);
-  if (remix)   ::free(remix);
-  if (version) ::free(version);
+  if (index_remark)   ::deallocate(index_remark);
+  if (index_file)     ::deallocate(index_file);
+  if (index_tempo)    ::deallocate(index_tempo);
+  if (index_tags)     ::deallocate(index_tags);
+  if (index_md5sum)   ::deallocate(index_md5sum);
+  if (index_time)     ::deallocate(index_time);
+  if (index_spectrum) ::deallocate(index_spectrum);
+  // if (index_pattern) deallocate(index_pattern);
+  if (title)   ::deallocate(title);
+  if (author)  ::deallocate(author);
+  if (remix)   ::deallocate(remix);
+  if (version) ::deallocate(version);
   assert(prev && next);
   while (*prev) delete(*prev++);
   while (*next) delete(*next++);
@@ -349,15 +349,15 @@ bool Index::fix_tagline()
     *(runner)=0;
   if (strcmp(index_tags,new_tags)==0)
     {
-      ::free(new_tags);
-      ::free(temp);
+      ::deallocate(new_tags);
+      ::deallocate(temp);
       return false;
     }
   else
     {
       printf("Index: tags '%s' to '%s'\n",index_tags,new_tags);
-      ::free(index_tags);
-      ::free(temp);
+      ::deallocate(index_tags);
+      ::deallocate(temp);
       index_tags=new_tags;
       return true;
     }
@@ -578,7 +578,7 @@ void Index::read_idx(const char* indexn)
 	    {
 	      char tmp[1000];
 	      sprintf(tmp,"%s %s",index_tags,value);
-	      ::free(index_tags);
+	      ::deallocate(index_tags);
 	      index_tags=strdup(tmp);
 	    }
 	}
@@ -631,7 +631,7 @@ void Index::read_idx(const char* indexn)
   
   // release the meta_version, this is no longer necessary because
   // we know which version we currently are
-  ::free(meta_version);
+  ::deallocate(meta_version);
 }
 
 char* zeroable(char* in)
@@ -639,7 +639,7 @@ char* zeroable(char* in)
   if (!in) return NULL;
   if (!*in) 
     {
-      free(in);
+      deallocate(in);
       return NULL;
     }
   return in;
@@ -793,39 +793,6 @@ void Index::write_v23_field(FILE * index)
     }
 }
 
-char * Index::tohex(long i)
-{
-  char r[9];
-  r[8]=0;
-  for(int p = 7 ; p >= 0 ; p --)
-    {
-      int d = i%16;
-      i/=16;
-      if (d<10)
-	r[p]='0'+d;
-      else
-	r[p]='a'-10+d;
-    }
-  return strdup(r);
-}
-
-long Index::toint(const char* name)
-{
-  long result = 0;
-  for (int j = 0 ; j < 8 ; j ++)
-    {
-      int c = name[j];
-      if (c>='0' && c <= '9')
-	result = result*16+c-'0';
-      else  if (c>='a' && c<='f')
-	result = result*16+c-'a'+10;
-      else  if (c>='A' && c<='F')
-	result = result*16+c-'A'+10;
-      else assert(0);
-    }
-  return result;
-}
-
 void Index::write_bib_field(FILE * index)
 {
   file_long(23,index);
@@ -834,13 +801,21 @@ void Index::write_bib_field(FILE * index)
 
 long Index::read_bib_field(long position, const char* meta_shortname)
 {
+  static int printed_meta_version = false;
+  int meta_version;
   // open file and jump to position
   assert(buffer);
   buffer_ptr=position;
   // clear all fields
   init();
   // version describing the format of this field
-  int meta_version = buffer_long();
+  meta_version = buffer_long();
+  if (!printed_meta_version)
+    {
+      printed_meta_version = true;
+      printf("Loading  index v%g\n",(float)meta_version/10.0); fflush(stdout);
+    }
+
   // depending on the field we can call different routines
   if (meta_version==23) read_v23_field();
   else assert(0);
@@ -993,7 +968,7 @@ bool Index::fix_tar_info()
       if (remix)
 	remix=strdup(remix);
     }
-  ::free(original);
+  ::deallocate(original);
   return meta_contains_tar=busy==4;
 }
 
@@ -1142,3 +1117,13 @@ void Index::set_time(const char* str)
       meta_changed = 1;
     }
 };
+
+spectrum_type Index::get_spectrum_copy()
+{
+  if (!index_spectrum) 
+    return no_spectrum;
+  spectrum_type result = allocate_spectrum();
+  for(int i = 0 ; i < spectrum_size && index_spectrum[i]; i ++)
+    result[i]=((spectrum_freq)(index_spectrum[i]-'a'))/24.0;
+  return result;
+}

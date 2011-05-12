@@ -369,10 +369,13 @@ template <class Key> Node<Key>::Node()
 
 template <class Key> AvlTree<Key>::AvlTree()
 {
-  root = Node<Key>::Null; 
+  init(); 
 };
 
-
+template <class Key> void AvlTree<Key>::init()
+{
+  root = Node<Key>::Null; 
+};
 
 template <class Key> void AvlTree<Key>::PurgeAll(Node<Key>* root)
 {

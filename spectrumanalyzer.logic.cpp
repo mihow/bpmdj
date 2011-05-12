@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001 Werner Van Belle
+ Copyright (C) 2001-2004 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -216,10 +216,10 @@ void SpectrumDialogLogic::fetchSpectrum_normal()
       printf("Could not measure spectrum because there is not enough data at position (bytes) %d\n",(int)startpos);
     }
   // free everything involved
-  free(fftwindowfreq);
-  free(fftfreq);
-  free(fftfreqi);
-  free(fftdata);
-  free(data);
+  deallocate(fftwindowfreq);
+  deallocate(fftfreq);
+  deallocate(fftfreqi);
+  deallocate(fftdata);
+  deallocate(data);
 }
 

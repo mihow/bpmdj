@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001 Werner Van Belle
+ Copyright (C) 2001-2004 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@
 
 #include "version.h"
 
-#ifdef COMPILE_NONE
 #include "common.h"
 
 class dsp_none: public dsp_driver
@@ -32,4 +31,3 @@ class dsp_none: public dsp_driver
   void    close();
 };
 
-#endif
