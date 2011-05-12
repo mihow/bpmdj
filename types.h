@@ -1,10 +1,8 @@
-#ifndef __loaded__types_h__
-#define __loaded__types_h__
-using namespace std;
-#line 1 "types.h++"
 /****
- Om-Data
- Copyright (C) 2005-2006 Werner Van Belle
+ Borg4 Data Library
+ Copyright (C) 2005-2009 Werner Van Belle
+
+ http://werner.yellowcouch.org/Borg4/group__data.html
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -20,13 +18,15 @@ using namespace std;
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
-#ifndef OM_TYPE_H
-#define OM_TYPE_H
+#ifndef __loaded__types_h__
+#define __loaded__types_h__
+using namespace std;
+#line 1 "types.h++"
 #include <typeinfo>
 #include <Qt/qstring.h>
 
-// #define SHORT_ONE  // can be used to limit the maximum array size to 4 dimensions
+// can be used to limit the maximum array size to 4 dimensions
+// #define SHORT_ONE  
 
 //===============================================================
 //                         Data Types
@@ -61,7 +61,7 @@ BASIC_TYPE(unsigned long long int, unsigned8, Unsigned8) \
 BASIC_TYPE(                 float, float4,    Float4) \
 BASIC_TYPE(                double, float8,    Float8) 
 
-#define BASIC_TYPE(WHAT, NAME, CLASS) typedef WHAT NAME;
+#define BASIC_TYPE(A,B,C) typedef A B;
 BASIC_TYPES
 #undef BASIC_TYPE
 
@@ -79,7 +79,7 @@ typedef FloatClass<float8,'d'>   Float8;
 // A list of useful array types
 #ifdef SHORT_ONE
 #define ARRAY_TYPES \
-ARRAY_TYPE(1,signed1)   ARRAY_TYPE(2,signed1)   ARRAY_TYPE(3,signed1)   ARRAY_TYPE(4,signed1) \
+  ARRAY_TYPE(1,signed1)   ARRAY_TYPE(2,signed1)   ARRAY_TYPE(3,signed1)   ARRAY_TYPE(4,signed1) \
 ARRAY_TYPE(1,signed2)   ARRAY_TYPE(2,signed2)   ARRAY_TYPE(3,signed2)   ARRAY_TYPE(4,signed2) \
 ARRAY_TYPE(1,signed4)   ARRAY_TYPE(2,signed4)   ARRAY_TYPE(3,signed4)   ARRAY_TYPE(4,signed4) \
 ARRAY_TYPE(1,signed8)   ARRAY_TYPE(2,signed8)   ARRAY_TYPE(3,signed8)   ARRAY_TYPE(4,signed8) \
@@ -113,8 +113,6 @@ ARRAY_TYPE(5,float4)    ARRAY_TYPE(6,float4)    ARRAY_TYPE(7,float4)    ARRAY_TY
 ARRAY_TYPE(1,float8)    ARRAY_TYPE(2,float8)    ARRAY_TYPE(3,float8)    ARRAY_TYPE(4,float8) \
 ARRAY_TYPE(5,float8)    ARRAY_TYPE(6,float8)    ARRAY_TYPE(7,float8)    ARRAY_TYPE(8,float8) \
 ARRAY_TYPE(1,Data)      ARRAY_TYPE(2,Data)      ARRAY_TYPE(3,Data)      ARRAY_TYPE(4,Data) \
-ARRAY_TYPE(5,Data)      ARRAY_TYPE(6,Data)      ARRAY_TYPE(7,Data)      ARRAY_TYPE(8,Data)
+ARRAY_TYPE(5,Data)      ARRAY_TYPE(6,Data)      ARRAY_TYPE(7,Data)      ARRAY_TYPE(8,Data) 
 #endif
-
-#endif 
 #endif // __loaded__types_h__

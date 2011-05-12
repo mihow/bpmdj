@@ -1,6 +1,8 @@
 /****
  BpmDj v3.6: Free Dj Tools
- Copyright (C) 2001-2007 Werner Van Belle
+ Copyright (C) 2001-2009 Werner Van Belle
+
+ http://bpmdj.yellowcouch.org/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -45,15 +47,15 @@ ITERATE_OVER(song)
 ITERATE_OVER(svi)
 
     if (svi.val()->get_spectrum() != no_spectrum)
-    {
-      assert(written<count);
-      ++ written; 
-      for (int j = 0 ; j < spectrum_size ; j++)
-      data [ written ] [ j + 1 ] = svi.val() -> get_spectrum() -> band ( j ) ;
-    }
+      {
+	assert(written<count);
+	++ written; 
+	for (int j = 0 ; j < spectrum_size ; j++)
+	  data [ written ] [ j + 1 ] = svi.val() -> get_spectrum() -> band ( j ) ;
+      }
   }
   // 2. do principal component analysis
-  char * error_msg = NULL;
+  const char * error_msg = NULL;
   do_pca(count,spectrum_size,data,error_msg);
   if (error_msg)
     {
@@ -92,15 +94,15 @@ ITERATE_OVER(svi)
 ITERATE_OVER(svi2)
 
       if (svi2.val()->get_spectrum() != no_spectrum)
-      {
-	written++;
-	float x = (data[written][1] - minx) / dx;
-	float y = (data[written][2] - miny) / dy;
-	float z = (data[written][3] - minz) / dz;
-	QColor transfer;
-	transfer.setRgb(127+(int)x,127+(int)y,127+(int)z);
-	svi2.val()->setColor(transfer);
-      }
+	{
+	  written++;
+	  float x = (data[written][1] - minx) / dx;
+	  float y = (data[written][2] - miny) / dy;
+	  float z = (data[written][3] - minz) / dz;
+	  QColor transfer;
+	  transfer.setRgb(127+(int)x,127+(int)y,127+(int)z);
+	  svi2.val()->setColor(transfer);
+	}
     }
   }
  clean_up:

@@ -1,6 +1,8 @@
 /****
  BpmDj v3.6: Free Dj Tools
- Copyright (C) 2001-2007 Werner Van Belle
+ Copyright (C) 2001-2009 Werner Van Belle
+
+ http://bpmdj.yellowcouch.org/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -25,7 +27,7 @@ using namespace std;
 #define bpmdj_reallocate(thing, size, type) (type*)myrealloc(thing,sizeof(type)*(size))
 #define bpmdj_deallocate(thing) myfree(thing);
 
-void * myalloc(int size, char* file, int line);
+void * myalloc(int size, const char* file, int line);
 void * myrealloc(void* thing, int size);
 void   myfree(void*);
  

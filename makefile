@@ -1,4 +1,4 @@
-VERSION = 3.6
+VERSION = 3.7
 BIN = bpmplay bpmdj bpmmerge bpmcount 
 .EXPORT_ALL_VARIABLES:
 all: .link-targets .ui-forms .rc-files .source-creator .depend .compile 
@@ -29,7 +29,7 @@ LINK =  $(CPP) $(LDFLAGS) $(QT_INCLUDE_PATH) $(QT_LIBRARY_PATH) $(QT_LIBS)
 
 # Precompile all the source files
 # The output file is the .source file.
-.PHONY: .source-creator
+.PHONY: .source-creator documentation
 .source-creator: sources
 	@echo "Source Files:"
 	@make -s --no-print-directory -f sources .sources
@@ -49,6 +49,10 @@ LINK =  $(CPP) $(LDFLAGS) $(QT_INCLUDE_PATH) $(QT_LIBRARY_PATH) $(QT_LIBS)
 packages: packager all
 	@echo "Packaging:"
 	@make -s --no-print-directory -f packager
+
+documentation:
+	@echo "Documenting:"
+	@make -s --no-print-directory -f documenter
 
 check-bin: 
 	@make -s --no-print-directory -f packager bpmdj-source.tgz
@@ -89,7 +93,7 @@ nens:
 tuuster: 
 	@scp bpmmerge bpmdj@tuuster:.bin/
 	@scp bpmplay  bpmdj@tuuster:.bin/
-	@scp bpmdj    bpmdj@tuuster:.bin/
+	@scp bpmdj    bpmdj@tuuster:.bin/bpmdj.real
 
 website:
 	rsync -e ssh -xavz redirect_documentation/* krubbens@bpmdj.sourceforge.net:/home/groups/b/bp/bpmdj/htdocs/

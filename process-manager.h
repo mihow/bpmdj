@@ -1,6 +1,8 @@
 /****
  BpmDj v3.6: Free Dj Tools
- Copyright (C) 2001-2007 Werner Van Belle
+ Copyright (C) 2001-2009 Werner Van Belle
+
+ http://bpmdj.yellowcouch.org/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -35,6 +37,7 @@ class Song;
 
 extern Song* main_song;
 extern Song* monitor_song;
+extern vector<Song*> songs_to_avoid;
 
 class ProcessManager:
   public BasicProcessManager

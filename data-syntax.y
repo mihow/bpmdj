@@ -38,7 +38,7 @@ data: token  {$$=$1;}
     | NUMBER {$$=$1;}
     | STRING {$$=$1;}
     | array  {$$=$1;}
-    | sequence {$$=$1;}
+    | sequence {$$=Creator($1).getContentData();}
 
 token : BRACE_OPEN associations BRACE_CLOSE
         {$$=$2;}

@@ -1,10 +1,8 @@
-#ifndef __loaded__coordinates_h__
-#define __loaded__coordinates_h__
-using namespace std;
-#line 1 "coordinates.h++"
 /****
- Om-Data
- Copyright (C) 2005-2006 Werner Van Belle
+ Borg4 Data Library
+ Copyright (C) 2005-2009 Werner Van Belle
+
+ http://werner.yellowcouch.org/Borg4/group__data.html
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -20,10 +18,10 @@ using namespace std;
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
-#ifndef OM_COORDINATES_H
-#define OM_COORDINATES_H
-
+#ifndef __loaded__coordinates_h__
+#define __loaded__coordinates_h__
+using namespace std;
+#line 1 "coordinates.h++"
 //---------------------------------------------------------------
 //                          Forwards
 //---------------------------------------------------------------
@@ -285,6 +283,4 @@ template <int D> class From:     public _Coordinate<D>
   From(int x, int y, int z) : _Coordinate<D>(x,y,z) {};
   From(int x, int y, int z, int a) : _Coordinate<D>(x,y,z,a) {};
 };
-
-#endif 
 #endif // __loaded__coordinates_h__

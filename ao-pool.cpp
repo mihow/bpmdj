@@ -1,6 +1,8 @@
 /****
- Borg IV
- Copyright (C) 2006-2007 Werner Van Belle
+ Borg 4 Active Objects
+ Copyright (C) 2006-2009 Werner Van Belle
+
+ http://werner.yellowcouch.org/Borg4/group__ao.html
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,7 +18,6 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
 #ifndef __loaded__ao_pool_cpp__
 #define __loaded__ao_pool_cpp__
 using namespace std;
@@ -47,15 +48,18 @@ class StdDawnTilDusk: public DawnTilDusk
 {
   SpawnWhenActivated scheduler;
   AoTracker *tracker;
+  volatile bool running;
 public:
   StdDawnTilDusk(): scheduler()
   {
     tracker=NULL;
     aoPool=this;
     tracker = new AoTracker();
+    running=true;
   }
   ~StdDawnTilDusk()
   {
+    assert(!running);
     delete tracker;
   }
   /**
@@ -73,11 +77,22 @@ public:
    */
   virtual void sunset(string who)
   {
-    if (who=="AoTracker") exit(0);
+    if (who=="AoTracker") running=false;
     else tracker->sunset(who);
   };
+  virtual void wait_for_finish()
+  {
+    while(running) 
+      sleep(10);
+  };
+  /**
+   * can be called to print the list of active obejcts
+   */
+  virtual void print_active_object_list()
+  {
+    tracker->print();
+  }
 };
-
 
 DawnTilDusk * aoPool = new StdDawnTilDusk();
 

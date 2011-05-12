@@ -1,6 +1,8 @@
 /****
  BpmDj v3.6: Free Dj Tools
- Copyright (C) 2001-2007 Werner Van Belle
+ Copyright (C) 2001-2009 Werner Van Belle
+
+ http://bpmdj.yellowcouch.org/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -282,7 +284,7 @@ bool Index::fix_tagline()
   // we creeeren een array die refereert naar de gevraagde words,
   int length;
   int nextword = 0;
-  char* lastword;
+  const char* lastword;
   char* words[100];
   char* runner;
   char* temp;
@@ -429,52 +431,62 @@ void Index::read_idx(QString indexn)
   // clear all fields
   init();
   // we assume we have a text file format
-  Token token = (Token)DataBinner::read_file((const char*)meta_filename);
-
-  // we retrieve all fields that we are interested in
-  String meta_version = (String)token[key_bpmdj_version];
-  index_period = period_type((Signed4)token[key_period]);
-  index_file   = (String)token[key_file];
-  index_time   = (String)token[key_time];
-  index_cue    = (Signed8)token[key_cue];
-  index_cue_z  = (Signed8)token[key_cuez];
-  index_cue_x  = (Signed8)token[key_cuex];
-  index_cue_c  = (Signed8)token[key_cuec];
-  index_cue_v  = (Signed8)token[key_cuev];
-  index_md5sum = (String)token[key_md5sum];
-  index_min.set_data(token[key_min]);
-  index_max.set_data(token[key_max]);
-  index_mean.set_data(token[key_mean]);
-  index_power.set_data(token[key_power]);
-  Data d = token[key_spectrum];
-  if (!d.isNull())
-    index_spectrum=new spectrum_type(d);
-  index_histogram.set_data(token[key_echo]);
-  index_rythm.set_data(token[key_rythm]);
-  index_composition.set_data(token[key_composition]);
-  index_disabled_capacities=(Unsigned2)token[key_disabled_capacities];
-  // the previous and next fields are somewhat more interesting...
-  Array<1,Data>::values iterator;
-  Array<1,Data> prevfields = (Array<1,Data>)token[key_prev];
-  for(iterator.reset(prevfields) ; iterator.more() ; ++iterator)
-    add_prev_history(new HistoryField(*iterator));
-  Array<1,Data> nextfields = (Array<1,Data>)token[key_next];
-  for(iterator.reset(nextfields) ; iterator.more() ; ++iterator)
-    add_next_history(new HistoryField(*iterator));
-  // albums
-  Array<1,Data> albums = (Array<1,Data>)token[key_albums];
-  iterator.reset(albums);
-  while(iterator.more())
+  try
     {
-      add_album(new AlbumField(*iterator));
-      ++iterator;
+      Token token = (Token)DataBinner::read_file((const char*)meta_filename);
+      
+      // we retrieve all fields that we are interested in
+      String meta_version = (String)token[key_bpmdj_version];
+      index_period = period_type((Signed4)token[key_period]);
+      index_file   = (String)token[key_file];
+      index_time   = (String)token[key_time];
+      index_cue    = (Signed8)token[key_cue];
+      index_cue_z  = (Signed8)token[key_cuez];
+      index_cue_x  = (Signed8)token[key_cuex];
+      index_cue_c  = (Signed8)token[key_cuec];
+      index_cue_v  = (Signed8)token[key_cuev];
+      index_md5sum = (String)token[key_md5sum];
+      index_min.set_data(token[key_min]);
+      index_max.set_data(token[key_max]);
+      index_mean.set_data(token[key_mean]);
+      index_power.set_data(token[key_power]);
+      Data d = token[key_spectrum];
+      if (!d.isNull())
+	index_spectrum=new spectrum_type(d);
+      index_histogram.set_data(token[key_echo]);
+      index_rythm.set_data(token[key_rythm]);
+      index_composition.set_data(token[key_composition]);
+      index_disabled_capacities=(Unsigned2)token[key_disabled_capacities];
+      // the previous and next fields are somewhat more interesting...
+      Array<1,Data>::values iterator;
+      Array<1,Data> prevfields = (Array<1,Data>)token[key_prev];
+      for(iterator.reset(prevfields) ; iterator.more() ; ++iterator)
+	add_prev_history(new HistoryField(*iterator));
+      Array<1,Data> nextfields = (Array<1,Data>)token[key_next];
+      for(iterator.reset(nextfields) ; iterator.more() ; ++iterator)
+	add_next_history(new HistoryField(*iterator));
+      // albums
+      Array<1,Data> albums = (Array<1,Data>)token[key_albums];
+      iterator.reset(albums);
+      while(iterator.more())
+	{
+	  add_album(new AlbumField(*iterator));
+	  ++iterator;
+	}
+      title=(String)token[key_title];
+      author=(String)token[key_author];
+      remix=(String)token[key_remix];
+      version=(String)token[key_version];
+      index_tags=(String)token[key_tags];
     }
-  title=(String)token[key_title];
-  author=(String)token[key_author];
-  remix=(String)token[key_remix];
-  version=(String)token[key_version];
-  index_tags=(String)token[key_tags];
-
+  catch (DataError *e)
+    {
+      fprintf(stderr,"Could not read %s\nError was %s\n",
+	      indexn.ascii(),
+	      e->msg.c_str());
+      fflush(stderr);
+      exit(0);
+    }
   if (fix_tempo_fields())
     meta_changed=true;
   if (fix_tagline())

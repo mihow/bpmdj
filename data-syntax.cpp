@@ -1383,7 +1383,7 @@ yyreduce:
 
   case 8:
 #line 41 "data-syntax.y"
-    {(yyval)=(yyvsp[(1) - (1)]);;}
+    {(yyval)=Creator((yyvsp[(1) - (1)])).getContentData();;}
     break;
 
   case 9:

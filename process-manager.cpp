@@ -1,6 +1,8 @@
 /****
  BpmDj v3.6: Free Dj Tools
- Copyright (C) 2001-2007 Werner Van Belle
+ Copyright (C) 2001-2009 Werner Van Belle
+
+ http://bpmdj.yellowcouch.org/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -28,6 +30,7 @@ using namespace std;
 
 Song* main_song = NULL;
 Song* monitor_song = NULL;
+vector<Song*> songs_to_avoid;
 
 ProcessManager::ProcessManager(SongSelectorLogic * sel) :
   BasicProcessManager(4)
@@ -125,10 +128,11 @@ bool ProcessManager::startSong(Song *song)
     }
   if (nextSlot==-1)
     {
-      Error(true,"No free slots to play song");
+      Error(true,"No free slots to play song\n"
+	    "Enable one of the players in the top left pannel");
       return false;
     }
-
+  
   start(nextSlot,song);
   // if there is no main song playing:
   // Place it in the main, otherwise, try the monitor

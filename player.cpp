@@ -1,6 +1,8 @@
 /****
  BpmDj v3.6: Free Dj Tools
- Copyright (C) 2001-2007 Werner Van Belle
+ Copyright (C) 2001-2009 Werner Van Belle
+
+ http://bpmdj.yellowcouch.org/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -54,11 +56,12 @@ using namespace std;
 #include "dsp-drivers.h"
 #include "about.h"
 #include "bpmplay-event.h"
+#include "ao-som-beatgraph.h"
 
-void fetch_config_from(PlayerConfig * target, const SongPlayer& song_player);
-void store_config_into(PlayerConfig * from,   SongPlayer* song_player);
+void fetch_config_from(PlayerConfig * target, const Player& song_player);
+void store_config_into(PlayerConfig * from,   Player* song_player);
 
-void fetch_config_from(PlayerConfig * target, const SongPlayer& player)
+void fetch_config_from(PlayerConfig * target, const Player& player)
 {
   if (player.raw_directory->text()!=target->get_core_rawpath())
     {
@@ -118,7 +121,7 @@ void fetch_config_from(PlayerConfig * target, const SongPlayer& player)
    target->set_player_rms_target(atof(player.rms->text()));
 }
 
-void store_config_into(PlayerConfig * from, SongPlayer* player)
+void store_config_into(PlayerConfig * from, Player* player)
 {
   player->raw_directory->setText(from->get_core_rawpath());
   // clear all selections according to numerical coding
@@ -151,7 +154,7 @@ void store_config_into(PlayerConfig * from, SongPlayer* player)
   init_capacity_widget(player->capacity,from->get_disabled_capacities());
 }
 
-void SongPlayer::done(int r)
+void Player::done(int r)
 {
   static int test=0;
   test++;
@@ -166,7 +169,7 @@ void SongPlayer::done(int r)
   test--;
 }
 
-void SongPlayer::init_tempo_switch_time()
+void Player::init_tempo_switch_time()
 {
   // we must know both tempos
   if (targetperiod <= 0 || normalperiod <= 0) return;
@@ -191,7 +194,7 @@ void SongPlayer::init_tempo_switch_time()
   tempoSwitchTime->setValue(time);
 }
 
-SongPlayer::SongPlayer(): 
+Player::Player(): 
   QDialog(NULL,"songplayer",false,Qt::Window)
 {
   setupUi(this);
@@ -216,7 +219,7 @@ SongPlayer::SongPlayer():
   connect(tab, SIGNAL( currentChanged(QWidget*) ), this, SLOT( tabChanged() ) );
 }
 
-void SongPlayer::captionize_according_to_index()
+void Player::captionize_according_to_index()
 {
   QString blah="";
   if (!playing)
@@ -235,7 +238,7 @@ void SongPlayer::captionize_according_to_index()
   setCaption(blah);
 }
 
-void SongPlayer::tabChanged()
+void Player::tabChanged()
 {
   // The beatgraph ins and outs
   if (tab->currentPageIndex() == TAB_BEATGRAPH)
@@ -251,7 +254,7 @@ void SongPlayer::tabChanged()
     store_config_into(config,this);
 }
 
-void SongPlayer::redrawCues()
+void Player::redrawCues()
 {
   setColor(PushButton11,cues[0]>0);
   setColor(PushButton12,cues[1]>0);
@@ -260,7 +263,7 @@ void SongPlayer::redrawCues()
   beatGraphAnalyzer->cuesChanged();
 }
 
-void SongPlayer::setColor(QWidget *button, bool enabled)
+void Player::setColor(QWidget *button, bool enabled)
 {
    QColor a, ad, am, aml, al;
    QPalette pal;
@@ -334,7 +337,7 @@ void SongPlayer::setColor(QWidget *button, bool enabled)
    button->setPalette( pal );
 }
 
-void SongPlayer::storeCue(int nr)
+void Player::storeCue(int nr)
 {
   checkCueNonZero();
   cue_store(nr);
@@ -342,14 +345,14 @@ void SongPlayer::storeCue(int nr)
   startStopButton->setFocus();
 }
 
-void SongPlayer::retrieveCue(int nr)
+void Player::retrieveCue(int nr)
 {
   cue_retrieve(nr);
   jumpto(0,0);
   startStopButton->setFocus();
 }
 
-void SongPlayer::retrieveNextCue()
+void Player::retrieveNextCue()
 {
   static int cue_nr=0;
   for(int i = 0 ; i < 4 ; i++)
@@ -364,7 +367,7 @@ void SongPlayer::retrieveNextCue()
     }
 }
 
-bool SongPlayer::cueKey(QKeyEvent* e, int p)
+bool Player::cueKey(QKeyEvent* e, int p)
 {
   int bs = e->state() & Qt::KeyButtonMask;
   if (bs==0) 
@@ -380,7 +383,7 @@ bool SongPlayer::cueKey(QKeyEvent* e, int p)
   return false;
 }
 
-void SongPlayer::keyPressEvent(QKeyEvent * e)
+void Player::keyPressEvent(QKeyEvent * e)
 {
   if (tab->currentPageIndex() == TAB_BEATGRAPH)
     {
@@ -417,7 +420,7 @@ void SongPlayer::keyPressEvent(QKeyEvent * e)
   QDialog::keyPressEvent(e);
 }
 
-void SongPlayer::shift_playpos(signed4 direction)
+void Player::shift_playpos(signed4 direction)
 {
   ::y+=direction;
   if (::y<0)
@@ -428,27 +431,27 @@ void SongPlayer::shift_playpos(signed4 direction)
   startStopButton->setFocus();
 }
 
-void SongPlayer::nudgePlus()
+void Player::nudgePlus()
 {
   shift_playpos(-::currentperiod/(4*128));
 }
 
-void SongPlayer::nudgeMinus()
+void Player::nudgeMinus()
 {
   shift_playpos(+::currentperiod/(4*128));
 }
 
-void SongPlayer::nudgePlusB()
+void Player::nudgePlusB()
 {
   shift_playpos(+::currentperiod/4);
 }
 
-void SongPlayer::nudgeMinusHalfB()
+void Player::nudgeMinusHalfB()
 {
   shift_playpos(-::currentperiod/8);
 }
 
-void SongPlayer::nudgePlus1M()
+void Player::nudgePlus1M()
 {
   if (::currentperiod.valid())
     shift_playpos(+::currentperiod);
@@ -456,7 +459,7 @@ void SongPlayer::nudgePlus1M()
     shift_playpos(+WAVRATE);
 }
 
-void SongPlayer::nudgeMinus1M()
+void Player::nudgeMinus1M()
 {
   if (::currentperiod.valid())
     shift_playpos(-::currentperiod);
@@ -464,7 +467,7 @@ void SongPlayer::nudgeMinus1M()
     shift_playpos(-WAVRATE);
 }
 
-void SongPlayer::nudgePlus4M()
+void Player::nudgePlus4M()
 {
   if (::currentperiod.valid())
     shift_playpos(+::currentperiod*4);
@@ -472,7 +475,7 @@ void SongPlayer::nudgePlus4M()
     shift_playpos(+4*WAVRATE);
 }
 
-void SongPlayer::nudgeMinus4M()
+void Player::nudgeMinus4M()
 {
   if (::currentperiod.valid())
     shift_playpos(-::currentperiod*4);
@@ -480,7 +483,7 @@ void SongPlayer::nudgeMinus4M()
     shift_playpos(-4*WAVRATE);
 }
 
-void SongPlayer::nudgePlus8M()
+void Player::nudgePlus8M()
 {
   if (::currentperiod.valid())
     shift_playpos(+::currentperiod*8);
@@ -488,7 +491,7 @@ void SongPlayer::nudgePlus8M()
     shift_playpos(+8*WAVRATE);
 }
 
-void SongPlayer::nudgeMinus8M()
+void Player::nudgeMinus8M()
 {
   if (::currentperiod.valid())
     shift_playpos(-::currentperiod*8);
@@ -496,7 +499,7 @@ void SongPlayer::nudgeMinus8M()
     shift_playpos(-8*WAVRATE);
 }
 
-void SongPlayer::accept()
+void Player::accept()
 {
   timer->stop();
   beatGraphAnalyzer->deactivate();
@@ -504,7 +507,7 @@ void SongPlayer::accept()
 }
 
 static bool autostarted = false;
-void SongPlayer::timerTick()
+void Player::timerTick()
 {
   static int no_raw_file_error_box = 10;
   unsigned4 m=wave_max();
@@ -561,7 +564,7 @@ void SongPlayer::timerTick()
     targetStep();
 }
 
-void SongPlayer::setCue()
+void Player::setCue()
 {
   cue_set();
   beatGraphAnalyzer->cuesChanged();
@@ -569,19 +572,19 @@ void SongPlayer::setCue()
 
 /*
 
-void SongPlayer::shiftBack()
+void Player::shiftBack()
 {
   ::y=y_normalise(cue)+dsp->latency();
 }
 */
 
-void SongPlayer::restart()
+void Player::restart()
 {
   ::y=0;
   unpause_playing();
 }
 
-void SongPlayer::set_start_stop_text()
+void Player::set_start_stop_text()
 {
   if (get_paused())
     startStopButton->setText("Start");
@@ -593,7 +596,7 @@ void SongPlayer::set_start_stop_text()
   startStopButton->setFocus();
 }
 
-void SongPlayer::start_stop()
+void Player::start_stop()
 {
   if (!get_paused())
     {
@@ -607,47 +610,47 @@ void SongPlayer::start_stop()
   else jumpto(0,0);
 }
 
-void SongPlayer::retrieveZ()
+void Player::retrieveZ()
 {
   retrieveCue(0);
 }
 
-void SongPlayer::retrieveX()
+void Player::retrieveX()
 {
   retrieveCue(1);
 }
 
-void SongPlayer::retrieveC()
+void Player::retrieveC()
 {
   retrieveCue(2);
 }
 
-void SongPlayer::retrieveV()
+void Player::retrieveV()
 {
   retrieveCue(3);
 }
 
-void SongPlayer::storeZ()
+void Player::storeZ()
 {
   storeCue(0);
 }
 
-void SongPlayer::storeX()
+void Player::storeX()
 {
   storeCue(1);
 }
 
-void SongPlayer::storeC()
+void Player::storeC()
 {
   storeCue(2);
 }
 
-void SongPlayer::storeV()
+void Player::storeV()
 {
   storeCue(3);;
 }
 
-void SongPlayer::checkCueNonZero()
+void Player::checkCueNonZero()
 {
   if (::cue==0)
     QMessageBox::warning(this,"Cue Zero ?",
@@ -658,7 +661,7 @@ void SongPlayer::checkCueNonZero()
 }
 
 #define knick 15
-void SongPlayer::changeTempo(int p)
+void Player::changeTempo(int p)
 {
   wantedcurrentperiod = p;
   int pos = tempoSlider->value();
@@ -702,33 +705,33 @@ void SongPlayer::changeTempo(int p)
   TempoLd->display(100.0*(double)normalperiod/(double)currentperiod);
 }
 
-void SongPlayer::targetTempo()
+void Player::targetTempo()
 {
   tempo_fade = fade_time;
   changeTempo(targetperiod);
   normalReached(false);
 }
 
-void SongPlayer::normalTempo()
+void Player::normalTempo()
 {
   tempo_fade = fade_time;
   changeTempo(normalperiod);
   normalReached(true);
 }
 
-void SongPlayer::mediumSwitch()
+void Player::mediumSwitch()
 {
   fade_time = tempoSwitchTime->value();
   tempo_fade=0;
 }
 
-void SongPlayer::normalReached(bool t)
+void Player::normalReached(bool t)
 {
   setColor(switcherButton,t);
   setColor(beatGraphAnalyzer->switcherLabel,t);
 }
 
-void SongPlayer::targetStep()
+void Player::targetStep()
 {
   tempo_fade++;
   if (tempo_fade>fade_time)
@@ -759,75 +762,75 @@ void SongPlayer::targetStep()
   changeTempo((int)result);
 }
 
-void SongPlayer::tempoChanged()
+void Player::tempoChanged()
 {
   if (wantedcurrentperiod == 0 )
     wantedcurrentperiod = currentperiod;
   changeTempo(wantedcurrentperiod);
 }
 
-void SongPlayer::cueShift(signed8 dir)
+void Player::cueShift(signed8 dir)
 {
   cue_shift(dir);
   beatGraphAnalyzer->cuesChanged();
 }
 
-void SongPlayer::nudgeCueBack()
+void Player::nudgeCueBack()
 {
   cueShift(-WAVRATE/80);
 }
 
-void SongPlayer::nudgeCueForward()
+void Player::nudgeCueForward()
 {
   cueShift(+WAVRATE/80); 
 }
 
-void SongPlayer::nudgeCueBack8M()
+void Player::nudgeCueBack8M()
 {
   cueShift(-8*normalperiod); 
 }
 
-void SongPlayer::nudgeCueForward8M()
+void Player::nudgeCueForward8M()
 {
   cueShift(8*normalperiod);
 }
 
-void SongPlayer::fastSaw()
+void Player::fastSaw()
 {
-   lfo_set("Saw",lfo_saw,16,::y-dsp->latency());
+  lfo_set("Saw",lfo_saw,16,::y-dsp->latency());
 }
 
-void SongPlayer::slowSaw()
+void Player::slowSaw()
 {
-   lfo_set("Saw",lfo_saw,8,::y-dsp->latency());
+  lfo_set("Saw",lfo_saw,8,::y-dsp->latency());
 }
 
-void SongPlayer::fastPan()
+void Player::fastPan()
 {
-   lfo_set("Pan",lfo_pan,16,::y-dsp->latency());
+  lfo_set("Pan",lfo_pan,16,::y-dsp->latency());
 }
 
-void SongPlayer::slowPan()
+void Player::slowPan()
 {
-   lfo_set("Pan",lfo_pan,8,::y-dsp->latency()); 
+  lfo_set("Pan",lfo_pan,8,::y-dsp->latency()); 
 }
 
-void SongPlayer::normalLfo()
+void Player::normalLfo()
 {
    lfo_set("No",lfo_no,4,::y-dsp->latency()); 
 }
 
-void SongPlayer::fastRevSaw()
+void Player::fastRevSaw()
 {
   lfo_set("Reverse saw",lfo_revsaw,16,::y-dsp->latency());
 }
 
-void SongPlayer::slowRevSaw()
+void Player::slowRevSaw()
 {
   lfo_set("Reverse saw",lfo_revsaw,8,::y-dsp->latency()); 
 }
 
-void SongPlayer::metronome()
+void Player::metronome()
 {
   if (lfo_get()==lfo_metronome)
     normalLfo();
@@ -835,12 +838,12 @@ void SongPlayer::metronome()
     lfo_set("Metronome",lfo_metronome,16,::y-dsp->latency()); 
 }
 
-void SongPlayer::breakLfo()
+void Player::breakLfo()
 {
   lfo_set("Break",lfo_break,1,::y-dsp->latency());
 }
 
-void SongPlayer::mapScaleChanged(int i)
+void Player::mapScaleChanged(int i)
 {
   if (i == 0) map_scale = 64;
   else if (i == 1) map_scale = 32;
@@ -851,7 +854,7 @@ void SongPlayer::mapScaleChanged(int i)
   startStopButton->setFocus();
 }
 
-void SongPlayer::update_map_scale_box()
+void Player::update_map_scale_box()
 {
   if (map_scale == 64) mapping_scale->setCurrentItem(0);
   else if (map_scale == 32) mapping_scale->setCurrentItem(1);
@@ -861,7 +864,7 @@ void SongPlayer::update_map_scale_box()
   else assert(0);
 }
 
-void SongPlayer::mapLengthChanged(int new_size)
+void Player::mapLengthChanged(int new_size)
 {
   startStopButton->setFocus();
   map_data new_map = bpmdj_allocate(new_size,map_segment);
@@ -890,7 +893,7 @@ void SongPlayer::mapLengthChanged(int new_size)
   update_map_pixmaps();
 }
 
-void SongPlayer::saveMap()
+void Player::saveMap()
 {
   QString s = QFileDialog::getSaveFileName("sequences","Beat Patterns (*.map)",this,"Save pattern","Choose a filename" );
   if (s.isNull()) return;
@@ -933,7 +936,7 @@ void SongPlayer::saveMap()
   fclose(f);
 }
 
-void SongPlayer::loadMap()
+void Player::loadMap()
 {
   QString s = QFileDialog::getOpenFileName("sequences","Beat Patterns (*.map)",this,"Load Pattern","Choose a file");
   if (s.isNull()) return;
@@ -986,7 +989,7 @@ void SongPlayer::loadMap()
   update_map_pixmaps();
 }
 
-void SongPlayer::mapStart()
+void Player::mapStart()
 {
   map_data mapcopy = bpmdj_allocate(map_size,map_segment);
   // copy all data and take scaling into account...
@@ -1031,22 +1034,22 @@ void SongPlayer::mapStart()
   map_set(map_size,mapcopy,normalperiod*map_size/map_scale,mexit,atend_loop->isOn());
 }
 
-void SongPlayer::mapStop()
+void Player::mapStop()
 {
   map_stop();
 }
 
-void SongPlayer::mapLoopChange()
+void Player::mapLoopChange()
 {
   map_loop_set(atend_loop->isOn());
 }
 
-void SongPlayer::openAbout()
+void Player::openAbout()
 {
   About box(1);
 }
 
-void SongPlayer::mousePressEvent(QMouseEvent * e)
+void Player::mousePressEvent(QMouseEvent * e)
 {
   QPoint p = e->pos(); // p is expressed in window coordinates.
   QPoint xy = mapin->mapToParent(mapin->mapFrom(this,p));
@@ -1108,7 +1111,7 @@ void SongPlayer::mousePressEvent(QMouseEvent * e)
   QDialog::mousePressEvent(e);
 }
 
-void SongPlayer::mouseMoveEvent(QMouseEvent * e)
+void Player::mouseMoveEvent(QMouseEvent * e)
 {
   QPoint p = e->pos();
   QPoint xy = mapin->mapToParent(mapin->mapFrom(this,p));
@@ -1129,7 +1132,7 @@ void SongPlayer::mouseMoveEvent(QMouseEvent * e)
   QDialog::mousePressEvent(e);
 }
 
-void SongPlayer::mouseReleaseEvent(QMouseEvent * e)
+void Player::mouseReleaseEvent(QMouseEvent * e)
 {
   QPoint p = e->pos();
   QPoint xy = mapin->mapToParent(mapin->mapFrom(this,p));
@@ -1163,7 +1166,7 @@ int valuetick(int i)
   return 0;
 }
 
-void SongPlayer::update_inmap_pixmap()
+void Player::update_inmap_pixmap()
 {
   int h = mapin->height();
   QPixmap *mi = new QPixmap(map_size,h);
@@ -1189,7 +1192,7 @@ void SongPlayer::update_inmap_pixmap()
   mapin->setPixmap(*mi);
 }
 
-void SongPlayer::update_speedmap_pixmap()
+void Player::update_speedmap_pixmap()
 {
   int h = mapspeed->height();
   QPixmap *ms = new QPixmap(map_size,h);
@@ -1206,7 +1209,7 @@ void SongPlayer::update_speedmap_pixmap()
   mapspeed->setPixmap(*ms);
 }
 
-void SongPlayer::update_volumemap_pixmap()
+void Player::update_volumemap_pixmap()
 {
   int h = mapvolume->height();
   QPixmap *mv = new QPixmap(map_size,h);
@@ -1223,7 +1226,7 @@ void SongPlayer::update_volumemap_pixmap()
   mapvolume->setPixmap(*mv);
 }
 
-void SongPlayer::update_map_pixmaps()
+void Player::update_map_pixmaps()
 {
   update_inmap_pixmap();
   update_speedmap_pixmap();
@@ -1246,65 +1249,58 @@ void SongPlayer::update_map_pixmaps()
 }
 
 
-void SongPlayer::setAlsa()
+void Player::setAlsa()
 {
   oss->setChecked(false);
   bpm->setChecked(false);
   jack->setChecked(false);
 }
 
-void SongPlayer::setOss()
+void Player::setOss()
 {
   alsa->setChecked(false);
   bpm->setChecked(false);
   jack->setChecked(false);
 }
 
-void SongPlayer::setBpmMixingDesk()
+void Player::setBpmMixingDesk()
 {
   alsa->setChecked(false);
   oss->setChecked(false);
   jack->setChecked(false);
 }
 
-void SongPlayer::setJack()
+void Player::setJack()
 {
   alsa->setChecked(false);
   oss->setChecked(false);
   bpm->setChecked(false);
 }
 
-void SongPlayer::restartCore()
+void Player::restartCore()
 {
-   fetch_config_from(config,*this);
-   // printf("Stopping core\n");
-   stopCore();
-   // printf("reassigning dsp device\n");
-   dsp = dsp_driver::get_driver(config);
-   // printf("Starting core\n");
-   startCore();
-   // printf("Finished applying options\n");
-   config->save();
-   store_config_into(config,this);
+  fetch_config_from(config,*this);
+  stopCore();
+  dsp = dsp_driver::get_driver(config);
+  startCore();
+  config->save();
+  store_config_into(config,this);
 }
 
-void InitAndStart::run(SongPlayer * player)
+void InitAndStart::run(Player * player)
 {
- printf("Init core\n"); fflush(stdout);
   player->initCore();
- printf("Start core\n"); fflush(stdout);
   player->startCore();
 }
 
-void PlayingStateChanged::run(SongPlayer * player)
+void PlayingStateChanged::run(Player * player)
 {
- printf("Player state changed [paused = %d]\n",get_paused()); fflush(stdout);
   if (opt_check && get_paused())
     player->accept();
   player->set_start_stop_text();
 }
 
-void SongPlayer::customEvent(QEvent * e)
+void Player::customEvent(QEvent * e)
 {
   if ((int)e->type()==(int)BpmPlayCustom)
     {
@@ -1316,7 +1312,7 @@ void SongPlayer::customEvent(QEvent * e)
 /**
  * here we assume that the core dsp device has been set to something usefull
  */
-void SongPlayer::startCore()
+void Player::startCore()
 {
   int err = core_start();
   if (opt_check)
@@ -1326,14 +1322,33 @@ void SongPlayer::startCore()
     }
   else
     {
-      if (show_error(err, err_dsp, "Unable to open dsp device\n"
-		     "Swithcing back to zero DSP driver\n"))
+      /**
+       * because of a concurrency problem in the kernel we try again until we succeed here.
+       * The problem is that between telling the kernel to close the dsp device and opening it from another 
+       * application. Since neither the bpmdj selector nor the bpm player can know whether the device is
+       * really closed or whether it has been hijacked by anoither program, we need to spend some time on
+       * trying to access it. If it doesn't work, then we forget it completely and give an error message.
+       */
+      static unsigned4 opening_tries=10;
+      if (err==err_dsp)
 	{
-	  config->set_player_dsp(0);
-	  dsp = dsp_driver::get_driver(config);
-	  err = core_start();
-	  show_error(err, err_dsp, "Still unable to get anywhere\n");
-	};
+	  if (--opening_tries==0)
+	    {
+	      if (show_error(err, err_dsp, "Unable to open dsp device\n"
+			     "Swithcing back to zero DSP driver\n"))
+		{
+		  config->set_player_dsp(0);
+		  dsp = dsp_driver::get_driver(config);
+		  err = core_start();
+		  show_error(err, err_dsp, "Still unable to get anywhere\n");
+		};
+	    }
+	  else
+	    {
+	      sleep(1);
+	      startCore();
+	    }
+	}
     }
 }
 
@@ -1341,19 +1356,20 @@ void SongPlayer::startCore()
  * here we stop the core, close the dsp device but
  * do not close the reading file
  */
-void SongPlayer::stopCore()
+void Player::stopCore()
 {
   core_stop();
   delete(dsp);
   dsp = NULL;
 }
 
-void SongPlayer::initCore()
+void Player::initCore()
 {
   // if we check the raw file, we want to write the information synchronous
   int err = core_object_init(opt_check);
-  if (show_error(err, err_noraw, "No raw file to be read. Probably the .mp3 is broken.\n")
-      || show_error(err, err_nospawn, "Unable to spawn decoding process.\nPlease check your PATH environment variable\n"))
+  if (  show_error(err, err_noraw, "No raw file to be read. Probably the .mp3 is broken.\n")
+     || show_error(err, err_nospawn, "Unable to spawn decoding process.\nPlease check your PATH environment variable\n")
+     )
     if (opt_check)
       reject();
 };
@@ -1367,7 +1383,7 @@ void msg_playing_state_changed()
 class WritingFinished: public BpmPlayEvent
 {
 public:
-  virtual void run(SongPlayer* sp)
+  virtual void run(Player* sp)
   {
     if (normalperiod.valid())
       {
@@ -1375,6 +1391,7 @@ public:
 	  sp->tabChanged(); // it didn't but it triggers an update 
 	else
 	  sp->tab->setCurrentIndex(TAB_BEATGRAPH);
+	// (new SomBeatGraph())->start();
       }
   }
 };

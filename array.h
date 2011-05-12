@@ -1,10 +1,8 @@
-#ifndef __loaded__array_h__
-#define __loaded__array_h__
-using namespace std;
-#line 1 "array.h++"
 /****
- Om-Data
- Copyright (C) 2005-2006 Werner Van Belle
+ Borg4 Data Library
+ Copyright (C) 2005-2009 Werner Van Belle
+
+ http://werner.yellowcouch.org/Borg4/group__data.html
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -20,9 +18,11 @@ using namespace std;
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
-#ifndef ARRAY_H
-#define ARRAY_H
+#ifndef __loaded__array_h__
+#define __loaded__array_h__
+using namespace std;
+#line 1 "array.h++"
+#include <stdlib.h>
 #include "types.h"
 #include "data-visitor.h"
 #include "coordinates.h"
@@ -274,7 +274,69 @@ template <int D, class T> class Array: public DataClass
   typedef ArrayIterator<D,T,true ,1,true>  ordered_vectors;
   typedef ArrayIterator<D,T,false,2,false> matrix_values;
   typedef ArrayIterator<D,T,true ,2,false> matrix_positions;
+  
+  virtual Data getField(QString e);
+ private:
+   Data getField1(int idx);
+   Data getField2(int idx);
+   Data getField3(int idx);
+   Data getField4(int idx);
+   Data getField5(int idx);
+   Data getField6(int idx);
+   Data getField7(int idx);
+   Data getField8(int idx);
 };
+
+template <int D, class T>
+Data Array<D,T>::getField(QString p)
+{
+   int pos = atol(p.toAscii().data());
+   assert(pos>=0);
+   assert(pos<size()[0]);
+   if (D==1) return getField1(pos);
+   if (D==2) return getField2(pos);
+   if (D==3) return getField3(pos);
+   if (D==4) return getField4(pos);
+   if (D==5) return getField5(pos);
+   if (D==6) return getField6(pos);
+   if (D==7) return getField7(pos);
+   if (D==8) return getField8(pos);
+   assert(0);
+   return  getField1(pos); // just to satisfy the compiler
+}
+
+template <int D, class T>
+Data Array<D,T>::getField1(int idx)
+{
+   assert(D==1);
+   Position<D> p;
+   p[0]=idx;
+   return to_data(Array<D,T>::operator[](p));
+}
+
+#define GETFIELD(NR) \
+template <int D, class T> \
+Data Array<D,T>::getField##NR(int idx) \
+{\
+   assert(D==NR);\
+   assert(D>1);\
+   Position<D> p;\
+   p[0]=idx;\
+   From<D> f(p);\
+   Select<NR-1> s;\
+   for(int i = 0 ; i < D-1;i++)\
+     s[i]=i+1;\
+   Array<NR-1,T> result((*this)(f),s);\
+   return result;\
+}
+
+GETFIELD(2);
+GETFIELD(3);
+GETFIELD(4);
+GETFIELD(5);
+GETFIELD(6);
+GETFIELD(7);
+GETFIELD(8);
 
 /**
  * The assignment operator will set the content of the array
@@ -436,6 +498,4 @@ Array<D,T> Array<D,T>::operator +(const Array<D,T>& in2) const
   out+=in2;
   return out;
 }
-
-#endif
 #endif // __loaded__array_h__

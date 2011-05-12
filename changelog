@@ -1,3 +1,20 @@
+3.7:
+	+ made sure that we try somewhat longer to open the DSP device
+	+ moved the analyzers to the analyzer tab.
+	+ added suport for mpg123 1.4.3
+        + added developers documentation
+	- empty index files would crash the data loader
+	- completely empty files would crash the data loader due to NaN
+        - a bug in the energyanalyzer. For long songs the analyzer was
+          completely wrong and would put less weight on the first half
+          of the song.
+        - a bug in moc-qt4 from Qt 4.4.3 makes that the beatgraphlabel
+          no longer compiled. We implemented a silly workaround
+	+ mirroring and entire song database is done asynchronously
+	- if the fragments were deleted while the selector was open, the program would crash
+	- if the selector could not open the dsp device it would crash
+	- Timer killed from wrong thread -> should be fixed now
+	- removed some warnings about char* depcreatead conversions with the new gcc compiler
 3.6:
 	- fixed a compilation problem on debian platforms (moc-qt4 vc moc-qt3)
 	- the dsp flag in the fragment_player will no longer lockup optimized compilations

@@ -1,6 +1,8 @@
 /****
  BpmDj v3.6: Free Dj Tools
- Copyright (C) 2001-2007 Werner Van Belle
+ Copyright (C) 2001-2009 Werner Van Belle
+
+ http://bpmdj.yellowcouch.org/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -49,10 +51,12 @@ using namespace std;
 #include "signals.h"
 #include "fragment-player.h"
 #include "fragment-creator.h"
+#include "song-copier.h"
 
 extern FragmentPlayer  fragmentPlayer;
 extern FragmentCreator fragmentCreator;
 extern IndexReader     indexReader;
+extern SongCopier      songCopier;
 
 /*-------------------------------------------
  *         Templates we need
@@ -107,28 +111,26 @@ public:
 class BpmDjSplash: public QDialog, public Ui::Loader
 {
 public:
-  BpmDjSplash();
+  BpmDjSplash(): QDialog(NULL,NULL,FALSE,Qt::SplashScreen)
+  {
+    setupUi(this);
+    // read the image from memory
+    QByteArray image_data;
+    image_data.setRawData(logo_png,logo_png_size);
+    QImage image(image_data);
+    // when deleting the object we don't want to screw up our memory
+    image_data.resetRawData(logo_png,logo_png_size);
+    QPixmap pixmap(image);
+    // set the dialog background
+    setPaletteBackgroundPixmap(pixmap);
+    app->processEvents();
+    // show it
+    show();
+    QTimer * timer=new QTimer(this);
+    connect(timer,SIGNAL(timeout()), this, SLOT(close()));
+    timer->start(10000,true);
+  }
 };
-
-BpmDjSplash::BpmDjSplash(): QDialog(NULL,NULL,FALSE,Qt::SplashScreen)
-{
-  setupUi(this);
-  // read the image from memory
-  QByteArray image_data;
-  image_data.setRawData(logo_png,logo_png_size);
-  QImage image(image_data);
-  // when deleting the object we don't want to screw up our memory
-  image_data.resetRawData(logo_png,logo_png_size);
-  QPixmap pixmap(image);
-  // set the dialog background
-  setPaletteBackgroundPixmap(pixmap);
-  app->processEvents();
-  // show it
-  show();
-  QTimer * timer=new QTimer(this);
-  connect(timer,SIGNAL(timeout()), this, SLOT(close()));
-  timer->start(10000,true);
-}
 
 const char* programname;
 QStatusBar* status = NULL;
@@ -206,9 +208,8 @@ int main(int argc, char* argv[])
       QMessageBox::message(NULL,"Qt3 -> Qt4 bump:\n"
 			   "From this version on the source code has been ported to "
 			   "Qt4. This has been a non trivial port so I expect that "
-			   "some bugs will show up. Don't hesitate to send detailed "
-			   "bug reports to werner@yellowcouch.org or post them at "
-			   "http://bpmdj.yellowcouch.org/bugzilla/");
+			   "some bugs will show up. Don't hesitate to post detailed "
+			   "bug reports at http://bpmdj.yellowcouch.org/bugzilla/");
   BpmDjSplash splash;
   application.setMainWidget(&main_window);
   main_window.show();
@@ -223,12 +224,13 @@ int main(int argc, char* argv[])
     }
   taglist2config(main_window.tagList);
   Config::save();
+  songCopier.terminate();
   existenceScanner.terminate();
   fragmentPlayer.terminate();
   fragmentCreator.terminate();
   spectrumPca.terminate();
   indexReader.terminate();
-  while(true) sleep(1000);
+  aoPool->wait_for_finish();
   return result;
 }
 #endif // __loaded__bpmdj_cpp__

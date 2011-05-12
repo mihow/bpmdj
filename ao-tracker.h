@@ -71,6 +71,8 @@ class ActiveAoTracker: public ActiveObject<Smart< ActiveAoTracker_msg_ > >
   protected: void queue_sunset(string s);
   public: elementResult sunrise(string s);
   protected: void queue_sunrise(string s);
+  public: elementResult print();
+  protected: void queue_print();
   protected:
     ActiveAoTracker(AoTracker* s, string name):
       ActiveObject<Smart< ActiveAoTracker_msg_ > >(name), self(s)
@@ -122,6 +124,26 @@ class ActiveAoTracker_msg_sunrise: public ActiveAoTracker_msg_
       };
 };
 
+class ActiveAoTracker_msg_print: public ActiveAoTracker_msg_
+{
+    ;
+  public:
+    ActiveAoTracker_msg_print()
+      {
+      };
+    virtual string declaration()
+    {
+      return "AoTracker::print()";
+    }
+    virtual elementResult run(ActiveAoTracker * ao)
+      {
+        ENTER_MSG;
+        elementResult res = ao->print();
+        LEAVE_MSG;
+        return res;
+      };
+};
+
 
 //-------------------------------------
 // Active Object wrapper 
@@ -142,6 +164,11 @@ class AoTracker
     {
       object.queue_sunrise(s);
     };
+  public:
+    void print()
+    {
+      object.queue_print();
+    };
 };
 
 
@@ -157,5 +184,10 @@ inline void ActiveAoTracker::queue_sunrise(string s)
   {
     push(Smart<ActiveAoTracker_msg_sunrise>(
         new ActiveAoTracker_msg_sunrise(s)));
+  };
+inline void ActiveAoTracker::queue_print()
+  {
+    push(Smart<ActiveAoTracker_msg_print>(
+        new ActiveAoTracker_msg_print()));
   };
 #endif // __AO_TRACKER_H

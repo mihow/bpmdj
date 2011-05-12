@@ -1,0 +1,11 @@
+CPP             = g++ -g -O3 -Wall
+UIC3            = uic3
+RCC             = rcc
+UIC             = uic-qt4
+MOC             = moc-qt4
+CFLAGS         += -D COMPILE_OSS -D COMPILE_ALSA -D COMPILE_JACK -D QT_THREAD_SUPPORT -D QT3_SUPPORT
+LDFLAGS        += -lpthread -lm -lasound -lrt -lfftw3
+QT_INCLUDE_PATH = -I/usr/include/QtGui/ -I/usr/include/QtCore/ -I/usr/include/Qt3Support/
+QT_LIBRARY_PATH =
+QT_LIBS         = -lQt3Support -lQtGui 
+BITS            = 32

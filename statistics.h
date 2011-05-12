@@ -1,6 +1,8 @@
 /****
  BpmDj v3.6: Free Dj Tools
- Copyright (C) 2001-2007 Werner Van Belle
+ Copyright (C) 2001-2009 Werner Van Belle
+
+ http://bpmdj.yellowcouch.org/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -38,6 +40,7 @@ void statistics_first_pass(Song * song);
 void statistics_prepare_second_pass();
 void statistics_second_pass(Song * song);
 void statistics_stop_second_pass();
+
 
 class Statistics: public QDialog, public Ui::Statistics
 {

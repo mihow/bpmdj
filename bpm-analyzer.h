@@ -1,6 +1,8 @@
 /****
  BpmDj v3.6: Free Dj Tools
- Copyright (C) 2001-2007 Werner Van Belle
+ Copyright (C) 2001-2009 Werner Van Belle
+
+ http://bpmdj.yellowcouch.org/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -26,7 +28,7 @@ using namespace std;
 #include "ui-bpmcounter.h"
 
 typedef float8 fft_type;
-class SongPlayer;
+class Player;
 
 class BpmAnalyzerDialog : public QWidget, public Ui::CountDialog, public Analyzer
 {
@@ -82,7 +84,7 @@ private:
    void analyze();
    void rangeCheck();
    void removeRaw();
-   SongPlayer *  player;
+   Player *  player;
    BpmAnalyzerDialog(QWidget*parent=0);
    virtual void started();
    virtual void stop();

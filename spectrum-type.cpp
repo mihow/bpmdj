@@ -1,6 +1,8 @@
 /****
  BpmDj v3.6: Free Dj Tools
- Copyright (C) 2001-2007 Werner Van Belle
+ Copyright (C) 2001-2009 Werner Van Belle
+
+ http://bpmdj.yellowcouch.org/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -24,7 +26,7 @@ using namespace std;
 #include <qstring.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "spectrum-type.h"
+#include "index.h"
 #include "signals.h"
 #include "files.h"
 
@@ -40,7 +42,14 @@ void spectrum_type::set_data(Data &data)
 {
   Array<1,float4> spectrumdata = data;
   for(signed4 i = 0 ; i < spectrum_size ; i++)
-    bark[i]=spectrumdata[i];
+    {
+      float4 f=spectrumdata[i];
+      if (isnan(f))
+	throw new DataError("Spectrum float at is nan");
+      if (isinf(f))
+	throw new DataError("Spectrum float at is inf");
+      bark[i]=f;
+    }
 }
 
 double barkbounds[barksize+1] =

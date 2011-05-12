@@ -1,28 +1,11 @@
-/****
- Borg IV
- Copyright (C) 2006-2007 Werner Van Belle
-
- This program is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 2 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-****/
-
 #ifndef __loaded__reference_count_h__
 #define __loaded__reference_count_h__
 using namespace std;
 #line 1 "reference-count.h++"
 #include <assert.h>
+#ifndef SINGLE_THREADED
 #include "cmpxchg.h"
+#endif
 
 /**
  * @brief counts the number of smartpointers refering to it
@@ -31,6 +14,8 @@ using namespace std;
  * This class is resistent to concurrent access. In other words the 
  * reference_count will be atomically increased and decreased
  */
+
+//#define SINGLE_THREADED
 class ReferenceCount
 {
  public:
@@ -38,16 +23,16 @@ class ReferenceCount
    * The number of smart pointers refering to this object.
    * 0 if none.
    */
-  int reference_count;
-  bool deleting;
-  ReferenceCount(): reference_count(0), deleting(false)
+  volatile int reference_count;
+  ReferenceCount(): reference_count(0)
   {
   }
-  ReferenceCount(const ReferenceCount&): reference_count(0), deleting(false)
+  ReferenceCount(const ReferenceCount&): reference_count(0)
   {
   }
-  ReferenceCount& operator =(const ReferenceCount&)
+  ReferenceCount& operator =(const ReferenceCount& o)
   {
+    assert(&o!=this);
     reference_count=0;
     return *this;
   }
@@ -56,34 +41,43 @@ class ReferenceCount
    */
   void incref() 
   {
+#ifdef SINGLE_THREADED
+    assert(reference_count>=0);
+    reference_count++;
+#else
     int before;
     do 
       {
 	before = reference_count;
       }
     while(cmpxchg(&reference_count,before,before+1)!=before);
+    assert(before>=0);
+#endif
   }
   /**
    * decreases the refernce count. Returns the new reference count.
    */
   int decref()
   {
+#ifdef SINGLE_THREADED
+    return --reference_count;
+#else
     int before;
     do 
       {
 	before = reference_count;
       }
     while(cmpxchg(&reference_count,before,before-1)!=before);
-    assert(before-1>=0);
     return before-1;
+#endif
   }
   /**
    * destroys the object. In this case performs a sanity check 
-   * on the refernec_count.
+   * on the refernce_count.
    */
   virtual ~ReferenceCount()
   {
-    assert(reference_count==0);
+    assert(reference_count==-1);
   }
 };
 
@@ -97,18 +91,31 @@ class Smart
 public:
   ReferenceCountedObject* ptr;
   void incref() const
-    {
-      if (ptr)
-	ptr->incref();
-    }
+  {
+    if (ptr)
+      ptr->incref();
+  }
+  /**
+   * The general idea is to decrease the reference count of the underlying object
+   * in an atomic manner. If the object reaches zero we delete it. With the deletion
+   * there are some tricky semantics involved. For instance, if the object that is
+   * deleted suddenly passes itself to another one then the reference count will be
+   * increased again. However, the object was just being deleted, which means that
+   * it should not be deleted again. There are two possible strategies to use this
+   * file. Either you do care about using an object that is being deleted (leave 
+   * everything as it is, the program will crash when you do so). Or you don't care
+   * about it and really only want one deletion. In that case, uncomment the assert
+   * in the incref method. In both cases, we detect a deletion operation by decreffing
+   * the pointer once more.
+   */
   void decref() const
-    {
-      if (ptr && ptr->decref()==0 && !ptr->deleting)
-	{
-	  ptr->deleting=true;
-	  delete ptr;
-	}
-    }
+  {
+    if (ptr && ptr->decref()==0)
+      {
+	ptr->decref();
+	delete ptr;
+      }
+  }
  public:
   explicit Smart(ReferenceCountedObject* p = 0) : ptr(p)
   {

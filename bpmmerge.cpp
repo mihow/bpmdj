@@ -1,6 +1,8 @@
 /****
  BpmDj v3.6: Free Dj Tools
- Copyright (C) 2001-2007 Werner Van Belle
+ Copyright (C) 2001-2009 Werner Van Belle
+
+ http://bpmdj.yellowcouch.org/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -46,9 +48,9 @@ PlayerConfig * config;      // will be the standard configuration
 /*-------------------------------------------
  *         BpmDj Merger
  *-------------------------------------------*/
-void options_failure(char* err)
+void options_failure(const char* err)
 {
-  printf("BpmDj Merger v%s, Copyright (c) 2001-2007 Werner Van Belle\n",VERSION);
+  printf("BpmDj Merger v%s, Copyright (c) 2001-2009 Werner Van Belle\n",VERSION);
   printf("This software is distributed under the GPL2 license. See copyright.txt\n\n");
   printf("Usage:  bpmmerge <options> [old-song] new-song\n\n"
 	 "  --mix         nbr  how many measures should be used to create the mix\n" 
@@ -93,7 +95,7 @@ void openlog()
   assert(automix_log);
 }
 
-void log_entry(unsigned8 position, char* type, char* text, char* text2 = NULL)
+void log_entry(unsigned8 position, const char* type, const char* text, const char* text2 = NULL)
 {
   position/=4;
   char * tmp = strdup(text);

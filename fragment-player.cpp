@@ -1,6 +1,8 @@
 /****
  BpmDj v3.6: Free Dj Tools
- Copyright (C) 2001-2007 Werner Van Belle
+ Copyright (C) 2001-2009 Werner Van Belle
+
+ http://bpmdj.yellowcouch.org/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -20,6 +22,7 @@
 #define __loaded__fragment_player_cpp__
 using namespace std;
 #line 1 "fragment-player.c++"
+#include "player-core.h"
 #include "fragment-cache.h"
 #include "fragment-player.h"
 #include "player-config.h"
@@ -34,6 +37,7 @@ elementResult ActiveFragmentPlayer::playChunk(int t)
   if (!playing || !dsp || finished || stopped) return Done;
   static const int check_every = 44100/3;
   stereo_sample2 * samples = playing.get_samples();
+  if (!samples) return Done;
   for(int i = check_every; i ; i--)
     {
       dsp->write(samples[curpos++]);
@@ -66,9 +70,16 @@ elementResult ActiveFragmentPlayer::playWave(FragmentInMemory fragment)
 	return Done;
       PlayerConfig player_config(free_slot->getName());
       dsp = dsp_driver::get_driver(&player_config);
-      dsp->open();
-      dsp->start();
-      just_opened=true;
+      if (dsp->open()!=err_none)
+	{
+	  delete dsp;
+	  dsp=NULL;
+	}
+      else
+	{
+	  dsp->start();
+	  just_opened=true;
+	}
     }
   if (!dsp) return Done;
   playing = fragment;

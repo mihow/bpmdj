@@ -1,6 +1,8 @@
 /****
  BpmDj v3.6: Free Dj Tools
- Copyright (C) 2001-2007 Werner Van Belle
+ Copyright (C) 2001-2009 Werner Van Belle
+
+ http://bpmdj.yellowcouch.org/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -95,7 +97,7 @@ stereo_sample2 lfo_difference(stereo_sample2 x);
 stereo_sample2 lfo_revsaw(stereo_sample2 x);
 stereo_sample2 lfo_metronome(stereo_sample2 x);
 typedef stereo_sample2 (*_lfo_)(stereo_sample2 x);
-void  lfo_set(char* name, _lfo_ l, unsigned8 freq, unsigned8 phase);
+void  lfo_set(const char* name, _lfo_ l, unsigned8 freq, unsigned8 phase);
 _lfo_ lfo_get();
 
 typedef struct t_segment {

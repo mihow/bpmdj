@@ -1,6 +1,8 @@
 /****
  BpmDj v3.6: Free Dj Tools
- Copyright (C) 2001-2007 Werner Van Belle
+ Copyright (C) 2001-2009 Werner Van Belle
+
+ http://bpmdj.yellowcouch.org/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -163,6 +165,8 @@ public slots:
   virtual void selectionEditInfo();
   virtual void selectionInsertInAlbum();
   virtual void quitButton();
+  virtual void avoidNoSongs();
+  virtual void avoidSongs();
   
   // color toggles...
   virtual void toggle_temporange();

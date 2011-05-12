@@ -1,6 +1,7 @@
 AR = ar
 bin: $(BIN)
 include .depend
+include defines
 
 %.o: %.cpp
 	@echo "  [cpp] "$@
@@ -77,23 +78,24 @@ analyzers.a: $(ANALYZERS)
 	@echo "   [ar] analyzers.a"
 	@$(AR) r $@ $(ANALYZERS) 2>.ignore
 
-KPLAY_OBJECTS = about.moc.o memory.o power-type.o files.o \
-	player.moc.o player.o constants.o \
+ACTIVE_OBJECTS = ao-scheduler.o lock.o
+KPLAY_OBJECTS = ao-tracker.o about.moc.o memory.o power-type.o files.o \
+	player.moc.o player.o constants.o $(ACTIVE_OBJECTS) \
 	sample4-type.o player-core.o spectrum-type.o \
  	song-information.o song-information.moc.o \
 	pca.o capacity.o index.o bpmplay.o signals.o \
 	player-config.o data.a capacity-checker.o types.o dsp.a \
 	embedded.a efence.o page.o rc-player.o \
-	efence-print.o analyzers.a histogram-type.o common.o scripts.o bpm.o
+	efence-print.o analyzers.a histogram-type.o \
+	common.o scripts.o bpm.o ao-som-beatgraph.o ao-pool.o 
 
 BPM_LIB = bpm.o memory.o	
-BPMCOUNT_OBJECTS = bpmcount.o files.o signals.o bpm.a 
+BPMCOUNT_OBJECTS = bpmcount.o files.o signals.o bpm.a data.a
 
 KCOUNT_OBJECTS = index.o kbpm-count.o \
 	kbpm-count.moc.o scripts.o merger.o
 
 FRAGMENTS = fragment-player.o fragment-cache.o fragment.o fragment-creator.o
-ACTIVE_OBJECTS = ao-scheduler.o lock.o
 KSEL_OBJECTS = ao-tracker.o qstring-factory.o tags.o about.moc.o capacity.o \
 	renamerstart.o renamerstart.moc.o \
 	heap.o pixmap-cache.o song-process.o song-process.moc.o spectrum-type.o \
@@ -112,7 +114,7 @@ KSEL_OBJECTS = ao-tracker.o qstring-factory.o tags.o about.moc.o capacity.o \
 	index-reader.o index.o history.o albumitem.o files.o \
 	bpmdj.o edit-distance.o renamer.o renamer.moc.o \
 	renamer.logic.o renamer.logic.moc.o \
-	config.o common.o \
+	config.o common.o song-copier.o \
 	statistics.o statistics.moc.o song-metric.o \
 	cluster-dialog.o cluster-dialog.moc.o \
 	log-viewer.o log-viewer.moc.o data.a embedded.a ao-pool.o 

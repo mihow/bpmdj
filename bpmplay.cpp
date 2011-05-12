@@ -1,6 +1,8 @@
 /****
  BpmDj v3.6: Free Dj Tools
- Copyright (C) 2001-2007 Werner Van Belle
+ Copyright (C) 2001-2009 Werner Van Belle
+
+ http://bpmdj.yellowcouch.org/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -121,9 +123,9 @@ static int    opt_rythm = 0;
 static int    arg_low = 80;
 static int    arg_high = 160;
 static bool   opt_remote = false;
-static char * arg_remote = "";
+static const char * arg_remote = "";
        bool   opt_setup = false;
-       char * arg_config = "";
+       const char * arg_config = "";
        bool   opt_check = false;
 PlayerConfig* config;
 
@@ -131,32 +133,32 @@ PlayerConfig* config;
  *         Parsing arguments 
  *-------------------------------------------*/
 QApplication *app;
-SongPlayer *player_window;
+Player *player_window;
 
-void options_failure(char* err)
+void options_failure(const char* err)
 {
   QMessageBox::critical(NULL,
 			"Command line arguments",
 			QString(err),
 			QMessageBox::Ok,QMessageBox::NoButton); 
- 
+  
   // print options
   printf("Usage:  bpmplay <options> argument\n\n"
-	 "               --config name         name of the configfile\n"
-	 "   -s          --setup               setup the configuration without opening dsp/playing song\n"
-	 "   -c          --create              create an index file if none exists\n"
-	 "   -q          --quiet               be quiet\n"
-	 "   -m arg      --match arg           song to match tempo with\n"
-	 "               --remote user@host    copy necessary files (requires ssh & scp)\n"
-	 "  --analysis------------------------------------\n"
-	 "   -b          --batch               no ui output, md5sum is automatically checked\n"
-	 "               --bpm [1,2,3,4,5]     measure bpm with specified technique (default = 1)\n"
-	 "   -l nbr      --low nbr             lowest bpm to look for (default = 120)\n"
-	 "   -h nbr      --high nbr            highest bpm to look for (default = 160)\n"
-	 "               --spectrum            obtain color & echo information\n"
-	 "               --rythm               obtain rythm information\n"
-	 "   -e          --energy              measure energy levels\n"
-	 "   argument                          the index file of the song to handle\n\n%s\n\n",err);
+	 "         --config name       name of the configfile\n"
+	 " -s      --setup             setup the configuration without opening dsp/playing song\n"
+	 " -c      --create            create an index file if none exists\n"
+	 " -q      --quiet             be quiet\n"
+	 " -m arg  --match arg         song to match tempo with\n"
+	 "         --remote user@host  copy necessary files (requires ssh & scp)\n"
+	 "--analysis------------------------------------\n"
+	 " -b      --batch             no ui output, md5sum is automatically checked\n"
+	 "         --bpm [1,2,3,4,5]   measure bpm with specified technique (default = 1)\n"
+	 " -l nbr  --low nbr           lowest bpm to look for (default = 120)\n"
+	 " -h nbr  --high nbr          highest bpm to look for (default = 160)\n"
+	 "         --spectrum          obtain color & echo information\n"
+	 "         --rythm             obtain rythm information\n"
+	 " -e      --energy            measure energy levels\n"
+	 " argument                    the index file of the song to handle\n\n%s\n\n",err);
   _exit(1);
 }
 
@@ -207,7 +209,7 @@ void process_options(int argc, char* argv[])
 	    {
 	      opt_remote=true;
 	      arg_str(arg_remote);
-	      argv[i]=argv[i-1]="";
+	      argv[i]=argv[i-1]=(char*)"";
 	    } 
 	  else if (option(arg,"config"))
 	    {
@@ -244,7 +246,7 @@ void process_options(int argc, char* argv[])
 	  else if (option(arg,"match","m"))
 	    { 
 	      opt_match=true;
-	      arg_str(arg_match); 
+	      arg_str(arg_match);
 	    }
 	}
       else
@@ -327,7 +329,7 @@ void setup_start()
 {
   playing = NULL;
   check_capacities();
-  player_window = new SongPlayer();
+  player_window = new Player();
   //app->setMainWidget(player_window);
   player_window->tab->setCurrentPage(TAB_OPTIONS);
   player_window->show();
@@ -346,8 +348,7 @@ void normal_start()
 		 " file\nAn index file can be made with 'bpmplay -c'\n"
 		 "The argument you passed was "+QString(argument)))
     _exit(err);
-  player_window = new SongPlayer();
-  //app->setMainWidget(player_window);
+  player_window = new Player();
   player_window->show();
   config->load_ui_position(player_window);
   app->postEvent(player_window,new InitAndStart());
@@ -375,7 +376,7 @@ void check_start()
       QMessageBox::critical(NULL,a,b,QMessageBox::Ok,0,0);
       _exit(10);
     }
-  player_window = new SongPlayer();
+  player_window = new Player();
   //app->setMainWidget(player_window);
   player_window->showMinimized();
   app->postEvent(player_window,new InitAndStart());
@@ -392,6 +393,11 @@ void batch_start()
   // 0. core init: synchronous without opening dsp
   core_meta_init();
   core_object_init(true);
+  if (!playing) 
+    {
+      Debug("No valid index file given to analyze");
+      return;
+    }
   Info("%d. Wave written: %s",nr++,(const char*)playing->readable_description());
   // 1. md5sum
   if (playing->get_md5sum().isEmpty())
@@ -419,7 +425,11 @@ void batch_start()
   // 3. bpm
   if (opt_bpm)
     {
-      if (playing->get_time_in_seconds()<760)
+      if (playing->get_time_in_seconds()>=760)
+	Info("%d. Bpm count skipped because song is longer than 760s",nr++);
+      else if (playing->get_min()==playing->get_max())
+	Info("%d. Bpm count skipped because song is empty",nr++);
+      else
 	{
 	  BpmAnalyzerDialog *counter = new BpmAnalyzerDialog();
 	  counter->setBpmBounds(arg_low,arg_high);
@@ -430,32 +440,52 @@ void batch_start()
 	  counter->start();
 	  Info("%d. Bpm count: %s",nr++,playing->get_tempo().get_charstr());
 	}
-      else
-	{
-	  Info("%d. Bpm count skipped because song is longer than 760s",nr++);
-	}
     }
+  
   // 4. spectrum
   if (opt_color)
     {
+      Info("%d. Spectrum / Echo",nr++);
       SpectrumAnalyzer *counter = new SpectrumAnalyzer();
       counter->start();
-      Info("%d. Spectrum / Echo",nr++);
     }
   // 5. rythm
   if (opt_rythm)
     {
-      if (playing->get_time_in_seconds()<760)
+      if (playing->get_time_in_seconds()>=760)
+	Info("%d. Rythm analysis skipped because song is longer than 760s",nr++);
+      else if (!playing->get_spectrum())
+	Info("%d. Need spectrum before analyzing rythm",nr++);
+      else 
 	{
 	  RythmAnalyzer *r = new RythmAnalyzer();
 	  r->start();
 	  Info("%d. Rythm",nr++);
 	}
-      else
-	{
-	  Info("%d. Bpm count skipped because song is longer than 760s",nr++);
-	}
     }
+  
+  // 98. Setting tags as necessary (Bug #195)
+  if (playing->get_min()==playing->get_max())
+    {
+      Info("%d. Tagging song as Empty because of no sensible energy levels",nr++);
+      playing->set_tags(playing->get_tags()+" Empty");
+    }
+  if (playing->get_time_in_seconds()>=760)
+    {
+      Info("%d. Tagging song as TooLongToAnalyze because of its length",nr++);
+      playing->set_tags(playing->get_tags()+" TooLongToAnalyze");
+    }
+  if (playing->get_time_in_seconds()>=30*60)
+    {
+      Info("%d. Tagging song as Long since it is longer than 30'",nr++);
+      playing->set_tags(playing->get_tags()+" Long");
+    }
+  if (playing->get_time_in_seconds()<30)
+    {
+      Info("%d. Tagging song as Short since it is shorter than 30\"",nr++);
+      playing->set_tags(playing->get_tags()+" Short");
+    }
+
   // 99. finish the core -> remove the raw file
   core_done();
 }

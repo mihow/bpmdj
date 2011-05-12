@@ -1,10 +1,8 @@
-#ifndef __loaded__data_io_cpp__
-#define __loaded__data_io_cpp__
-using namespace std;
-#line 1 "data-io.c++"
 /****
- Om-Data
- Copyright (C) 2005-2006 Werner Van Belle
+ Borg4 Data Library
+ Copyright (C) 2005-2009 Werner Van Belle
+
+ http://werner.yellowcouch.org/Borg4/group__data.html
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -20,7 +18,10 @@ using namespace std;
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
+#ifndef __loaded__data_io_cpp__
+#define __loaded__data_io_cpp__
+using namespace std;
+#line 1 "data-io.c++"
 #include <sys/mman.h>
 #include <qstring.h>
 #include "symbol.h"
@@ -462,6 +463,13 @@ Data DataTexter::read_file(QString filename)
   return texter.read();
 }
 
+Data DataTexter::read_file(FILE * f)
+{
+   DataTexter texter(f);
+   texter.start_reading();
+   return texter.read();
+}
+
 void DataTexter::write(Data data, QString filename)
 {
   DataTexter dt(filename,"wb");
@@ -489,7 +497,7 @@ void DataTexter::write_fileformat_versionnr()
   fprintf(text,"0x%08x\n",version);
 }
 
-int  DataTexter::read_fileformat_versionnr()
+int DataTexter::read_fileformat_versionnr()
 {
   int version;
   // we read the characters one by one
@@ -679,7 +687,7 @@ Data DataBinner::read_array()
   unsigned1 dimension;
   read_internal(dimension);         // B
   int T = read_typenr();            // C
-  char * type = NULL;
+  const char * type = NULL;
   switch(T)
     {
     case type_data : type = "Data"; break;
@@ -698,7 +706,7 @@ Data DataBinner::read_array()
       assert(0);
     }
 #define ARRAY_TYPE(D,T) \
-if (D==dimension && type==#T) return read_array_internal<D,T>();
+if (D==dimension && strcmp(type,#T)==0) return read_array_internal<D,T>();
   ARRAY_TYPES
 #undef ARRAY_TYPE
   assert(0);
@@ -738,9 +746,19 @@ void DataBinner::write_internal(Data data)
   write(data);   // A
 };
 
+void DataBinner::write_internal(String data)
+{
+  write(data);   // A
+};
+
 void DataBinner::read_internal(Data &data)
 {
   read_into(data); // B
+}
+
+void DataBinner::read_internal(String &data)
+{    
+   data=read_string(); // B
 }
 
 void DataBinner::read_into(Data & result)

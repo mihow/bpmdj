@@ -1,6 +1,8 @@
 /****
  BpmDj v3.6: Free Dj Tools
- Copyright (C) 2001-2007 Werner Van Belle
+ Copyright (C) 2001-2009 Werner Van Belle
+
+ http://bpmdj.yellowcouch.org/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -473,7 +475,7 @@ ITERATE_OVER(song)
   
   // 6b - perform PCA
   printf("Performing PCA\n");
-  char * err = NULL;
+  const char * err = NULL;
   do_pca(nr_colors,vec_size/8,pca_in_out,err);
   if (err) printf("Error %s\n",err);
   

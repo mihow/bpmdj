@@ -17,7 +17,7 @@ DO      = ${shell ls *.do  2>/dev/null | grep -v .*\.L.c++ 2>/dev/null}
 
 %.h: %.do doc
 	@echo "  [doc] "$@
-	@./doc $< $@
+	@./doc --noaccess $< $@
 
 # The .h and .cpp sources are generated from corresponding .h++ and .c++ 
 # sources. This allows us to automatically prefix a copyright header, 

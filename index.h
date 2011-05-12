@@ -1,6 +1,8 @@
 /****
  BpmDj v3.6: Free Dj Tools
- Copyright (C) 2001-2007 Werner Van Belle
+ Copyright (C) 2001-2009 Werner Van Belle
+
+ http://bpmdj.yellowcouch.org/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -34,11 +36,23 @@ using namespace std;
 /*-------------------------------------------
  *          Album Objects
  *-------------------------------------------*/
+class DataError
+{
+public:
+  string msg;
+  DataError(string s): msg(s)
+  {
+  };
+};
+
+/*-------------------------------------------
+ *          Album Objects
+ *-------------------------------------------*/
 class AlbumField
 {
  public:
   QString name;    // name of the album
-  int    nr;      // position of the song on the album (-1 if no album is known)
+  int     nr;      // position of the song on the album (-1 if no album is known)
   AlbumField(int, QString);
   AlbumField(Data &data)
     {

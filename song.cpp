@@ -1,6 +1,8 @@
 /****
  BpmDj v3.6: Free Dj Tools
- Copyright (C) 2001-2007 Werner Van Belle
+ Copyright (C) 2001-2009 Werner Van Belle
+
+ http://bpmdj.yellowcouch.org/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -34,7 +36,7 @@ using namespace std;
 #include "composition-property.h"
 #include "tags.h"
 #include "memory.h"
-#include "song-statistics.h"
+#include "statistics.h"
 #include "song-metric.h"
 #include "song.h"
 #include "qstring-factory.h"
@@ -273,7 +275,19 @@ bool Song::get_distance_to_main(float limit)
   set_color_distance(2);
   if (get_spectrum()!=no_spectrum)
     if (::main_song)
-      set_color_distance(SongMetriek::std.distance(*this, *::main_song,limit));
+      {
+	if (songs_to_avoid.size())
+	  {
+	    int s = songs_to_avoid.size();
+	    double d = SongMetriek::std.distance(*this, *::main_song,2);
+	    for(int i = 0 ; i < s ; i++)
+	      d+=1.0-SongMetriek::std.distance(*this, *songs_to_avoid[i],2);
+	    d/=s+1.0;
+	    set_color_distance(d);
+	  }
+	else
+	  set_color_distance(SongMetriek::std.distance(*this, *::main_song,limit));
+      }
   if (get_color_distance()>1.0)
     set_distance_string(QString::null);
   else

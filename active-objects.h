@@ -1,6 +1,8 @@
 /****
- Borg IV
- Copyright (C) 2006-2007 Werner Van Belle
+ Borg 4 Active Objects
+ Copyright (C) 2006-2009 Werner Van Belle
+
+ http://werner.yellowcouch.org/Borg4/group__ao.html
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,7 +18,6 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
 #ifndef __loaded__active_objects_h__
 #define __loaded__active_objects_h__
 using namespace std;
@@ -288,15 +289,19 @@ private:
   /**
    * True when we requested the creation of a thread. This flag should
    * only be update when the @ref updating_state lock has been acquired.
+   * We make this variable volatile so that a previous read does not pass over
+   * the acquisition of @updating_state
    */
-  bool active;
+  volatile bool active;
   /**
    * True when we _would_ have asked the creation of a thread, but 
    * we already did so. See activate() for more details on this.
    * This flag should
    * only be update when the @ref updating_state lock has been acquired.
+   * We make this variable volatile so that a previous read does not pass over
+   * the acquisition of @updating_state
    */
-  bool changed;
+  volatile bool changed;
   /**
    * The activation of the queues is a rather complicated
    * manner. We have two locks involved. The first ist the
@@ -467,7 +472,8 @@ protected:
 	default:
 	  assert(0);
 	}
-      return !handling.empty();
+      bool t=!handling.empty();
+      return t;
     }
   /**
    * The standard queue handler (handle()), looks at each element in turn

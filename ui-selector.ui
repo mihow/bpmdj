@@ -5,7 +5,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>823</width>
+    <width>511</width>
     <height>531</height>
    </rect>
   </property>
@@ -14,6 +14,18 @@
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
+  </property>
+  <property name="minimumSize" >
+   <size>
+    <width>0</width>
+    <height>531</height>
+   </size>
+  </property>
+  <property name="maximumSize" >
+   <size>
+    <width>16777215</width>
+    <height>16777215</height>
+   </size>
   </property>
   <property name="windowTitle" >
    <string>BpmDj Song Selector</string>
@@ -25,16 +37,7 @@
    <property name="spacing" >
     <number>3</number>
    </property>
-   <property name="leftMargin" >
-    <number>5</number>
-   </property>
-   <property name="topMargin" >
-    <number>5</number>
-   </property>
-   <property name="rightMargin" >
-    <number>5</number>
-   </property>
-   <property name="bottomMargin" >
+   <property name="margin" >
     <number>5</number>
    </property>
    <item>
@@ -42,21 +45,12 @@
      <property name="orientation" >
       <enum>Qt::Vertical</enum>
      </property>
-     <widget class="QWidget" name="layoutWidget" >
+     <widget class="QWidget" name="layoutWidget1" >
       <layout class="QHBoxLayout" >
        <property name="spacing" >
         <number>2</number>
        </property>
-       <property name="leftMargin" >
-        <number>0</number>
-       </property>
-       <property name="topMargin" >
-        <number>0</number>
-       </property>
-       <property name="rightMargin" >
-        <number>0</number>
-       </property>
-       <property name="bottomMargin" >
+       <property name="margin" >
         <number>0</number>
        </property>
        <item>
@@ -95,140 +89,26 @@
          <property name="frameShadow" >
           <enum>QFrame::Raised</enum>
          </property>
-         <layout class="QGridLayout" >
-          <property name="leftMargin" >
-           <number>0</number>
-          </property>
-          <property name="topMargin" >
-           <number>0</number>
-          </property>
-          <property name="rightMargin" >
-           <number>0</number>
-          </property>
-          <property name="bottomMargin" >
-           <number>0</number>
-          </property>
-          <property name="horizontalSpacing" >
-           <number>0</number>
-          </property>
-          <property name="verticalSpacing" >
+         <layout class="QGridLayout" name="gridLayout_4" >
+          <property name="margin" >
            <number>0</number>
           </property>
           <item row="0" column="0" >
-           <layout class="QVBoxLayout" >
-            <property name="spacing" >
-             <number>0</number>
-            </property>
-            <property name="leftMargin" >
-             <number>0</number>
-            </property>
-            <property name="topMargin" >
-             <number>0</number>
-            </property>
-            <property name="rightMargin" >
-             <number>0</number>
-            </property>
-            <property name="bottomMargin" >
-             <number>0</number>
-            </property>
-           </layout>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QFrame" name="analLayout1" >
-         <property name="frameShape" >
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-         <property name="frameShadow" >
-          <enum>QFrame::Raised</enum>
-         </property>
-         <layout class="QGridLayout" >
-          <property name="leftMargin" >
-           <number>0</number>
-          </property>
-          <property name="topMargin" >
-           <number>0</number>
-          </property>
-          <property name="rightMargin" >
-           <number>0</number>
-          </property>
-          <property name="bottomMargin" >
-           <number>0</number>
-          </property>
-          <property name="horizontalSpacing" >
-           <number>0</number>
-          </property>
-          <property name="verticalSpacing" >
-           <number>0</number>
-          </property>
-          <item row="0" column="0" >
-           <layout class="QVBoxLayout" >
-            <property name="spacing" >
-             <number>0</number>
-            </property>
-            <property name="leftMargin" >
-             <number>0</number>
-            </property>
-            <property name="topMargin" >
-             <number>0</number>
-            </property>
-            <property name="rightMargin" >
-             <number>0</number>
-            </property>
-            <property name="bottomMargin" >
-             <number>0</number>
-            </property>
-           </layout>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QFrame" name="analLayout2" >
-         <property name="frameShape" >
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-         <property name="frameShadow" >
-          <enum>QFrame::Raised</enum>
-         </property>
-         <layout class="QGridLayout" >
-          <property name="leftMargin" >
-           <number>0</number>
-          </property>
-          <property name="topMargin" >
-           <number>0</number>
-          </property>
-          <property name="rightMargin" >
-           <number>0</number>
-          </property>
-          <property name="bottomMargin" >
-           <number>0</number>
-          </property>
-          <property name="horizontalSpacing" >
-           <number>0</number>
-          </property>
-          <property name="verticalSpacing" >
-           <number>0</number>
-          </property>
-          <item row="0" column="0" >
-           <layout class="QVBoxLayout" >
-            <property name="spacing" >
-             <number>0</number>
-            </property>
-            <property name="leftMargin" >
-             <number>0</number>
-            </property>
-            <property name="topMargin" >
-             <number>0</number>
-            </property>
-            <property name="rightMargin" >
-             <number>0</number>
-            </property>
-            <property name="bottomMargin" >
-             <number>0</number>
-            </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_3" >
+            <item>
+             <layout class="QVBoxLayout" name="playersLeft" >
+              <property name="spacing" >
+               <number>0</number>
+              </property>
+             </layout>
+            </item>
+            <item>
+             <layout class="QVBoxLayout" name="playersRight" >
+              <property name="spacing" >
+               <number>0</number>
+              </property>
+             </layout>
+            </item>
            </layout>
           </item>
          </layout>
@@ -236,21 +116,12 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="layoutWidget" >
+     <widget class="QWidget" name="layoutWidget2" >
       <layout class="QVBoxLayout" >
        <property name="spacing" >
         <number>6</number>
        </property>
-       <property name="leftMargin" >
-        <number>0</number>
-       </property>
-       <property name="topMargin" >
-        <number>0</number>
-       </property>
-       <property name="rightMargin" >
-        <number>0</number>
-       </property>
-       <property name="bottomMargin" >
+       <property name="margin" >
         <number>0</number>
        </property>
        <item>
@@ -261,27 +132,15 @@
          <property name="currentIndex" >
           <number>0</number>
          </property>
-         <widget class="QWidget" name="tab" >
+         <widget class="QWidget" name="tab1" >
           <attribute name="title" >
            <string>Songs</string>
           </attribute>
           <layout class="QGridLayout" >
-           <property name="leftMargin" >
+           <property name="margin" >
             <number>0</number>
            </property>
-           <property name="topMargin" >
-            <number>0</number>
-           </property>
-           <property name="rightMargin" >
-            <number>0</number>
-           </property>
-           <property name="bottomMargin" >
-            <number>0</number>
-           </property>
-           <property name="horizontalSpacing" >
-            <number>6</number>
-           </property>
-           <property name="verticalSpacing" >
+           <property name="spacing" >
             <number>6</number>
            </property>
            <item row="1" column="1" >
@@ -302,7 +161,7 @@
              <property name="sizeType" >
               <enum>QSizePolicy::Expanding</enum>
              </property>
-             <property name="sizeHint" >
+             <property name="sizeHint" stdset="0" >
               <size>
                <width>430</width>
                <height>20</height>
@@ -325,27 +184,15 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="TabPage" >
+         <widget class="QWidget" name="TabPage1" >
           <attribute name="title" >
            <string>Albums</string>
           </attribute>
           <layout class="QGridLayout" >
-           <property name="leftMargin" >
+           <property name="margin" >
             <number>0</number>
            </property>
-           <property name="topMargin" >
-            <number>0</number>
-           </property>
-           <property name="rightMargin" >
-            <number>0</number>
-           </property>
-           <property name="bottomMargin" >
-            <number>0</number>
-           </property>
-           <property name="horizontalSpacing" >
-            <number>6</number>
-           </property>
-           <property name="verticalSpacing" >
+           <property name="spacing" >
             <number>6</number>
            </property>
            <item row="0" column="0" >
@@ -366,30 +213,66 @@
               <property name="text" >
                <string>Album</string>
               </property>
+              <property name="clickable" >
+               <bool>true</bool>
+              </property>
+              <property name="resizable" >
+               <bool>true</bool>
+              </property>
              </column>
              <column>
               <property name="text" >
                <string>Title</string>
+              </property>
+              <property name="clickable" >
+               <bool>true</bool>
+              </property>
+              <property name="resizable" >
+               <bool>true</bool>
               </property>
              </column>
              <column>
               <property name="text" >
                <string>Author</string>
               </property>
+              <property name="clickable" >
+               <bool>true</bool>
+              </property>
+              <property name="resizable" >
+               <bool>true</bool>
+              </property>
              </column>
              <column>
               <property name="text" >
                <string>Time</string>
+              </property>
+              <property name="clickable" >
+               <bool>true</bool>
+              </property>
+              <property name="resizable" >
+               <bool>true</bool>
               </property>
              </column>
              <column>
               <property name="text" >
                <string>Index</string>
               </property>
+              <property name="clickable" >
+               <bool>true</bool>
+              </property>
+              <property name="resizable" >
+               <bool>true</bool>
+              </property>
              </column>
              <column>
               <property name="text" >
                <string>File</string>
+              </property>
+              <property name="clickable" >
+               <bool>true</bool>
+              </property>
+              <property name="resizable" >
+               <bool>true</bool>
               </property>
              </column>
             </widget>
@@ -411,22 +294,10 @@
            <string>Tags</string>
           </attribute>
           <layout class="QGridLayout" >
-           <property name="leftMargin" >
+           <property name="margin" >
             <number>0</number>
            </property>
-           <property name="topMargin" >
-            <number>0</number>
-           </property>
-           <property name="rightMargin" >
-            <number>0</number>
-           </property>
-           <property name="bottomMargin" >
-            <number>0</number>
-           </property>
-           <property name="horizontalSpacing" >
-            <number>6</number>
-           </property>
-           <property name="verticalSpacing" >
+           <property name="spacing" >
             <number>6</number>
            </property>
            <item row="0" column="0" >
@@ -441,47 +312,59 @@
               <property name="text" >
                <string>Tag</string>
               </property>
+              <property name="clickable" >
+               <bool>true</bool>
+              </property>
+              <property name="resizable" >
+               <bool>true</bool>
+              </property>
              </column>
              <column>
               <property name="text" >
                <string>Include</string>
+              </property>
+              <property name="clickable" >
+               <bool>true</bool>
+              </property>
+              <property name="resizable" >
+               <bool>true</bool>
               </property>
              </column>
              <column>
               <property name="text" >
                <string>Must Be Present</string>
               </property>
+              <property name="clickable" >
+               <bool>true</bool>
+              </property>
+              <property name="resizable" >
+               <bool>true</bool>
+              </property>
              </column>
              <column>
               <property name="text" >
                <string>Exclude</string>
+              </property>
+              <property name="clickable" >
+               <bool>true</bool>
+              </property>
+              <property name="resizable" >
+               <bool>true</bool>
               </property>
              </column>
             </widget>
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="tab" >
+         <widget class="QWidget" name="tab2" >
           <attribute name="title" >
            <string>Queue</string>
           </attribute>
           <layout class="QGridLayout" >
-           <property name="leftMargin" >
+           <property name="margin" >
             <number>0</number>
            </property>
-           <property name="topMargin" >
-            <number>0</number>
-           </property>
-           <property name="rightMargin" >
-            <number>0</number>
-           </property>
-           <property name="bottomMargin" >
-            <number>0</number>
-           </property>
-           <property name="horizontalSpacing" >
-            <number>6</number>
-           </property>
-           <property name="verticalSpacing" >
+           <property name="spacing" >
             <number>6</number>
            </property>
            <item row="0" column="0" colspan="3" >
@@ -517,70 +400,154 @@
               <property name="text" >
                <string>Nr°</string>
               </property>
+              <property name="clickable" >
+               <bool>true</bool>
+              </property>
+              <property name="resizable" >
+               <bool>true</bool>
+              </property>
              </column>
              <column>
               <property name="text" >
                <string>Match</string>
+              </property>
+              <property name="clickable" >
+               <bool>true</bool>
+              </property>
+              <property name="resizable" >
+               <bool>true</bool>
               </property>
              </column>
              <column>
               <property name="text" >
                <string>Tempo</string>
               </property>
+              <property name="clickable" >
+               <bool>true</bool>
+              </property>
+              <property name="resizable" >
+               <bool>true</bool>
+              </property>
              </column>
              <column>
               <property name="text" >
                <string>Spectrum</string>
+              </property>
+              <property name="clickable" >
+               <bool>true</bool>
+              </property>
+              <property name="resizable" >
+               <bool>true</bool>
               </property>
              </column>
              <column>
               <property name="text" >
                <string>Time</string>
               </property>
+              <property name="clickable" >
+               <bool>true</bool>
+              </property>
+              <property name="resizable" >
+               <bool>true</bool>
+              </property>
              </column>
              <column>
               <property name="text" >
                <string>Cues</string>
+              </property>
+              <property name="clickable" >
+               <bool>true</bool>
+              </property>
+              <property name="resizable" >
+               <bool>true</bool>
               </property>
              </column>
              <column>
               <property name="text" >
                <string>Title</string>
               </property>
+              <property name="clickable" >
+               <bool>true</bool>
+              </property>
+              <property name="resizable" >
+               <bool>true</bool>
+              </property>
              </column>
              <column>
               <property name="text" >
                <string>Author</string>
+              </property>
+              <property name="clickable" >
+               <bool>true</bool>
+              </property>
+              <property name="resizable" >
+               <bool>true</bool>
               </property>
              </column>
              <column>
               <property name="text" >
                <string>Version</string>
               </property>
+              <property name="clickable" >
+               <bool>true</bool>
+              </property>
+              <property name="resizable" >
+               <bool>true</bool>
+              </property>
              </column>
              <column>
               <property name="text" >
                <string>Tags</string>
+              </property>
+              <property name="clickable" >
+               <bool>true</bool>
+              </property>
+              <property name="resizable" >
+               <bool>true</bool>
               </property>
              </column>
              <column>
               <property name="text" >
                <string>OnDisk</string>
               </property>
+              <property name="clickable" >
+               <bool>true</bool>
+              </property>
+              <property name="resizable" >
+               <bool>true</bool>
+              </property>
              </column>
              <column>
               <property name="text" >
                <string>Index</string>
+              </property>
+              <property name="clickable" >
+               <bool>true</bool>
+              </property>
+              <property name="resizable" >
+               <bool>true</bool>
               </property>
              </column>
              <column>
               <property name="text" >
                <string>Md5</string>
               </property>
+              <property name="clickable" >
+               <bool>true</bool>
+              </property>
+              <property name="resizable" >
+               <bool>true</bool>
+              </property>
              </column>
              <column>
               <property name="text" >
                <string>Filename on disk</string>
+              </property>
+              <property name="clickable" >
+               <bool>true</bool>
+              </property>
+              <property name="resizable" >
+               <bool>true</bool>
               </property>
              </column>
             </widget>
@@ -613,7 +580,7 @@
              <property name="sizeType" >
               <enum>QSizePolicy::Expanding</enum>
              </property>
-             <property name="sizeHint" >
+             <property name="sizeHint" stdset="0" >
               <size>
                <width>40</width>
                <height>20</height>
@@ -629,7 +596,7 @@
              <property name="sizeType" >
               <enum>QSizePolicy::Expanding</enum>
              </property>
-             <property name="sizeHint" >
+             <property name="sizeHint" stdset="0" >
               <size>
                <width>140</width>
                <height>20</height>
@@ -649,27 +616,15 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="TabPage" >
+         <widget class="QWidget" name="TabPage2" >
           <attribute name="title" >
            <string>History</string>
           </attribute>
           <layout class="QGridLayout" >
-           <property name="leftMargin" >
+           <property name="margin" >
             <number>0</number>
            </property>
-           <property name="topMargin" >
-            <number>0</number>
-           </property>
-           <property name="rightMargin" >
-            <number>0</number>
-           </property>
-           <property name="bottomMargin" >
-            <number>0</number>
-           </property>
-           <property name="horizontalSpacing" >
-            <number>6</number>
-           </property>
-           <property name="verticalSpacing" >
+           <property name="spacing" >
             <number>6</number>
            </property>
            <item row="0" column="0" colspan="3" >
@@ -687,60 +642,132 @@
               <property name="text" >
                <string>Rel</string>
               </property>
+              <property name="clickable" >
+               <bool>true</bool>
+              </property>
+              <property name="resizable" >
+               <bool>true</bool>
+              </property>
              </column>
              <column>
               <property name="text" >
                <string>Comments</string>
+              </property>
+              <property name="clickable" >
+               <bool>true</bool>
+              </property>
+              <property name="resizable" >
+               <bool>true</bool>
               </property>
              </column>
              <column>
               <property name="text" >
                <string>Tempo</string>
               </property>
+              <property name="clickable" >
+               <bool>true</bool>
+              </property>
+              <property name="resizable" >
+               <bool>true</bool>
+              </property>
              </column>
              <column>
               <property name="text" >
                <string>Spectrum</string>
+              </property>
+              <property name="clickable" >
+               <bool>true</bool>
+              </property>
+              <property name="resizable" >
+               <bool>true</bool>
               </property>
              </column>
              <column>
               <property name="text" >
                <string>Color</string>
               </property>
+              <property name="clickable" >
+               <bool>true</bool>
+              </property>
+              <property name="resizable" >
+               <bool>true</bool>
+              </property>
              </column>
              <column>
               <property name="text" >
                <string>Time</string>
+              </property>
+              <property name="clickable" >
+               <bool>true</bool>
+              </property>
+              <property name="resizable" >
+               <bool>true</bool>
               </property>
              </column>
              <column>
               <property name="text" >
                <string>Cues</string>
               </property>
+              <property name="clickable" >
+               <bool>true</bool>
+              </property>
+              <property name="resizable" >
+               <bool>true</bool>
+              </property>
              </column>
              <column>
               <property name="text" >
                <string>Title</string>
+              </property>
+              <property name="clickable" >
+               <bool>true</bool>
+              </property>
+              <property name="resizable" >
+               <bool>true</bool>
               </property>
              </column>
              <column>
               <property name="text" >
                <string>Author</string>
               </property>
+              <property name="clickable" >
+               <bool>true</bool>
+              </property>
+              <property name="resizable" >
+               <bool>true</bool>
+              </property>
              </column>
              <column>
               <property name="text" >
                <string>Version</string>
+              </property>
+              <property name="clickable" >
+               <bool>true</bool>
+              </property>
+              <property name="resizable" >
+               <bool>true</bool>
               </property>
              </column>
              <column>
               <property name="text" >
                <string>Tags</string>
               </property>
+              <property name="clickable" >
+               <bool>true</bool>
+              </property>
+              <property name="resizable" >
+               <bool>true</bool>
+              </property>
              </column>
              <column>
               <property name="text" >
                <string>Ondisk</string>
+              </property>
+              <property name="clickable" >
+               <bool>true</bool>
+              </property>
+              <property name="resizable" >
+               <bool>true</bool>
               </property>
              </column>
             </widget>
@@ -767,7 +794,7 @@
              <property name="sizeType" >
               <enum>QSizePolicy::Expanding</enum>
              </property>
-             <property name="sizeHint" >
+             <property name="sizeHint" stdset="0" >
               <size>
                <width>500</width>
                <height>20</height>
@@ -787,247 +814,369 @@
               <property name="text" >
                <string>Nr</string>
               </property>
+              <property name="clickable" >
+               <bool>true</bool>
+              </property>
+              <property name="resizable" >
+               <bool>true</bool>
+              </property>
              </column>
              <column>
               <property name="text" >
                <string>Title</string>
               </property>
+              <property name="clickable" >
+               <bool>true</bool>
+              </property>
+              <property name="resizable" >
+               <bool>true</bool>
+              </property>
              </column>
              <column>
               <property name="text" >
                <string>Author</string>
+              </property>
+              <property name="clickable" >
+               <bool>true</bool>
+              </property>
+              <property name="resizable" >
+               <bool>true</bool>
               </property>
              </column>
             </widget>
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="TabPage" >
+         <widget class="QWidget" name="TabPage3" >
           <attribute name="title" >
            <string>Analysis</string>
           </attribute>
-          <layout class="QGridLayout" >
-           <property name="leftMargin" >
-            <number>0</number>
-           </property>
-           <property name="topMargin" >
-            <number>0</number>
-           </property>
-           <property name="rightMargin" >
-            <number>0</number>
-           </property>
-           <property name="bottomMargin" >
-            <number>0</number>
-           </property>
-           <property name="horizontalSpacing" >
-            <number>6</number>
-           </property>
-           <property name="verticalSpacing" >
-            <number>6</number>
-           </property>
-           <item row="0" column="0" colspan="9" >
-            <widget class="Q3ListView" name="anal_queue" >
-             <property name="sizePolicy" >
-              <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="autoFillBackground" >
-              <bool>true</bool>
-             </property>
-             <property name="frameShape" >
-              <enum>QFrame::Panel</enum>
-             </property>
-             <property name="resizePolicy" >
-              <enum>Q3ScrollView::Manual</enum>
-             </property>
-             <property name="selectionMode" >
-              <enum>Q3ListView::Extended</enum>
-             </property>
-             <property name="allColumnsShowFocus" >
-              <bool>true</bool>
-             </property>
-             <property name="showSortIndicator" >
-              <bool>true</bool>
-             </property>
-             <property name="rootIsDecorated" >
-              <bool>false</bool>
-             </property>
-             <column>
-              <property name="text" >
-               <string>Title</string>
-              </property>
-             </column>
-             <column>
-              <property name="text" >
-               <string>Author</string>
-              </property>
-             </column>
-             <column>
-              <property name="text" >
-               <string>RMS</string>
-              </property>
-             </column>
-             <column>
-              <property name="text" >
-               <string>Spectrum</string>
-              </property>
-             </column>
-             <column>
-              <property name="text" >
-               <string>Echo</string>
-              </property>
-             </column>
-             <column>
-              <property name="text" >
-               <string>Tempo</string>
-              </property>
-             </column>
-             <column>
-              <property name="text" >
-               <string>Rhythm</string>
-              </property>
-             </column>
-             <column>
-              <property name="text" >
-               <string>Composition</string>
-              </property>
-             </column>
-             <column>
-              <property name="text" >
-               <string>Index</string>
-              </property>
-             </column>
-            </widget>
-           </item>
-           <item row="1" column="4" >
-            <widget class="QLabel" name="textLabel2_2" >
-             <property name="font" >
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="text" >
-              <string>hours</string>
-             </property>
-             <property name="wordWrap" >
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="6" >
-            <widget class="QLabel" name="textLabel3_2" >
-             <property name="font" >
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="text" >
-              <string>minutes</string>
-             </property>
-             <property name="wordWrap" >
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="8" >
-            <widget class="QLabel" name="textLabel4_2" >
-             <property name="font" >
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="text" >
-              <string>seconds remaining</string>
-             </property>
-             <property name="wordWrap" >
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="2" >
-            <widget class="QLabel" name="textLabel1_5" >
-             <property name="font" >
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="text" >
-              <string>days</string>
-             </property>
-             <property name="wordWrap" >
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="5" >
-            <widget class="QLCDNumber" name="eta_minutes" >
-             <property name="sizePolicy" >
-              <sizepolicy vsizetype="Maximum" hsizetype="Minimum" >
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="numDigits" >
-              <number>2</number>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="7" >
-            <widget class="QLCDNumber" name="eta_seconds" >
-             <property name="sizePolicy" >
-              <sizepolicy vsizetype="Maximum" hsizetype="Minimum" >
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="numDigits" >
-              <number>2</number>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="3" >
-            <widget class="QLCDNumber" name="eta_hours" >
-             <property name="sizePolicy" >
-              <sizepolicy vsizetype="Maximum" hsizetype="Minimum" >
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="numDigits" >
-              <number>2</number>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1" >
-            <widget class="QLCDNumber" name="eta_days" >
-             <property name="sizePolicy" >
-              <sizepolicy vsizetype="Maximum" hsizetype="Minimum" >
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="numDigits" >
-              <number>3</number>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0" >
-            <spacer>
-             <property name="orientation" >
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeType" >
-              <enum>QSizePolicy::Expanding</enum>
-             </property>
-             <property name="sizeHint" >
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
+          <layout class="QGridLayout" name="gridLayout_3" >
+           <item row="0" column="0" >
+            <layout class="QVBoxLayout" name="verticalLayout_3" >
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout" >
+               <item>
+                <widget class="QFrame" name="analLayout1" >
+                 <property name="maximumSize" >
+                  <size>
+                   <width>16777215</width>
+                   <height>199</height>
+                  </size>
+                 </property>
+                 <property name="frameShape" >
+                  <enum>QFrame::StyledPanel</enum>
+                 </property>
+                 <property name="frameShadow" >
+                  <enum>QFrame::Raised</enum>
+                 </property>
+                 <layout class="QGridLayout" name="gridLayout_a" >
+                  <property name="margin" >
+                   <number>0</number>
+                  </property>
+                  <property name="spacing" >
+                   <number>0</number>
+                  </property>
+                  <item row="0" column="0" >
+                   <layout class="QVBoxLayout" name="verticalLayout" >
+                    <property name="spacing" >
+                     <number>0</number>
+                    </property>
+                   </layout>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QFrame" name="analLayout2" >
+                 <property name="frameShape" >
+                  <enum>QFrame::StyledPanel</enum>
+                 </property>
+                 <property name="frameShadow" >
+                  <enum>QFrame::Raised</enum>
+                 </property>
+                 <layout class="QGridLayout" name="gridLayout_2" >
+                  <property name="margin" >
+                   <number>0</number>
+                  </property>
+                  <property name="spacing" >
+                   <number>0</number>
+                  </property>
+                  <item row="0" column="0" >
+                   <layout class="QVBoxLayout" name="verticalLayout_2" >
+                    <property name="spacing" >
+                     <number>0</number>
+                    </property>
+                   </layout>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <widget class="Q3ListView" name="anal_queue" >
+               <property name="sizePolicy" >
+                <sizepolicy vsizetype="MinimumExpanding" hsizetype="Preferred" >
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="autoFillBackground" >
+                <bool>true</bool>
+               </property>
+               <property name="frameShape" >
+                <enum>QFrame::Panel</enum>
+               </property>
+               <property name="resizePolicy" >
+                <enum>Q3ScrollView::Manual</enum>
+               </property>
+               <property name="selectionMode" >
+                <enum>Q3ListView::Extended</enum>
+               </property>
+               <property name="allColumnsShowFocus" >
+                <bool>true</bool>
+               </property>
+               <property name="showSortIndicator" >
+                <bool>true</bool>
+               </property>
+               <property name="rootIsDecorated" >
+                <bool>false</bool>
+               </property>
+               <column>
+                <property name="text" >
+                 <string>Title</string>
+                </property>
+                <property name="clickable" >
+                 <bool>true</bool>
+                </property>
+                <property name="resizable" >
+                 <bool>true</bool>
+                </property>
+               </column>
+               <column>
+                <property name="text" >
+                 <string>Author</string>
+                </property>
+                <property name="clickable" >
+                 <bool>true</bool>
+                </property>
+                <property name="resizable" >
+                 <bool>true</bool>
+                </property>
+               </column>
+               <column>
+                <property name="text" >
+                 <string>RMS</string>
+                </property>
+                <property name="clickable" >
+                 <bool>true</bool>
+                </property>
+                <property name="resizable" >
+                 <bool>true</bool>
+                </property>
+               </column>
+               <column>
+                <property name="text" >
+                 <string>Spectrum</string>
+                </property>
+                <property name="clickable" >
+                 <bool>true</bool>
+                </property>
+                <property name="resizable" >
+                 <bool>true</bool>
+                </property>
+               </column>
+               <column>
+                <property name="text" >
+                 <string>Echo</string>
+                </property>
+                <property name="clickable" >
+                 <bool>true</bool>
+                </property>
+                <property name="resizable" >
+                 <bool>true</bool>
+                </property>
+               </column>
+               <column>
+                <property name="text" >
+                 <string>Tempo</string>
+                </property>
+                <property name="clickable" >
+                 <bool>true</bool>
+                </property>
+                <property name="resizable" >
+                 <bool>true</bool>
+                </property>
+               </column>
+               <column>
+                <property name="text" >
+                 <string>Rhythm</string>
+                </property>
+                <property name="clickable" >
+                 <bool>true</bool>
+                </property>
+                <property name="resizable" >
+                 <bool>true</bool>
+                </property>
+               </column>
+               <column>
+                <property name="text" >
+                 <string>Composition</string>
+                </property>
+                <property name="clickable" >
+                 <bool>true</bool>
+                </property>
+                <property name="resizable" >
+                 <bool>true</bool>
+                </property>
+               </column>
+               <column>
+                <property name="text" >
+                 <string>Index</string>
+                </property>
+                <property name="clickable" >
+                 <bool>true</bool>
+                </property>
+                <property name="resizable" >
+                 <bool>true</bool>
+                </property>
+               </column>
+              </widget>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_2" >
+               <item>
+                <spacer>
+                 <property name="orientation" >
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeType" >
+                  <enum>QSizePolicy::Expanding</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0" >
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QLCDNumber" name="eta_days" >
+                 <property name="sizePolicy" >
+                  <sizepolicy vsizetype="Maximum" hsizetype="Minimum" >
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="numDigits" >
+                  <number>3</number>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="textLabel1_5" >
+                 <property name="font" >
+                  <font>
+                   <pointsize>10</pointsize>
+                  </font>
+                 </property>
+                 <property name="text" >
+                  <string>days</string>
+                 </property>
+                 <property name="wordWrap" >
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLCDNumber" name="eta_hours" >
+                 <property name="sizePolicy" >
+                  <sizepolicy vsizetype="Maximum" hsizetype="Minimum" >
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="numDigits" >
+                  <number>2</number>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="textLabel2_2" >
+                 <property name="font" >
+                  <font>
+                   <pointsize>10</pointsize>
+                  </font>
+                 </property>
+                 <property name="text" >
+                  <string>hours</string>
+                 </property>
+                 <property name="wordWrap" >
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLCDNumber" name="eta_minutes" >
+                 <property name="sizePolicy" >
+                  <sizepolicy vsizetype="Maximum" hsizetype="Minimum" >
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="numDigits" >
+                  <number>2</number>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="textLabel3_2" >
+                 <property name="font" >
+                  <font>
+                   <pointsize>10</pointsize>
+                  </font>
+                 </property>
+                 <property name="text" >
+                  <string>minutes</string>
+                 </property>
+                 <property name="wordWrap" >
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLCDNumber" name="eta_seconds" >
+                 <property name="sizePolicy" >
+                  <sizepolicy vsizetype="Maximum" hsizetype="Minimum" >
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="numDigits" >
+                  <number>2</number>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="textLabel4_2" >
+                 <property name="font" >
+                  <font>
+                   <pointsize>10</pointsize>
+                  </font>
+                 </property>
+                 <property name="text" >
+                  <string>seconds remaining</string>
+                 </property>
+                 <property name="wordWrap" >
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
            </item>
           </layout>
          </widget>

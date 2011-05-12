@@ -1,10 +1,8 @@
-#ifndef __loaded__data_h__
-#define __loaded__data_h__
-using namespace std;
-#line 1 "data.h++"
 /****
- Om-Data
- Copyright (C) 2005-2006 Werner Van Belle
+ Borg4 Data Library
+ Copyright (C) 2005-2009 Werner Van Belle
+
+ http://werner.yellowcouch.org/Borg4/group__data.html
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -20,9 +18,10 @@ using namespace std;
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
-#ifndef OM_DATA_H
-#define OM_DATA_H
+#ifndef __loaded__data_h__
+#define __loaded__data_h__
+using namespace std;
+#line 1 "data.h++"
 #include <Qt/qstring.h>
 #include <assert.h>
 #include "data-version.h"
@@ -123,6 +122,7 @@ class DataClass
    * a proper pointer management is possible.
    */
   void       memory_release();
+   
  protected:
   /**
    * The shallow_copy function should be overridden to return a 
@@ -130,6 +130,11 @@ class DataClass
    */
   virtual DataClass* shallow_copy() const = 0;
   virtual QString    type_name()    const = 0;
+   /**
+    * setting and getting of subtrees and values
+    */
+   virtual Data     getField(QString ref);
+   virtual void     setField(QString, Data v);
  public:
 
   /**
@@ -320,6 +325,16 @@ class Data
       assert(0); 
     };
 
+   /**
+    * Value retrieval by string reference
+    */
+   Data getField(QString s);
+   
+   /**
+    * Setting the values
+   */
+   void setField(QString s, Data v);
+     
   /**
    * Empty function at the moment. Will assert itself. This function is necessary to 
    * allow the array templates to compile properly
@@ -332,6 +347,4 @@ class Data
   friend class DataVisitor;
   void visit(DataVisitor& v);
 };
-
-#endif
 #endif // __loaded__data_h__

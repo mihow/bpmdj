@@ -1,6 +1,8 @@
 /****
  BpmDj v3.6: Free Dj Tools
- Copyright (C) 2001-2007 Werner Van Belle
+ Copyright (C) 2001-2009 Werner Van Belle
+
+ http://bpmdj.yellowcouch.org/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -23,6 +25,9 @@ using namespace std;
 #include "ui-rythm.h"
 #include "analyzer.h"
 #include "types.h"
+#include "spectrum-type.h"
+
+void fft_to_bark(double * in_r, int window_size, spectrum_type &out);
 
 class SongPlayer;
 class RythmAnalyzer : 

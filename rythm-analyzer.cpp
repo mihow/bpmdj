@@ -1,6 +1,8 @@
 /****
  BpmDj v3.6: Free Dj Tools
- Copyright (C) 2001-2007 Werner Van Belle
+ Copyright (C) 2001-2009 Werner Van Belle
+
+ http://bpmdj.yellowcouch.org/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -59,7 +61,29 @@ using namespace std;
 #include "version.h"
 #include "scripts.h"
 #include "pca.h"
-#include "types.h"
+
+void fft_to_bark(double * in_r, int window_size, spectrum_type &out)
+{
+  for(int b = 0 ; b < barksize ; b ++)
+    {
+      int a = (int)barkbounds[b];
+      int c = (int)barkbounds[b+1];
+      a *= window_size;
+      c *= window_size;
+      a /= WAVRATE;
+      c /= WAVRATE;
+      if (c==a)
+	{
+	  printf("a = %d; b=%d, c=%d\n",a,b,c);
+	  assert(c!=a);
+	}
+      out.set_bark(b,0);
+      double r = 0;
+      for(int i = a ; i < c; i++)
+	r+=fabs(in_r[i]);
+      out.set_bark(b,r/(c-a));
+    } 
+};
 
 RythmAnalyzer::RythmAnalyzer(QWidget*parent) : QWidget(parent)
 {
@@ -317,6 +341,7 @@ void pattern_test(long slice_size, unsigned4* phases, int maximum_slice, const c
 }  
 
 
+#ifdef TEST_RYTHM_PROJECTIONS
 void write_out_projection(long slice_size, unsigned4* phases, int maximum_slice, const char* target)
 {
   int frame_size = higher_power_of_two(2 * WAVRATE / 40);
@@ -344,7 +369,7 @@ void write_out_projection(long slice_size, unsigned4* phases, int maximum_slice,
       for(int i = 0 ; i < frame_size ; i ++)
 	target_m[(x/frame_size)+1][i+1]=curr_spectr.get(i)[0];
     }
-  char *ignore = NULL;
+  const char *ignore = NULL;
   printf("starting PCA\n");
   fflush(stdout);
   do_pca(count,frame_size,target_m,ignore);
@@ -614,29 +639,7 @@ void write_out_projection_old(long slice_size, unsigned4* phases, int maximum_sl
     }
     fclose(out);*/
 }
-
-void fft_to_bark(double * in_r, int window_size, spectrum_type &out)
-{
-  for(int b = 0 ; b < barksize ; b ++)
-    {
-      int a = (int)barkbounds[b];
-      int c = (int)barkbounds[b+1];
-      a *= window_size;
-      c *= window_size;
-      a /= WAVRATE;
-      c /= WAVRATE;
-      if (c==a)
-	{
-	  printf("a = %d; b=%d, c=%d\n",a,b,c);
-	  assert(c!=a);
-	}
-      out.set_bark(b,0);
-      double r = 0;
-      for(int i = a ; i < c; i++)
-	r+=fabs(in_r[i]);
-      out.set_bark(b,r/(c-a));
-    } 
-}
+#endif
 
 static fftw_plan plan;
 static double *fft_out = NULL;

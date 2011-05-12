@@ -1,6 +1,8 @@
 /****
  BpmDj v3.6: Free Dj Tools
- Copyright (C) 2001-2007 Werner Van Belle
+ Copyright (C) 2001-2009 Werner Van Belle
+
+ http://bpmdj.yellowcouch.org/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -103,8 +105,7 @@ bool Mpg123Decoder::checkProgram(QString filename)
     {
       if (line.find("0.59r")>=0) check1=true;
       if (line.find("0.6")>=0) check1=true;
-      if (line.find("0.6")>=0) check1=true;
-      if (line.find("0.6")>=0) check1=true;
+      if (line.find("1.4.3")>=0) check1=true;
       if (line.find("Michael Hipp")>=0) check2=true;
     }
   logfile.close();

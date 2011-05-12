@@ -1,6 +1,8 @@
 /****
  BpmDj v3.6: Free Dj Tools
- Copyright (C) 2001-2007 Werner Van Belle
+ Copyright (C) 2001-2009 Werner Van Belle
+
+ http://bpmdj.yellowcouch.org/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -55,17 +57,14 @@ using namespace std;
 
 #define SIGN(a, b) ( (b) < 0 ? -fabs(a) : fabs(a) )
 static void corcol(float **data, int n, int m, float **symmat);
-static void covcol(float **data, int n, int m, float **symmat);
 static float *pca_vector(int n);
 static void tred2(float **a, int n, float *d, float *e);
-static void tqli(float d[], float e[], int n, float ** z, char* &error_msg);
+static void tqli(float d[], float e[], int n, float ** z, const char* &error_msg);
 static void free_pca_vector(float *v, int n);
-static void scpcol(float **data, int n, int m, float **symmat);
-
 
 // WVB -- this function is a modified version of the original code
 // !!! data will be modified !!!
-void do_pca(int n, int m, float** data, char* &error_msg)
+void do_pca(int n, int m, float** data, const char* &error_msg)
 {
   int  i, j, k, k2;
   float **symmat, **symmat2, *evals, *interm;
@@ -148,6 +147,60 @@ void do_pca(int n, int m, float** data, char* &error_msg)
   free_pca_vector(evals, m);
   free_pca_vector(interm, m);
   
+}
+
+#ifdef TEST_PCA
+/**  Variance-covariance matrix: creation  *****************************/
+/* Create m * m covariance matrix from given n * m data matrix. */
+static void covcol(float **data, int n, int m, float **symmat)
+{
+  float *mean;
+  int i, j, j1, j2;
+  /* Allocate storage for mean pca_vector */
+  mean = pca_vector(m);
+  /* Determine mean of column pca_vectors of input data matrix */
+  for (j = 1; j <= m; j++)
+    {
+      mean[j] = 0.0;
+      for (i = 1; i <= n; i++)
+	mean[j] += data[i][j];
+      mean[j] /= (float)n;
+    }
+  
+  // printf("\nMeans of column pca_vectors:\n");
+  // for (j = 1; j <= m; j++)  {
+  //    printf("%7.1f",mean[j]);  }   printf("\n");
+  
+  /* Center the column pca_vectors. */
+  
+  for (i = 1; i <= n; i++)
+    for (j = 1; j <= m; j++)
+      data[i][j] -= mean[j];
+  
+  /* Calculate the m * m covariance matrix. */
+  for (j1 = 1; j1 <= m; j1++)
+    for (j2 = j1; j2 <= m; j2++)
+      {
+	symmat[j1][j2] = 0.0;
+	for (i = 1; i <= n; i++)
+	  symmat[j1][j2] += data[i][j1] * data[i][j2];
+	symmat[j2][j1] = symmat[j1][j2];
+      }
+}
+
+/* Create m * m sums-of-cross-products matrix from n * m data matrix. */
+void scpcol(float **data, int n, int m, float **symmat)
+{
+  int i, j1, j2;
+  /* Calculate the m * m sums-of-squares-and-cross-products matrix. */
+  for (j1 = 1; j1 <= m; j1++)
+    for (j2 = j1; j2 <= m; j2++)
+      {
+	symmat[j1][j2] = 0.0;
+	for (i = 1; i <= n; i++)
+	  symmat[j1][j2] += data[i][j1] * data[i][j2];
+	symmat[j2][j1] = symmat[j1][j2];
+      }
 }
 
 // WVB -- renamed the original main
@@ -354,6 +407,7 @@ int old_main(int argc, char *argv[])
 
   return 0; // WVB -- the main must return something to avoid a warning
 }
+#endif 
 
 /**  Correlation matrix: creation  ***********************************/
 
@@ -421,60 +475,8 @@ static void corcol(float **data, int n, int m, float **symmat)
   symmat[m][m] = 1.0;
 }
 
-/**  Variance-covariance matrix: creation  *****************************/
-/* Create m * m covariance matrix from given n * m data matrix. */
-static void covcol(float **data, int n, int m, float **symmat)
-{
-  float *mean;
-  int i, j, j1, j2;
-  /* Allocate storage for mean pca_vector */
-  mean = pca_vector(m);
-  /* Determine mean of column pca_vectors of input data matrix */
-  for (j = 1; j <= m; j++)
-    {
-      mean[j] = 0.0;
-      for (i = 1; i <= n; i++)
-	mean[j] += data[i][j];
-      mean[j] /= (float)n;
-    }
-  
-  // printf("\nMeans of column pca_vectors:\n");
-  // for (j = 1; j <= m; j++)  {
-  //    printf("%7.1f",mean[j]);  }   printf("\n");
-  
-  /* Center the column pca_vectors. */
-  
-  for (i = 1; i <= n; i++)
-    for (j = 1; j <= m; j++)
-      data[i][j] -= mean[j];
-  
-  /* Calculate the m * m covariance matrix. */
-  for (j1 = 1; j1 <= m; j1++)
-    for (j2 = j1; j2 <= m; j2++)
-      {
-	symmat[j1][j2] = 0.0;
-	for (i = 1; i <= n; i++)
-	  symmat[j1][j2] += data[i][j1] * data[i][j2];
-	symmat[j2][j1] = symmat[j1][j2];
-      }
-}
-
 /**  Sums-of-squares-and-cross-products matrix: creation  **************/
 
-/* Create m * m sums-of-cross-products matrix from n * m data matrix. */
-void scpcol(float **data, int n, int m, float **symmat)
-{
-  int i, j1, j2;
-  /* Calculate the m * m sums-of-squares-and-cross-products matrix. */
-  for (j1 = 1; j1 <= m; j1++)
-    for (j2 = j1; j2 <= m; j2++)
-      {
-	symmat[j1][j2] = 0.0;
-	for (i = 1; i <= n; i++)
-	  symmat[j1][j2] += data[i][j1] * data[i][j2];
-	symmat[j2][j1] = symmat[j1][j2];
-      }
-}
 
 /* Allocates a float pca_vector with range [1..n]. */
 float *pca_vector(int n)
@@ -603,7 +605,7 @@ static void tred2(float **a, int n, float *d, float *e)
 }
 
 /**  Tridiagonal QL algorithm -- Implicit  **********************/
-static void tqli(float d[], float e[], int n, float ** z, char* &error_occured)
+static void tqli(float d[], float e[], int n, float ** z, const char* &error_occured)
 {
   int m, l, iter, i, k;
   float s, r, p, g, f, dd, c, b;

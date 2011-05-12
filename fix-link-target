@@ -14,7 +14,7 @@ if ls *.L.* >/dev/null 2>/dev/null; then
     # if the target didn't exist we creat it
     if test ! -e .$target -a ! -e $target; then 
 	echo " [copy] "$target
-	cp -f $link $target; 
+	cp -f $link $target;
 	cp -f $link .$target; 
     fi
     # if the target exists and are the same

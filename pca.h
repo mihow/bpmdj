@@ -1,6 +1,8 @@
 /****
  BpmDj v3.6: Free Dj Tools
- Copyright (C) 2001-2007 Werner Van Belle
+ Copyright (C) 2001-2009 Werner Van Belle
+
+ http://bpmdj.yellowcouch.org/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -20,7 +22,7 @@
 #define __loaded__pca_h__
 using namespace std;
 #line 1 "pca.h++"
-void do_pca(int rows, int columns, float**data, char* &error_msg);
+void do_pca(int rows, int columns, float**data, const char* &error_msg);
 float ** matrix(int rows, int columns);
 void free_matrix(float **data, int rows, int columns);
 #endif // __loaded__pca_h__

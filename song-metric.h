@@ -1,6 +1,8 @@
 /****
  BpmDj v3.6: Free Dj Tools
- Copyright (C) 2001-2007 Werner Van Belle
+ Copyright (C) 2001-2009 Werner Van Belle
+
+ http://bpmdj.yellowcouch.org/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -37,8 +39,7 @@ QString tonumber(const int b);
 #define no_distance 1000
 class SongMetriek: public Metriek
 {
- public: 
-  
+public: 
   // weights
   float tempo;
   float spectrum;
@@ -49,7 +50,7 @@ class SongMetriek: public Metriek
   // ranges
   accessors(float,tempo_limits,0.05); // tempo_limits input from configuration
 
- private:
+private:
   float tempo_scale;     // thge tempo scale in the log range
   float total;           // the total weight
   bool  harmonic545;     // which harmonics do we take into account
@@ -66,8 +67,7 @@ class SongMetriek: public Metriek
   float harmonic48_term;
   bool  unknown_tempo_matches;
 
- public:
-  
+public:
   SongMetriek(float tw, float sw, float hw, float rw, float cw);
   SongMetriek(MetricWidget & take_from);
   void  set_show_harmonics(bool h5, bool h6,bool h7,bool h8);

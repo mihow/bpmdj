@@ -1,10 +1,8 @@
-#ifndef __loaded__numbers_h__
-#define __loaded__numbers_h__
-using namespace std;
-#line 1 "numbers.h++"
 /****
- Om-Data
- Copyright (C) 2005-2006 Werner Van Belle
+ Borg4 Data Library
+ Copyright (C) 2005-2009 Werner Van Belle
+
+ http://werner.yellowcouch.org/Borg4/group__data.html
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -20,9 +18,11 @@ using namespace std;
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
-#ifndef OM_NUMBERS_H
-#define OM_NUMBERS_H
+#ifndef __loaded__numbers_h__
+#define __loaded__numbers_h__
+using namespace std;
+#line 1 "numbers.h++"
+#include <stdlib.h>
 #include "data.h"
 #include "data-visitor.h"
 
@@ -153,6 +153,4 @@ template <class T, char C> class FloatClass: public DataClass
       return *this;
     };
 };
-
-#endif
 #endif // __loaded__numbers_h__

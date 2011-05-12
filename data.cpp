@@ -1,10 +1,8 @@
-#ifndef __loaded__data_cpp__
-#define __loaded__data_cpp__
-using namespace std;
-#line 1 "data.c++"
 /****
- Om-Data
- Copyright (C) 2005-2006 Werner Van Belle
+ Borg4 Data Library
+ Copyright (C) 2005-2009 Werner Van Belle
+
+ http://werner.yellowcouch.org/Borg4/group__data.html
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -20,9 +18,10 @@ using namespace std;
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
-#ifndef OM_DATA_CPP
-#define OM_DATA_CPP
+#ifndef __loaded__data_cpp__
+#define __loaded__data_cpp__
+using namespace std;
+#line 1 "data.c++"
 #include "data.h"
 #include "null.h"
 #include "numbers.h"
@@ -64,16 +63,30 @@ void DataClass::memory_release()
     }
 }
 
+Data DataClass::getField(QString)
+{  
+   QString s = type_name() + " does not have a getField operation";
+   printf("%s\n",s.toAscii().data());
+   assert(0);
+   _exit(100);
+ }
+
+void DataClass::setField(QString, Data d)
+{  
+   QString s = type_name() + " does not have a setField operation";
+   printf("%s\n",s.toAscii().data());
+}
+
 void Data::type_error(QString expected) const
 {
   const char * a;
   const char * b;
 #if QT_VERSION > 0x040000
-  a = expected.toAscii();
-  b = type().toAscii();
+  a = strdup(expected.toAscii().data());
+  b = strdup(type().toAscii().data());
 #else
-  a = expected.ascii();
-  b = type().ascii();
+  a = strdup(expected.ascii());
+  b = strdup(type().ascii());
 #endif
   printf("Expected %s, got %s\n",a,b);
   assert(0);
@@ -165,5 +178,15 @@ void Data::visit(DataVisitor& v)
   content->visit(v);
 };
 
-#endif
+Data Data::getField(QString s)
+{
+   assert(content);
+   return content->getField(s);
+}
+
+void Data::setField(QString s, Data v)
+{
+   assert(content);
+   content->setField(s,v);
+}
 #endif // __loaded__data_cpp__

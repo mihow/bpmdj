@@ -6,7 +6,7 @@
     <x>0</x>
     <y>0</y>
     <width>469</width>
-    <height>262</height>
+    <height>280</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -375,6 +375,14 @@
    <header>capacity-widget.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>titleEdit</tabstop>
+  <tabstop>authorEdit</tabstop>
+  <tabstop>remixEdit</tabstop>
+  <tabstop>versionEdit</tabstop>
+  <tabstop>tagEdit</tabstop>
+  <tabstop>save</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

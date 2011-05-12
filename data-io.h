@@ -1,10 +1,8 @@
-#ifndef __loaded__data_io_h__
-#define __loaded__data_io_h__
-using namespace std;
-#line 1 "data-io.h++"
 /****
- Om-Data
- Copyright (C) 2005-2006 Werner Van Belle
+ Borg4 Data Library
+ Copyright (C) 2005-2009 Werner Van Belle
+
+ http://werner.yellowcouch.org/Borg4/group__data.html
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -20,9 +18,10 @@ using namespace std;
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
-#ifndef DATAIO_H
-#define DATAIO_H
+#ifndef __loaded__data_io_h__
+#define __loaded__data_io_h__
+using namespace std;
+#line 1 "data-io.h++"
 using namespace std;
 #include "data.h"
 #include "data-visitor.h"
@@ -128,6 +127,7 @@ class DataTexter: public DataIo
   virtual void write(Data data);
   // static routines
   static Data read_file(QString filename);
+  static Data read_file(FILE * file);
   static void write(Data data, QString filename);
   static void write(Data data, FILE *target);
 };
@@ -222,6 +222,7 @@ class DataBinner: public DataIo
 
   Token  read_token();
   void write_internal(Data data);
+  void write_internal(String data);
   void write_internal(signed1 s);
   void write_internal(signed2 s);
   void write_internal(signed4 s);
@@ -238,6 +239,7 @@ class DataBinner: public DataIo
   Data read_array();
   template <int D, class T> Data read_array_internal();
   void read_internal(Data &data);
+  void read_internal(String &data);
   void read_internal(signed1 &s);
   void read_internal(signed2 &s);
   void read_internal(signed4 &s);
@@ -262,6 +264,4 @@ class DataBinner: public DataIo
   void write_typenr_of(float4 s);
   void write_typenr_of(float8 s);
 };
-
-#endif
 #endif // __loaded__data_io_h__

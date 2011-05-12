@@ -1,6 +1,8 @@
 /****
  BpmDj v3.6: Free Dj Tools
- Copyright (C) 2001-2007 Werner Van Belle
+ Copyright (C) 2001-2009 Werner Van Belle
+
+ http://bpmdj.yellowcouch.org/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -52,5 +54,9 @@ class sample4_type
   Data get_data(int versionnr) const; 
   void set_data(Data & data);
   void read(char*);
+  bool operator ==(const sample4_type& o) const
+  {
+    return left==o.left && right==o.right;
+  }
 };
 #endif // __loaded__sample4_type_h__

@@ -20,7 +20,7 @@
 #ifndef __DO_FRAGMENT_H
 #define __DO_FRAGMENT_H
 #include <typeinfo>
-#include "reference-count.h"
+#include "data-reference-count.h"
 #include "song.h"
 #include "stereo-sample2.h"
 #include "memory.h"
@@ -30,43 +30,9 @@ class FragmentFile;
 class FragmentFileData;
 
 //-------------------------------------
-// Data Object Definition
-//-------------------------------------
-class FragmentInMemoryData: public ReferenceCount
-{
-  friend class FragmentInMemory;
-  public: virtual ~FragmentInMemoryData();
-  protected: stereo_sample2* samples;
-  public: stereo_sample2* get_samples();
-  public: void set_samples(stereo_sample2*);
-  protected: unsigned4 size;
-  public: unsigned4 get_size();
-  public: void set_size(unsigned4);
-  protected: FragmentInMemoryData();
-  protected: FragmentInMemoryData(QString filename);
-};
-
-class FragmentFileData: public ReferenceCount
-{
-  friend class FragmentFile;
-  public: virtual ~FragmentFileData();
-  protected: QString f;
-  public: QString get_f();
-  public: void set_f(QString);
-  protected: Song* song;
-  public: Song* get_song();
-  public: void set_song(Song*);
-  protected: bool isEmpty();
-  protected: FragmentFileData();
-  protected: FragmentFileData(Song* s, QString f);
-  protected: FragmentInMemory getFragment();
-};
-
-
-//-------------------------------------
 // Data Meta Definition 
 //-------------------------------------
-class FragmentInMemory: public Smart<FragmentInMemoryData>
+class FragmentInMemory: public DataSmart<FragmentInMemoryData>
 {
   public: template <class SmartRefChild> FragmentInMemory(SmartRefChild& other)
     {
@@ -76,7 +42,7 @@ class FragmentInMemory: public Smart<FragmentInMemoryData>
     ptr=target;
     }
   public: FragmentInMemory(FragmentInMemoryData * other):
-    Smart<FragmentInMemoryData>(other)
+    DataSmart<FragmentInMemoryData>(other)
     {
     }
   public: stereo_sample2* get_samples();
@@ -87,7 +53,7 @@ class FragmentInMemory: public Smart<FragmentInMemoryData>
   public: FragmentInMemory(QString filename);
 };
 
-class FragmentFile: public Smart<FragmentFileData>
+class FragmentFile: public DataSmart<FragmentFileData>
 {
   public: template <class SmartRefChild> FragmentFile(SmartRefChild& other)
     {
@@ -97,7 +63,7 @@ class FragmentFile: public Smart<FragmentFileData>
     ptr=target;
     }
   public: FragmentFile(FragmentFileData * other):
-    Smart<FragmentFileData>(other)
+    DataSmart<FragmentFileData>(other)
     {
     }
   public: QString get_f();
@@ -112,8 +78,49 @@ class FragmentFile: public Smart<FragmentFileData>
 
 
 //-------------------------------------
+// Data Object Definition
+//-------------------------------------
+class FragmentInMemoryData: public DataReferenceCount
+{
+  friend class FragmentInMemory;
+  public: virtual ~FragmentInMemoryData();
+  public: virtual DataReferenceCount* clone();
+  protected: stereo_sample2* samples;
+  public: stereo_sample2* get_samples();
+  public: void set_samples(stereo_sample2*);
+  protected: unsigned4 size;
+  public: unsigned4 get_size();
+  public: void set_size(unsigned4);
+  protected: FragmentInMemoryData();
+  protected: FragmentInMemoryData(QString filename);
+};
+
+class FragmentFileData: public DataReferenceCount
+{
+  friend class FragmentFile;
+  public: virtual ~FragmentFileData();
+  public: virtual DataReferenceCount* clone();
+  protected: QString f;
+  public: QString get_f();
+  public: void set_f(QString);
+  protected: Song* song;
+  public: Song* get_song();
+  public: void set_song(Song*);
+  public: bool isEmpty();
+  protected: FragmentFileData();
+  protected: FragmentFileData(Song* s, QString f);
+  public: FragmentInMemory getFragment();
+};
+
+
+//-------------------------------------
 // Data Methods
 //-------------------------------------
+inline DataReferenceCount* FragmentInMemoryData::clone()
+  {
+  return new FragmentInMemoryData(*this);
+  }
+
 inline stereo_sample2* FragmentInMemoryData::get_samples()
   {
   return samples;
@@ -155,13 +162,18 @@ inline void FragmentInMemory::set_size(unsigned4 __arg)
   }
 
 inline FragmentInMemory::FragmentInMemory():
-  Smart<FragmentInMemoryData>(new FragmentInMemoryData())
+  DataSmart<FragmentInMemoryData>(new FragmentInMemoryData())
   {
   }
 
 inline FragmentInMemory::FragmentInMemory(QString filename):
-  Smart<FragmentInMemoryData>(new FragmentInMemoryData(filename))
+  DataSmart<FragmentInMemoryData>(new FragmentInMemoryData(filename))
   {
+  }
+
+inline DataReferenceCount* FragmentFileData::clone()
+  {
+  return new FragmentFileData(*this);
   }
 
 inline QString FragmentFileData::get_f()
@@ -210,12 +222,12 @@ inline bool FragmentFile::isEmpty()
   }
 
 inline FragmentFile::FragmentFile():
-  Smart<FragmentFileData>(new FragmentFileData())
+  DataSmart<FragmentFileData>(new FragmentFileData())
   {
   }
 
 inline FragmentFile::FragmentFile(Song* s, QString f):
-  Smart<FragmentFileData>(new FragmentFileData(s, f))
+  DataSmart<FragmentFileData>(new FragmentFileData(s, f))
   {
   }
 

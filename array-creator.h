@@ -1,10 +1,8 @@
-#ifndef __loaded__array_creator_h__
-#define __loaded__array_creator_h__
-using namespace std;
-#line 1 "array-creator.h++"
 /****
- Om-Data
- Copyright (C) 2005-2006 Werner Van Belle
+ Borg4 Data Library
+ Copyright (C) 2005-2009 Werner Van Belle
+
+ http://werner.yellowcouch.org/Borg4/group__data.html
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -20,9 +18,10 @@ using namespace std;
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
-#ifndef ARRAY_CREATOR_H
-#define ARRAY_CREATOR_H
+#ifndef __loaded__array_creator_h__
+#define __loaded__array_creator_h__
+using namespace std;
+#line 1 "array-creator.h++"
 #include "array.h"
 #include "numbers.h"
 
@@ -32,23 +31,24 @@ using namespace std;
 class NoElement{};
 
 // this class keeps the next index in the first index
-// the actual size can be extended through 
+// we do this because the parse can only pass along Data
+// types, so we need a good method in which we don't continuiosly
+// relocate the entire array.
 class Creator
 {
-  typedef Array<1,Data> Content;
-  Content content;
-  void init();
-  void ensure_size(int S);
+   typedef Array<1,Data> Content;
+   Content content;
+   void init();
+   void ensure_size(int S);
  private:
-  template<int D, class T> Data createAndFillTarget(Size<8> s);
-    void updateSize(Size<8>& size, int last_depth, int depth = 0 );
+   template<int D, class T> Data createAndFillTarget(Size<8> s);
+   void updateSize(Size<8>& size, int last_depth, int depth = 0);
  public:
-  Creator() : content(1) { content[0]=Unsigned4(1); };
-  Creator(Data data) : content(Array<1,Data>(data)) {};
-  operator Data() {return content;};
-  Data convertTo(Unsigned4 dimension, Symbol type);
-  void append(Data& e);
+   Creator() : content(1) { content[0]=Unsigned4(1); };
+   Creator(Data data) : content(Array<1,Data>(data)) {};
+   Array<1,Data> getContentData();
+   operator Data() {return content;};
+   Data convertTo(Unsigned4 dimension, Symbol type);
+   void append(Data& e);
 };
-
-#endif
 #endif // __loaded__array_creator_h__

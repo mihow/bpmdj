@@ -1,6 +1,8 @@
 /****
- Borg IV
- Copyright (C) 2006-2007 Werner Van Belle
+ Borg 4 Active Objects
+ Copyright (C) 2006-2009 Werner Van Belle
+
+ http://werner.yellowcouch.org/Borg4/group__ao.html
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,7 +18,6 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
 #ifndef __loaded__ao_tracker_cpp__
 #define __loaded__ao_tracker_cpp__
 using namespace std;
@@ -25,12 +26,16 @@ using namespace std;
 
 elementResult ActiveAoTracker::sunset(string s)
 {
-  // cerr << "The sun is setting for " << s << "\n";
+#ifdef SUNSET_CHECK
+  cerr << "The sun is setting for " << s << "\n";
+#endif
   assert(alive.find(s)!=alive.end());
   alive.erase(s);
   if (alive.empty())
     {
-      // cerr << "No active objects left, deactivating pool\n";
+#ifdef SUNSET_CHECK
+      cerr << "No active objects left, deactivating pool\n";
+#endif
       deactivate();
     }
   return Done;
@@ -38,7 +43,9 @@ elementResult ActiveAoTracker::sunset(string s)
 
 elementResult ActiveAoTracker::sunrise(string s)
 {
-  // cerr << "The sun is rising for " << s << "\n";
+#ifdef SUNSET_CHECK
+  cerr << "The sun is rising for " << s << "\n";
+#endif
   if (alive.find(s)!=alive.end())
     {
       cerr << "Allocating second active object with name " << s 
@@ -46,6 +53,19 @@ elementResult ActiveAoTracker::sunrise(string s)
       exit(0);
     }
   alive.insert(s);
+  return Done;
+}
+
+elementResult ActiveAoTracker::print()
+{
+  // prints the obejcts that are still active
+  set<string>::iterator sit=alive.begin();
+  cerr << "Active Objects still alive:\n";
+  while(sit!=alive.end())
+    {
+      cerr << *sit << "\n";
+      sit++;
+    }
   return Done;
 }
 #endif // __loaded__ao_tracker_cpp__

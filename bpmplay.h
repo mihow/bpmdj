@@ -1,6 +1,8 @@
 /****
  BpmDj v3.6: Free Dj Tools
- Copyright (C) 2001-2007 Werner Van Belle
+ Copyright (C) 2001-2009 Werner Van Belle
+
+ http://bpmdj.yellowcouch.org/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -28,14 +30,14 @@ using namespace std;
 #error "DATA library has wrong version number"
 #endif
 
-class SongPlayer;
+class Player;
 
-extern QApplication    * app;
-extern PlayerConfig    * config;
-extern SongPlayer      * player_window;
+extern QApplication  * app;
+extern PlayerConfig  * config;
+extern Player        * player_window;
 extern bool opt_setup;
 extern bool opt_check;
-extern char * arg_config;
+extern const char * arg_config;
 
 QString get_rawpath();
 bool show_error(int err, int err2, const char*text);

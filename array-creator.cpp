@@ -1,10 +1,8 @@
-#ifndef __loaded__array_creator_cpp__
-#define __loaded__array_creator_cpp__
-using namespace std;
-#line 1 "array-creator.c++"
 /****
- Om-Data
- Copyright (C) 2005-2006 Werner Van Belle
+ Borg4 Data Library
+ Copyright (C) 2005-2009 Werner Van Belle
+
+ http://werner.yellowcouch.org/Borg4/group__data.html
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -20,7 +18,10 @@ using namespace std;
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
+#ifndef __loaded__array_creator_cpp__
+#define __loaded__array_creator_cpp__
+using namespace std;
+#line 1 "array-creator.c++"
 #include "array-creator.h"
 #include "array-iterator.h"
 #include "symbol.h"
@@ -59,40 +60,63 @@ void Creator::append(Data& val)
   content[0]=next_index;
 }
 
-template<int D, class T> 
+template<int D, class T>
 Data Creator::createAndFillTarget(Size<8> s)
 {
-  // allocate array of correct size
-  Size<D> correct_size;
-  correct_size.takeFrom(s);
-  typedef Array<D,T> Result;
-  Result result(correct_size);
-  // iterate through the entire array
-  typename Result::positions position(result);
-  for(;position.more(); ++position)
-    {
-      Content cur = content;
-      for(int d = 0 ; d < D-1 ; d++)
-	cur=(Content)cur[position[d]+1];
-      Data data = cur[position[D-1]+1];
-      ::convertTo(data,*position.current());
-    }
-  return result;
+   // allocate array of correct size
+   Size<D> correct_size;
+   correct_size.takeFrom(s);
+   typedef Array<D,T> Result;
+   Result result(correct_size);
+   // iterate through the entire array
+   typename Result::positions position(result);
+   for(;position.more(); ++position)
+     {
+	Content cur = getContentData();
+	// here we navigate down to the right dimension. 
+	// Because the first element is ourselve we need to add one to the coordinate
+	// for all the subelements we can be confident that the content is a proper 
+	// matrix already
+	int idx;
+	for(int d = 0 ; d < D-1 ; d++)
+	  {
+	     idx=position[d];
+	     cur=(Content)cur[idx];
+	  }
+	Data data = cur[position[D-1]];
+	::convertTo(data,*position.current());
+     }
+   return result;
+}
+
+Array<1,Data> Creator::getContentData()
+{
+   Unsigned4 next_index=(Unsigned4)content[0];
+   return content(From<1>(1),Size<1>(next_index-1));
+}
+
+void updateSize(Array<1,Data> content, Size<8>& size, int last_depth, int depth)
+{
+   // get the sizes of all the children
+   int s = content.size()[0];
+   if (s > size[depth])
+     size[depth]=s;
+   if (depth!=last_depth)
+     {
+	Array<1,Data>::values element(content);
+	int i = 0;
+	for ( ; element.more();  ++element)
+	  {
+	     ++i;
+	     Array<1,Data> e=*element;
+	     updateSize(e,size,last_depth,1+depth);
+	  }
+     }
 }
 
 void Creator::updateSize(Size<8>& size, int last_depth, int depth)
 {
-  // get the sizes of all the children
-  Unsigned4 next_index=(Unsigned4)content[0];
-  int s = next_index - 1;
-  if (s > size[depth]) 
-    size[depth]=s;
-  if (depth!=last_depth)
-    {
-      Content::values element(content(From<1>(1),Size<1>(s)));
-      for ( ; element.more();  ++element)
-	Creator(element).updateSize(size,last_depth,1+depth);
-    }
+   ::updateSize(getContentData(),size,last_depth,depth);
 }
 
 Data Creator::convertTo(Unsigned4 dimension, Symbol type)

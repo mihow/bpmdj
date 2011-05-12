@@ -1,6 +1,8 @@
 /****
  BpmDj v3.6: Free Dj Tools
- Copyright (C) 2001-2007 Werner Van Belle
+ Copyright (C) 2001-2009 Werner Van Belle
+
+ http://bpmdj.yellowcouch.org/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -20,20 +22,24 @@
 #define __loaded__beatgraph_label_h__
 using namespace std;
 #line 1 "beatgraph-label.h++"
+#include <Qt/qobject.h>
 #include <Qt/qtimer.h>
 #include <Qt/qlabel.h>
 #include <Qt/qpainter.h>
 #include <qmutex.h>
 #include "common.h"
+#include "bloody-moc.h"
 
 /**
- * The port from Qt3 to Qt4 is a bit tricky here. First: the new painter system does not allow us to draw outside
- * a paintevent message, so we need to fake these. Secondly: the double buffering makes the xor operation effectively
- * useless. Third: removing the old line with a small redraw will redraw the entire bitmap regardless. 
- * These 3 reasons forced me to redraw the content of the window myself by updating the resized pixmap.
- * The result is that drawCursor will always update the image in a way that only leaves 1 line on the image. Once the 
- * image is updated we either request two paint operations (if the lines are far apart), or 1 merged operation if they
- * are close to each other.
+ * The port from Qt3 to Qt4 is a bit tricky here. First: the new painter system
+ * does not allow us to draw outside a paintevent message, so we need to fake 
+ * these. Secondly: the double buffering makes the xor operation effectively
+ * useless. Third: removing the old line with a small redraw will redraw the entire
+ * bitmap regardless. These 3 reasons forced me to redraw the content of the window
+ * myself by updating the resized pixmap. The result is that drawCursor will always
+ * update the image in a way that only leaves 1 line on the image. Once the image
+ * is updated we either request two paint operations (if the lines are far apart), 
+ * or 1 merged operation if they are close to each other.
  */
 class BeatGraphLabel: public QWidget
 {
@@ -67,8 +73,9 @@ protected:
    */
   virtual void resizeEvent(QResizeEvent * event);
   /**
-   * The original image as produced in the beatgraph analyzer is placed here. Depending on 
-   * the size of the target window, we resize it to something smaller/or larger.
+   * The original image as produced in the beatgraph analyzer is placed here.
+   * Depending on the size of the target window, we resize it to something 
+   * smaller/or larger.
    */
   QImage original;
   /**
@@ -125,7 +132,7 @@ public slots:
   /**
    * once the pixamp is set it remains the property of the label
    */
-  virtual void setImage(QImage, unsigned8 samplespercol);
+  virtual void setImage(QImage I, wunsigned8 samplespercol);
 };
 
 #endif // __loaded__beatgraph_label_h__

@@ -1,6 +1,8 @@
 /****
  BpmDj v3.6: Free Dj Tools
- Copyright (C) 2001-2007 Werner Van Belle
+ Copyright (C) 2001-2009 Werner Van Belle
+
+ http://bpmdj.yellowcouch.org/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -266,7 +268,7 @@ _lfo_ lfo_get()
   return lfo_do;
 }
 
-void lfo_set(char* name, _lfo_ l, unsigned8 freq, unsigned8 phase)
+void lfo_set(const char* name, _lfo_ l, unsigned8 freq, unsigned8 phase)
 {
   /* if paused, unpause and set phase */
   lfo_period=currentperiod.muldiv(4,freq);
@@ -844,7 +846,7 @@ void unpause_playing()
  *-------------------------------------------*/ 
 void copyright()
 {
-  printf("BpmDj Player v%s, Copyright (c) 2001-2007 Werner Van Belle\n",VERSION);
+  printf("BpmDj Player v%s, Copyright (c) 2001-2009 Werner Van Belle\n",VERSION);
   printf("This software is distributed under the GPL2 license. See copyright.txt\n");
   printf("--------------------------------------------------------------------\n");
   fflush(stdout);

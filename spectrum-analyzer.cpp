@@ -1,6 +1,8 @@
 /****
  BpmDj v3.6: Free Dj Tools
- Copyright (C) 2001-2007 Werner Van Belle
+ Copyright (C) 2001-2009 Werner Van Belle
+
+ http://bpmdj.yellowcouch.org/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -98,7 +100,7 @@ void fft_to_bark(double * in_r, int window_size, double * out)
 	}
       // bin * WAVRATE / window_size = freq; thus...
       // bin = freq * window_size / WAVRATE
-
+      
       double r = 0;
       for(int i = a ; i < c; i++)
 	r+= fabs(in_r[i]); // the use of only the cosine compacts the energy
@@ -134,6 +136,12 @@ static void bark_fft(int window_size, double * bark_energy)
 // central peaks are and how quickly they fall off. 
 void SpectrumAnalyzer::fetchSpectrum_normal()
 {
+  // Bug #963
+  if (playing->get_min()==playing->get_max())
+    {
+      Info("Empty song, so no spectrum measurement possible");
+      return;
+    }
   const int window_size = 2048;
   const int step_size = window_size/2;
   const int distri_size = 768;

@@ -1,6 +1,8 @@
 /****
  BpmDj v3.6: Free Dj Tools
- Copyright (C) 2001-2007 Werner Van Belle
+ Copyright (C) 2001-2009 Werner Van Belle
+
+ http://bpmdj.yellowcouch.org/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -34,7 +36,7 @@ class BpmAnalyzerDialog;
 #define TAB_INFO       6
 #define TAB_OPTIONS    7
 
-class SongPlayer: 
+class Player: 
   public QDialog,
   public Ui::SongPlayer
 {
@@ -74,7 +76,7 @@ protected:
   void captionize_according_to_index();
   virtual void keyPressEvent ( QKeyEvent * e );
 public:
-  SongPlayer();
+  Player();
 public slots:
   virtual void mousePressEvent(QMouseEvent * e);
   virtual void mouseReleaseEvent(QMouseEvent * e);

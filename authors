@@ -4,18 +4,13 @@ BpmDj: Free Dj Tools
  BPM-code           : Werner Van Belle <werner.van.belle@gmail.com>
  PCA-code           : F. Murtagh <murtagh@scivax.stsci.edu>
  suse-packages      : oc2pus@arcor.de
- defines.mandrake   : Romanin Gianluca <contact@openjay.org>
- defines.slackware  : Erik <erik@cpuhookup.com>
  slackware patches  : Majc_ <majci888@gmail.com>
- defines.redhat     : Ray B. Morris <support@webmastersguide.com>
- defines.redhat9    : Peter Lawler <yaluser@pacific.net.au>
  defines.suse.8.1   : Johan Fabry <johan.fabry@vub.ac.be>
- defines.fc3_x86_64 : Harrison L. Rommel <rommel@u.washington.edu>
- defines.fc5_x86_32 : Stefan Wanja <wanja@informatik.hu-berlin.de>
- minor patches      : James Gerken <phlegm@mib.org>
+ defines.fedora7    : Pierre Marc Dumuid <pierre.dumuid@adelaide.edu.au>
  windows port       : Luciano Genero <luciano.genero@softway.it>
  Low pass filter    : Julius O. Smith <http://www-ccrma.stanford.edu/~jos/>
  64bit support      : Detlef & Bernard Fortz <bernard.fortz@mobistarmail.be>
  Electric Fence     : Bruce Perens (bruce@pixar.com)
  Meta import filter : Tom Vogt (tom@lemuria.org)
- bugfixing          : Bernard Fortz <bernard.fortz@mobistarmail.be>
+ minor patches      : James Gerken <phlegm@mib.org>
+                    : Bernard Fortz <bernard.fortz@mobistarmail.be>

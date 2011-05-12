@@ -1,6 +1,8 @@
 /****
  BpmDj v3.6: Free Dj Tools
- Copyright (C) 2001-2007 Werner Van Belle
+ Copyright (C) 2001-2009 Werner Van Belle
+
+ http://bpmdj.yellowcouch.org/
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -43,36 +45,36 @@ class spectrum_type
  public:
   spectrum_freq bark[spectrum_size];
   spectrum_type()
-    {
-      for(signed4 i = 0 ; i < spectrum_size; i ++)
-	bark[i]=0;
-    };
+  {
+    for(signed4 i = 0 ; i < spectrum_size; i ++)
+      bark[i]=0;
+  };
   spectrum_type(Data &d)
-    {
-      set_data(d);
-    }
+  {
+    set_data(d);
+  }
   spectrum_type(spectrum_type * other)
-    {
-      memcpy(bark,other->bark,sizeof(spectrum_freq)*spectrum_size);
-    }
+  {
+    memcpy(bark,other->bark,sizeof(spectrum_freq)*spectrum_size);
+  }
   spectrum_freq band(int i) 
-    {
-      return bark[i];
-    };
+  {
+    return bark[i];
+  };
   void set_band(signed4 i, spectrum_freq a)
-    {
-      bark[i]=a;
-      if (i==spectrum_size-1)
-	translate_mean(bark,spectrum_size);
-    }
+  {
+    bark[i]=a;
+    if (i==spectrum_size-1)
+      translate_mean(bark,spectrum_size);
+  }
   void set_bark(signed4 i, spectrum_freq a)
-    {
-      bark[i]=a;
-    }
+  {
+    bark[i]=a;
+  }
   spectrum_freq get_bark(signed4 i)
-    {
-      return bark[i];
-    }
+  {
+    return bark[i];
+  }
   Data get_data() const;
   void set_data(Data &data);
 };
