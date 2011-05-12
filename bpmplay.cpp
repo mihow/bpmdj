@@ -1,5 +1,5 @@
 /****
- BpmDj v4.1pl1: Free Dj Tools
+ BpmDj v4.2 beta: Free Dj Tools
  Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -159,23 +159,29 @@ void options_failure(const char* err)
 			QString(err),
 			QMessageBox::Ok,QMessageBox::NoButton); 
   printf("Usage:  bpmplay <options> argument\n\n"
-"        --config name     name of the configfile\n"
-" -s     --setup           setup a configuration\n"
-" -c     --create          create an index file if none exists\n"
-" -q     --quiet           be quiet\n"
-" -m arg --match arg       song to match tempo with\n"
+"        --config name       name of the configfile\n"
+" -s     --setup             setup a configuration\n"
+" -c     --create            create an index file if none exists\n"
+" -q     --quiet             be quiet\n"
+" -m arg --match arg         song to match tempo with\n"
 "--remote------------------------------------------\n"
-"      --remote user@host  executes bpmplay remotely\n"
-"      --copymusic         copy music first\n"
+"      --remote user@host    executes bpmplay remotely\n"
+"      --copymusic           copy music first\n"
 "--analysis----------------------------------------\n"
-" -b     --batch           no ui output, md5sum is automatically checked\n"
-"        --bpm [1,2,3,4,5] measure bpm with specified technique (default = 1)\n"
-" -l nbr --low nbr         lowest bpm to look for (default = 120)\n"
-" -h nbr --high nbr        highest bpm to look for (default = 160)\n"
-"        --spectrum        obtain color & echo information\n"
-"        --rhythm          obtain rhythm information\n"
-" -e     --energy          measure energy levels\n"
-" argument                 the index file of the song to handle\n\n%s\n\n",err);
+" -b     --batch             no ui output, md5sum is automatically checked\n"
+"        --bpm [1,2,3,4,5,6] measure bpm with specified technique (default = 1)\n"
+"                            1: rayshoot block resampling\n"
+"                            2: rayshoot with fft guidance\n"
+"                            3: enveloppe spectrum\n"
+"                            4: autocorrelation\n"
+"                            5: weighted approach\n"
+"                            6: experimental algorithm\n"
+" -l nbr --low nbr           lowest bpm to look for (default = 120)\n"
+" -h nbr --high nbr          highest bpm to look for (default = 160)\n"
+"        --spectrum          obtain color & echo information\n"
+"        --rhythm            obtain rhythm information\n"
+" -e     --energy            measure energy levels\n"
+" argument                   the index file of the song to handle\n\n%s\n\n",err);
   _exit(1);
 }
 
@@ -304,9 +310,9 @@ void process_options(int argc, char* argv[])
 	  if (arg_bpm<1) 
 	    options_failure("selected BPM analyzing technique too low (starts"
 			    " with 1)\n");
-	  if (arg_bpm>5)
+	  if (arg_bpm>6)
 	    options_failure("selected BPM analyzing technique too hi (ends"
-			    " with 5)\n");
+			    " with 6)\n");
 	}
       if ((opt_color || opt_bpm || opt_energy) && !opt_batch)
 	options_failure("to start an analyzer, you need to supply the "
@@ -446,6 +452,7 @@ void batch_start()
 	  else if (arg_bpm==3) counter->enveloppeSpectrum->setChecked(true);
 	  else if (arg_bpm==4) counter->fullAutoCorrelation->setChecked(true);
 	  else if (arg_bpm==5) counter->weightedEnvCor->setChecked(true);
+	  else if (arg_bpm==6) counter->experimentalAlg->setChecked(true);
 	  counter->start();
 	  Info("%d. Bpm count: %s",nr++,
 	       playing->get_tempo().qstring().toAscii().data());

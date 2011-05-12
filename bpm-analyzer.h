@@ -1,5 +1,5 @@
 /****
- BpmDj v4.1pl1: Free Dj Tools
+ BpmDj v4.2 beta: Free Dj Tools
  Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -72,6 +72,12 @@ private:
   void rayshoot_scan();
   void peak_scan();                    // scan based on FFT-peaks
   void readAudio();                    // reads the file in memory
+  /**
+   * Technique 6 in which we first extract the notes
+   * and then start aligning them.
+   */
+  void experimental_scan_varia();
+  void experimental_scan();
   /**
    * Reads the file in memory divided by blocks
    */

@@ -1,5 +1,5 @@
 /****
- BpmDj v4.1pl1: Free Dj Tools
+ BpmDj v4.2 beta: Free Dj Tools
  Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -247,8 +247,8 @@ void shape(Signal<float8,2> &in)
     {
       float8 a = barkbounds[b];
       float8 c = barkbounds[b+1];
-      int l = (int)(a * in.length / 44100.0);
-      int r = (int)(c * in.length / 44100.0);
+      int l = (int)(a * in.length / (double)WAVRATE);
+      int r = (int)(c * in.length / (double)WAVRATE);
       Sample<float8,2> e = 0;
       for(int i = l ; i < r ; i ++)
 	{
@@ -270,8 +270,8 @@ void shape(Signal<float8,2> &in)
   
   float8 a = barkbounds[barksize];
   float8 c = 22050;
-  int l = (int)(a * in.length / 44100.0);
-  int r = (int)(c * in.length / 44100.0);
+  int l = (int)(a * in.length / (double)WAVRATE);
+  int r = (int)(c * in.length / (double)WAVRATE);
   for(int i = l ; i < r ; i ++)
     energy.set(i,0);
   

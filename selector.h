@@ -1,5 +1,5 @@
 /****
- BpmDj v4.1pl1: Free Dj Tools
+ BpmDj v4.2 beta: Free Dj Tools
  Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -138,6 +138,7 @@ public slots:
   virtual void doSpectrumPca(bool fulldatabase = false, 
 			     bool update_process_view = true);
   virtual void doClustering();
+  virtual void exportTempoList();
   virtual void doBackup();
   virtual void selectionAddTags();
   virtual void selectionSetAuthor();

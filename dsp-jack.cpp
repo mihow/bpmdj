@@ -1,5 +1,5 @@
 /****
- BpmDj v4.1pl1: Free Dj Tools
+ BpmDj v4.2 beta: Free Dj Tools
  Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -160,9 +160,10 @@ void dsp_jack::process_buffers()
 {
   while (1) 
     {    
-      if ((jack_ringbuffer_read_space(buf1) < minfill) && (!get_stopped()) && (!paused)) 
+      unsigned8 filled = jack_ringbuffer_read_space(buf1);
+      if ((filled < minfill) && (!get_stopped()) && (!paused)) 
 	{
-	  while (jack_ringbuffer_read_space(buf1) < minfill)
+	  while (filled < minfill)
 	    {
 	      stereo_sample2 value=audio->read();
 	      sample_t val;
@@ -170,6 +171,7 @@ void dsp_jack::process_buffers()
 	      jack_ringbuffer_write(buf1, (const char *)&val, sizeof(sample_t));
 	      val = value.right / signed2_sample_max_f;
 	      jack_ringbuffer_write(buf2, (const char *)&val, sizeof(sample_t));
+	      filled += 2*sizeof(sample_t);
 	    }
 	}
       if (get_stopped() || paused) 
@@ -177,7 +179,7 @@ void dsp_jack::process_buffers()
 	  jack_ringbuffer_reset(buf1);
 	  jack_ringbuffer_reset(buf2);
 	}      
-      usleep(1);
+      usleep(100);
   }
 }
 
@@ -235,15 +237,16 @@ int dsp_jack::open(bool ui)
       Error(ui,"The jack server (jackd) should be running. Is it ?");
       return err_dsp;
     }
-  
+
   if (verbose) 
     Info("engine sample rate: %d",jack_get_sample_rate (client));
   
-  if (jack_get_sample_rate (client) != 44100) 
+  if (jack_get_sample_rate (client) != WAVRATE) 
     {
       Error(ui,"engine sample rate: %d\n"
-	    "Please be sure jackd is running at 44100",
-	    jack_get_sample_rate (client));
+	    "Please be sure jackd is running at %d",
+	    jack_get_sample_rate (client),
+	    WAVRATE);
       return err_dsp;
     }
   

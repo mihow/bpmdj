@@ -1,5 +1,5 @@
 /****
- BpmDj v4.1pl1: Free Dj Tools
+ BpmDj v4.2 beta: Free Dj Tools
  Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -212,7 +212,7 @@ int wave_read(unsigned4 pos, stereo_sample2 *val)
   if (pos<wave_bufferpos || pos-wave_bufferpos>=wave_bufsize)
     {
       // we only stop one second later than necessary
-      if (pos>=wave_max()+44100L) return -1;
+      if (pos>=wave_max()+(long)WAVRATE) return -1;
       if (pos>=wave_max())
 	{
 	  wave_bufferpos=pos;
@@ -243,7 +243,7 @@ int wave_read(unsigned4 pos, stereo_sample2 *val)
   if (pos<wave_bufferpos || pos+musthave-wave_bufferpos>=wave_bufsize)
     {
       // we only stop one second later than necessary
-      if (pos>=wave_max()+44100L) return -1;
+      if (pos>=wave_max()+(long)WAVRATE) return -1;
       if (pos>=wave_max())
 	{
 	  wave_bufferpos=pos;

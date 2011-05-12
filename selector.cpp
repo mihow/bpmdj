@@ -1,5 +1,5 @@
 /****
- BpmDj v4.1pl1: Free Dj Tools
+ BpmDj v4.2 beta: Free Dj Tools
  Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -103,6 +103,7 @@ using namespace std;
 #include "song-copier.h"
 #include "info.h"
 #include "qt-helpers.h"
+
 SongSelectorLogic * selector = NULL;
 
 SongSelectorLogic::~SongSelectorLogic()
@@ -267,6 +268,7 @@ SongSelectorLogic::SongSelectorLogic(QWidget * parent) :
      selection->addAction("This is the main song, but don't play it",
 		  this,SLOT(selectionSetMainSong()))
 			     );
+  selection->addAction("Export Filename / tempo list",this,SLOT(exportTempoList()));
 #ifdef INCOMPLETE_FEATURES
   selection->addAction("Avoid this song",this,SLOT(avoidSongs()));
   selection->addAction("Clear Song Avoidance",this,SLOT(avoidNoSongs()));
@@ -768,14 +770,14 @@ void SongSelectorLogic::setColor(QColor color)
   QMutexLocker _ml(&lock);
   if (Config::get_color_main_window())
     {
-      setBackgroundColor(this,color);
-      setBackgroundColor(countLcd,color);
-      setBackgroundColor(mainLCD,color);
+      ::setBackgroundColor(this,color);
+      ::setBackgroundColor(countLcd,color);
+      ::setBackgroundColor(mainLCD,color);
     }
   else
     {
-      setBackgroundColor(countLcd,color);
-      setBackgroundColor(mainLCD,color);
+      ::setBackgroundColor(countLcd,color);
+      ::setBackgroundColor(mainLCD,color);
     }
 }
 
@@ -785,9 +787,9 @@ void SongSelectorLogic::setPlayerColor(QLabel *player ,QColor color)
   int r,g,b;
   color.getRgb(&r,&g,&b);
   if (r<128 && g < 128 && b < 128)
-    setBackgroundColor(player,QColor(255-r,255-g,255-b));
+    ::setBackgroundColor(player,QColor(255-r,255-g,255-b));
   else
-    setBackgroundColor(player,color);
+    ::setBackgroundColor(player,color);
 }
 
 void SongSelectorLogic::resetCounter()
@@ -1005,6 +1007,25 @@ ITERATE_OVER(svi)
     idx.write_idx();
     reread_and_repaint(svi.val());
   };
+}
+
+void SongSelectorLogic::exportTempoList()
+{
+  QMutexLocker _ml(&lock);
+
+  QString targetfilename = QFileDialog::getSaveFileName();
+  if (targetfilename.isEmpty()) return;
+  printf("Saving to %s\n",targetfilename.toAscii().data());
+  FILE *f=fopen(targetfilename.toAscii().data(),"wb");
+  assert(f);
+  selectedSongIterator svi;
+ITERATE_OVER(svi)
+
+    tempo_type t=svi.val()->get_tempo();
+    QString str=svi.val()->get_file();
+    fprintf(f,"%s\t%g\n",str.toAscii().data(),t.tempo);
+  };
+  fclose(f);
 }
 
 /**

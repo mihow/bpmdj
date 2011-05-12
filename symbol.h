@@ -54,7 +54,7 @@ class Symbol: public DataClass
     {
       return "Symbol";
     }
-  Symbol() :  text(NULL) 
+ Symbol() :  text((const char*)NULL) 
     {
     }; 
   Symbol(const QString &s)

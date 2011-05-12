@@ -1,5 +1,5 @@
 /****
- BpmDj v4.1pl1: Free Dj Tools
+ BpmDj v4.2 beta: Free Dj Tools
  Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -661,7 +661,7 @@ void Index::clear_energy()
 
 unsigned2 Index::get_time_in_seconds()
 {
-  const char* T = get_time().toAscii().data();
+  const char* T = index_time.toAscii().data();
   if (!T) return -1;
   int minutes = atoi(T);
   while(*T && isdigit(*T)) T++;

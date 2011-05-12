@@ -1,5 +1,5 @@
 /****
- BpmDj v4.1pl1: Free Dj Tools
+ BpmDj v4.2 beta: Free Dj Tools
  Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -689,10 +689,11 @@ bool Config::open_ui(int pane)
     Warning("The BPM analysis technique required doesn't exist. "
 	    "Setting to the first available");
   if (nr==1) preferences.resamplingScan->setChecked(true);
-  else if (nr==2) preferences.enveloppeSpectrum->setChecked(true);
-  else if (nr==3) preferences.ultraLongFFT->setChecked(true);
+  else if (nr==2) preferences.ultraLongFFT->setChecked(true);
+  else if (nr==3) preferences.enveloppeSpectrum->setChecked(true);
   else if (nr==4) preferences.fullAutoCorrelation->setChecked(true);
   else if (nr==5) preferences.weightedEnvCor->setChecked(true);
+  else if (nr==6) preferences.experimentalAlg->setChecked(true);
   else assert(0);
 
   if (preferences.exec()!=QDialog::Accepted) return false;
@@ -746,10 +747,11 @@ bool Config::open_ui(int pane)
   
   nr=0;
   if (preferences.resamplingScan->isChecked()) nr=1;
-  if (preferences.enveloppeSpectrum->isChecked()) nr=2;
-  if (preferences.ultraLongFFT->isChecked()) nr=3;
+  if (preferences.ultraLongFFT->isChecked()) nr=2;
+  if (preferences.enveloppeSpectrum->isChecked()) nr=3;
   if (preferences.fullAutoCorrelation->isChecked()) nr=4;
   if (preferences.weightedEnvCor->isChecked()) nr=5;
+  if (preferences.experimentalAlg->isChecked()) nr=6;
   assert(nr);
   set_anal_bpm_technique(nr);
   if (get_anal_bpm_from()>get_anal_bpm_to())

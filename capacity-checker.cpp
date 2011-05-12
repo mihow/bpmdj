@@ -1,5 +1,5 @@
 /****
- BpmDj v4.1pl1: Free Dj Tools
+ BpmDj v4.2 beta: Free Dj Tools
  Copyright (C) 2001-2010 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -105,6 +105,7 @@ bool Mpg123Decoder::checkProgram(QString filename)
       if (line.indexOf("0.59r")>=0) check1=true;
       if (line.indexOf("0.6")>=0) check1=true;
       if (line.indexOf("1.4.3")>=0) check1=true;
+      if (line.indexOf("1.10.0")>=0) check1=true;
       if (line.indexOf("Michael Hipp")>=0) check2=true;
     }
   logfile.close();
