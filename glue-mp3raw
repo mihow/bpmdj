@@ -1,2 +1,3 @@
 #!/bin/bash
-mpg123 -2 -s music/`basename $1` >./`basename $1`.raw 2>/dev/null
+rawname=`basename "$1"`.raw
+! (test -f "$rawname") && mpg123 -2 -s music/"$1" >./"$rawname" 2>/dev/null

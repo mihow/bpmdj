@@ -23,17 +23,10 @@ flag = {
   arg_default = "/dev/dsp";
   };
 
-flag = {
-  name = target;
-  descrip = "Target Period";
-  value = t;
-  arg_type = string;
-  };
-
-flag = {
-  name = normal;
-  descrip = "Normal period";
-  value = n;
+flag = {	
+  name = match;
+  descrip = "Song to match tempo to (.idx file)";
+  value = m;
   arg_type = string;
   };
 
@@ -44,6 +37,5 @@ flag = {
   arg_type = string;
   arg_default = "744";
   };
-
 
 argument=string;  

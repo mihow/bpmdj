@@ -1,6 +1,6 @@
 Autogen Definitions options;
-prog_name  = cbpmcount;
-prog_title = "cbpm-count";
+prog_name  = cbpmcolor;
+prog_title = "cbpm-color";
 long_opts;
 
 flag = {
