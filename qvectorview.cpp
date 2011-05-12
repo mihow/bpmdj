@@ -1,10 +1,9 @@
 /****
  A QVectorView suitable for BpmDj.
- This is a stripdown from trolltechs QListView class. 
+ This is a huge stripdown from trolltechs QListView class.
 
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
- See 'BeatMixing.ps' for more information
+ Copyright (C) 2001-2005 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -128,7 +127,7 @@ void QVectorViewData::paintCell(QVectorView* lv, int number, QPainter * p, const
     } 
   else 
     p->setPen( cg.text() );
-  bool reverse = FALSE;
+  //  bool reverse = FALSE;
   if ( !t.isEmpty() ) {
     if ( !(align & AlignTop || align & AlignBottom) )
       align |= AlignVCenter;
@@ -293,7 +292,7 @@ void QVectorView::drawContentsOffset( QPainter * p, int ox, int oy,
   int fx = -1, x, fc = 0, lc = 0;
   int tx = -1;
   int ih = item_container->height();
-  int ith = item_container->totalHeight;
+  //  int ith = item_container->totalHeight;
   if (ih>0)
     for(int current = top_line_number ; current <=bottom_line_number ; current++)
       {
@@ -337,7 +336,7 @@ void QVectorView::drawContentsOffset( QPainter * p, int ox, int oy,
       
 	    while ( c < lc )
 	      {
-		int i = d_h->mapToLogical( c );
+		// int i = d_h->mapToLogical( c );
 		cs = d_h->cellSize( c );
 		r.setRect( x - ox, y - oy, cs, ih );
 		p->save();

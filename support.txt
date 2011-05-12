@@ -1,0 +1,57 @@
+You can help 
+- by putting a refernce to this work on your webpage
+- by publicily acknowledging the use of this software where you use it
+- offer the undersigned a hugely paid position in your company
+- request support actions from undersigned
+- give monetary donations
+- helping extend the software (see the webpages)
+
+Creating this program takes a lot of work. On one side there is the creative
+process of inventing new algorithms and concepts, on the other side there is
+the realization of these concepts into a program.
+
+The past 4 years the software has been open sourced, free to use by anybody
+under a GPL license. Recently I've become very frustrated about this. Open
+source promises a lot of things. Among those things is the possibility to 
+develop with many people on the same thing. In practice however, I've been 
+contacted by many people which all 'wants' things, but very few people 
+actually offer help and those who actually do are far from qualified to 
+do so in a useable manner.
+
+Aside from this, the development of the algorithms expressed in this program
+are worth money, a lot of money. Also here I've been contacted by people
+interested in whether the output of the algorithm can be used for free and
+whether they can use the algorithm in their own software. Interestingly,
+because they already have the software, I'm never in a position to negotiate
+properly.
+
+Other people contact me to see whether I want to help them out with their 
+student project based on this software, others simply claim that they wrote it.
+Bottomline here is that people seem to have absolutely no respect whatsoever
+for the effort it took to create this software.
+
+So then, what do I expect ?
+
+I don't expect end users to pay for this stuff, however I insist that
+- people are honest about their own possibilities and not claim things they 
+  didn't do, 
+- or sell things they didn't make, 
+- or 'reinvent' things without giving proper credit (and back communication). 
+The time _I_ spent to write this software and invent the algorithms seems 
+easily forgotten when the dealine comes close.
+
+Since I'm a researcher in heart, the software remains GPL, but please if you
+are in the possiblity to support this work in any way, please do so. You can 
+help 
+
+- by putting a refernce to this work on your webpage
+- by publicily acknowledging the use of this software where you use it
+- offer the undersigned a hugely paid position in your company
+- request support actions from undersigned
+- give monetary donations
+- helping extend the software (see the webpages)
+
+--
+January 2005
+Werner Van Belle
+werner.van.belle@itek.norut.no

@@ -1,4 +1,4 @@
-<!DOCTYPE UI><UI version="3.2" stdsetdef="1">
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
 <class>ChooseAnalyzers</class>
 <widget class="QDialog">
     <property name="name">
@@ -67,40 +67,7 @@
                     <property name="name">
                         <cstring>unnamed</cstring>
                     </property>
-                    <widget class="QCheckBox" row="0" column="0">
-                        <property name="name">
-                            <cstring>tempoAnalyzer</cstring>
-                        </property>
-                        <property name="text">
-                            <string>Tempo Analyzer</string>
-                        </property>
-                        <property name="checked">
-                            <bool>true</bool>
-                        </property>
-                    </widget>
-                    <widget class="QCheckBox" row="1" column="0">
-                        <property name="name">
-                            <cstring>spectrumAnalyzer</cstring>
-                        </property>
-                        <property name="text">
-                            <string>Spectrum Analyzer</string>
-                        </property>
-                        <property name="checked">
-                            <bool>true</bool>
-                        </property>
-                    </widget>
-                    <widget class="QCheckBox" row="2" column="0">
-                        <property name="name">
-                            <cstring>energyAnalyzer</cstring>
-                        </property>
-                        <property name="text">
-                            <string>Energy Scanner</string>
-                        </property>
-                        <property name="checked">
-                            <bool>true</bool>
-                        </property>
-                    </widget>
-                    <widget class="Line" row="3" column="0">
+                    <widget class="Line" row="4" column="0">
                         <property name="name">
                             <cstring>line2</cstring>
                         </property>
@@ -114,24 +81,7 @@
                             <enum>Horizontal</enum>
                         </property>
                     </widget>
-                    <spacer row="5" column="0">
-                        <property name="name">
-                            <cstring>spacer5</cstring>
-                        </property>
-                        <property name="orientation">
-                            <enum>Vertical</enum>
-                        </property>
-                        <property name="sizeType">
-                            <enum>Expanding</enum>
-                        </property>
-                        <property name="sizeHint">
-                            <size>
-                                <width>20</width>
-                                <height>50</height>
-                            </size>
-                        </property>
-                    </spacer>
-                    <widget class="QLabel" row="4" column="0">
+                    <widget class="QLabel" row="5" column="0">
                         <property name="name">
                             <cstring>textLabel1</cstring>
                         </property>
@@ -153,6 +103,70 @@ If you fill in a space seperated user@host list then multiple hosts will be used
                         </property>
                         <property name="alignment">
                             <set>WordBreak|AlignVCenter</set>
+                        </property>
+                    </widget>
+                    <spacer row="6" column="0">
+                        <property name="name">
+                            <cstring>spacer5</cstring>
+                        </property>
+                        <property name="orientation">
+                            <enum>Vertical</enum>
+                        </property>
+                        <property name="sizeType">
+                            <enum>Expanding</enum>
+                        </property>
+                        <property name="sizeHint">
+                            <size>
+                                <width>20</width>
+                                <height>30</height>
+                            </size>
+                        </property>
+                    </spacer>
+                    <widget class="QCheckBox" row="3" column="0">
+                        <property name="name">
+                            <cstring>rythmAnalyzer</cstring>
+                        </property>
+                        <property name="text">
+                            <string>Rythm Analyzer</string>
+                        </property>
+                        <property name="checked">
+                            <bool>true</bool>
+                        </property>
+                    </widget>
+                    <widget class="QCheckBox" row="2" column="0">
+                        <property name="name">
+                            <cstring>tempoAnalyzer</cstring>
+                        </property>
+                        <property name="text">
+                            <string>Tempo Analyzer</string>
+                        </property>
+                        <property name="checked">
+                            <bool>true</bool>
+                        </property>
+                    </widget>
+                    <widget class="QCheckBox" row="1" column="0">
+                        <property name="name">
+                            <cstring>spectrumAnalyzer</cstring>
+                        </property>
+                        <property name="text">
+                            <string>Sound Color &amp;&amp; Echo Analyzer</string>
+                        </property>
+                        <property name="accel">
+                            <string></string>
+                        </property>
+                        <property name="checked">
+                            <bool>true</bool>
+                        </property>
+                    </widget>
+                    <widget class="QCheckBox" row="0" column="0">
+                        <property name="name">
+                            <cstring>energyAnalyzer</cstring>
+                        </property>
+                        <property name="text">
+                            <string>RMS Power Scanner</string>
+                        </property>
+                        <property name="checked">
+                            <bool>true</bool>
                         </property>
                     </widget>
                 </grid>

@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
- See 'BeatMixing.ps' for more information
+ Copyright (C) 2001-2005 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -24,16 +23,7 @@
 #include <math.h>
 #include "dirscanner.h"
 #include "common.h"
-long fsize(FILE * f)
-{
-   long answer, pos;
-   assert(f);
-   pos = ftell(f);
-   fseek(f,0,SEEK_END);
-   answer=ftell(f);
-   fseek(f,pos,SEEK_SET);
-   return answer;
-}
+#include "basic-types.h"
 
 void common_init()
 {
@@ -43,42 +33,6 @@ void common_init()
    assert(sizeof(signed8)==8);
    assert(sizeof(float8)==8);
    assert(sizeof(float4)==4);
-}
-
-long readsamples(void* target, int count, FILE* file)
-{
-  int result;
-  assert(target);
-  assert(file);
-  assert(count>0);
-  result = fread(target,sizeof(unsigned4),count,file);
-  if (result<=0)
-    {
-      int err = ferror(file);
-      if (feof(file)) 
-	return 0;
-      printf("file: Could not read %d samples, errno = %d (%s)\n",count,err,strerror(err));
-      assert(0);
-    }
-  return result;
-}
-
-long writesamples(void* target, int count, FILE* file)
-{
-  int result;
-  assert(target);
-  assert(file);
-  if (!count)
-    return count;
-  assert(count>0);
-  result = fwrite(target,sizeof(unsigned4),count,file);
-  if (result<=0)
-    {
-      int err = ferror(file);
-      printf("file: Could not write %d samples, errno = %d (%s)\n",count,err,strerror(err));
-    }
-  assert(result>0);
-  return result;
 }
 
 bool strxeq(const char* a, const char* b)
@@ -171,10 +125,3 @@ int clip(int val)
   if (val>0) return +1;
   return 0;
 }
-
-void file_long(long i, FILE * f)
-{
-  int written = fwrite(&i,4,1,f);
-  assert(written==1);
-}
-

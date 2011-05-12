@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
+ Copyright (C) 2001-2005 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -43,26 +43,11 @@ struct mixarea
   }
 };
 
-struct synced_sample
-{
-  unsigned4 value;
-  signed4   sync;
-};
-
-#define sync_max 8192
-#define sync_halve (8192/2)
-
-struct synced_longtrick
-{
-  longtrick value;
-  signed4   sync;
-};
-
 class dsp_mixed: public dsp_driver
 {
  private:
   mixarea * shared;
-  synced_sample * audio;
+  synced_stereo_sample2 * audio;
   int devfd;
   signed4 mapsize;
   signed4 audiosize;
@@ -71,7 +56,7 @@ class dsp_mixed: public dsp_driver
   static int mix_dev;
   void    start();
   void    pause();
-  void    write(unsigned4 *value);
+  void    write(stereo_sample2 value);
   signed8 latency();
   int     open();
   void    close();

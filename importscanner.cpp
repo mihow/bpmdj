@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
- See 'BeatMixing.ps' for more information
+ Copyright (C) 2001-2005 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -82,7 +81,7 @@ void ImportScanner::checkfile(const QString pathname, const QString filen)
       index->set_tags(strdup("New"));
       index->fix_tar_info();  // to fix filenames that had the correct name
       index->set_period(-1);  // writes immediatelly to disk
-      Song * song = new Song(index,true,true,true);
+      Song * song = new Song(index,true,true);
       delete index;
       selector -> acceptNewSong( song );
     }

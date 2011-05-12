@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
- See 'BeatMixing.ps' for more information
+ Copyright (C) 2001-2005 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -59,7 +58,6 @@ void SongSelectorLogic::compactIdxDirectory()
     }
   execute("mkdir ./new_index/");
   // fetch all songs
-  int nr;
   GrowingArray<Song*> * all = database->getAllSongs();
   assert(all->count>=0);
   // create a tree containing the different filenames

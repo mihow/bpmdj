@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
- See 'BeatMixing.ps' for more information
+ Copyright (C) 2001-2005 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -28,7 +27,6 @@
 #include "process-manager.h"
 #include "history.h"
 #include "dirscanner.h"
-#include "spectrum.h"
 #include "historysong.h"
 #include "tags.h"
 
@@ -54,7 +52,7 @@ void HistorySong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid,
   switch(col)
     {
     case HISTORY_CUES:
-      if (Config::color_cues && !song->get_has_cues())
+      if (Config::get_color_cues() && !song->get_has_cues())
 	{
 	  QColorGroup ncg(cg);
 	  ncg.setColor(QColorGroup::Base,QColor(0,0,255));
@@ -66,7 +64,7 @@ void HistorySong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid,
     case HISTORY_TEMPO: 
       {
 	Song * main = ProcessManager::playingInMain();
-	if (color=QSong::colorOfTempoCol(main,song))
+	if ( (color=QSong::colorOfTempoCol(main,song)) )
 	  {
 	    QColorGroup ncg(cg);
 	    ncg.setColor(QColorGroup::Base,*color);
@@ -78,17 +76,17 @@ void HistorySong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid,
       }
 
     case HISTORY_TITLE:
-      if (Config::color_played && song->get_played())
+      if (Config::get_color_played() && song->get_played())
 	{
 	  QColorGroup ncg(cg);
-	  ncg.setColor(QColorGroup::Base,Config::color_played_song);
+	  ncg.setColor(QColorGroup::Base,Config::get_color_played_song());
 	  QListViewItem::paintCell(p,ncg,col,wid,align);
 	  return;
 	}
       break;
       
     case HISTORY_AUTHOR:
-      if (color=QSong::colorOfAuthorCol(song))
+      if ( (color=QSong::colorOfAuthorCol(song)) )
 	{
 	  QColorGroup ncg(cg);
 	  ncg.setColor(QColorGroup::Base,*color);
@@ -99,7 +97,7 @@ void HistorySong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid,
       break;
       
     case HISTORY_DCOLOR:
-      if (color=QSong::colorOfdColorCol(song))
+      if ( (color=QSong::colorOfdColorCol(song)) )
 	{
 	  QColorGroup ncg(cg);
 	  ncg.setColor(QColorGroup::Base,*color);
@@ -110,7 +108,7 @@ void HistorySong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid,
       break;
       
     case HISTORY_SPECTRUM:
-      if (Config::color_spectrum)
+      if (Config::get_color_spectrum())
 	if (song->get_spectrum()!=no_spectrum)
 	  {
 	    QColorGroup ncg(cg);
@@ -121,10 +119,10 @@ void HistorySong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid,
       break;
     }
   
-  if (Config::color_ondisk && !song->get_ondisk())
+  if (Config::get_color_ondisk() && !song->get_ondisk())
     {
       QColorGroup ncg(cg);
-      ncg.setColor(QColorGroup::Base,Config::color_unavailable);
+      ncg.setColor(QColorGroup::Base,Config::get_color_unavailable());
       QListViewItem::paintCell(p,ncg,col,wid,align);
     }
   else

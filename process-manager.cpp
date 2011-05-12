@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
- See 'BeatMixing.ps' for more information
+ Copyright (C) 2001-2005 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -70,7 +69,7 @@ void ProcessManager::setMainSong(Song* song)
 {
   song->realize();
   playing_songs[0]=song;
-  get_selector()->updateProcessView();
+  get_selector()->updateProcessView(true);
 }
 
 void ProcessManager::clearId(int id)
@@ -88,7 +87,7 @@ void ProcessManager::clearPlayer(int id, bool update)
   active_pids[id] = 0;
   playing_songs[id]=NULL;
   if (update)
-    get_selector()->updateProcessView();
+    get_selector()->updateProcessView(id==0);
 }
 
 void ProcessManager::switchMonitorToMain()
@@ -105,7 +104,7 @@ void ProcessManager::switchMonitorToMain()
   // write playing sucker to disk
   Played::Play(playing_songs[0]);
   get_selector()->resetCounter();
-  get_selector()->updateProcessView();
+  get_selector()->updateProcessView(true);
 }
 
 void ProcessManager::startExtraSong(int id, Song *song)
@@ -118,13 +117,13 @@ void ProcessManager::startExtraSong(int id, Song *song)
     matchWith=song;
   playing_songs[id]=song;
   sprintf(playercommand,
-	  (const char*)(id == 3 ? Config::playCommand4
-			: Config::playCommand3),
-	  (const char*)Config::tmp_directory,
+	  (const char*)(id == 3 ? Config::get_playCommand4()
+			: Config::get_playCommand3()),
+	  (const char*)Config::get_tmp_directory(),
 	  (const char*)matchWith->get_storedin(), 
 	  (const char*)song->get_storedin());
   start(id,playercommand);
-  get_selector()->updateProcessView();
+  get_selector()->updateProcessView(false);
 }
 
 void ProcessManager::startSong(Song *song)
@@ -146,17 +145,20 @@ void ProcessManager::startSong(Song *song)
   playing_songs[1]=song;
   matchWith=playingInMain();
   if (!matchWith) matchWith=playing_songs[1];
-  player = monitorPlayCommand == 1 ? Config::playCommand1 : Config::playCommand2;
+  player = monitorPlayCommand == 1 ? Config::get_playCommand1() : Config::get_playCommand2();
   sprintf(playercommand, 
 	  (const char*)player, 
-	  (const char*)Config::tmp_directory,
+	  (const char*)Config::get_tmp_directory(),
 	  (const char*)matchWith->get_storedin(), 
 	  (const char*)playing_songs[1]->get_storedin());
   // fork the command and once the player exists immediatelly stop
   start(1,playercommand);
-  // if there is no main song playing. Place it main, otherwise, try the monitor
+  // if there is no main song playing. Place it in the main, otherwise, try the monitor
   if (!playingInMain())
-    switchMonitorToMain();
+    {
+      switchMonitorToMain();
+      return;
+    }
   // update the process view of course
-  get_selector()->updateProcessView();
+  get_selector()->updateProcessView(false);
 }

@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
+ Copyright (C) 2001-2005 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -48,6 +48,7 @@ int Tag2Index::compareSearchData(QString b)
   if (a<b) return -1;
   if (a==b) return 0;
   if (a>b) return 1;
+  return 1;
 }
 
 AvlTree<QString>      Tags::tree;

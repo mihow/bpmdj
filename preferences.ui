@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>830</width>
-            <height>359</height>
+            <width>831</width>
+            <height>401</height>
         </rect>
     </property>
     <property name="caption">
@@ -71,7 +71,7 @@
             </item>
             <item>
                 <property name="text">
-                    <string>Spectrum</string>
+                    <string>Metrics</string>
                 </property>
                 <property name="pixmap">
                     <pixmap>image5</pixmap>
@@ -108,7 +108,7 @@
                 <enum>NoSelection</enum>
             </property>
         </widget>
-        <widget class="Line" row="1" column="0" rowspan="1" colspan="4">
+        <widget class="Line" row="1" column="0" rowspan="2" colspan="4">
             <property name="name">
                 <cstring>line1</cstring>
             </property>
@@ -122,7 +122,7 @@
                 <enum>Horizontal</enum>
             </property>
         </widget>
-        <widget class="QPushButton" row="2" column="2">
+        <widget class="QPushButton" row="2" column="2" rowspan="2" colspan="1">
             <property name="name">
                 <cstring>PushButton12</cstring>
             </property>
@@ -133,7 +133,7 @@
                 <string>Alt+O</string>
             </property>
         </widget>
-        <widget class="QPushButton" row="2" column="3">
+        <widget class="QPushButton" row="2" column="3" rowspan="2" colspan="1">
             <property name="name">
                 <cstring>PushButton13</cstring>
             </property>
@@ -144,7 +144,7 @@
                 <string>Alt+C</string>
             </property>
         </widget>
-        <spacer row="2" column="0" rowspan="1" colspan="2">
+        <spacer row="3" column="0" rowspan="1" colspan="2">
             <property name="name">
                 <cstring>spacer1</cstring>
             </property>
@@ -844,7 +844,7 @@
                             <number>1</number>
                         </property>
                         <property name="value">
-                            <number>5</number>
+                            <number>6</number>
                         </property>
                     </widget>
                     <widget class="QLabel" row="1" column="0">
@@ -953,6 +953,19 @@
                     <property name="name">
                         <cstring>unnamed</cstring>
                     </property>
+                    <widget class="MetricWidget" row="1" column="0" rowspan="1" colspan="4">
+                        <property name="name">
+                            <cstring>dColorMetric</cstring>
+                        </property>
+                        <property name="sizePolicy">
+                            <sizepolicy>
+                                <hsizetype>5</hsizetype>
+                                <vsizetype>3</vsizetype>
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                            </sizepolicy>
+                        </property>
+                    </widget>
                     <widget class="QLabel" row="0" column="0">
                         <property name="name">
                             <cstring>textLabel2_4</cstring>
@@ -961,7 +974,7 @@
                             <bool>true</bool>
                         </property>
                         <property name="text">
-                            <string>Color of the dColor column</string>
+                            <string>Color 'dColor' col</string>
                         </property>
                     </widget>
                     <widget class="QPushButton" row="0" column="1">
@@ -985,95 +998,20 @@
                             <bool>true</bool>
                         </property>
                     </widget>
-                    <spacer row="6" column="1">
-                        <property name="name">
-                            <cstring>spacer11</cstring>
-                        </property>
-                        <property name="orientation">
-                            <enum>Vertical</enum>
-                        </property>
-                        <property name="sizeType">
-                            <enum>Expanding</enum>
-                        </property>
-                        <property name="sizeHint">
-                            <size>
-                                <width>20</width>
-                                <height>90</height>
-                            </size>
-                        </property>
-                    </spacer>
-                    <widget class="Line" row="4" column="0" rowspan="1" colspan="2">
-                        <property name="name">
-                            <cstring>line2</cstring>
-                        </property>
-                        <property name="frameShape">
-                            <enum>HLine</enum>
-                        </property>
-                        <property name="frameShadow">
-                            <enum>Sunken</enum>
-                        </property>
-                        <property name="orientation">
-                            <enum>Horizontal</enum>
-                        </property>
-                    </widget>
-                    <widget class="QLabel" row="2" column="0" rowspan="1" colspan="2">
+                    <widget class="QLabel" row="0" column="2">
                         <property name="name">
                             <cstring>textLabel2_2</cstring>
                         </property>
                         <property name="text">
-                            <string>Spectrum Distance Scale (multiplication factor)</string>
+                            <string>Maximum songs</string>
                         </property>
                     </widget>
-                    <widget class="QLabel" row="5" column="0" rowspan="1" colspan="2">
+                    <widget class="QSpinBox" row="0" column="3">
                         <property name="name">
-                            <cstring>textLabel1_3_2</cstring>
-                        </property>
-                        <property name="sizePolicy">
-                            <sizepolicy>
-                                <hsizetype>5</hsizetype>
-                                <vsizetype>7</vsizetype>
-                                <horstretch>0</horstretch>
-                                <verstretch>0</verstretch>
-                            </sizepolicy>
-                        </property>
-                        <property name="backgroundOrigin">
-                            <enum>ParentOrigin</enum>
-                        </property>
-                        <property name="font">
-                            <font>
-                                <pointsize>10</pointsize>
-                            </font>
-                        </property>
-                        <property name="text">
-                            <string>The &lt;b&gt;spectrum&lt;/b&gt; column contains different colors. The color of a song is determined using a principal component analysis. The 24 dimensional spectrum-space is reduced to three primary dimensions, which form the different color components of the song. Songs with the same color sound similar</string>
-                        </property>
-                        <property name="alignment">
-                            <set>WordBreak|AlignTop</set>
-                        </property>
-                    </widget>
-                    <widget class="QCheckBox" row="1" column="0" rowspan="1" colspan="2">
-                        <property name="name">
-                            <cstring>logdcolor</cstring>
-                        </property>
-                        <property name="text">
-                            <string>dColor calculated using logarithmic base</string>
-                        </property>
-                        <property name="checked">
-                            <bool>true</bool>
-                        </property>
-                    </widget>
-                    <widget class="QSpinBox" row="3" column="0" rowspan="1" colspan="2">
-                        <property name="name">
-                            <cstring>spectrumSpin</cstring>
+                            <cstring>max_songs</cstring>
                         </property>
                         <property name="maxValue">
-                            <number>1000</number>
-                        </property>
-                        <property name="minValue">
-                            <number>1</number>
-                        </property>
-                        <property name="lineStep">
-                            <number>10</number>
+                            <number>1000000</number>
                         </property>
                         <property name="value">
                             <number>100</number>
@@ -1277,6 +1215,24 @@
         </widget>
     </grid>
 </widget>
+<customwidgets>
+    <customwidget>
+        <class>MetricWidget</class>
+        <header location="local">metric-widget.h</header>
+        <sizehint>
+            <width>-1</width>
+            <height>-1</height>
+        </sizehint>
+        <container>0</container>
+        <sizepolicy>
+            <hordata>5</hordata>
+            <verdata>5</verdata>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+        </sizepolicy>
+        <pixmap>image8</pixmap>
+    </customwidget>
+</customwidgets>
 <images>
     <image name="image0">
         <data format="PNG" length="480">89504e470d0a1a0a0000000d4948445200000040000000400806000000aa6971de000001a749444154789ced9bdb9183300c456526bfd44501298502b682144403349402922fefb0ac0dc6922d5de3f39987a37b2204641cb7ae2b71792def0f11d13c8d8ebd5865862b2ff6415be2928016111580d821bd03b40bd02659c0bebd63ed8e76180cbee0d4406801cff8d701db80313929125044f519107b02e51be4d6f947004a68491e44f9c15b1056740620080a0a40285c8a221d802410fa347876119702b400099a1190db05c505589f07cd74402e5d807601da7401da05e422355c610548d1056817a00da400c98b2b3801d257960fc9c54a221ddcaf67568064e0a3b5dcf367a976b3324fa3dbee25b070a354558045e086a0345566c07eebcc6b797fac1c022a43d00b09ed29e2c839daa3145bcfdc59e04c0e77ddfd3ae6041ce143700f9dad8cdb0fc12e40bb006d200548ee4885142009ac00a92e801520453302723ba21901b9141580f0ff0196809480d625b03b2014709e465723b8c467f419b07f20d7aaf5568f11ec00b4309c7a87b337b730e88ec8fa412416185144d210ac35d573e0d675e92c60550287e821d062d81003d17dc286f8ed80bb4ae85782da0568737b015f02edb4d872e527790000000049454e44ae426082</data>
@@ -1301,6 +1257,9 @@
     </image>
     <image name="image7">
         <data format="PNG" length="3219">89504e470d0a1a0a0000000d4948445200000040000000400806000000aa6971de00000c5a49444154789ced9bdb6f1cd77dc73f676676672f33bbcbdd25c59b28919455d9327471854aa5653b3082c4a8031829900009fc50f4ad8051a0fe0f9a97a00f45f214204002e4c12852340f4d5f5aa04de00831498916254a144d529144992b5e77b9bb33b3d7b9f561b5635e444a35e2aeecf00bf0813be7ccfebedff3bb1e82627c7c9c3f65489d36a0d33814a0d306741a870274da804ee350804e1bd0691c0ad069033a8d43013a6d40a7712840a70de8349446a3e1bff8e28bcccfcf73f2e4493ccfa35c2e934ea7912409dff7f76c2a168b542a15b2d92cb95c8ea1a1212449a2542ad16834c864320821505515d334d1348d070f1e880ef07b2ac47befbde78f8d8d71e7ce1dbababad0759d5c2ec7c0c000972f5fa6bbbb7bcfa642a140b95c6676769662b1482a95a2d96c128d46b12c8b582c861082b7df7e1bd775a956ab241209eedfbfffdc8920ee2d2efaf83e32e0341ac880ef38845229944603b9d100c741380ec2b6f185209f4e934aa5f0a7a7b10c8348b349dc71a84912e1f3e759f9ed6f919b4d8ed8369b80f2ad6fa1f7f6b2b4b4f4dc09a0dcba74897ed7a5eebaac791e673d8f69cfe39b3ff909d7af5c21fac107847c9f19dfe728b0128bf1f52b57a8aa2ab77ff10b067ef52b7e070c009e24f1173fff392b3ffa11a95c8e69219024890bb68df9eebb8c8e8efaf7eedd7bae445028977185202c0423a110d54884974221c4d616c3a74ef1f0e85142910817e371fc4c864c2c46a45aa5108d72f67bdfc3ecede58d488450344aa2bb1b7f7898133ffe3151c72165db648f1e85540a4396a9d7eb5f0889e1e1611f0872d6ff25d4c4fcaf7feda78e1ca154afe387c364fafb4196f11585f58d0d62b11808413e9f67787838d8b8b9b9492291606b6b0bc771d0759d542a05806ddbacacaca0280afdfdfd0821f07d9f52a9442a957a26037b7b7bfd582cd63252b496fbbe8febba98a6492291409665002a950a6b6b6b542a15128904c78f1fe7593d4d4c4e4efa9ee7e1fb3e43434384c3e1e0a1effbacadade1380efdfdfdc11702188681aaaac8b2cceaea2ae9749a783c1e3c775d979595157a7a7a5055353054922442a110b22c2384a05eafa3aa2ab66d63db3642086459269fcf23cb32b3b3b364321946474789c5627cf4d147dcbf7f9f93274f3236361688bbb8b888e77984c3610607075155f5994410f7efdff74dd36cabbe6781699a188641229140d7f5e073cff328168b6432195656565055954c26b363effafa3ae17098aeaeaee0b362b11878c2ad5bb7c8e5724422116cdb26140a917e9c60f3f93c8aa2100e87d1348d9e9e1efafafaa8d7eb8147b8ae4b341a0d7e2f954a7cfae9a7148b45fafafa78e185179eea6d4a5bc1fd108bc5300c836ab5ba43004992701c0780502884e338789e87247dd65b259349f2f93c9aa6110a8500884422747777b3b8b8c8912347181919415114745d0fca67a552e1fcf9f3388e43b95cc6f33c1a8d0677efdee5c489135896c5871f7e48a150e0c2850bbcfcf2cbc1f7c5e3717a7a7a906519d7759f9a789f2a802ccb388e83a2287b372b0aaeeb92c964585e5ec6b22c128944f03c128920cb32954a25c80fd16894adad2dce9d3b47a15040d334565656c8e572489284699af8be8fe779f4f6f6f2c9279f100a855014856432c9d0d010baaef3eaabaf22cb3291488446a3816118789e87a66994cb651e3e7c882449bcf6da6b078af05401001cc7d911ff6d689a86611874757521cb32b66def5993482428168be8ba1ebc43d7752a950a73737384c3616667673976ec5890876459465555344de3d4a95381570921585b5b4351140cc3a0bbbb9bab57af120a85304d93478f1e71ead429e2f138c78f1f27168b619a663b873c5104450881e779411c3d0942088410b8aebb4308555529168bc1c9361a8d3d6be2f138e57239100a5a21635916972e5dc2f33c2e5ebcb823744cd3c4b22c6cdb66717191e5e5656ab51aa66952a95488c562e8bacee9d3a73977ee1c5b5b5b9c3d7b3648cad04ae0beef2384383019061e709000b1580cc771827677377cdf27994cb2b6b616cc11bbf7d76ab51de224128980d0b56bd778e59557c8e572acafaf63db36cd6613cff3181a1a425555fafafad0348d442281a66941650182dcf4795a6d4592a43da7b61bc9649242a18065597b0488c7e3542a15344dc375dd2786532a95c2344d4cd30c7241bb0cf6f4f490cd66999b9bc3b66dce9c3983a228c46231b2d9ec0ecff07d1f5996b97bf7eee7ea264746467ccbb21042108bc578f0e0810842e0a03ca0aa2aaeeb3e31c6e3f1389b9b9b689a463c1ea7d16804256d3ba2d128b55a8d643219789baeeb944a25c6c6c6002897cba452a91d53e8e76d9d8787877d2104966551a9575817ebfcb2f64ba6b42936939bbc5f7d9ff3a3e77da51ddb0709d02e79dbdd6efb33d77501e8eaea6265658572b94c369bddb12e9d4eb3baba4aa9540a72812449288a826ddbed7c22da39e5f3607474d4b76d9b42a1c0527e8939658eeb9bd7991a9e62a1b680316b4015781d1e661ff243f38728c0537300b41a1f5996f7d47a6825b5f6a9efe74d922405426eff3e5dd729140a4f14f75908b74ba0ef1b18c66f50d529d4e19b7c3b3ec39253c29bf06005c803bdc029e00a2c7c67811f683fd859050e12a2ddbe56ab55344ddbf12c9d4e532814e8e9e9211e8fe3ba2eb55a6d4fbee8e9e9e1d1a3471886413299045a15261a8d52ad569fdab48c8c8cf88ee350a954a856cb6c6d5d231abd4e363b85e3dc62737395f57587b141f86701df0f43edbb800d38c0167014c62be382c9d63b15689deed3a0691a9ee705096f3bb6f700e9749ae5e5e580d8ee75b22cd36c36777cdece23ede1a78dd1d151dff33c4aa512cd468dadad1954f5369635852cdf2493b9c7d5ab0e850284c3b0b505ba0e8e03efbc017f0ffcd3e3f1647c62bc256c6127af4080dd6ebd1bbaaeb3b1b1b1ef3a4551828eb11d024ff2a86c36cbe6e626e57239f0026895c546a3c1f0f0b06f5916d58ac5c6d21ce1d2025d852992e60dd4771611472a3c7ae473eb16fce10f60593030d012e0cd372116839ffd0cde7803de991817ef1cc8ea711fd0c64121100e87a9d7eb3b26bedd021986110c33b55a6d87abb7d1ae28db9fb5afcd9cba85b2b5403c3f455f719adaea1cb34b054e1e7f9c53fe1378b745b85201d304c380cb97a15d742626c6c5a54b3031f114e66d018060a839a81208218296f8494245a3d1a02b4c2412c100b55b0080fefe7eaad52a1b6b8f10c632b1cdebf497a789e6af6314d659d8f4f84d011a0ed81e9cee86ee38f010b8068cc1c9939f11fef8e36723bbaf00db5d763f11c4e3eb2d4551a8d7eb7be2bb9d4ca195f1dbe5b5fd5ecbb2a85826527d8b487e8674699adf4d4e535e7dc0994c8ddb062812ac59ad9f78187ab516f1c0221ff83d4c88f13fdab55a20407b7cdcaf23f47d1f4dd350148542a1c0e0e0e09e35d96c16d775912489aeaeaed64dcdfc3ce13b7708ddb8c140ef0c697516e154018816e19e017617dc5c035d0545c0d786e1a56e48aa20448bf8c437fe78a4f708d0aef1ed13db0fc9649252a944ad56dbe329cd669372b98c5bad12be770ffdc60d4e5cbf8e72fb3672b1c8bf7b1ea533f0b77ffdd99ed78f81ebc3c5c116d9c10468a1c7a481896f7e31a4b72318f2db59fc20b4e37c606000d775c9e7f3d8b68db2b181363dcdb15bb7d0a6a7f19696f82fc7a148abffe8034a80310fae05f2e32a1a0fc35b2740002f66010f26defae2496f471002edd8de0f8ee3601806f83ec5c5452277ee706c6e8ed8e424cae222956693296010f817e04d6011c801596018309ae0cc80fceae397fa30f5ff4c78370201da17986d789e87611818e53252a341e4ee5dba676618999e46999da5512e53f57d3e001680e3b4daec7520458bf80bc05b40929630005c87897fec2ce9ed106b6b6b7ebb116a5f5cf8cd26e1070fc8cecd919d9941b9760d299f27e7fbdca475a2ff01348130f057b4aa93017c8dd6697701edcb31014c8c3f3fa4b743595e5ec66d34503636e85e5840cccc303839493897c3731c56817f05fe12f86fe03cf07b6014a8d03add978163b4fe3ad4ee139f67d2dba1a47ffa53a6a6a6b8393fcfeb8d061140a715c73aadf9e16f000ff837e063e0dbb4668b33804a8b6c8a2f0fe9ed10ef82ff0fc09f01ef0343b4e2790630818bc03cad93ffc6e34da9ed2fe0cb477a3b9408f012ad58ced28add085007be0bbc0e348076dff76527bc1b8a0b4c01ff03fc3970018803dbfa15a2c0e45788f47628a78155e0ef801e5a270c5fbd93de0fc2df356b7c554f7a3f88c3ff18f913c7a1009d36a0d33814a0d306741a870274da804ee350804e1bd0691c0ad069033a8d43013a6d40a7f1bf2cf8e42314f24fab0000000049454e44ae426082</data>
+    </image>
+    <image name="image8">
+        <data format="PNG" length="1002">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000003b149444154388dad945f4c5b551cc73fe7dc4b7b4bcba0762d45c43114323599ee6192609c51d883892ce083f1718b3ebb185f8dc91e972cf39d2d2a2f1af664b6f1e0fe3863a0718969700eb0c52142da0242a1bd6d696f7bcff101585203ceb8fd9ece39f99dcff9fe7edf939f88c562ec465f5f9fe609442c161362173c3e3eae7b7a7ac8e7f36432196cdbfe4f907c3e4f2291201e8fe338cec3737357e9e8e828aded1e229d650e1f2d51754b082110124c13a4dc5ea341eb9dc284c0558a853f3ce8cb0677ef500fde7d39d2596679e326597b8e9abb85d7a770ab16ab6983ec5a05b487a70e36f0f4e10afe408d6a558310980108478dba4a1e8233990c5d474b64ed39aa3a8fe5f3317fbf81dbd70bccfeb205947632fd74f6589c1c6ea2f70d03a58ba0c1f2c9bdc1b66de3b8256a6e11cbe7e3ee1d181b590124fe2693aeee08d223c82c3a2c24b7b874bec8f26288774f7bd054504aef0dde6e99c0eb83f9fb266323cb80a27fb0958141836044605a2ee5523393371cc646fee2da37195aa35d0c0c5b4859ac03d7e91712dcaac5adab3650a3ff9d08ef7dd8404bb48869e5d958b5b87dadc4c9a1464e9f0d0326df7ebd86bd2e310cb1bf62d384d59441f2d70a070e1c60e09489929b988681bdd9cc97170bcc4c65595f71f8e0e3301337fc24a7732467831875a47f289652b0be5e4151e6d07316c1b0c0340d8ab92023e76d66a6b2840e36d2fb7a13fee632475e6edc367ea98a90fb98b7dd6310ca0328a44761582e1bab41befabcc0ec940d28bc5e93b68e064cab84e1d9beaeb48934eac1f53b01c1b000fca496aa54b61a99fcde61662a4b4b4b23d1680be9d426173e4df3602a48ea411989a4fd590f52a8fd156b05ed9d350e3defe3cfdf4b4c7ce770ea7d3fb9f520afbe1620daeee5c26735d20b9b9cfb6811a754a439e4e5c5639a4caa1e5caf586bfc0197b78702005cb9b4cae4cd3267ce8638fe964bd72b393e39d74928d242617303a756a37f284447770dcdbffc6384a05a85de1306e9a52057c7527c7131c3c42d3f475eb2303c82d4fc3276d6811db37efeb148723082d9b08f79f97c1e5729109a9a28307cc622d2d6cdf52b2b24efe548dedb00142009862cfa879ee1a71f6cec928353511472fbf4389148b0b0e0c108081412458dfe21c9f11351e67e7358595468246d1d1e5e38a6e9e851bc39d84ab502a669331dafec0d8ec7e3e8cb06e1a881d727d1ae40180a434a8c9db129a54126ad48a7358c2b4c5352c8c374bcccdab2bb37d8719cba79fab8211f9df218e0582c261e95f8bfc04f1a1e8bc5c4dfe0a190172af6a9690000000049454e44ae426082</data>
     </image>
 </images>
 <connections>
@@ -1455,4 +1414,7 @@
     <slot>modifydColorCol()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
+<includehints>
+    <includehint>metricwidget.h</includehint>
+</includehints>
 </UI>

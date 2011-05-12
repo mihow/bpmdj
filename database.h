@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
+ Copyright (C) 2001-2005 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -45,10 +45,12 @@ class DataBase
     void copyTags(SongSelectorLogic * selector);
     bool tagFilter(Song*);
     void updateCache(SongSelectorLogic * selector);
-    bool filter(SongSelectorLogic* selector, Song* song, Song* main);
+    bool filter(SongSelectorLogic* selector, Song* song, Song* main, float limit);
     AvlTree<QString>* file_tree;
     void     init();
     void     clear();
+    int      get_unheaped_selection(SongSelectorLogic* selector, Song* main, QVectorView* target);
+    int      set_answer(Song * * show, int length, QVectorView* target);
  public:
     DataBase();
     virtual ~DataBase();
@@ -57,7 +59,7 @@ class DataBase
     // void     del(Song*);
     Song *   find(QString song_filename);
     // bool     lookfor(const QString z);
-    int      getSelection(SongSelectorLogic* selector, Song* main, QVectorView* target);
+    int      getSelection(SongSelectorLogic* selector, Song* main, QVectorView* target, int nr = 0);
     GrowingArray<Song*> * getAllSongs() { return &all;};
     AvlTree<QString> * getFileTreeRef();
     AvlTree<QString> * getFileTreeCopy();

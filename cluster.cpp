@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
- See 'BeatMixing.ps' for more information
+ Copyright (C) 2001-2005 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -248,7 +247,7 @@ void Couple::color_clusters_dw2()
 
 void Couple::color_clusters_dw2(float hue_min, float hue_max, int min_depth, int max_depth, int depth)
 {
-  int nr = cluster_elements();
+  // int nr = cluster_elements();
   int a = Cluster::realcontent[first]->cluster_elements();
   int b = Cluster::realcontent[second]->cluster_elements();
   float h = hue_min+(hue_max-hue_min)*(float)a/(float)(a+b);

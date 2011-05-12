@@ -13,7 +13,7 @@ can be used:
 If you are running another distribution please take a look at one of these
 defines files and adapt where necessary. The file format is self explanatory !
 After creating such a file be sure to send it to me
-(werner.van.belle@vub.ac.be) so I can include it in the next release.
+(werner.van.belle@itek.norut.no) so I can include it in the next release.
 
 Some compile time flags:
  
@@ -25,15 +25,9 @@ Some compile time flags:
     add to the CFLAGS '-D COMPILE_ALSA' to include native support for alsalib. 
     Don't forget to add -lasound to the LDFLAGS !
 
-These defines files proably include distcc and ccache. These two programs are 
-of course not striclt necesasry. Removing these words from the defines file 
-should still work.
+These defines files probably include distcc and ccache. These two programs are 
+of course not strictly necessary. Removing these words from the defines file 
+should fix problems related to these.
 
-PS: I don't want to use automake configure like things because they are simply
-too difficult to use. Makefiles become unreadable, configuring for KDE
-requires more work and testing from the programmer than necessary and in fact,
-I don't like it because the configure suit sounds more like a hack than a
-well designed software deployment process.
-
--- Werner Van Belle (werner.van.belle@vub.ac.be)
+-- Werner Van Belle (werner.van.belle@itek.norut.no)
 

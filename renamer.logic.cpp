@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
- See 'BeatMixing.ps' for more information
+ Copyright (C) 2001-2005 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -23,8 +22,12 @@
 #include <qlineedit.h>
 #include <qlistview.h>
 #include <stdlib.h>
+#include <qfiledialog.h>
 #include <stdio.h>
+#include <qradiobutton.h>
 #include "renamer.logic.h"
+#include "renamerstart.h"
+#include "songselector.logic.h"
 #include "scripts.h"
 
 RenamerLogic::RenamerLogic(QWidget*parent,const QString name) :
@@ -57,9 +60,20 @@ bool RenamerLogic::matchextension(const QString  filename)
 
 void RenamerLogic::add(const QString name, const QString pos)
 {
-  // check whether the filename is good enough
-  if (!goodName(name))
-    new QListViewItem(NameList,name,name,pos);
+  // check whether the filename is too good
+  if (goodName(name)) return;
+  // if it is an index it should have no correct information
+  if (name.contains(".idx",0))
+    {
+      Index i(pos);
+      if (i.valid_tar_info()) 
+	{
+	  printf("Skipping %s because it contains correct information\n",(const char*)name);
+	  return;
+	}
+    }
+  // so it is an incorrect filename which does not contain correct information
+  new QListViewItem(NameList,name,name,pos);
 }
 
 QString RenamerLogic::smallCapsInWord(QString in)
@@ -417,4 +431,31 @@ void RenamerLogic::ignoreSelection()
     }
 }
 
-// eens de selectie weg is kunnen we ergens proberen ene groep te selecteren van zaken die
+
+//---------------------------------------------------------
+//   Starting the stuff from within the song selector
+//---------------------------------------------------------
+void SongSelectorLogic::startRenamer()
+{
+  RenamerStart which_renamer;
+  int result = which_renamer.exec();
+  if (result!=which_renamer.Accepted) return;
+  if (which_renamer.already_indexed->isOn())
+    {
+      RenamerLogic *renamer = new RenamerLogic(this);
+      renamer->scan(IndexDir,IndexDir);
+      renamer->show();
+    }
+  else if (which_renamer.not_yet_indexed->isOn())
+    {
+      QString text = QFileDialog::getExistingDirectory(NULL,this,NULL,"Specify directory to look for songs with wrong name");
+      if (!text.isEmpty())
+	{
+	  if (text.right(1)=="/")
+	    text = text.left(text.length()-1);
+	  RenamerLogic *renamer = new RenamerLogic(this);
+	  renamer->scan(text,text);
+	  renamer->show();
+	}
+    }
+}

@@ -15,8 +15,8 @@
 CPP = distcc g++ -O3
 CC = distcc gcc -O3
 
-#CPP = g++ -O0 -g -pg
-#CC = gcc -O0 -g -pg 
+# CPP = distcc g++ -O0 -g -pg -Wall
+# CC = distcc gcc -O0 -g -pg -Wall
 
 UIC = uic
 MOC = moc
@@ -28,7 +28,7 @@ INSTALL = install
 # -D EFENCE = include electric fence debugging code
 
 CFLAGS+= -D COMPILE_OSS -D COMPILE_ALSA
-LDFLAGS+= -lpthread -lm -lasound -lrt
+LDFLAGS+= -lpthread -lm -lasound -lrt -lfftw3
 QT_INCLUDE_PATH=-I/usr/include/qt3/
 QT_LIBRARY_PATH=
 QT_LIBS= -lqt-mt

@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
- See 'BeatMixing.ps' for more information
+ Copyright (C) 2001-2005 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -61,12 +60,7 @@
  *         Constants & Variables
  *-------------------------------------------*/
 static int    opt_quiet;
-static int    opt_latency;
 char*   arg_latency = "300";
-static int    opt_none = 0;
-static int    opt_alsa = 0;
-static int    opt_oss = 0;
-static int    opt_batch = 0;
 static int    arg_posx = -1;
 static int    arg_posy = -1;
 static dsp_driver *dsp1;
@@ -207,8 +201,8 @@ void set_color2(int r, int g, int b)
 
 static mixarea * area1 = NULL;
 static mixarea * area2 = NULL;
-static synced_longtrick* audio1;
-static synced_longtrick* audio2;
+static synced_stereo_sample2* audio1;
+static synced_stereo_sample2* audio2;
 static int round_robin_size = 10000;
 
 void one_card()
@@ -216,7 +210,6 @@ void one_card()
   // dsp start
   dsp1->open();
   dsp1->start();
-  unsigned4 *value;
   // measure the latency per device every second
   unsigned4 ticker = 0;
   unsigned8 latency = 0;
@@ -229,56 +222,56 @@ void one_card()
       // we read the different values
       unsigned4 readat1 = area1->read;
       unsigned4 readat2 = area2->read;
-      synced_longtrick value1 = audio1[readat1];
-      synced_longtrick value2 = audio2[readat2];
+      synced_stereo_sample2 value1 = audio1[readat1];
+      synced_stereo_sample2 value2 = audio2[readat2];
       signed4 diff = value1.sync - value2.sync;
-      longtrick value;
+      stereo_sample2 value;
       
       // take care to route the signals
       switch (mixer_window->mode)
 	{
 	case 0:
-	  value.leftright.left =
-	    ((signed4)value1.value.leftright.left * mixer_window->ch1main 
-	     + (signed4)value2.value.leftright.left * mixer_window->ch2main) / dspmixdoublemult;
-	  value.leftright.right =
-	    ((signed4)value1.value.leftright.right * mixer_window->ch1main 
-	     + (signed4)value2.value.leftright.right * mixer_window->ch2main) / dspmixdoublemult;
+	  value.left =
+	    ((signed4)value1.value.left * mixer_window->ch1main 
+	     + (signed4)value2.value.left * mixer_window->ch2main) / dspmixdoublemult;
+	  value.right =
+	    ((signed4)value1.value.right * mixer_window->ch1main 
+	     + (signed4)value2.value.right * mixer_window->ch2main) / dspmixdoublemult;
 	  break;
 	case 1:
-	  value1.value.leftright.left = 
-	    ((signed4)value1.value.leftright.left +
-	     (signed4)value1.value.leftright.right) / 2;
-	  value2.value.leftright.left = 
-	    ((signed4)value2.value.leftright.left +
-	     (signed4)value2.value.leftright.right) / 2;
-	  value.leftright.left =
-	    (((signed4)value1.value.leftright.left) * mixer_window->ch1main +
-	     ((signed4)value2.value.leftright.left) * mixer_window->ch2main) / dspmixdoublemult;
-	  value.leftright.right =
-	    (((signed4)value1.value.leftright.left) * mixer_window->ch1monitor +
-	     ((signed4)value2.value.leftright.left) * mixer_window->ch2monitor) / dspmixdoublemult;
+	  value1.value.left = 
+	    ((signed4)value1.value.left +
+	     (signed4)value1.value.right) / 2;
+	  value2.value.left = 
+	    ((signed4)value2.value.left +
+	     (signed4)value2.value.right) / 2;
+	  value.left =
+	    (((signed4)value1.value.left) * mixer_window->ch1main +
+	     ((signed4)value2.value.left) * mixer_window->ch2main) / dspmixdoublemult;
+	  value.right =
+	    (((signed4)value1.value.left) * mixer_window->ch1monitor +
+	     ((signed4)value2.value.left) * mixer_window->ch2monitor) / dspmixdoublemult;
 	  break;
 	case 2:
-	  value1.value.leftright.left = 
-	    ((signed4)value1.value.leftright.left +
-	     (signed4)value1.value.leftright.right) / 2;
-	  value2.value.leftright.left = 
-	    ((signed4)value2.value.leftright.left +
-	     (signed4)value2.value.leftright.right) / 2;
-	  value.leftright.right =
-	    (((signed4)value1.value.leftright.left) * mixer_window->ch1main +
-	     ((signed4)value2.value.leftright.left) * mixer_window->ch2main) / dspmixdoublemult;
-	  value.leftright.left =
-	    (((signed4)value1.value.leftright.left) * mixer_window->ch1monitor +
-	     ((signed4)value2.value.leftright.left) * mixer_window->ch2monitor) / dspmixdoublemult;
+	  value1.value.left = 
+	    ((signed4)value1.value.left +
+	     (signed4)value1.value.right) / 2;
+	  value2.value.left = 
+	    ((signed4)value2.value.left +
+	     (signed4)value2.value.right) / 2;
+	  value.right =
+	    (((signed4)value1.value.left) * mixer_window->ch1main +
+	     ((signed4)value2.value.left) * mixer_window->ch2main) / dspmixdoublemult;
+	  value.left =
+	    (((signed4)value1.value.left) * mixer_window->ch1monitor +
+	     ((signed4)value2.value.left) * mixer_window->ch2monitor) / dspmixdoublemult;
 	  break;
 	default:
 	  assert(0);
 	}
       
       // write out this value & measure latency
-      dsp1->write(&value.value);
+      dsp1->write(value);
       if (++ticker == 44100)
 	{
 	  ticker=0;
@@ -373,7 +366,6 @@ void two_card()
   dsp1->start();
   printf("Starting dsp2\n");
   dsp2->start();
-  unsigned4 *value;
   // measure the latency per device every second
   unsigned4 ticker = 0;
   unsigned8 latency1 = 0;
@@ -389,29 +381,29 @@ void two_card()
       // we read the different values
       unsigned4 readat1 = area1->read;
       unsigned4 readat2 = area2->read;
-      synced_longtrick value1 = audio1[readat1];
-      synced_longtrick value2 = audio2[readat2];
+      synced_stereo_sample2 value1 = audio1[readat1];
+      synced_stereo_sample2 value2 = audio2[readat2];
       signed4 diff = value1.sync - value2.sync;
-      longtrick out1;
-      longtrick out2;
+      stereo_sample2 out1;
+      stereo_sample2 out2;
 
       // route the signals
-      out1.leftright.left =
-	((signed4)value1.value.leftright.left * mixer_window->ch1main 
-	 + (signed4)value2.value.leftright.left * mixer_window->ch2main) / dspmixdoublemult;
-      out1.leftright.right =
-	((signed4)value1.value.leftright.right * mixer_window->ch1main 
-	 + (signed4)value2.value.leftright.right * mixer_window->ch2main) / dspmixdoublemult;
-      out2.leftright.left =
-	((signed4)value1.value.leftright.left * mixer_window->ch1monitor 
-	 + (signed4)value2.value.leftright.left * mixer_window->ch2monitor) / dspmixdoublemult;
-      out2.leftright.right =
-	((signed4)value1.value.leftright.right * mixer_window->ch1monitor
-	 + (signed4)value2.value.leftright.right * mixer_window->ch2monitor) / dspmixdoublemult;
+      out1.left =
+	((signed4)value1.value.left * mixer_window->ch1main 
+	 + (signed4)value2.value.left * mixer_window->ch2main) / dspmixdoublemult;
+      out1.right =
+	((signed4)value1.value.right * mixer_window->ch1main 
+	 + (signed4)value2.value.right * mixer_window->ch2main) / dspmixdoublemult;
+      out2.left =
+	((signed4)value1.value.left * mixer_window->ch1monitor 
+	 + (signed4)value2.value.left * mixer_window->ch2monitor) / dspmixdoublemult;
+      out2.right =
+	((signed4)value1.value.right * mixer_window->ch1monitor
+	 + (signed4)value2.value.right * mixer_window->ch2monitor) / dspmixdoublemult;
       
       if (mixer_window->mode == 1)
 	{
-	  longtrick o = out1;
+	  stereo_sample2 o = out1;
 	  out1 = out2;
 	  out2 = o;
       	}
@@ -426,15 +418,15 @@ void two_card()
       if (skipping && ticker%skipevery==0 )
 	{
 	  if (latency1 < latency2)
-	    dsp1->write(&out1.value);
+	    dsp1->write(out1);
 	  else 
-	    dsp2->write(&out2.value);
+	    dsp2->write(out2);
 	  skipping--;
 	}
       else
 	{
-	  dsp1->write(&out1.value);
-	  dsp2->write(&out2.value);
+	  dsp1->write(out1);
+	  dsp2->write(out2);
 	}
       
       // can we measure the latency difference between the two cards ?
@@ -469,7 +461,7 @@ void two_card()
 	  if (skipping > 0)
 	    skipevery = 44100 / skipping;
 	  else
-	    skipevery == 88000;
+	    skipevery += 88000;
 	}
       
       // automatic synchronisation
@@ -554,7 +546,7 @@ int main(int argc, char *argv[])
   int devfd2 = shm_open("/kbpm-mix2",O_CREAT|O_RDWR,S_IRUSR|S_IWUSR);
   if (devfd2 == -1)
     printf("Could not open shared memory area for device 2\n");
-  int buffersize = round_robin_size * sizeof(struct synced_sample) + sizeof(mixarea);
+  int buffersize = round_robin_size * sizeof(struct synced_stereo_sample2) + sizeof(mixarea);
   int mapsize = buffersize / getpagesize();
   if (mapsize * getpagesize() != buffersize)
     mapsize++;
@@ -572,8 +564,8 @@ int main(int argc, char *argv[])
   ftruncate(devfd2,mapsize);
   mlock(area1,mapsize);
   mlock(area2,mapsize);
-  audio1 = (synced_longtrick*)(area1+1);
-  audio2 = (synced_longtrick*)(area2+1);
+  audio1 = (synced_stereo_sample2*)(area1+1);
+  audio2 = (synced_stereo_sample2*)(area2+1);
   area1->init(round_robin_size);
   area2->init(round_robin_size);
 

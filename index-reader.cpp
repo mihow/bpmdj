@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
- See 'BeatMixing.ps' for more information
+ Copyright (C) 2001-2005 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -33,7 +32,7 @@
 #include "kbpm-dj.h"
 #include "qsong.h"
 #include "config.h"
-#include "spectrum.h"
+#include "spectrum-type.h"
 #include "database.h"
 #include "songtree.h"
 #include "avltree.cpp"
@@ -48,7 +47,7 @@ IndexReader::IndexReader(QProgressBar * b, QLabel *l, DataBase * db) :
   reading = l;
   total_files = 0;
   reading_bib = true;
-  progress->setTotalSteps(Config::file_count);
+  progress->setTotalSteps(Config::get_file_count());
   songs_already_in_database = 0;
   scan(IndexDir,IndexDir);
   // printf("Debug: %d songs already in database when scanning .bib files\n",songs_already_in_database);
@@ -58,7 +57,6 @@ IndexReader::IndexReader(QProgressBar * b, QLabel *l, DataBase * db) :
   scan(IndexDir,IndexDir);
   // printf("Debug: %d songs already in database when scanning .idx files\n",songs_already_in_database);
   progress -> setProgress(total_files);
-  last_spectrum();  
   QStringFactory::kill();
 }
 
@@ -71,7 +69,7 @@ void IndexReader::add(Song * song)
 {
    database->add(song);
    song->checkondisk();
-   if ( ++ total_files % (Config::file_count/100 > 0 ? Config::file_count / 100 : 10) == 0)
+   if ( ++ total_files % (Config::get_file_count()/100 > 0 ? Config::get_file_count() / 100 : 10) == 0)
      {
       progress -> setProgress(total_files);
 	app -> processEvents();
@@ -80,7 +78,6 @@ void IndexReader::add(Song * song)
 
 void IndexReader::checkfile(const QString prefix, const QString  filename)
 {
-  int meta_version;
   QString fullname = prefix + "/" + filename;
   if (reading_bib)
     {
@@ -99,7 +96,7 @@ void IndexReader::checkfile(const QString prefix, const QString  filename)
 	      songs_already_in_database++;
 	    }
 	  else
-	    add(new Song(&index,false,false,true));
+	    add(new Song(&index,false,false));
 	}
       Index::done_bib_batchread();
     }
@@ -113,7 +110,7 @@ void IndexReader::checkfile(const QString prefix, const QString  filename)
 	  songs_already_in_database++;
 	}
       else
-	add(new Song(&index,true,false,true));
+	add(new Song(&index,true,false));
     }
   
 }

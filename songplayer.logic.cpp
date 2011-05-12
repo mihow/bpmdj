@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
+ Copyright (C) 2001-2005 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -41,8 +41,9 @@
 #include <qpainter.h>
 #include "songplayer.logic.h"
 #include "bpm-analyzer.logic.h"
-#include "pattern-analyzer.logic.h"
-#include "spectrumanalyzer.logic.h"
+#include "beatgraph-analyzer.logic.h"
+#include "spectrum-analyzer.logic.h"
+#include "rythm-analyzer.logic.h"
 #include "memory.h"
 #include "about.h"
 
@@ -772,6 +773,12 @@ void SongPlayerLogic::openBpmCounter()
      bpmcounter->show();
 }
 
+void SongPlayerLogic::openRythmAnalyzer()
+{
+  RythmDialogLogic analyzer;
+  analyzer.exec();
+}
+
 void SongPlayerLogic::openInfo()
 {
   playing->executeInfoDialog();
@@ -785,7 +792,7 @@ void SongPlayerLogic::openSpectrumAnalyzer()
 
 void SongPlayerLogic::openPatternAnalyzer()
 {
-  PatternAnalyzerLogic analyzer(true);
+  BeatGraphAnalyzerLogic analyzer(true);
   analyzer.exec();
 }
 
@@ -901,15 +908,17 @@ void SongPlayerLogic::mouseReleaseEvent(QMouseEvent * e)
 
 int valuetick(int i)
 {
+  if (i==-1) return 0;
   i%=8;
   if (i == 0) return 255;
-        if (i == 1) return 128;
-      if (i == 2) return 170;
-        if (i == 3) return 128;
-    if (i == 4) return 212;
-        if (i == 5) return 128;
-      if (i == 6) return 170;
-        if (i == 7) return 128;
+  if (i == 1) return 128;
+  if (i == 2) return 170;
+  if (i == 3) return 128;
+  if (i == 4) return 212;
+  if (i == 5) return 128;
+  if (i == 6) return 170;
+  if (i == 7) return 128;
+  assert(0);
 }
 
 void SongPlayerLogic::update_inmap_pixmap()
@@ -984,7 +993,9 @@ void SongPlayerLogic::update_map_pixmaps()
   for(int i = 0 ; i < map_size ; i ++)
     {
       QColor out;
-      out.setHsv(map[i] . take_from * 240 / map_size , 255 , valuetick( map [ i ].take_from ));
+      out.setHsv(abs(map[i] . take_from * 240 / map_size), 
+		 255, 
+		 valuetick( map [ i ].take_from ));
       pmo.setPen(out);
       pmo.drawLine(i,0,i,h-1);
     }

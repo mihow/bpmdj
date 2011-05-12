@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
+ Copyright (C) 2001-2005 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@
 #include "scripts.h"
 #include "version.h"
 #include "dsp-drivers.h"
+#include "fourier.h"
 #include "energy-analyzer.h"
 #include "memory.h"
 
@@ -66,7 +67,7 @@ dsp_driver *dsp = NULL;
  *         File input oprations
  *-------------------------------------------*/
 char * wave_name=NULL;
-unsigned4 wave_buffer[wave_bufsize];
+stereo_sample2 wave_buffer[wave_bufsize];
 FILE * wave_file;
 unsigned4 wave_bufferpos=wave_bufsize;
 
@@ -150,17 +151,88 @@ unsigned4 wave_max()
   return fsize(wave_file)/4;
 }
 
-int wave_read(unsigned4 pos, unsigned4 *val)
+void wave_process(stereo_sample2 *wave_buffer, int size)
+  // this contrast enhancing works quite well, except that the 'mean curve' 
+  // is certainly not good. Short beats will sound stronger in the end result
+  // than long sounds, which is not what is required
+  // 
+ {
+  static double *tot_energy = NULL;
+  static int count = 0;
+  static double *amp;
+  static double *co;
+  static double *si;
+  static double *dl;
+
+  if (!tot_energy)
+    {
+      tot_energy = allocate(size,double);
+      for(int i = 0 ; i < size ; i ++)
+	tot_energy[i]=0;
+      amp = allocate(size,double);
+      co = allocate(size,double);
+      si = allocate(size,double);
+      dl = allocate(size,double);
+    }
+  for(int i = 0 ; i < size ; i ++)
+    {
+      amp[i] = wave_buffer[i].left;
+      amp[i]/=32768.0;
+    }
+  fft_double(size,0,amp,NULL,co,si);
+  count++;
+  if (count % 100 == 0)
+    {
+      for(int i = 0 ; i < size ; i ++)
+	printf("%g  ",tot_energy[i]);
+      printf("\n");
+    }
+  for(int i = 0 ; i < size ; i ++)
+    {
+      double e = co[i]*co[i]+si[i]*si[i];
+      double ea = sqrt(e);
+      double an = atan2(si[i],co[i]);
+      e = tot_energy[i]+=ea/count;
+      
+      ea/=e;
+      if (ea<1)
+	{
+	  if (ea<0) ea = -sqrt(ea)/3;
+	  else ea=sqrt(ea)/3;
+	  //if (ea<0) ea = -ea*ea;
+	  // else ea*=ea;
+	  ea*=ea;
+	}
+      ea*=e;
+      
+      co[i]=ea*cos(an);
+      si[i]=ea*sin(an);
+    }
+  fft_double(size,1,co,si,amp,dl);
+  for(int i = 0 ; i < size ; i ++)
+    wave_buffer[i].left = (short int)(amp[i]*32768.0);
+}
+
+void wave_process()
 {
-   if (pos-wave_bufferpos>=wave_bufsize)
-     {
-	if (pos>wave_max()) return -1;
-	wave_bufferpos=pos;
-	fseek(wave_file,pos*4,SEEK_SET);
-	fread(wave_buffer,4,wave_bufsize,wave_file);
-     }
-   *val=wave_buffer[pos-wave_bufferpos];
-   return 0;
+  const int size = 512;
+  for(int i = 0 ; i < wave_bufsize ; i+=size)
+    wave_process(wave_buffer+i,size);
+}
+
+
+int wave_read(unsigned4 pos, stereo_sample2 *val)
+{
+  if (pos-wave_bufferpos>=wave_bufsize)
+    {
+      if (pos>wave_max()) return -1;
+      wave_bufferpos=pos;
+      fseek(wave_file,pos*4,SEEK_SET);
+      fread(wave_buffer,4,wave_bufsize,wave_file);
+      //wave_process();
+    }
+  *val=wave_buffer[pos-wave_bufferpos];
+  return 0;
 }
 
 
@@ -198,116 +270,31 @@ void lfo_set(char* name, _lfo_ l, unsigned8 freq, unsigned8 phase)
 }
 
 static signed4 volume = 100;
-unsigned4 lfo_no(unsigned4 x)
+stereo_sample2 lfo_no(stereo_sample2 lt)
 {
-  longtrick lt;
-  lt.value=x;
-  lt.leftright.left=((signed4)lt.leftright.left)*volume/100;
-  lt.leftright.right=((signed4)lt.leftright.right)*volume/100;
-  return lt.value;
+  return lt.muldiv(volume,100);
 }
 
-unsigned4 lfo_volume(unsigned4 x, signed4 multiplierleft, signed4 divisorleft, signed4 multiplierright,signed4 divisorright)
+stereo_sample2 lfo_volume(stereo_sample2 x, signed4 multiplierleft, signed4 divisorleft, signed4 multiplierright,signed4 divisorright)
 {
-   longtrick lt;
-   signed4 left;
-   signed4 right;
-   lt.value=x;
-   left=lt.leftright.left;
-   right=lt.leftright.right;
-   left*=multiplierleft;
-   right*=multiplierright;
-   left/=divisorleft;
-   right/=divisorright;
-   lt.leftright.left=left;
-   lt.leftright.right=right;
-   return lt.value;
+  return x.muldiv2(multiplierleft,divisorleft,multiplierright,divisorright);
 }
 
-unsigned4 lfo_metronome(unsigned4 x)
+stereo_sample2 lfo_metronome(stereo_sample2 x)
 {
    double val;
    signed8 diff;
-   longtrick lt;
    diff=(signed8)y-(signed8)lfo_phase;
    diff=diff%lfo_period;
    /* say ping */
    val=sin(6.28*diff*(double)(WAVRATE)/440.0)*4096.0*(1.0-(double)diff/(double)lfo_period);
    /* mix them */
-   lt.value=x;
-   lt.leftright.left=((long)lt.leftright.left)*7/8;
-   lt.leftright.right=((long)lt.leftright.right)*7/8;
-   lt.leftright.left+=(signed short)val;
-   lt.leftright.right+=(signed short)val;
-   return lt.value;
+   stereo_sample2 a =  x.muldiv(7,8);
+   return a.add((signed4)val,(signed4)val);
 }
 
 #define DIFF 100
 #define DECAY 11050
-unsigned4 lfo_difference(unsigned4 x)
-{
-   static signed short freq=2;
-   static signed short oldestat=0;
-   static signed8 suml=0;
-   static signed8 sumr=0;
-   static signed short prevl[DIFF];
-   static signed short prevr[DIFF];
-   static signed8 lostrengths[DECAY];
-   static signed8 histrengths[DECAY];
-   static signed8 lostrength=1L;
-   static signed8 histrength=1L;
-   static signed8 leftlo, lefthi, rightlo, righthi;
-   static signed8 oldeststrengthat=0;
-   longtrick lt;
-   signed4 left;
-   signed4 right;
-   signed4 oldleft;
-   signed4 oldright;
-   lt.value=x;
-   /* get the oldest value */
-   oldleft=prevl[oldestat];
-   oldright=prevr[oldestat];
-   /* subtract them from the sum */
-   suml-=oldleft;
-   sumr-=oldright;
-   /* store this value */
-   prevl[oldestat]=lt.leftright.left;
-   prevr[oldestat]=lt.leftright.right;
-   oldestat++;
-   if (oldestat>=freq) oldestat=0;
-   /* add it to the sum */
-   suml+=lt.leftright.left;
-   sumr+=lt.leftright.right;
-   /* calculate the new ratio */
-   lostrength-=lostrengths[oldeststrengthat];
-   histrength-=histrengths[oldeststrengthat];
-   /* calculate the difference */
-   lefthi=lt.leftright.left;
-   leftlo=suml/freq;
-   righthi=lt.leftright.right;
-   rightlo=sumr/freq;
-   left=lefthi-leftlo;
-   right=righthi-rightlo;
-   /* this will be played */
-   lt.leftright.left=left;
-   lt.leftright.right=right;
-   /* calculate the new strength */
-   leftlo=abs(leftlo);
-   lefthi=abs(lefthi);
-   lostrength+=leftlo;
-   histrength+=lefthi;
-   lostrengths[oldeststrengthat]=leftlo;
-   histrengths[oldeststrengthat]=lefthi;
-   oldeststrengthat++;
-   if (oldeststrengthat>=DECAY) 
-     {
-	oldeststrengthat=0;
-	printf("%g %g\n",(log(lostrength)/log(1.002))-8000.0,(log(histrength)/log(1.002))-8000.0);
-     }
-   return lt.value;
-}
-
-
 #ifdef IMPULSE_PANNING
 #undef DIFF
 static int DIFF = 19190*4;
@@ -328,7 +315,7 @@ void pan_init()
 }
 
 static float maxsig=0.0;
-unsigned4 lfo_pan(unsigned4 x)
+stereo_sample2 lfo_pan(stereo_sample2 x)
 {
    signed8 diff;
    longtrick lt;
@@ -349,7 +336,7 @@ unsigned4 lfo_pan(unsigned4 x)
 #endif
 
 #ifndef IMPULSE_PANNING
-unsigned4 lfo_pan(unsigned4 x)
+stereo_sample2 lfo_pan(stereo_sample2 x)
 {
   signed8 diff;
   signed4 quart;
@@ -373,7 +360,7 @@ unsigned4 lfo_pan(unsigned4 x)
 }
 #endif
 
-unsigned4 lfo_saw(unsigned4 x)
+stereo_sample2 lfo_saw(stereo_sample2 x)
 {
    signed8 diff;
    diff=(signed8)y-(signed8)lfo_phase;
@@ -381,18 +368,18 @@ unsigned4 lfo_saw(unsigned4 x)
    return lfo_volume(x,diff,lfo_period,diff,lfo_period);
 }
 
-unsigned4 lfo_break(unsigned4 x)
+stereo_sample2 lfo_break(stereo_sample2 x)
 {
   signed8 diff;
   diff=(signed8)y-(signed8)lfo_phase;
   diff=diff%lfo_period;
   if (diff>lfo_period*95/100) 
-    return 0;
+    return stereo_sample2();
   else 
     return x;
 }
 
-unsigned4 lfo_revsaw(unsigned4 x)
+stereo_sample2 lfo_revsaw(stereo_sample2 x)
 {
   signed8 diff;
   diff=(signed8)y-(signed8)lfo_phase;
@@ -634,9 +621,9 @@ static float4 right_fact;
 
 void rms_init()
 {
-  sample_type min = playing->get_min();
-  sample_type max = playing->get_max();
-  sample_type mean = playing->get_mean();
+  sample4_type min = playing->get_min();
+  sample4_type max = playing->get_max();
+  sample4_type mean = playing->get_mean();
   power_type pow = playing->get_power();
   if (!min.fully_defined() || !max.fully_defined() || 
       !mean.fully_defined() || !pow.fully_defined())
@@ -658,18 +645,18 @@ void rms_init()
   right_fact /= pow.right;
 }
 
-void rms_normalize(longtrick *l)
+void rms_normalize(stereo_sample2 *l)
 {
   // left
-  float v = l->leftright.left;
+  float v = l->left;
   v -= left_sub;
   v *= left_fact;
-  l->leftright.left=(signed2)v;
+  l->left=(signed2)v;
   // right
-  v = l->leftright.right;
+  v = l->right;
   v -= right_sub;
   v *= right_fact;
-  l->leftright.right=(signed2)v;
+  l->right=(signed2)v;
 }
 
 /*-------------------------------------------
@@ -777,7 +764,7 @@ void jumpto(signed8 mes, int txt)
 
 void read_write_bare_loop()
 {
-  unsigned4 value[1];
+  stereo_sample2 value[1];
   unsigned8 m;
   lfo_init();
   map_init();
@@ -799,19 +786,19 @@ void read_write_bare_loop()
 	{
 	  printf("End of song, pausing\n");
 	  paused = 1;
-	  value[0] = 0L;
+	  value[0] = stereo_sample2();
 	};
       value[0]=lfo_do(value[0]);
       y=y+1;
       
       // write value
-      dsp->write(value);
+      dsp->write(value[0]);
     }
 }
 
 void read_write_normalize_loop()
 {
-  unsigned4 value[1];
+  stereo_sample2 value[1];
   unsigned8 m;
   rms_init();
   if (!opt_rms)
@@ -839,14 +826,14 @@ void read_write_normalize_loop()
 	{
 	  printf("End of song, pausing\n");
 	  paused = 1;
-	  value[0] = 0L;
+	  value[0] = stereo_sample2();
 	};
-      rms_normalize((longtrick*)value);
+      rms_normalize(value);
       value[0]=lfo_do(value[0]);
       y=y+1;
       
       // write value
-      dsp->write(value);
+      dsp->write(value[0]);
     }
 }
 
@@ -868,7 +855,7 @@ void line()
 
 void copyright()
 {
-  printf("BpmDj Player v%s, Copyright (c) 2001-2004 Werner Van Belle\n",VERSION);
+  printf("BpmDj Player v%s, Copyright (c) 2001-2005 Werner Van Belle\n",VERSION);
   printf("This software is distributed under the GPL2 license. See copyright.txt\n");
   line();
 }

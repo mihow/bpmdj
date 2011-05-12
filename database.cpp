@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
- See 'BeatMixing.ps' for more information
+ Copyright (C) 2001-2005 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -21,6 +20,7 @@
 #include <qlabel.h>
 #include "history.h"
 #include "database.h"
+#include "song-metric.h"
 #include "qsong.h"
 #include "songselector.logic.h"
 #include "process-manager.h"
@@ -28,12 +28,10 @@
 #include "avltree.cpp"
 #include "growing-array.cpp"
 #include "tags.h"
+#include "heap.h"
 
 /**
- * The database makes use of some optimalisations
- * - The cache contains items that are visible if only taking the taglist into account
- * - Every song itself also keeps track of its associated qsong (if any), this avoids
- *   unneccessary Qsong deletion and creation.
+ * The database cache contains items that are visible when only considereing the taglist
  */
 
 DataBase::DataBase() : all(), cache()
@@ -184,79 +182,41 @@ void DataBase::updateCache(SongSelectorLogic* selector)
     }
 }
 
-/* WVB -- the thing below can be seriously optimized
- * 2 - get all flags and pass them in one flag
- * 3 - move the getDistance to a later moment
- * 4 - make the song to work internally with floats/doubles instead of strings
- * 5 - remove the maintempo flag.. I don't think its usefull
+/* WVB -- the thing below can be further optimized
+ * 1 - get all flags and pass them in one flag
  */
-bool DataBase::filter(SongSelectorLogic* selector, Song *item, Song* main)
+bool DataBase::filter(SongSelectorLogic* selector, Song *item, Song* main, float limit)
 {
   if (main!=NULL && main->get_author()==item->get_author())
     item->set_played_author_at_time(Played::songs_played);
-  // we must obtain the distance first because this value is updated on the fly
-  bool indistance = item->getDistance();
-  if (Config::limit_indistance && !indistance)
-    return false;
   // song on disk ?
-  if (Config::limit_ondisk && !item->get_ondisk())
+  if (Config::get_limit_ondisk() && !item->get_ondisk())
     return false;
   // song played ?
-  if (Config::limit_nonplayed && item->get_played())
+  if (Config::get_limit_nonplayed() && item->get_played())
     return false;
   // okay, no similar authors please..
-  if (Config::limit_authornonplayed && 
-      Played::songs_played - item->get_played_author_at_time() < Config::authorDecay)
+  if (Config::get_limit_authornonplayed() && 
+      Played::songs_played - item->get_played_author_at_time() < Config::get_authorDecay())
     return false;
-  
-  if (item->get_tempo().valid() && main && (Config::limit_uprange || Config::limit_downrange))
-    {
-      double d = item->tempo_n_distance(1,main);
-      if (Config::show_unknown_tempo && d == 1000) goto tempo_has_reason_to_show;
-      if (Config::limit_uprange   && d >= 0 && d <= 1) goto tempo_has_reason_to_show; // we have a reason to show this item
-      if (Config::limit_downrange && d <= 0 && d >= -1) goto tempo_has_reason_to_show;
-      
-      if (Config::show_tempo54)
-	{
-	  d = abs_minimum(item->tempo_n_distance(5.0/4.0,main), item->tempo_n_distance(4.0/5.0,main));
-	  if (Config::limit_uprange   && d >= 0 && d <= 1) goto tempo_has_reason_to_show;
-	  if (Config::limit_downrange && d <= 0 && d >= -1) goto tempo_has_reason_to_show;
-	}
-      
-      if (Config::show_tempo64)
-	{
-	  d = abs_minimum (item->tempo_n_distance(6.0/4.0,main),item->tempo_n_distance(4.0/6.0,main));
-	  if (Config::limit_uprange   && d >= 0 && d <= 1) goto tempo_has_reason_to_show;
-	  if (Config::limit_downrange && d <= 0 && d >= -1) goto tempo_has_reason_to_show;
-	}
-      
-      if (Config::show_tempo74)
-	{
-	  d = abs_minimum (item->tempo_n_distance(7.0/4.0,main),item->tempo_n_distance(4.0/7.0,main));
-	  if (Config::limit_uprange   && d >= 0 && d <= 1) goto tempo_has_reason_to_show;
-	  if (Config::limit_downrange && d <= 0 && d >= -1) goto tempo_has_reason_to_show;
-	}
-      
-      if (Config::show_tempo84)
-	{
-	  d = abs_minimum ( item->tempo_n_distance(8.0/4.0,main), item->tempo_n_distance(4.0/8.0,main));
-	  if (Config::limit_uprange   && d >= 0 && d <= 1) goto tempo_has_reason_to_show;
-	  if (Config::limit_downrange && d <= 0 && d >= -1) goto tempo_has_reason_to_show;
-	}
-      
-      return false; // there is no reason to show the song with this tempo;
-    }
-  
- tempo_has_reason_to_show:
+  // now check the tempo stuff
+  if (main && (Config::get_limit_uprange() || Config::get_limit_downrange()))
+    if (!item->tempo_show(main,
+			  Config::get_limit_uprange(),
+			  Config::get_limit_downrange())) return false;
   // search
   const QString lookingfor = selector -> searchLine -> text();
-  if (strcmp(lookingfor,"")!=0)
+  if (!lookingfor.isEmpty())
     {
       QString title=item->get_title().upper();
       QString author=item->get_author().upper();
       if (title.contains(lookingfor)+author.contains(lookingfor)==0)
 	return false;
     }
+  // obtain the distance
+  bool indistance = item->get_distance_to_main(limit);
+  if (Config::get_limit_indistance() && !indistance)
+    return false;
   return true;
 }
 
@@ -274,18 +234,25 @@ AvlTree<QString>* DataBase::getFileTreeRef()
   return file_tree;
 }
 
-int DataBase::getSelection(SongSelectorLogic* selector, Song* main, QVectorView* target)
+int DataBase::get_unheaped_selection(SongSelectorLogic* selector, Song* main, QVectorView* target)
 {
+  // to get an appropriate selection we allocate the nessary vector
   int itemcount=0;
   updateCache(selector);
   Song * * show = allocate(cache.count,Song*);
   for(int i = 0; i < cache.count ; i ++)
     {
       Song *song = cache.elements[i];
-      bool vis = filter(selector,song,main);
+      bool vis = filter(selector,song,main,1.0);
       if (vis)
 	show[itemcount++] = song;
     }
+  return set_answer(show,itemcount,target);
+}
+
+
+int DataBase::set_answer(Song ** show, int itemcount, QVectorView* target)
+{
   if (itemcount)
     show = reallocate(show, itemcount, Song*);
   else
@@ -296,6 +263,27 @@ int DataBase::getSelection(SongSelectorLogic* selector, Song* main, QVectorView*
   QSong::setVector(show,itemcount);
   target->vectorChanged();
   return itemcount;
+}
+
+int DataBase::getSelection(SongSelectorLogic* selector, Song* main, QVectorView* target, int count)
+{
+  if (count==0 || main==NULL) return get_unheaped_selection(selector, main, target);
+  
+  // to get an appropriate selection we allocate the nessary vector
+  updateCache(selector);
+  Song * * show = allocate(count,Song*);
+  SongHeap heap(count);
+  if (Config::get_limit_indistance()) heap.maximum = 1.0;
+  for(int i = 0; i < cache.count ; i ++)
+    {
+      Song *song = cache.elements[i];
+      bool vis = filter(selector,song,main, heap.maximum);
+      if (vis)
+	heap.add(song);
+    }
+  int itemcount = heap.copy_to(show);
+  assert(itemcount<=count);
+  return set_answer(show,itemcount,target);
 }
 
 Song * * DataBase::closestSongs(SongSelectorLogic * selector, Song * target, SongMetriek * metriek, int maximum, int &count)
@@ -317,7 +305,7 @@ Song * * DataBase::closestSongs(SongSelectorLogic * selector, Song * target, Son
       if (!song->get_ondisk()) continue;
       if (!tagFilter(song)) continue;
       // measure distance, gegeven de metriek
-      double d = song->distance(target,metriek);
+      double d = song->distance(target,metriek,100000);
       // find the best position to insert the item..
       for (j = 0 ; j < count ; j++)
 	if (minima[j]>d) 

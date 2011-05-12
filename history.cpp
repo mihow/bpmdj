@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
- See 'BeatMixing.ps' for more information
+ Copyright (C) 2001-2005 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -98,7 +97,7 @@ void Played::Play(Song * main_now)
 	{
 	  f = i.add_next_song(t_0->get_file());
 	  info = f -> comment;
-	  if (Config::ask_mix)
+	  if (Config::get_ask_mix())
 	    {
 	      bool ok;
 	      QString mixinfo = QInputDialog::getText("How did the mix go ?",

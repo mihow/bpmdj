@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
- See 'BeatMixing.ps' for more information
+ Copyright (C) 2001-2005 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -49,7 +48,7 @@ void EnergyAnalyzer::readAudio()
   FILE * raw = openRawFile(playing,arg_rawpath);
   audiosize=fsize(raw);
   audiosize/=4;
-  audio=allocate(audiosize+1,longtrick);
+  audio=allocate(audiosize+1,stereo_sample2);
   if (audiosize==0) return;
   readsamples(audio,audiosize,raw);
 }
@@ -69,18 +68,18 @@ void EnergyAnalyzer::run()
   playing->clear_energy();
   if (audiosize == 0) return;
   // scan for minima, maxima and mean
-  signed2 minl = audio[0].leftright.left;
-  signed2 minr = audio[0].leftright.right;
-  signed2 maxl = audio[0].leftright.left;
-  signed2 maxr = audio[0].leftright.right;
+  signed2 minl = audio[0].left;
+  signed2 minr = audio[0].right;
+  signed2 maxl = audio[0].left;
+  signed2 maxr = audio[0].right;
   signed8 meal = 0;
   signed8 mear = 0;
   signed8 divl = audiosize;
   signed8 divr = audiosize;
   for(unsigned8 i = 0 ; i < audiosize ; i ++)
     {
-      signed2 l = audio[i].leftright.left;
-      signed2 r = audio[i].leftright.right;
+      signed2 l = audio[i].left;
+      signed2 r = audio[i].right;
       if (l < minl) minl=l;
       if (r < minr) minr=r;
       if (l > maxl) maxl=l;
@@ -110,8 +109,8 @@ void EnergyAnalyzer::run()
   float8 powr = 0;
   for(unsigned8 i = 0 ; i < audiosize ; i ++)
     {
-      float8 l = audio[i].leftright.left;
-      float8 r = audio[i].leftright.right;
+      float8 l = audio[i].left;
+      float8 r = audio[i].right;
       l -= subl;
       r -= subr;
       l *= facl;

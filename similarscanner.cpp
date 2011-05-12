@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
+ Copyright (C) 2001-2005 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -133,7 +133,6 @@ void SimilarScanner::similarNameFound(QString name, QString similar, QString ful
 
 void SimilarScanner::findSimilarNames(QString text, QString fullname)
 {
-  QVectorView *songList = selector->songList;
   similarnames = false;
   char exact[1024];
   for(int it1 = 0 ; it1 < QSong::get_song_count() ; it1 ++)

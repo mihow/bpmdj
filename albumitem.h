@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
+ Copyright (C) 2001-2005 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -20,6 +20,7 @@
 
 #include "config.h"
 #include "cluster.h"
+#include "data.h"
 
 #define ALBUM_NR 0
 #define ALBUM_TITLE 1
@@ -31,8 +32,7 @@
 class AlbumItem: 
   public QListViewItem
 {
- public:
-  Song * song;
+  accessors(Song*, song, NULL);
  public:
   AlbumItem(const char* name, QListView * parent);
   AlbumItem(int nr, Song *song, QListViewItem * parent);

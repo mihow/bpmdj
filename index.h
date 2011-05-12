@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
+ Copyright (C) 2001-2005 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -24,6 +24,10 @@
 #include <stdio.h>
 #include "common.h"
 #include "types.h"
+#include "spectrum-type.h"
+#include "histogram-property.h"
+#include "composition-property.h"
+#include "rythm-property.h"
 
 /*-------------------------------------------
  *         Index operations
@@ -69,11 +73,14 @@ class Index
   char            * index_file;           // the mp3 file in the music/ directory
   char            * index_remark;         // some small remark (without newlines)
   char            * index_tags;           // a alphabetically sorted tag list
-  int               index_bpmcount_from;  // lastbpmcount was from ... 
+  int               index_bpmcount_from;  // lastbpmcount was from ...
   int               index_bpmcount_to;    // and to ...
   char            * index_md5sum;         // the md5 sum of the mp3
   char            * index_time;           // the normal playing time of the song
-  char            * index_spectrum;       // 26 digits marking the spectrum
+  spectrum_type   * index_spectrum;       // the bark frequencies
+  histogram_property index_histogram;     // the histogram of the SFFT at the different bark bands
+  rythm_property     index_rythm;         // the slice rotated SFFT of measures
+  composition_property index_composition; // the autocorrelation of the composition of the song
   // information only available from v2.2 on
   char            * title;
   char            * author;
@@ -84,10 +91,10 @@ class Index
   AlbumField     ** albums;       // list of albums containing this song
   // information only available from v2.6 on
  public:
-  sample_type       index_min;   // min value (below zero line) of both channels
-  sample_type       index_max;   // max value 
-  sample_type       index_mean;  // mean value
-  power_type        index_power; // rms
+  sample4_type       index_min;   // min value (below zero line) of both channels
+  sample4_type       index_max;   // max value 
+  sample4_type       index_mean;  // mean value
+  power_type         index_power; // rms
  private:
   // some conversion functions from old versions
   bool fix_tagline();
@@ -105,8 +112,13 @@ class Index
   // reading an index stored in a .bib (.bib)
   void read_v23_field();
   void read_v261_field();
+  void read_v27_field();
+  void read_v271_field();
+  void read_v272_field();
+  void read_v273_field();
+  void read_v274_field();
   void read_bib_field(const char* name);
-  void write_v261_field(FILE * file);
+  void write_v274_field(FILE * file);
  public:
   bool fix_tar_info();
   static void init_bib_batchread(const char* name);
@@ -143,9 +155,9 @@ class Index
   // statistical accessors
   bool             fully_defined_energy();  
   void             clear_energy();
-  sample_type      get_min()                { return index_min; };
-  sample_type      get_max()                { return index_max; };
-  sample_type      get_mean()               { return index_mean; };
+  sample4_type     get_min()                { return index_min; };
+  sample4_type     get_max()                { return index_max; };
+  sample4_type     get_mean()               { return index_mean; };
   power_type       get_power()              { return index_power; };
   // album accessors
   void             add_album(AlbumField *);
@@ -185,9 +197,16 @@ class Index
   void             set_bpmcount_to(int f)   { index_bpmcount_to = f; };
   int              get_bpmcount_to()        { return index_bpmcount_to; };
   // spectrum accessors       
-  void             set_spectrum(char*s)     { if (!index_spectrum || strcmp(index_spectrum,s)!=0) {index_spectrum = s; meta_changed=true; } };
-  // char           * get_spectrum()           { return index_spectrum; };
-  spectrum_type    get_spectrum_copy();
+  void             set_spectrum(spectrum_type*s) { index_spectrum = s; meta_changed=true; };
+  spectrum_type *  get_spectrum();
+  void             set_histogram(histogram_property h) { index_histogram = h; meta_changed=true; };
+  histogram_property get_histogram()          { return index_histogram; };
+  // rythm accessors
+  void             set_rythm(rythm_property r) { index_rythm = r ; meta_changed = true; } ;
+  rythm_property   get_rythm() { return index_rythm; };
+  // composition accessors
+  void             set_composition(composition_property r) { index_composition = r ; meta_changed = true; } ;
+  composition_property get_composition() { return index_composition; };
 };
 
 #endif

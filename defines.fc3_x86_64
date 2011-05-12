@@ -1,0 +1,20 @@
+# Fedora Core 3, x84, 64 bit !
+# submitted by: Harrison L. Rommel <rommel@u.washington.edu>
+
+CPP = g++ -O9
+CC = gcc -O9 
+
+CP = cp
+MV = mv
+TAR = tar
+MKDIR = mkdir
+UIC = /usr/bin/uic
+MOC = moc
+STRIP = strip
+INSTALL = install
+
+CFLAGS+= -D COMPILE_OSS -D COMPILE_ALSA
+LDFLAGS+= -lpthread -lm -lasound -lrt -lfftw3
+QT_INCLUDE_PATH=-I/usr/lib64/qt-3.3/include
+QT_LIBRARY_PATH=-L/usr/lib64/qt-3.3/lib
+QT_LIBS= -lqt-mt

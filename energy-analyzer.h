@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
+ Copyright (C) 2001-2005 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -20,6 +20,7 @@
 
 #include "analyzer.h"
 #include "common.h"
+#include "stereo-sample2.h"
 
 float4 normalization_factor(signed2 mi, signed2 ma, signed2 me);
 
@@ -27,7 +28,7 @@ class EnergyAnalyzer: public Analyzer
 {
  private:
   unsigned8 audiosize;
-  longtrick *audio;
+  stereo_sample2 *audio;
  public:
   EnergyAnalyzer() {};
   void readAudio();

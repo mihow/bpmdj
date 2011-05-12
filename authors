@@ -1,17 +1,17 @@
 $Id: authors,v 1.3 2004/05/10 09:46:51 krubbens Exp $
 
 BpmDj: Free Dj Tools
- Copyright (C) 2001 Werner Van Belle
- See 'beatmixing.ps' for more information
+ Copyright (C) 2001-2005 Werner Van Belle
 
- BPM-code         : Werner Van Belle (werner.van.belle@itek.norut.no)
- FFT-code         : Don Cross (dcross@intersrv.com)
- PCA-code         : F. Murtagh (murtagh@scivax.stsci.edu)
- defines.mandrake : Romanin Gianluca (contact@openjay.org)
- defines.slackware: Erik (erik@cpuhookup.com)
- defines.redhat   : Ray B. Morris (support@webmastersguide.com)
- defines.redhat9  : Peter Lawler (yaluser@pacific.net.au)
- defines.suses.8.1: Johan Fabry (johan.fabry@vub.ac.be)
- minor patches    : James Gerken (phlegm@mib.org)
- windows port     : Luciano Genero (luciano.genero@softway.it)
- pre-1.0 buildenv : Thomas Steudten <thomas@steudten.com>
+ BPM-code          : Werner Van Belle <werner.van.belle@itek.norut.no>
+ FFT-code          : Don Cross <dcross@intersrv.com>
+ PCA-code          : F. Murtagh <murtagh@scivax.stsci.edu>
+ defines.mandrake  : Romanin Gianluca <contact@openjay.org>
+ defines.slackware : Erik <erik@cpuhookup.com>
+ defines.redhat    : Ray B. Morris <support@webmastersguide.com>
+ defines.redhat9   : Peter Lawler <yaluser@pacific.net.au>
+ defines.suses.8.1 : Johan Fabry <johan.fabry@vub.ac.be>
+ defines.fc3_x86_64: Harrison L. Rommel <rommel@u.washington.edu>
+ minor patches     : James Gerken <phlegm@mib.org>
+ windows port      : Luciano Genero <luciano.genero@softway.it>
+ pre-1.0 buildenv  : Thomas Steudten <thomas@steudten.com>

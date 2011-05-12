@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
+ Copyright (C) 2001-2005 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -18,27 +18,11 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#include <qstring.h>
-#include <stdio.h>
-#include "spectrum.h"
+#ifndef TAG_TYPE_H
+#define TAG_TYPE_H
 
-spectrum_freq scales[spectrum_size] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
-spectrum_freq sums[spectrum_size] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-static int spectra=0;
+typedef   signed char   tag_type;
+typedef      tag_type * tags_type;
+const        tag_type   tag_end = 0;
 
-void new_spectrum(spectrum_type spectrum)
-{
-  if (spectrum==no_spectrum) return;
-  spectra++;
-  for(int i = 0 ;i < spectrum_size; i ++ )
-    sums[i]+=spectrum[i];
-}
-
-void last_spectrum()
-{
-  for(int i = 0 ; i < spectrum_size ; i ++ )
-    {
-      // printf("mean of frequency band %d is %g\n",i,sums[i]/(float)spectra);
-      scales[i]=(float)spectra/(float)sums[i];
-    }
-}
+#endif

@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
- See 'BeatMixing.ps' for more information
+ Copyright (C) 2001-2005 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -69,7 +68,7 @@ public:
   };
   virtual void scan()
   { 
-    DirectoryScanner::scan(Config::tmp_directory,NULL); 
+    DirectoryScanner::scan(Config::get_tmp_directory(),NULL); 
   };
 };
 
@@ -124,7 +123,7 @@ int main(int argc, char* argv[])
     if (QMessageBox::warning(NULL,RAW_EXT " files check",
 			     "There are some left over "RAW_EXT" files. These are:\n"+raw.result,
 			     "Remove", "Ignore", 0, 0, 1)==0)
-      removeAllRaw(Config::tmp_directory);  
+      removeAllRaw(Config::get_tmp_directory());  
   
   // 3. read all the files in memory
   main_window.initialize_using_config();
@@ -135,7 +134,7 @@ int main(int argc, char* argv[])
   // create the index in memory
   loader->progressBar1->setEnabled(true);
   IndexReader * indexReader = new IndexReader(loader->progressBar1, loader->readingDir ,main_window.database);
-  Config::file_count=indexReader->total_files;
+  Config::set_file_count(indexReader->total_files);
   delete indexReader;
   indexReader = NULL;
   
@@ -147,7 +146,7 @@ int main(int argc, char* argv[])
   loader = NULL;
   
   // 5. Some extra version dependent blurb...
-  if (!Config::shown_aboutbox)
+  if (!Config::get_shown_aboutbox())
     {
       if (MAGIC_NOW == MAGIC_2_1)
 	QMessageBox::message(NULL,"The player now supports OSS and ALSA, together\n"
@@ -159,23 +158,28 @@ int main(int argc, char* argv[])
 			     "algorithm. Please go to Preferences|spectrum to revert it\n"
 			     "back to the old (lesser accurate) version.\n"
 			     "Also, be sure to look at the fragment sequencer of the player !\n");
+      if (MAGIC_NOW == MAGIC_2_7)
+	QMessageBox::message(NULL,"This highly improved version of BpmDj can now\n"
+			     "analyze echo, rythm and composition characteristics !\n"
+			     "Be sure to read the copyright and licensing information.\n");
     }
   
   // 5b. startup mixers ?
-  if (Config::open_mixer)
+  if (Config::get_open_mixer())
     main_window.openMixer();
-  if (Config::open_bpmmixer)
+  if (Config::get_open_bpmmixer())
     main_window.openBpmMixer();
   
   // 6. start the application
   main_window.show();
   int result = application.exec();
-  if (!Config::shown_aboutbox)
+  if (!Config::get_shown_aboutbox())
     {
-      Config::shown_aboutbox=true;
-      QMessageBox::message(NULL,"If you like this software please consider putting a\n"
-			   "link to http://bpmdj.sourceforge.net/ on your webpage\n"
-			   "(together with some nice words of course :)");
+      Config::set_shown_aboutbox(true);
+      QMessageBox::message(NULL,"If you use this software regularly, then please put a\n"
+			        "link to http://bpmdj.sourceforge.net/ on your homepage\n"
+			        "(together with some nice words of course :) If you don't\n"
+			        "have a homepage, it should not be too difficult to create one.");
     }
   Config::save();
   return result;

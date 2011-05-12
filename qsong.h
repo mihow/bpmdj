@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
+ Copyright (C) 2001-2005 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -42,6 +42,9 @@
 #define LIST_MAX 14
 #define LIST_MEAN 15
 #define LIST_POWER 16
+#define LIST_HISTOGRAM 17
+#define LIST_RYTHM 18
+#define LIST_COMPOSITION 19
 
 class QSong: public QVectorViewData
 {
@@ -65,7 +68,7 @@ class QSong: public QVectorViewData
     static  void Sort();
     QSong();
     static Song * songEssence(int i);
-    static QColor * colorOfTempoCol(Song* main, Song* song);
+    static QColor * colorOfTempoCol(const Song* main, Song* song);
     static QColor * colorOfAuthorCol(Song* song);
     static QColor * QSong::colorOfdColorCol(Song* song);
     static void playedAuthorAtTime(int i, int t) {get_songs(i)->set_played_author_at_time(t);};

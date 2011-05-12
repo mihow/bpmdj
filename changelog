@@ -1,3 +1,16 @@
+2.7: 
+  doc   + added documentation on the rythm analyzer
+  ksel  + added simple statistics box to show spectrum statistics	
+  ksel  + added composition analyzer	
+  ksel  + improved search algorithm to match the required metrics
+  anal  + added rythm analyzer
+  anal  - since ssh sometimes deadlocks, a timeout is introduced in the 
+	  analyzer starter.
+  ksel  ~ modified spectrum representation in index and bib files
+  ksel  - removed the non-logartihmic matching	
+  anal  + added echo analyzer	
+  ksel  ~ removed longtricks and replaced it by descent type	
+  ksel  + added accesors for the configuration options	
 2.6:    
   doc   + wrote a section about the kbpm-mix program
   ksel  + can start songs with the keyboard (ctrl-enter)	

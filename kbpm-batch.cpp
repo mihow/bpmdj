@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
- See 'BeatMixing.ps' for more information
+ Copyright (C) 2001-2005 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -96,8 +95,6 @@ int main(int argc, char *argv[])
       arguments++;
   if (arguments==0)
     options_failure("requires at least one host");
-  // allocate application thread
-  pthread_t *y = allocate(1,pthread_t);
   // and create new window
   progress = new AnalyzersProgressLogic(arguments);
   // make it the main window
@@ -125,7 +122,5 @@ int main(int argc, char *argv[])
     free(line);
   // start the batch processing
   progress->start();
-  // and start it in its own thread
   go(NULL);
-  //   pthread_create(y,NULL,go,NULL);
 }

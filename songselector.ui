@@ -1,4 +1,4 @@
-<!DOCTYPE UI><UI version="3.2" stdsetdef="1">
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
 <class>SongSelector</class>
 <widget class="QDialog">
     <property name="name">
@@ -575,7 +575,7 @@
                         <property name="name">
                             <cstring>unnamed</cstring>
                         </property>
-                        <widget class="QListView" row="0" column="0" rowspan="1" colspan="8">
+                        <widget class="QListView" row="0" column="0" rowspan="1" colspan="3">
                             <column>
                                 <property name="text">
                                     <string>Nr°</string>
@@ -760,20 +760,12 @@
                                 <bool>false</bool>
                             </property>
                         </widget>
-                        <widget class="QSpinBox" row="1" column="7">
+                        <widget class="QSpinBox" row="1" column="2">
                             <property name="name">
                                 <cstring>extraSongs</cstring>
                             </property>
                         </widget>
-                        <widget class="QLabel" row="2" column="5">
-                            <property name="name">
-                                <cstring>textLabel1_5_2</cstring>
-                            </property>
-                            <property name="text">
-                                <string>Spectrum weight</string>
-                            </property>
-                        </widget>
-                        <widget class="QLabel" row="1" column="2" rowspan="1" colspan="5">
+                        <widget class="QLabel" row="1" column="1">
                             <property name="name">
                                 <cstring>textLabel1</cstring>
                             </property>
@@ -781,7 +773,7 @@
                                 <string>Number of extra songs to insert when adding a song to the queue</string>
                             </property>
                         </widget>
-                        <widget class="QPushButton" row="2" column="7">
+                        <widget class="QPushButton" row="2" column="2">
                             <property name="name">
                                 <cstring>pushButton2</cstring>
                             </property>
@@ -789,42 +781,7 @@
                                 <string>Fullly automatic mix !!!</string>
                             </property>
                         </widget>
-                        <widget class="QLabel" row="2" column="3">
-                            <property name="name">
-                                <cstring>textLabel1_5</cstring>
-                            </property>
-                            <property name="text">
-                                <string>Tempo weight</string>
-                            </property>
-                        </widget>
-                        <widget class="QSpinBox" row="2" column="4">
-                            <property name="name">
-                                <cstring>tempoWeight</cstring>
-                            </property>
-                            <property name="value">
-                                <number>1</number>
-                            </property>
-                        </widget>
-                        <widget class="QSpinBox" row="2" column="6">
-                            <property name="name">
-                                <cstring>spectrumWeight</cstring>
-                            </property>
-                            <property name="value">
-                                <number>1</number>
-                            </property>
-                        </widget>
-                        <widget class="QCheckBox" row="2" column="1" rowspan="1" colspan="2">
-                            <property name="name">
-                                <cstring>weighDuplicateAuthors</cstring>
-                            </property>
-                            <property name="text">
-                                <string>No duplicate authors</string>
-                            </property>
-                            <property name="checked">
-                                <bool>true</bool>
-                            </property>
-                        </widget>
-                        <spacer row="1" column="0" rowspan="1" colspan="2">
+                        <spacer row="1" column="0">
                             <property name="name">
                                 <cstring>spacer3</cstring>
                             </property>
@@ -858,6 +815,17 @@
                                 </size>
                             </property>
                         </spacer>
+                        <widget class="QCheckBox" row="2" column="1">
+                            <property name="name">
+                                <cstring>weighDuplicateAuthors</cstring>
+                            </property>
+                            <property name="text">
+                                <string>No duplicate authors</string>
+                            </property>
+                            <property name="checked">
+                                <bool>true</bool>
+                            </property>
+                        </widget>
                     </grid>
                 </widget>
                 <widget class="QWidget">

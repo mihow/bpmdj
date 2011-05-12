@@ -1,4 +1,4 @@
-VERSION = 2.6
+VERSION = 2.7
 DESTDIR = /usr/local/
 #TIME = /usr/bin/time -f ' '\[%e\]
 #ECHO = echo -n 
@@ -16,7 +16,7 @@ include defines
 UIS = ${shell ls *.ui}
 LINK = $(TIME) $(CPP) $(LDFLAGS) $(QT_INCLUDE_PATH) $(QT_LIBRARY_PATH) $(QT_LIBS)
 
-bin: kbpm-play kbpm-dj kbpm-merge kbpm-mix kbpm-batch
+bin: kbpm-play kbpm-dj kbpm-merge kbpm-mix kbpm-batch 
 
 #############################################################################
 # Rules
@@ -95,16 +95,16 @@ mrproper: clean temp_files
 .PHONY: website all clean files
 
 files:
-	@echo " [file] list"
-	@rm -r tmp 2>/dev/null; exit 0
-	@find . -iname "*" | grep -v ^\./index | grep -v ^\./music > existing_files # list of existing files
-	@grep \  existing_files > problem_files; exit 0 # problematic files
-	@test ! -s problem_files
-	@gawk '{print $$1}' files >known_files # list of known files
-	@grep -vxFf known_files existing_files >unknown_files; exit 0 # unknown files
-	@gawk '{print $$1"  ---"}' unknown_files >>files # attach these to the files
-	@gawk '{if ($$2=="---") print $1}' files >untagged_files; exit 0 # find files missing tags
-	@if test -s untagged_files; then cat untagged_files; exit 1; fi
+	echo " [file] list"
+	rm -r tmp 2>/dev/null; exit 0
+	find . -iname "*" | grep -v ^\./index | grep -v ^\./music > existing_files # list of existing files
+	grep \  existing_files > problem_files; exit 0 # problematic files
+	test ! -s problem_files
+	gawk '{print $$1}' files >known_files # list of known files
+	grep -vxFf known_files existing_files >unknown_files; exit 0 # unknown files
+	gawk '{print $$1"  ---"}' unknown_files >>files # attach these to the files
+	gawk '{if ($$2=="---") print $1}' files >untagged_files; exit 0 # find files missing tags
+	if test -s untagged_files; then cat untagged_files; exit 1; fi
 
 source_files: files
 	@echo " [file] source"
@@ -131,6 +131,8 @@ bpmdj-source.tgz: source_files
 	@tar -cz --no-recursion --ignore-failed-read -T source_files -f bpmdj-source.tgz  2>/dev/null 
 
 bpmdj-bin.tgz: install_files bin
+	@echo "[strip]"
+	@strip * 2>/dev/null; exit 0
 	@echo "  [tgz] install"
 	@tar -cz --no-recursion --ignore-failed-read -T install_files -f bpmdj-bin.tgz 2>/dev/null 
 
@@ -238,24 +240,28 @@ include depend
 VECTOR_OBJECTS = qvectorview.o qvectorview.moc.o vector-view.o vector-view.moc.o
 
 KPLAY_OBJECTS = avltree.o about.o about.moc.o power-type.o\
-	songplayer.o songplayer.moc.o memory.o sample-type.o\
+	songplayer.o songplayer.moc.o memory.o sample4-type.o\
 	player-core.o dsp-oss.o dsp-alsa.o dsp-none.o dsp-mixed.o\
-	dsp-drivers.o\
+	dsp-drivers.o spectrum-type.o files.o \
 	song-information.o song-information.moc.o\
 	index.o kbpm-play.o analyzer.o signals.o\
 	songplayer.logic.o songplayer.logic.moc.o\
 	md5-analyzer.o efence.o page.o efence-print.o energy-analyzer.o\
 	bpmcounter.o bpmcounter.moc.o bpm-analyzer.logic.o bpm-analyzer.logic.moc.o\
-	pattern-analyzer.o pattern-analyzer.moc.o pattern-analyzer.logic.o pattern-analyzer.logic.moc.o\
-	spectrumanalyzer.o spectrumanalyzer.moc.o spectrumanalyzer.logic.o spectrumanalyzer.logic.moc.o\
-	pattern-filter.logic.o   pattern-rythm.logic.o\
-	fourierd.o\
-	fftmisc.o\
-	common.o\
+	spectrum-analyzer.o  spectrum-analyzer.moc.o  spectrum-analyzer.logic.o  spectrum-analyzer.logic.moc.o\
+	beatgraph-analyzer.o beatgraph-analyzer.moc.o beatgraph-analyzer.logic.o beatgraph-analyzer.logic.moc.o\
+	rythm-analyzer.o     rythm-analyzer.moc.o     rythm-analyzer.logic.o     rythm-analyzer.logic.moc.o\
+	fourierd.o histogram-type.o histogram-property.o\
+	fftmisc.o common.o\
 	scripts.o
 
 KMIX_OBJECTS = mixerdialog.o mixerdialog.moc.o mixerdialog.logic.o mixerdialog.logic.moc.o\
-	kbpm-mix.o dsp-oss.o dsp-alsa.o dsp-none.o memory.o dsp-drivers.o
+	kbpm-mix.o dsp-oss.o dsp-alsa.o dsp-none.o memory.o dsp-drivers.o files.o\
+	efence.o page.o efence-print.o fourierd.o signals.o spectrum-type.o fftmisc.o 
+
+KLIFE_OBJECTS = kbpm-life.o bpm-life.o bpm-life.moc.o\
+	memory.o files.o\
+	efence.o page.o efence-print.o fourierd.o signals.o spectrum-type.o fftmisc.o 
 
 KCOUNT_OBJECTS = bpmcounter.o bpmcounter.moc.o\
 	index.o kbpm-count.o kbpm-count.moc.o\
@@ -273,35 +279,39 @@ avltree-test:
 	g++ -pg -g avltree-test.cpp
 
 KSEL_OBJECTS = 	avltree.o songtree.o qstring-factory.o tags.o\
-	spectrum.o scripts.o cluster.o pca.o about.o about.moc.o\
-	loader.o loader.moc.o compacter.o compacter.moc.o\
+	renamerstart.o renamerstart.moc.o heap.o \
+	spectrum-type.o scripts.o cluster.o pca.o about.o about.moc.o\
+	loader.o loader.moc.o compacter.o compacter.moc.o histogram-type.o\
 	qvectorview.o qvectorview.moc.o freq-mapping.o freq-mapping.moc.o\
-	albumbox.o albumbox.moc.o compact-idx.o memory.o\
-	song-information.o song-information.moc.o sample-type.o\
+	albumbox.o albumbox.moc.o compact-idx.o memory.o histogram-property.o\
+	song-information.o song-information.moc.o sample4-type.o\
 	scanningprogress.o scanningprogress.moc.o power-type.o\
 	choose-analyzers.o choose-analyzers.moc.o basic-process-manager.o\
 	database.o dirscanner.o importscanner.o efence.o page.o efence-print.o\
 	songselector.o songselector.moc.o songselector.logic.o songselector.logic.moc.o\
 	process-manager.o playercommandwizard.o playercommandwizard.moc.o\
 	preferences.o preferences.moc.o preferences.logic.o preferences.logic.moc.o\
-	song.o qsong.o queuedsong.o historysong.o\
-	index-reader.o index.o history.o albumitem.o\
+	song.o qsong.o queuedsong.o historysong.o signals.o fftmisc.o\
+	index-reader.o index.o history.o albumitem.o fourierd.o files.o\
 	setupwizard.moc.o setupwizard.o kbpm-dj.o edit-distance.o\
 	renamer.o renamer.moc.o renamer.logic.o renamer.logic.moc.o\
 	similars.o similars.moc.o similarscanner.o similarscanner.moc.o\
-	config.o merger-dialog.o merger-dialog.moc.o common.o
+	config.o merger-dialog.o merger-dialog.moc.o common.o\
+	song-statistics.o statistics.o statistics.moc.o song-metric.o \
+	metric-widget.o metric-widget.moc.o cluster-dialog.o cluster-dialog.moc.o
 
 KBATCH_OBJECTS = scripts.o memory.o \
 	analyzers-manager.o analyzers-progress.o analyzers-progress.logic.o\
 	analyzers-progress.moc.o analyzers-progress.logic.moc.o\
-	sample-type.o\
-	power-type.o\
-	basic-process-manager.o\
-	efence.o page.o efence-print.o\
+	sample4-type.o histogram-property.o histogram-type.o\
+	power-type.o files.o signals.o index.o fourierd.o spectrum-type.o\
+	basic-process-manager.o song-information.o song-information.moc.o \
+	efence.o page.o efence-print.o fftmisc.o\
 	kbpm-batch.o common.o
 
 MERGER_OBJECTS = merger.o index.o common.o scripts.o song-information.o song-information.moc.o\
-	efence.o page.o efence-print.o memory.o sample-type.o power-type.o
+	efence.o page.o efence-print.o memory.o sample4-type.o power-type.o spectrum-type.o \
+	signals.o fourierd.o fftmisc.o files.o histogram-property.o histogram-type.o
 
 #############################################################################
 # Binaries
@@ -324,6 +334,10 @@ kbpm-play: $(KPLAY_OBJECTS)
 kbpm-mix: $(KMIX_OBJECTS)
 	@$(ECHO) " [link] "$@
 	@$(LINK) $(KMIX_OBJECTS) -o kbpm-mix
+
+kbpm-life: $(KLIFE_OBJECTS)
+	@$(ECHO) " [link] "$@
+	@$(LINK) $(KLIFE_OBJECTS) -o kbpm-life
 
 kbpm-batch: $(KBATCH_OBJECTS)
 	@$(ECHO) " [link] "$@

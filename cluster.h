@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
+ Copyright (C) 2001-2005 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -23,6 +23,7 @@
 
 #include <assert.h>
 #include "common.h"
+#include "basic-types.h"
 
 // TODO: by taking all elements in realcontent immediatelly from
 // Qsong global if the index is below type_mark 

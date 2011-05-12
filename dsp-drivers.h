@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
+ Copyright (C) 2001-2005 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 #ifndef DSP_DRIVERS
 #define DSP_DRIVERS
 #include "common.h"
+#include "stereo-sample2.h"
 #ifndef COMPILE_OSS
 #ifndef COMPILE_ALSA
 #error -------------------------------------------
@@ -41,7 +42,7 @@ class dsp_driver
   dsp_driver() { verbose = false; };
   virtual void start() = 0;
   virtual void pause() = 0;
-  virtual void write(unsigned4 *value) = 0;
+  virtual void write(stereo_sample2 value) = 0;
   virtual signed8 latency() = 0;
   virtual int  open() = 0;
   virtual void close() = 0;

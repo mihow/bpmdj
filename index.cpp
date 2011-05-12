@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
- See 'BeatMixing.ps' for more information
+ Copyright (C) 2001-2005 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -40,6 +39,7 @@
 #include "version.h"
 #include "song-information.h"
 #include "memory.h"
+#include "spectrum-type.h"
 
 /*-------------------------------------------
  *         Performance operations
@@ -93,15 +93,35 @@ static char* strldup(char* str, int l)
   strncpy(result,str,l+1);
   return result;
 }
-	      
-static long int buffer_long()
+
+long int buffer_signed4()
 {
-  long p = *(long*)(buffer+buffer_ptr);
+  signed4 p = *(long*)(buffer+buffer_ptr);
   buffer_ptr+=4;
   return p;
 }
 
-static float8 buffer_double()
+void buffer_sequence(unsigned1 *a, int l)
+{
+  memcpy(a,buffer+buffer_ptr,1*l);
+  buffer_ptr+=l;
+}
+
+float4 buffer_float4()
+{
+  float p = *(float*)(buffer+buffer_ptr);
+  buffer_ptr+=4;
+  return p;
+}
+
+unsigned1 buffer_unsigned1()
+{
+  unsigned1 p = *(unsigned1*)(buffer+buffer_ptr);
+  buffer_ptr+=1;
+  return p;
+}
+
+static float8 buffer_float8()
 {
   float8 p = *(float8*)(buffer+buffer_ptr);
   buffer_ptr+=8;
@@ -165,6 +185,9 @@ void Index::init()
   index_cue_v = 0;
   index_cue = 0;
   index_spectrum = NULL;
+  index_histogram.clear();
+  index_rythm.clear();
+  index_composition.clear();
   title = NULL;
   author = NULL;
   remix = NULL;
@@ -187,7 +210,7 @@ void Index::free()
   if (index_tags)     ::deallocate(index_tags);
   if (index_md5sum)   ::deallocate(index_md5sum);
   if (index_time)     ::deallocate(index_time);
-  if (index_spectrum) ::deallocate(index_spectrum);
+  if (index_spectrum) delete index_spectrum;
   // if (index_pattern) deallocate(index_pattern);
   if (title)   ::deallocate(title);
   if (author)  ::deallocate(author);
@@ -239,7 +262,10 @@ void Index::write_idx()
    if (index_md5sum) fprintf(f,"md5sum : %s\n",index_md5sum);
    if (index_remark) fprintf(f,"remark   : %s\n",index_remark);
    if (index_time) fprintf(f,"time : %s\n",index_time);
-   if (index_spectrum) fprintf(f,"spectrum : %s\n",index_spectrum);
+   if (index_spectrum!=no_spectrum) index_spectrum->write_idx(f);
+   index_histogram.write_idx(f,"histogram");
+   index_rythm.write_idx(f,"rythm");
+   index_composition.write_idx(f,"composition");
    index_min.write("min : ",f);
    index_max.write("max : ",f);
    index_mean.write("mean : ",f);
@@ -512,7 +538,10 @@ void Index::read_idx(const char* indexn)
       else if(strcmp(field,"max")==0) index_max.read(value);
       else if(strcmp(field,"mean")==0) index_mean.read(value);
       else if(strcmp(field,"power")==0) index_power.read(value);
-      else if(strcmp(field,"spectrum")==0) index_spectrum=strldup(value,end-value);
+      else if(strcmp(field,"spectrum")==0) index_spectrum=new spectrum_type(value);
+      else if(strcmp(field,"histogram")==0) index_histogram.read_idx(value);
+      else if(strcmp(field,"rythm")==0) index_rythm.read_idx(value);
+      else if(strcmp(field,"composition")==0) index_composition.read_idx(value);
       else if(strcmp(field,"prev")==0 || strcmp(field,"next")==0)
 	{
 	  char * subfield, * subvalue;
@@ -657,42 +686,43 @@ void Index::read_v23_field()
   index_remark= zeroable(buffer_strdup());
   index_time= buffer_strdup();
   index_md5sum= buffer_strdup();
-  index_spectrum= zeroable(buffer_strdup());
+  char * tmp = zeroable(buffer_strdup());
+  index_spectrum = tmp ? new spectrum_type(tmp) : no_spectrum;
   index_tags=buffer_strdup();
   // 2. read all kinds of numbers
-  index_period = buffer_long();
-  index_bpmcount_from = buffer_long();
-  index_bpmcount_to = buffer_long();
-  index_cue = buffer_long();
-  index_cue_z = buffer_long();
-  index_cue_x = buffer_long();
-  index_cue_c = buffer_long();
-  index_cue_v = buffer_long();
+  index_period = buffer_signed4();
+  index_bpmcount_from = buffer_signed4();
+  index_bpmcount_to = buffer_signed4();
+  index_cue = buffer_signed4();
+  index_cue_z = buffer_signed4();
+  index_cue_x = buffer_signed4();
+  index_cue_c = buffer_signed4();
+  index_cue_v = buffer_signed4();
   // 3. read the list structures... (prev, next, album)
   int count;
-  count = buffer_long();
+  count = buffer_signed4();
   // printf("prev_count = %ld\n",count);
   while(count-->0)
     {
       current = new HistoryField(buffer_strdup());
-      current->count = buffer_long();
+      current->count = buffer_signed4();
       current->comment = buffer_strdup();
       add_prev_history(current);
     }
-  count = buffer_long();
+  count = buffer_signed4();
   // printf("next_count = %ld\n",count);
   while(count-->0)
     {
       current = new HistoryField(buffer_strdup());
-      current->count = buffer_long();
+      current->count = buffer_signed4();
       current->comment = buffer_strdup();
       add_next_history(current);
     }
-  count = buffer_long();
+  count = buffer_signed4();
   // printf("album_count = %ld\n",count);
   while(count-->0)
     {
-      int   nr = buffer_long();
+      int   nr = buffer_signed4();
       char * n = buffer_strdup();
       add_album(new AlbumField(nr,n));
       // printf("Located in album %d : %s\n",nr,n);
@@ -714,50 +744,414 @@ void Index::read_v261_field()
   index_remark= zeroable(buffer_strdup());
   index_time= buffer_strdup();
   index_md5sum= buffer_strdup();
-  index_spectrum= zeroable(buffer_strdup());
+  char * tmp = zeroable(buffer_strdup());
+  index_spectrum = tmp ? new spectrum_type(tmp) : no_spectrum;
   index_tags=buffer_strdup();
   // 2. read all kinds of numbers
-  index_period = buffer_long();
-  index_bpmcount_from = buffer_long();
-  index_bpmcount_to = buffer_long();
-  index_cue = buffer_long();
-  index_cue_z = buffer_long();
-  index_cue_x = buffer_long();
-  index_cue_c = buffer_long();
-  index_cue_v = buffer_long();
-  index_min.left = buffer_long();
-  index_min.right = buffer_long();
-  index_max.left = buffer_long();
-  index_max.right = buffer_long();
-  index_mean.left = buffer_long();
-  index_mean.right = buffer_long();
-  index_power.left = buffer_double();
-  index_power.right = buffer_double();
+  index_period = buffer_signed4();
+  index_bpmcount_from = buffer_signed4();
+  index_bpmcount_to = buffer_signed4();
+  index_cue = buffer_signed4();
+  index_cue_z = buffer_signed4();
+  index_cue_x = buffer_signed4();
+  index_cue_c = buffer_signed4();
+  index_cue_v = buffer_signed4();
+  index_min.left = buffer_signed4();
+  index_min.right = buffer_signed4();
+  index_max.left = buffer_signed4();
+  index_max.right = buffer_signed4();
+  index_mean.left = buffer_signed4();
+  index_mean.right = buffer_signed4();
+  index_power.left = buffer_float8();
+  index_power.right = buffer_float8();
   // 3. read the list structures... (prev, next, album)
   int count;
-  count = buffer_long();
+  count = buffer_signed4();
   // printf("prev_count = %ld\n",count);
   while(count-->0)
     {
       current = new HistoryField(buffer_strdup());
-      current->count = buffer_long();
+      current->count = buffer_signed4();
       current->comment = buffer_strdup();
       add_prev_history(current);
     }
-  count = buffer_long();
+  count = buffer_signed4();
   // printf("next_count = %ld\n",count);
   while(count-->0)
     {
       current = new HistoryField(buffer_strdup());
-      current->count = buffer_long();
+      current->count = buffer_signed4();
       current->comment = buffer_strdup();
       add_next_history(current);
     }
-  count = buffer_long();
+  count = buffer_signed4();
   // printf("album_count = %ld\n",count);
   while(count-->0)
     {
-      int   nr = buffer_long();
+      int   nr = buffer_signed4();
+      char * n = buffer_strdup();
+      add_album(new AlbumField(nr,n));
+      // printf("Located in album %d : %s\n",nr,n);
+    }
+}
+
+void Index::read_v27_field()
+{
+  HistoryField * current = NULL;
+  // initialize the buffer to the correct size
+  // 1. read all kinds of strings
+  meta_contains_tar = true;   // otherwise it should not be placed into the .bib file
+  title = buffer_strdup();
+  author = buffer_strdup();
+  remix = zeroable(buffer_strdup());
+  version = buffer_strdup();
+  index_file= buffer_strdup();
+  buffer_strdup();  // was index_tempo
+  index_remark= zeroable(buffer_strdup());
+  index_time= buffer_strdup();
+  index_md5sum= buffer_strdup();
+  if (buffer_signed4())
+    {
+      index_spectrum = new spectrum_type();
+      index_spectrum->read_bib_v27();
+    }
+  else
+    index_spectrum = no_spectrum;
+  index_tags=buffer_strdup();
+  // 2. read all kinds of numbers
+  index_period = buffer_signed4();
+  index_bpmcount_from = buffer_signed4();
+  index_bpmcount_to = buffer_signed4();
+  index_cue = buffer_signed4();
+  index_cue_z = buffer_signed4();
+  index_cue_x = buffer_signed4();
+  index_cue_c = buffer_signed4();
+  index_cue_v = buffer_signed4();
+  index_min.left = buffer_signed4();
+  index_min.right = buffer_signed4();
+  index_max.left = buffer_signed4();
+  index_max.right = buffer_signed4();
+  index_mean.left = buffer_signed4();
+  index_mean.right = buffer_signed4();
+  index_power.left = buffer_float8();
+  index_power.right = buffer_float8();
+  // 3. read the list structures... (prev, next, album)
+  int count;
+  count = buffer_signed4();
+  // printf("prev_count = %ld\n",count);
+  while(count-->0)
+    {
+      current = new HistoryField(buffer_strdup());
+      current->count = buffer_signed4();
+      current->comment = buffer_strdup();
+      add_prev_history(current);
+    }
+  count = buffer_signed4();
+  // printf("next_count = %ld\n",count);
+  while(count-->0)
+    {
+      current = new HistoryField(buffer_strdup());
+      current->count = buffer_signed4();
+      current->comment = buffer_strdup();
+      add_next_history(current);
+    }
+  count = buffer_signed4();
+  // printf("album_count = %ld\n",count);
+  while(count-->0)
+    {
+      int   nr = buffer_signed4();
+      char * n = buffer_strdup();
+      add_album(new AlbumField(nr,n));
+      // printf("Located in album %d : %s\n",nr,n);
+    }
+}
+
+
+void Index::read_v271_field()
+{
+  HistoryField * current = NULL;
+  // initialize the buffer to the correct size
+  // 1. read all kinds of strings
+  meta_contains_tar = true;   // otherwise it should not be placed into the .bib file
+  title = buffer_strdup();
+  author = buffer_strdup();
+  remix = zeroable(buffer_strdup());
+  version = buffer_strdup();
+  index_file= buffer_strdup();
+  buffer_strdup();  // was index_tempo
+  index_remark= zeroable(buffer_strdup());
+  index_time= buffer_strdup();
+  index_md5sum= buffer_strdup();
+  if (buffer_signed4())
+    {
+      index_spectrum = new spectrum_type();
+      index_spectrum->read_bib_v27();
+    }
+  else
+    index_spectrum = no_spectrum;
+  index_histogram.read_bib_v271();
+  index_tags=buffer_strdup();
+  // 2. read all kinds of numbers
+  index_period = buffer_signed4();
+  index_bpmcount_from = buffer_signed4();
+  index_bpmcount_to = buffer_signed4();
+  index_cue = buffer_signed4();
+  index_cue_z = buffer_signed4();
+  index_cue_x = buffer_signed4();
+  index_cue_c = buffer_signed4();
+  index_cue_v = buffer_signed4();
+  index_min.left = buffer_signed4();
+  index_min.right = buffer_signed4();
+  index_max.left = buffer_signed4();
+  index_max.right = buffer_signed4();
+  index_mean.left = buffer_signed4();
+  index_mean.right = buffer_signed4();
+  index_power.left = buffer_float8();
+  index_power.right = buffer_float8();
+  // 3. read the list structures... (prev, next, album)
+  int count;
+  count = buffer_signed4();
+  // printf("prev_count = %ld\n",count);
+  while(count-->0)
+    {
+      current = new HistoryField(buffer_strdup());
+      current->count = buffer_signed4();
+      current->comment = buffer_strdup();
+      add_prev_history(current);
+    }
+  count = buffer_signed4();
+  // printf("next_count = %ld\n",count);
+  while(count-->0)
+    {
+      current = new HistoryField(buffer_strdup());
+      current->count = buffer_signed4();
+      current->comment = buffer_strdup();
+      add_next_history(current);
+    }
+  count = buffer_signed4();
+  // printf("album_count = %ld\n",count);
+  while(count-->0)
+    {
+      int   nr = buffer_signed4();
+      char * n = buffer_strdup();
+      add_album(new AlbumField(nr,n));
+      // printf("Located in album %d : %s\n",nr,n);
+    }
+}
+
+void Index::read_v272_field()
+{
+  HistoryField * current = NULL;
+  // initialize the buffer to the correct size
+  // 1. read all kinds of strings
+  meta_contains_tar = true;   // otherwise it should not be placed into the .bib file
+  title = buffer_strdup();
+  author = buffer_strdup();
+  remix = zeroable(buffer_strdup());
+  version = buffer_strdup();
+  index_file= buffer_strdup();
+  buffer_strdup();  // was index_tempo
+  index_remark= zeroable(buffer_strdup());
+  index_time= buffer_strdup();
+  index_md5sum= buffer_strdup();
+  if (buffer_signed4())
+    {
+      index_spectrum = new spectrum_type();
+      index_spectrum->read_bib_v27();
+    }
+  else
+    index_spectrum = no_spectrum;
+  index_histogram.read_bib_v272();
+  index_tags=buffer_strdup();
+  // 2. read all kinds of numbers
+  index_period = buffer_signed4();
+  index_bpmcount_from = buffer_signed4();
+  index_bpmcount_to = buffer_signed4();
+  index_cue = buffer_signed4();
+  index_cue_z = buffer_signed4();
+  index_cue_x = buffer_signed4();
+  index_cue_c = buffer_signed4();
+  index_cue_v = buffer_signed4();
+  index_min.left = buffer_signed4();
+  index_min.right = buffer_signed4();
+  index_max.left = buffer_signed4();
+  index_max.right = buffer_signed4();
+  index_mean.left = buffer_signed4();
+  index_mean.right = buffer_signed4();
+  index_power.left = buffer_float8();
+  index_power.right = buffer_float8();
+  // 3. read the list structures... (prev, next, album)
+  int count;
+  count = buffer_signed4();
+  // printf("prev_count = %ld\n",count);
+  while(count-->0)
+    {
+      current = new HistoryField(buffer_strdup());
+      current->count = buffer_signed4();
+      current->comment = buffer_strdup();
+      add_prev_history(current);
+    }
+  count = buffer_signed4();
+  // printf("next_count = %ld\n",count);
+  while(count-->0)
+    {
+      current = new HistoryField(buffer_strdup());
+      current->count = buffer_signed4();
+      current->comment = buffer_strdup();
+      add_next_history(current);
+    }
+  count = buffer_signed4();
+  // printf("album_count = %ld\n",count);
+  while(count-->0)
+    {
+      int   nr = buffer_signed4();
+      char * n = buffer_strdup();
+      add_album(new AlbumField(nr,n));
+      // printf("Located in album %d : %s\n",nr,n);
+    }
+}
+
+void Index::read_v273_field()
+{
+  HistoryField * current = NULL;
+  // initialize the buffer to the correct size
+  // 1. read all kinds of strings
+  meta_contains_tar = true;   // otherwise it should not be placed into the .bib file
+  title = buffer_strdup();
+  author = buffer_strdup();
+  remix = zeroable(buffer_strdup());
+  version = buffer_strdup();
+  index_file= buffer_strdup();
+  buffer_strdup();  // was index_tempo
+  index_remark= zeroable(buffer_strdup());
+  index_time= buffer_strdup();
+  index_md5sum= buffer_strdup();
+  if (buffer_signed4())
+    {
+      index_spectrum = new spectrum_type();
+      index_spectrum->read_bib_v27();
+    }
+  else
+    index_spectrum = no_spectrum;
+  index_histogram.read_bib_v272();
+  index_rythm.read_bib_v272();
+  index_tags=buffer_strdup();
+  // 2. read all kinds of numbers
+  index_period = buffer_signed4();
+  index_bpmcount_from = buffer_signed4();
+  index_bpmcount_to = buffer_signed4();
+  index_cue = buffer_signed4();
+  index_cue_z = buffer_signed4();
+  index_cue_x = buffer_signed4();
+  index_cue_c = buffer_signed4();
+  index_cue_v = buffer_signed4();
+  index_min.left = buffer_signed4();
+  index_min.right = buffer_signed4();
+  index_max.left = buffer_signed4();
+  index_max.right = buffer_signed4();
+  index_mean.left = buffer_signed4();
+  index_mean.right = buffer_signed4();
+  index_power.left = buffer_float8();
+  index_power.right = buffer_float8();
+  // 3. read the list structures... (prev, next, album)
+  int count;
+  count = buffer_signed4();
+  // printf("prev_count = %ld\n",count);
+  while(count-->0)
+    {
+      current = new HistoryField(buffer_strdup());
+      current->count = buffer_signed4();
+      current->comment = buffer_strdup();
+      add_prev_history(current);
+    }
+  count = buffer_signed4();
+  // printf("next_count = %ld\n",count);
+  while(count-->0)
+    {
+      current = new HistoryField(buffer_strdup());
+      current->count = buffer_signed4();
+      current->comment = buffer_strdup();
+      add_next_history(current);
+    }
+  count = buffer_signed4();
+  // printf("album_count = %ld\n",count);
+  while(count-->0)
+    {
+      int   nr = buffer_signed4();
+      char * n = buffer_strdup();
+      add_album(new AlbumField(nr,n));
+      // printf("Located in album %d : %s\n",nr,n);
+    }
+}
+
+void Index::read_v274_field()
+{
+  HistoryField * current = NULL;
+  // initialize the buffer to the correct size
+  // 1. read all kinds of strings
+  meta_contains_tar = true;   // otherwise it should not be placed into the .bib file
+  title = buffer_strdup();
+  author = buffer_strdup();
+  remix = zeroable(buffer_strdup());
+  version = buffer_strdup();
+  index_file= buffer_strdup();
+  buffer_strdup();  // was index_tempo
+  index_remark= zeroable(buffer_strdup());
+  index_time= buffer_strdup();
+  index_md5sum= buffer_strdup();
+  if (buffer_signed4())
+    {
+      index_spectrum = new spectrum_type();
+      index_spectrum->read_bib_v27();
+    }
+  else
+    index_spectrum = no_spectrum;
+  index_histogram.read_bib_v272();
+  index_rythm.read_bib_v272();
+  index_composition.read_bib_v272();
+  index_tags=buffer_strdup();
+  // 2. read all kinds of numbers
+  index_period = buffer_signed4();
+  index_bpmcount_from = buffer_signed4();
+  index_bpmcount_to = buffer_signed4();
+  index_cue = buffer_signed4();
+  index_cue_z = buffer_signed4();
+  index_cue_x = buffer_signed4();
+  index_cue_c = buffer_signed4();
+  index_cue_v = buffer_signed4();
+  index_min.left = buffer_signed4();
+  index_min.right = buffer_signed4();
+  index_max.left = buffer_signed4();
+  index_max.right = buffer_signed4();
+  index_mean.left = buffer_signed4();
+  index_mean.right = buffer_signed4();
+  index_power.left = buffer_float8();
+  index_power.right = buffer_float8();
+  // 3. read the list structures... (prev, next, album)
+  int count;
+  count = buffer_signed4();
+  // printf("prev_count = %ld\n",count);
+  while(count-->0)
+    {
+      current = new HistoryField(buffer_strdup());
+      current->count = buffer_signed4();
+      current->comment = buffer_strdup();
+      add_prev_history(current);
+    }
+  count = buffer_signed4();
+  // printf("next_count = %ld\n",count);
+  while(count-->0)
+    {
+      current = new HistoryField(buffer_strdup());
+      current->count = buffer_signed4();
+      current->comment = buffer_strdup();
+      add_next_history(current);
+    }
+  count = buffer_signed4();
+  // printf("album_count = %ld\n",count);
+  while(count-->0)
+    {
+      int   nr = buffer_signed4();
       char * n = buffer_strdup();
       add_album(new AlbumField(nr,n));
       // printf("Located in album %d : %s\n",nr,n);
@@ -780,13 +1174,7 @@ static void file_string(char*str, FILE * f)
   assert(written==1);
 }
 
-static void file_double(float8 i, FILE * f)
-{
-  int written = fwrite(&i,8,1,f);
-  assert(written==1);
-}
-
-void Index::write_v261_field(FILE * index)
+void Index::write_v274_field(FILE * index)
 {
   HistoryField * current = NULL;
   // initialize the buffer to the correct size
@@ -801,37 +1189,46 @@ void Index::write_v261_field(FILE * index)
   file_string(index_remark,index);
   file_string(index_time,index);
   file_string(index_md5sum,index);
-  file_string(index_spectrum,index);
+  if (index_spectrum==no_spectrum)
+    file_signed4(0,index);
+  else
+    {
+      file_signed4(1,index);
+      index_spectrum->write_bib_v27(index);
+    }
+  index_histogram.write_bib_v272(index);
+  index_rythm.write_bib_v272(index);
+  index_composition.write_bib_v272(index);
   file_string(index_tags,index);
   // 2. write all kinds of numbers
   index_period.write_bib_v261(index);
-  file_long(index_bpmcount_from,index);
-  file_long(index_bpmcount_to,index);
-  file_long(index_cue,index);
-  file_long(index_cue_z,index);
-  file_long(index_cue_x,index);
-  file_long(index_cue_c,index);
-  file_long(index_cue_v,index);
-  file_long(index_min.left,index);
-  file_long(index_min.right,index);
-  file_long(index_max.left,index);
-  file_long(index_max.right,index);
-  file_long(index_mean.left,index);
-  file_long(index_mean.right,index);
-  file_double(index_power.left,index);
-  file_double(index_power.right,index);
-
+  file_signed4(index_bpmcount_from,index);
+  file_signed4(index_bpmcount_to,index);
+  file_signed4(index_cue,index);
+  file_signed4(index_cue_z,index);
+  file_signed4(index_cue_x,index);
+  file_signed4(index_cue_c,index);
+  file_signed4(index_cue_v,index);
+  file_signed4(index_min.left,index);
+  file_signed4(index_min.right,index);
+  file_signed4(index_max.left,index);
+  file_signed4(index_max.right,index);
+  file_signed4(index_mean.left,index);
+  file_signed4(index_mean.right,index);
+  file_float8(index_power.left,index);
+  file_float8(index_power.right,index);
+  
   // 3. write the list structures... (prev, next, album)
   HistoryField ** tmp = prev;
   int count = 0;
   while(*(tmp++)) count++;
-  file_long(count,index);
+  file_signed4(count,index);
   tmp = prev;
   while(*tmp)
     {
       current = *tmp;
       file_string(current->file,index);
-      file_long(current->count,index);
+      file_signed4(current->count,index);
       file_string(current->comment,index);
       tmp++;
     }
@@ -839,13 +1236,13 @@ void Index::write_v261_field(FILE * index)
   tmp = next;
   count = 0;
   while(*(tmp++)) count++;
-  file_long(count,index);
+  file_signed4(count,index);
   tmp = next;
   while(*tmp)
     {
       current = *tmp;
       file_string(current->file,index);
-      file_long(current->count,index);
+      file_signed4(current->count,index);
       file_string(current->comment,index);
       tmp++;
     }
@@ -853,12 +1250,12 @@ void Index::write_v261_field(FILE * index)
   count = 0;
   AlbumField**album = albums;
   while(*(album++)) count++;
-  file_long(count,index);
+  file_signed4(count,index);
   album=albums;
   while(*album)
     {
       
-      file_long((*album)->nr,index);
+      file_signed4((*album)->nr,index);
       file_string((*album)->name,index);
       album++;
     }
@@ -866,8 +1263,8 @@ void Index::write_v261_field(FILE * index)
 
 void Index::write_bib_field(FILE * index)
 {
-  file_long(261,index);
-  write_v261_field(index);
+  file_signed4(274,index);
+  write_v274_field(index);
 }
 
 long Index::read_bib_field(long position, const char* meta_shortname)
@@ -880,7 +1277,7 @@ long Index::read_bib_field(long position, const char* meta_shortname)
   // clear all fields
   init();
   // version describing the format of this field
-  meta_version = buffer_long();
+  meta_version = buffer_signed4();
   if (!printed_meta_version)
     {
       printed_meta_version = true;
@@ -890,6 +1287,11 @@ long Index::read_bib_field(long position, const char* meta_shortname)
   // depending on the field we can call different routines
   if (meta_version==23) read_v23_field();
   else if (meta_version==261) read_v261_field();
+  else if (meta_version==27) read_v27_field();
+  else if (meta_version==271) read_v271_field();
+  else if (meta_version==272) read_v272_field();
+  else if (meta_version==273) read_v273_field();
+  else if (meta_version==274) read_v274_field();
   else assert(0);
   // fix fields when necessary
   if (fix_tempo_fields()) meta_changed=true;
@@ -1182,14 +1584,10 @@ void Index::set_time(const char* str)
     }
 };
 
-spectrum_type Index::get_spectrum_copy()
+spectrum_type *Index::get_spectrum()
 {
-  if (!index_spectrum) 
-    return no_spectrum;
-  spectrum_type result = allocate_spectrum();
-  for(int i = 0 ; i < spectrum_size && index_spectrum[i]; i ++)
-    result[i]=((spectrum_freq)(index_spectrum[i]-'a'))/24.0;
-  return result;
+  if (!index_spectrum) return no_spectrum;
+  return new spectrum_type(index_spectrum);
 }
 
 bool Index::fully_defined_energy()
@@ -1202,8 +1600,8 @@ bool Index::fully_defined_energy()
 
 void Index::clear_energy()
 {
-  index_min=sample_type();
-  index_max=sample_type();
-  index_mean=sample_type();
+  index_min=sample4_type();
+  index_max=sample4_type();
+  index_mean=sample4_type();
   index_power=power_type();
 }

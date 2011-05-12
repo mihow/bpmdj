@@ -1,4 +1,4 @@
-<!DOCTYPE UI><UI version="3.1" stdsetdef="1">
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
 <class>Renamer</class>
 <widget class="QDialog">
     <property name="name">
@@ -402,58 +402,6 @@
                 <string></string>
             </property>
         </widget>
-        <widget class="QListView" row="0" column="0" rowspan="1" colspan="5">
-            <column>
-                <property name="text">
-                    <string>New</string>
-                </property>
-                <property name="clickable">
-                    <bool>true</bool>
-                </property>
-                <property name="resizable">
-                    <bool>true</bool>
-                </property>
-            </column>
-            <column>
-                <property name="text">
-                    <string>Original </string>
-                </property>
-                <property name="clickable">
-                    <bool>true</bool>
-                </property>
-                <property name="resizable">
-                    <bool>true</bool>
-                </property>
-            </column>
-            <column>
-                <property name="text">
-                    <string>Full Name</string>
-                </property>
-                <property name="clickable">
-                    <bool>true</bool>
-                </property>
-                <property name="resizable">
-                    <bool>true</bool>
-                </property>
-            </column>
-            <property name="name">
-                <cstring>NameList</cstring>
-            </property>
-            <property name="font">
-                <font>
-                    <family>adobe-courier</family>
-                </font>
-            </property>
-            <property name="frameShape">
-                <enum>NoFrame</enum>
-            </property>
-            <property name="selectionMode">
-                <enum>Extended</enum>
-            </property>
-            <property name="allColumnsShowFocus">
-                <bool>true</bool>
-            </property>
-        </widget>
         <widget class="QGroupBox" row="3" column="2">
             <property name="name">
                 <cstring>GroupBox2</cstring>
@@ -561,6 +509,58 @@
                     </property>
                 </widget>
             </grid>
+        </widget>
+        <widget class="QListView" row="0" column="0" rowspan="1" colspan="5">
+            <column>
+                <property name="text">
+                    <string>New</string>
+                </property>
+                <property name="clickable">
+                    <bool>true</bool>
+                </property>
+                <property name="resizable">
+                    <bool>true</bool>
+                </property>
+            </column>
+            <column>
+                <property name="text">
+                    <string>Original </string>
+                </property>
+                <property name="clickable">
+                    <bool>true</bool>
+                </property>
+                <property name="resizable">
+                    <bool>true</bool>
+                </property>
+            </column>
+            <column>
+                <property name="text">
+                    <string>Full Name</string>
+                </property>
+                <property name="clickable">
+                    <bool>true</bool>
+                </property>
+                <property name="resizable">
+                    <bool>true</bool>
+                </property>
+            </column>
+            <property name="name">
+                <cstring>NameList</cstring>
+            </property>
+            <property name="font">
+                <font>
+                    <family>adobe-courier</family>
+                </font>
+            </property>
+            <property name="frameShape">
+                <enum>NoFrame</enum>
+            </property>
+            <property name="selectionMode">
+                <enum>Extended</enum>
+            </property>
+            <property name="allColumnsShowFocus">
+                <bool>true</bool>
+            </property>
         </widget>
     </grid>
 </widget>

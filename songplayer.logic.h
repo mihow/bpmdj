@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
+ Copyright (C) 2001-2005 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -124,6 +124,7 @@ class SongPlayerLogic :
    virtual void openBpmCounter();
    virtual void openSpectrumAnalyzer();
    virtual void openPatternAnalyzer();
+   virtual void openRythmAnalyzer();
    virtual void openInfo();
    virtual void openAbout();
 };

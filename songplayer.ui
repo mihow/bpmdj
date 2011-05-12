@@ -1,4 +1,4 @@
-<!DOCTYPE UI><UI version="3.2" stdsetdef="1">
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
 <class>SongPlayer</class>
 <widget class="QDialog">
     <property name="name">
@@ -8,7 +8,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>629</width>
+            <width>638</width>
             <height>607</height>
         </rect>
     </property>
@@ -22,9 +22,9 @@
     </property>
     <property name="paletteBackgroundColor">
         <color>
-            <red>255</red>
-            <green>178</green>
-            <blue>231</blue>
+            <red>64</red>
+            <green>255</green>
+            <blue>163</blue>
         </color>
     </property>
     <property name="palette">
@@ -36,29 +36,29 @@
                     <blue>0</blue>
                 </color>
                 <color>
-                    <red>223</red>
-                    <green>138</green>
-                    <blue>233</blue>
+                    <red>64</red>
+                    <green>255</green>
+                    <blue>207</blue>
                 </color>
                 <color>
-                    <red>254</red>
-                    <green>245</green>
-                    <blue>255</blue>
+                    <red>191</red>
+                    <green>255</green>
+                    <blue>239</blue>
                 </color>
                 <color>
-                    <red>238</red>
-                    <green>191</green>
-                    <blue>244</blue>
+                    <red>127</red>
+                    <green>255</green>
+                    <blue>223</blue>
                 </color>
                 <color>
-                    <red>111</red>
-                    <green>69</green>
-                    <blue>116</blue>
+                    <red>32</red>
+                    <green>127</green>
+                    <blue>103</blue>
                 </color>
                 <color>
-                    <red>149</red>
-                    <green>92</green>
-                    <blue>155</blue>
+                    <red>43</red>
+                    <green>170</green>
+                    <blue>138</blue>
                 </color>
                 <color>
                     <red>0</red>
@@ -81,9 +81,9 @@
                     <blue>255</blue>
                 </color>
                 <color>
-                    <red>255</red>
-                    <green>178</green>
-                    <blue>231</blue>
+                    <red>64</red>
+                    <green>255</green>
+                    <blue>163</blue>
                 </color>
                 <color>
                     <red>0</red>
@@ -118,29 +118,29 @@
                     <blue>128</blue>
                 </color>
                 <color>
-                    <red>223</red>
-                    <green>138</green>
-                    <blue>233</blue>
+                    <red>64</red>
+                    <green>255</green>
+                    <blue>207</blue>
                 </color>
                 <color>
-                    <red>254</red>
-                    <green>245</green>
-                    <blue>255</blue>
+                    <red>191</red>
+                    <green>255</green>
+                    <blue>239</blue>
                 </color>
                 <color>
-                    <red>246</red>
-                    <green>163</green>
-                    <blue>255</blue>
+                    <red>102</red>
+                    <green>255</green>
+                    <blue>217</blue>
                 </color>
                 <color>
-                    <red>111</red>
-                    <green>69</green>
-                    <blue>116</blue>
+                    <red>32</red>
+                    <green>127</green>
+                    <blue>103</blue>
                 </color>
                 <color>
-                    <red>149</red>
-                    <green>92</green>
-                    <blue>155</blue>
+                    <red>43</red>
+                    <green>170</green>
+                    <blue>138</blue>
                 </color>
                 <color>
                     <red>128</red>
@@ -163,9 +163,9 @@
                     <blue>255</blue>
                 </color>
                 <color>
-                    <red>255</red>
-                    <green>178</green>
-                    <blue>231</blue>
+                    <red>64</red>
+                    <green>255</green>
+                    <blue>163</blue>
                 </color>
                 <color>
                     <red>0</red>
@@ -200,29 +200,29 @@
                     <blue>0</blue>
                 </color>
                 <color>
-                    <red>223</red>
-                    <green>138</green>
-                    <blue>233</blue>
+                    <red>64</red>
+                    <green>255</green>
+                    <blue>207</blue>
                 </color>
                 <color>
-                    <red>254</red>
-                    <green>245</green>
-                    <blue>255</blue>
+                    <red>191</red>
+                    <green>255</green>
+                    <blue>239</blue>
                 </color>
                 <color>
-                    <red>246</red>
-                    <green>163</green>
-                    <blue>255</blue>
+                    <red>102</red>
+                    <green>255</green>
+                    <blue>217</blue>
                 </color>
                 <color>
-                    <red>111</red>
-                    <green>69</green>
-                    <blue>116</blue>
+                    <red>32</red>
+                    <green>127</green>
+                    <blue>103</blue>
                 </color>
                 <color>
-                    <red>149</red>
-                    <green>92</green>
-                    <blue>155</blue>
+                    <red>43</red>
+                    <green>170</green>
+                    <blue>138</blue>
                 </color>
                 <color>
                     <red>0</red>
@@ -245,9 +245,9 @@
                     <blue>255</blue>
                 </color>
                 <color>
-                    <red>255</red>
-                    <green>178</green>
-                    <blue>231</blue>
+                    <red>64</red>
+                    <green>255</green>
+                    <blue>163</blue>
                 </color>
                 <color>
                     <red>0</red>
@@ -922,7 +922,7 @@
                         <property name="spacing">
                             <number>1</number>
                         </property>
-                        <widget class="QPushButton" row="0" column="0">
+                        <widget class="QPushButton" row="0" column="0" rowspan="1" colspan="2">
                             <property name="name">
                                 <cstring>pushButton55</cstring>
                             </property>
@@ -941,7 +941,51 @@
                                 <string>Song</string>
                             </property>
                         </widget>
-                        <widget class="QPushButton" row="1" column="0" rowspan="1" colspan="2">
+                        <widget class="QPushButton" row="2" column="0" rowspan="1" colspan="3">
+                            <property name="name">
+                                <cstring>SpectrumButton</cstring>
+                            </property>
+                            <property name="enabled">
+                                <bool>true</bool>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>3</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="backgroundOrigin">
+                                <enum>AncestorOrigin</enum>
+                            </property>
+                            <property name="text">
+                                <string>Spectrum</string>
+                            </property>
+                        </widget>
+                        <widget class="QPushButton" row="0" column="2">
+                            <property name="name">
+                                <cstring>AboutButton</cstring>
+                            </property>
+                            <property name="enabled">
+                                <bool>true</bool>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>3</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="backgroundOrigin">
+                                <enum>AncestorOrigin</enum>
+                            </property>
+                            <property name="text">
+                                <string>About</string>
+                            </property>
+                        </widget>
+                        <widget class="QPushButton" row="1" column="0" rowspan="1" colspan="3">
                             <property name="name">
                                 <cstring>pushButton42</cstring>
                             </property>
@@ -966,29 +1010,7 @@
                                 <string>Alt+A</string>
                             </property>
                         </widget>
-                        <widget class="QPushButton" row="2" column="0" rowspan="1" colspan="2">
-                            <property name="name">
-                                <cstring>SpectrumButton</cstring>
-                            </property>
-                            <property name="enabled">
-                                <bool>true</bool>
-                            </property>
-                            <property name="sizePolicy">
-                                <sizepolicy>
-                                    <hsizetype>3</hsizetype>
-                                    <vsizetype>0</vsizetype>
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="backgroundOrigin">
-                                <enum>AncestorOrigin</enum>
-                            </property>
-                            <property name="text">
-                                <string>Spectrum</string>
-                            </property>
-                        </widget>
-                        <widget class="QPushButton" row="3" column="0" rowspan="1" colspan="2">
+                        <widget class="QPushButton" row="3" column="0">
                             <property name="name">
                                 <cstring>BpmCounter</cstring>
                             </property>
@@ -1007,15 +1029,15 @@
                                 <enum>AncestorOrigin</enum>
                             </property>
                             <property name="text">
-                                <string>&amp;Bpm Counter</string>
+                                <string>&amp;Bpm</string>
                             </property>
                             <property name="accel">
                                 <string>Alt+B</string>
                             </property>
                         </widget>
-                        <widget class="QPushButton" row="0" column="1">
+                        <widget class="QPushButton" row="3" column="1" rowspan="1" colspan="2">
                             <property name="name">
-                                <cstring>AboutButton</cstring>
+                                <cstring>BpmCounter_2</cstring>
                             </property>
                             <property name="enabled">
                                 <bool>true</bool>
@@ -1032,7 +1054,10 @@
                                 <enum>AncestorOrigin</enum>
                             </property>
                             <property name="text">
-                                <string>About</string>
+                                <string>Rythm</string>
+                            </property>
+                            <property name="accel">
+                                <string></string>
                             </property>
                         </widget>
                     </grid>
@@ -2166,28 +2191,28 @@
 </widget>
 <images>
     <image name="image0">
-        <data format="XPM.GZ" length="425">789cd3d7528808f055d0d2e72a2e492cc94c5648ce482c52d04a29cdcdad8c8eb5ade65232325130345230563054d2e15252564856f0cbcf4b05b1f5806c650330007113a1dce4b434b0ac321c24223351e550a450e550a550e4d0a490e5d0a590e430a41072985270392c5230396c525039ac521039ec528960391c40a9d69a0b00b3bc49a4</data>
+        <data format="PNG" length="150">89504e470d0a1a0a0000000d49484452000000180000000c080600000078307d750000005d49444154789cb5cdb11180300c04c113310dd905b8680a1065898088c180b0a58f7ff6043055151cabad986efbafefe2398fe200aec028ee0acce09f8159fc3510813f06a2f06e2012bf05a2f14b20030710c0588d0cbcb6626720710787735e71889ee87e0000000049454e44ae426082</data>
     </image>
     <image name="image1">
-        <data format="XPM.GZ" length="425">789cd3d7528808f055d0d2e72a2e492cc94c5648ce482c52d04a29cdcdad8c8eb5ade65232325130345230563054d2e15252564856f0cbcf4b05b1f5806c650330007113a1dce4b434b0ac320824c2091809974bc454802a87a20d2e87451baa1caa36981c366d287268daa07258b521cba16b83c861d7862487a10d22870328d55a73010081904eba</data>
+        <data format="PNG" length="160">89504e470d0a1a0a0000000d49484452000000180000000c080600000078307d750000006749444154789cb593cb1180201043b374250558b405ac652d271df993617dc70ce4850302c054555010cfc3f4ba6596cdf25086a30bccd9276f0a76a55f2a81e7faa680295a211378afaf044cd12aafe08ff599802962086c11fbd9ba2ff0580f0002c0764b46241ef1622030101c0d0000000049454e44ae426082</data>
     </image>
     <image name="image2">
-        <data format="XPM.GZ" length="425">789cd3d7528808f055d0d2e72a2e492cc94c5648ce482c52d04a29cdcdad8c8eb5ade65232325130345230563054d2e1524a544856f0cbcf4b05b1f5806c650330007195a1dce4b434b0ac72221c2033c17289d8252172d825a17258256172d824e17258241172989248721892c872e89228726892a872a89260391c40a9d69a0b00c4d27bc6</data>
+        <data format="PNG" length="157">89504e470d0a1a0a0000000d49484452000000180000000c080600000078307d750000006449444154789cb5cdcb0dc0300803509b73174a06c8d019808c454f95aa7ea1a19c00d97a0460580cda07e198da8a45b20460aaca68d19b956dd13e585b314f299295fdf10722c747367202b2914b2013b905b290472003790566111730831080abf4755644d45e7112e737340000000049454e44ae426082</data>
     </image>
     <image name="image3">
-        <data format="XPM.GZ" length="425">789cd3d7528808f055d0d2e72a2e492cc94c5648ce482c52d04a29cdcdad8c8eb5ade65232325130345230563054d2e1524a544856f0cbcf4b05b1f5806c650330007195a1dce4b434b0ac72220828c309280996c310c690c3500191c3ae11590e5d05540eab461439341530396c1a51e55055c0e5b068449343510196c301946aadb9003ebd76b0</data>
+        <data format="PNG" length="161">89504e470d0a1a0a0000000d49484452000000180000000c080600000078307d750000006849444154789cad93b111c0200cc464ea2c0403303403c0584e97821020d85f3e7fe8545800e5526a69429794a3f6fda89bf501a096262947ed1f47f9b37d001e9f7d6dc36a60054f0d3cc06135b082970656f00be06db16560010f019e16db06a76001b6aff224378619616886b792310000000049454e44ae426082</data>
     </image>
     <image name="image4">
-        <data format="XPM.GZ" length="425">789cd3d7528808f055d0d2e72a2e492cc94c5648ce482c52d04a29cdcdad8c8eb5ade65232325130345230563054d2e1524a544856f0cbcf4b05b1f5806c650330007195a1dce4b434b0ac327600964bc40e46bc1c0ea0546bcd0500dab57bc6</data>
+        <data format="PNG" length="106">89504e470d0a1a0a0000000d49484452000000180000000c080600000078307d750000003149444154789cedd4310100300803c1a373fd4bc2161dab201b2f20b7a530ee485598eeae147052c30b2cb0c0af90fb093c939d0671740d602a0000000049454e44ae426082</data>
     </image>
     <image name="image5">
-        <data format="XPM.GZ" length="425">789cd3d7528808f055d0d2e72a2e492cc94c5648ce482c52d04a29cdcdad8c8eb5ade65232325130345230563054d2e1524a544856f0cbcf4b05b1f5806c650330007195a1dce4b434b0ac32082426a25360b944ec60e4c881c2029502cbe1004ab5d65c0071b37bc6</data>
+        <data format="PNG" length="129">89504e470d0a1a0a0000000d49484452000000180000000c080600000078307d750000004849444154789ced93b11100101004f7c41aa200452be095f5722466488c4df7e7367a014e7446ac3601e49226b9e304b899692a1c22dc1afe811f7821904bf2d5a7ee3a01cbc35374f2e61cc18c534ace0000000049454e44ae426082</data>
     </image>
     <image name="image6">
-        <data format="XPM.GZ" length="425">789cd3d7528808f055d0d2e72a2e492cc94c5648ce482c52d04a29cdcdad8c8eb5ade65232325130345230563054d2e1524a544856f0cbcf4b05b1f5806c650330007195a1dce4b434b0ac722214205889401641b944981082a50c8468727a7a18725049e5441416584e4f4f594f0f4a22b1a0fad0b5805938e4c016c3e4c096239ca10772332e39147d8928de86eb4bc401946aadb9009c9f756c</data>
+        <data format="PNG" length="216">89504e470d0a1a0a0000000d49484452000000180000000c080600000078307d750000009f49444154789cad92510e83300c431db44f2e840fc0a13980b9d0feb39fa5b483b630b054a9a99e543b8901708c0e2daba12192a73800e03c7970430fbeab0100b4acc679f21e7c860bf7c15d4a40d2f1ee76a89001704996ff5e7355ab5b1c00783aa37b51d7de2f704582bb6e8fb8d751dffe15c9b400617a37e47c036aae5a9c249364f1d9a309f214916037830436dcd73892db467eef26e9d104bffa00b9a797342f934cd30000000049454e44ae426082</data>
     </image>
     <image name="image7">
-        <data format="XPM.GZ" length="425">789c75cfbd0a02310c07f0bd4f119aad48ce3bddc447501c057108d5438753d07310f1ddbd7ea4ed29fea7343fd2a69581ed6605a652f79efbb3057be21b98c3a3eb9ebbfdf2a5743387ba8119d47aa2348385f5f57274350d354e7ddc11e3d1b6ad57e418e21c646f8cbf36b4820952496211892853b2746da6603e48df4973c5a41485490fe5e1d202625c98c6e6fac5c26363cc1f0d73fc27fabd501f82af7978</data>
+        <data format="PNG" length="215">89504e470d0a1a0a0000000d49484452000000180000000c080600000078307d750000009e49444154789cad91c111c3300804174f9e6ec814e0a25dc0a9a1fcc98b19cb916439139ed2710b8701c11ae828c6a0dc3d240d35957edf4247b105404731dfb7986d9e350758f2f15f90b379059881b87bb87bffff620e60c057b62de1d3c92b40b3630d783f6234abb9c1dd544f344bef03266e7231cf1b9def34048c20bdc92599244bc82da00519c5921b64ecaf19c01532ca3c8d13629266193fd5075f5279597e3870db0000000049454e44ae426082</data>
     </image>
 </images>
 <connections>
@@ -2509,6 +2534,12 @@
         <receiver>SongPlayer</receiver>
         <slot>tempoChanged()</slot>
     </connection>
+    <connection>
+        <sender>BpmCounter_2</sender>
+        <signal>clicked()</signal>
+        <receiver>SongPlayer</receiver>
+        <slot>openRythmAnalyzer()</slot>
+    </connection>
 </connections>
 <tabstops>
     <tabstop>startStopButton</tabstop>
@@ -2624,6 +2655,7 @@
     <slot>mapStop()</slot>
     <slot>mapLoopChange()</slot>
     <slot>nudgeMinusHalfB()</slot>
+    <slot>openRythmAnalyzer()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

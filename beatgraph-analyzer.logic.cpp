@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
- See 'BeatMixing.ps' for more information
+ Copyright (C) 2001-2005 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -50,9 +49,10 @@
 #include <math.h>
 #include <assert.h>
 #include <math.h>
+#include <sys/mman.h>
 #include <qmessagebox.h>
-#include "pattern-analyzer.logic.h"
-#include "spectrumanalyzer.logic.h"
+#include "beatgraph-analyzer.logic.h"
+#include "rythm-analyzer.logic.h"
 #include "sys/times.h"
 #include "kbpm-play.h"
 #include "fourier.h"
@@ -61,12 +61,13 @@
 #include "memory.h"
 #include "signals.h"
 
-#define COLLAPSE 4
+#define COLLAPSE 32
+// the further collapse when shifting around
 #define COLLAPSE_HAAR 4
 #define sample_freq ((double)WAVRATE/(double)COLLAPSE)
 
-PatternAnalyzerLogic::PatternAnalyzerLogic(bool showreaderprogress, SongPlayer*parent, const char*name, bool modal, WFlags f) :
-  PatternDialog(0,name,modal,f)
+BeatGraphAnalyzerLogic::BeatGraphAnalyzerLogic(bool showreaderprogress, SongPlayer*parent, const char*name, bool modal, WFlags f) :
+  BeatGraphDialog(0,name,modal,f)
 {
   period=normalperiod;
   data = NULL;
@@ -76,11 +77,11 @@ PatternAnalyzerLogic::PatternAnalyzerLogic(bool showreaderprogress, SongPlayer*p
   showPattern();
 }
 
-void PatternAnalyzerLogic::readFile(bool showreaderprogress)
+void BeatGraphAnalyzerLogic::readFile(bool showreaderprogress)
 {
   if (data) return;
   long int bufsize = 65536;
-  longtrick buffer[bufsize];
+  stereo_sample2 buffer[bufsize];
   // read in memory and shrink it 
   FILE * raw=openRawFile(playing,arg_rawpath);
   audiosize=fsize(raw)/4;
@@ -112,8 +113,8 @@ void PatternAnalyzerLogic::readFile(bool showreaderprogress)
 	  for(int j = 0 ; j < COLLAPSE ; j++)
 	    {
 	      assert(i*COLLAPSE+j<count);
-	      sum+=abs(buffer[i*COLLAPSE+j].leftright.left)/(1<<7);
-	      sum+=abs(buffer[i*COLLAPSE+j].leftright.right)/(1<<7);
+	      sum+=abs(buffer[i*COLLAPSE+j].left)/(1<<7);
+	      sum+=abs(buffer[i*COLLAPSE+j].right)/(1<<7);
 	    }
 	  sum /= COLLAPSE*2;
 	  assert(i + pos/COLLAPSE < audiosize/COLLAPSE);
@@ -139,7 +140,7 @@ void PatternAnalyzerLogic::readFile(bool showreaderprogress)
     data[i]=(signed8)data[i]*(signed8)255/maximum;
 }
 
-void PatternAnalyzerLogic::readFileSigned(bool showreaderprogress)
+void BeatGraphAnalyzerLogic::readFileSigned(bool showreaderprogress)
 {
   if (data) 
     {
@@ -149,7 +150,7 @@ void PatternAnalyzerLogic::readFileSigned(bool showreaderprogress)
   if (signed_data)
     return;
   long int bufsize = 65536;
-  longtrick buffer[bufsize];
+  stereo_sample2 buffer[bufsize];
 
   // read in memory and shrink it 
   FILE * raw=openRawFile(playing,arg_rawpath);
@@ -182,8 +183,8 @@ void PatternAnalyzerLogic::readFileSigned(bool showreaderprogress)
 	  for(int j = 0 ; j < COLLAPSE_HAAR ; j++)
 	    {
 	      assert(i*COLLAPSE_HAAR+j<count);
-	      sum+=buffer[i*COLLAPSE_HAAR+j].leftright.left;
-	      sum+=buffer[i*COLLAPSE_HAAR+j].leftright.right;
+	      sum+=buffer[i*COLLAPSE_HAAR+j].left;
+	      sum+=buffer[i*COLLAPSE_HAAR+j].right;
 	    }
 	  sum /= COLLAPSE_HAAR*2;
 	  assert(i + pos/COLLAPSE_HAAR < audiosize/COLLAPSE_HAAR);
@@ -210,7 +211,7 @@ void PatternAnalyzerLogic::readFileSigned(bool showreaderprogress)
 }
 
 
-void PatternAnalyzerLogic::showPatternVersion1()
+void BeatGraphAnalyzerLogic::showPatternVersion1()
 { 
   int beats_per_column = beats->value() ;
   unsigned4 collapsed_period = period  / COLLAPSE ;
@@ -283,7 +284,7 @@ void PatternAnalyzerLogic::showPatternVersion1()
 }
 
 
-void PatternAnalyzerLogic::showHaarVersion1()
+void BeatGraphAnalyzerLogic::showHaarVersion1()
 { 
   unsigned4 collapsed_size = audiosize / COLLAPSE_HAAR ;
   
@@ -381,7 +382,7 @@ void getBandColor(int band, QColor &color, float val)
     }
 }
 
-void PatternAnalyzerLogic::distribution(float *bank, 
+void BeatGraphAnalyzerLogic::distribution(float *bank, 
 					long bank_size, 
 					float *distri, 
 					long distribution_size, 
@@ -404,7 +405,7 @@ void PatternAnalyzerLogic::distribution(float *bank,
     }
 }
 
-void PatternAnalyzerLogic::distribution(float *bank, long size, QPixmap &pm, int slice)
+void BeatGraphAnalyzerLogic::distribution(float *bank, long size, QPixmap &pm, int slice)
 {
   float min=0;
   float max=0;
@@ -417,14 +418,14 @@ void PatternAnalyzerLogic::distribution(float *bank, long size, QPixmap &pm, int
   distribution(bank,size,distri,ds,min,max);
 
   //  if (slice==8)
-    {
-      FILE * data = fopen("d.t","ab");
+//    {
+//      FILE * data = fopen("d.t","ab");
       //for(int i = 1 ; i < ds ; i++)
       //distri[i]=distri[i+1]-distri[i];
-      for(int i = 0 ; i < ds ; i++)
-	fprintf(data,"%d %d %g\n",slice,i,distri[i]);
-      fclose(data);
-    }
+//      for(int i = 0 ; i < ds ; i++)
+//	fprintf(data,"%d %d %g\n",slice,i,distri[i]);
+//      fclose(data);
+//    }
 
   //  for(int i = 0 ; i < ds ; i++)
   //    distri[i]*=i;
@@ -479,7 +480,7 @@ void PatternAnalyzerLogic::distribution(float *bank, long size, QPixmap &pm, int
   p.end();
 }
 
-void PatternAnalyzerLogic::showHaarVersion2()
+void BeatGraphAnalyzerLogic::showHaarVersion2()
 { 
   // we should have sopme technique to reduce the smoothness of things. We want to increase
   // the contrast level of most signals...
@@ -564,21 +565,9 @@ void PatternAnalyzerLogic::showHaarVersion2()
 	}
 
       // smooth entry ?
-      /*for(int y = 0 ; y < haar_size - 1; y++)
-		{
-	  float sum = 0;
-	  for(int x = 0 ; x < 1 ; x++)
-	    sum+=filtered[y+x];
-	  filtered[y]=sum;
-	}
-      */
-      
       if (decay->isChecked())
 	{
-	  float decay = 0.95;
 	  float last = 0;
-	  //for(int y = 0 ; y < haar_size; y++)
-	  //last = (filtered[y] += decay * last);
 	  for(int y = 0 ; y < haar_size; y++)
 	    last = filtered[y] += 1 - exp(-last);
 	}
@@ -794,7 +783,7 @@ void PatternAnalyzerLogic::showHaarVersion2()
   p.end(); 
   pattern->setPixmap(*pm);
   projection->setPixmap(*distri_map);
-  signed4 maximum=0;
+  // signed4 maximum=0;
   //  for(int row = 0 ; row < window_ysize ; row ++)
     //if (project[row]>maximum)
     //  maximum=project[row];
@@ -857,7 +846,7 @@ void fatten1(float * data, long size)
 	      power  = sqrt(power);
 	      for(int x = 0 ; x < block_size ; x++)
 		data[x+offset]-=mean;
-	      power/4;
+	      power/=4;
 	      for(int x = 0 ; x < block_size ; x++)
 		{
 		  int a = offset+x;
@@ -885,7 +874,7 @@ void fatten2(float * data, long size)
 {
   // Copy all the data
   long length = higher_power_of_two(size);
-  printf("Copying all data %d\n",length);
+  printf("Copying all data %ld\n",length);
   double * data_r = allocate(length,double);
   for(long i = 0 ; i < size ; i ++)
     data_r[i]=data[i];
@@ -1009,10 +998,75 @@ void fatten(float * data, long size)
   printf("0.Done\n");
 }
 
-void PatternAnalyzerLogic::fatten()
+
+void BeatGraphAnalyzerLogic::rotate_slices()
+{
+  // other preparations
+  int beats_per_column = beats->value() ;
+  unsigned4 collapsed_period = period  / COLLAPSE ;
+  collapsed_period *= beats_per_column;
+  collapsed_period /= 4;
+  signed4 slice_size = collapsed_period;
+  unsigned4 collapsed_size = audiosize / COLLAPSE ;
+  int maximum_slice = collapsed_size / collapsed_period - 1 ;
+  double * prototype = allocate(slice_size,double);
+  unsigned4 * phases = allocate(maximum_slice,unsigned4);
+  for(int y = 0 ; y < slice_size ; y++)
+    prototype[y]=data[y];
+  phases[0]=0;
+  for(int x = 1 ; x < maximum_slice ; x++)
+    {
+      double m = -1;
+      int a = 0;
+      // find best rotational fit
+      compressed *nd = allocate(slice_size,compressed);
+      for(int y = 0 ; y < slice_size ; y++)
+	nd[y] = (unsigned char)(prototype[y]/x);
+      for(int p = 0 ; p < slice_size ; p++)
+	{
+	  double d = 0;
+	  for(int y = 0 ; y < slice_size ; y++)
+	    {
+	      int v = nd[y];
+	      int z = (y + p)%slice_size;
+	      int w = data[x*slice_size+z];
+	      d+=abs(v-w);
+	    }
+	  if (d<m || m<0)
+	    {
+	      m = d;
+	      a = p;
+	    }
+	}
+      // rotate it
+      for(int y = 0 ; y < slice_size ; y++)
+	{
+	  int z = (y + a)%slice_size;
+	  nd[y]= data[x*slice_size+z];
+	}
+      for(int y = 0 ; y < slice_size; y++)
+	{
+	  data[x*slice_size+y]=nd[y];
+	  prototype[y]+=nd[y];
+	}
+      deallocate(nd);
+      // show progress as it goes on
+      phases[x]=a*COLLAPSE;
+      printf("%d / %d -> %d\n",x,maximum_slice,a);
+      showPattern();
+      app->processEvents();
+    }
+  deallocate(prototype);
+  slice_size*=COLLAPSE;
+  write_out_projection(slice_size,phases,maximum_slice,"sample-pattern.raw");
+}
+
+void BeatGraphAnalyzerLogic::fatten()
 { 
+  rotate_slices();
+  return;
   // read the file in memory
-  int data; // to avoid using the incorrect data set
+  // int data; // to avoid using the incorrect data set
   long int bufsize = 65536;
   FILE * raw=openRawFile(playing,arg_rawpath);
   signed8 audiosize=fsize(raw)/4;
@@ -1020,7 +1074,7 @@ void PatternAnalyzerLogic::fatten()
   if (audiosize == 0) return;
   signed4 pos = 0;
   fseek(raw,pos,SEEK_SET);
-  array(left_right,audiosize,longtrick);
+  array(left_right,audiosize,stereo_sample2);
   while(pos<audiosize)
     {
       long toread = audiosize - pos;
@@ -1034,8 +1088,8 @@ void PatternAnalyzerLogic::fatten()
   array(right,audiosize,float);
   for(long i = 0 ; i < audiosize ; i++)
     {
-      left[i]=left_right[i].leftright.left;
-      right[i]=left_right[i].leftright.right;
+      left[i]=left_right[i].left;
+      right[i]=left_right[i].right;
     }
   // fix both sets
   ::fatten(left,audiosize);
@@ -1043,8 +1097,8 @@ void PatternAnalyzerLogic::fatten()
   // combine and write out
   for(long i = 0 ; i < audiosize ; i++)
     {
-      left_right[i].leftright.left=(signed2)left[i];
-      left_right[i].leftright.right=(signed2)right[i];
+      left_right[i].left=(signed2)left[i];
+      left_right[i].right=(signed2)right[i];
     }
   raw = fopen("fattened.raw","wb");
   pos = 0;
@@ -1061,7 +1115,7 @@ void PatternAnalyzerLogic::fatten()
   free(left_right);
 }
 
-void PatternAnalyzerLogic::showHaarVersion3()
+void BeatGraphAnalyzerLogic::showHaarVersion3()
 { 
   int beats_per_column = beats->value() ;
   const int maxslice = 8;
@@ -1138,7 +1192,6 @@ void PatternAnalyzerLogic::showHaarVersion3()
 	  for(int row = 0 ; row < window_ysize ; row++)
 	    {
 	      QColor c;
-	      int r = 0, g = 0, b = 0;
 	      int x1 = row * haar_size / window_ysize;
 	      int x2 = (row+1) * haar_size / window_ysize;
 	      float value = 0;
@@ -1161,7 +1214,7 @@ void PatternAnalyzerLogic::showHaarVersion3()
     p.drawLine(0,row,window_xsize-1,row);
   p.end(); 
   pattern->setPixmap(*pm);
-  signed4 maximum=0;
+  // signed4 maximum=0;
   //  for(int row = 0 ; row < window_ysize ; row ++)
     //if (project[row]>maximum)
     //  maximum=project[row];
@@ -1181,7 +1234,7 @@ void PatternAnalyzerLogic::showHaarVersion3()
   //  projection->setPixmap(*sm);
 }
 
-void PatternAnalyzerLogic::showPattern()
+void BeatGraphAnalyzerLogic::showPattern()
 {
   if (!period)
     {
@@ -1210,7 +1263,7 @@ void PatternAnalyzerLogic::showPattern()
     showPatternVersion1();
 }
 
-void PatternAnalyzerLogic::showPatternVersion2()
+void BeatGraphAnalyzerLogic::showPatternVersion2()
 { 
   int beats_per_column = beats->value() ;
   unsigned4 collapsed_period = period  / COLLAPSE ;
@@ -1286,13 +1339,13 @@ void PatternAnalyzerLogic::showPatternVersion2()
   projection->setPixmap(*sm);
 }
 
-void PatternAnalyzerLogic::settogrey()
+void BeatGraphAnalyzerLogic::settogrey()
 {
   if (haar->isChecked())
     haar->setChecked(false);
 }
   
- void PatternAnalyzerLogic::slantChanged()
+ void BeatGraphAnalyzerLogic::slantChanged()
    {
      settogrey();
      period=normalperiod+periodDelta->value()+periodDelta10->value();
@@ -1300,13 +1353,13 @@ void PatternAnalyzerLogic::settogrey()
   showPattern();
 }
 
-void PatternAnalyzerLogic::balanceChanged()
+void BeatGraphAnalyzerLogic::balanceChanged()
 {
   settogrey();
   showPattern();
 }
 
-void PatternAnalyzerLogic::setTempo()
+void BeatGraphAnalyzerLogic::setTempo()
 {
   normalperiod = normalperiod+periodDelta->value()+periodDelta10->value();
   if (normalperiod<=0) normalperiod = 1;

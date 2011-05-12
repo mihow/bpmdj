@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
+ Copyright (C) 2001-2005 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -101,10 +101,10 @@ void dsp_oss::pause()
   dsp_writecount=0;
 }
 
-void dsp_oss::write(unsigned4 *value)
+void dsp_oss::write(stereo_sample2 value)
 {
   dsp_writecount++;
-  ::write(dsp,value,4);
+  ::write(dsp,&value,4);
 }
 
 signed8 dsp_oss::latency()

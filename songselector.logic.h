@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
+ Copyright (C) 2001-2005 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -93,7 +93,7 @@ public SongSelector, public ProcessChanged
     void addTag(const QString tag);
     // process functions
     virtual void resetCounter();
-    virtual void updateProcessView();
+    virtual void updateProcessView(bool main_changed);
     // tag functionality
     void findsimilarnames(const QString & name, const QString & fullname);
     void initialize_using_config();
@@ -136,7 +136,7 @@ public SongSelector, public ProcessChanged
     virtual void checkDisc();
     virtual void exportPlayList();
     virtual void doSpectrumPca(bool fulldatabase = false, bool update_process_view = true);
-    virtual void doSpectrumClustering();
+    virtual void doClustering();
     virtual void selectionAddTags();
     virtual void selectionPlayIn3th();
     virtual void selectionPlayIn4th();
@@ -182,8 +182,8 @@ public SongSelector, public ProcessChanged
     virtual void doAutoMix();
     virtual void selectionMenu();
     virtual void openQueueMenu();
-    virtual void findWrongIdxNames();
-    virtual void findWrongSongNames();
+    virtual void openStatistics();
+    virtual void startRenamer();
 
     // queue actions
     virtual void playQueueSong(QListViewItem *);

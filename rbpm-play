@@ -1,3 +1,0 @@
-#!/bin/bash
-xterm -iconic -e ssh -t werner@asus /home/werner/play "$@"
-# -hold 

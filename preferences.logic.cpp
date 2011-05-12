@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
- See 'BeatMixing.ps' for more information
+ Copyright (C) 2001-2005 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -34,28 +33,28 @@ PreferencesLogic::PreferencesLogic(QWidget*parent,const char*name, bool modal, W
 
 void PreferencesLogic::createPlayerOne()
 {
-  QString command = getCommand();
+  QString command = getCommand(0,0);
   if (command.isNull()) return;
   playerCommand1->setText(command);
 }
 
 void PreferencesLogic::createPlayerTwo()
 {
-  QString command = getCommand();
+  QString command = getCommand(640,0);
   if (command.isNull()) return;
   playerCommand2->setText(command);
 }
 
 void PreferencesLogic::createPlayerThree()
 {
-  QString command = getCommand();
+  QString command = getCommand(0,200);
   if (command.isNull()) return;
   playerCommand3->setText(command);
 }
 
 void PreferencesLogic::createPlayerFour()
 {
-  QString command = getCommand();
+  QString command = getCommand(640,200);
   if (command.isNull()) return;
   playerCommand4->setText(command);
 }
@@ -133,12 +132,15 @@ void PreferencesLogic::modifydColorCol()
 }
 
 
-QString PreferencesLogic::getCommand()
+QString PreferencesLogic::getCommand(int x_suggestion, int y_suggestion)
 {
   PlayerCommandWizard commandCreator(NULL,NULL,TRUE);
+  commandCreator.x->setText(QString::number(x_suggestion));
+  commandCreator.y->setText(QString::number(y_suggestion));
+  
   if (commandCreator.exec()!=QDialog::Accepted)
     return "";
-
+  
   // xmms player
   if (commandCreator.xmms->isChecked())
     return "xmms-play \"%s\" -m \"%s\"";
@@ -199,9 +201,11 @@ QString PreferencesLogic::getCommand()
 
   // some more common options
   text = commandCreator.latency->text();
-  if (!text.isNull())
+  if (!text.isNull()
+      && !commandCreator.none->isChecked())
     options+="-L "+text+" ";
-  if (commandCreator.verbose->isChecked())
+  if (commandCreator.verbose->isChecked() 
+      && !commandCreator.none->isChecked())
     options+="-v ";
 
   // creation of the command line

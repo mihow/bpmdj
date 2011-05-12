@@ -1,8 +1,8 @@
 <!DOCTYPE UI><UI version="3.3" stdsetdef="1">
-<class>PatternDialog</class>
+<class>BeatGraphDialog</class>
 <widget class="QDialog">
     <property name="name">
-        <cstring>PatternDialog</cstring>
+        <cstring>BeatGraphDialog</cstring>
     </property>
     <property name="geometry">
         <rect>
@@ -21,7 +21,7 @@
         </sizepolicy>
     </property>
     <property name="caption">
-        <string>Pattern Analyzer</string>
+        <string>Beat Graph</string>
     </property>
     <property name="sizeGripEnabled">
         <bool>true</bool>
@@ -329,10 +329,10 @@
                 <cstring>pushButton53</cstring>
             </property>
             <property name="enabled">
-                <bool>false</bool>
+                <bool>true</bool>
             </property>
             <property name="text">
-                <string>fatten/clean ?</string>
+                <string>Straighten</string>
             </property>
         </widget>
     </grid>
@@ -341,49 +341,49 @@
     <connection>
         <sender>updateButton</sender>
         <signal>clicked()</signal>
-        <receiver>PatternDialog</receiver>
+        <receiver>BeatGraphDialog</receiver>
         <slot>showPattern()</slot>
     </connection>
     <connection>
         <sender>pushButton2</sender>
         <signal>clicked()</signal>
-        <receiver>PatternDialog</receiver>
+        <receiver>BeatGraphDialog</receiver>
         <slot>accept()</slot>
     </connection>
     <connection>
         <sender>periodDelta</sender>
         <signal>valueChanged(int)</signal>
-        <receiver>PatternDialog</receiver>
+        <receiver>BeatGraphDialog</receiver>
         <slot>slantChanged()</slot>
     </connection>
     <connection>
         <sender>pushButton4</sender>
         <signal>clicked()</signal>
-        <receiver>PatternDialog</receiver>
+        <receiver>BeatGraphDialog</receiver>
         <slot>setTempo()</slot>
     </connection>
     <connection>
         <sender>periodDelta10</sender>
         <signal>valueChanged(int)</signal>
-        <receiver>PatternDialog</receiver>
+        <receiver>BeatGraphDialog</receiver>
         <slot>slantChanged()</slot>
     </connection>
     <connection>
         <sender>color</sender>
         <signal>valueChanged(int)</signal>
-        <receiver>PatternDialog</receiver>
+        <receiver>BeatGraphDialog</receiver>
         <slot>balanceChanged()</slot>
     </connection>
     <connection>
         <sender>beats</sender>
         <signal>valueChanged(int)</signal>
-        <receiver>PatternDialog</receiver>
+        <receiver>BeatGraphDialog</receiver>
         <slot>slantChanged()</slot>
     </connection>
     <connection>
         <sender>pushButton53</sender>
         <signal>clicked()</signal>
-        <receiver>PatternDialog</receiver>
+        <receiver>BeatGraphDialog</receiver>
         <slot>fatten()</slot>
     </connection>
 </connections>
@@ -408,7 +408,6 @@
     <slot>balanceChanged()</slot>
     <slot>dumpPatternToIdx()</slot>
     <slot>filterChanged()</slot>
-    <slot>calculateRythmPattern()</slot>
     <slot>fatten()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>

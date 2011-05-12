@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
- See 'BeatMixing.ps' for more information
+ Copyright (C) 2001-2005 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -42,11 +41,12 @@
 #include <assert.h>
 #include <math.h>
 #include <pthread.h>
+#include "beatgraph-analyzer.logic.h"
 #include "songplayer.logic.h"
 #include "energy-analyzer.h"
 #include "bpm-analyzer.logic.h"
-#include "spectrumanalyzer.logic.h"
-#include "pattern-analyzer.logic.h"
+#include "spectrum-analyzer.logic.h"
+#include "rythm-analyzer.logic.h"
 #include "md5-analyzer.h"
 #include "dsp-drivers.h"
 #include "dsp-oss.h"
@@ -56,6 +56,7 @@
 #include "memory.h"
 #include "player-core.h"
 #include "scripts.h"
+#include "signals.h"
 
 /*-------------------------------------------
  *         Constants & Variables
@@ -66,6 +67,7 @@ static int    arg_bpm = 0;
 static int    opt_color = 0;
 static int    opt_create = 0;
 static int    opt_energy = 0;
+static int    opt_rythm = 0;
 static int    arg_posx = -1;
 static int    arg_posy = -1;
 static int    arg_low = 80;
@@ -135,7 +137,8 @@ void options_failure(char* err)
 	 //	  "               --pattern             dump pattern\n"
 	 "   -l nbr      --low nbr             lowest bpm to look for (default = 120)\n"
 	 "   -h nbr      --high nbr            highest bpm to look for (default = 160)\n"
-	 "               --spectrum            obtain color at cue-point, no sound, quit imm\n"
+	 "               --spectrum            obtain color & echo information\n"
+	 "               --rythm               obtain rythm information\n"
 	 "   -e          --energy              measure energy levels\n"
 	 "   -r arg      --rawpath arg         path that .raw temp files are stored in\n"
 	 "   argument                          the index file of the song to handle\n\n%s\n\n",err);
@@ -228,6 +231,8 @@ void process_options(int argc, char* argv[])
 	    opt_create=true;
 	  else if (option(arg,"spectrum"))
 	    opt_color = true;
+	  else if (option(arg,"rythm"))
+	    opt_rythm = true;
 	  else if (option(arg,"rawpath","r"))
 	    {
 	      arg_str(arg_rawpath);
@@ -362,16 +367,15 @@ void batch_start()
     {
       SpectrumDialogLogic *counter = new SpectrumDialogLogic();
       counter->fetchSpectrum();
-      printf("%d. Spectrum\n",nr++);
+      printf("%d. Spectrum / Echo\n",nr++);
     }
-  // 5. pattern
-  /*  if (opt_pattern)
+  // 5. spectrum
+  if (opt_rythm)
     {
-      PatternAnalyzerLogic *pattern = new PatternAnalyzerLogic(false);
-      pattern->run();
-      printf("%d. Pattern\n",nr++);
+      RythmDialogLogic *r = new RythmDialogLogic();
+      r->calculateRythmPattern();
+      printf("%d. Rythm\n",nr++);
     }
-  */
   // 99. finish the core -> remove the raw file
   core_done();
 }
@@ -379,7 +383,7 @@ void batch_start()
 // The escaping necessary for ssh to work is ridicoulous..
 // An ordinary containement within " ... " does not work, so we must
 // escape every character on its own. Especially the & is important
-// because this spawns a background procses :)
+// because this spawns a background procses.
 char * escape(char * in)
 {
   char escaped[2048];
@@ -441,8 +445,10 @@ int remote(int argc, char* argv[])
   return 0;
 }
 
+
 int main(int argc, char *argv[])
 {
+  test_signals();
   app = new QApplication(argc,argv);
   process_options(argc,argv);
   if (opt_remote)

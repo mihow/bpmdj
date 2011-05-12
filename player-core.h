@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
+ Copyright (C) 2001-2005 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -85,14 +85,14 @@ void      core_close();
 // closes the wave and writes any changes to the index 
 void      core_done();
 
-unsigned4 lfo_no(unsigned4 x);
-unsigned4 lfo_saw(unsigned4 x);
-unsigned4 lfo_pan(unsigned4 x);
-unsigned4 lfo_break(unsigned4 x);
-unsigned4 lfo_difference(unsigned4 x);
-unsigned4 lfo_revsaw(unsigned4 x);
-unsigned4 lfo_metronome(unsigned4 x);
-typedef unsigned4 (*_lfo_)(unsigned4 x);
+stereo_sample2 lfo_no(stereo_sample2 x);
+stereo_sample2 lfo_saw(stereo_sample2 x);
+stereo_sample2 lfo_pan(stereo_sample2 x);
+stereo_sample2 lfo_break(stereo_sample2 x);
+stereo_sample2 lfo_difference(stereo_sample2 x);
+stereo_sample2 lfo_revsaw(stereo_sample2 x);
+stereo_sample2 lfo_metronome(stereo_sample2 x);
+typedef stereo_sample2 (*_lfo_)(stereo_sample2 x);
 void  lfo_set(char* name, _lfo_ l, unsigned8 freq, unsigned8 phase);
 _lfo_ lfo_get();
 

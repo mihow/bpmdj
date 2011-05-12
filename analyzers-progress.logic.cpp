@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
- See 'BeatMixing.ps' for more information
+ Copyright (C) 2001-2005 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -76,6 +75,17 @@
 #include "common.h"
 #include "memory.h"
 
+#define ID 0
+#define HOST 1
+#define DONE 2
+#define FAILED 3
+#define RUNNING 4
+#define COMMAND 5
+
+// Processes per host
+#define PPH 1
+#define LIMIT (240 * PPH)
+
 AnalyzersProgressLogic::~AnalyzersProgressLogic()
 {
   delete processManager;
@@ -84,7 +94,7 @@ AnalyzersProgressLogic::~AnalyzersProgressLogic()
 AnalyzersProgressLogic::AnalyzersProgressLogic(int i, QWidget * parent, const QString name) :
   AnalyzersProgress(parent,name)
 {
-  processManager = new AnalyzersManager(i,this);
+  processManager = new AnalyzersManager(i*PPH,this);
   timer=new QTimer(this);
   connect(timer,SIGNAL(timeout()), SLOT(timerTick()));
   timer->start(1000);
@@ -93,12 +103,11 @@ AnalyzersProgressLogic::AnalyzersProgressLogic(int i, QWidget * parent, const QS
 
 void AnalyzersProgressLogic::start()
 {
-  
   QListViewItemIterator it(hosts);
   while(it.current())
     {
       QListViewItem * i = it.current();
-      startAnother(atoi(i->text(0)));
+      startAnother(atoi(i->text(ID)));
       ++it;
     }
   bar->setProgress(done,total);
@@ -112,11 +121,11 @@ void AnalyzersProgressLogic::startAnother(int id)
   if (tostart.isEmpty() || tostart.isNull()) return;
   pending->removeItem(0);
   // find host and increase counter
-  QListViewItem * i = hosts->findItem(QString::number(id),0);
+  QListViewItem * i = hosts->findItem(QString::number(id),ID);
   assert(i);
-  QString nr = i->text(2);
-  QString host = i->text(1);
-  i->setText(2,QString::number(atol(nr)+1));
+  QString nr = i->text(DONE);
+  QString host = i->text(HOST);
+  i->setText(DONE,QString::number(atol(nr)+1));
   // create suitable command
   if (host!="localhost")
     tostart.replace("kbpm-play ","kbpm-play --remote "+host+" ");
@@ -124,9 +133,10 @@ void AnalyzersProgressLogic::startAnother(int id)
   QString toshow = tostart;
   toshow = tostart.right(tostart.length()-tostart.find("index"));
   toshow.replace("index/","\"");
-  i->setText(3,toshow);
+  i->setText(COMMAND,toshow);
+  i->setText(RUNNING,"0");
   // update the view
-  bar->setProgress(done++);
+  bar->setProgress(++done);
   int secs = (time(NULL)-started)*(total-done)/done;
   int min = secs / 60;
   secs %= 60;
@@ -142,20 +152,36 @@ void AnalyzersProgressLogic::startAnother(int id)
 
 void AnalyzersProgressLogic::addHost(int id, QString host)
 {
-  new QListViewItem(hosts,QString::number(id),host,"0");
+  for(int i = 0 ; i <  PPH ; i++)
+    new QListViewItem(hosts,QString::number(i + id * PPH),host,"0","0");
 }
 
 void AnalyzersProgressLogic::addLine(QString line)
 {
   if (line.contains("kbpm-play "))
-   {
-     pending->insertItem(line);
-     total++;
-   };
+    {
+      pending->insertItem(line);
+      total++;
+    };
 }
 
 void AnalyzersProgressLogic::timerTick()
 {
   processManager->checkSignals();
+  QListViewItemIterator it(hosts);
+  while(it.current())
+    {
+      QListViewItem *i = it.current();
+      long nr = atol(i->text(RUNNING)) + 1;
+      if (nr<=LIMIT+1) 
+	i->setText(RUNNING,QString::number(nr));
+      if (nr == LIMIT) 
+	{
+	  nr = atol(i->text(FAILED)) + 1;
+	  i->setText(FAILED,QString::number(nr));
+	  startAnother(atol(i->text(0)));
+	}
+      it++;
+    }
 }
 

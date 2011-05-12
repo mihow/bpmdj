@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
+ Copyright (C) 2001-2005 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -33,78 +33,65 @@
 class QSong;
 QString tonumber(const int b);
 
-class SongMetriek:
-  public Metriek
-{
-  public: 
-    // which properties needs to be taken into account
-    float tempo;
-    float spectrum;
-    SongMetriek(float tw, float sw)
-      {
-	tempo = tw;
-	spectrum = sw;
-      };
-};
-
 class Song: public Point
 {
-    // taken from the index file
-    accessors(QString, title,"");
-    accessors(QString, author,"");
-    accessors(QString,version,"");
-    accessors(QString,storedin,"");
-    accessors(QString,file,"");
-    accessors(QString,md5sum,"");
-    accessors(QString,time,"");
-    accessors(tempo_type,tempo,tempo_type());
-    accessors(spectrum_type,spectrum,no_spectrum); 
-    accessors(tags_type,tags,NULL);
-    accessors(sample_type, max_amp,sample_type());
-    accessors(sample_type,min_amp,sample_type());
-    accessors(sample_type,mean_amp,sample_type());
-    accessors(power_type,power,power_type());
-    // calculated as necessary
-    accessors(QColor,color,QColor(127,127,127));
-    accessors(QString,spectrum_string,"");
-    accessors(QString,distance_string,QString::null);
-    accessors(float,color_distance,0);
-    accessors(AlbumField**,albums,NULL);
-    accessors(bool,played,false);
-    accessors(bool,ondisk,true);
-    accessors(int,has_cues,0);
-    accessors(int,played_author_at_time,-100);
-  private:
-    void init(const QString fullname, bool checkondisk);
-    void clearFloatingFields();
-  public: 
-    QString  tempo_str();
-  public:
-    Song();
-    Song(Index* idx, bool allow_write, bool checkondisk, bool account_spectrum);
-    // WVB -- need to add delete operation here...
-    void refill(Index &read, bool allowed_to_write=false);
-    void reread();
-    void realize();
-    void checkondisk();
-    void setColor(QColor c);
-    QString getDisplayTitle();
-    bool getDistance();
-    bool contains_tag(const tag_type which);
-    tempo_type tempo_between(Song*, float);
-    float   tempo_n_distance(float harmonic, Song* song); // without taking the abs value
-    float   tempo_distance(float harmonic, Song* song);
-    float   tempo_distance(Song* song);
-    spectrum_type spectrum_between(Song*, float);
-    QColor  color_between(Song* song, float percent);
-    float   spectrum_distance(Song* song);
-    virtual float   distance(Point* point, Metriek * dp);
-    virtual Point* percentToward(Point * other, Metriek * dp, float percent);
-    virtual void simpledump(int d);
-    virtual void determine_color(float hue, float, int, int);
-    virtual void color_sub_elements(int a, int b, float d);
-    virtual ~Song();
-    bool    modifiedOnDisk();
+  // taken from the index file
+  accessors(QString, title,"");
+  accessors(QString, author,"");
+  accessors(QString,version,"");
+  accessors(QString,storedin,"");
+  accessors(QString,file,"");
+  accessors(QString,md5sum,"");
+  accessors(QString,time,"");
+  accessors(tempo_type,tempo,tempo_type());
+  accessors(spectrum_type*,spectrum,no_spectrum); 
+  accessors(tags_type,tags,NULL);
+  accessors(sample4_type, max_amp,sample4_type());
+  accessors(sample4_type,min_amp,sample4_type());
+  accessors(sample4_type,mean_amp,sample4_type());
+  accessors(power_type,power,power_type());
+  accessors(histogram_property,histogram,histogram_property());
+  accessors(rythm_property,rythm,rythm_property());
+  accessors(composition_property,composition,composition_property());
+  // calculated as necessary
+  accessors(QColor,color,QColor(127,127,127));
+  accessors(QString,spectrum_string,"");
+  accessors(QString,distance_string,QString::null);
+  accessors(float,color_distance,0);
+  accessors(AlbumField**,albums,NULL);
+  accessors(bool,played,false);
+  accessors(bool,ondisk,true);
+  accessors(int,has_cues,0);
+  accessors(int,played_author_at_time,-100);
+ private:
+  void  init(const QString fullname, bool checkondisk);
+  void  clearFloatingFields();
+ public: 
+  QString  tempo_str();
+ public:
+  Song();
+  Song(Index* idx, bool allow_write, bool checkondisk);
+  // WVB -- need to add delete operation here...
+  void refill(Index &read, bool allowed_to_write=false);
+  void reread();
+  bool has_all_cluster_fields();
+  void realize();
+  void checkondisk();
+  void setColor(QColor c);
+  QString getDisplayTitle();
+  bool get_distance_to_main(float limit=1.0);
+  bool contains_tag(const tag_type which);
+  tempo_type tempo_between(Song*, float);
+  bool    tempo_show(const Song* main, bool uprange, bool downrange);
+  QColor  color_between(Song* song, float percent);
+  virtual float distance(Point* point, Metriek * dp, double limit);
+  virtual float distance(Point* point, Metriek* dp);
+  virtual Point* percentToward(Point * other, Metriek * dp, float percent);
+  virtual void simpledump(int d);
+  virtual void determine_color(float hue, float, int, int);
+  virtual void color_sub_elements(int a, int b, float d);
+  virtual ~Song();
+  bool    modifiedOnDisk();
 };
 
 #endif

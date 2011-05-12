@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
+ Copyright (C) 2001-2005 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -30,9 +30,12 @@
 #include "process-manager.h"
 #include "history.h"
 #include "dirscanner.h"
-#include "spectrum.h"
+#include "spectrum-type.h"
+#include "composition-property.h"
 #include "tags.h"
 #include "memory.h"
+#include "song-statistics.h"
+#include "song-metric.h"
 
 void Song::refill(Index &reader, bool allowed_to_write)
 {
@@ -46,7 +49,7 @@ void Song::refill(Index &reader, bool allowed_to_write)
   set_time(QStringFactory::create(reader.get_time()));
   set_md5sum(QStringFactory::create(reader.get_md5sum()));
   if (get_spectrum()!=no_spectrum) deallocate(get_spectrum());
-  set_spectrum(reader.get_spectrum_copy());
+  set_spectrum(reader.get_spectrum());
   set_title(QStringFactory::create(reader.get_display_title()));
   set_author(QStringFactory::create(reader.get_display_author()));
   set_version(QStringFactory::create(reader.get_display_version()));
@@ -55,8 +58,19 @@ void Song::refill(Index &reader, bool allowed_to_write)
   set_max_amp(reader.get_max());
   set_mean_amp(reader.get_mean());
   set_power(reader.get_power());
-  /* are there any cues stored */
+  set_histogram(reader.get_histogram());
+  set_rythm(reader.get_rythm());
+  set_composition(reader.get_composition());
   set_has_cues(reader.get_cue_z() + reader.get_cue_x() + reader.get_cue_c() + reader.get_cue_v());
+}
+
+bool Song::has_all_cluster_fields()
+{
+  return get_spectrum()!=no_spectrum
+    && get_tempo().valid()
+    && !get_histogram().empty()
+    && !get_composition().empty()
+    && !get_rythm().empty();
 }
 
 void Song::checkondisk()
@@ -108,17 +122,18 @@ Song::Song()
   init_mean_amp();
   init_power();
   init_played_author_at_time();
+  init_histogram();
+  init_rythm();
+  init_composition();
 }
 
-Song::Song(Index * idx, bool allowwrite, bool check_ondisk, bool accountspectrum)
+Song::Song(Index * idx, bool allowwrite, bool check_ondisk)
 {
   init_ondisk();
   init_tags();
   init_spectrum();
   refill(*idx, allowwrite);
   clearFloatingFields();
-  if (accountspectrum)
-    new_spectrum(get_spectrum());
   if (check_ondisk)
     checkondisk();
 }
@@ -129,11 +144,12 @@ void Song::reread()
   // if (reader.changed()) reader.write_idx();
   refill(reader);
 }
- 
+
 
 void Song::realize()
 {
-  // wat we hier doen is een nieuwe index file creeeren en deze op disk schrijven. Dit vereist natuurlijk een unieke naam :)
+  // hier creeeren we een nieuwe index file omdat kbpm-play enkel met index files overweg kan
+  // Dit vereist natuurlijk een unieke naam
   if (get_storedin().endsWith(".bib"))
     {
       Index transfer(get_storedin());
@@ -185,102 +201,20 @@ void Song::determine_color(float hue, float dummy, int dummy2, int dummy3)
   set_spectrum_string(tonumber((int)hue));
 }
 
-float Song::tempo_n_distance(float harmonic, Song* song)
-{
-  tempo_type fa = get_tempo();
-  tempo_type fb = song->get_tempo();
-  if (fa.none() || fb.none()) return 1000;
-  float ffa = fa.tempo;
-  float ffb = fb.tempo;
-  ffa*=harmonic;
-  float sa = ffa * Config::distance_temposcale;
-  float sb = ffb * Config::distance_temposcale;
-  float s = (sa < sb ? sa : sb);
-  return (ffa-ffb)/s;
-}
 
-float Song::tempo_distance(float harmonic, Song* song)
+bool Song::tempo_show(const Song* main, bool uprange, bool downrange)
 {
-  return(fabs(tempo_n_distance(harmonic, song)));
-}
-
-float Song::tempo_distance(Song* song)
-{
-  return tempo_distance(1.0,song);
+  double d = SongMetriek::std.tempo_diff(*this,*main);
+  int harmonic = 0;
+  d = SongMetriek::std.find_harmonic(d,harmonic);
+  if (uprange   && d >= 0 && d <= 1) return true;
+  if (downrange && d <= 0 && d >= -1) return true;
+  return false; // there is no reason to show the song with this tempo;
 }
 
 tempo_type Song::tempo_between(Song* song,  float percent)
 {
   return between_tempos(get_tempo(),song->get_tempo(),percent);
-}
-
-float Song::spectrum_distance(Song* song)
-{
-  if (get_spectrum()==no_spectrum || song->get_spectrum()==no_spectrum)
-    return 1000000;
-  spectrum_type b = song->get_spectrum();
-  spectrum_freq distance=0;
-  if (Config::log_spectrum_distance)
-    {
-      // first calculate mean energy mismatch
-      spectrum_freq mean = 0.0;
-      int cnt = 0;
-      for (int i = 0; i < spectrum_size ; i ++ )
-	{
-	  spectrum_freq mismatch = 0;
-	  if (b[i] > 0 && get_spectrum()[i] > 0 && ((mismatch = get_spectrum()[i]/b[i]) > 0)) // assignment intended
-	    {
-	      mean += 10.0*log(mismatch);
-	      cnt++;
-	    }
-	}
-      if (cnt==0) 
-	mean = 0;
-      else
-	mean/=(spectrum_freq)cnt;
-      // now calculate the actual energy mismatch without taking the mean
-      // fix into account
-      for (int i = 0; i < spectrum_size ; i ++ )
-	{
-	  spectrum_freq mismatch = 0;
-	  if (b[i] > 0 && get_spectrum()[i] > 0)
-	    {
-	      mismatch = get_spectrum()[i]/b[i];
-	      if (mismatch>0)
-		mismatch = 10.0*log(mismatch) - mean;
-	      else
-		mismatch = 0;
-	    }
-	  distance+=fabs(mismatch);
-	}
-      distance /= 9.0 * spectrum_size;
-    }
-  else
-    {
-      for (int i = 0; i < spectrum_size ; i ++ )
-	{
-	  spectrum_freq mismatch = get_spectrum()[i]-b[i];
-	  mismatch*=scales[i]; // to normalize the weight of this band
-	  mismatch*=mismatch;
-	  distance+=mismatch;
-	}
-      distance *= 0.048828;
-      // multiplying by this value is done in order to keep the same scale as
-      // previous versions...
-    }
-  return distance * Config::distance_spectrumscale;
-}
-
-spectrum_type Song::spectrum_between(Song* song, float percent)
-{
-  if (get_spectrum() == no_spectrum) return no_spectrum;
-  spectrum_type b = song->get_spectrum();
-  if (b == no_spectrum) return no_spectrum;
-  spectrum_type result=allocate_spectrum();
-  assert(percent>=0.0 && percent <=1.0);
-  for (int i = 0; i < spectrum_size ; i++)
-    result[i] = get_spectrum()[i]*(1.0-percent) + b[i]*percent;
-  return result;
 }
 
 QColor Song::color_between(Song* song, float percent)
@@ -304,23 +238,19 @@ QColor Song::color_between(Song* song, float percent)
   R3=(R2-R1)*percent+R1;
   G3=(G2-G1)*percent+G1;
   B3=(B2-B1)*percent+B1;
-  // printf("%g %g %g  // %g %g %g // %g %g %g\n",R1,G1,B1,R2,G2,B2,R3,G3,B3);
   result.setRgb((int)R3,(int)G3,(int)B3);
   return result;
 }
 
 float Song::distance(Point* point, Metriek* dp)
 {
-  Song *song = (Song*)point;
-  SongMetriek *measure = (SongMetriek*)dp;
-  float total = measure -> tempo + measure -> spectrum;
-  if (total == 0) return 1000;
-  float sum = 0;
-  if (measure->tempo > 0)
-    sum+=tempo_distance(song)*measure->tempo;
-  if (measure->spectrum > 0)
-    sum+=spectrum_distance(song)*measure->spectrum;
-  return sum/total;
+  return distance(point,dp,1000);
+}
+
+float Song::distance(Point* point, Metriek* dp, double limit)
+{
+  SongMetriek * sm = (SongMetriek*)dp;
+  return sm->distance((const Song &)*this,(const Song &)*(Song*)point,limit);
 }
 
 Point* Song::percentToward(Point * other, Metriek * dp, float percent)
@@ -334,20 +264,18 @@ Point* Song::percentToward(Point * other, Metriek * dp, float percent)
     result->set_tempo(tempo_between(song,percent));
   if (measure->spectrum)
     {
-      result -> set_spectrum ( spectrum_between(song,percent) );
-      result -> setColor(color_between(song,percent));
+      result -> set_spectrum ( between_spectra(get_spectrum(),song->get_spectrum(),percent) );
+      result -> setColor( color_between(song,percent) );
     }
   return result;
 }
 
-static SongMetriek spectrum_distance(0.0,1.0);
-
-bool Song::getDistance()
+bool Song::get_distance_to_main(float limit)
 {
   set_color_distance(2);
   if (get_spectrum()!=no_spectrum)
     if (ProcessManager::playingInMain())
-      set_color_distance(distance(ProcessManager::playingInMain(),&::spectrum_distance));
+      set_color_distance(SongMetriek::std.distance(*this, *ProcessManager::playingInMain(),limit));
   if (get_color_distance()>1.0)
     set_distance_string(QString::null);
   else

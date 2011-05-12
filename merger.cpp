@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
- See 'BeatMixing.ps' for more information
+ Copyright (C) 2001-2005 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -33,7 +32,7 @@
 
 void options_failure(char* err)
 {
-  printf("BpmDj Merger v%s, Copyright (c) 2001-2004 Werner Van Belle\n",VERSION);
+  printf("BpmDj Merger v%s, Copyright (c) 2001-2005 Werner Van Belle\n",VERSION);
   printf("This software is distributed under the GPL2 license. See copyright.txt\n\n");
   printf("Usage:  kbpm-merge <options> [old-song] new-song\n\n"
 	 "  --mix         nbr  how many measures should be used to create the mix\n" 
@@ -326,7 +325,7 @@ static FILE * file_b;
 void normalize_file()
 {
 #define BUFSIZE 32*1024
-  longtrick buffer[BUFSIZE];
+  stereo_sample2 buffer[BUFSIZE];
   signed4 read;
   signed8 position;
   printf("Normalizing new song\n");
@@ -339,9 +338,9 @@ void normalize_file()
       read = readsamples(buffer,BUFSIZE,file_b);
       for(int i = 0 ; i < read ; i++)
 	{
-	  int m = abs(buffer[i].leftright.left);
+	  int m = abs(buffer[i].left);
 	  if (m > leftmax) leftmax = m;
-	  m = abs(buffer[i].leftright.right);
+	  m = abs(buffer[i].right);
 	  if (m > rightmax) rightmax = m;
 	}
     }
@@ -355,11 +354,11 @@ void normalize_file()
       int i = 0;
       while(i < read)
 	{
-	  buffer[i].leftright.left = 
-	    ((signed8)(buffer[i].leftright.left))*
+	  buffer[i].left = 
+	    ((signed8)(buffer[i].left))*
 	    ((signed8)32767)/leftmax;
-	  buffer[i].leftright.right = 
-	    ((signed8)(buffer[i].leftright.right))*
+	  buffer[i].right = 
+	    ((signed8)(buffer[i].right))*
 	    ((signed8)32767)/rightmax;
 	  i++;
 	}
@@ -404,12 +403,12 @@ bool createFiles(char* a, char* b)
 static unsigned4 filelength_a;
 static unsigned4 position_a = 0;
 static unsigned4 length_a;
-static unsigned4 *buffer_a; // the full data at the end of the old file
+static stereo_sample2 *buffer_a; // the full data at the end of the old file
 
 void readTail(signed8 measures)
 {
   length_a = (unsigned4)(measures * period_a);
-  buffer_a = allocate(length_a,unsigned4);
+  buffer_a = allocate(length_a,stereo_sample2);
   filelength_a = fsize(file_a);
   if (length_a * 4 > filelength_a)
     {
@@ -426,18 +425,18 @@ void readTail(signed8 measures)
   readsamples(buffer_a,length_a,file_a);
   
   if (dump_raw)  
-    dumpAudio(TAILDUMP_NAME,buffer_a,length_a);
+    dumpAudio(TAILDUMP_NAME,(unsigned4*)buffer_a,length_a);
 }
 
 static unsigned4 filelength_b;
 static unsigned4 position_b;
 static unsigned4 length_b;
-static unsigned4 *buffer_b; // full new data at the beginning of the new file
+static stereo_sample2 *buffer_b; // full new data at the beginning of the new file
 
 void readHead(signed8 percent, signed8 measures)
 {
   length_b = (unsigned4)(measures * period_b);
-  buffer_b = allocate(length_b,unsigned4);
+  buffer_b = allocate(length_b,stereo_sample2);
   filelength_b = fsize(file_b);
   position_b = filelength_b*percent/100;
   position_b /= 4;
@@ -448,13 +447,13 @@ void readHead(signed8 percent, signed8 measures)
   readsamples(buffer_b,length_b,file_b);
   
   if (dump_raw) 
-    dumpAudio(HEADDUMP_NAME,buffer_b,length_b);
+    dumpAudio(HEADDUMP_NAME,(unsigned4*)buffer_b,length_b);
 }
 
 void copySong(signed8 percent)
 {
   length_b = (unsigned4)64*1024;
-  buffer_b = allocate(length_b,unsigned4);
+  buffer_b = allocate(length_b,stereo_sample2);
   position_b = ftell(file_b);
   filelength_b = fsize(file_b);
   unsigned4 togo=(filelength_b*percent/100)-position_b;
@@ -473,13 +472,13 @@ void copySong(signed8 percent)
     }
 } 
 
-static unsigned4 *buffer_c;  // stretched full data of head
+static stereo_sample2 *buffer_c;  // stretched full data of head
 static unsigned4 length_c;
 void stretchHead(signed8 headmeasures)
 {
   printf("Stretching head to fit (period_a = %d, period_b = %d)\n",(int)period_a,(int)period_b);
   length_c = period_a*headmeasures;
-  buffer_c = allocate(length_c,unsigned4);
+  buffer_c = allocate(length_c,stereo_sample2);
   for(unsigned4 i = 0 ; i < length_c ; i ++)
     {
       buffer_c[i]=buffer_b[(unsigned8)i*(unsigned8)length_b/(unsigned8)length_c];
@@ -505,11 +504,11 @@ void collapseBuffers()
   buffer_f = allocate(length_f,compressed);
   // calculate absolute value
   for(unsigned4 pos = 0 ; pos < length_d ; pos++)
-    buffer_d[pos]=(((signed4)abs(((longtrick*)buffer_a)[pos * COLLAPSE].leftright.left)+
-		    (signed4)abs(((longtrick*)buffer_a)[pos * COLLAPSE].leftright.right))/2)>>8;
+    buffer_d[pos]=(((signed4)abs(((stereo_sample2*)buffer_a)[pos * COLLAPSE].left)+
+		    (signed4)abs(((stereo_sample2*)buffer_a)[pos * COLLAPSE].right))/2)>>8;
   for(unsigned4 pos = 0 ; pos < length_f ; pos++)
-    buffer_f[pos]=(((signed4)abs(((longtrick*)buffer_b)[pos * COLLAPSE].leftright.left)+
-		    (signed4)abs(((longtrick*)buffer_b)[pos * COLLAPSE].leftright.right))/2)>>8;
+    buffer_f[pos]=(((signed4)abs(((stereo_sample2*)buffer_b)[pos * COLLAPSE].left)+
+		    (signed4)abs(((stereo_sample2*)buffer_b)[pos * COLLAPSE].right))/2)>>8;
 }
 
 void collapseStretchedBuffer()
@@ -517,8 +516,8 @@ void collapseStretchedBuffer()
   length_e = length_c / COLLAPSE;
   buffer_e = allocate(length_e,compressed);
   for(unsigned4 pos = 0 ; pos < length_e ; pos++)
-    buffer_e[pos]=(((signed4)abs(((longtrick*)buffer_c)[pos * COLLAPSE].leftright.left)+
-		    (signed4)abs(((longtrick*)buffer_c)[pos * COLLAPSE].leftright.right))/2)>>8;
+    buffer_e[pos]=(((signed4)abs(((stereo_sample2*)buffer_c)[pos * COLLAPSE].left)+
+		    (signed4)abs(((stereo_sample2*)buffer_c)[pos * COLLAPSE].right))/2)>>8;
 }
 
 signed8 phaseFit(int period, compressed* buffer, int length)
@@ -705,18 +704,14 @@ unsigned4 findMatch()
     return findMatchWithoutVolumeAccounting();
 }
 
-unsigned4 mix(unsigned4 A, unsigned4 B, signed8 vol, signed8 tot)
+stereo_sample2 mix(stereo_sample2 a, stereo_sample2 b, signed8 vol, signed8 tot)
 {
-  longtrick a;
-  longtrick b;
-  longtrick c;
-  a.value=A;
-  b.value=B;
-  c.leftright.left = (signed8)a.leftright.left * vol / tot
-    + (signed8)b.leftright.left * (tot-vol) / tot;
-  c.leftright.right = (signed8)a.leftright.right * vol / tot
-    + (signed8)b.leftright.right * (tot-vol) / tot;
-  return c.value;
+  stereo_sample2 c;
+  c.left = (signed8)a.left * vol / tot
+    + (signed8)b.left * (tot-vol) / tot;
+  c.right = (signed8)a.right * vol / tot
+    + (signed8)b.right * (tot-vol) / tot;
+  return c;
 }
 
 void volumefade(signed8 pos)
@@ -733,13 +728,13 @@ void volumefade(signed8 pos)
   fseek(file_a,start,SEEK_SET);
   writesamples(buffer_a+pos,length_c,file_a);
   if (dump_raw)
-    dumpAudio(MIXDUMP_NAME,buffer_a+pos,length_c);
+    dumpAudio(MIXDUMP_NAME,(unsigned4*)buffer_a+pos,length_c);
 }
 
 void tempocopy(unsigned4 target_period)
 {
-  buffer_b=allocate(period_b,unsigned4);
-  buffer_c=allocate(target_period,unsigned4);
+  buffer_b=allocate(period_b,stereo_sample2);
+  buffer_c=allocate(target_period,stereo_sample2);
   readsamples(buffer_b,period_b,file_b);
   for(unsigned4 i = 0 ; i < target_period; i ++ )
     buffer_c[i]=buffer_b[(signed8)i*(signed8)period_b/(signed8)target_period];

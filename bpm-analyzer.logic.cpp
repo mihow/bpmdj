@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
- See 'BeatMixing.ps' for more information
+ Copyright (C) 2001-2005 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -298,7 +297,7 @@ void BpmAnalyzerDialog::readAudioBlock(int blocksize)
   StatusLabel->setText("Reading audio (blocksize "+QString::number(blocksize)+")");
   unsigned long pos = 0;
   long count;
-  longtrick buffer[blocksize];
+  stereo_sample2 buffer[blocksize];
   fseek(raw,startpercent*4,SEEK_SET);
   while(pos<audiosize && !stop_signal)
     {
@@ -313,8 +312,8 @@ void BpmAnalyzerDialog::readAudioBlock(int blocksize)
       for (int i = 0 ; i < blocksize ; i ++ )
 	{
 	  signed long int left, right;
-	  left=abs(buffer[i].leftright.left);
-	  right=abs(buffer[i].leftright.right);
+	  left=abs(buffer[i].left);
+	  right=abs(buffer[i].right);
 	  total+=(left+right)/256;
 	}
       audio[pos]=total/blocksize;
@@ -494,7 +493,7 @@ void BpmAnalyzerDialog::fft()
   // owkee, nu moeten we dat delen door 2^shifter dan brengt ons dat binnen range van 322.9 BPM
   audiosize>>=shifter;
   signed4 blocksize = 1 << shifter;
-  longtrick *block = allocate(blocksize,longtrick);
+  stereo_sample2 *block = allocate(blocksize,stereo_sample2);
   double *audio = allocate(audiosize,double);
   for(int i = 0 ; i < audiosize; i++)
     {
@@ -503,8 +502,8 @@ void BpmAnalyzerDialog::fft()
       while(read<blocksize)
 	read+=readsamples(block+read,blocksize-read,raw);
       for (int j = 0 ; j < blocksize ; j ++)
-	sum+=abs(block[j].leftright.left);
-      // sum+=(long)block[j].leftright.left*(long)block[j].leftright.left;
+	sum+=abs(block[j].left);
+      // sum+=(long)block[j].left*(long)block[j].left;
       sum/=blocksize;
       audio[i]=sum;
     }
@@ -595,7 +594,7 @@ void BpmAnalyzerDialog::enveloppe_spectrum()
   // owkee, nu moeten we dat delen door 2^spectrum_shifter
   audiosize>>=spectrum_shifter;
   signed4 blocksize = 1 << spectrum_shifter;
-  longtrick *block = allocate(blocksize,longtrick);
+  stereo_sample2 *block = allocate(blocksize,stereo_sample2);
   fft_type *audio = allocate(audiosize,fft_type);
   for(int i = 0 ; i < audiosize; i++)
     {
@@ -604,7 +603,7 @@ void BpmAnalyzerDialog::enveloppe_spectrum()
       while(read<blocksize)
 	read+=readsamples(block+read,blocksize-read,raw);
       for (int j = 0 ; j < blocksize ; j ++)
-	sum+=abs(block[j].leftright.left);
+	sum+=abs(block[j].left);
       sum/=blocksize;
       audio[i]=sum;
     }
@@ -709,7 +708,7 @@ void BpmAnalyzerDialog::autocorrelate_spectrum()
   // owkee, nu moeten we dat delen door 2^spectrum_shifter
   audiosize>>=spectrum_shifter;
   signed4 blocksize = 1 << spectrum_shifter;
-  longtrick *block = allocate(blocksize,longtrick);
+  stereo_sample2 *block = allocate(blocksize,stereo_sample2);
   fft_type *audio = allocate(audiosize,fft_type);
   for(int i = 0 ; i < audiosize; i++)
     {
@@ -718,7 +717,7 @@ void BpmAnalyzerDialog::autocorrelate_spectrum()
       while(read<blocksize)
 	read+=readsamples(block+read,blocksize-read,raw);
       for (int j = 0 ; j < blocksize ; j ++)
-	sum+=block[j].leftright.left;
+	sum+=block[j].left;
       sum/=blocksize;
       audio[i]=sum;
     }

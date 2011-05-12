@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
+ Copyright (C) 2001-2005 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@
 #include <qheader.h>
 #include <qgroupbox.h>
 #include <stdlib.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
@@ -74,11 +75,10 @@ void dsp_mixed::pause()
   toskip = shared->latency + audiosize;
 }
 
-void dsp_mixed::write(unsigned4 *value)
+void dsp_mixed::write(stereo_sample2 value)
 {
   // do skip writing when we are starting
   // but when we start reset the read and write pointers
-  bool flag = false;;
   if (toskip) 
       {
 	// printf("Skipping %d\n",toskip);
@@ -97,7 +97,7 @@ void dsp_mixed::write(unsigned4 *value)
       usleep(1000000/50000);
     }
   audio[w].sync = ((signed4)((::x - ::cue) % ::normalperiod)) * sync_max / (signed4)::normalperiod;
-  audio[w++].value = value[0];
+  audio[w++].value = value;
   w%=audiosize;
   shared->write=w;
 }
@@ -126,18 +126,19 @@ int dsp_mixed::open()
       exit(50);
     }
   audiosize = shared->size;;
-  int buffersize = audiosize * sizeof(struct synced_sample) + sizeof(struct mixarea);
+  int buffersize = audiosize * sizeof(struct synced_stereo_sample2) + sizeof(struct mixarea);
   mapsize = buffersize / getpagesize();
   if (mapsize * getpagesize() != buffersize) mapsize++;
   mapsize*=getpagesize();
   shared = (mixarea *) mremap(shared,getpagesize(),mapsize,MAP_SHARED);
-  audio = (struct synced_sample*)(void*)(shared+1);
+  audio = (synced_stereo_sample2*)(void*)(shared+1);
   if (!shared || shared == MAP_FAILED)
     {
       printf("Could not remap shared area into memory\n");
       printf("Error is %s\n",strerror(errno));
       exit(51);
     }
+  return err_none;
 }
 
 void dsp_mixed::close()

@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
+ Copyright (C) 2001-2005 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -18,21 +18,21 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#include "songplayer.h"
+#ifndef SONG_STATISTICS_H
+#define SONG_STATISTICS_H
+
+#include <math.h>
 #include "common.h"
-#include "spectrumanalyzer.h"
+#include "signals.h"
+#include "files.h"
 
-#define barksize spectrum_size
-extern double barkbounds[barksize+1];
+float4 normalize_freq(float4 in, int band);
+float4 normalize_echo(float4 val, int band, int delay);
+float4 stats_get_freq(int band);
 
-class SpectrumDialogLogic : public SpectrumDialog
-{
-   Q_OBJECT
- private:
-   QSlider * meters[barksize];
- public:
-   SpectrumDialogLogic(SongPlayer*parent=0, const char * name=0, bool modal=FALSE, WFlags f=0);
- public slots:
-   virtual void fetchSpectrum_normal();
-   virtual void fetchSpectrum() {fetchSpectrum_normal();};
-};
+void statistics_first_pass(Song * song);
+void statistics_prepare_second_pass();
+void statistics_second_pass(Song * song);
+void statistics_stop_second_pass();
+
+#endif

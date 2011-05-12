@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2004 Werner Van Belle
+ Copyright (C) 2001-2005 Werner Van Belle
  See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
@@ -18,12 +18,19 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#include "common.h"
-class QString;
-extern spectrum_freq scales[spectrum_size];
-// multiplying a frequency band i with scale[i] normalizes the band to
-// its mean value. E.g a frequence which is the mean will become 1 afterward.
-// a frequency which is higher than mean will have a value larger than 1
-// and a frequence with a value lower than mean will become lesser than 1
-void new_spectrum(spectrum_type spectrum);
-void last_spectrum();
+#include "songplayer.h"
+#include "basic-types.h"
+#include "rythm-analyzer.h"
+
+class RythmDialogLogic : public RythmDialog
+{
+   Q_OBJECT
+ public:
+   RythmDialogLogic(SongPlayer*parent=0, const char * name=0, bool modal=FALSE, WFlags f=0);
+ public slots:
+   virtual void calculateRythmPattern1();
+   virtual void calculateRythmPattern2();
+   virtual void calculateRythmPattern() { calculateRythmPattern2();};
+};
+
+void write_out_projection(long slice_size, unsigned4 *phases, int maximum_slice, const char * target);
