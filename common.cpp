@@ -100,4 +100,11 @@ long writesamples(void* target, int count, FILE* file)
   return result;
 }
 
-
+bool strxeq(const char* a, const char* b)
+{
+  if (a==NULL || !*a)
+    return (b==NULL || !*b);
+  if (b==NULL || !*b)
+    return false;
+  return strcmp(a,b)==0;
+}

@@ -17,6 +17,9 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
+#ifndef DSP_DRIVERS
+#define DSP_DRIVERS
+
 #include "common.h"
 #include "dsp-oss.h"
 #include "dsp-alsa.h"
@@ -44,3 +47,6 @@ int mixer_get_pcm();
 void mixer_set_main(int v);
 void mixer_set_pcm(int v);
 */
+
+
+#endif

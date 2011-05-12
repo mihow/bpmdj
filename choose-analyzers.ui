@@ -1,4 +1,4 @@
-<!DOCTYPE UI><UI version="3.1" stdsetdef="1">
+<!DOCTYPE UI><UI version="3.2" stdsetdef="1">
 <class>ChooseAnalyzers</class>
 <widget class="QDialog">
     <property name="name">
@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>604</width>
-            <height>349</height>
+            <height>352</height>
         </rect>
     </property>
     <property name="caption">
@@ -87,14 +87,6 @@ Warning: If the process is killed when you close kbpm-dj. Start analyze.sh manua
                         </property>
                         <property name="text">
                             <string>Spectrum Analyzer</string>
-                        </property>
-                    </widget>
-                    <widget class="QCheckBox" row="4" column="0">
-                        <property name="name">
-                            <cstring>patternAnalyzer</cstring>
-                        </property>
-                        <property name="text">
-                            <string>Pattern Analyzer</string>
                         </property>
                     </widget>
                 </grid>

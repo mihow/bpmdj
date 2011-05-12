@@ -1,4 +1,4 @@
-<!DOCTYPE UI><UI version="3.1" stdsetdef="1">
+<!DOCTYPE UI><UI version="3.2" stdsetdef="1">
 <class>CountDialog</class>
 <widget class="QDialog">
     <property name="name">
@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>557</width>
-            <height>715</height>
+            <width>781</width>
+            <height>419</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -36,383 +36,7 @@
         <property name="spacing">
             <number>6</number>
         </property>
-        <widget class="QPushButton" row="0" column="0">
-            <property name="name">
-                <cstring>BusyToggle</cstring>
-            </property>
-            <property name="enabled">
-                <bool>false</bool>
-            </property>
-            <property name="sizePolicy">
-                <sizepolicy>
-                    <hsizetype>0</hsizetype>
-                    <vsizetype>0</vsizetype>
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                </sizepolicy>
-            </property>
-            <property name="focusPolicy">
-                <enum>NoFocus</enum>
-            </property>
-            <property name="text">
-                <string></string>
-            </property>
-            <property name="toggleButton">
-                <bool>true</bool>
-            </property>
-            <property name="on">
-                <bool>false</bool>
-            </property>
-            <property name="flat">
-                <bool>true</bool>
-            </property>
-        </widget>
-        <widget class="QLayoutWidget" row="2" column="0" rowspan="1" colspan="2">
-            <property name="name">
-                <cstring>Layout34</cstring>
-            </property>
-            <grid>
-                <property name="name">
-                    <cstring>unnamed</cstring>
-                </property>
-                <property name="margin">
-                    <number>0</number>
-                </property>
-                <property name="spacing">
-                    <number>6</number>
-                </property>
-                <widget class="QLayoutWidget" row="0" column="1">
-                    <property name="name">
-                        <cstring>Layout32</cstring>
-                    </property>
-                    <hbox>
-                        <property name="name">
-                            <cstring>unnamed</cstring>
-                        </property>
-                        <property name="margin">
-                            <number>0</number>
-                        </property>
-                        <property name="spacing">
-                            <number>6</number>
-                        </property>
-                        <widget class="QLayoutWidget">
-                            <property name="name">
-                                <cstring>Layout26</cstring>
-                            </property>
-                            <grid>
-                                <property name="name">
-                                    <cstring>unnamed</cstring>
-                                </property>
-                                <property name="margin">
-                                    <number>0</number>
-                                </property>
-                                <property name="spacing">
-                                    <number>6</number>
-                                </property>
-                                <widget class="QLabel" row="1" column="0">
-                                    <property name="name">
-                                        <cstring>TextLabel1_2</cstring>
-                                    </property>
-                                    <property name="text">
-                                        <string>Skip</string>
-                                    </property>
-                                </widget>
-                                <widget class="QSpinBox" row="1" column="1">
-                                    <property name="name">
-                                        <cstring>SkipBox</cstring>
-                                    </property>
-                                    <property name="maxValue">
-                                        <number>32</number>
-                                    </property>
-                                    <property name="minValue">
-                                        <number>1</number>
-                                    </property>
-                                </widget>
-                                <widget class="QLCDNumber" row="0" column="1">
-                                    <property name="name">
-                                        <cstring>TapLcd</cstring>
-                                    </property>
-                                    <property name="numDigits">
-                                        <number>4</number>
-                                    </property>
-                                </widget>
-                            </grid>
-                        </widget>
-                        <widget class="QLayoutWidget">
-                            <property name="name">
-                                <cstring>Layout30</cstring>
-                            </property>
-                            <vbox>
-                                <property name="name">
-                                    <cstring>unnamed</cstring>
-                                </property>
-                                <property name="margin">
-                                    <number>0</number>
-                                </property>
-                                <property name="spacing">
-                                    <number>6</number>
-                                </property>
-                                <widget class="QPushButton">
-                                    <property name="name">
-                                        <cstring>PushButton7</cstring>
-                                    </property>
-                                    <property name="text">
-                                        <string>&amp;Tap</string>
-                                    </property>
-                                </widget>
-                                <widget class="QPushButton">
-                                    <property name="name">
-                                        <cstring>PushButton8</cstring>
-                                    </property>
-                                    <property name="text">
-                                        <string>&amp;Reset</string>
-                                    </property>
-                                </widget>
-                            </vbox>
-                        </widget>
-                        <widget class="QLayoutWidget">
-                            <property name="name">
-                                <cstring>Layout29</cstring>
-                            </property>
-                            <vbox>
-                                <property name="name">
-                                    <cstring>unnamed</cstring>
-                                </property>
-                                <property name="margin">
-                                    <number>0</number>
-                                </property>
-                                <property name="spacing">
-                                    <number>6</number>
-                                </property>
-                                <widget class="QPushButton">
-                                    <property name="name">
-                                        <cstring>PushButton6</cstring>
-                                    </property>
-                                    <property name="text">
-                                        <string>&amp;-0.1 BPM</string>
-                                    </property>
-                                </widget>
-                                <widget class="QPushButton">
-                                    <property name="name">
-                                        <cstring>PushButton7_2</cstring>
-                                    </property>
-                                    <property name="text">
-                                        <string>&amp;+0.1 BPM</string>
-                                    </property>
-                                </widget>
-                            </vbox>
-                        </widget>
-                        <widget class="QLayoutWidget">
-                            <property name="name">
-                                <cstring>Layout28</cstring>
-                            </property>
-                            <vbox>
-                                <property name="name">
-                                    <cstring>unnamed</cstring>
-                                </property>
-                                <property name="margin">
-                                    <number>0</number>
-                                </property>
-                                <property name="spacing">
-                                    <number>6</number>
-                                </property>
-                                <widget class="QPushButton">
-                                    <property name="name">
-                                        <cstring>StartButton</cstring>
-                                    </property>
-                                    <property name="enabled">
-                                        <bool>true</bool>
-                                    </property>
-                                    <property name="text">
-                                        <string>&amp;Start</string>
-                                    </property>
-                                </widget>
-                            </vbox>
-                        </widget>
-                    </hbox>
-                </widget>
-                <widget class="QLayoutWidget" row="0" column="0" rowspan="2" colspan="1">
-                    <property name="name">
-                        <cstring>Layout25</cstring>
-                    </property>
-                    <hbox>
-                        <property name="name">
-                            <cstring>unnamed</cstring>
-                        </property>
-                        <property name="margin">
-                            <number>0</number>
-                        </property>
-                        <property name="spacing">
-                            <number>6</number>
-                        </property>
-                        <widget class="QLayoutWidget">
-                            <property name="name">
-                                <cstring>Layout23</cstring>
-                            </property>
-                            <vbox>
-                                <property name="name">
-                                    <cstring>unnamed</cstring>
-                                </property>
-                                <property name="margin">
-                                    <number>0</number>
-                                </property>
-                                <property name="spacing">
-                                    <number>6</number>
-                                </property>
-                                <widget class="QLabel">
-                                    <property name="name">
-                                        <cstring>TextLabel2</cstring>
-                                    </property>
-                                    <property name="text">
-                                        <string>from bpm =</string>
-                                    </property>
-                                    <property name="alignment">
-                                        <set>AlignVCenter|AlignRight</set>
-                                    </property>
-                                    <property name="hAlign" stdset="0">
-                                    </property>
-                                </widget>
-                                <widget class="QLabel">
-                                    <property name="name">
-                                        <cstring>TextLabel4</cstring>
-                                    </property>
-                                    <property name="text">
-                                        <string>to bpm =</string>
-                                    </property>
-                                    <property name="alignment">
-                                        <set>AlignVCenter|AlignRight</set>
-                                    </property>
-                                    <property name="hAlign" stdset="0">
-                                    </property>
-                                </widget>
-                                <widget class="QLabel">
-                                    <property name="name">
-                                        <cstring>TextLabel5</cstring>
-                                    </property>
-                                    <property name="text">
-                                        <string>from % =</string>
-                                    </property>
-                                    <property name="alignment">
-                                        <set>AlignVCenter|AlignRight</set>
-                                    </property>
-                                    <property name="hAlign" stdset="0">
-                                    </property>
-                                </widget>
-                                <widget class="QLabel">
-                                    <property name="name">
-                                        <cstring>TextLabel6</cstring>
-                                    </property>
-                                    <property name="text">
-                                        <string>to % =</string>
-                                    </property>
-                                    <property name="alignment">
-                                        <set>AlignVCenter|AlignRight</set>
-                                    </property>
-                                    <property name="hAlign" stdset="0">
-                                    </property>
-                                </widget>
-                            </vbox>
-                        </widget>
-                        <widget class="QLayoutWidget">
-                            <property name="name">
-                                <cstring>Layout24</cstring>
-                            </property>
-                            <vbox>
-                                <property name="name">
-                                    <cstring>unnamed</cstring>
-                                </property>
-                                <property name="margin">
-                                    <number>0</number>
-                                </property>
-                                <property name="spacing">
-                                    <number>6</number>
-                                </property>
-                                <widget class="QLineEdit">
-                                    <property name="name">
-                                        <cstring>FromBpmEdit</cstring>
-                                    </property>
-                                    <property name="enabled">
-                                        <bool>true</bool>
-                                    </property>
-                                    <property name="text">
-                                        <string>120</string>
-                                    </property>
-                                </widget>
-                                <widget class="QLineEdit">
-                                    <property name="name">
-                                        <cstring>ToBpmEdit</cstring>
-                                    </property>
-                                    <property name="enabled">
-                                        <bool>true</bool>
-                                    </property>
-                                    <property name="text">
-                                        <string>160</string>
-                                    </property>
-                                </widget>
-                                <widget class="QLineEdit">
-                                    <property name="name">
-                                        <cstring>FromPercentEdit</cstring>
-                                    </property>
-                                    <property name="enabled">
-                                        <bool>true</bool>
-                                    </property>
-                                    <property name="text">
-                                        <string>0</string>
-                                    </property>
-                                </widget>
-                                <widget class="QLineEdit">
-                                    <property name="name">
-                                        <cstring>ToPercentEdit</cstring>
-                                    </property>
-                                    <property name="enabled">
-                                        <bool>true</bool>
-                                    </property>
-                                    <property name="text">
-                                        <string>100</string>
-                                    </property>
-                                </widget>
-                            </vbox>
-                        </widget>
-                    </hbox>
-                </widget>
-                <widget class="QLayoutWidget" row="1" column="1">
-                    <property name="name">
-                        <cstring>Layout31</cstring>
-                    </property>
-                    <vbox>
-                        <property name="name">
-                            <cstring>unnamed</cstring>
-                        </property>
-                        <property name="margin">
-                            <number>0</number>
-                        </property>
-                        <property name="spacing">
-                            <number>6</number>
-                        </property>
-                        <widget class="QProgressBar">
-                            <property name="name">
-                                <cstring>ReadingBar</cstring>
-                            </property>
-                            <property name="lineWidth">
-                                <number>2</number>
-                            </property>
-                            <property name="progress">
-                                <number>0</number>
-                            </property>
-                        </widget>
-                        <widget class="QProgressBar">
-                            <property name="name">
-                                <cstring>CountingBar</cstring>
-                            </property>
-                            <property name="progress">
-                                <number>0</number>
-                            </property>
-                        </widget>
-                    </vbox>
-                </widget>
-            </grid>
-        </widget>
-        <widget class="QLayoutWidget" row="5" column="0" rowspan="1" colspan="2">
+        <widget class="QLayoutWidget" row="4" column="0" rowspan="1" colspan="3">
             <property name="name">
                 <cstring>Layout3</cstring>
             </property>
@@ -561,11 +185,11 @@
                 </spacer>
             </grid>
         </widget>
-        <widget class="QLayoutWidget" row="0" column="0" rowspan="1" colspan="2">
+        <widget class="QLayoutWidget" row="1" column="1">
             <property name="name">
-                <cstring>Layout21</cstring>
+                <cstring>Layout31</cstring>
             </property>
-            <hbox>
+            <vbox>
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
@@ -575,9 +199,81 @@
                 <property name="spacing">
                     <number>6</number>
                 </property>
+                <widget class="QProgressBar">
+                    <property name="name">
+                        <cstring>ReadingBar</cstring>
+                    </property>
+                    <property name="lineWidth">
+                        <number>2</number>
+                    </property>
+                    <property name="progress">
+                        <number>0</number>
+                    </property>
+                </widget>
+                <widget class="QProgressBar">
+                    <property name="name">
+                        <cstring>CountingBar</cstring>
+                    </property>
+                    <property name="progress">
+                        <number>0</number>
+                    </property>
+                </widget>
+            </vbox>
+        </widget>
+        <widget class="QLayoutWidget" row="0" column="1">
+            <property name="name">
+                <cstring>layout14</cstring>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
                 <widget class="QLayoutWidget">
                     <property name="name">
-                        <cstring>Layout20</cstring>
+                        <cstring>Layout26</cstring>
+                    </property>
+                    <grid>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <property name="margin">
+                            <number>0</number>
+                        </property>
+                        <property name="spacing">
+                            <number>6</number>
+                        </property>
+                        <widget class="QLabel" row="1" column="0">
+                            <property name="name">
+                                <cstring>TextLabel1_2</cstring>
+                            </property>
+                            <property name="text">
+                                <string>Skip</string>
+                            </property>
+                        </widget>
+                        <widget class="QSpinBox" row="1" column="1">
+                            <property name="name">
+                                <cstring>SkipBox</cstring>
+                            </property>
+                            <property name="maxValue">
+                                <number>32</number>
+                            </property>
+                            <property name="minValue">
+                                <number>1</number>
+                            </property>
+                        </widget>
+                        <widget class="QLCDNumber" row="0" column="1">
+                            <property name="name">
+                                <cstring>TapLcd</cstring>
+                            </property>
+                            <property name="numDigits">
+                                <number>4</number>
+                            </property>
+                        </widget>
+                    </grid>
+                </widget>
+                <widget class="QLayoutWidget">
+                    <property name="name">
+                        <cstring>Layout30</cstring>
                     </property>
                     <vbox>
                         <property name="name">
@@ -589,37 +285,33 @@
                         <property name="spacing">
                             <number>6</number>
                         </property>
-                        <widget class="QLabel">
+                        <widget class="QPushButton">
                             <property name="name">
-                                <cstring>TextLabel1</cstring>
+                                <cstring>PushButton7</cstring>
                             </property>
                             <property name="text">
-                                <string>song =</string>
+                                <string>&amp;Tap</string>
                             </property>
-                            <property name="alignment">
-                                <set>AlignVCenter|AlignRight</set>
-                            </property>
-                            <property name="hAlign" stdset="0">
+                            <property name="accel">
+                                <string>Alt+T</string>
                             </property>
                         </widget>
-                        <widget class="QLabel">
+                        <widget class="QPushButton">
                             <property name="name">
-                                <cstring>TextLabel5_2</cstring>
+                                <cstring>PushButton8</cstring>
                             </property>
                             <property name="text">
-                                <string>md5sum =</string>
+                                <string>&amp;Reset</string>
                             </property>
-                            <property name="alignment">
-                                <set>AlignVCenter|AlignRight</set>
-                            </property>
-                            <property name="hAlign" stdset="0">
+                            <property name="accel">
+                                <string>Alt+R</string>
                             </property>
                         </widget>
                     </vbox>
                 </widget>
                 <widget class="QLayoutWidget">
                     <property name="name">
-                        <cstring>Layout18</cstring>
+                        <cstring>Layout29</cstring>
                     </property>
                     <vbox>
                         <property name="name">
@@ -631,43 +323,91 @@
                         <property name="spacing">
                             <number>6</number>
                         </property>
-                        <widget class="QLabel">
+                        <widget class="QPushButton">
                             <property name="name">
-                                <cstring>SongLabel</cstring>
-                            </property>
-                            <property name="sizePolicy">
-                                <sizepolicy>
-                                    <hsizetype>7</hsizetype>
-                                    <vsizetype>1</vsizetype>
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
+                                <cstring>PushButton6</cstring>
                             </property>
                             <property name="text">
-                                <string>...</string>
+                                <string>&amp;-0.1 BPM</string>
+                            </property>
+                            <property name="accel">
+                                <string>Alt+-</string>
                             </property>
                         </widget>
-                        <widget class="QLabel">
+                        <widget class="QPushButton">
                             <property name="name">
-                                <cstring>Md5Label</cstring>
+                                <cstring>PushButton7_2</cstring>
+                            </property>
+                            <property name="text">
+                                <string>&amp;+0.1 BPM</string>
+                            </property>
+                            <property name="accel">
+                                <string>Alt++</string>
+                            </property>
+                        </widget>
+                    </vbox>
+                </widget>
+                <widget class="QLayoutWidget">
+                    <property name="name">
+                        <cstring>layout13</cstring>
+                    </property>
+                    <vbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>StartButton</cstring>
+                            </property>
+                            <property name="enabled">
+                                <bool>true</bool>
+                            </property>
+                            <property name="text">
+                                <string>&amp;Start</string>
+                            </property>
+                            <property name="accel">
+                                <string>Alt+S</string>
+                            </property>
+                        </widget>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>BusyToggle</cstring>
+                            </property>
+                            <property name="enabled">
+                                <bool>false</bool>
                             </property>
                             <property name="sizePolicy">
                                 <sizepolicy>
-                                    <hsizetype>7</hsizetype>
-                                    <vsizetype>1</vsizetype>
+                                    <hsizetype>0</hsizetype>
+                                    <vsizetype>0</vsizetype>
                                     <horstretch>0</horstretch>
                                     <verstretch>0</verstretch>
                                 </sizepolicy>
                             </property>
+                            <property name="focusPolicy">
+                                <enum>NoFocus</enum>
+                            </property>
                             <property name="text">
-                                <string>...</string>
+                                <string></string>
+                            </property>
+                            <property name="accel">
+                                <string></string>
+                            </property>
+                            <property name="toggleButton">
+                                <bool>true</bool>
+                            </property>
+                            <property name="on">
+                                <bool>false</bool>
+                            </property>
+                            <property name="flat">
+                                <bool>true</bool>
                             </property>
                         </widget>
                     </vbox>
                 </widget>
             </hbox>
         </widget>
-        <widget class="QLabel" row="4" column="0" rowspan="1" colspan="2">
+        <widget class="QLabel" row="3" column="0" rowspan="1" colspan="3">
             <property name="name">
                 <cstring>BpmPix</cstring>
             </property>
@@ -695,11 +435,49 @@
                 <bool>true</bool>
             </property>
         </widget>
-        <widget class="QLayoutWidget" row="1" column="0">
+        <widget class="QButtonGroup" row="0" column="0" rowspan="2" colspan="1">
             <property name="name">
-                <cstring>Layout20</cstring>
+                <cstring>buttonGroup1</cstring>
             </property>
-            <vbox>
+            <property name="title">
+                <string>Algorithm</string>
+            </property>
+            <property name="radioButtonExclusive">
+                <bool>true</bool>
+            </property>
+            <grid>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QRadioButton" row="0" column="0">
+                    <property name="name">
+                        <cstring>resamplingScan</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Resampling Energy Scan</string>
+                    </property>
+                    <property name="checked">
+                        <bool>true</bool>
+                    </property>
+                </widget>
+                <widget class="QRadioButton" row="1" column="0">
+                    <property name="name">
+                        <cstring>ultraLongFFT</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Ultra Long FFT Guidance</string>
+                    </property>
+                    <property name="checked">
+                        <bool>false</bool>
+                    </property>
+                </widget>
+            </grid>
+        </widget>
+        <widget class="QLayoutWidget" row="0" column="2" rowspan="2" colspan="1">
+            <property name="name">
+                <cstring>Layout25</cstring>
+            </property>
+            <hbox>
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
@@ -709,68 +487,151 @@
                 <property name="spacing">
                     <number>6</number>
                 </property>
-                <widget class="QLabel">
-                    <property name="name">
-                        <cstring>TextLabel2_2</cstring>
-                    </property>
-                    <property name="text">
-                        <string>tags =</string>
-                    </property>
-                    <property name="alignment">
-                        <set>AlignVCenter|AlignRight</set>
-                    </property>
-                    <property name="hAlign" stdset="0">
-                    </property>
-                </widget>
-                <widget class="QLabel">
-                    <property name="name">
-                        <cstring>TextLabel3</cstring>
-                    </property>
-                    <property name="text">
-                        <string>.idx =</string>
-                    </property>
-                    <property name="alignment">
-                        <set>AlignVCenter|AlignRight</set>
-                    </property>
-                    <property name="hAlign" stdset="0">
-                    </property>
-                </widget>
-            </vbox>
-        </widget>
-        <widget class="QLayoutWidget" row="1" column="1">
-            <property name="name">
-                <cstring>layout20</cstring>
-            </property>
-            <vbox>
-                <property name="name">
-                    <cstring>unnamed</cstring>
-                </property>
-                <widget class="QLineEdit">
-                    <property name="name">
-                        <cstring>TagEdit</cstring>
-                    </property>
-                </widget>
                 <widget class="QLayoutWidget">
                     <property name="name">
-                        <cstring>layout19</cstring>
+                        <cstring>Layout23</cstring>
                     </property>
-                    <hbox>
+                    <vbox>
                         <property name="name">
                             <cstring>unnamed</cstring>
                         </property>
-                        <widget class="QLineEdit">
+                        <property name="margin">
+                            <number>0</number>
+                        </property>
+                        <property name="spacing">
+                            <number>6</number>
+                        </property>
+                        <widget class="QLabel">
                             <property name="name">
-                                <cstring>IdxEdit</cstring>
+                                <cstring>TextLabel2</cstring>
                             </property>
-                            <property name="enabled">
-                                <bool>false</bool>
+                            <property name="text">
+                                <string>from bpm =</string>
+                            </property>
+                            <property name="alignment">
+                                <set>AlignVCenter|AlignRight</set>
+                            </property>
+                            <property name="hAlign" stdset="0">
                             </property>
                         </widget>
-                    </hbox>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>TextLabel4</cstring>
+                            </property>
+                            <property name="text">
+                                <string>to bpm =</string>
+                            </property>
+                            <property name="alignment">
+                                <set>AlignVCenter|AlignRight</set>
+                            </property>
+                            <property name="hAlign" stdset="0">
+                            </property>
+                        </widget>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>TextLabel5</cstring>
+                            </property>
+                            <property name="text">
+                                <string>from % =</string>
+                            </property>
+                            <property name="alignment">
+                                <set>AlignVCenter|AlignRight</set>
+                            </property>
+                            <property name="hAlign" stdset="0">
+                            </property>
+                        </widget>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>TextLabel6</cstring>
+                            </property>
+                            <property name="text">
+                                <string>to % =</string>
+                            </property>
+                            <property name="alignment">
+                                <set>AlignVCenter|AlignRight</set>
+                            </property>
+                            <property name="hAlign" stdset="0">
+                            </property>
+                        </widget>
+                    </vbox>
                 </widget>
-            </vbox>
+                <widget class="QLayoutWidget">
+                    <property name="name">
+                        <cstring>Layout24</cstring>
+                    </property>
+                    <vbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <property name="margin">
+                            <number>0</number>
+                        </property>
+                        <property name="spacing">
+                            <number>6</number>
+                        </property>
+                        <widget class="QLineEdit">
+                            <property name="name">
+                                <cstring>FromBpmEdit</cstring>
+                            </property>
+                            <property name="enabled">
+                                <bool>true</bool>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>3</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="minimumSize">
+                                <size>
+                                    <width>50</width>
+                                    <height>0</height>
+                                </size>
+                            </property>
+                            <property name="text">
+                                <string>80</string>
+                            </property>
+                        </widget>
+                        <widget class="QLineEdit">
+                            <property name="name">
+                                <cstring>ToBpmEdit</cstring>
+                            </property>
+                            <property name="enabled">
+                                <bool>true</bool>
+                            </property>
+                            <property name="text">
+                                <string>160</string>
+                            </property>
+                        </widget>
+                        <widget class="QLineEdit">
+                            <property name="name">
+                                <cstring>FromPercentEdit</cstring>
+                            </property>
+                            <property name="enabled">
+                                <bool>true</bool>
+                            </property>
+                            <property name="text">
+                                <string>0</string>
+                            </property>
+                        </widget>
+                        <widget class="QLineEdit">
+                            <property name="name">
+                                <cstring>ToPercentEdit</cstring>
+                            </property>
+                            <property name="enabled">
+                                <bool>true</bool>
+                            </property>
+                            <property name="text">
+                                <string>100</string>
+                            </property>
+                        </widget>
+                    </vbox>
+                </widget>
+            </hbox>
         </widget>
-        <widget class="QLabel" row="3" column="0" rowspan="1" colspan="2">
+        <widget class="QLabel" row="2" column="0" rowspan="1" colspan="3">
             <property name="name">
                 <cstring>StatusLabel</cstring>
             </property>
@@ -864,10 +725,14 @@
         <receiver>PushButton7_2</receiver>
         <slot>setDisabled(bool)</slot>
     </connection>
+    <connection>
+        <sender>BusyToggle</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>buttonGroup1</receiver>
+        <slot>setDisabled(bool)</slot>
+    </connection>
 </connections>
 <tabstops>
-    <tabstop>TagEdit</tabstop>
-    <tabstop>IdxEdit</tabstop>
     <tabstop>FromBpmEdit</tabstop>
     <tabstop>ToBpmEdit</tabstop>
     <tabstop>FromPercentEdit</tabstop>

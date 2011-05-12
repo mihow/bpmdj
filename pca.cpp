@@ -32,10 +32,7 @@
 #include <assert.h>
 #include "kbpm-dj.h"
 #include "pca.h"
-
-extern "C" {
 #include "common.h"
-}
 
 #define SIGN(a, b) ( (b) < 0 ? -fabs(a) : fabs(a) )
 static void corcol(float **data, int n, int m, float **symmat);

@@ -49,16 +49,13 @@
 #include <math.h>
 #include <assert.h>
 #include <math.h>
+#include <qmessagebox.h>
 #include "pattern-analyzer.logic.h"
 #include "sys/times.h"
 #include "kbpm-play.h"
-
-extern "C"
-{
-#include "cbpm-index.h"
+#include "index.h"
 #include "version.h"
 #include "scripts.h"
-}
 
 #define COLLAPSE 4
 PatternAnalyzerLogic::PatternAnalyzerLogic(bool showreaderprogress, SongPlayer*parent, const char*name, bool modal, WFlags f) :
@@ -79,6 +76,7 @@ void PatternAnalyzerLogic::readFile(bool showreaderprogress)
   // read in memory and shrink it 
   FILE * raw=openRawFile(arg_rawpath);
   audiosize=fsize(raw)/4;
+  if (audiosize == 0) return;
   signed4 pos = 0;
   fseek(raw,pos,SEEK_SET);
   data = allocate(audiosize/COLLAPSE,compressed);
@@ -124,12 +122,28 @@ void PatternAnalyzerLogic::readFile(bool showreaderprogress)
   for(int i = 0 ; i < audiosize/COLLAPSE ; i++)
     if (data[i]>maximum)
       maximum=data[i];
+  if (maximum==0)
+    {
+      audiosize=0;
+      return;
+    }
   for(int i = 0 ; i < audiosize/COLLAPSE ; i++)
     data[i]=(signed8)data[i]*(signed8)255/maximum;
 }
 
 void PatternAnalyzerLogic::showPattern()
 { 
+  if (!audiosize)
+    {
+      QMessageBox::warning(this,"Fragment too small","There is simply no raw data on disk,\nHence, I can't display the beat graph");
+      return;
+    }
+  if (!period)
+    {
+      QMessageBox::warning(this,"No period estimate","No period estimate, hence cannot show the beat graph.\n"
+			   "Please go to the bpm counter and measure the tempo first");
+      return;
+    }
   int beats_per_column = beats->value() ;
   unsigned4 collapsed_period = period  / COLLAPSE ;
   collapsed_period *= beats_per_column;
@@ -262,8 +276,5 @@ void PatternAnalyzerLogic::setTempo()
   ::y = ::x * currentperiod / normalperiod;
   periodDelta->setValue(0);
   periodDelta10->setValue(0);
-  index_period = normalperiod/4;
-  index_changed = 1;
-  // immediatelly write to disk
-  index_write();
+  Index::index->set_period(normalperiod/4);
 }

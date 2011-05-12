@@ -21,9 +21,7 @@
 #ifndef CLUSTER_H
 #define CLUSTER_H
 
-extern "C" {
 #include "common.h"
-}
 
 class Metriek
 {

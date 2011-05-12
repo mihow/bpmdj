@@ -31,6 +31,7 @@
 #include "dirscanner.h"
 #include "spectrum.h"
 #include "queuedsong.h"
+#include "index.h"
 
 #define QUEUED_ANKER 0
 #define QUEUED_DLINE 1
@@ -47,10 +48,6 @@
 #define QUEUED_MD5SUM 12
 #define QUEUED_FILE 13
 
-extern "C"
-{
-#include "cbpm-index.h"
-}
 
 /**
  * this is a mess... (TM)

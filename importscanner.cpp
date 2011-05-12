@@ -24,11 +24,7 @@
 #include "qsong.h"
 #include "kbpm-dj.h"
 #include "avltree.cpp"
-
-extern "C"
-{
-#include "cbpm-index.h"
-}
+#include "index.h"
 
 void ImportScanner::recursing(const QString  dirname)
 {
@@ -84,24 +80,21 @@ void ImportScanner::checkfile(const QString pathname, const QString filen)
 	  sprintf(indexname,"./index/%s%d.idx",temp,nr++);
 	}
       
-      index_init();
-      index_readfrom=strdup(indexname);
+      Index *index = new Index();
+      index->meta_writeto(indexname);
       
       char log[500];
-      sprintf(log,"Writing %s",index_readfrom);
+      sprintf(log,"Writing %s",index->meta_readfrom());
       Created->insertLine(log);
       Created->setCursorPosition(Created->numLines(),1);
       
       app->processEvents();
       
-      index_setversion();
-      index_file=strdup(filename);
-      index_changed=true;
-      index_tags=strdup("New");
-      index_period=-1;
-      index_tempo=strdup("/");
-      index_write();
-      index_free();
+      index->index_file=strdup(filename);
+      index->index_changed=true;
+      index->index_tags=strdup("New");
+      index->set_period(-1);  // writes immediatelly to disk
+      delete index;
       
       selector -> acceptNewSong( new Song( ( const QString ) halfindexname, IndexDir, true ) );
     }

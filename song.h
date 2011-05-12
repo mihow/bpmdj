@@ -87,7 +87,6 @@ public Point
   public:
     Song();
     Song(QString filename, QString currentpath, bool checkondisk);
-    bool obtainTitleAuthor(char * fulltitle);
     void reread(bool checkfileondisk);
     void checkondisk();
     void setColor(QColor c);

@@ -35,7 +35,6 @@
 #include <sys/times.h>
 #include <math.h>
 #include "player-core.h"
-#include "cbpm-index.h"
 #include "version.h"
 #include "scripts.h"
 

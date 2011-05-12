@@ -54,13 +54,9 @@
 #include "sys/times.h"
 #include "fourier.h"
 #include "kbpm-play.h"
-
-extern "C"
-{
-#include "cbpm-index.h"
+#include "index.h"
 #include "version.h"
 #include "scripts.h"
-}
 
 TempoLineAnalyzerLogic::TempoLineAnalyzerLogic(SongPlayer*parent, const char*name, bool modal, WFlags f) :
   TempoLineDialog(0,name,modal,f)

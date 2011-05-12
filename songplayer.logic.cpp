@@ -36,16 +36,26 @@
 #include "spectrumanalyzer.logic.h"
 #include "impulseanalyzer.logic.h"
 #include "tempolineanalyzer.logic.h"
+#include <assert.h>
 #include "about.h"
+#include "index.h"
 
-extern "C" 
-{
-#include "cbpm-index.h"
-}
-
+static int test=0;
 void SongPlayerLogic::done(int r)
 {
-  accept();
+  test++;
+  assert(test<2);
+  // signal any active counter to stop working
+  bpmcounter->finish();
+  // if the song has been stopped, simply start and stop again.
+  ::stop=1;
+  ::paused=0;
+  // wait until finished: if this thread/function returns, the application is deleted
+  // so we must make sure that the player has stopped
+  while(!finished) ;
+  // now finish
+  SongPlayer::done(r);
+  test--;
 }
 
 SongPlayerLogic::SongPlayerLogic(QWidget*parent,const char*name, bool modal,WFlags f) :
@@ -61,9 +71,14 @@ SongPlayerLogic::SongPlayerLogic(QWidget*parent,const char*name, bool modal,WFla
   redrawCues();
   
   // set caption
-  if (index_readfrom)
+  if (Index::index->valid_tar_info())
     {
-      QString blah = index_readfrom;
+      QString blah = Index::index->encoded_tar();
+      setCaption(blah);
+    }
+  else if (Index::index->meta_readfrom())
+    {
+      QString blah = Index::index->meta_readfrom();
       blah.replace("./index/","");
       setCaption(blah);
     }
@@ -228,15 +243,7 @@ void SongPlayerLogic::nudgeMinus8M()
 
 void SongPlayerLogic::accept()
 {
-   // signal any active counter to stop working
-   bpmcounter->finish();
-   // if the song has been stopped, simply start and stop again.
-   ::stop=1;
-   ::paused=0;
-   // wait until finished
-   while(!finished) ;
-   // now finish
-   SongPlayer::accept();
+  done(0);
 }
 
 void SongPlayerLogic::timerTick()
@@ -246,7 +253,12 @@ void SongPlayerLogic::timerTick()
    // LcdLeft->display((double)((int)(x_normalise(::y)*1000/m))/(double)10);
    // LcdRight->display((int)(m/1024));
    // times are displayed with respect to the current tempo
-   unsigned4 totaltime=samples2s(y_normalise(m));
+   unsigned4 m2;
+   if (currentperiod<0)
+     m2 = m;
+   else
+     m2 = y_normalise(m);
+   unsigned4 totaltime=samples2s(m2);
    unsigned4 currenttime=samples2s(::y);
    char totalstr[20], currentstr[20];
    sprintf(totalstr,"%02d:%02d",(int)totaltime/60,(int)totaltime%60);
@@ -550,7 +562,7 @@ void SongPlayerLogic::metronome()
 
 void SongPlayerLogic::breakLfo()
 {
-   lfo_set("Break",lfo_break,1,::y-dsp_latency());
+  lfo_set("Break",lfo_break,1,::y-dsp_latency());
 }
 
 void SongPlayerLogic::openBpmCounter()
@@ -559,6 +571,11 @@ void SongPlayerLogic::openBpmCounter()
     bpmcounter->hide();
    else
      bpmcounter->show();
+}
+
+void SongPlayerLogic::openInfo()
+{
+  Index::index->executeInfoDialog();
 }
 
 void SongPlayerLogic::openSpectrumAnalyzer()

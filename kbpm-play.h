@@ -19,9 +19,6 @@
 ****/
 
 #include <qapplication.h>
-
-extern "C" {
 #include "player-core.h"
-}
 
 extern QApplication *app;

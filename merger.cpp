@@ -25,11 +25,9 @@
 #include <stdio.h>
 #include <ctype.h>
 #include "unistd.h"
-extern"C"{
-#include "cbpm-index.h"
+#include "index.h"
 #include "common.h"
 #include "scripts.h"
-}
 
 void options_failure(char* err)
 {
@@ -370,22 +368,22 @@ void normalize_file()
 
 bool createFiles(char* a, char* b)
 {
-  index_read(b);
-  filename_b = strdup(index_file);
-  period_b = index_period*4;
+  Index::read(b);
+  filename_b = strdup(Index::index->index_file);
+  period_b = Index::index->get_period()*4;
   printf("Decoding %s\n",b);
   if (!vexecute(CREATERAW_CMD,"./",filename_b))
     exit(100);
   
   file_b=openRawFileForWriting("./");
-  index_free();
+  delete Index::index;
   
   if (normalize)
     normalize_file();
   
-  index_read(a);
-  period_a = index_period*4;
-  index_free();
+  Index::read(a);
+  period_a = Index::index->get_period()*4;
+  delete Index::index;
   
   file_a=fopen(BPMMIXED_NAME,"r+b");
   if (file_a)

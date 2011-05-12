@@ -1,8 +1,7 @@
-VERSION = 2.1
+VERSION = 2.2
 include defines
-
-BIN = cbpm-play kbpm-play kbpm-dj merger bpmdj-raw rbpm-play xmms-play alsamixerguis
-DOC = authors changelog copyright todo readme ${shell ls *.html *.png}
+BIN = kbpm-play kbpm-dj merger bpmdj-raw rbpm-play xmms-play alsamixerguis
+DOC = authors changelog copyright todo readme ${shell ls *.html *.png *.css *.pdf}
 UIS = ${shell ls *.ui}
 
 all: $(BIN)
@@ -29,7 +28,7 @@ all: $(BIN)
 	$(MOC) -o $@ $<
 
 %.o: %.cpp
-	$(CC) -c $< $(CFLAGS) -o $@ $(QT_INCLUDE_PATH)
+	$(CPP) -c $< $(CFLAGS) -o $@ $(QT_INCLUDE_PATH)
 
 %.cpp: %.ui
 	$(UIC) -i `basename $< .ui`.h -o $@ $<
@@ -48,7 +47,7 @@ clean:
 	$(RM) a.out core *.o *.log *.tex.dep *.toc *.dvi *.aux
 	$(RM) plot.ps gmon.out toplot.dat build sum.tmp fetchfiles.sh
 	$(RM) cbpm-count cbpm-play kbpm-play kbpm-dj kbpm-count merger
-	$(RM) *.moc.cpp *.ui.cpp *.ui.h
+	$(RM) *.moc.cpp *.ui.cpp *.ui.h 
 	$(RM) tagbox.h tagbox.cpp songplayer.h songplayer.cpp
 	$(RM) bpmcounter.h bpmcounter.cpp
 	$(RM) setupwizard.h setupwizard.cpp
@@ -66,6 +65,7 @@ clean:
 
 mrproper: clean
 	$(RM) *~ playlist.xmms played.log
+	$(RM) \#*\#
 	$(RM) debian/*~ depends
 
 #############################################################################
@@ -82,10 +82,10 @@ uninstall:
 	for doc in $(DOC); do $(RM) ${DESTDIR}/usr/share/doc/bpmdj/$$doc; done
 
 website: 
-	scp *.html *.png krubbens@bpmdj.sourceforge.net:/home/groups/b/bp/bpmdj/htdocs/
+	rsync -e ssh -xavz *.html *.css *.png *.pdf krubbens@bpmdj.sourceforge.net:/home/groups/b/bp/bpmdj/htdocs/
 
 nancy: nens
-nens:
+nens:	
 	tar -cvzf index.tgz index
 	scp index.tgz root@tnm:/home/nens/
 	mv index.tgz ..
@@ -108,8 +108,8 @@ include depend
 KPLAY_OBJECTS = about.o about.moc.o\
 	songplayer.o songplayer.moc.o\
 	player-core.o dsp-drivers.o dsp-oss.o dsp-alsa.o\
-	cbpm-index.o\
-	kbpm-play.o analyzer.o\
+	song-information.o song-information.moc.o\
+	index.o kbpm-play.o analyzer.o\
 	songplayer.logic.o songplayer.logic.moc.o\
 	md5-analyzer.o\
 	bpmcounter.o       bpmcounter.moc.o       bpm-analyzer.logic.o     bpm-analyzer.logic.moc.o\
@@ -125,7 +125,7 @@ KPLAY_OBJECTS = about.o about.moc.o\
 	scripts.o
 
 KCOUNT_OBJECTS = bpmcounter.o bpmcounter.moc.o\
-	cbpm-index.o kbpm-count.o kbpm-count.moc.o\
+	index.o kbpm-count.o kbpm-count.moc.o\
 	scripts.o merger.o
 
 avltree-test:
@@ -135,39 +135,41 @@ KSEL_OBJECTS = 	avltree.o songtree.o qstring-factory.o spectrum.o\
 	scripts.o cluster.o pca.o\
 	about.o about.moc.o\
 	loader.o loader.moc.o\
+	mixinformation.o mixinformation.moc.o\
 	askinput.o askinput.moc.o\
 	tagbox.o tagbox.moc.o\
+	song-information.o song-information.moc.o\
 	scanningprogress.o scanningprogress.moc.o\
 	choose-analyzers.o choose-analyzers.moc.o\
 	database.o dirscanner.o importscanner.o\
 	songselector.o songselector.moc.o songselector.logic.o songselector.logic.moc.o\
 	process-manager.o playercommandwizard.o playercommandwizard.moc.o\
 	preferences.o preferences.moc.o preferences.logic.o preferences.logic.moc.o\
-	song.o qsong.o queuedsong.o\
-	index-reader.o cbpm-index.o kbpm-played.o\
+	song.o qsong.o queuedsong.o historysong.o\
+	index-reader.o index.o kbpm-played.o\
 	setupwizard.moc.o setupwizard.o kbpm-dj.o edit-distance.o\
 	renamer.o renamer.moc.o renamer.logic.o renamer.logic.moc.o\
 	similars.o similars.moc.o similarscanner.o similarscanner.moc.o\
 	config.o merger-dialog.o merger-dialog.moc.o common.o
 
-MERGER_OBJECTS = merger.o cbpm-index.o common.o scripts.o
+MERGER_OBJECTS = merger.o index.o common.o scripts.o song-information.o song-information.moc.o
 
 #############################################################################
 # Binaries
 #############################################################################
-cbpm-play: cbpm-play.o cbpm-index.o player-core.o common.o scripts.o dsp-drivers.o dsp-oss.o dsp-alsa.o
-	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
+#cbpm-play: cbpm-play.o index.o player-core.o common.o scripts.o dsp-drivers.o dsp-oss.o dsp-alsa.o
+#	$(CPP) $(CFLAGS) $(LDFLAGS) $^ -o $@
 
 kbpm-play: $(KPLAY_OBJECTS)
-	$(CC) $(KPLAY_OBJECTS) -o kbpm-play\
+	$(CPP) $(KPLAY_OBJECTS) -o kbpm-play\
 	  $(LDFLAGS) $(QT_INCLUDE_PATH) $(QT_LIBRARY_PATH) $(QT_LIBS)
 
 kbpm-dj: $(KSEL_OBJECTS) songselector.cpp songselector.h
-	$(CC) $(KSEL_OBJECTS) -o kbpm-dj\
+	$(CPP) $(KSEL_OBJECTS) -o kbpm-dj\
 	  $(LDFLAGS) $(QT_INCLUDE_PATH) $(QT_LIBRARY_PATH) $(QT_LIBS)
 
 merger: $(MERGER_OBJECTS)
-	$(CC) $(MERGER_OBJECTS) -o merger\
+	$(CPP) $(MERGER_OBJECTS) -o merger\
 	  $(LDFLAGS) $(QT_INCLUDE_PATH) $(QT_LIBRARY_PATH) $(QT_LIBS)
 
 #############################################################################

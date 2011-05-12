@@ -47,10 +47,7 @@
 #include "process-manager.h"
 #include "qsong.h"
 #include "config.h"
-
-extern "C" {
 #include "scripts.h"
-}
 
 ProcessManager* processManager = NULL;
 
@@ -155,11 +152,7 @@ void ProcessManager::switchMonitorToMain()
   playing_songs[0]=playing_songs[1];
   playing_songs[1]=NULL;
   // write playing sucker to disk
-  if (playing_songs[0])
-    {
-      Played::Play(playing_songs[0]->index);
-      playing_songs[0]->played=true;
-    }
+  Played::Play(playing_songs[0]);
   selector->resetCounter();
   selector->updateProcessView();
 }

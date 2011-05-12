@@ -1,17 +1,35 @@
+LATER
+- Q: dubbel klikken als de monitor nog aan het spelen is brengt het nieuwe nummer in de queue
+- BUG: fetch spectrum crashed op "102_AllYouNeedIsLove[Beatles].mp3"
+- ervoor zorgen dat de bpm-analyzer min of meer correcte info weergeeft...
+- zrogen dat hem rapper van disk leest (blokje per blokje kan wel wat traag zijn op het einde)
+- fix pattern analyzer to use differnt colors for three different frequency bands...
+  red for low, yellow for high pass filter. Benieuwd of dit duidelijker gaat zijn ?
+- de renamerbox is eigenlijk nog een probleem dan... Hoewel eigenlijk ook niet..
+  als we renamen moeten we eigenlijk ook gewoon de inhoud van de files up to date
+  brengen (hebben we een speciale button voor nodig ???
+- albums toevoegen
+- een mix van .idx files en .bun files... DE .bun files bevatten alle data. 
+  terwijl .idx files manueel geediteerd kunnen worden...
+  a- zorgen dat fields _uniek geidentificeerd kunenn worden... Niet langer
+     enkel op de filename... Daarom moeten we somehow de filename eveneens 
+     in de .idx files brengen. Dan kunnen we typos eveneens ook oplossen in de
+     filename... Het probleem zijn dan natuurlijk conflicten bij het laden...
+     filenames die niet meer overeen komen met hun huidige versie... 
+     aargle... En het probleem van meerdere files met dezelfde inhoud...
+  b- album informatie der aan toevoegen... Misschien kunnen we hier de tags voor 
+     gebruiken ? Uiteindelijk houd dat reeds deze informatie bij. Het probleem 
+     is dan wel dat we teveel tags gaan krijgen, wat niet de bedoeling kan zijn. 
+     dus daarom kunnen we beter
+  c- zorgen dat er een versie nummer op elk field plakt, dat we tenminste weten
+     welke versie nu precies de nieuwe is...
+- remote adding of queue laten marcheren...
 - converting bpmdj to only a file selector while xmms keeps the playlist
   mainplayer om te monitoren
   xmms --queue om toe te voegen
   morgen eens proberen...
-- alsa drivers in orde brengen...
-  2 verschillende drivers... Maakt het wel moeilijk omdat deze posities nu net
-  toch wel vrij vaak opgeroepen worden. Dus afhankelijk van de driver moeten we een andere routine aansturen... Dus eigenlijk diegene die we het meest gebruiken mogen we niet wegabstraheren... De andere kan me niet zoveel bommen.
-  op de commandline moeten we wel opgeven hoe we de boel uitlezen...
-- patches van verschillende mensen er aan toevoegen...
-
 
 2.0:
-  audiosize == 0 in pattern-analyzer crashed
-- Q: dubbel klikken als de monitor nog aan het spelen is brengt het nieuwe nummer in de queue
   Q: als de queue leeg is nemen we natuurlijk de huidige main-song.
      dan kunnen we een aantal songs er tussen proppen die
   - similar name scanner 
@@ -21,7 +39,6 @@
     - fast wizards laten werken
   - weigh tags toevoegen aan de distance metriek zodat het selecteren van songs
     weer iets eenvoudiger wordt..
-  - BUG: fetch spectrum crashed op "102_AllYouNeedIsLove[Beatles].mp3"
   - automixer
     - percentage waar de mix moet invallen
     - bug verwijderen als het nemen van de head verder gaat dan het einde van het nummer 
@@ -43,12 +60,6 @@
       - metriek
     - performantie nog eens verder bekijken... Volgens mij wordt er nog iets te veel geheugen gebruikt...
     - verschillende distance methoden erin steken
-  - auto-menu
-    - AUTOMATIC inversion when main song too dark
-    - AUTOMATIC scanning of spectrum and tags when starting
-    - PCA - analysis when starting
-    - inversion of song-colors when too dark
-    - pop Queue when monitor empty
   - de toggle troep centraliseren door ze in een kanon van een define te proppen..
   - fetch brol from disk...
   - qsong uitbreiden met een extra kolom die de cluster beschrijft..
@@ -62,47 +73,28 @@
     - kbpm-counter.cpp kbpm-counter.h CountDialog en BpmCountDialog beter consistentere namen geven..
     - merge index_file creation into cbpm-index (kbpm-play.c bevat dergelijke code en import-scanner.cpp)
   - libmd5 gebruiken...
-  - automatisch verzamelen van de mp3s die in de Q zitten...
   - opzetten mailinglist...
-  - automatisch scannen van spectrum en tags a16zetten en de boel cachen in de index files
+  - automatisch scannen van spectrum en tags afzetten en de boel cachen in de index files
   - Misschien beter een optie maken van het cdrom device ???
   - een eenvoudige tool malken die de code pretty-fied op basis van de tokens...
   - FAQ: Why the access through disk ???
   - FAQ: Why not using channels ?
-  - FAQ: Why no tempo-modifier in the player ?
   - multi-language support...
-  - sneller importeren van mp3's door beide lijsten eerst te sorteren en dan de gekende er reeds uitgooien...
   - pause veld verwijderen als variable en als functie toevoegen..
   - player zou eigen thread moeten starten...
-  - een eenvoudige tool die alle source files pakt en de gelijkenissen visualiseert
-  - automatisch opstellen van playlist aan de hand van een aantal maten:
-  - tempo, spectrum, dcolor
+  - een eenvoudige tool die alle source files pakt en de gelijkenissen visualiseert (duploc like)
+  - automatisch opstellen van playlist aan de hand van een aantal maten: tempo, spectrum, dcolor
   - impulse response meten... volgens mij kan dat gebruikt worden om het 'soort muziek te meten', net zoals het gebruikt moet kunnen worden om in 
     hogere frequenties de rest te meten... 
-  - Pattern recognizer der in proppen
-  - folding derin steken... en op disk schrijven waar gepast...
-    eens zien hoe de cluster detetctie daarmee overweeg kan..
-    normaal gesproken zou dit wel eens een serieus tijdje kunnen duren, daar de afstandsmaat
-    toch wat rekenwerk vraagt..
-    in elk geval we moeten er wat mee experimenteren
-  - Automatisch playlist genereren aan de hand van een randm walk doorheen
-    de kleuren en stijlen...
-    daarentegen kunnen we toch al een 'target' color ergens opgeven, zodat we we  - IDX: switchen naar een meer binair formaat zodat ze binnenkort tenminste een sample 
-         kunnen stokeren zonder al te veel bytes te moeten verspelen...
   - Path tag toevoegen. This box should contain ' a number of entries. Every entry is either 
     het volledig automatisch laten gebeuren is nog niet voor vandaag... 
-ten naar welke
-    waarde we streven. Eens we dit weten, kunnen we ook de spectrum analyse limiteren to de zaken 
-    die in de correcte richting gaan...
-  - beter resample filter der in steken
-  - genereren van data tussen twee punten... ???
+  - beter resample filter der in steken (blijft nog een beetje een uitdaging natuurlijk...)
   - MERGER: progressbar zou weer eens verschrikkelijk handig zijn...
   - SELECTOR: als de .raw file al bestaat voordat we hem gaan creeeren moet hier ook iets mee aangevangen worden
   - Helpen in automatisch afhalen van songs:
   - na een tofetch list opgesteld te hebben moeten we de songs afhalen.
     - tar appenden is geen goed systeem
     - we zouden ook beter direct zorgen dat de namen correct zijn
-  - WEBSITE: overview maken van de vorige layouts... ik ben eigenlijk benieuwd naar de evolutie...
   - Impulse detection/impulse response meten
   - Player: automatische fade-out erin steken
   - color path finder derin steken
@@ -116,15 +108,11 @@ ten naar welke
 =====================================
 kbpm-play:
   - als de file al bestaat en we moeten correleren onmiddelijk binnen 10BPM bounds zoeken
-  - eerst een volledige high energy scan doen over gans het tempo bereik
   - target tempo zetten laat de percent indicator niet volgen
   - als tempo = inf deftige errormelding geven
   - cue shifting beyond zero should lock down to zero (or produce somthing 'okay')
   - should show remaining time instead of total time
-  - checking of de cue points persistent blijven over tempo verschillen heen
-    (en eventueel fixen als dat fout is)
   - when changing an lfo the current phase should remain the same.
-  - reverse playing of certain measures
 
 documentation:
   - logfile doc schrijven
@@ -146,8 +134,3 @@ kbpm-dj:
     - automatic removal of duplicate tags in taglines / song
     - automatic sorting of tags in tagline / song
     - importing mp3's can faster by copying the list and removing every item we found to match
-  - we should slowly migrate to a better data-structure. However i absoilutely refuse to use a database, these things tends to be completely 
-    unmanagebale and useless. I also don't want a binary format. Do we want everyhting to be loaded in memory ? Evenenens compressed in memory
-    houden ? Dus tempos als double, strings met wat extra tekens kwijt ? Willen we bij elke change aan de playlist opnieuw een Songlist genereren ? 
-    Dit zal het ons beter mogelijk malken om rap te sorteren en eens we binnen dezelfde selectierange werken kunnen we op die manier bijzonder 
-    snel te werk gaan, zal nog wel wat hackwerk vragen denk ik..

@@ -34,9 +34,7 @@
 #include "index-reader.h"
 #include "version.h"
 #include "dirscanner.h"
-extern "C" {
 #include "scripts.h"
-}
 
 QApplication *app;
 

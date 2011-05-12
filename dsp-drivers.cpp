@@ -30,8 +30,8 @@
 #endif
 
 // dispatching should be redone in C++
-const int dsp_oss = 1;
-const int dsp_alsa = 2;
+int dsp_oss = 1;
+int dsp_alsa = 2;
 int dsp_driver = 1;
 
 #ifdef COMPILE_OSS

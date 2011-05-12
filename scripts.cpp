@@ -23,7 +23,7 @@
 #include <string.h>
 #include <libgen.h>
 #include <unistd.h>
-#include "cbpm-index.h"
+#include "index.h"
 #include "scripts.h"
 #include "stdarg.h"
 
@@ -37,7 +37,7 @@ char *getRawFilename(const char * rawpath, const char * n)
 FILE * openRawFile(const char * rawpath)
 {
   FILE * raw;
-  char * name = getRawFilename(rawpath, index_file);
+  char * name = getRawFilename(rawpath, Index::index->index_file);
   assert(name);
   raw = fopen(name,"rb");
   if (!raw)
@@ -52,7 +52,7 @@ FILE * openRawFile(const char * rawpath)
 FILE * openRawFileForWriting(const char *d)
 {
   FILE * raw;
-  char * name = getRawFilename(d,index_file);
+  char * name = getRawFilename(d,Index::index->index_file);
   assert(name);
   raw = fopen(name,"r+b");
   if (!raw)
@@ -66,7 +66,7 @@ FILE * openRawFileForWriting(const char *d)
 
 void removeRaw(char* d)
 {
-  char * name = getRawFilename(d,index_file);
+  char * name = getRawFilename(d,Index::index->index_file);
   remove(name);
   free(name);
 }

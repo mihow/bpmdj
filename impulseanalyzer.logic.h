@@ -20,9 +20,7 @@
 
 #include "songplayer.h"
 #include "impulseanalyzer.h"
-extern "C" {
 #include "common.h"
-}
 
 class ImpulseAnalyzerLogic : public ImpulseDialog
 {

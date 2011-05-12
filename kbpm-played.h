@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <qstring.h>
+#include "song.h"
 
 /**
  * A class to represent the song already played
@@ -30,6 +31,9 @@
 class Played
 {
   private:
+    static Song * t_2;  // T - 2
+    static Song * t_1;  // T - 1
+    static Song * t_0;  // the current main
     static QString** names;
     static int size;
     static int next;
@@ -39,5 +43,5 @@ class Played
     static int songs_played;
     Played(const QString filename);
     static bool IsPlayed(const QString indexname);
-    static void Play(const QString indexname);
+    static void Play(Song * main_now);
 };

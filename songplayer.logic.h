@@ -21,9 +21,7 @@
 #include <qtimer.h>
 #include <qbutton.h>
 #include "songplayer.h"
-extern "C" {
 #include "player-core.h"
-}
 
 class BpmAnalyzerDialog;
 
@@ -104,6 +102,7 @@ class SongPlayerLogic :
    virtual void openBpmCounter();
    virtual void openSpectrumAnalyzer();
    virtual void openPatternAnalyzer();
+   virtual void openInfo();
    virtual void openAbout();
    // loop functionality
    virtual void toggleNoLoop();

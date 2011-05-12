@@ -1,8 +1,8 @@
 /****************************************************************************
 ** Form implementation generated from reading ui file 'choose-analyzers.ui'
 **
-** Created: Fri Aug 15 14:21:37 2003
-**      by: The User Interface Compiler ($Id: choose-analyzers.cpp,v 1.1 2003/10/10 08:50:55 krubbens Exp $)
+** Created: Sun Oct 26 15:48:42 2003
+**      by: The User Interface Compiler ($Id: choose-analyzers.cpp,v 1.2 2003/10/26 15:31:53 krubbens Exp $)
 **
 ** WARNING! All changes made in this file will be lost!
 ****************************************************************************/
@@ -21,8 +21,8 @@
 #include <qtooltip.h>
 #include <qwhatsthis.h>
 
-/* 
- *  Constructs a ChooseAnalyzers as a child of 'parent', with the 
+/*
+ *  Constructs a ChooseAnalyzers as a child of 'parent', with the
  *  name 'name' and widget flags set to 'f'.
  *
  *  The dialog will by default be modeless, unless you set 'modal' to
@@ -55,10 +55,6 @@ ChooseAnalyzers::ChooseAnalyzers( QWidget* parent, const char* name, bool modal,
     spectrumAnalyzer = new QCheckBox( tab, "spectrumAnalyzer" );
 
     tabLayout->addWidget( spectrumAnalyzer, 3, 0 );
-
-    patternAnalyzer = new QCheckBox( tab, "patternAnalyzer" );
-
-    tabLayout->addWidget( patternAnalyzer, 4, 0 );
     tabWidget2->insertTab( tab, QString("") );
 
     tab_2 = new QWidget( tabWidget2, "tab_2" );
@@ -107,7 +103,7 @@ ChooseAnalyzers::ChooseAnalyzers( QWidget* parent, const char* name, bool modal,
     QSpacerItem* spacer_2 = new QSpacerItem( 40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum );
     ChooseAnalyzersLayout->addItem( spacer_2, 1, 0 );
     languageChange();
-    resize( QSize(604, 349).expandedTo(minimumSizeHint()) );
+    resize( QSize(604, 352).expandedTo(minimumSizeHint()) );
     clearWState( WState_Polished );
 
     // signals and slots connections
@@ -135,7 +131,6 @@ void ChooseAnalyzers::languageChange()
 "Warning: If the process is killed when you close kbpm-dj. Start analyze.sh manually (certain bashes kills childs without parent)." ) );
     tempoAnalyzer->setText( tr( "Tempo Analyzer" ) );
     spectrumAnalyzer->setText( tr( "Spectrum Analyzer" ) );
-    patternAnalyzer->setText( tr( "Pattern Analyzer" ) );
     tabWidget2->changeTab( tab, tr( "Analyzers" ) );
     TextLabel1->setText( tr( "From :" ) );
     TextLabel2->setText( tr( "To :" ) );

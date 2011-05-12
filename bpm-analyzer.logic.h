@@ -26,23 +26,41 @@ class BpmAnalyzerDialog : public CountDialog, ThreadedAnalyzer
 {
    Q_OBJECT
  private:
-   unsigned char *audio;
-   unsigned long audiosize;
-   unsigned long audiorate;
-   unsigned long startbpm, stopbpm;
-   unsigned long startshift, stopshift;
-   long     int  bufsiz;
-            int  reading_progress;
-            int  processing_progress;
+            // fine scanning
+   unsigned char * audio;
+   unsigned long   audiosize;
+   unsigned long   audiorate;
+   unsigned long   startbpm, stopbpm;
+   unsigned long   startshift, stopshift;
+   long     int    bufsiz;
+	    // progress indicator fields
+            int    reading_progress;
+            int    processing_progress;
+	    // tapping fields
+            int    tapcount;
+            int    starttime;
+	    // fft fields
+	  double * freq;
+	  double * peak_bpm;
+	  double * peak_energy;
+	    int  * peak_fit;
+ 	    int    windowsize;
+	    int    peaks;
+	    // FFT guidance routines
+   void          fft();        // do a quick fft to obtain a set of 'hints'
+   void          fft_draw(QPainter &p, int xs, int ys);
+            // finding the error fit of a curve
    unsigned long phasefit(unsigned long i);
-   int tapcount;
-   int starttime;
+   unsigned long phasefit(unsigned long i, unsigned long clip);
+   void          block_scan(); // first energy scan, second fine scan
+   void          peak_scan();   // scan based on fft-peaks
+   void          readAudio();  // reads the file in memory
+   void          readAudioBlock(int blocksize);  // reads the file in memory divided by blocks
  public:
    void          setPercentBounds(long startper, long stopper);
    void          setBpmBounds(long start, long stop);
    void          getMd5();     // retrieves MD5 sum
    void          writeAudio(); // writes audio to disk
-   void          readAudio();  // reads the file in memory
    void          run();
    void          rangeCheck();
    void          removeRaw();

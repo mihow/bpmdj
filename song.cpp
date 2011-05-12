@@ -32,6 +32,7 @@
 #include "kbpm-played.h"
 #include "dirscanner.h"
 #include "spectrum.h"
+#include "index.h"
 
 #define LIST_DCOLOR 2
 #define LIST_TITLE 5
@@ -47,10 +48,6 @@
 #define LIST_MD5SUM 11
 #define LIST_FILE 12
 
-extern "C"
-{
-#include "cbpm-index.h"
-}
 
 //float SongMetriek::tempo_scale = 0.06; 
 //float SongMetriek::spectrum_scale = 1.0/512.0;
@@ -62,34 +59,37 @@ SongMetriek SongMetriek::PATTERN(false,false,false,true);
 
 void Song::reread(bool checkfileonline)
 {
-  index_read((const char*)index);
+  Index::read((const char*)index);
   /* when the index changes immediately (new version and so on)
    * write it out again
    */
-  if (index_changed)
-    index_write();
+  if (Index::index->index_changed)
+    Index::index->write_idx();
   /* read last modification time */
   struct stat status;
   if (stat((const char*)index,&status)==0)
     modification_time = status.st_mtime;
   /* copy everything to object */
-  tempo = index_tempo;
-  file = index_file;
-  tags = index_tags;
-  time = index_time;
-  md5sum = index_md5sum;
-  spectrum = index_spectrum;
-  // pattern_size = index_pattern_size;
+  tempo = Index::index->get_tempo_str();
+  file = Index::index->index_file;
+  tags = Index::index->index_tags;
+  time = Index::index->index_time;
+  md5sum = Index::index->index_md5sum;
+  spectrum = Index::index->index_spectrum;
+  title = Index::index->get_display_title();
+  author = Index::index->get_display_author();
+  version = Index::index->get_display_version();
+  // pattern_size = Index::index->index_pattern_size;
   // pattern = NULL;
   // if (pattern_size > 0)
   //{
   //pattern = allocate(pattern_size,unsigned char);
-  // memcpy(pattern,index_pattern,pattern_size);
+  // memcpy(pattern,Index::index->index_pattern,pattern_size);
   //}
   /* are there any cues stored */
-  has_cues = index_cue_z + index_cue_x + index_cue_c + index_cue_v;
+  has_cues = Index::index->index_cue_z + Index::index->index_cue_x + Index::index->index_cue_c + Index::index->index_cue_v;
   /* free all */
-  index_free();
+  delete Index::index;
   /* try to open the song */
   if (checkfileonline)
     checkondisk();
@@ -114,13 +114,6 @@ void Song::init(const QString filename, const QString currentpath, bool checkond
   fulltitle=strdup(filename);
   assert(fulltitle);
   fulltitle[len-4]=0;
-  /* get all data */
-  if (!obtainTitleAuthor(fulltitle))
-    {
-      title = fulltitle;
-      author = "";
-      version = "";
-    }
   free(fulltitle);
   /* read the index file */
   reread(checkondisk);
@@ -130,34 +123,6 @@ void Song::init(const QString filename, const QString currentpath, bool checkond
   color_distance = 0;
   spectrum_string = "";
   distance_string = "";
-}
-
-bool Song::obtainTitleAuthor(char * fulltitle)
-{
-  char * tmp_author, * the_version;
-  /* find '[' */
-  tmp_author=fulltitle;
-  while(*tmp_author && (*tmp_author!='[')) 
-    tmp_author++;
-  if (!*tmp_author)
-    return false;
-  *tmp_author=0;
-  tmp_author++;
-  /* version is everything after the last ] */
-  the_version=tmp_author;
-  while(*the_version && (*the_version!=']')) 
-    the_version++;
-  if (!*the_version) 
-    return false;
-  *the_version=0;
-  the_version++;
-  if (!*the_version) 
-    the_version="1";
-  /* succeeded, assign and return */
-  title = fulltitle;
-  author = tmp_author;
-  version = the_version;
-  return true;
 }
 
 bool Song::containsTag(const QString tag)

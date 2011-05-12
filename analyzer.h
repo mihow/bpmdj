@@ -55,7 +55,7 @@ class ThreadedAnalyzer: public Analyzer
   // call this to start the analyzer
   virtual void stopAnalyzer();
   // call this to stop the analyzer
-
+  
   virtual void run() = 0;
   // fill this in with appropriate logic
   virtual void store() = 0;

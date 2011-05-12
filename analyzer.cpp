@@ -19,6 +19,7 @@
 ****/
 
 #include <pthread.h>
+#include <stdio.h>
 #include "analyzer.h"
 
 Analyzer::Analyzer()

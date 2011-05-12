@@ -24,12 +24,8 @@
 #include "similarscanner.h"
 #include "qsong.h"
 #include "kbpm-dj.h"
-
-extern "C"
-{
 #include "edit-distance.h"
 #include "scripts.h"
-}
 
 #define LIST_SONGNAME 0
 #define LIST_SIMILARNAME 1

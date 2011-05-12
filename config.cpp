@@ -50,7 +50,8 @@ bool Config::shown_aboutbox = false;
 bool Config::open_mixer = false;
 float Config::distance_temposcale = 0.06;
 float Config::distance_spectrumscale = 1.0;
-
+bool Config::ask_mix = true;
+bool Config::auto_popqueue = false;
 //QString Config::playCommand1 = "kbpm-play -d /dev/dsp2 -x /dev/mixer1 -p 0 0   -m \"%s\" \"%s\"";
 //QString Config::playCommand2 = "kbpm-play -d /dev/dsp1 -x /dev/mixer  -p 0 400 -m \"%s\" \"%s\"";
 //QString Config::playCommand3 = "rbpm-play -m \"%s\" \"%s\"";
@@ -97,6 +98,8 @@ void Config::save()
   s << tmp_directory;
   s << mixer_command;
   s << (Q_INT8)open_mixer;
+  s << (Q_INT8)ask_mix;
+  s << (Q_INT8)auto_popqueue;
 }
 
 void Config::load()
@@ -241,6 +244,41 @@ void Config::load()
 	  s >> tmp_directory;
 	  s >> mixer_command;
 	  s >> b; open_mixer = b;
+	}
+      else if (magic == MAGIC_2_2)
+	{
+	  printf("Loading config v2.2\n");
+	  s >> w; file_count = w;
+	  s >> w; yellowTime = w;
+	  s >> w; orangeTime = w;
+	  s >> w; redTime = w;
+	  s >> w; filterBpm = w;
+	  s >> b; color_range = b;
+	  s >> b; color_played = b;
+	  s >> b; color_authorplayed = b;
+	  s >> b; color_ondisk = b;
+	  s >> b; color_cues = b;
+	  s >> b; color_dcolor = b;
+	  s >> b; color_spectrum = b;
+	  s >> b; authorDecay = b;
+	  s >> b; limit_ondisk = b;
+	  s >> b; limit_nonplayed = b;
+	  s >> b; limit_uprange = b;
+	  s >> b; limit_downrange = b;
+	  s >> b; limit_indistance = b;
+	  s >> playCommand1;
+	  s >> playCommand2;
+	  s >> playCommand3;
+	  s >> playCommand4;
+	  s >> fl; distance_temposcale = fl;
+	  s >> fl; distance_spectrumscale = fl;
+	  s >> b; limit_authornonplayed = b;
+	  s >> b; shown_aboutbox = b;
+	  s >> tmp_directory;
+	  s >> mixer_command;
+	  s >> b; open_mixer = b;
+	  s >> b; ask_mix = b;
+	  s >> b; auto_popqueue = b;
 	}
       else
 	printf("Wrong config file format\n");

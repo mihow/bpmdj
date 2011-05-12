@@ -53,13 +53,9 @@
 #include "sys/times.h"
 #include "fourier.h"
 #include "kbpm-play.h"
-
-extern "C"
-{
-#include "cbpm-index.h"
+#include "index.h"
 #include "version.h"
 #include "scripts.h"
-}
 
 static double barkbounds[barksize+1] =
   {
@@ -75,10 +71,6 @@ static double barkbounds[barksize+1] =
 SpectrumDialogLogic::SpectrumDialogLogic(SongPlayer*parent, const char*name, bool modal, WFlags f) :
   SpectrumDialog(0,name,modal,f)
 {
-  // here we need to find out what the index filename is...
-  char d[1024];
-  sprintf(d,"BpmDj v%s",VERSION);
-  index_version=strdup(d);
   // clear the image
   QPixmap *pm = new QPixmap(10,10);
   QPainter p;
@@ -116,7 +108,7 @@ SpectrumDialogLogic::SpectrumDialogLogic(SongPlayer*parent, const char*name, boo
     meters[i]->setValue(0);
 }
 
-void SpectrumDialogLogic::fetchSpectrum()
+void SpectrumDialogLogic::fetchSpectrum_normal()
 {
   long int slidesize = WAVRATE*10;
   long int slide;
@@ -218,8 +210,8 @@ void SpectrumDialogLogic::fetchSpectrum()
       for(pos=0;pos<barksize;pos++)
 	spectrum[pos]='a'+(char)(barkscale[pos]/4);
       spectrum[barksize]=0;
-      index_spectrum=strdup(spectrum);
-      index_changed=1;
+      Index::index->index_spectrum=strdup(spectrum);
+      Index::index->index_changed=1;
     }
   else
     {
@@ -232,3 +224,4 @@ void SpectrumDialogLogic::fetchSpectrum()
   free(fftdata);
   free(data);
 }
+

@@ -25,10 +25,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "renamer.logic.h"
-
-extern "C" {
 #include "scripts.h"
-}
 
 RenamerLogic::RenamerLogic(QWidget*parent,const QString name) :
   Renamer(parent,name),

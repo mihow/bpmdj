@@ -23,11 +23,8 @@
 #include <string.h>
 #include "player-core.h"
 #include "md5-analyzer.h"
-
-extern "C" {
 #include "scripts.h"
-#include "cbpm-index.h"
-}
+#include "index.h"
 
 void Md5Analyzer::run()
 {
@@ -45,10 +42,10 @@ void Md5Analyzer::run()
     }
   s[32]=0;
   fclose(kloink);
-  if (!index_md5sum ||
-      strcmp(index_md5sum,s)!=0)
+  if (!Index::index->index_md5sum ||
+      strcmp(Index::index->index_md5sum,s)!=0)
     {
-      index_md5sum = strdup(s);
-      index_changed=1;
+      Index::index->index_md5sum = strdup(s);
+      Index::index->index_changed=1;
     }
 }

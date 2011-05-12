@@ -1,3 +1,20 @@
+2.2:
+  kplay - normal tempo known, target tempo unknown -> player didn't play	 
+  kplay - normal tempo unknown, target tempo known -> player didn't play	
+  kplay - break lfo didn't work, because ui not connected to program
+  kplay + all tempo updates are written immediatelly to disk
+  kplay - no raw data on disk, beat graph crashes... 	 
+  ksel  + added 'how did the mix go' question
+  ksel  + turned brightness button up for all spectrumcolor and removed inversion of pca color
+  ksel  + added persistent history view
+  kplay - bug removed in batch analyzer	 
+  kplay + improved bpm-detection algorithm substantially
+  kplay + modified layout (again), added pixmaps for LFO's	
+  kplay + double race condition in application cleanup (destructors and stop signalling)
+  cplay - removed console player from compilation
+  idx   + .idx files are always upgraded to the latest version every time they are written out	
+  idx   + added title/autor/remix/Version info in .idx files
+  kplay - the playing length was not shown when no normal period was known
 2.1:
   ksel  + removed some important bugs...	 
   ksel  + added a player command creator wizard

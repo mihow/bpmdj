@@ -39,6 +39,7 @@ DataBase::DataBase()
   exclude = NULL;
   tag = NULL;
   tag_size = 0;
+  file_tree = NULL;
 }
 
 void DataBase::add(Song* song)
@@ -194,11 +195,19 @@ bool DataBase::filter(SongSelectorLogic* selector, Song *item, Song* main)
 
 AvlTree<QString>* DataBase::getFileTree()
 {
-  AvlTree<QString> * tree = new AvlTree<QString>();
+  AvlTree<QString> * file_tree = new AvlTree<QString>();
   for(int i = 0 ; i < all_count ; i ++)
-    if (!tree->search(all[i]->file))
-      tree->add(new SongSortedByFile(all[i]));
-  return tree;
+    if (!file_tree->search(all[i]->file))
+      file_tree->add(new SongSortedByFile(all[i]));
+  return file_tree;
+}
+
+AvlTree<QString>* DataBase::getCachedFileTree()
+{
+  if (file_tree)
+    return file_tree;
+  else 
+    return getFileTree();
 }
 
 int DataBase::getSelection(SongSelectorLogic* selector, Song* main, QListView* target)

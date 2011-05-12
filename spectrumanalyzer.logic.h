@@ -31,5 +31,6 @@ class SpectrumDialogLogic : public SpectrumDialog
  public:
    SpectrumDialogLogic(SongPlayer*parent=0, const char * name=0, bool modal=FALSE, WFlags f=0);
  public slots:
-   virtual void fetchSpectrum();
+   virtual void fetchSpectrum_normal();
+   virtual void fetchSpectrum() {fetchSpectrum_normal();};
 };

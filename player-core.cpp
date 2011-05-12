@@ -32,7 +32,7 @@
 #include <sys/times.h>
 #include <math.h>
 #include "player-core.h"
-#include "cbpm-index.h"
+#include "index.h"
 #include "version.h"
 #include "dsp-drivers.h"
 #include "scripts.h"
@@ -85,10 +85,10 @@ void writer_died(int sig, siginfo_t *info, void* hu)
   min = sec/60;
   sec = sec%60;
   sprintf(newstr,"%02d:%02d",(int)min,(int)sec);
-  if (!index_time || (strcmp(newstr,index_time)!=0))
+  if (!Index::index->index_time || (strcmp(newstr,Index::index->index_time)!=0))
     {
-      index_time=strdup(newstr);
-      index_changed=1;
+      Index::index->index_time=strdup(newstr);
+      Index::index->index_changed=1;
     }
 }
 
@@ -141,7 +141,7 @@ void wave_close()
   fclose(wave_file);
   if (writing)
     {
-      // send terminate (well the insisting variant) signal
+      // send terminate (the insisting variant) signal
       kill(writer,SIGKILL);
       writing = 0;
     }
@@ -195,8 +195,26 @@ void lfo_set(char* name, _lfo_ l, unsigned8 freq, unsigned8 phase)
     }
 }
 
+//#define ABSTEST
 unsigned4 lfo_no(unsigned4 x)
 {
+#ifdef ABSTEST
+  static signed leftmax = 0, rightmax = 0;
+  longtrick lt;
+  lt.value=x;
+  
+  lt.leftright.left=abs(lt.leftright.left);
+  if (lt.leftright.left>leftmax)
+    leftmax=lt.leftright.left;
+  lt.leftright.left-=leftmax/2;
+  
+  lt.leftright.right=abs(lt.leftright.right);
+  if (lt.leftright.right>rightmax)
+    rightmax=lt.leftright.right;
+  lt.leftright.right-=rightmax/2;
+
+  return lt.value;
+#endif
   return x;
 }
 
@@ -374,13 +392,13 @@ unsigned4 lfo_saw(unsigned4 x)
 
 unsigned4 lfo_break(unsigned4 x)
 {
-   signed8 diff;
-   diff=(signed8)y-(signed8)lfo_phase;
-   diff=diff%lfo_period;
-   if (diff>lfo_period*95/100) 
-     return 0;
-   else 
-     return x;
+  signed8 diff;
+  diff=(signed8)y-(signed8)lfo_phase;
+  diff=diff%lfo_period;
+  if (diff>lfo_period*95/100) 
+    return 0;
+  else 
+    return x;
 }
 
 unsigned4 lfo_revsaw(unsigned4 x)
@@ -450,43 +468,43 @@ void cue_write()
 {
    if (cue!=cue_before)
      {
-	index_cue=cue;
-	index_changed=1;
+	Index::index->index_cue=cue;
+	Index::index->index_changed=1;
 	printf("Index has been changed\n");
      }
-   if (index_cue_z!=(unsigned4)cues[0])
+   if (Index::index->index_cue_z!=(unsigned4)cues[0])
      {
 	printf("Z cue has been changed\n");
-	index_changed=1;
-	index_cue_z=cues[0];
+	Index::index->index_changed=1;
+	Index::index->index_cue_z=cues[0];
      }
-   if (index_cue_x!=(unsigned4)cues[1])
+   if (Index::index->index_cue_x!=(unsigned4)cues[1])
      {
 	printf("X cue has been changed\n");
-	index_changed=1;
-	index_cue_x=cues[1];
+	Index::index->index_changed=1;
+	Index::index->index_cue_x=cues[1];
      }
-   if (index_cue_c!=(unsigned4)cues[2])
+   if (Index::index->index_cue_c!=(unsigned4)cues[2])
      {
 	printf("C cue has been changed\n");
-	index_changed=1;
-	index_cue_c=cues[2];
+	Index::index->index_changed=1;
+	Index::index->index_cue_c=cues[2];
      }
-   if (index_cue_v!=(unsigned4)cues[3])
+   if (Index::index->index_cue_v!=(unsigned4)cues[3])
      {
 	printf("V cue has been changed\n");
-	index_changed=1;
-	index_cue_v=cues[3];
+	Index::index->index_changed=1;
+	Index::index->index_cue_v=cues[3];
      }
 }
 
 void cue_read()
 {
-   cue_before=cue=index_cue;
-   cues[0]=index_cue_z;
-   cues[1]=index_cue_x;
-   cues[2]=index_cue_c;
-   cues[3]=index_cue_v;
+   cue_before=cue=Index::index->index_cue;
+   cues[0]=Index::index->index_cue_z;
+   cues[1]=Index::index->index_cue_x;
+   cues[2]=Index::index->index_cue_c;
+   cues[3]=Index::index->index_cue_v;
    if (!opt_quiet)
      {
 	printf("Available cue's: ");
@@ -544,12 +562,12 @@ void help();
 
 void doubleperiod()
 {
-   index_period*=2; index_changed=1;
+  Index::index->set_period(Index::index->get_period()*2);
 }
 
 void halveperiod()
 {
-   index_period/=2; index_changed=1;
+  Index::index->set_period(Index::index->get_period()/2);
 }
 
 void changetempo(signed8 period)
@@ -654,16 +672,20 @@ int core_init(int sync)
   // Parsing the arguments
   if (opt_match)
     {
-      index_read(arg_match);
-      targetperiod=index_period*4;
-      index_free();
+      Index::read(arg_match);
+      targetperiod=Index::index->get_period()*4;
+      delete Index::index;
     }
-  if (strstr(argument,".idx")==NULL || strcmp(strstr(argument,".idx"),".idx")!=0)
+  if ( strstr(argument,".idx")==NULL || strcmp(strstr(argument,".idx"),".idx")!=0)
     return err_needidx;
-  index_read(argument);
-  normalperiod=index_period*4;
+  Index::read(argument);
+  
+  normalperiod=Index::index->get_period()*4;
   if (!opt_match) targetperiod=normalperiod;
+  if (normalperiod<=0 && targetperiod>0) normalperiod=targetperiod;
+  else if (normalperiod>0 && targetperiod<=0) targetperiod=normalperiod;
   currentperiod=targetperiod;
+  
   if (WAVRATE==22050)
     {
       currentperiod/=2;
@@ -684,11 +706,12 @@ int core_init(int sync)
 	printf("No Target tempo known\n");
       printf(" speed(%g)\n",(double)normalperiod/(double)currentperiod);
     }
+  
   cue_read();
 #ifdef IMPULSE_PANNING
   pan_init();
 #endif
-  err = wave_open(index_file,sync);
+  err = wave_open(Index::index->index_file,sync);
   return err;
 }
 
@@ -714,14 +737,14 @@ void core_close()
 
 void core_done()
 {
-   wave_close();
-   cue_write();
-   if (index_changed)
-     {
-       if (!opt_quiet)
-	 printf("Updating index file\n");
-       index_write();
-     }
-   index_free();
-   finished = 1;
+  wave_close();
+  cue_write();
+  if (Index::index->index_changed)
+    {
+      if (!opt_quiet)
+	printf("Updating index file\n");
+      Index::index->write_idx();
+    }
+  delete Index::index;
+  finished = 1;
 }

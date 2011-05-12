@@ -32,7 +32,7 @@
 #include <math.h>
 #include <unistd.h>
 #include "player-core.h"
-#include "dsp-oss.h"
+#include "dsp-drivers.h"
 #include "scripts.h"
 
 /*-------------------------------------------
@@ -95,8 +95,8 @@ void useraction(int neglect)
 	          changetempo(targetperiod+(normalperiod - targetperiod)*tempo_fade/10); break;
       case '.' :  changetempo(normalperiod);  printf("Tempo normal\n");  break;
       case ',' :  changetempo(targetperiod);  printf("Tempo target\n");  break;
-      case 'l' :  changetempo(currentperiod/1.05946);  break;
-      case 'k' :  changetempo(currentperiod*1.05946);  break;
+      case 'l' :  changetempo((long long int) (currentperiod/1.05946) );  break;
+      case 'k' :  changetempo((long long int) (currentperiod*1.05946) );  break;
 	/* marking and jumping */
       case '[' :
       case '/' :  cue_set(); break;
@@ -172,15 +172,15 @@ void msg_speedup(int change)
 
 void terminal_blurb(int Reset)
 {
-   static struct termios old;
-   struct termios new;
-   if (Reset == 0)
-     {(void) tcgetattr (0, &old);
-	new = old;
-	new.c_lflag &= ~(ECHO | ICANON);
-	new.c_iflag &= ~(ISTRIP | INPCK);
-	(void) tcsetattr (0, TCSANOW, &new);}
-   else (void) tcsetattr (0, TCSANOW, &old);
+  static struct termios old;
+  struct termios njew;
+  if (Reset == 0)
+    {(void) tcgetattr (0, &old);
+    njew = old;
+    njew.c_lflag &= ~(ECHO | ICANON);
+    njew.c_iflag &= ~(ISTRIP | INPCK);
+    (void) tcsetattr (0, TCSANOW, &njew);}
+  else (void) tcsetattr (0, TCSANOW, &old);
 }
 
 void stopsignal(int n)

@@ -1,4 +1,4 @@
-<!DOCTYPE UI><UI version="3.1" stdsetdef="1">
+<!DOCTYPE UI><UI version="3.2" stdsetdef="1">
 <class>SongSelector</class>
 <widget class="QDialog">
     <property name="name">
@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>938</width>
-            <height>746</height>
+            <height>752</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -721,7 +721,7 @@
                     <property name="name">
                         <cstring>unnamed</cstring>
                     </property>
-                    <widget class="QPushButton" row="2" column="4">
+                    <widget class="QPushButton" row="2" column="3">
                         <property name="name">
                             <cstring>pushButton2</cstring>
                         </property>
@@ -729,7 +729,7 @@
                             <string>Fullly automatic mix !!!</string>
                         </property>
                     </widget>
-                    <widget class="QListView" row="0" column="0" rowspan="1" colspan="5">
+                    <widget class="QListView" row="0" column="0" rowspan="1" colspan="4">
                         <column>
                             <property name="text">
                                 <string>Nr°</string>
@@ -931,7 +931,7 @@
                             </size>
                         </property>
                     </spacer>
-                    <widget class="QLabel" row="1" column="1" rowspan="1" colspan="3">
+                    <widget class="QLabel" row="1" column="1" rowspan="1" colspan="2">
                         <property name="name">
                             <cstring>textLabel1</cstring>
                         </property>
@@ -939,20 +939,12 @@
                             <string>Number of extra songs to insert when adding a song to the queue</string>
                         </property>
                     </widget>
-                    <widget class="QSpinBox" row="1" column="4">
+                    <widget class="QSpinBox" row="1" column="3">
                         <property name="name">
                             <cstring>extraSongs</cstring>
                         </property>
                     </widget>
-                    <widget class="QCheckBox" row="2" column="0" rowspan="1" colspan="2">
-                        <property name="name">
-                            <cstring>autoPopQueue</cstring>
-                        </property>
-                        <property name="text">
-                            <string>Automatically pop when monitor is free</string>
-                        </property>
-                    </widget>
-                    <widget class="QCheckBox" row="2" column="2">
+                    <widget class="QCheckBox" row="2" column="1">
                         <property name="name">
                             <cstring>weighDuplicateAuthors</cstring>
                         </property>
@@ -963,12 +955,178 @@
                             <bool>true</bool>
                         </property>
                     </widget>
-                    <widget class="QCheckBox" row="2" column="3">
+                    <widget class="QCheckBox" row="2" column="2">
                         <property name="name">
                             <cstring>weighTempo</cstring>
                         </property>
                         <property name="text">
                             <string>Weigh tempo</string>
+                        </property>
+                    </widget>
+                </grid>
+            </widget>
+            <widget class="QWidget">
+                <property name="name">
+                    <cstring>TabPage</cstring>
+                </property>
+                <attribute name="title">
+                    <string>History</string>
+                </attribute>
+                <grid>
+                    <property name="name">
+                        <cstring>unnamed</cstring>
+                    </property>
+                    <widget class="QListView" row="1" column="0">
+                        <column>
+                            <property name="text">
+                                <string>Rel</string>
+                            </property>
+                            <property name="clickable">
+                                <bool>true</bool>
+                            </property>
+                            <property name="resizable">
+                                <bool>true</bool>
+                            </property>
+                        </column>
+                        <column>
+                            <property name="text">
+                                <string>Comments</string>
+                            </property>
+                            <property name="clickable">
+                                <bool>true</bool>
+                            </property>
+                            <property name="resizable">
+                                <bool>true</bool>
+                            </property>
+                        </column>
+                        <column>
+                            <property name="text">
+                                <string>Tempo</string>
+                            </property>
+                            <property name="clickable">
+                                <bool>true</bool>
+                            </property>
+                            <property name="resizable">
+                                <bool>true</bool>
+                            </property>
+                        </column>
+                        <column>
+                            <property name="text">
+                                <string>Spectrum</string>
+                            </property>
+                            <property name="clickable">
+                                <bool>true</bool>
+                            </property>
+                            <property name="resizable">
+                                <bool>true</bool>
+                            </property>
+                        </column>
+                        <column>
+                            <property name="text">
+                                <string>Color</string>
+                            </property>
+                            <property name="clickable">
+                                <bool>true</bool>
+                            </property>
+                            <property name="resizable">
+                                <bool>true</bool>
+                            </property>
+                        </column>
+                        <column>
+                            <property name="text">
+                                <string>Time</string>
+                            </property>
+                            <property name="clickable">
+                                <bool>true</bool>
+                            </property>
+                            <property name="resizable">
+                                <bool>true</bool>
+                            </property>
+                        </column>
+                        <column>
+                            <property name="text">
+                                <string>Cues</string>
+                            </property>
+                            <property name="clickable">
+                                <bool>true</bool>
+                            </property>
+                            <property name="resizable">
+                                <bool>true</bool>
+                            </property>
+                        </column>
+                        <column>
+                            <property name="text">
+                                <string>Title</string>
+                            </property>
+                            <property name="clickable">
+                                <bool>true</bool>
+                            </property>
+                            <property name="resizable">
+                                <bool>true</bool>
+                            </property>
+                        </column>
+                        <column>
+                            <property name="text">
+                                <string>Author</string>
+                            </property>
+                            <property name="clickable">
+                                <bool>true</bool>
+                            </property>
+                            <property name="resizable">
+                                <bool>true</bool>
+                            </property>
+                        </column>
+                        <column>
+                            <property name="text">
+                                <string>Version</string>
+                            </property>
+                            <property name="clickable">
+                                <bool>true</bool>
+                            </property>
+                            <property name="resizable">
+                                <bool>true</bool>
+                            </property>
+                        </column>
+                        <column>
+                            <property name="text">
+                                <string>Tags</string>
+                            </property>
+                            <property name="clickable">
+                                <bool>true</bool>
+                            </property>
+                            <property name="resizable">
+                                <bool>true</bool>
+                            </property>
+                        </column>
+                        <column>
+                            <property name="text">
+                                <string>Ondisk</string>
+                            </property>
+                            <property name="clickable">
+                                <bool>true</bool>
+                            </property>
+                            <property name="resizable">
+                                <bool>true</bool>
+                            </property>
+                        </column>
+                        <property name="name">
+                            <cstring>historyList</cstring>
+                        </property>
+                        <property name="selectionMode">
+                            <enum>Single</enum>
+                        </property>
+                        <property name="allColumnsShowFocus">
+                            <bool>true</bool>
+                        </property>
+                    </widget>
+                    <widget class="QLabel" row="0" column="0">
+                        <property name="name">
+                            <cstring>textLabel1_3</cstring>
+                        </property>
+                        <property name="text">
+                            <string>&lt;b&gt;Persistent History&lt;/b&gt;&lt;br&gt;
++X: the listed song is played X times after the current main song&lt;br&gt;
+-X: the listed song is played X times before the current main song</string>
                         </property>
                     </widget>
                 </grid>
@@ -1019,6 +1177,12 @@
         <receiver>SongSelector</receiver>
         <slot>playQueueSong(QListViewItem*)</slot>
     </connection>
+    <connection>
+        <sender>historyList</sender>
+        <signal>doubleClicked(QListViewItem*)</signal>
+        <receiver>SongSelector</receiver>
+        <slot>playHistorySong(QListViewItem*)</slot>
+    </connection>
 </connections>
 <tabstops>
     <tabstop>songList</tabstop>
@@ -1044,6 +1208,7 @@
     <slot>selectionIsTargetColor()</slot>
     <slot>openQueueMenu()</slot>
     <slot>playQueueSong(QListViewItem*)</slot>
+    <slot>playHistorySong(QListViewItem*)</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

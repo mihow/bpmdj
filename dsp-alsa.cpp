@@ -24,22 +24,11 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
-//#include <stdio.h>
-//#include <fcntl.h>
-//#include <signal.h>
-//#include <sys/ioctl.h>
-//#include <unistd.h>
-//#include <libgen.h>
 #define ALSA_PCM_NEW_HW_PARAMS_API
 #define ALSA_PCM_NEW_SW_PARAMS_API
 #include <alsa/asoundlib.h>
-//#include <time.h>
-//#include <sys/times.h>
-//#include <math.h>
 #include "player-core.h"
-#include "cbpm-index.h"
 #include "version.h"
-//#include "scripts.h"
 
 /*-------------------------------------------
  *         Dsp operations
@@ -129,7 +118,7 @@ void alsa_write(unsigned4 *value)
   if (++filled>=period_size)
     {
       int err;
-      void* buf= buffer;
+      unsigned4* buf= buffer;
       do 
 	{
 	  err = snd_pcm_writei(dsp,buf,filled);
@@ -227,16 +216,16 @@ int alsa_open()
       return err_dsp;
     }
   
-  p=WAVRATE;
-  err = snd_pcm_hw_params_set_rate_near(dsp, hparams, &p, 0);
+  unsigned int q = WAVRATE;
+  err = snd_pcm_hw_params_set_rate_near(dsp, hparams, &q, 0);
   if (err < 0)
     {
-      printf("dsp: setting dsp speed (%d) failed\n",p);
+      printf("dsp: setting dsp speed (%d) failed\n",q);
       return err_dsp;
     }
-  if (p != WAVRATE)
+  if (q != WAVRATE)
     {
-      printf("dsp: setting dsp speed (%d) failed, resulting rate = %d \n",WAVRATE, p);
+      printf("dsp: setting dsp speed (%d) failed, resulting rate = %d \n",WAVRATE, q);
     }
 
   // playing latency instellen...

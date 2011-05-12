@@ -51,6 +51,7 @@ class DataBase
     bool tagFilter(Song*);
     void updateCache(SongSelectorLogic * selector);
     bool filter(SongSelectorLogic* selector, Song* song, Song* main);
+    AvlTree<QString>* file_tree;
  public:
     DataBase();
     void     add(Song*);
@@ -58,6 +59,7 @@ class DataBase
     // bool     lookfor(const QString z);
     int      getSelection(SongSelectorLogic* selector, Song* main, QListView* target);
     Song * * getAllSongs(int &cnt) {cnt=all_count; return all;};
+    AvlTree<QString> * getCachedFileTree();
     AvlTree<QString> * getFileTree();
     Song * * closestSongs(SongSelectorLogic * selector, Song * target, SongMetriek * metriek, int maximum, int &count);
 };

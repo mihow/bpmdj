@@ -1,4 +1,4 @@
-<!DOCTYPE UI><UI version="3.1" stdsetdef="1">
+<!DOCTYPE UI><UI version="3.2" stdsetdef="1">
 <class>PreferencesDialog</class>
 <widget class="QDialog">
     <property name="name">
@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>684</width>
-            <height>422</height>
+            <height>399</height>
         </rect>
     </property>
     <property name="caption">
@@ -182,17 +182,6 @@
                     <widget class="QLineEdit" row="5" column="1" rowspan="1" colspan="3">
                         <property name="name">
                             <cstring>tmpDirectory</cstring>
-                        </property>
-                    </widget>
-                    <widget class="QCheckBox" row="7" column="0" rowspan="1" colspan="2">
-                        <property name="name">
-                            <cstring>open_mixer</cstring>
-                        </property>
-                        <property name="text">
-                            <string>open mixer when starting program</string>
-                        </property>
-                        <property name="checked">
-                            <bool>false</bool>
                         </property>
                     </widget>
                 </grid>

@@ -46,10 +46,7 @@
 #define LIST_MD5SUM 11
 #define LIST_FILE 12
 
-extern "C"
-{
-#include "cbpm-index.h"
-}
+#include "index.h"
 
 QSong::QSong(Song * s, QListView* parent) :
   QListViewItem(parent)

@@ -33,7 +33,8 @@ const QString IndexDir = "./index";
 #define MAGIC_1_8 0xBDE2
 #define MAGIC_1_9 0xBDE3
 #define MAGIC_2_1 0xBDE4
-#define MAGIC_NOW MAGIC_2_1
+#define MAGIC_2_2 0xBDE5
+#define MAGIC_NOW MAGIC_2_2
 
 class Config
 {
@@ -73,6 +74,9 @@ class Config
     static QString tmp_directory;
     static QString mixer_command;
     static bool    open_mixer;
+    // version 2.2
+    static bool    ask_mix;
+    static bool    auto_popqueue;
  public:
     static void openUi();
     static void save();

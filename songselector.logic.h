@@ -47,7 +47,7 @@ class SongSelectorLogic:
     int mainTicks;
     QPopupMenu *selection;
     QPopupMenu *queuemenu;
-    // colors
+    // toggles
     int coloralreadyplayed_item;
     int colorauthorplayed_item;
     int colorinrange_item;
@@ -62,7 +62,11 @@ class SongSelectorLogic:
     int onlyondisk_item;
     int onlyindistance_item;
     int onlynonplayedauthors_item;
+    int auto_popq_item;
+    int auto_askmix_item;
+    int auto_mixer_item;
     QPopupMenu *view;
+    QPopupMenu *autom;
   public:
     DataBase *database;
     // display
@@ -86,12 +90,13 @@ class SongSelectorLogic:
     void doAbout(int pg);
     void updateItemList();
     void toggleItem(int which);
+    void toggleAutoItem(int which);
     QListViewItem *filterView(QListViewItem * who, QListViewItem * parent);
     void setColor(QColor color);
     void setPlayerColor(QGroupBox *player, QColor color);
     void songAddTag(QListViewItem * song, const QString & tag);
     void songDelTag(QListViewItem * song, const QString & tag);
-    void songEdit(QListViewItem* song);
+    void songEditInfo(QListViewItem * song);
     void queueFindAndRename(int oldpos, int newpos);
     void queueOrder();
   public slots:
@@ -107,6 +112,7 @@ class SongSelectorLogic:
     virtual void doLegende();
     virtual void doLicense();
     virtual void doFilterChanged();
+    virtual void doAutoFilterChanged();
     virtual void fetchSelection();
     virtual void checkDisc();
     virtual void exportPlayList();
@@ -118,6 +124,7 @@ class SongSelectorLogic:
     virtual void selectionSetMainSong();
     virtual void selectionDelTags();
     virtual void selectionAddQueue();
+    virtual void selectionEditInfo();
     virtual void doMarkDups();
     virtual void quitButton();
     virtual void playersChanged();
@@ -138,8 +145,11 @@ class SongSelectorLogic:
     virtual void toggle_onlyondisk();
     virtual void toggle_onlyindistance();
     virtual void toggle_onlynonplayedauthors();
-
-    virtual void invertSpectrum();
+    
+    virtual void toggle_autopop();
+    virtual void toggle_askmix();
+    virtual void toggle_openmixer();
+    
     virtual void findsimilarnames();
     virtual void findallsimilarnames();
     virtual void importSongs();
@@ -165,6 +175,9 @@ class SongSelectorLogic:
     virtual void queueSelectSong();
     virtual void queueCopySongs();
     virtual void queueAnker();
+
+    // history actions
+    virtual void playHistorySong(QListViewItem *);
 };
 
 #endif

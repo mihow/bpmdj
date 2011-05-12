@@ -48,4 +48,5 @@ void* myrealloc(void* thing, int size);
 long  fsize(FILE * f);
 long  readsamples(void* target, int count, FILE* file);
 long  writesamples(void* target, int count, FILE* file);
+bool  strxeq(const char* a, const char* b); // also works when a or b or NULL
 #endif

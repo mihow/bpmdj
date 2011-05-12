@@ -20,9 +20,7 @@
 
 #include "songplayer.h"
 #include "tempolineanalyzer.h"
-extern "C" {
 #include "common.h"
-}
 
 class TempoLineAnalyzerLogic : public TempoLineDialog
 {
