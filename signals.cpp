@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
  Copyright (C) 2001-2005 Werner Van Belle
- See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -62,6 +61,7 @@ void vector_mul_div(signed4 * data, long l, signed4 mul, signed4 div)
 {
   signed8 m = mul;
   signed8 d = div;
+  if (!d) d = 1;
   for(long i = 0 ; i < l ; i++)
     data[i]=(signed4)((signed8)data[i]*m/d);
 }
@@ -72,10 +72,7 @@ double find_abs_max(double * data, long l)
   double m = data[0];
   for(long i = 0 ; i < l ; i ++)
     if (fabs(data[i])>m)
-      {
-	// printf("maximum = %g at %d\n",data[i],i);
-	m=fabs(data[i]);
-      }
+      m=fabs(data[i]);
   return m;
 }
 

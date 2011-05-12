@@ -26,7 +26,9 @@
 #include <qlabel.h>
 #include <stdlib.h>
 #include <qprogressbar.h>
+#include <qsplashscreen.h>
 #include <qmessagebox.h>
+#include "kbpm-dj.h"
 #include "setupwizard.h"
 #include "songselector.logic.h"
 #include "history.h"
@@ -42,10 +44,10 @@ QApplication *app;
 class RawScanner: public DirectoryScanner
 {
 protected:
-  virtual void recursing(const QString  dirname)
+  virtual void recursing(const QString dirname)
   {
   }
-  virtual void scandir(const QString  dirname, const QString  checkname)
+  virtual void scandir(const QString dirname, const QString  checkname)
   {
     if (entered) return;
     entered=true;
@@ -53,8 +55,8 @@ protected:
   }
   virtual void checkfile(const QString  fullname, const QString  filename)
   {
-      result+=QString::number(number)+". "+filename+"\n";
-      number++;
+    result+=QString::number(number)+". "+filename+"\n";
+    number++;
   }
 public:
   QString result;
@@ -72,18 +74,64 @@ public:
   };
 };
 
+/**
+ * The overriden loader object will allow us to load the picture from
+ * another place
+ */
+class BpmDjSplash: public QSplashScreen
+{
+public:
+  QProgressBar * progress;
+  QLabel       * reading;
+  BpmDjSplash(const QPixmap & pm);
+};
+
+BpmDjSplash::BpmDjSplash(const QPixmap & pm): QSplashScreen(pm)
+{
+  progress = new QProgressBar(this);
+  progress->setGeometry( QRect( 10, 160, 378, 27 ) );
+  progress->setPaletteBackgroundPixmap( pm );
+  progress->setBackgroundOrigin( QLabel::ParentOrigin );
+  reading = new QLabel( this, "reading" );
+  reading->setGeometry( QRect( 12, 136, 376, 19 ) );
+  reading->setBackgroundOrigin( QLabel::ParentOrigin );
+  reading->setPaletteBackgroundPixmap( pm );
+  show();
+  app->processEvents();
+}
+
+BpmDjSplash * create_splash()
+{
+  QString logo_name = ".bpmdj-logo.png";
+  QPixmap *bpmdj = new QPixmap(logo_name);
+  if (bpmdj->isNull() || !Config::get_shown_aboutbox())
+    {
+      // if we don't have the pixmap we create a window and get it from there
+      Loader * loader = new Loader();
+      const QPixmap * created = loader->paletteBackgroundPixmap();
+      (*bpmdj)=(*created);
+      created->save(logo_name,"PNG");
+    }
+  return new BpmDjSplash(*bpmdj);
+}
+
+const char* programname;
+QStatusBar* status = NULL;
+
 int main(int argc, char* argv[])
 {
+  programname = argv[0];
+
   Tags::init();
 
-  printf("Loading bpmdj v"VERSION"\n"); fflush(stdout);
   QApplication application(argc,argv);
   SongSelectorLogic main_window;
   app = &application;
   
-  Loader * loader = new Loader(NULL,NULL,true,Qt::WStyle_Customize | Qt::WStyle_NoBorder);
-  loader -> show();
-  
+  // 2. read the configuration
+  Config::load();    
+  BpmDjSplash * splash = create_splash();
+
   // 1.a first check the availability of a number of directories...
   DIR * mdir;
   DIR * idir;
@@ -113,9 +161,6 @@ int main(int argc, char* argv[])
       exit(0);
     }
   
-  // 2. read the configuration
-  Config::load();
-  
   // 1.c checking left over raw files (deze komt laatst omdat tmp_directory het kuiste pad bevat)
   RawScanner raw;
   raw.scan();
@@ -128,23 +173,27 @@ int main(int argc, char* argv[])
   // 3. read all the files in memory
   main_window.initialize_using_config();
   application.setMainWidget(&main_window);
-  // read already played indices
-  new Played("played.log");
   
   // create the index in memory
-  loader->progressBar1->setEnabled(true);
-  IndexReader * indexReader = new IndexReader(loader->progressBar1, loader->readingDir ,main_window.database);
+  splash->progress->setEnabled(true);
+  IndexReader * indexReader = new IndexReader(splash->progress, splash->reading ,main_window.database);
   Config::set_file_count(indexReader->total_files);
+  if (indexReader->total_files == 0)
+    QMessageBox::message(NULL,
+			 "You have no songs indexed in the database. You can\n"
+			 "import songs from the music directory by selecting\n"
+			 "'Import Songs' from the Management menu.");
+  if (indexReader->idx_files > 1000)
+    QMessageBox::message(NULL,"You have more than 1000 songs\n"
+			 "in index files. You can compact them\n"
+			 "and ensure faster data acess by selecting\n"
+			 "Management|Compact Index Directory");
   delete indexReader;
   indexReader = NULL;
   
   // 4. Retrieve tags and spectra
   application.processEvents();
-  main_window.findAllAlbums();
-  
-  delete loader;
-  loader = NULL;
-  
+  main_window.initialize_extras();
   // 5. Some extra version dependent blurb...
   if (!Config::get_shown_aboutbox())
     {
@@ -162,8 +211,19 @@ int main(int argc, char* argv[])
 	QMessageBox::message(NULL,"This highly improved version of BpmDj can now\n"
 			     "analyze echo, rythm and composition characteristics !\n"
 			     "Be sure to read the copyright and licensing information.\n");
+      if (MAGIC_NOW == MAGIC_2_8)
+	QMessageBox::message(NULL,"BpmDj now depends on mplayer instead of mpg123 & ogg123\n"
+			     "make sure you have mplayer installed properly.\n");
     }
   
+  // show the window immediatelly
+  main_window.show();
+  app->processEvents();
+
+  // now we can delete the splash stuff
+  delete splash;
+  splash = NULL;
+
   // 5b. startup mixers ?
   if (Config::get_open_mixer())
     main_window.openMixer();
@@ -171,7 +231,8 @@ int main(int argc, char* argv[])
     main_window.openBpmMixer();
   
   // 6. start the application
-  main_window.show();
+  main_window.start_spectrum_pca();
+  main_window.start_existence_check();
   int result = application.exec();
   if (!Config::get_shown_aboutbox())
     {

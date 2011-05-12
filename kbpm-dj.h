@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
  Copyright (C) 2001-2005 Werner Van Belle
- See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -19,5 +18,12 @@
 ****/
 
 #include <qapplication.h>
+#include <qsplashscreen.h>
+#include <qpixmap.h>
+#include <qprogressbar.h>
+#include <qlabel.h>
+#include <qstatusbar.h>
 
 extern QApplication *app;
+extern const char* programname;
+extern QStatusBar* status;

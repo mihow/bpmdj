@@ -40,6 +40,11 @@
 #include "song-information.h"
 #include "memory.h"
 #include "spectrum-type.h"
+#include "kbpm-dj.h"
+#include "smallhistogram-type.cpp"
+#include "histogram-property.cpp"
+//#include "echo-property.h"
+//#include "histogram-property.h"
 
 /*-------------------------------------------
  *         Performance operations
@@ -1269,7 +1274,6 @@ void Index::write_bib_field(FILE * index)
 
 long Index::read_bib_field(long position, const char* meta_shortname)
 {
-  static int printed_meta_version = false;
   int meta_version;
   // open file and jump to position
   assert(buffer);
@@ -1278,12 +1282,6 @@ long Index::read_bib_field(long position, const char* meta_shortname)
   init();
   // version describing the format of this field
   meta_version = buffer_signed4();
-  if (!printed_meta_version)
-    {
-      printed_meta_version = true;
-      printf("Index v%g\n",(float)meta_version/10.0); fflush(stdout);
-    }
-
   // depending on the field we can call different routines
   if (meta_version==23) read_v23_field();
   else if (meta_version==261) read_v261_field();
@@ -1514,7 +1512,14 @@ char* Index::get_display_title()
 
 void Index::set_period(period_type t, bool update_on_disk)
 {
-  index_period = t; 
+  // if the period is different from the old period then we remove the rythm information
+  // and compostion information
+  if (t.period!=index_period.period)
+    {
+      index_rythm.clear();
+      index_composition.clear();
+    }
+  index_period = t;
   meta_changed = 1;
   if (update_on_disk)
     write_idx();
@@ -1604,4 +1609,15 @@ void Index::clear_energy()
   index_max=sample4_type();
   index_mean=sample4_type();
   index_power=power_type();
+}
+
+int Index::get_time_in_seconds()
+{
+  char * T = get_time();
+  if (!T) return -1;
+  int minutes = atoi(T);
+  while(*T && isdigit(*T)) T++;
+  if (*T!=':') return -1;
+  int seconds = atoi(T);
+  return minutes*60+seconds;
 }

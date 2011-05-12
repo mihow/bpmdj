@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
  Copyright (C) 2001-2005 Werner Van Belle
- See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -22,13 +21,13 @@
 #define HISTOGRAM_PROPERTY_H
 
 #include "memory.h"
-#include "histogram-type.h"
+#include "smallhistogram-type.h"
 #include "spectrum-type.h"
 
-class histogram_property
+template<int bandsize> class histogram_property
 {
  public:
-  smallhistogram_type *bark;
+  smallhistogram_type<bandsize> *bark;
   histogram_property()
     {
       bark = NULL;
@@ -49,7 +48,7 @@ class histogram_property
     }
   virtual void init()
     {
-      bark = new smallhistogram_type[spectrum_size]();
+      bark = new smallhistogram_type<bandsize>[spectrum_size]();
     }
   void read_idx(const char* str);
   const void write_idx(FILE * f, char* fieldname);
@@ -64,13 +63,13 @@ class histogram_property
     {
       return bark[band].get_probability_scaled(delay);
     }
-  smallhistogram_type get_band(int b)
+  smallhistogram_type<bandsize> &get_band(int b)
     {
       return bark[b];
     }
   int get_count(int band)
     {
-      return bark[band].count;
+      return bandsize;
     }
 };
 

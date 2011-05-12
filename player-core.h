@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
  Copyright (C) 2001-2005 Werner Van Belle
- See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -45,9 +44,6 @@ extern  quad_period_type normalperiod;
 // x is the data position in the raw file (thus at normal tempo)
 // y is the position in the playing file (thus at target tempo)
 extern  signed8 y,x;
-volatile extern  int stop;
-volatile extern  int finished;
-volatile extern  int paused;
 typedef unsigned8 cue_info;
 extern  cue_info cue;
 extern  cue_info cues[4];
@@ -62,8 +58,6 @@ void      cue_retrieve(char*, int);
 void      jumpto(signed8, int);
 void      changetempo(signed8);
 void      cue_shift(char*, signed8);
-void      doubleperiod();
-void      halveperiod();
 
 extern dsp_driver *dsp;
 
@@ -73,17 +67,26 @@ extern dsp_driver *dsp;
 #define   err_needidx 1
 #define   err_noraw   2
 #define   err_nospawn 3
-int       core_init(int synchronous);
+int       core_meta_init();
+int       core_object_init(bool sync);
 // opens the playing device
 // #define   err_mixer   4
 #define   err_dsp     5
 int       core_open();
 // plays until asked to stop
 void      core_play();
+bool      get_paused();
+void      pause_playing();
+void      unpause_if_necessary();
+void      wait_for_unpause();
+void      stop_and_wait_for_finish();
 // closes the playing device
 void      core_close();
 // closes the wave and writes any changes to the index 
 void      core_done();
+// runs the entire core in its own thread and finishes 
+// when the stop flag is set
+int       core_run();
 
 stereo_sample2 lfo_no(stereo_sample2 x);
 stereo_sample2 lfo_saw(stereo_sample2 x);
@@ -119,8 +122,6 @@ extern int   opt_match;
 extern char* arg_match;
 extern char* arg_rawpath;
 extern char* argument;
-
-void line();
 
 extern int app_init(int argc, char *argv[]);
 extern void process_options(int argc,char *argv[]);

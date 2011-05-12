@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
  Copyright (C) 2001-2005 Werner Van Belle
- See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -24,13 +23,14 @@
 #include "memory.h"
 #include "histogram-property.h"
 
-class rythm_property: public histogram_property
+#define rythm_prop_sx 96
+class rythm_property: public histogram_property<rythm_prop_sx>
 {
  public:
-  rythm_property() : histogram_property() {};
+  rythm_property() : histogram_property<rythm_prop_sx>() {};
   virtual void init()
     {
-      histogram_property::init();
+      histogram_property<rythm_prop_sx>::init();
       for(int i=0; i<24;i++)
 	bark[i].init();
     }

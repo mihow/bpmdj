@@ -36,6 +36,7 @@ void* myalloc(int length, char* file, int line)
   void * result;
   // printf("%s(%d): allocating %d bytes\n",file,line,length);
   assert(length>=0);
+  if (length==0) return NULL;
 #ifdef EFENCE
   result = efence_malloc(length);
 #else

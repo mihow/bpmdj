@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
  Copyright (C) 2001-2005 Werner Van Belle
- See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -76,12 +75,14 @@ bool Song::has_all_cluster_fields()
 void Song::checkondisk()
 {
   QString songfilename = MusicDir + "/" + get_file();
+  // printf("Checking ondisk of %s",(const char*)songfilename);
   set_ondisk(exists(songfilename));
+  set_ondisk_checked(true);
 }
 
 void Song::clearFloatingFields()
 {
-  set_played(Played::IsPlayed(this));
+  set_played(false);
   init_played_author_at_time();
   init_color_distance();
   init_spectrum_string();
@@ -125,11 +126,13 @@ Song::Song()
   init_histogram();
   init_rythm();
   init_composition();
+  init_ondisk_checked();
 }
 
 Song::Song(Index * idx, bool allowwrite, bool check_ondisk)
 {
   init_ondisk();
+  init_ondisk_checked();
   init_tags();
   init_spectrum();
   refill(*idx, allowwrite);

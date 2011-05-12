@@ -85,6 +85,13 @@ double abs_minimum(double a, double b)
   else return b;
 }
 
+int clip(int val)
+{
+  if (val<0) return -1;
+  if (val>0) return +1;
+  return 0;
+}
+
 char * tohex(long i)
 {
   char r[9];
@@ -118,10 +125,3 @@ long toint(const char* name)
   return result;
 }
 
-
-int clip(int val)
-{
-  if (val<0) return -1;
-  if (val>0) return +1;
-  return 0;
-}

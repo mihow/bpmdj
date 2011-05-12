@@ -134,9 +134,9 @@ int Couple::clusters_with_size(int min_size, int max_size, float &min_internal_d
 	max_internal_distance = d;
       return 1;
     }
-  if (nr>max_size) return 
-		     Cluster::realcontent[first]->clusters_with_size(min_size,max_size,min_internal_distance,max_internal_distance)+
-		     Cluster::realcontent[second]->clusters_with_size(min_size,max_size,min_internal_distance,max_internal_distance);
+  return 
+    Cluster::realcontent[first]->clusters_with_size(min_size,max_size,min_internal_distance,max_internal_distance)+
+    Cluster::realcontent[second]->clusters_with_size(min_size,max_size,min_internal_distance,max_internal_distance);
 }
 
 void Couple::color_sub_elements(int a, int b, float d)
@@ -409,8 +409,6 @@ void Cluster::dumpConnectionMatrix()
     }
   printf("====================================\n");
 }
-
-
 
 // het probleem in de originele agglomerate function is dat telkens opnieuw het minimum gezocht moet worden
 // om dit tegen te gaan, werken we nu met een lijst waar de bsetaande minima in staan, tesamen met hun posities

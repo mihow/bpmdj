@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
  Copyright (C) 2001-2005 Werner Van Belle
- See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -58,6 +57,7 @@
 #include "scripts.h"
 #include "signals.h"
 #include <fftw3.h>
+#include <qmessagebox.h>
 
 RythmDialogLogic::RythmDialogLogic(SongPlayer*parent, const char*name, bool modal, WFlags f) :
   RythmDialog(0,name,modal,f)
@@ -259,198 +259,24 @@ static void free_bark_fft2()
   fftw_free(plan);
 }
 
-void RythmDialogLogic::calculateRythmPattern1()
-{
-  // check premises
-  if (!normalperiod)
-    {
-      printf("Rythm Analyzer: need tempo estimate\n");
-      return;
-    }
-  spectrum_type * spectrum = playing->get_spectrum();
-  if (!spectrum)
-    {
-      printf("Rythm Analyzer: need spectrum\n");
-      return;
-    }
-  // constants and some variables
-  const int window_size = 2048;
-  const int step_size = window_size/2;
-  const int view_xs = 640;
-  // how many frames will go into the period of the song
-  int slice_samples = normalperiod * 4;
-  int slice_frames = (slice_samples - window_size)/step_size;
-  printf("Rythm analysis: %d frames per slice\n",slice_frames);
-  // allocate arrays
-  stereo_sample2 * slice_audio = allocate(slice_samples,stereo_sample2);
-  spectrum_type * slice_freq = allocate(slice_frames,spectrum_type);
-  spectrum_type * slice_prot = allocate(slice_frames,spectrum_type);
-  for(int i = 0 ; i < slice_frames ; i ++)
-    for(int b = 0 ; b < 24 ; b++)
-      slice_prot[i].set_bark(b,0);
-  double * buffer_fft = init_bark_fft2(window_size);
-  // open song
-  FILE * raw = openRawFile(playing, arg_rawpath);
-  long int audio_size = fsize(raw)/4;
-  int max_slices = audio_size / slice_samples;
-  // go through song slice by slice
-  for(int slice = 0 ; slice < max_slices ; slice++)
-    {
-      Progress->setProgress(slice,max_slices);
-      app->processEvents();
-      // read data
-      long int pos = slice * slice_samples;
-      fseek(raw,pos*sizeof(stereo_sample2),SEEK_SET);
-      assert(pos+slice_samples < audio_size);
-      int read = readsamples(slice_audio,slice_samples,raw);
-      assert(read>0);
-      for(int a = 0 ; a < slice_frames ; a ++)
-	{
-	  // take the appropriate data
-	  int s = a * step_size;
-	  assert(s + window_size < slice_samples);
-	  for(int i = 0 ; i < window_size ; i++)
-	    buffer_fft[i]=slice_audio[i+s].left+slice_audio[i+s].right;
-	  /*	  printf("Buffer : ");
-	  for(int i = 0 ; i < 24 ; i ++)
-	    printf("%g ",buffer_fft[i]);
-	  printf("\n");
-	  */
-	  
-	  // convert to fft and normalize
-	  bark_fft2(window_size,slice_freq[a]);
-
-	  /*printf("Fft output: ");
-	  for(int i = 0 ; i < 24 ; i ++)
-	    printf("%g ",slice_freq[a].get_bark(i));
-	  printf("\n");
-	  */
-
-	  for(int i = 0 ; i < 24 ; i ++)
-	    {
-	      double v;
-	      v = slice_prot[a].get_bark(i);
-	      assert(!isinf(v));
-	      v = tovol(slice_freq[a].get_bark(i));
-	      assert(!isinf(v));
-	      slice_freq[a].set_bark(i,v);
-	    }
-	  /*
-	    for(int i = 0 ; i < 24 ; i ++)
-	    printf("%g ",slice_freq[a].get_bark(i));
-	    printf("\n");
-	  */
-	  // slice_freq[a].set_bark(i,slice_freq[a].get_bark(i)-spectrum->get_bark(i));
-	}
-      // find best rotational fit
-      double m = -1;
-      int a = 0;
-      for(int p = 0 ; p < slice_frames ; p++)
-	{
-	  double d = 0;
-	  for(int y = 0 ; y < slice_frames ; y++)
-	    {
-	      int z = (y + p)%slice_frames;
-	      for(int b = 0 ; b < 24 ; b ++)
-		{
-		  double v = slice_prot[y].get_bark(b) / slice;
-		  double w = slice_freq[z].get_bark(b);
-		  d+=fabs(v-w);
-		}
-	    }
-	  if (d<m || m<0)
-	    {
-	      m = d;
-	      a = p;
-	    }
-	}
-      // add the rotation to the prototype
-      for(int y = 0 ; y < slice_frames; y++)
-	{
-	  int z = (y + a)%slice_frames;
-	  for(int b = 0 ; b < 24 ; b++)
-	    slice_prot[y].set_bark(b,slice_prot[y].get_bark(b)+slice_freq[z].get_bark(b));
-	}
-    }
-  Progress->setProgress(1,1);
-  fclose(raw);
-  
-  // normalize the spectrum
-  for(int f = 0 ; f < slice_frames ; f++)
-    for(int b = 0 ; b < 24 ; b ++)
-      slice_prot[f].set_bark(b,slice_prot[f].get_bark(b)/max_slices);
-  spectrum_type maxima;
-  spectrum_type mean;
-  for(int f = 0 ; f < slice_frames ; f++)
-    for(int b = 0 ; b < 24 ; b ++)
-      {
-	double v = slice_prot[f].get_bark(b);
-	mean.set_bark(b,mean.get_bark(b)+v);
-	if (fabs(v) > maxima.get_bark(b))
-	  maxima.set_bark(b,fabs(v));
-      }
-  for(int f = 0 ; f < slice_frames ; f++)
-    for(int b = 0 ; b < 24 ; b ++)
-      {
-	double v = slice_prot[f].get_bark(b);
-	double m = mean.get_bark(b) / slice_frames;
-	v -=m;
-	v /= maxima.get_bark(b) - m;
-	slice_prot[f].set_bark(b,v);
-      }
-
-  /* 
-     spectrum_type minima = maxima;
-     for(int f = 0 ; f < slice_frames ; f++)
-     for(int b = 0 ; b < 24 ; b ++)
-     if (fabs(slice_prot[f].get_bark(b)) < minima.get_bark(b))
-     minima.set_bark(b,fabs(slice_prot[f].get_bark(b)));
-  */
-  /*for(int b = 0 ; b < 24 ; b++)
-    printf("Bark %d is %g\n",b,maxima.get_bark(b));
-    for(int f = 0 ; f < slice_frames ; f++)
-    for(int b = 0 ; b < 24 ; b ++)
-      {
-	double v1 = slice_prot[f].get_bark(b);
-	double v2 = maxima.get_bark(b);
-	//double v3 = minima.get_bark(b);
-	double v4 = v1-v2;
-	slice_prot[f].set_bark(b,v4);
-      }
-  */
-  // now draw the different distribution on the different axis
-  QPixmap *pm = new QPixmap(view_xs, 24);
-  QPainter p;
-  p.begin(pm);
-  for(int x = 0 ; x < view_xs ; x++)
-    for(int y = 0 ; y < 24 ; y ++)
-      {
-	int z = x * (slice_frames - 1) / ( view_xs - 1 );
-	double dB = slice_prot[z].get_bark(y);
-	dB*=192;
-	dB+=64;
-	if (dB<0) dB=0;
-	QColor col;
-	col.setHsv(y*240/24,255,(int)dB);
-	p.setPen(col);
-	p.drawPoint(x,23-y);
-      }
-  p.end(); 
-  rythm->setPixmap(*pm);
-}
-
 void RythmDialogLogic::calculateRythmPattern2()
 {
   // check premises
   if (!normalperiod)
-    {
-      printf("Rythm Analyzer: need tempo estimate\n");
+    { 
+      QMessageBox::critical(NULL,
+			    "Rhythm analyzer",
+			    QString("Need tempo before rhythm can be analyzed"),
+			    QMessageBox::Ok,0,0);
       return;
     }
   spectrum_type * spectrum = playing->get_spectrum();
   if (!spectrum)
     {
-      printf("Rythm Analyzer: need spectrum\n");
+      QMessageBox::critical(NULL,
+			    "Rhythm analyzer",
+			    QString("Need spectrum before rhythm can be analyzed"),
+			    QMessageBox::Ok,0,0);
       return;
     }
   // constants and some variables
@@ -490,7 +316,7 @@ void RythmDialogLogic::calculateRythmPattern2()
       // read data
       long int pos = slice * slice_samples;
       fseek(raw,pos*sizeof(stereo_sample2),SEEK_SET);
-      assert(pos+slice_samples < audio_size);
+      assert(pos+slice_samples <= audio_size);
       int read = readsamples(slice_audio,slice_samples,raw);
       assert(read>0);
       for(int a = 0 ; a < slice_frames ; a ++)
@@ -639,9 +465,9 @@ void RythmDialogLogic::calculateRythmPattern2()
   for(int y = 0 ; y < 24 ; y++)
     {
       R.set_scale(y,scale.get_bark(y));
-      for(int x = 0 ; x < smallhistogram_size ; x ++)
+      for(int x = 0 ; x < rythm_prop_sx ; x ++)
 	{
-	  int z = x * slice_frames / smallhistogram_size; 
+	  int z = x * slice_frames / rythm_prop_sx; 
 	  z += startpos;
 	  z %= slice_frames;
 	  double dB = slice_prot[z].get_bark(y);
@@ -749,11 +575,13 @@ void RythmDialogLogic::calculateRythmPattern2()
   composition->setPixmap(*pm);
 
   // calculate the frequency content of the composition
+  const int ps = 33; // we take 33 measures because the first will always be zero
   int ws = higher_power_of_two(max_slices);
+  if (ps>ws) 
+    ws = higher_power_of_two(ps);
   double * ain = allocate(ws,double);
   double * aou = allocate(ws,double);
   double * aio = allocate(ws,double);
-  const int ps = 33; // we take 33 measures because the first will always be zero
   double * periods = allocate(ps,double);
   // int *counts = allocate(ps,int);
   pm = new QPixmap(ps, 24);
@@ -764,48 +592,17 @@ void RythmDialogLogic::calculateRythmPattern2()
     {
       for(int x = 0 ; x < max_slices ; x++)
 	ain[x]=changes[x].get_bark(y);
-      for(int x = max_slices ; x >=1 ; x--)
+      for(int x = max_slices - 1; x >=1 ; x--)
 	ain[x]-=ain[x-1];
       ain[0]=0;
-      for(int x = max_slices; x < ws ; x++)
+      for(int x = max_slices - 1; x < ws ; x++)
 	ain[x]=0;
-      /*fft_double(ws,0,ain,NULL,aou,aio);
-      for(int pml = 0 ; pml < ps ; pml++)
-	{
-	  periods[pml]=0;
-	  counts[pml]=0;
-	}
-      for(int x = 0 ; x < ws / 2; x++)
-	{
-	  double f = ((double)x)/(double)ws;
-	  if(f>0)
-	    {
-	      f=1/f;
-	      //      printf("%d maps to %g (ws = %d)\n",x,f,ws);
-	      int pml = (int)(f) - 1;
-	      if (pml<ps)
-		{
-		  periods[pml]+=sqrt(aio[x]*aio[x]+aou[x]*aou[x]);
-		  counts[pml]++;
-		}
-	    }
-	}
-      for(int pml = 0 ; pml < ps ; pml++)
-	{
-	  // printf("%d : %d\n",pml,counts[pml]);
-	  if (counts[pml]>0)
-	  periods[pml]/=counts[pml];
-	  }
-      */
       unbiased_autocorrelation(ain,ws);
       for(int pml = 0 ; pml < ps ; pml++)
 	periods[pml]=ain[pml];
-      //double mien = find_mean(periods+1,ps-1);
-      //for(int pml = 0 ; pml < ps ; pml++)
-      //	periods[pml]-=mien;
       periods[0]=0;
       double maxed = normalize_abs_max(periods,ps);
-      
+      printf("%g\n",maxed);
       // assign the autocorrelation to the composition property
       cp.set_scale(y,maxed);
       for(int x = 1 ; x < ps ; x ++)
@@ -830,9 +627,9 @@ void RythmDialogLogic::calculateRythmPattern2()
 	}
     }
   // the data which we will write out in the index file are the non absed periods
-  delete(aio);
-  delete(aou);
-  delete(ain);
+  deallocate(aio);
+  deallocate(aou);
+  deallocate(ain);
   p.end(); 
   composition_freq->setPixmap(*pm);
   playing->set_composition(cp);

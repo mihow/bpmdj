@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
  Copyright (C) 2001-2005 Werner Van Belle
- See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -80,6 +79,7 @@ public SongSelector, public ProcessChanged
     int auto_askmix_item;
     int auto_mixer_item;
     int auto_bpmmixer_item;
+    int amountlimited_item;
     QPopupMenu *view;
     QPopupMenu *autom;
   public:
@@ -88,7 +88,7 @@ public SongSelector, public ProcessChanged
     // display
     SongSelectorLogic(QWidget*parent=0, const QString name=0);
     virtual ~SongSelectorLogic();
-    void findAllAlbums();
+    void initialize_extras();
     void acceptNewSong(Song* song);
     void addTag(const QString tag);
     // process functions
@@ -101,12 +101,12 @@ public SongSelector, public ProcessChanged
     void parse_tags();
     void insertSongInAlbum(Song*, const QString & a, int nr);
     void deleteSongFromAlbum(AlbumItem *);
-    void doAbout(int pg);
     void updateItemList();
     void updateFrequencyMap();
     void toggleItem(int which);
     void toggleAutoItem(int which);
     QListViewItem *filterView(QListViewItem * who, QListViewItem * parent);
+    void updateColors();
     void setColor(QColor color);
     void setPlayerColor(QLabel *player, QColor color);
     void songAddTag(Song * song, const QString & tag);
@@ -115,7 +115,10 @@ public SongSelector, public ProcessChanged
     void queueFindAndRename(int oldpos, int newpos);
     void queueOrder();
   public slots:
+    void start_spectrum_pca();
+    void start_existence_check();
     virtual void selectAllButTagged();
+    virtual void selectAllTags();
     // a signal from the UI to notify a forced switch
     virtual void switchMonitorToMain();
   
@@ -137,6 +140,7 @@ public SongSelector, public ProcessChanged
     virtual void exportPlayList();
     virtual void doSpectrumPca(bool fulldatabase = false, bool update_process_view = true);
     virtual void doClustering();
+    virtual void doBackup();
     virtual void selectionAddTags();
     virtual void selectionPlayIn3th();
     virtual void selectionPlayIn4th();
@@ -166,6 +170,7 @@ public SongSelector, public ProcessChanged
     virtual void toggle_onlyondisk();
     virtual void toggle_onlyindistance();
     virtual void toggle_onlynonplayedauthors();
+    virtual void toggle_amountlimited();
     
     virtual void toggle_autopop();
     virtual void toggle_askmix();

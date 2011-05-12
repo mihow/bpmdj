@@ -84,7 +84,7 @@
 
 // Processes per host
 #define PPH 1
-#define LIMIT (240 * PPH)
+#define LIMIT (480 * PPH)
 
 AnalyzersProgressLogic::~AnalyzersProgressLogic()
 {

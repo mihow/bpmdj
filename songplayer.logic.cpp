@@ -38,6 +38,7 @@
 #include <stdlib.h>
 #include "kbpm-play.h"
 #include <qfiledialog.h>
+#include <qtabwidget.h>
 #include <qpainter.h>
 #include "songplayer.logic.h"
 #include "bpm-analyzer.logic.h"
@@ -45,21 +46,43 @@
 #include "spectrum-analyzer.logic.h"
 #include "rythm-analyzer.logic.h"
 #include "memory.h"
-#include "about.h"
+#include "aboutbox.h"
 
-static int test=0;
 void SongPlayerLogic::done(int r)
 {
+  static int test=0;
   test++;
   assert(test<2);
   // signal any active counter to stop working
   bpmcounter->finish();
-  ::stop=1;
-  ::paused=0;
-  while(!finished) ;
+  stop_and_wait_for_finish();
   // now finish
   SongPlayer::done(r);
   test--;
+}
+
+void SongPlayerLogic::init_tempo_switch_time()
+{
+  // we must know both tempos
+  if (targetperiod <= 0 || normalperiod <= 0) return;
+  // we take the percentage difference
+  int percentage = targetperiod * 100 / normalperiod;
+  if (percentage < 100) percentage = 100 - percentage;
+  else percentage -= 100;
+  // 1 percent difference is 10 seconds switch time
+  int time = percentage * 10;
+  // we limit this time to half of the songlength
+  int total_time = playing->get_time_in_seconds();
+  total_time/=2;
+  // if the songlength is known of cours
+  if (total_time<=0) total_time=180;
+  if (time > total_time) time = total_time;
+  // we don't want switching times smalelr than 10 seconds 
+  if (time < 10) time = 10;
+  // and not larger than 180 s
+  if (time > 180) time = 180;
+  // finally we set the value
+  tempoSwitchTime->setValue(time);
 }
 
 SongPlayerLogic::SongPlayerLogic(QWidget*parent,const char*name, bool modal,WFlags f) :
@@ -78,6 +101,17 @@ SongPlayerLogic::SongPlayerLogic(QWidget*parent,const char*name, bool modal,WFla
   wantedcurrentperiod=0;
   redrawCues();
   // set caption
+  captionize_according_to_index();
+  TempoLd->display(100.0*(double)normalperiod/(double)currentperiod);
+  // set colors of tempo change buttons
+  init_tempo_switch_time();
+  normalReached(currentperiod==normalperiod);
+  startStopButton->setFocus();
+  connect(tab, SIGNAL( currentChanged(QWidget*) ), this, SLOT( tabChanged() ) );
+}
+
+void SongPlayerLogic::captionize_according_to_index()
+{
   if (playing->valid_tar_info())
     {
       QString blah = playing->encoded_tar();
@@ -89,12 +123,14 @@ SongPlayerLogic::SongPlayerLogic(QWidget*parent,const char*name, bool modal,WFla
       blah.replace("./index/","");
       setCaption(blah);
     }
-  TempoLd->display(100.0*(double)normalperiod/(double)currentperiod);
-  // set colors of tempo change buttons
-  normalReached(currentperiod==normalperiod);
-  startStopButton->setFocus();
 }
 
+#define TAB_BEATGRAPH 2
+void SongPlayerLogic::tabChanged()
+{
+  if (tab->currentPageIndex() == TAB_BEATGRAPH)
+    beatGraphAnalyzer->activate();
+}
 
 void SongPlayerLogic::redrawCues()
 {
@@ -301,43 +337,54 @@ void SongPlayerLogic::shiftBack()
 void SongPlayerLogic::restart()
 {
   ::y=0;
-  if (::paused)
-    ::paused=0;
+  unpause_if_necessary();
 }
 
-void SongPlayerLogic::stop()
+void SongPlayerLogic::set_start_stop_text()
 {
-  if (!::paused)
+  if (get_paused())
+    startStopButton->setText("Start");
+  else
+    startStopButton->setText("Stop");
+}
+
+void SongPlayerLogic::start_stop()
+{
+  if (!get_paused())
     {
       if (!cue) cue_set();
-      ::paused=1;
+      pause_playing();
     }
-  else 
-    jumpto(0,0);
+  else jumpto(0,0);
+  set_start_stop_text();
 }
 
 void SongPlayerLogic::retrieveZ()
 {
   cue_retrieve("Z-",0);
   jumpto(0,0);
+  set_start_stop_text();
 }
 
 void SongPlayerLogic::retrieveX()
 {
   cue_retrieve("X-",1);
   jumpto(0,0);
+  set_start_stop_text();
 }
 
 void SongPlayerLogic::retrieveC()
 {
   cue_retrieve("C-",2);
   jumpto(0,0);
+  set_start_stop_text();
 }
 
 void SongPlayerLogic::retrieveV()
 {
   cue_retrieve("V-",3);
   jumpto(0,0);
+  set_start_stop_text();
 }
 
 void SongPlayerLogic::storeZ()
@@ -425,39 +472,27 @@ void SongPlayerLogic::changeTempo(int p)
 
 void SongPlayerLogic::targetTempo()
 {
+  tempo_fade = fade_time;
   changeTempo(targetperiod);
   normalReached(false);
 }
 
 void SongPlayerLogic::normalTempo()
 {
+  tempo_fade = fade_time;
   changeTempo(normalperiod);
   normalReached(true);
 }
 
-void SongPlayerLogic::fastSwitch()
-{
-   fade_time=10;
-   tempo_fade=0;
-}
-
 void SongPlayerLogic::mediumSwitch()
 {
-   fade_time=30;
-   tempo_fade=0;
-}
-
-void SongPlayerLogic::slowSwitch()
-{
-  fade_time=60;
+  fade_time = tempoSwitchTime->value();
   tempo_fade=0;
 }
 
 void SongPlayerLogic::normalReached(bool t)
 {
-  setColor(PushButton22,t);	
   setColor(switcherButton,t);
-  setColor(PushButton37,t);
 }
 
 void SongPlayerLogic::targetStep()
@@ -468,7 +503,7 @@ void SongPlayerLogic::targetStep()
       tempo_fade=0;
       fade_time=0;
       normalReached(true);
-      switcherButton->setText("Normal Switch");
+      switcherButton->setText("Fade");
       return;
     }
   if (tempo_fade==1)
@@ -782,6 +817,7 @@ void SongPlayerLogic::openRythmAnalyzer()
 void SongPlayerLogic::openInfo()
 {
   playing->executeInfoDialog();
+  captionize_according_to_index();
 }
 
 void SongPlayerLogic::openSpectrumAnalyzer()
@@ -790,27 +826,18 @@ void SongPlayerLogic::openSpectrumAnalyzer()
   analyzer.exec();
 }
 
-void SongPlayerLogic::openPatternAnalyzer()
-{
-  BeatGraphAnalyzerLogic analyzer(true);
-  analyzer.exec();
-}
-
 void SongPlayerLogic::openAbout()
 {
-  char tmp[500];
-  AboutDialog about(NULL,NULL,1);
-  sprintf(tmp,"BpmDj v%s",VERSION);
-  about.versionLabel->setText(tmp);
-  about.exec();
+  doAbout(1);
 }
 
 void SongPlayerLogic::mousePressEvent(QMouseEvent * e)
 {
   QPoint p = e->pos();
-  QPoint xy = mappingbox->mapFromParent(p);
+  QPoint xy = tab->mapFromParent(p);
   int x = xy.x();
   int y = xy.y();
+  //  printf("(%d,%d) -> (%d,%d)\n",p.x(),p.y(),x,y);
   if (mapin->geometry().contains(x,y))
     { 
       x = x - mapin->x();
@@ -870,7 +897,7 @@ void SongPlayerLogic::mousePressEvent(QMouseEvent * e)
 void SongPlayerLogic::mouseMoveEvent(QMouseEvent * e)
 {
   QPoint p = e->pos();
-  QPoint xy = mappingbox->mapFromParent(p);
+  QPoint xy = tab->mapFromParent(p);
   int x = xy.x();
   int y = xy.y();
   if (mapin->geometry().contains(x,y))
@@ -891,7 +918,7 @@ void SongPlayerLogic::mouseMoveEvent(QMouseEvent * e)
 void SongPlayerLogic::mouseReleaseEvent(QMouseEvent * e)
 {
   QPoint p = e->pos();
-  QPoint xy = mappingbox->mapFromParent(p);
+  QPoint xy = tab->mapFromParent(p);
   int x = xy.x();
   int y = xy.y();
   if (mapin->geometry().contains(x,y))

@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
  Copyright (C) 2001-2005 Werner Van Belle
- See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -38,11 +37,11 @@ class Song: public Point
   // taken from the index file
   accessors(QString, title,"");
   accessors(QString, author,"");
-  accessors(QString,version,"");
-  accessors(QString,storedin,"");
-  accessors(QString,file,"");
-  accessors(QString,md5sum,"");
-  accessors(QString,time,"");
+  accessors(QString, version,"");
+  accessors(QString, storedin,"");
+  accessors(QString, file,"");
+  accessors(QString, md5sum,"");
+  accessors(QString, time,"");
   accessors(tempo_type,tempo,tempo_type());
   accessors(spectrum_type*,spectrum,no_spectrum); 
   accessors(tags_type,tags,NULL);
@@ -50,17 +49,18 @@ class Song: public Point
   accessors(sample4_type,min_amp,sample4_type());
   accessors(sample4_type,mean_amp,sample4_type());
   accessors(power_type,power,power_type());
-  accessors(histogram_property,histogram,histogram_property());
+  accessors(echo_property,histogram,echo_property());
   accessors(rythm_property,rythm,rythm_property());
   accessors(composition_property,composition,composition_property());
   // calculated as necessary
   accessors(QColor,color,QColor(127,127,127));
-  accessors(QString,spectrum_string,"");
-  accessors(QString,distance_string,QString::null);
+  accessors(QString, spectrum_string, "");
+  accessors(QString, distance_string, QString::null);
   accessors(float,color_distance,0);
   accessors(AlbumField**,albums,NULL);
   accessors(bool,played,false);
   accessors(bool,ondisk,true);
+  accessors(bool,ondisk_checked,false);
   accessors(int,has_cues,0);
   accessors(int,played_author_at_time,-100);
  private:

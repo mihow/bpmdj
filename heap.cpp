@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
  Copyright (C) 1995-2005 Werner Van Belle
- See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -30,6 +29,10 @@ public:
   {
     song = s;
   }
+  void print() 
+  {
+    printf(" %s : %g",(const char*)song->getDisplayTitle(),song->get_color_distance());
+  };
   int SongWithDistance::compareSearchData(Song* w);
   int SongWithDistance::compareAddData(Node<Song*>* n);
 };
@@ -42,12 +45,25 @@ int SongWithDistance::compareAddData(Node<Song*>* n)
 
 int SongWithDistance::compareSearchData(Song* other)
 {
-  if (song->get_color_distance() < other->get_color_distance()) return -1;
-  if (song->get_color_distance() == other->get_color_distance()) 
-    {
-      if (song<other) return -1;
-      if (song==other) return 0;
-    }
+  /**
+   * Important !
+   * The order in which we compare the distances is important because
+   * if we compare A with B we might get that A is smaller than B but
+   * if we compare B with A we don't get that B is bigger than A because
+   * the equality was checked first !
+   */
+
+  /**
+   * Well even ordering the thing didn't work out too well. SO a convertion 
+   * to an integer will save us here...
+   */ 
+
+  unsigned4 a = (unsigned4)(song->get_color_distance() * 1000000.0);
+  unsigned4 b = (unsigned4)(other->get_color_distance() * 1000000.0);
+  if ( a < b ) return -1;
+  if ( a > b ) return 1;
+  if (song<other) return -1;
+  if (song==other) return 0;
   return 1;
 }
 
@@ -55,10 +71,10 @@ void SongHeap::add(Song *s)
 {
   assert(s);
   // is there space ?
-  if (count<maxsize)
+  if (size<maxsize)
     {
       AvlTree<Song*>::add(new SongWithDistance(s));
-      count ++;
+      size ++;
       return;
     }
   // does it not belong in the set ?
@@ -77,21 +93,25 @@ void SongHeap::add(Song *s)
     }
   assert(last);
   assert(last->song);
+  assert(!last->isNull());
+  //  printf("Shifting out %g: %s\n",(double)last->song->get_color_distance(), (const char*)last->song->getDisplayTitle());
   del(last->song);
   // update the maximum last value
   last = cur = (SongWithDistance*)top();
   assert(cur);
-  while(!cur -> isNull() )
+  while(! cur -> isNull() )
     {
       last = cur;
       cur = (SongWithDistance*) cur -> right;
     }
   assert(last);
   maximum = last -> song -> get_color_distance();
+  //  printf("  Maximum is now %g: %s\n",maximum,(const char*)last->song->getDisplayTitle());
 }
 
 static int copy_to(Song** &target, SongWithDistance * who)
 {
+  assert(who!= NULL);
   if (who->isNull()) return 0;
   int count = copy_to(target,(SongWithDistance*)who->left);
   target[0] = who->song;

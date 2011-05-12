@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
  Copyright (C) 2001-2005 Werner Van Belle
- See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -25,7 +24,7 @@
 #include "common.h"
 #include "types.h"
 #include "spectrum-type.h"
-#include "histogram-property.h"
+#include "echo-property.h"
 #include "composition-property.h"
 #include "rythm-property.h"
 
@@ -78,7 +77,7 @@ class Index
   char            * index_md5sum;         // the md5 sum of the mp3
   char            * index_time;           // the normal playing time of the song
   spectrum_type   * index_spectrum;       // the bark frequencies
-  histogram_property index_histogram;     // the histogram of the SFFT at the different bark bands
+  echo_property     index_histogram;     // the histogram of the SFFT at the different bark bands
   rythm_property     index_rythm;         // the slice rotated SFFT of measures
   composition_property index_composition; // the autocorrelation of the composition of the song
   // information only available from v2.2 on
@@ -179,6 +178,7 @@ class Index
   // time accessors
   void             set_time(const char * str);
   char           * get_time()               { return index_time; };
+  int              get_time_in_seconds();
   // filename accessors
   char           * get_filename()           { return index_file; };
   void             set_filename(char* fn)   { index_file = fn; meta_changed = true; };
@@ -199,8 +199,8 @@ class Index
   // spectrum accessors       
   void             set_spectrum(spectrum_type*s) { index_spectrum = s; meta_changed=true; };
   spectrum_type *  get_spectrum();
-  void             set_histogram(histogram_property h) { index_histogram = h; meta_changed=true; };
-  histogram_property get_histogram()          { return index_histogram; };
+  void             set_histogram(echo_property h) { index_histogram = h; meta_changed=true; };
+  echo_property    get_histogram()          { return index_histogram; };
   // rythm accessors
   void             set_rythm(rythm_property r) { index_rythm = r ; meta_changed = true; } ;
   rythm_property   get_rythm() { return index_rythm; };

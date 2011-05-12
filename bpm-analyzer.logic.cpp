@@ -911,7 +911,7 @@ void BpmAnalyzerDialog::run()
 
 void BpmAnalyzerDialog::rayshoot_scan()
 {
-  const unsigned blockshifter_max = 8;  // this is a good start, goes fast and is accurately enough to skip no import points
+  const unsigned blockshifter_max = 8;  // this is a good start, goes fast and is accurate enough to not skip import points
   unsigned blockshifter = blockshifter_max;
   signed* mismatch_array[blockshifter_max+1];
   unsigned mean[blockshifter_max+1];
@@ -981,12 +981,14 @@ void BpmAnalyzerDialog::rayshoot_scan()
 	      if (store!=i) continue;
 	      unsigned prev_store = ((phase / 2) * 2) << blockshifter;
 	      unsigned next_store = (((phase / 2) + 1 ) * 2) << blockshifter;
+	      if (prev_store < startshift ) continue;
 	      if (next_store >= stopshift ) break;
 	      unsigned prev_val = prev_mismatch[prev_store]; // sign is important !
 	      unsigned next_val = prev_mismatch[next_store]; // sign is important !
 	      if (prev_val < prev_maximum || next_val < prev_maximum)
 		phasefit_total++;
 	    }
+	  if (!phasefit_total) phasefit_total = 1;
 #ifdef PROFILER
 	  rays_shot[blockshifter]=phasefit_total;
 #endif
@@ -1001,6 +1003,7 @@ void BpmAnalyzerDialog::rayshoot_scan()
 	      // dus de vorige was op - en + blocksize *2
 	      unsigned prev_store = ((phase / 2) * 2) << blockshifter;
 	      unsigned next_store = (((phase / 2) + 1 ) * 2) << blockshifter;
+	      if (prev_store < startshift ) continue;
 	      if (next_store >= stopshift ) break;
 	      unsigned prev_val = prev_mismatch[prev_store]; // sign is important !
 	      unsigned next_val = prev_mismatch[next_store]; // sign is important !
@@ -1036,6 +1039,7 @@ void BpmAnalyzerDialog::rayshoot_scan()
 	    total+=mismatch[i];
 	  }
       maxima[blockshifter]=maximum;
+      if (!count) count = 1;
       mean[blockshifter]=total/count;
       
       // draw the sucker
@@ -1054,6 +1058,7 @@ void BpmAnalyzerDialog::rayshoot_scan()
       for (unsigned i = blockshifter_max ; i >= blockshifter ; i --)
 	{
 	  unsigned slice_maximum = maxima[i];
+	  if (!slice_maximum) slice_maximum=1;
 	  unsigned pos = r.height() - ((long long)mean[i] * (long long) r.height() / (long long)slice_maximum);
 	  QColor c(0,0,0);
 	  int kleur = (i - blockshifter_min) * 128 / (blockshifter_max - blockshifter_min);

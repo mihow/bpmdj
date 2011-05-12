@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
  Copyright (C) 2001-2005 Werner Van Belle
- See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -40,7 +39,8 @@ const QString IndexDir = "./index";
 #define MAGIC_2_5 0xBDE7
 #define MAGIC_2_6 0xBDE8
 #define MAGIC_2_7 0xBDE9
-#define MAGIC_NOW MAGIC_2_7
+#define MAGIC_2_8 0xBDEA
+#define MAGIC_NOW MAGIC_2_8
 
 void realize_mapping(QHeader * h, int column, int location, int size);
 void copy_header(QHeader * in, QHeader * out);
@@ -127,10 +127,12 @@ class Config
   singleton_accessors(float,distance_rythmweight);
   singleton_accessors(float,distance_compositionweight);
   singleton_accessors(int,  max_songs);
+  // 2.8
+  singleton_accessors(QColor,color_unchecked);
  private:
   static void calc_and_cache();
  public:
-  static void openUi();
+  static bool open_ui();
   static void save();
   static void load();
 };

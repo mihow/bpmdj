@@ -40,6 +40,9 @@ init_singleton_var(QSong,compare_col,int,LIST_TEMPO);
 init_singleton_var(QSong,compare_asc,bool,true);
 init_singleton_var(QSong,songs,Song**,NULL);
 init_singleton_var(QSong,song_count,int,0);
+QPixmapCache QSong::echo_icon_cache = QPixmapCache(); 
+QPixmapCache QSong::rythm_icon_cache = QPixmapCache(); 
+QPixmapCache QSong::composition_icon_cache = QPixmapCache(); 
 
 void QSong::setVector(Song**arr, int cnt)
 {
@@ -98,7 +101,7 @@ QColor * QSong::colorOfTempoCol(const Song* main, Song* song)
 QColor * QSong::colorOfAuthorCol(Song* song)
 {
   if (!Config::get_color_authorplayed()) return NULL;
-  int played_author_songs_ago = Played::songs_played - song->get_played_author_at_time();
+  int played_author_songs_ago = History::get_songs_played() - song->get_played_author_at_time();
   if (played_author_songs_ago < Config::get_authorDecay())
     return mixColor(Config::get_color_played_author(), (float)played_author_songs_ago/(float)Config::get_authorDecay() ,Qt::white);
   return NULL;
@@ -182,52 +185,56 @@ void QSong::paintCell(QVectorView* vv, int i, QPainter *p,const QColorGroup &cg,
 	  }
       break;
     case LIST_HISTOGRAM:
-      // the color doesn't matter yet, we rather want to show a picture
       if (!song->get_histogram().empty())
 	{
-	  int h = height();
-	  histogram_property his = song->get_histogram();
-	  if (main && !main->get_histogram().empty())
+	  int h = height() - 1;
+	  
+	  // do we have a cached version ?
+	  QPixmap picture = echo_icon_cache.find(song,main,echo_prop_sx,h);
+	  if (picture.isNull())
 	    {
-	      histogram_property mis = main->get_histogram();
-	      for(int y = 0 ; y < h ; y ++)
+	      picture.resize(echo_prop_sx,h+1);
+	      QPainter icon;
+	      icon.begin(&picture);
+	      
+	      echo_property his = song->get_histogram();
+	      if (main && !main->get_histogram().empty())
 		{
-		  int z = y*23/(h-1);
-		  smallhistogram_type his_band = his.get_band(z);
-		  smallhistogram_type mis_band = mis.get_band(z);
-		  signed2 c1,c2;
-		  for(int x = 0 ; x < 96 ; x ++)
+		  echo_property mis = main->get_histogram();
+		  for(int y = 0 ; y <= h ; y ++)
 		    {
-		      if (x>=his_band.count)
-			c1 = 0;
-		      else
-			c1 = his_band.get_probability(x);
-		      if (x>=mis_band.count)
-			c2 = 0;
-		      else
-			c2 = mis_band.get_probability(x);
-		      p->setPen(QColor(c1,(c1+c2)/2,c2));
-		      p->drawPoint(x,y);
+		      int z = y*23/h;
+		      smallhistogram_type<echo_prop_sx> his_band = his.get_band(z);
+		      smallhistogram_type<echo_prop_sx> mis_band = mis.get_band(z);
+		      signed2 c1,c2;
+		      for(int x = 0 ; x < echo_prop_sx ; x ++)
+			{
+			  c1 = his_band.get_probability(x);
+			  c2 = mis_band.get_probability(x);
+			  icon.setPen(QColor(c1,(c1+c2)/2,c2));
+			  icon.drawPoint(x,h-y);
+			}
 		    }
 		}
-	    }
-	  else
-	    for(int y = 0 ; y < h ; y ++)
-	      {
-		int x,z = y*23/(h-1);
-		smallhistogram_type his_band = his.get_band(z);
-		unsigned1 c;
-		for(x = 0 ; x < his_band.count ; x ++)
+	      else
+		for(int y = 0 ; y <= h ; y ++)
 		  {
-		    c = his_band.get_probability(x);
-		    p->setPen(QColor(c,c,c));
-		    p->drawPoint(x,y);
+		    int x,z = y*23/h;
+		    smallhistogram_type<echo_prop_sx> his_band = his.get_band(z);
+		    unsigned1 c;
+		    for(x = 0 ; x < echo_prop_sx ; x ++)
+		      {
+			c = his_band.get_probability(x);
+			icon.setPen(QColor(c,c,c));
+			icon.drawPoint(x,h-y);
+		      }
 		  }
-		p->setPen(QColor(0,0,0));
-		for( ; x < 96 ; x ++)
-		  p->drawPoint(x,y);
-	      }
-	  if (wid>96)
+	      icon.end();
+	      echo_icon_cache.insert(song,picture);
+	    }
+
+	  p->drawPixmap(0,0,picture);
+	  if (wid>echo_prop_sx)
 	    {
 	      p->setPen(Qt::white);
 	      p->eraseRect(96,0,wid-96,24);
@@ -238,139 +245,172 @@ void QSong::paintCell(QVectorView* vv, int i, QPainter *p,const QColorGroup &cg,
     case LIST_RYTHM:
       if (!song->get_rythm().empty())
 	{
-	  int h = height();
-	  rythm_property his = song->get_rythm();
-	  QColor co;
-	  if (main && !main->get_rythm().empty())
+	  int h = height() - 1;
+	  QPixmap picture = rythm_icon_cache.find(song,main,wid,h);
+	  
+	  if (picture.isNull())
 	    {
-	      rythm_property mis = main->get_rythm();
-	      for(int y = 0 ; y < h ; y ++)
+	      picture.resize(wid,h+1);
+	      QPainter icon;
+	      icon.begin(&picture);
+	      
+	      rythm_property his = song->get_rythm();
+	      QColor co;
+	      if (main && !main->get_rythm().empty())
 		{
-		  int z = y*23/(h-1);
-		  smallhistogram_type his_band = his.get_band(z);
-		  smallhistogram_type mis_band = mis.get_band(z);
-		  co.setHsv(z*10,255,255);
-		  int r = co.red();
-		  int g = co.green();
-		  int b = co.blue();
-		  for(int v = 0 ; v < wid ; v ++)
+		  rythm_property mis = main->get_rythm();
+		  for(int y = 0 ; y <= h ; y ++)
 		    {
-		      int x = v*96/wid;
-		      signed2 c1 = his_band.get_energy(x);
-		      signed2 c2 = mis_band.get_energy(x);
-		      if (c1<86) c1=86;
-		      if (c2<86) c2=86;
-		      signed2 c = abs(c1-c2) * 3 / 2;
-		      co.setRgb(r*c/255,g*c/255,b*c/255);
-		      p->setPen(co);
-		      p->drawPoint(v,h-y);
+		      int z = y*23/h;
+		      smallhistogram_type<rythm_prop_sx> his_band = his.get_band(z);
+		      smallhistogram_type<rythm_prop_sx> mis_band = mis.get_band(z);
+		      co.setHsv(z*10,255,255);
+		      int r = co.red();
+		      int g = co.green();
+		      int b = co.blue();
+		      for(int v = 0 ; v < wid ; v ++)
+			{
+			  int x = v*rythm_prop_sx/wid;
+			  signed2 c1 = his_band.get_energy(x);
+			  signed2 c2 = mis_band.get_energy(x);
+			  if (c1<86) c1=86;
+			  if (c2<86) c2=86;
+			  signed2 c = abs(c1-c2) * 3 / 2;
+			  co.setRgb(r*c/255,g*c/255,b*c/255);
+			  icon.setPen(co);
+			  icon.drawPoint(v,h-y);
+			}
 		    }
 		}
-	    }
-	  else
-	    for(int y = 0 ; y < h ; y ++)
-	      {
-		int z = y*23/(h-1);
-		smallhistogram_type his_band = his.get_band(z);
-		co.setHsv(z*10,255,255);
-		int r = co.red();
-		int g = co.green();
-		int b = co.blue();
-		for(int v = 0 ; v < wid; v ++)
+	      else
+		for(int y = 0 ; y <= h ; y ++)
 		  {
-		    int x = v*96/wid;
-		    signed2 c = his_band.get_energy(x);
-		    if (c<86)
-		      c=0;
-		    else
+		    int z = y*23/h;
+		    smallhistogram_type<rythm_prop_sx> his_band = his.get_band(z);
+		    co.setHsv(z*10,255,255);
+		    int r = co.red();
+		    int g = co.green();
+		    int b = co.blue();
+		    for(int v = 0 ; v < wid; v ++)
 		      {
-			c*=3;
-			c/=2;
-			c-=128;
+			int x = v*rythm_prop_sx/wid;
+			signed2 c = his_band.get_energy(x);
+			if (c<86)
+			  c=0;
+			else
+			  {
+			    c*=3;
+			    c/=2;
+			    c-=128;
+			  }
+			co.setRgb(r*c/255,g*c/255,b*c/255);
+			icon.setPen(co);
+			icon.drawPoint(v,h-y);
 		      }
-		    co.setRgb(r*c/255,g*c/255,b*c/255);
-		    p->setPen(co);
-		    p->drawPoint(v,h-y);
 		  }
-	      }
+	      
+	      icon.end();
+	      rythm_icon_cache.insert(song,picture);
+	    }
+	  p->drawPixmap(0,0,picture);
 	  return;
 	}
+      break;
     case LIST_COMPOSITION:
       if (!song->get_composition().empty())
 	{
-	  int h = height();
-	  composition_property his = song->get_composition();
-	  QColor co;
-	  if (main && !main->get_composition().empty())
+	  int h = height() - 1;
+	  QPixmap picture = composition_icon_cache.find(song,main,wid,h);
+
+	  if (picture.isNull())
 	    {
-	      composition_property mis = main->get_composition();
-	      for(int y = 0 ; y < h ; y ++)
+	      picture.resize(wid,h+1);
+	      QPainter icon;
+	      icon.begin(&picture);
+	      
+	      composition_property his = song->get_composition();
+	      QColor co;
+	      if (main && !main->get_composition().empty())
 		{
-		  int z = y*23/(h-1);
-		  smallhistogram_type his_band = his.get_band(z);
-		  smallhistogram_type mis_band = mis.get_band(z);
-		  co.setHsv(z*10,255,255);
-		  int cnt = his_band.get_count();
-		  if (mis_band.get_count()<cnt)
-		    cnt = mis_band.get_count();
-		  for(int v = 0 ; v < wid ; v ++)
+		  composition_property mis = main->get_composition();
+		  for(int y = 0 ; y <= h ; y ++)
 		    {
-		      int x = v*cnt/wid;
-		      float c1 = (his_band.get_energy(x)-127.0)*his_band.scale;
-		      float c2 = (mis_band.get_energy(x)-127.0)*mis_band.scale;
-		      if (c1>c2)
+		      int z = y*23/h;
+		      smallhistogram_type<composition_prop_sx> his_band = his.get_band(z);
+		      smallhistogram_type<composition_prop_sx> mis_band = mis.get_band(z);
+		      co.setHsv(z*10,255,255);
+		      for(int v = 0 ; v < wid ; v ++)
 			{
-			  int c = (int)((c1-c2)*10);
-			  if (c>255) c = 255;
-			  co.setRgb(c,c,0);
+			  int x = v*composition_prop_sx/wid;
+			  float c1 = (his_band.get_energy(x)-127.0)*his_band.scale;
+			  float c2 = (mis_band.get_energy(x)-127.0)*mis_band.scale;
+			  if (c1>c2)
+			    {
+			      int c = (int)((c1-c2)*10);
+			      if (c>255) c = 255;
+			      co.setRgb(c,c,0);
+			    }
+			  else
+			    {
+			      int c = (int)((c2-c1)*10);
+			      if (c>255) c = 255;
+			      co.setRgb(0,c,c);
+			    }
+			  icon.setPen(co);
+			  icon.drawPoint(v,h-y);
 			}
-		      else
-			{
-			  int c = (int)((c2-c1)*10);
-			  if (c>255) c = 255;
-			  co.setRgb(0,c,c);
-			}
-		      p->setPen(co);
-		      p->drawPoint(v,h-y);
 		    }
 		}
-	    }
-	  else
-	    for(int y = 0 ; y < h ; y ++)
-	      {
-		int z = y*23/(h-1);
-		smallhistogram_type his_band = his.get_band(z);
-		int cnt = his_band.get_count();
-		for(int v = 0 ; v < wid; v ++)
+	      else
+		for(int y = 0 ; y <= h ; y ++)
 		  {
-		    int x = v*cnt/wid;
-		    signed2 c = his_band.get_energy(x);
-		    if (c>127)
+		    int z = y*23/h;
+		    smallhistogram_type<composition_prop_sx> his_band = his.get_band(z);
+		    for(int v = 0 ; v < wid; v ++)
 		      {
-			c = (c-127)*2;
-			co.setRgb(c,c,0);
+			int x = v*composition_prop_sx/wid;
+			signed2 c = his_band.get_energy(x);
+			if (c>127)
+			  {
+			    c = (c-127)*2;
+			    co.setRgb(c,c,0);
+			  }
+			else
+			  {
+			    c=(127-c)*2;
+			    co.setRgb(0,c,c);
+			  }
+			icon.setPen(co);
+			icon.drawPoint(v,h-y);
 		      }
-		    else
-		      {
-			c=(127-c)*2;
-			co.setRgb(0,c,c);
-		      }
-		    p->setPen(co);
-		    p->drawPoint(v,h-y);
 		  }
-	      }
+	      icon.end();
+	      composition_icon_cache.insert(song,picture);
+	    }
+	  p->drawPixmap(0,0,picture);
 	  return;
 	}
       break;
     }
   
   // the normal color depends wether the song is on the disk or not
-  if (Config::get_color_ondisk() && !song->get_ondisk())
+  if (Config::get_color_ondisk())
     {
-      QColorGroup ncg(cg);
-      ncg.setColor(QColorGroup::Base,Config::get_color_unavailable());
-      QVectorViewData::paintCell(vv,i,p,ncg,col,wid,align);
-    }  
+      if (!song->get_ondisk_checked())
+	{
+	  QColorGroup ncg(cg);
+	  ncg.setColor(QColorGroup::Base,Config::get_color_unchecked());
+	  QVectorViewData::paintCell(vv,i,p,ncg,col,wid,align);
+	}
+      else if (!song->get_ondisk())
+	{
+	  QColorGroup ncg(cg);
+	  ncg.setColor(QColorGroup::Base,Config::get_color_unavailable());
+	  QVectorViewData::paintCell(vv,i,p,ncg,col,wid,align);
+	}  
+      else
+	QVectorViewData::paintCell(vv,i,p,cg,col,wid,align);
+    }
   else
     QVectorViewData::paintCell(vv,i,p,cg,col,wid,align);
 }
@@ -439,8 +479,8 @@ static int compare_songs_histogram(const void * a, const void * b)
   Song * B = *((Song **)b);
   assert(A);
   assert(B);
-  histogram_property AT = A->get_histogram();
-  histogram_property BT = B->get_histogram();
+  echo_property AT = A->get_histogram();
+  echo_property BT = B->get_histogram();
   if (AT.empty())
     if (BT.empty()) return 0;
     else return 1;
@@ -526,7 +566,6 @@ void QSong::Sort()
     return;
   if (get_compare_col()==LIST_TEMPO)
     {
-      printf("Sorting according to tempo column\n");
       qsort(get_songs(),get_song_count(),sizeof(Song*),compare_songs_tempo);
     }
   else if (get_compare_col()==LIST_POWER)
@@ -547,7 +586,6 @@ void QSong::Sort()
     }
   else  
     {
-      // printf("Sorting according to column %d\n",compare_col);
       qsort(get_songs(),get_song_count(),sizeof(Song*),compare_songs_text);
     }
   if (!get_compare_asc())
@@ -559,7 +597,6 @@ void QSong::Sort()
 	  set_songs(get_song_count()-1-i,tmp);
 	}
     }
-  // printf("Done sorting\n");
 }
 
 Song * QSong::songEssence(int i) 

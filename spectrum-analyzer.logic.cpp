@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
  Copyright (C) 2001-2005 Werner Van Belle
- See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -57,6 +56,8 @@
 #include "version.h"
 #include "scripts.h"
 #include "signals.h"
+#include "smallhistogram-type.cpp"
+#include "histogram-property.cpp"
 #include <fftw3.h>
 
 SpectrumDialogLogic::SpectrumDialogLogic(SongPlayer*parent, const char*name, bool modal, WFlags f) :
@@ -352,7 +353,7 @@ void SpectrumDialogLogic::fetchSpectrum_normal()
     }
 
   // set the current data of the playing song
-  histogram_property h(bark_energy_distri);
+  echo_property h(bark_energy_distri);
   playing->set_histogram(h);
 
   // now draw the different distribution on the different axis

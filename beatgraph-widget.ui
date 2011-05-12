@@ -1,0 +1,158 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>BeatGraphWidget</class>
+<widget class="QWidget">
+    <property name="name">
+        <cstring>BeatGraphWidget</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>589</width>
+            <height>358</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>BeatGraphWidget</string>
+    </property>
+    <grid>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <property name="margin">
+            <number>0</number>
+        </property>
+        <widget class="QCheckBox" row="1" column="1">
+            <property name="name">
+                <cstring>haar</cstring>
+            </property>
+            <property name="text">
+                <string>Wavelet based</string>
+            </property>
+        </widget>
+        <widget class="QPushButton" row="1" column="3" rowspan="1" colspan="3">
+            <property name="name">
+                <cstring>pushButton4</cstring>
+            </property>
+            <property name="text">
+                <string>Set Tempo</string>
+            </property>
+        </widget>
+        <widget class="QLabel" row="0" column="0" rowspan="1" colspan="4">
+            <property name="name">
+                <cstring>pattern</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>5</hsizetype>
+                    <vsizetype>2</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="frameShape">
+                <enum>Panel</enum>
+            </property>
+            <property name="scaledContents">
+                <bool>true</bool>
+            </property>
+        </widget>
+        <widget class="QSlider" row="0" column="4">
+            <property name="name">
+                <cstring>periodDelta</cstring>
+            </property>
+            <property name="minValue">
+                <number>-100</number>
+            </property>
+            <property name="maxValue">
+                <number>100</number>
+            </property>
+            <property name="orientation">
+                <enum>Vertical</enum>
+            </property>
+            <property name="tickmarks">
+                <enum>NoMarks</enum>
+            </property>
+            <property name="tickInterval">
+                <number>100</number>
+            </property>
+        </widget>
+        <widget class="QSlider" row="0" column="5">
+            <property name="name">
+                <cstring>periodDelta10</cstring>
+            </property>
+            <property name="minValue">
+                <number>-1000</number>
+            </property>
+            <property name="maxValue">
+                <number>1000</number>
+            </property>
+            <property name="lineStep">
+                <number>10</number>
+            </property>
+            <property name="pageStep">
+                <number>100</number>
+            </property>
+            <property name="orientation">
+                <enum>Vertical</enum>
+            </property>
+            <property name="tickmarks">
+                <enum>NoMarks</enum>
+            </property>
+            <property name="tickInterval">
+                <number>100</number>
+            </property>
+        </widget>
+        <spacer row="1" column="0">
+            <property name="name">
+                <cstring>spacer4</cstring>
+            </property>
+            <property name="orientation">
+                <enum>Horizontal</enum>
+            </property>
+            <property name="sizeType">
+                <enum>Expanding</enum>
+            </property>
+            <property name="sizeHint">
+                <size>
+                    <width>40</width>
+                    <height>20</height>
+                </size>
+            </property>
+        </spacer>
+    </grid>
+</widget>
+<connections>
+    <connection>
+        <sender>pushButton4</sender>
+        <signal>clicked()</signal>
+        <receiver>BeatGraphWidget</receiver>
+        <slot>setTempo()</slot>
+    </connection>
+    <connection>
+        <sender>periodDelta</sender>
+        <signal>valueChanged(int)</signal>
+        <receiver>BeatGraphWidget</receiver>
+        <slot>slantChanged()</slot>
+    </connection>
+    <connection>
+        <sender>periodDelta10</sender>
+        <signal>valueChanged(int)</signal>
+        <receiver>BeatGraphWidget</receiver>
+        <slot>slantChanged()</slot>
+    </connection>
+    <connection>
+        <sender>haar</sender>
+        <signal>stateChanged(int)</signal>
+        <receiver>BeatGraphWidget</receiver>
+        <slot>changeVisualisation()</slot>
+    </connection>
+</connections>
+<slots>
+    <slot>setTempo()</slot>
+    <slot>showPattern()</slot>
+    <slot>slantChanged()</slot>
+    <slot>changeVisualisation()</slot>
+</slots>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

@@ -46,6 +46,7 @@ IndexReader::IndexReader(QProgressBar * b, QLabel *l, DataBase * db) :
   progress = b;
   reading = l;
   total_files = 0;
+  idx_files = 0;
   reading_bib = true;
   progress->setTotalSteps(Config::get_file_count());
   songs_already_in_database = 0;
@@ -67,13 +68,12 @@ void IndexReader::recursing(const QString dirname)
 
 void IndexReader::add(Song * song)
 {
-   database->add(song);
-   song->checkondisk();
-   if ( ++ total_files % (Config::get_file_count()/100 > 0 ? Config::get_file_count() / 100 : 10) == 0)
-     {
+  database->add(song);
+  if ( ++ total_files % (Config::get_file_count()/100 > 0 ? Config::get_file_count() / 100 : 10) == 0)
+    {
       progress -> setProgress(total_files);
-	app -> processEvents();
-     }
+      app -> processEvents();
+    }
 }
 
 void IndexReader::checkfile(const QString prefix, const QString  filename)
@@ -102,6 +102,7 @@ void IndexReader::checkfile(const QString prefix, const QString  filename)
     }
   else
     {
+      idx_files++;
       Index index(fullname);
       Song * song = database->find(index.get_filename());
       if (song)
@@ -112,5 +113,4 @@ void IndexReader::checkfile(const QString prefix, const QString  filename)
       else
 	add(new Song(&index,true,false));
     }
-  
 }

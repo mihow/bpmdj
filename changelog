@@ -1,4 +1,33 @@
-2.7: 
+2.8:
+  ksel  - bug in amount limited songlist. Comparison operator was entirily wrong	 
+  anal  - composition-analysis: toos hort songs were analyzed wrong	
+  kplay + uses RMS power now for beatgraph visualisation
+  kplay + integration of beatgraph into the player
+  kplay - remove cue shifting beyond zero bug	
+  ksel  + added played log view in history tab	
+  anal  + added idiot-boxes to rhythm analyzer (need tempo & spectrum)	
+  anal  + added beat detection algorithm	
+  ksel  - echo picture was shown upsuide down	
+  batch - 4 minutes per song on remote machines was not enough, so we increased it
+	  to an 8 minutes timeout
+  anal  - sometimes a bug occured in rayshooting at the left side
+  comm  - spectrum-type stdlib bug
+  kplay - bug through strange Qt convention that the app event loop NEEDS to be started
+	  from the main program thread. Very annoying actually..
+  ksel  - fixed problem with too many tags
+  kplay - rythm information gets cleared when tempo information changes
+  kplay - title is updated when songinfo is updated
+  kplay + started with moving different dialogboxes into one overall dialogbox	
+  ksel  - removed some dead code: edit.ui, songproperties.ui
+  ksel  + kpbm-play should now start a little bit faster
+  ksel  - limit dColor switched off -> don't limit amount of songs
+  ksel  - bug in de limited songlist due to false sorting of floating point numbers
+  ksel  + added status bar
+  ksel  + asynchronous file checking
+  ksel  + asynchronous PCA analysis
+  kplay + automatically selects switch speed
+  kplay - memory boundary problem in rythm analyzer
+2.7:
   doc   + added documentation on the rythm analyzer
   ksel  + added simple statistics box to show spectrum statistics	
   ksel  + added composition analyzer	

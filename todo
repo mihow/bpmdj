@@ -1,4 +1,16 @@
-  - cluster detector:
+- qvectorview is waarschijnlijk overbodig ?
+- kunnen we werken met het deleten van alle qsongs and erop terug ni te
+steken ?
+nadeel:
+- traag
+- complex bij verandering van selectie
+- we moeten eens kijken of die errors van de tekeningen komen of van de
+  asynchoniteit of van de vectorview ?
+- overschakelen naar een table like situatie ?
+- otherwise we go for the smooth scroller in which the selection is a smooth
+scroller ?
+
+- cluster detector:
     - clustering werkt niet meer...
     - add cluster detection thing
     - memory check doen

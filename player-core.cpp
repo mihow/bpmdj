@@ -39,16 +39,17 @@
 #include "energy-analyzer.h"
 #include "memory.h"
 
-// WVB -- testing variable for the impulse characeteristic
-//#define IMPULSE_PANNING
+//#define DEBUG_WAIT_STATES
 
 /*-------------------------------------------
  *         Constants & Variables
  *-------------------------------------------*/
 #define  wave_bufsize (32L*1024L)
+
 volatile int stop = 0;
 volatile int finished = 0;
 volatile int paused = 0;
+
 quad_period_type targetperiod;
 quad_period_type currentperiod;
 quad_period_type normalperiod;
@@ -62,6 +63,7 @@ char*   arg_rawpath = "./";
 char*   argument;
 Index*  playing = NULL;
 dsp_driver *dsp = NULL;
+
 
 /*-------------------------------------------
  *         File input oprations
@@ -90,7 +92,7 @@ void writer_died(int sig, siginfo_t *info, void* hu)
   playing->set_time(newstr);
 }
 
-int wave_open(char* fname, int synchronous)
+int wave_open(char* fname, bool synchronous)
 {
   // start decoding the file; this means: fork bpmdj-raw process
   // wait 1 second and start reading the file
@@ -118,7 +120,7 @@ int wave_open(char* fname, int synchronous)
 	}
     }
   wave_name=getRawFilename(arg_rawpath,fname);
-  int tries = 5;
+  int tries = 20;
   do
     {
       wave_file=fopen(wave_name,"rb");
@@ -148,6 +150,7 @@ void wave_close()
 
 unsigned4 wave_max()
 {
+  if (!wave_file) return 0;
   return fsize(wave_file)/4;
 }
 
@@ -295,47 +298,6 @@ stereo_sample2 lfo_metronome(stereo_sample2 x)
 
 #define DIFF 100
 #define DECAY 11050
-#ifdef IMPULSE_PANNING
-#undef DIFF
-static int DIFF = 19190*4;
-static float *prevl;
-static float *prevr;
-void pan_init()
-{
-  int i;
-  DIFF = normalperiod;
-  prevl = allocate(DIFF,float);
-  prevr = allocate(DIFF,float);
-  
-  for(i = 0 ; i < DIFF ; i ++)
-    {
-      prevl[i]=0.0;
-      prevr[i]=0.0;
-    }
-}
-
-static float maxsig=0.0;
-stereo_sample2 lfo_pan(stereo_sample2 x)
-{
-   signed8 diff;
-   longtrick lt;
-   signed4 left;
-   signed4 right;
-   lt.value=x;
-   int pos = y %DIFF;
-   prevl[pos]+=(float)lt.leftright.left/100.0;
-   prevr[pos]+=(float)lt.leftright.right/100.0;
-   if (fabs(prevl[pos])>maxsig)
-     maxsig=fabs(prevl[pos]);
-   if (fabs(prevr[pos])>maxsig)
-     maxsig=fabs(prevr[pos]);
-   lt.leftright.left = prevl[pos]*32767.0/maxsig;
-   lt.leftright.right = prevr[pos]*32767.0/maxsig;
-   return lt.value;
-}
-#endif
-
-#ifndef IMPULSE_PANNING
 stereo_sample2 lfo_pan(stereo_sample2 x)
 {
   signed8 diff;
@@ -358,7 +320,6 @@ stereo_sample2 lfo_pan(stereo_sample2 x)
   diff-=quart;
   return lfo_volume(x,1,1,diff,quart);
 }
-#endif
 
 stereo_sample2 lfo_saw(stereo_sample2 x)
 {
@@ -561,27 +522,25 @@ cue_info cues[4] = {0,0,0,0};
 void cue_set()
 {
    cue=x_normalise(y-dsp->latency());
-   printf("Setting cue\n");
+   // printf("Setting cue\n");
 }
 
 void cue_shift(char* txt, signed8 whence)
 {
-   printf("%s\n",txt);
-   cue+=whence;
-   if (!paused) 
-     paused=1;
+  if (whence < 0 && (unsigned8)(-whence) > cue) cue=0;
+  else cue+=whence;
+  if (!paused) 
+    paused=1;
 }
 
 void cue_store(char* text,int nr)
 {
-   printf("Storing %s cue\n",text);
-   cues[nr]=cue;
+  cues[nr]=cue;
 }
 
 void cue_retrieve(char* text,int nr)
 {
-   printf("Retrieving and jumping to %s cue\n",text);
-   cue=cues[nr];
+  cue=cues[nr];
 }
 
 void cue_write()
@@ -600,15 +559,6 @@ void cue_read()
   cues[1]=playing->get_cue_x();
   cues[2]=playing->get_cue_c();
   cues[3]=playing->get_cue_v();
-  if (!opt_quiet)
-    {
-      printf("Available cue's: ");
-      if (cues[0]) printf("Z ");
-      if (cues[1]) printf("X ");
-      if (cues[2]) printf("C ");
-      if (cues[3]) printf("V ");
-      printf("\n");
-    }
 }
 
 /*-------------------------------------------
@@ -633,16 +583,22 @@ void rms_init()
       opt_rms=0;
       return;
     }
+  
   // obtain amplitude maximisation factor factor 
   left_sub = mean.left;
   left_fact = normalization_factor(min.left,max.left,mean.left);
   right_sub = mean.right;
   right_fact = normalization_factor(min.right,max.right,mean.right);
+  
   // take into account the rms
   left_fact *= arg_rms;
   left_fact /= pow.left;
+  if (arg_rms > pow.left) left_fact = 1.0;
+  
   right_fact *= arg_rms;
   right_fact /= pow.right;
+  if (arg_rms > pow.right) right_fact = 1.0;
+
 }
 
 void rms_normalize(stereo_sample2 *l)
@@ -668,7 +624,6 @@ const signed8 loop_off = 0x7FFFFFFFFFFFFFFFLL;
 
 int loop_set(unsigned8 jumpback)
 {
-  //  printf("---\nloop_at = %d, loop_restart = %d, cue = %d, jumpback=%d, paused = %d\n",(int)loop_at,(int)loop_restart,(int)cue,(int)jumpback,(int)paused);
   if (paused)
     {
       loop_at = cue;
@@ -701,16 +656,6 @@ void loop_jump()
  *         Program logic
  *-------------------------------------------*/
 void help();
-
-void doubleperiod()
-{
-  playing->set_period(playing->get_period().doubled());
-}
-
-void halveperiod()
-{
-  playing->set_period(playing->get_period().halved());
-}
 
 void changetempo(signed8 period)
 {
@@ -845,24 +790,62 @@ void read_write_loop()
     read_write_bare_loop();
 }  
 
+void stop_and_wait_for_finish()
+{
+#ifdef DEBUG_WAIT_STATES
+  printf("stop_and_wait_for_finish(): entered\n");
+  fflush(stdout);
+#endif
+  ::stop=1;
+  ::paused=0;
+  while(!finished) ;
+#ifdef DEBUG_WAIT_STATES
+  printf("stop_and_wait_for_finish(): finished\n");
+  fflush(stdout);
+#endif
+}
+
+void wait_for_unpause()
+{
+#ifdef DEBUG_WAIT_STATES
+  printf("wait_for_unpause(): entered\n");
+  fflush(stdout);
+#endif
+  while(paused);
+#ifdef DEBUG_WAIT_STATES
+  printf("wait_for_unpause(): finished\n");
+  fflush(stdout);
+#endif
+}
+
+bool get_paused()
+{
+  return ::paused;
+}
+
+void pause_playing()
+{
+  paused = 1;
+}
+
+void unpause_if_necessary()
+{
+  if (::paused)
+    ::paused=0;
+}
+
 /*-------------------------------------------
  *         Startup code
  *-------------------------------------------*/ 
-void line()
-{
-  printf("--------------------------------------------------------------------\n");
-}
-
 void copyright()
 {
   printf("BpmDj Player v%s, Copyright (c) 2001-2005 Werner Van Belle\n",VERSION);
   printf("This software is distributed under the GPL2 license. See copyright.txt\n");
-  line();
+  printf("--------------------------------------------------------------------\n");
 }
 
-int core_init(int sync)
+int core_meta_init()
 {
-  int err;
   copyright();
   common_init();
   // Parsing the arguments
@@ -887,27 +870,15 @@ int core_init(int sync)
       normalperiod=normalperiod.halved();
       targetperiod=targetperiod.halved();
     }
-  if (!opt_quiet)
-    {
-      double normaltempo = mperiod2bpm(normalperiod);
-      double targettempo = mperiod2bpm(targetperiod);
-      if (normaltempo>0)
-	printf("Normal tempo = %g BPM\n",normaltempo);
-      else
-	printf("No normal tempo known\n");
-      if (targettempo>0)
-	printf("Target tempo = %g BPM",targettempo);
-      else
-	printf("No Target tempo known\n");
-      printf(" speed(%g)\n",(double)normalperiod/(double)currentperiod);
-    }
-  
+
   cue_read();
-#ifdef IMPULSE_PANNING
-  pan_init();
-#endif
-  err = wave_open(playing->get_filename(),sync);
-  return err;
+  return err_none;
+}
+
+
+int core_object_init(bool sync)
+{
+  return wave_open(playing->get_filename(),sync);
 }
 
 int core_open()
@@ -935,5 +906,34 @@ void core_done()
       playing->write_idx();
     }
   delete playing;
+#ifdef DEBUG_WAIT_STATES
+  printf("finished marked true\n");
+  fflush(stdout);
+#endif
   finished = 1;
+}
+
+static void * go(void* neglect)
+{
+  core_play();
+  core_close();
+  core_done();
+  return neglect;
+}
+
+
+int core_run()
+{
+  int err = core_object_init(false);
+  if (err==err_noraw || err==err_nospawn)
+    return err;
+  err = core_open();
+  if (err==err_dsp) 
+    {
+      core_done();
+      return err;
+    }
+  pthread_t *y = allocate(1,pthread_t);
+  pthread_create(y,NULL,go,NULL);
+  return err_none;
 }

@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>335</width>
-            <height>315</height>
+            <width>390</width>
+            <height>348</height>
         </rect>
     </property>
     <property name="caption">
@@ -18,6 +18,9 @@
     <grid>
         <property name="name">
             <cstring>unnamed</cstring>
+        </property>
+        <property name="margin">
+            <number>0</number>
         </property>
         <widget class="QLabel" row="5" column="0">
             <property name="name">

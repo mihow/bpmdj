@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
  Copyright (C) 2001-2005 Werner Van Belle
- See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -51,14 +50,15 @@ class DataBase
     void     clear();
     int      get_unheaped_selection(SongSelectorLogic* selector, Song* main, QVectorView* target);
     int      set_answer(Song * * show, int length, QVectorView* target);
- public:
+  public:
     DataBase();
     virtual ~DataBase();
     void     reset();
     void     add(Song*);
     // void     del(Song*);
     Song *   find(QString song_filename);
-    // bool     lookfor(const QString z);
+    void     start_existence_check();
+   // bool     lookfor(const QString z);
     int      getSelection(SongSelectorLogic* selector, Song* main, QVectorView* target, int nr = 0);
     GrowingArray<Song*> * getAllSongs() { return &all;};
     AvlTree<QString> * getFileTreeRef();

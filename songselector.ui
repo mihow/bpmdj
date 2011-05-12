@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>923</width>
-            <height>606</height>
+            <width>823</width>
+            <height>652</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -839,6 +839,50 @@
                         <property name="name">
                             <cstring>unnamed</cstring>
                         </property>
+                        <widget class="QListView" row="1" column="0">
+                            <column>
+                                <property name="text">
+                                    <string>Nr</string>
+                                </property>
+                                <property name="clickable">
+                                    <bool>true</bool>
+                                </property>
+                                <property name="resizable">
+                                    <bool>true</bool>
+                                </property>
+                            </column>
+                            <column>
+                                <property name="text">
+                                    <string>Title</string>
+                                </property>
+                                <property name="clickable">
+                                    <bool>true</bool>
+                                </property>
+                                <property name="resizable">
+                                    <bool>true</bool>
+                                </property>
+                            </column>
+                            <column>
+                                <property name="text">
+                                    <string>Author</string>
+                                </property>
+                                <property name="clickable">
+                                    <bool>true</bool>
+                                </property>
+                                <property name="resizable">
+                                    <bool>true</bool>
+                                </property>
+                            </column>
+                            <property name="name">
+                                <cstring>playedList</cstring>
+                            </property>
+                            <property name="selectionMode">
+                                <enum>Single</enum>
+                            </property>
+                            <property name="allColumnsShowFocus">
+                                <bool>true</bool>
+                            </property>
+                        </widget>
                         <widget class="QListView" row="0" column="0">
                             <column>
                                 <property name="text">
@@ -982,19 +1026,28 @@
                                 <bool>true</bool>
                             </property>
                         </widget>
-                        <widget class="QLabel" row="1" column="0">
-                            <property name="name">
-                                <cstring>textLabel1_3</cstring>
-                            </property>
-                            <property name="text">
-                                <string>&lt;b&gt;Persistent History&lt;/b&gt;&lt;br&gt;
-+X: the listed song is played X times after the current main song&lt;br&gt;
--X: the listed song is played X times before the current main song</string>
-                            </property>
-                        </widget>
                     </grid>
                 </widget>
             </widget>
+        </widget>
+        <widget class="QFrame" row="2" column="0">
+            <property name="name">
+                <cstring>statusframe</cstring>
+            </property>
+            <property name="sizePolicy">
+                <sizepolicy>
+                    <hsizetype>5</hsizetype>
+                    <vsizetype>4</vsizetype>
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                </sizepolicy>
+            </property>
+            <property name="frameShape">
+                <enum>StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+                <enum>Raised</enum>
+            </property>
         </widget>
     </grid>
 </widget>

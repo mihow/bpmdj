@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
  Copyright (C) 2001-2005 Werner Van Belle
- See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -24,6 +23,7 @@
 #include "cluster.h"
 #include "song.h"
 #include "data.h"
+#include "pixmap-cache.h"
 
 #define LIST_TEMPO 0
 #define LIST_DCOLOR 2
@@ -54,6 +54,10 @@ class QSong: public QVectorViewData
     singleton_accessors(int,compare_col);
     singleton_accessors(bool,compare_asc);
     singleton_accessors(int,song_count);
+   private:
+    static QPixmapCache echo_icon_cache;
+    static QPixmapCache rythm_icon_cache;
+    static QPixmapCache composition_icon_cache;
     
    public:
     static void setVector(Song** arr, int cnt);

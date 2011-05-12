@@ -5,18 +5,20 @@
 #  - qt3-designer
 #  - qt3-mt-headers
 #  - qt3-mt-dev
-#  - mpg123
+#  - mplayer
 #  - gcc
+#  - distcc
+#  - fftw3
 #  - make
 #  - alsa-headers (for alsa support)
 
 
 # full optimalisations
-CPP = distcc g++ -O3
+CPP = distcc g++ -O3 
 CC = distcc gcc -O3
 
-# CPP = distcc g++ -O0 -g -pg -Wall
-# CC = distcc gcc -O0 -g -pg -Wall
+#CPP = distcc g++ -O0 -g -pg -Wall
+#CC = distcc gcc -O0 -g -pg -Wall
 
 UIC = uic
 MOC = moc
@@ -26,8 +28,9 @@ INSTALL = install
 # -D COMPILE_OSS = include OSS drivers
 # -D COMPILE_ALSA = include ALSA drivers
 # -D EFENCE = include electric fence debugging code
+# -D NDEBUG = remove all asserts
 
-CFLAGS+= -D COMPILE_OSS -D COMPILE_ALSA
+CFLAGS+= -D COMPILE_OSS -D COMPILE_ALSA -D NDEBUG
 LDFLAGS+= -lpthread -lm -lasound -lrt -lfftw3
 QT_INCLUDE_PATH=-I/usr/include/qt3/
 QT_LIBRARY_PATH=

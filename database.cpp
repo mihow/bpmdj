@@ -29,6 +29,8 @@
 #include "growing-array.cpp"
 #include "tags.h"
 #include "heap.h"
+#include <pthread.h>
+#include "kbpm-dj.h"
 
 /**
  * The database cache contains items that are visible when only considereing the taglist
@@ -87,6 +89,26 @@ void DataBase::add(Song* song)
       exit(0);
     }
   file_tree->add(new SongSortedByFile(song));
+}
+
+void* existence_checker(void * something)
+{
+  GrowingArray<Song*> *all = (GrowingArray<Song*>*)something;
+  int i = 0;
+  while(i < all->count)
+    {
+      Song * song = all->elements[i];
+      song -> checkondisk();
+      i++;
+    }
+  status->message("Finished checking existence of "+QString::number(i)+" songs",2000);
+  return something;
+}
+
+void DataBase::start_existence_check()
+{
+  pthread_t *checker = allocate(1,pthread_t);
+  pthread_create(checker,NULL,existence_checker,&all); 
 }
 
 Song * DataBase::find(QString song_filename)
@@ -187,8 +209,8 @@ void DataBase::updateCache(SongSelectorLogic* selector)
  */
 bool DataBase::filter(SongSelectorLogic* selector, Song *item, Song* main, float limit)
 {
-  if (main!=NULL && main->get_author()==item->get_author())
-    item->set_played_author_at_time(Played::songs_played);
+  if (main!=NULL && main->get_author()==item->get_author() && !main->get_author().isEmpty())
+    item->set_played_author_at_time(History::get_songs_played());
   // song on disk ?
   if (Config::get_limit_ondisk() && !item->get_ondisk())
     return false;
@@ -197,7 +219,7 @@ bool DataBase::filter(SongSelectorLogic* selector, Song *item, Song* main, float
     return false;
   // okay, no similar authors please..
   if (Config::get_limit_authornonplayed() && 
-      Played::songs_played - item->get_played_author_at_time() < Config::get_authorDecay())
+      History::get_songs_played() - item->get_played_author_at_time() < Config::get_authorDecay())
     return false;
   // now check the tempo stuff
   if (main && (Config::get_limit_uprange() || Config::get_limit_downrange()))
@@ -265,11 +287,15 @@ int DataBase::set_answer(Song ** show, int itemcount, QVectorView* target)
   return itemcount;
 }
 
+static int itemUpdateingCount = 0;
 int DataBase::getSelection(SongSelectorLogic* selector, Song* main, QVectorView* target, int count)
 {
-  if (count==0 || main==NULL) return get_unheaped_selection(selector, main, target);
+  // only when we have a dcolor limitation can we use the amount limitation
+  if (!Config::get_limit_indistance() || count==0 || main==NULL) return get_unheaped_selection(selector, main, target);
+  assert(count>0);
   
   // to get an appropriate selection we allocate the nessary vector
+  itemUpdateingCount++;
   updateCache(selector);
   Song * * show = allocate(count,Song*);
   SongHeap heap(count);
@@ -283,6 +309,7 @@ int DataBase::getSelection(SongSelectorLogic* selector, Song* main, QVectorView*
     }
   int itemcount = heap.copy_to(show);
   assert(itemcount<=count);
+  itemUpdateingCount--;
   return set_answer(show,itemcount,target);
 }
 

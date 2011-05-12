@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
  Copyright (C) 2001-2005 Werner Van Belle
- See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -22,24 +21,31 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <qstring.h>
+#include <qlistview.h>
 #include "song.h"
-#include "growing-array.h"
-
+#include "database.h"
+#include "data.h"
 /**
  * A class to represent the song already played
+ * This played class is reworked in comparison to v2.7
+ * From v2.8 on we read in the played data after all songs have been
+ * read into memory. This allows us to mark all songs much faster
+ * and reduces the time to read all song when the playlist is larger.
+ * It also ensures that we can fill in the right information in the 
+ * logfile view list.
  */
-
-class Played
+class History
 {
-  private:
-    static Song * t_2;  // T - 2
-    static Song * t_1;  // T - 1
-    static Song * t_0;  // T: the current main
-    static GrowingArray<QString> names;
-    static FILE* f;
-  public:
-    static int songs_played;
-    Played(const QString filename);
-    static bool IsPlayed(Song * which);
-    static void Play(Song * main_now);
+ private:
+  static Song * t_2;  // T - 2
+  static Song * t_1;  // T - 1
+  static Song * t_0;  // T: the current main
+  static FILE* f;
+  singleton_accessors(int,songs_played);
+  static QListView * log_ui;
+  static void mark_as_played(DataBase * db, QString s);
+  static void mark_as_played(Song *song);
+ public:
+  History(const QString filename, DataBase * db, QListView * putin);
+  static void this_is_playing(Song * main_now);
 };

@@ -29,6 +29,7 @@
 #include "song.h"
 #include "song-metric.h"
 #include "metric-widget.h"
+#include "kbpm-dj.h"
 
 init_singleton_var(Config,file_count,int,1000);
 init_singleton_var(Config,yellowTime,int,120);
@@ -94,6 +95,7 @@ init_singleton_var(Config,distance_echoweight,float,0.7);
 init_singleton_var(Config,distance_rythmweight,float,2.5);
 init_singleton_var(Config,distance_compositionweight,float,1.0);
 init_singleton_var(Config,max_songs,int,100);
+init_singleton_var(Config,color_unchecked,QColor,QColor(219,219,219));
 
 /**
  * we don't open the mixer command because the program its normal 
@@ -218,6 +220,8 @@ void Config::save()
   s << get_distance_rythmweight();
   s << get_distance_compositionweight();
   s << (Q_UINT16)get_max_songs();
+  // save pixmap if it is there
+  s << get_color_unchecked();
 }
 
 void Config::load()
@@ -238,7 +242,6 @@ void Config::load()
       s >> magic;
       if (magic == MAGIC_1_6)
 	{
-	  printf("Config v1.6\n");
 	  s >> w; set_file_count (w);
 	  s >> w; set_yellowTime (w);
 	  s >> w; set_orangeTime (w);
@@ -253,7 +256,6 @@ void Config::load()
 	}
       else if (magic == MAGIC_1_7)
 	{
-	  printf("Config v1.7\n");
 	  s >> w; set_file_count (w);
 	  s >> w; set_yellowTime (w);
 	  s >> w; set_orangeTime (w);
@@ -280,7 +282,6 @@ void Config::load()
 	}
       else if (magic == MAGIC_1_8)
 	{
-	  printf("Config v1.8\n");
 	  s >> w; set_file_count (w);
 	  s >> w; set_yellowTime (w);
 	  s >> w; set_orangeTime (w);
@@ -306,7 +307,6 @@ void Config::load()
 	}
       else if (magic == MAGIC_1_9)
 	{
-	  printf("Config v1.9\n");
 	  s >> w; set_file_count (w);
 	  s >> w; set_yellowTime (w);
 	  s >> w; set_orangeTime (w);
@@ -336,7 +336,6 @@ void Config::load()
 	}
       else if (magic == MAGIC_2_1)
 	{
-	  printf("Config v2.1\n");
 	  s >> w; set_file_count (w);
 	  s >> w; set_yellowTime (w);
 	  s >> w; set_orangeTime (w);
@@ -369,7 +368,6 @@ void Config::load()
 	}
       else if (magic == MAGIC_2_2)
 	{
-	  printf("Config v2.2\n");
 	  s >> w; set_file_count (w);
 	  s >> w; set_yellowTime (w);
 	  s >> w; set_orangeTime (w);
@@ -404,7 +402,6 @@ void Config::load()
 	}
       else if (magic == MAGIC_2_4)
 	{
-	  printf("Config v2.4\n");
 	  s >> w; set_file_count (w);
 	  s >> w; set_yellowTime (w);
 	  s >> w; set_orangeTime (w);
@@ -442,7 +439,6 @@ void Config::load()
 	}
       else if (magic == MAGIC_2_5)
 	{
-	  printf("Config v2.5\n");
 	  s >> w; set_file_count (w);
 	  s >> w; set_yellowTime (w);
 	  s >> w; set_orangeTime (w);
@@ -524,7 +520,6 @@ void Config::load()
 	}
       else if (magic == MAGIC_2_6)
 	{
-	  printf("Config v2.6\n");
 	  s >> w; set_file_count (w);
 	  s >> w; set_yellowTime (w);
 	  s >> w; set_orangeTime (w);
@@ -608,7 +603,6 @@ void Config::load()
 	}
       else if (magic == MAGIC_2_7)
 	{
-	  printf("Config v2.7\n");
 	  s >> w; set_file_count (w);
 	  s >> w; set_yellowTime (w);
 	  s >> w; set_orangeTime (w);
@@ -696,6 +690,96 @@ void Config::load()
 	  s >> F; set_distance_compositionweight(F);
 	  s >> w; set_max_songs(w);
 	}
+      else if (magic == MAGIC_2_8)
+	{
+	  s >> w; set_file_count (w);
+	  s >> w; set_yellowTime (w);
+	  s >> w; set_orangeTime (w);
+	  s >> w; set_redTime (w);
+	  s >> w; set_filterBpm (w);
+	  s >> b; set_color_range(b);
+	  s >> b; set_color_played(b);
+	  s >> b; set_color_authorplayed(b);
+	  s >> b; set_color_ondisk(b);
+	  s >> b; set_color_cues(b);
+	  s >> b; set_color_dcolor(b);
+	  s >> b; set_color_spectrum(b);
+	  s >> b; set_authorDecay(b);
+	  s >> b; set_limit_ondisk(b);
+	  s >> b; set_limit_nonplayed(b);
+	  s >> b; set_limit_uprange(b);
+	  s >> b; set_limit_downrange(b);
+	  s >> b; set_limit_indistance(b);
+	  s >> str; set_playCommand1(str);
+	  s >> str; set_playCommand2(str);
+	  s >> str; set_playCommand3(str);
+	  s >> str; set_playCommand4(str);
+	  s >> fl; set_distance_temposcale(fl);
+	  s >> fl; set_distance_spectrumweight(fl);
+	  s >> b; set_limit_authornonplayed(b);
+	  s >> b; set_shown_aboutbox(b);
+	  s >> str; set_tmp_directory(str);
+	  s >> str; set_mixer_command(str);
+	  s >> b; set_open_mixer(b);
+	  s >> b; set_ask_mix(b);
+	  s >> b; set_auto_popqueue(b);
+	  s >> str; set_record_command(str);
+	  s >> str; set_replay_command(str);
+	  s >> str; set_record_mixer_command(str);
+	  s >> clr; set_color_tempo44(clr);
+	  s >> clr; set_color_tempo54(clr);
+	  s >> clr; set_color_tempo64(clr);
+	  s >> clr; set_color_tempo74(clr);
+	  s >> clr; set_color_tempo84(clr);
+	  s >> b; set_show_tempo54(b);
+	  s >> b; set_show_tempo64(b);
+	  s >> b; set_show_tempo74(b);
+	  s >> b; set_show_tempo84(b);
+	  s >> b; set_show_unknown_tempo(b);
+	  s >> clr; set_color_green_time(clr);
+	  s >> clr; set_color_yellow_time(clr);
+	  s >> clr; set_color_orange_time(clr);
+	  s >> clr; set_color_red_time(clr);
+	  s >> b; set_color_main_window(b);
+	  s >> b; set_log_spectrum_distance(b);
+	  s >> clr; set_color_played_song(clr);
+	  s >> clr; set_color_played_author(clr);
+	  s >> clr; set_color_unavailable(clr);
+	  s >> clr; set_color_dcolor_col(clr);
+	  s >> w; set_color_cluster_depth (w);
+	  s >> str; set_bpm_mixer_command(str);
+	  s >> b; set_open_bpmmixer(b);
+	  // read tag data
+	  s >> w; 
+	  while(w-->0)
+	    {
+	      QString t;
+	      Q_INT8 i,m,e;
+	      s >> t;
+	      s >> i; 
+	      s >> m; 
+	      s >> e; 
+	      new QListViewItem(get_taglist(), t, i ? TAG_TRUE : TAG_FALSE,
+				m ? TAG_TRUE : TAG_FALSE,
+				e ? TAG_TRUE : TAG_FALSE);
+	    }
+	  // read header
+	  s >> w; 
+	  for(int i = 0 ; i < w ; i++)
+	    get_header()->addLabel("");
+	  for(int i = 0 ; i < w ; i++)
+	    {
+	      Q_UINT16 m1,m2; s >> m1; s >> m2;
+	      realize_mapping(get_header(),i,m1,m2);
+	    }
+	  float F;
+	  s >> F; set_distance_tempoweight(F);
+	  s >> F; set_distance_echoweight(F);
+	  s >> F; set_distance_rythmweight(F);
+	  s >> F; set_distance_compositionweight(F);
+	  s >> w; set_max_songs(w);
+	  s >> clr; set_color_unchecked(clr);
+	}
       else
 	printf("Wrong config file format\n");
       if (magic != MAGIC_NOW)
@@ -714,7 +798,7 @@ void Config::load()
     }
 }
 
-void Config::openUi()
+bool Config::open_ui()
 {
   char tmp[50];
   PreferencesLogic preferences(NULL,NULL,TRUE);
@@ -757,6 +841,7 @@ void Config::openUi()
   preferences.colorPlayedSong -> setPaletteBackgroundColor( get_color_played_song ());
   preferences.colorPlayedAuthor -> setPaletteBackgroundColor( get_color_played_author ());
   preferences.colorUnavailableSong -> setPaletteBackgroundColor( get_color_unavailable ());
+  preferences.colorUncheckedSong -> setPaletteBackgroundColor( get_color_unchecked ());
   preferences.colordColorCol -> setPaletteBackgroundColor( get_color_dcolor_col ());
 
   preferences.dColorMetric->spectrumSpin -> setValue ( (int)(get_distance_spectrumweight()*100.0) );
@@ -809,6 +894,7 @@ void Config::openUi()
       set_color_played_song(preferences.colorPlayedSong -> paletteBackgroundColor( ));
       set_color_played_author(preferences.colorPlayedAuthor -> paletteBackgroundColor( ));
       set_color_unavailable(preferences.colorUnavailableSong -> paletteBackgroundColor( ));
+      set_color_unchecked(preferences.colorUncheckedSong -> paletteBackgroundColor( ));
       set_color_dcolor_col(preferences.colordColorCol -> paletteBackgroundColor( ));
       set_color_cluster_depth(preferences.clusterDepth -> value());
       set_bpm_mixer_command(preferences.bpmmixcmd -> text());
@@ -822,7 +908,9 @@ void Config::openUi()
 
       save();
       calc_and_cache();
+      return true;
     }
+  return false;
 }
 
 void Config::calc_and_cache()

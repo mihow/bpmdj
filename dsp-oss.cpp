@@ -96,7 +96,7 @@ void dsp_oss::pause()
 {
   //  dsp_flush();
   ioctl(dsp,SNDCTL_DSP_RESET);
-  while(paused);
+  wait_for_unpause();
   clock_start();
   dsp_writecount=0;
 }

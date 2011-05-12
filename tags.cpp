@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
  Copyright (C) 2001-2005 Werner Van Belle
- See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -64,9 +63,14 @@ void Tags::init()
   assert(t==tag_end);
 };
 
-QString  Tags::find_tag(tag_type idx)
+QString Tags::find_tag(tag_type idx)
 {
-  assert(idx>=0 && idx<tag_names.count);
+  if (idx >=tag_names.count)
+    {
+      printf("Didnt find tag id %d\n",idx);
+      fflush(stdout);
+      assert(idx<tag_names.count);
+    }
   return tag_names.elements[idx];
 }
 
@@ -78,7 +82,6 @@ tag_type Tags::find_tag(QString tag)
   return found->index;
 }
 
-
 tag_type Tags::add_tag(QString tag)
 {
   Tag2Index * found = (Tag2Index*)tree.search(tag);
@@ -86,8 +89,10 @@ tag_type Tags::add_tag(QString tag)
     {
       new_tags=true;
       int nr = tag_names.add(tag);
+      assert(nr<256);
       found=new Tag2Index(tag,nr);
       tree.add(found);
+      // printf("Adding tag :%s(%d)\n",(const char*)tag,found->index);
     }
   return found->index;
 }
@@ -128,7 +133,7 @@ tags_type Tags::parse_tags(QString tagstring)
       while(*runner)
 	{
 	  while(*runner && *runner!=' ') runner++;
-	  if (*runner) 
+	  if (*runner)
 	    {
 	      *runner=0;
 	      result[count++]=add_tag(tagss);

@@ -44,7 +44,6 @@
 #include "version.h"
 #include "kbpm-dj.h"
 #include "basic-process-manager.h"
-#include "qsong.h"
 #include "config.h"
 #include "scripts.h"
 #include "memory.h"

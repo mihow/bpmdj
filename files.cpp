@@ -24,13 +24,13 @@
 
 long fsize(FILE * f)
 {
-   long answer, pos;
-   assert(f);
-   pos = ftell(f);
-   fseek(f,0,SEEK_END);
-   answer=ftell(f);
-   fseek(f,pos,SEEK_SET);
-   return answer;
+  long answer, pos;
+  assert(f);
+  pos = ftell(f);
+  fseek(f,0,SEEK_END);
+  answer=ftell(f);
+  fseek(f,pos,SEEK_SET);
+  return answer;
 }
 
 void file_sequence(unsigned1*a, int c, FILE *f)

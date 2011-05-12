@@ -102,6 +102,7 @@ void histogram_type::strip()
   double new_left = left + a * (right-left) / count;
   double new_right = left + (b+1) * (right-left) / count;
   int    new_count = b-a+1;
+  if (new_count<=0) new_count=1;
   signed4 * new_bins = allocate(new_count,signed4);
   for(int i = a ; i <= b ; i++)
     new_bins[i-a]=bins[i];
@@ -228,82 +229,4 @@ void histogram_type::halve()
   for(int i = 1 ; i < count ; i++)
     bins[i]=(bins[2*i]+bins[2*i+1])/2;
 }
-
-// --------------------------------------------------------------------
-void smallhistogram_type::init(histogram_type * other)
-{
-  scale = other->scale;
-  bin = allocate(count=96,unsigned1);
-  for(int i = 0 ; i < 96; i++)
-    if (i<other->count)
-      bin[i]=abs(other->bins[i]);
-    else
-      bin[i]=0;
-}
-
-void smallhistogram_type::init()
-{
-  bin = allocate(count=smallhistogram_size,unsigned1);
-  for(int i = 0 ; i < count; i++)
-    bin[i]=0;
-}
-
-smallhistogram_type::smallhistogram_type()
-{
-}
-
-const void smallhistogram_type::write_idx(FILE*f)
-{
-  int c = count-1;
-  while(bin[c]==0) c--;
-  fprintf(f,"%g %d ",scale,c+1);
-  for(int i = 0 ; i <= c ; i++)
-    fprintf(f,"%2x ",bin[i]);
-  fprintf(f,"\n");
-}
-
-//static long winst = 0;
-void smallhistogram_type::read_idx(const char* str)
-{
-  char * cur;
-  char * nxt;
-  scale = strtof(str,&cur);
-  count = strtol(cur,&nxt,10);
-  cur=nxt;
-  assert(count<=smallhistogram_size);
-  if (count<0)
-    count = 0;
-  //winst+=smallhistogram_size-count;
-  //printf("%d\n",winst);
-  bin = allocate(count,unsigned1);
-  for(int i = 0 ; i < count ; i++)
-    {
-      bin[i]=strtol(cur,&nxt,16);
-      cur = nxt;
-    }
-}
-
-const void smallhistogram_type::write_bib_v272(FILE * index)
-{
-  file_float4(scale,index);
-  file_unsigned1(count,index);
-  file_sequence(bin,count,index);
-}
-
-void smallhistogram_type::read_bib_v271()
-{
-  scale = buffer_float4();
-  bin = allocate(count=smallhistogram_size,unsigned1);
-  buffer_sequence(bin,count);
-}
-
-void smallhistogram_type::read_bib_v272()
-{
-  scale = buffer_float4();
-  count = buffer_unsigned1();
-  assert(count>=0);
-  bin = allocate(count,unsigned1);
-  buffer_sequence(bin,count);
-}
-
 

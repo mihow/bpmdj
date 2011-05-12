@@ -2,7 +2,6 @@
 #
 # BpmDj: Free Dj Tools
 # Copyright (C) 2001 Werner Van Belle
-# See 'BeatMixing.ps' for more information
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -36,10 +35,11 @@ extension=${songname##*.}
 && (! (test -f "$songlocation") ) && exit 2;
 
 # now check the filename extension
-case $extension in 
-  (MP3)  mpg123 -s "$songlocation" >"$rawname" 2>/dev/null;;
-  (mp3)  mpg123 -s "$songlocation" >"$rawname" 2>/dev/null;;
-  (ogg)  ogg123 -q -d raw -f "$rawname" "$songlocation";;
-  (flac) ogg123 -q -d raw -f "$rawname" "$songlocation";;
-esac;
+#case $extension in 
+#  (MP3)  mpg123 -s "$songlocation" >"$rawname" 2>/dev/null;;
+#  (mp3)  mpg123 -s "$songlocation" >"$rawname" 2>/dev/null;;
+#  (ogg)  ogg123 -q -d raw -f "$rawname" "$songlocation";;
+#  (flac) ogg123 -q -d raw -f "$rawname" "$songlocation";;
+#esac;
 
+mplayer "$songlocation" -ao pcm -aofile "$rawname" -af resample=44100 -really-quiet 2>/dev/null >/dev/null

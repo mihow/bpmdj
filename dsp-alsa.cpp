@@ -66,7 +66,7 @@ void dsp_alsa::pause()
     printf("pause drop error: %s\n",snd_strerror(err));
   //}
   // wait...
-  while(paused) ;
+  wait_for_unpause();
   // simply continue
   /*
     if (can_pause)

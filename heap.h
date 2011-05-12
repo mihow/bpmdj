@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
  Copyright (C) 1995-2005 Werner Van Belle
- See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -35,12 +34,12 @@ class SongHeap: private AvlTree<Song*>
   int maxsize;
  public:
   float maximum;
-  int count;
+  int size;
   SongHeap(int nr)
     {
       maxsize = nr;
       maximum = 1000000;
-      count = 0;
+      size = 0;
     }
   void add(Song * s);
   int copy_to(Song** target);

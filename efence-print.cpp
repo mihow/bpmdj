@@ -64,24 +64,22 @@ void EF_Abort(const char * pattern, ...)
 	_exit(-1);
 }
 
-void
-EF_Exit(const char * pattern, ...)
+void EF_Exit(const char * pattern, ...)
 {
-	va_list	args;
-
-	va_start(args, pattern);
-
-	EF_Print("\nElectricFence Exiting: ");
-	vprintf(pattern, args);
-	EF_Print("\n");
-
-	va_end(args);
-
-	/*
-	 * I use _exit() because the regular exit() flushes stdio,
-	 * which may cause malloc() or free() to be called.
-	 */
-	_exit(-1);
+  va_list args;
+  va_start(args, pattern);
+  
+  EF_Print("\nElectricFence Exiting: ");
+  vprintf(pattern, args);
+  EF_Print("\n");
+  
+  va_end(args);
+  
+  /*
+   * I use _exit() because the regular exit() flushes stdio,
+   * which may cause malloc() or free() to be called.
+   */
+  _exit(-1);
 }
 
 void

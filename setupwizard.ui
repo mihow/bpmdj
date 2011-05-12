@@ -1,4 +1,4 @@
-<!DOCTYPE UI><UI version="3.2" stdsetdef="1">
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
 <class>SetupWizard</class>
 <widget class="QWizard">
     <property name="name">
@@ -81,8 +81,16 @@
                 <property name="name">
                     <cstring>TextLabel7</cstring>
                 </property>
+                <property name="paletteForegroundColor">
+                    <color>
+                        <red>0</red>
+                        <green>85</green>
+                        <blue>255</blue>
+                    </color>
+                </property>
                 <property name="font">
                     <font>
+                        <bold>1</bold>
                         <italic>1</italic>
                     </font>
                 </property>
@@ -250,6 +258,13 @@
                 <property name="name">
                     <cstring>TextLabel12</cstring>
                 </property>
+                <property name="paletteForegroundColor">
+                    <color>
+                        <red>0</red>
+                        <green>85</green>
+                        <blue>255</blue>
+                    </color>
+                </property>
                 <property name="font">
                     <font>
                         <italic>1</italic>
@@ -287,6 +302,13 @@
                 <property name="name">
                     <cstring>TextLabel8</cstring>
                 </property>
+                <property name="paletteForegroundColor">
+                    <color>
+                        <red>255</red>
+                        <green>0</green>
+                        <blue>0</blue>
+                    </color>
+                </property>
                 <property name="font">
                     <font>
                         <bold>1</bold>
@@ -296,7 +318,7 @@
                     <string>Beware: Once an .mp3 file is indexed (imported in kbpm-dj) it should not be renamed anymore nor should it be moved to other locations of the filesystem !</string>
                 </property>
                 <property name="alignment">
-                    <set>WordBreak|AlignVCenter|AlignLeft</set>
+                    <set>WordBreak|AlignVCenter</set>
                 </property>
                 <property name="vAlign" stdset="0">
                 </property>
@@ -404,26 +426,6 @@
                     </size>
                 </property>
             </spacer>
-            <widget class="QLabel" row="5" column="0" rowspan="1" colspan="4">
-                <property name="name">
-                    <cstring>TextLabel16</cstring>
-                </property>
-                <property name="font">
-                    <font>
-                        <italic>1</italic>
-                    </font>
-                </property>
-                <property name="text">
-                    <string>Now the program will open, you can create the necessary index files by selecting Tools/Import</string>
-                </property>
-                <property name="alignment">
-                    <set>WordBreak|AlignTop|AlignLeft</set>
-                </property>
-                <property name="vAlign" stdset="0">
-                </property>
-                <property name="wordwrap" stdset="0">
-                </property>
-            </widget>
             <widget class="QLabel" row="0" column="0" rowspan="1" colspan="4">
                 <property name="name">
                     <cstring>TextLabel14</cstring>
@@ -449,14 +451,16 @@
                     </font>
                 </property>
                 <property name="text">
-                    <string>- title/author/remix
-- version
+                    <string>- title/author/remix/version
 - mp3/ogg location
 - tempo
 - cue points
 - md5sum
-- style-tags
-- history and album information</string>
+- style tags
+- play history and album information
+- rythm characteristics
+- composition characteristics
+- echo characteristics</string>
                 </property>
                 <property name="alignment">
                     <set>AlignVCenter|AlignLeft</set>

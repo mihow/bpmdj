@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
  Copyright (C) 2001-2005 Werner Van Belle
- See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -27,7 +26,7 @@
 #include <qlabel.h>
 #include "song.h"
 #include "histogram-type.h"
-#include "histogram-property.h"
+#include "echo-property.h"
 #include "songselector.logic.h"
 #include "spectrum-type.h"
 #include "signals.h"
@@ -90,8 +89,7 @@ float4 normalize_freq(float4 in, int band)
   return in;
 }
 
-
-void mean_echo(histogram_property echo)
+void mean_echo_old(echo_property echo)
 {
   if (echo.empty()) return;
   echos++;
@@ -101,9 +99,9 @@ void mean_echo(histogram_property echo)
       echo_dev=allocate(spectrum_size,float8*);
       for(int i = 0 ; i < spectrum_size ; i ++)
 	{
-	  echo_mean[i]=allocate(smallhistogram_size,float8);
-	  echo_dev[i]=allocate(smallhistogram_size,float8);
-	  for(int j = 0 ; j < smallhistogram_size ; j++)
+	  echo_mean[i]=allocate(echo_prop_sx,float8);
+	  echo_dev[i]=allocate(echo_prop_sx,float8);
+	  for(int j = 0 ; j < echo_prop_sx ; j++)
 	    echo_mean[i][j]=echo_dev[i][j]=0;
 	}
     }
@@ -115,15 +113,15 @@ void mean_echo(histogram_property echo)
     }
 }
 
-void stop_mean_echo()
+void stop_mean_echo_old()
 {
   if (echos>0)
     for(int i = 0 ;i < spectrum_size; i ++ )
-      for(int j = 0 ; j < smallhistogram_size ; j ++)
+      for(int j = 0 ; j < echo_prop_sx ; j ++)
 	echo_mean[i][j]/=echos;
 }
 
-void dev_echo(histogram_property echo)
+void dev_echo(echo_property echo)
 {
   if (echo.empty()) return;
   for(int i = 0 ;i < spectrum_size; i ++ )
@@ -141,11 +139,11 @@ void stop_dev_echo()
 {
   if (echos-1>0)
     for(int i = 0 ;i < spectrum_size; i ++ )
-      for(int j = 0 ; j < smallhistogram_size ; j ++)
+      for(int j = 0 ; j < echo_prop_sx ; j ++)
 	echo_dev[i][j]=sqrt(echo_dev[i][j]/(echos-1));
 }
 
-float4 normalize_echo(float4 val, int band, int delay)
+float4 normalize_echo_old(float4 val, int band, int delay)
 {
   val-=echo_mean[band][delay];
   if (echo_dev[band][delay]>0)
@@ -156,25 +154,25 @@ float4 normalize_echo(float4 val, int band, int delay)
 void statistics_first_pass(Song * song)
 {
   mean_spectrum(song->get_spectrum());
-  mean_echo(song->get_histogram());
+  //  mean_echo(song->get_histogram());
 }
 
 void statistics_prepare_second_pass()
 {
   stop_mean_spectrum();
-  stop_mean_echo();
+  //  stop_mean_echo();
 }
 
 void statistics_second_pass(Song * song)
 {
   dev_spectrum(song->get_spectrum());
-  dev_echo(song->get_histogram());
+  //  dev_echo(song->get_histogram());
 }
 
 void statistics_stop_second_pass()
 {
   stop_dev_spectrum();
-  stop_dev_echo();
+  // stop_dev_echo();
 }
 
 float4 stats_get_freq(int band)
@@ -193,7 +191,7 @@ float4 stats_get_freq_dev(int band)
   return devs[band];
 }
 
-float4 stats_get_echo(int band, int delay)
+float4 stats_get_echo_old(int band, int delay)
 {
   return echo_mean[band][delay];
 }
@@ -262,12 +260,12 @@ void SongSelectorLogic::openStatistics()
   statistics->spectrum_data->setText(data_text);
 
   // the echo characteristics
-  pm = new QPixmap(smallhistogram_size, spectrum_size);
+  /*  pm = new QPixmap(echo_prop_sx, spectrum_size);
   p.begin(pm);
   min_freq = 1000;
   max_freq = -1000;
   for (int j = 0; j < spectrum_size ; j++)
-    for (int i = 0 ; i < smallhistogram_size ; i++)
+    for (int i = 0 ; i < echo_prop_sx ; i++)
       {
 	float energy_fix = stats_get_echo(j,i);
 	if (energy_fix<min_freq) min_freq = energy_fix;
@@ -278,7 +276,7 @@ void SongSelectorLogic::openStatistics()
     {
       float4 cr = 255/(max_freq - min_freq);
       for (int j = 0; j < spectrum_size ; j++)
-	for (int i = 0; i < smallhistogram_size ; i++)
+	for (int i = 0; i < echo_prop_sx ; i++)
 	  {
 	    float energy_fix = stats_get_echo(j,i);
 	    energy_fix -= min_freq;
@@ -290,6 +288,7 @@ void SongSelectorLogic::openStatistics()
     }
   p.end();
   statistics->echo->setPixmap(*pm);
+  */
 
   // execute the dialogbox
   statistics->exec();

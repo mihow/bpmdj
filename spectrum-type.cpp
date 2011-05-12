@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
  Copyright (C) 2001-2005 Werner Van Belle
- See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -21,6 +20,7 @@
 #include <assert.h>
 #include <qstring.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "spectrum-type.h"
 #include "signals.h"
 #include "files.h"
@@ -58,6 +58,7 @@ void spectrum_type::post27init(const char * txt)
     {
       char* nxt;
       bark[i]=strtof(cur,&nxt);
+      if (isnan(bark[i])) bark[i]=0;
       cur=nxt;
     }
   // normalize_mean(bark,spectrum_size);

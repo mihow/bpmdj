@@ -65,7 +65,12 @@ static int    arg_posx = -1;
 static int    arg_posy = -1;
 static dsp_driver *dsp1;
 static dsp_driver *dsp2;
-volatile int paused = 0;
+
+
+void wait_for_unpause()
+{
+  return;
+}
 
 /*-------------------------------------------
  *         Parsing arguments 
@@ -342,7 +347,7 @@ void one_card()
 	{\
 	  readat##nr++;\
 	  readat##nr%=round_robin_size;\
-	  if (readat##nr != area##nr->write) \
+	  if ((unsigned4)readat##nr != (unsigned4)area##nr->write) \
 	    area##nr->read = readat##nr;\
 	  else \
 	    break;\
@@ -520,7 +525,7 @@ void two_card()
 	{\
 	  readat##nr++;\
 	  readat##nr%=round_robin_size;\
-	  if (readat##nr != area##nr->write) \
+	  if ((unsigned4)readat##nr != (unsigned4)area##nr->write) \
 	    area##nr->read = readat##nr;\
 	  else \
 	    break;\

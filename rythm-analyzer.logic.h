@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
  Copyright (C) 2001-2005 Werner Van Belle
- See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -28,7 +27,6 @@ class RythmDialogLogic : public RythmDialog
  public:
    RythmDialogLogic(SongPlayer*parent=0, const char * name=0, bool modal=FALSE, WFlags f=0);
  public slots:
-   virtual void calculateRythmPattern1();
    virtual void calculateRythmPattern2();
    virtual void calculateRythmPattern() { calculateRythmPattern2();};
 };

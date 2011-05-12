@@ -35,6 +35,7 @@ bool DirectoryScanner::goodExtension(QString ext)
   // opgelet met extenties langer dan 4 tekens !!!
   return (ext.endsWith(".mp3") || 
 	  ext.endsWith(".ogg") || 
+	  ext.endsWith(".m4a") || 
 	  ext.endsWith(".flac"));
 }
 

@@ -9,7 +9,7 @@ Copyright: GPL
 Group: Applications/Multimedia 
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 BuildRequires: gzip  
-Requires: mpg123  
+Requires: mplayer
 
 %define strip_binaries 1
 %define gzip_man 1

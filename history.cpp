@@ -33,19 +33,19 @@
 #include <qinputdialog.h>
 #include "history.h"
 #include "common.h"
-#include "growing-array.cpp"
 
-int Played::songs_played = 0;
-Song * Played::t_2 = NULL;
-Song * Played::t_1 = NULL;
-Song * Played::t_0 = NULL;
-FILE *Played::f = NULL;
-GrowingArray<QString> Played::names;
+Song * History::t_2 = NULL;
+Song * History::t_1 = NULL;
+Song * History::t_0 = NULL;
+init_singleton_var(History,songs_played,int,0);
+QListView * History::log_ui = NULL;
+FILE *History::f = NULL;
 
-Played::Played(const QString filename)
+History::History(const QString filename, DataBase *db, QListView * putin)
 {
-  names.init();
-  f=fopen(filename,"rb");
+  log_ui = putin;
+  if (f) fclose(f);
+  f = fopen(filename,"rb");
   if (f!=NULL)
     {
       char  *line = NULL;
@@ -54,7 +54,8 @@ Played::Played(const QString filename)
       while((len=getline(&line,&blen,f))!=-1)
 	{
 	  line[len-1]=0;
-	  names.add(QString(line));
+	  QString s = QStringFactory::create(line);
+	  mark_as_played(db, s);
 	}
       if (line)
 	deallocate(line);
@@ -62,15 +63,25 @@ Played::Played(const QString filename)
   f=fopen(filename,"ab");
 }
 
-bool Played::IsPlayed(Song * which)
+void History::mark_as_played(DataBase * db, QString s)
 {
-  for(int i = 0 ; i < names.count ; i++)
-    if (names.elements[i]==which->get_file()) 
-      return true;
-  return false;
+  Song * song = db->find(s);
+  if (!song) return;
+  mark_as_played(song);
 }
 
-void Played::Play(Song * main_now)
+void History::mark_as_played(Song *song)
+{
+  song->set_played(true);
+  set_songs_played(get_songs_played() + 1);
+  if (log_ui)
+    new QListViewItem(log_ui,
+		      tonumber(get_songs_played()),
+		      song->get_title(),
+		      song->get_author());
+}
+
+void History::this_is_playing(Song * main_now)
 {
   if (main_now)
     {
@@ -78,10 +89,9 @@ void Played::Play(Song * main_now)
       const QString name = main_now->get_file();
       fprintf(f,"%s\n",(const char*)name);
       fflush(f);
-      // increase counter
-      songs_played++;
-      main_now->set_played(true);
+      mark_as_played(main_now);
     }
+  
   // check the history and update records as necessary...
   // t_1 its prev should point to t_2
   // t_1 its next should point to t_0

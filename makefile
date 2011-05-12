@@ -1,4 +1,4 @@
-VERSION = 2.7
+VERSION = 2.8
 DESTDIR = /usr/local/
 #TIME = /usr/bin/time -f ' '\[%e\]
 #ECHO = echo -n 
@@ -59,7 +59,7 @@ bin: kbpm-play kbpm-dj kbpm-merge kbpm-mix kbpm-batch
 #############################################################################
 rc: 
 	$(RM) *.raw
-	killall mpg123
+	killall mplayer
 
 clean: 
 	@$(ECHO) [clean] common
@@ -239,20 +239,20 @@ include depend
 #############################################################################
 VECTOR_OBJECTS = qvectorview.o qvectorview.moc.o vector-view.o vector-view.moc.o
 
-KPLAY_OBJECTS = avltree.o about.o about.moc.o power-type.o\
+KPLAY_OBJECTS = avltree.o about.o aboutbox.o about.moc.o power-type.o\
 	songplayer.o songplayer.moc.o memory.o sample4-type.o\
 	player-core.o dsp-oss.o dsp-alsa.o dsp-none.o dsp-mixed.o\
-	dsp-drivers.o spectrum-type.o files.o \
+	dsp-drivers.o spectrum-type.o files.o smallhistogram-type.o\
 	song-information.o song-information.moc.o\
-	index.o kbpm-play.o analyzer.o signals.o\
+	index.o kbpm-play.o analyzer.o signals.o echo-property.o\
+	composition-property.o rythm-property.o \
 	songplayer.logic.o songplayer.logic.moc.o\
 	md5-analyzer.o efence.o page.o efence-print.o energy-analyzer.o\
 	bpmcounter.o bpmcounter.moc.o bpm-analyzer.logic.o bpm-analyzer.logic.moc.o\
 	spectrum-analyzer.o  spectrum-analyzer.moc.o  spectrum-analyzer.logic.o  spectrum-analyzer.logic.moc.o\
-	beatgraph-analyzer.o beatgraph-analyzer.moc.o beatgraph-analyzer.logic.o beatgraph-analyzer.logic.moc.o\
+	beatgraph-widget.o beatgraph-widget.moc.o beatgraph-analyzer.logic.o beatgraph-analyzer.logic.moc.o\
 	rythm-analyzer.o     rythm-analyzer.moc.o     rythm-analyzer.logic.o     rythm-analyzer.logic.moc.o\
-	fourierd.o histogram-type.o histogram-property.o\
-	fftmisc.o common.o\
+	fourierd.o histogram-type.o histogram-property.o fftmisc.o common.o\
 	scripts.o
 
 KMIX_OBJECTS = mixerdialog.o mixerdialog.moc.o mixerdialog.logic.o mixerdialog.logic.moc.o\
@@ -278,12 +278,13 @@ UNPHASER_OBJECTS = unphaser.o common.o fourierd.o fftmisc.o
 avltree-test:
 	g++ -pg -g avltree-test.cpp
 
-KSEL_OBJECTS = 	avltree.o songtree.o qstring-factory.o tags.o\
-	renamerstart.o renamerstart.moc.o heap.o \
+KSEL_OBJECTS = 	avltree.o songtree.o qstring-factory.o tags.o aboutbox.o\
+	renamerstart.o renamerstart.moc.o heap.o echo-property.o pixmap-cache.o \
 	spectrum-type.o scripts.o cluster.o pca.o about.o about.moc.o\
 	loader.o loader.moc.o compacter.o compacter.moc.o histogram-type.o\
 	qvectorview.o qvectorview.moc.o freq-mapping.o freq-mapping.moc.o\
 	albumbox.o albumbox.moc.o compact-idx.o memory.o histogram-property.o\
+	smallhistogram-type.o composition-property.o rythm-property.o \
 	song-information.o song-information.moc.o sample4-type.o\
 	scanningprogress.o scanningprogress.moc.o power-type.o\
 	choose-analyzers.o choose-analyzers.moc.o basic-process-manager.o\

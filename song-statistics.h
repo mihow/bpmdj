@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
  Copyright (C) 2001-2005 Werner Van Belle
- See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -27,7 +26,7 @@
 #include "files.h"
 
 float4 normalize_freq(float4 in, int band);
-float4 normalize_echo(float4 val, int band, int delay);
+//float4 normalize_echo(float4 val, int band, int delay);
 float4 stats_get_freq(int band);
 
 void statistics_first_pass(Song * song);

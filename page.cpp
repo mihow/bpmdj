@@ -75,10 +75,7 @@ stringErrorReport(void)
 #elif ( defined(_AIX) )
 	return strerror(errno);
 #else
-	if ( errno > 0 && errno < sys_nerr )
-		return sys_errlist[errno];
-	else
-		return "Unknown error.\n";
+	return strerror(errno);
 #endif
 }
 

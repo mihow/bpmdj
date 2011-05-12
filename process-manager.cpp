@@ -102,7 +102,7 @@ void ProcessManager::switchMonitorToMain()
   playing_songs[0]=playing_songs[1];
   playing_songs[1]=NULL;
   // write playing sucker to disk
-  Played::Play(playing_songs[0]);
+  History::this_is_playing(playing_songs[0]);
   get_selector()->resetCounter();
   get_selector()->updateProcessView(true);
 }

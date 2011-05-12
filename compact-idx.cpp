@@ -179,5 +179,5 @@ void SongSelectorLogic::compactIdxDirectory()
   delete indexReader;
   compacter.prompt->setText("Finishing");
   app->processEvents();
-  findAllAlbums(); // necessary to update the album pointers and the view itself...
+  initialize_extras(); // necessary to update the album pointers and the view itself...
 }

@@ -44,5 +44,5 @@ AlbumItem::AlbumItem(int nr, Song * s, QListViewItem* parent) :
 void AlbumItem::fixNr()
 {
   if (text(0).length()<2)
-    setText(0,"0"+text(0));
+    setText(0,zero+text(0));
 }

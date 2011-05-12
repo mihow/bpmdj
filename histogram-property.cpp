@@ -25,7 +25,7 @@
 #include "memory.h"
 #include "signals.h"
 
-void histogram_property::read_idx(const char *str)
+template <int bandsize> void histogram_property<bandsize>::read_idx(const char *str)
 {
   if (empty()) 
     init();
@@ -35,7 +35,7 @@ void histogram_property::read_idx(const char *str)
   bark[band].read_idx(rest);
 }
 
-const void histogram_property::write_idx(FILE*f, char* name)
+template <int bandsize> const void histogram_property<bandsize>::write_idx(FILE*f, char* name)
 {
   if (empty()) return;
   for(int i = 0 ; i < spectrum_size ; i++)
@@ -46,7 +46,7 @@ const void histogram_property::write_idx(FILE*f, char* name)
   fprintf(f,"\n");
 }
 
-const void histogram_property::write_bib_v272(FILE * index)
+template <int bandsize> const void histogram_property<bandsize>::write_bib_v272(FILE * index)
 {
   if (empty()) 
     file_unsigned1(0,index);
@@ -58,7 +58,7 @@ const void histogram_property::write_bib_v272(FILE * index)
     }
 }
 
-void histogram_property::read_bib_v271()
+template <int bandsize> void histogram_property<bandsize>::read_bib_v271()
 {
   unsigned1 l = buffer_unsigned1();
   if (l==0) return;
@@ -68,7 +68,7 @@ void histogram_property::read_bib_v271()
     bark[i].read_bib_v271();
 }
 
-void histogram_property::read_bib_v272()
+template <int bandsize> void histogram_property<bandsize>::read_bib_v272()
 {
   unsigned1 l = buffer_unsigned1();
   if (l==0) return;
@@ -78,3 +78,7 @@ void histogram_property::read_bib_v272()
     bark[i].read_bib_v272();
 }
 
+
+// instatiating some dummys
+static const histogram_property<32> ignore_1;
+static const histogram_property<96> ignore_2;

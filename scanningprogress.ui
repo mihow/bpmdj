@@ -75,7 +75,7 @@
                 </sizepolicy>
             </property>
             <property name="text">
-                <string>&lt;b&gt;After importing mp3's, a set of empty index files is created, tagged as 'New'. Before they are usefull, you should select them in the selector and choose Selection|MeasureBpm...&lt;/b&gt;
+                <string>After importing mp3's, a set of empty index files is created, tagged as 'New'. 
 &lt;br&gt;&lt;br&gt;
 Index files can be renamed and moved around within the ./index directory. When using a special index-filename convention, the program will be able to retrieve title, author, remix and version of the song. The file format used by the author (and as such, understood by the program) is:
 &lt;br&gt;&lt;br&gt;

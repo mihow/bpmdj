@@ -71,7 +71,7 @@ void dsp_mixed::pause()
   shared -> write = 1; // read will never skip write so we put this first
   shared -> read = 0;  // then we set the read pointer and assign the initial value
   shared -> status = mix_pause;
-  while(paused) ;
+  wait_for_unpause();
   toskip = shared->latency + audiosize;
 }
 
@@ -104,7 +104,7 @@ void dsp_mixed::write(stereo_sample2 value)
 
 signed8 dsp_mixed::latency()
 {
-  unsigned4 latency = shared->write+audiosize-shared->read;
+  signed8 latency = shared->write+audiosize-shared->read;
   if (latency >= audiosize) latency -= audiosize;
   return latency+shared->latency;
 }

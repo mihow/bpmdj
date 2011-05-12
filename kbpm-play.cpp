@@ -81,34 +81,11 @@ static char * arg_remote = "";
 QApplication *app;
 SongPlayerLogic *player_window;
 
-void * go(void* neglect)
-{
-  app->exec();
-  delete(player_window);
-  delete(app);
-  return neglect;
-}
-
 void msg_slowdown(int change)
 {
 }
 
 void msg_speedup(int change)
-{
-}
-
-void terminal_start()
-{
-  pthread_t *y = allocate(1,pthread_t);
-  player_window = new SongPlayerLogic();
-  if (arg_posx >=0 && arg_posy >=0)
-     player_window->move(arg_posx,arg_posy);
-  app->setMainWidget(player_window);
-  player_window->show();
-  pthread_create(y,NULL,go,NULL);
-}
-
-void terminal_stop()
 {
 }
 
@@ -262,7 +239,7 @@ void process_options(int argc, char* argv[])
 	    { 
 	      opt_match=true;
 	      arg_str(arg_match); 
-	    } 
+	    }
 	  else if (option(arg,"position","p"))
 	    {
 	      arg_int(arg_posx); 
@@ -273,9 +250,9 @@ void process_options(int argc, char* argv[])
 	argument = argv[i];
     }
    if (argument==NULL)
-     options_failure("requires at least one argument");
+     options_failure("the program requires that at least one\n.idx file is passed as a command line argument");
    if (!dsp_chosen)
-     options_failure("please select a dsp device\n");
+     options_failure("please pass a dsp driver (--alsa, --oss, ...)\nas argument. See command line options");
    if (opt_bpm)
      {
 	if (arg_bpm<1) 
@@ -301,31 +278,30 @@ bool show_error(int err, int err2, const char*text)
 
 void normal_start()
 {
-  int err;
-  err = core_init(0);
-  if (show_error(err, err_needidx, "Please enter the index file, not the "SONG_EXT" file\nAn index file can be made with 'kbpm-play -c'\n")
-      || show_error(err, err_noraw, "No raw file to be read. Probably the .mp3 is broken.\n")
-      || show_error(err, err_nospawn, "Unable to spawn decoding process.\nPlease check your PATH environment variable\n"))
+  int err = core_meta_init();
+  if (show_error(err, err_needidx, "Please enter the index file, not the "SONG_EXT" file\nAn index file can be made with 'kbpm-play -c'\n"))
     exit(err);
-  
-  err = core_open();
-  if (show_error(err, err_dsp, "Unable to open dsp device\n"))
-    {
-      core_done();
-      exit(err);
-    }
-  terminal_start();
-  core_play();
-  terminal_stop();
-  core_close();
-  core_done();
+  player_window = new SongPlayerLogic();
+  if (arg_posx >=0 && arg_posy >=0)
+    player_window->move(arg_posx,arg_posy);
+  app->setMainWidget(player_window);
+  player_window->show();
+
+  // this one will start the player thread and return
+  err = core_run();
+  if (!show_error(err, err_noraw, "No raw file to be read. Probably the .mp3 is broken.\n")
+      && !show_error(err, err_nospawn, "Unable to spawn decoding process.\nPlease check your PATH environment variable\n")
+      && !show_error(err, err_dsp, "Unable to open dsp device\n"))
+    app->exec();
+  delete(player_window);
 }
 
 void batch_start()
 {
   int nr=0;
   // 0. core init: synchronous without opening dsp
-  core_init(1);
+  core_meta_init();
+  core_object_init(true);
   printf("%d. Wave written: %s\n",nr++,playing->readable_description());
   // 1. md5sum
   if (!playing->get_md5sum() || strcmp(playing->get_md5sum(),"")==0)
@@ -340,13 +316,13 @@ void batch_start()
       EnergyAnalyzer * energy_analyzer = new EnergyAnalyzer();
       energy_analyzer->run();
       printf("%d. Min, max : (L: %d, R: %d), (L: %d, R: %d)\n",nr++,
-	     playing->get_min().left,
-	     playing->get_min().right,
-	     playing->get_max().left,
-	     playing->get_max().right);
+	     (int)playing->get_min().left,
+	     (int)playing->get_min().right,
+	     (int)playing->get_max().left,
+	     (int)playing->get_max().right);
       printf("%d. Mean, RMS : (L: %d, R: %d), (L: %g, R: %g)\n",nr++,
-	     playing->get_mean().left,
-	     playing->get_mean().right,
+	     (int)playing->get_mean().left,
+	     (int)playing->get_mean().right,
 	     playing->get_power().left,
 	     playing->get_power().right);
     }
@@ -478,4 +454,5 @@ int main(int argc, char *argv[])
     batch_start();
   else
     normal_start();
+  delete(app);
 }

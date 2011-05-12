@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
  Copyright (C) 2001-2005 Werner Van Belle
- See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -21,7 +20,7 @@
 #ifndef TAG_TYPE_H
 #define TAG_TYPE_H
 
-typedef   signed char   tag_type;
+typedef   unsigned char tag_type;
 typedef      tag_type * tags_type;
 const        tag_type   tag_end = 0;
 

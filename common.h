@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
  Copyright (C) 2001-2005 Werner Van Belle
- See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -30,9 +29,9 @@ bool   exists(const char* fn);
 double minimum(double a, double b);
 double abs_minimum(double a, double b);
 double atod(const char* str);
-char * tohex(long i);
-long   toint(const char* name);
 int    clip(int val);
 inline bool option(char* arg, char* name) { return strcmp(arg,name)==0; };
 inline bool option(char* arg, char* namea, char* nameb) { return (strcmp(arg,namea)==0 || strcmp(arg,nameb)==0); };
+char *  tohex(long i);
+long    toint(const char* name);
 #endif

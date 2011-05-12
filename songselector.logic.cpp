@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
  Copyright (C) 2001-2005 Werner Van Belle
- See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -71,7 +70,7 @@
 #include <qframe.h>
 #include <libgen.h>
 #include "importscanner.h"
-#include "about.h"
+#include "aboutbox.h"
 #include "albumbox.h"
 #include "qsong.h"
 #include "version.h"
@@ -99,7 +98,9 @@
 #include "freq-mapping.h"
 #include "memory.h"
 #include "song-statistics.h"
+#include <qfont.h>
 #include "cluster-dialog.h"
+#include "history.h"
 
 #define foreach_qsong(V,B)  for(int V##idx = 0 ; V##idx < QSong::get_song_count() ; V##idx++) { Song * V = QSong::get_songs(V##idx); B ; } 
 #define foreach_selected_qsong(V,B) foreach_qsong ( V, if ( QSong::get_selected(V##idx) ) { B ; } ; )
@@ -113,6 +114,13 @@ SongSelectorLogic::~SongSelectorLogic()
 SongSelectorLogic::SongSelectorLogic(QWidget * parent, const QString name) :
   SongSelector(parent,name)
 {
+  QGridLayout* statuslayout = new QGridLayout(statusframe, 1, 1, 0, 0); 
+  status = new QStatusBar(statusframe);
+  status -> setSizeGripEnabled(false);
+  status -> setFont(QFont("Arial",10,QFont::Normal));
+    
+  status -> message("BpmDj v"VERSION" (c) Werner Van Belle 2000-2005");
+  statuslayout->addWidget(status,0,0);
   // fix frame thing
   splitter->setResizeMode(header_frame,QSplitter::KeepSize);
   // insert songList
@@ -143,7 +151,9 @@ SongSelectorLogic::SongSelectorLogic(QWidget * parent, const QString name) :
   songList->setFrameShape( QListView::Panel );
   songList->setResizePolicy( QScrollView::Manual );
   songList->setAllColumnsShowFocus( TRUE );
-  
+  songList->header()->moveSection(LIST_HISTOGRAM,2);
+  songList->header()->moveSection(LIST_RYTHM,2);
+  songList->header()->moveSection(LIST_COMPOSITION,2);
   songListFrameLayout->addWidget( songList, 0, 0 );
   
   connect( songList, SIGNAL( doubleClicked(int) ), this, SLOT( selectSong(int) ) );
@@ -200,6 +210,7 @@ SongSelectorLogic::SongSelectorLogic(QWidget * parent, const QString name) :
   before->insertItem("&Check/import cdrom content",this,SLOT(checkDisc())); // checks wether the songs on a disk can be found somewhere in the indices
   before->insertItem("Mark duplicates (experimental)",this,SLOT(doMarkDups())); // searches the current list and marks all MD5sum duplicates
   before->insertItem("Compact index directory...",this,SLOT(compactIdxDirectory()));
+  before->insertItem("Backup index directory...",this,SLOT(doBackup()));
 
   // view color menu
   view->insertSeparator();
@@ -249,7 +260,8 @@ SongSelectorLogic::SongSelectorLogic(QWidget * parent, const QString name) :
   selection->insertSeparator();
   selection->insertItem("&Fetch selection from cdrom...",this,SLOT(fetchSelection()));
   selection->insertSeparator();
-  selection->insertItem("Select all b&ut tagged",this,SLOT(selectAllButTagged()));
+  selection->insertItem("Select all songs without tag",this,SLOT(selectAllButTagged()));
+  selection->insertItem("Select all songs",this,SLOT(selectAllTags()));
 
   // queue menu
   queuemenu->insertItem("Select...",this,SLOT(queueSelectSong()));
@@ -366,6 +378,11 @@ void SongSelectorLogic::toggle_onlydowntemporange()
   toggleItem(onlydowntemporange_item);
 }
 
+void SongSelectorLogic::toggle_amountlimited()
+{
+  toggleItem(amountlimited_item);
+}
+
 void SongSelectorLogic::toggle_temporange()
 {
   toggleItem(onlyuptemporange_item);
@@ -399,12 +416,68 @@ void SongSelectorLogic::toggleAutoItem(int which)
   doAutoFilterChanged();
 }
 
-void SongSelectorLogic::doOnlineHelp()
+bool checkDocsAt(QString pos)
 {
-  QMessageBox::warning(this,"Online","Please browse to http://bpmdj.sourceforge.net/");
+  QString p = pos+"/bpmdj.html";
+  if (!exists(p)) return false;
+  p = pos+"/index.html";
+  return exists(p);
 }
 
-void SongSelectorLogic::findAllAlbums()
+void SongSelectorLogic::doOnlineHelp()
+{
+  // data location
+  QString pos;
+  QString pp = dirname(strdup(programname));
+  if (!(checkDocsAt(pos = ".") ||
+      checkDocsAt(pos = "documentation") ||
+      checkDocsAt(pos = pp) ||
+      checkDocsAt(pos = pp+"/documentation") ||
+	checkDocsAt(pos = "/usr/share/doc/bpmdj-"VERSION)))
+    pos = "http://bpmdj.sourceforge.net";
+
+  // code location
+  QString bin;
+  if (exists(bin="/usr/bin/mozilla") ||
+      exists(bin="/usr/bin/konqueror"))
+    {
+      spawn(bin+" "+pos+"/index.html");
+    }
+  else
+    QMessageBox::warning(this,"Online","Please browse to http://bpmdj.sourceforge.net/");
+}
+
+void SongSelectorLogic::doBackup()
+{
+  time_t t_in;
+  t_in=time(&t_in);
+  struct tm * t = NULL;
+  t = localtime(&t_in);
+  char s[256];
+  sprintf(s,"tar -cvzf bpmdj-index-backup-%d-%d-%d-%d-%d.tgz index",t->tm_mday,t->tm_mon,1900+t->tm_year,t->tm_hour,t->tm_min);
+  execute(s);
+}
+
+void* goSpectrumPca(void * whatever)
+{
+  SongSelectorLogic* ss = (SongSelectorLogic*)whatever;
+  ss -> doSpectrumPca(true,false);
+  status->message("Spectrum PCA finished",2000);
+  return whatever;
+}
+
+void SongSelectorLogic::start_spectrum_pca()
+{
+  pthread_t *checker = allocate(1,pthread_t);
+  pthread_create(checker,NULL,goSpectrumPca,this); 
+}
+
+void SongSelectorLogic::start_existence_check()
+{
+  database->start_existence_check();
+}
+
+void SongSelectorLogic::initialize_extras()
 {
   // first parse all the tags...
   parse_tags();
@@ -422,6 +495,7 @@ void SongSelectorLogic::findAllAlbums()
     }
   if (!ok && e)
     e->setText(TAGS_OR,TAG_TRUE);
+  
   // update statistics
   GrowingArray<Song*>* songs = database->getAllSongs();
   for(int i = 0 ; i < songs->count ; i ++)
@@ -430,8 +504,7 @@ void SongSelectorLogic::findAllAlbums()
   for(int i = 0 ; i < songs->count ; i ++)
     statistics_second_pass(songs->elements[i]);
   statistics_stop_second_pass();
-  // do spectrum analaysis
-  doSpectrumPca(true,false);
+
   // update albumlist
   for(int i = 0 ; i < songs->count ; i ++)
     {
@@ -445,6 +518,7 @@ void SongSelectorLogic::findAllAlbums()
 	  new AlbumItem(album->nr,song,ai);
 	}
     }
+  
   // check which tags were marked in the previous session
   QListViewItemIterator t(tagList);
   while(t.current())
@@ -460,6 +534,10 @@ void SongSelectorLogic::findAllAlbums()
       t++;
     }
   Config::set_taglist(tagList);
+
+  // mark all the played songs
+  History::History("played.log",database,playedList);
+  
   // copy the header information from the config file
   QHeader *h = songList->header();
   copy_header(Config::get_header(),h);
@@ -506,7 +584,7 @@ void SongSelectorLogic::updateItemList()
   songList->repaint();
   countLcd->display(itemcount);
   // nothing selected ?
-  if (itemcount==0 && !alreadygavefilterwarning)
+  if (itemcount==0 && !alreadygavefilterwarning && Config::get_file_count())
     {
       QMessageBox::warning(this,"Empty Selection","With the current selection of filters,\n"
 			   "there are no songs to be displayed.\n"
@@ -563,17 +641,26 @@ void SongSelectorLogic::updateItemList()
     }
 }
 
+void SongSelectorLogic::updateColors()
+{
+  if (mainTicks<Config::get_yellowTime())
+    setColor(Config::get_color_green_time());
+  else if (mainTicks<Config::get_orangeTime())
+    setColor(Config::get_color_yellow_time());
+  else if (mainTicks==Config::get_redTime())
+    setColor(Config::get_color_orange_time());
+  else
+    setColor(Config::get_color_red_time());
+}
+
 void SongSelectorLogic::timerTick()
 {
   mainLCD->display(++mainTicks);
-  if (mainTicks==1)
-    setColor(Config::get_color_green_time());
-  else if (mainTicks==Config::get_yellowTime())
-    setColor(Config::get_color_yellow_time());
-  else if (mainTicks==Config::get_orangeTime())
-    setColor(Config::get_color_orange_time());
-  else if (mainTicks==Config::get_redTime())
-    setColor(Config::get_color_red_time());
+  if (mainTicks==1 
+      || mainTicks==Config::get_yellowTime()
+      || mainTicks==Config::get_orangeTime()
+      || mainTicks==Config::get_redTime())
+    updateColors();
   processManager->checkSignals();
   
   // auto pop queue
@@ -1249,8 +1336,12 @@ void SongSelectorLogic::playHistorySong(QListViewItem *song)
 
 void SongSelectorLogic::doPreferences()
 {
-  Config::openUi();
-  updateItemList();
+  if (Config::open_ui())
+    {
+      updateItemList();
+      unsetPalette();
+      updateColors();
+    }
 }
 
 void SongSelectorLogic::songAddTag(Song *song, const QString & tag)
@@ -1487,22 +1578,12 @@ void SongSelectorLogic::doMarkDups()
 
 void SongSelectorLogic::doLicense()
 {
-  doAbout(1);
-}
-
-void SongSelectorLogic::doAbout(int pg)
-{
-  char tmp[500];
-  AboutDialog about(NULL,NULL,1);
-  sprintf(tmp,"BpmDj v%s",VERSION);
-  about.versionLabel->setText(tmp);
-  about.pages->setCurrentPage(pg);
-  about.exec();
+  ::doAbout(2);
 }
 
 void SongSelectorLogic::doAbout()
 {
-  doAbout(0);
+  ::doAbout(1);
 }
 
 void SongSelectorLogic::searchLineEntered()
@@ -1552,8 +1633,34 @@ void SongSelectorLogic::selectAllButTagged()
     {
       QListViewItem * c = (it++).current();
       if (c->text(TAGS_TEXT)!=EMPTY)
-	c->setText(TAGS_NOT,TAG_TRUE);
+	{
+	  c->setText(TAGS_AND,TAG_FALSE);
+	  c->setText(TAGS_NOT,TAG_TRUE);
+	}
     }
+  updateItemList();
+}
+
+void SongSelectorLogic::selectAllTags()
+{
+  QListViewItemIterator it(tagList);
+  while(it.current())
+    {
+       QListViewItem * c = (it++).current();
+      if (c->text(TAGS_TEXT)!=EMPTY)
+	{
+	  c->setText(TAGS_NOT,TAG_FALSE);
+	  c->setText(TAGS_AND,TAG_FALSE);
+	  c->setText(TAGS_OR,TAG_FALSE);
+	}
+      else
+	{
+	  c->setText(TAGS_NOT,TAG_FALSE);
+	  c->setText(TAGS_AND,TAG_FALSE);
+	  c->setText(TAGS_OR,TAG_TRUE);
+	}
+    }
+  updateItemList();
 }
 
 void SongSelectorLogic::addTag(const QString tag)
@@ -1595,10 +1702,19 @@ void SongSelectorLogic::findsimilarnames()
 
 void SongSelectorLogic::importSongs()
 {
+  bool explain_analysis = !Config::get_file_count();
+  if (explain_analysis)
+    Config::set_file_count(1);
   ImportScanner scanner(this);
   scanner.scan(MusicDir);
   updateItemList();
   scanner.exec();
+  if (explain_analysis)
+    QMessageBox::message(NULL,
+			 "The importer has created a number of empty index files. Before they are usefull\n"
+			 "they should be filled with appropriate meta-data. This can be done by analyzing\n"
+			 "the songs. To do so. Select them in the Songs-tab, press the right mouse button\n"
+			 "and choose 'Analyzers' from the popup-menu.");
 }
 
 void SongSelectorLogic::selectionMenu()

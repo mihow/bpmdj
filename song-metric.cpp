@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
  Copyright (C) 2001-2005 Werner Van Belle
- See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -123,14 +122,14 @@ float SongMetriek::spectrum_dist(const Song & self, const Song & song) const
 
 float SongMetriek::histogram_dist(const Song& self, const Song & song, double breakat) const
 {
-  histogram_property b = song.get_histogram();
-  histogram_property a = self.get_histogram();
+  echo_property b = song.get_histogram();
+  echo_property a = self.get_histogram();
   if (a.empty() || b.empty())
     return 1000000;
   float distance=0;
   /* recalculate breakat */
   breakat /= 10;
-  breakat *= (spectrum_size*smallhistogram_size)/100;
+  breakat *= (spectrum_size*echo_prop_sx)/100;
   breakat *= breakat;
   breakat *= breakat;
   /* The distance measure using the differential of the autocorrelation */
@@ -172,7 +171,7 @@ float SongMetriek::histogram_dist(const Song& self, const Song & song, double br
     return 1000000;
   distance = sqrt(distance);
   distance = sqrt(distance);
-  distance /= (spectrum_size*smallhistogram_size)/100;
+  distance /= (spectrum_size*echo_prop_sx)/100;
   distance *= 10;
   return distance;
 }
@@ -184,10 +183,10 @@ float SongMetriek::rythm_dist(const Song& self, const Song & song, double breaka
   if (a.empty() || b.empty()) return 1000000;
   float distance=0;
   // recalculate the breakat argument
-  breakat *= (spectrum_size*smallhistogram_size)/100;
+  breakat *= (spectrum_size*rythm_prop_sx)/100;
   breakat *= breakat;
   for (int x = 0; x < spectrum_size && distance < breakat; x ++ )
-    for(int y = 0 ; y < smallhistogram_size; y++)
+    for(int y = 0 ; y < rythm_prop_sx; y++)
       {
 	float c = a.get_energy(x,y)/255.0;
 	if (c<0.5) c=0.5;
@@ -200,7 +199,7 @@ float SongMetriek::rythm_dist(const Song& self, const Song & song, double breaka
       }
   if (distance>=breakat) return 1000000;
   distance = sqrt(distance);
-  distance /= (spectrum_size*smallhistogram_size)/100;
+  distance /= (spectrum_size*rythm_prop_sx)/100;
   return distance /* * Config::get_distance_spectrumscale() */;
 }
 

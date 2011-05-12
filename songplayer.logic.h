@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
  Copyright (C) 2001-2005 Werner Van Belle
- See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -43,6 +42,7 @@ class SongPlayerLogic :
    void redrawCues();
    void normalReached(bool yes);
    BpmAnalyzerDialog * bpmcounter;
+   void init_tempo_switch_time();
  protected:
    virtual void done(int r);
    void checkCueNonZero();
@@ -51,6 +51,8 @@ class SongPlayerLogic :
    void update_speedmap_pixmap();
    void update_volumemap_pixmap();
    void update_map_scale_box();
+   void set_start_stop_text();
+   void captionize_according_to_index();
  public:
    SongPlayerLogic::SongPlayerLogic(QWidget*parent=0,const char*name=0, bool modal=FALSE,WFlags f=0);
  public slots:
@@ -88,21 +90,16 @@ class SongPlayerLogic :
    virtual void nudgeCueBack8M();
    virtual void nudgeCueForward8M();
    // starting and stopping
-   virtual void stop();
+   virtual void start_stop();
    // tempo shifts
    virtual void targetTempo();
    virtual void normalTempo();
-   virtual void fastSwitch();
    virtual void mediumSwitch();
-   virtual void slowSwitch();
    virtual void targetStep();
    virtual void tempoChanged();
    void changeTempo(int p);
    // finish window
    virtual void accept();
-   // volumes
-   //   virtual void pcmVolume(int volume);
-   //   virtual void mainVolume(int volume);
    // Map functions
    virtual void mapStart();
    virtual void mapStop();
@@ -123,8 +120,8 @@ class SongPlayerLogic :
    virtual void fastRevSaw();
    virtual void openBpmCounter();
    virtual void openSpectrumAnalyzer();
-   virtual void openPatternAnalyzer();
    virtual void openRythmAnalyzer();
    virtual void openInfo();
    virtual void openAbout();
+   virtual void tabChanged();
 };
