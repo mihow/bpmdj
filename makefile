@@ -1,8 +1,8 @@
-VERSION = 1.3
+VERSION = 1.5
 include defines
 
 all: cbpm-count cbpm-play kbpm-play kbpm-dj beatmixing.ps
-	
+
 #############################################################################
 # Rulesets
 #############################################################################
@@ -25,11 +25,8 @@ all: cbpm-count cbpm-play kbpm-play kbpm-dj beatmixing.ps
 	$(MOC) -o $@ $<
 
 %.o: %.cpp
-	$(CPP) -c $< $(QT_INCLUDE_PATH)
+	$(CC) -c $< $(CFLAGS) -o $@ $(QT_INCLUDE_PATH)
 
-%.c: %.def
-	$(AUTOGEN_PROGRAM) $(AUTOGEN_FLAGS) $^ 
-	
 %.cpp: %.ui
 	$(UIC) -i `basename $< .ui`.h -o $@ $<
 
@@ -57,7 +54,7 @@ clean:
 	$(RM) renamer.h renamer.cpp
 	$(RM) -r kbpmdj-$(VERSION)
 	$(RM) -r beatmixing beatmixing.ps version.h
-	
+
 mrproper: clean
 	$(RM) *~ playlist.xmms played.log
 	$(RM) debian/*~
@@ -74,7 +71,7 @@ allhtml: beatmixing.html
 
 .PHONY: website allhtml all clean 
 website: allhtml
-	scp beatmixing/* krubbens@bpmdj.sourceforge.net:/home/groups/b/bp/bpmdj/htdocs
+	scp beatmixing/* bpmdj@bpmdj.strokemusic.org:/home/bpmdj/website
 
 #############################################################################
 # Command line version
@@ -82,14 +79,14 @@ website: allhtml
 version.h: profile-clock
 	echo "#define VERSION \""$(VERSION)"\"" >version.h
 	./profile-clock >>version.h
-		
+
 cbpm-index.c: cbpm-index.h version.h
 cbpm-play.c: cbpm-index.h version.h
 cbpm-count.c: cbpm-index.h version.h
 
 cbpm-count: cbpm-index.o cbpm-count.o
 	$(CC) $^ -o $@
-	
+
 cbpm-play: cbpm-play.o cbpm-index.o player-core.o
 	$(CC) $(LDFLAGS) $^ -o $@
 
@@ -115,7 +112,7 @@ KCOUNT_OBJECTS = bpmcounter.o\
 	cbpm-index.o\
 	kbpm-count.o\
 	kbpm-count.moc.o
-	
+
 KSEL_OBJECTS = about.o\
 	about.moc.o\
 	askinput.o\
@@ -130,6 +127,7 @@ KSEL_OBJECTS = about.o\
 	songselector.moc.o\
 	songselector.logic.moc.o\
 	songselector.logic.o\
+	process-manager.cpp\
 	preferences.o\
 	preferences.moc.o\
 	qsongviewitem.o\
@@ -145,7 +143,7 @@ KSEL_OBJECTS = about.o\
 	renamer.moc.o\
 	renamer.logic.o\
 	renamer.logic.moc.o
-	
+
 renamer.logic.h: renamer.h
 renamer.logic.cpp: renamer.logic.h
 renamer.cpp: renamer.h
@@ -166,11 +164,11 @@ songplayer.cpp songplayer.h: songplayer.ui version.h
 	$(UIC) -i songplayer.h -o songplayer.cpp songplayer.ui
 
 kbpm-play: $(KPLAY_OBJECTS)
-	$(CPP) $(KPLAY_OBJECTS) -o kbpm-play\
+	$(CC) $(KPLAY_OBJECTS) -o kbpm-play\
 	  $(LDFLAGS) $(QT_INCLUDE_PATH) $(QT_LIBRARY_PATH) $(QT_LIBS)
 
 kbpm-dj: $(KSEL_OBJECTS) songselector.cpp songselector.h
-	$(CPP) $(KSEL_OBJECTS) -o kbpm-dj\
+	$(CC) $(KSEL_OBJECTS) -o kbpm-dj\
 	  $(LDFLAGS) $(QT_INCLUDE_PATH) $(QT_LIBRARY_PATH) $(QT_LIBS)
 
 #############################################################################
@@ -180,7 +178,7 @@ DOC = authors changelog copyright todo beatmixing.ps readme
 BIN  = cbpm-count cbpm-play kbpm-play kbpm-dj glue-bpmraw glue-mp3raw\
 	rbpm-play xmms-play
 GOALS = $(DOC) $(BIN)
-	
+
 .PHONY: directories
 
 directories: mrproper
@@ -207,7 +205,7 @@ bin.tgz-dist: directories
 tgz-dist: 
 	$(MAKE) source.tgz-dist 
 	$(MAKE) bin.tgz-dist
-	
+
 deb-dist: 
 	fakeroot debian/rules binary
 

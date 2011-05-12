@@ -1,9 +1,3 @@
-CC=gcc -O9
-# -pg
-CPP=g++ -O9
-# -pg
-
-CFLAGS+=
 LDFLAGS+= -lpthread -lm
 
 CP = cp
@@ -13,10 +7,10 @@ LYX = lyx
 LATEX = latex
 DVIPS = dvips
 MKDIR = mkdir
-UIC = /usr/qt/2/bin/uic
-MOC = /usr/qt/2/bin/moc
+UIC = uic
+MOC = moc
 STRIP = strip
 
-QT_INCLUDE_PATH= -I /usr/qt/2/include/
-QT_LIBRARY_PATH= -L /usr/qt/2/lib/
+QT_INCLUDE_PATH= -I ${QTDIR}/include/
+QT_LIBRARY_PATH= -L ${QTDIR}/lib/
 QT_LIBS= -lqt

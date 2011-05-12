@@ -1,5 +1,4 @@
 
-
   COMPILING BPMDJ
   
 If you want to compile this package you need to create a defines
@@ -9,17 +8,24 @@ can be used:
 
   gentoo -> defines.gentoo
   debian -> defines.debian
-  
+
 If you are running another distribution please take a look at one of these
 defines files and adapt where necessary. The file format is self explanatory !
 After creating such a file be sure to send it to me
 (werner.van.belle@vub.ac.be) so I can include it in the next release.
-   
+
+Requirements:
+  - qt2.3.2
+  - qt-designer
+  - mpg123
+  - gcc
+  - make
+
 PS: I don't want to use automake configure like things because they are simply
 too difficult to use. Makefiles become unreadable, configuring for KDE
 requires more work and testing from the programmer than necessary and in fact,
 I don't like it because the configure suit sounds more like a hack than a
-well designed software deployement process.
+well designed software deployment process.
 
 -- Werner Van Belle (werner.van.belle@vub.ac.be)
 

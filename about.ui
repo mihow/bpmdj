@@ -11,7 +11,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>503</width>
+            <width>499</width>
             <height>436</height>
         </rect>
     </property>
@@ -264,43 +264,6 @@
         <class>QLabel</class>
         <property stdset="1">
             <name>name</name>
-            <cstring>TextLabel11</cstring>
-        </property>
-        <property stdset="1">
-            <name>geometry</name>
-            <rect>
-                <x>30</x>
-                <y>170</y>
-                <width>460</width>
-                <height>200</height>
-            </rect>
-        </property>
-        <property stdset="1">
-            <name>font</name>
-            <font>
-                <pointsize>16</pointsize>
-            </font>
-        </property>
-        <property stdset="1">
-            <name>text</name>
-            <string>(c) Werner Van Belle   Dec 2001
-e-mail: werner.van.belle@vub.ac.be
-Tel: +32 486 68 84 48
-
-http://bpmdj.sourceforge.net/</string>
-        </property>
-        <property stdset="1">
-            <name>alignment</name>
-            <set>AlignVCenter|AlignRight</set>
-        </property>
-        <property>
-            <name>hAlign</name>
-        </property>
-    </widget>
-    <widget>
-        <class>QLabel</class>
-        <property stdset="1">
-            <name>name</name>
             <cstring>TextLabel10</cstring>
         </property>
         <property stdset="1">
@@ -349,6 +312,43 @@ http://bpmdj.sourceforge.net/</string>
         <property stdset="1">
             <name>text</name>
             <string>BpmDj vX.Y</string>
+        </property>
+    </widget>
+    <widget>
+        <class>QLabel</class>
+        <property stdset="1">
+            <name>name</name>
+            <cstring>TextLabel11</cstring>
+        </property>
+        <property stdset="1">
+            <name>geometry</name>
+            <rect>
+                <x>30</x>
+                <y>170</y>
+                <width>460</width>
+                <height>200</height>
+            </rect>
+        </property>
+        <property stdset="1">
+            <name>font</name>
+            <font>
+                <pointsize>16</pointsize>
+            </font>
+        </property>
+        <property stdset="1">
+            <name>text</name>
+            <string>(c) Werner Van Belle   Dec 2001
+e-mail: werner.van.belle@vub.ac.be
+Tel: +32 486 68 84 48
+
+http://bpmdj.strokemusic.org/</string>
+        </property>
+        <property stdset="1">
+            <name>alignment</name>
+            <set>AlignVCenter|AlignRight</set>
+        </property>
+        <property>
+            <name>hAlign</name>
         </property>
     </widget>
 </widget>

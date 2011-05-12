@@ -19,7 +19,7 @@
 ****/
 
 #include "common.h"
-#define  WAVRATE  (22050)
+#define  WAVRATE  (44100)
 #define  wave_bufsize (32L*1024L)
 extern  signed8 targetperiod;
 extern  signed8 currentperiod;

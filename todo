@@ -4,11 +4,6 @@ all
 
 cbpm-play:
   - sometimes the mp3 file is not written completely... -- hu hu ?
-
-cbpm-count:
-  - eens testen of een kwadratische fout nog betere resultaten geeft of niet.
-    => is normala niet nodig gezien het feit dat we eigenlijk een lineair
-       digitale filter gemaakt hebben op deze manier. 
   
 kbpm-play:
   - als de file al bestaat en we moeten correleren onmiddelijk 
@@ -24,7 +19,7 @@ kbpm-play:
   - tempo down en upscalen
   - should show remaining time instead of total time
   - checking of de cue points persistent blijven over tempo verschillen heen
-     (en eventueel fixen als dat fout is)
+    (en eventueel fixen als dat fout is)
   - when quitting the program with the quitapp button it should quit in a sane way.
   - quitting while still writing the file, should result in killing the writing process.
   - loop support in player

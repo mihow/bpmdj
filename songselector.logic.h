@@ -42,33 +42,25 @@
 #include "renamer.logic.h"
 #include "kbpm-index.h"
 
-#define PLAYCOMMAND1  "kbpm-play -d /dev/dsp2 -x /dev/mixer1 -p 640 0   -m \"%s\" \"%s\""
-#define PLAYCOMMAND2  "kbpm-play -d /dev/dsp1 -x /dev/mixer  -p 640 400 -m \"%s\" \"%s\""
 #define TIME_YELLOW   120
 #define TIME_ORANGE   150
 #define TIME_RED      180
 #define MAXTAGSPERCOL 29
 #define MAXTAGS (MAXTAGSPERCOL*2)
 
+class ProcessManager;
 class SongSelectorLogic: public SongSelector
 {
    Q_OBJECT
- public:
-   int monitorpid;
  private:
+   ProcessManager *processManager;
    QTimer *timer;
    int mainTicks;
    int yellowTime;
    int orangeTime;
    int redTime;
-   int monitorPlayCommand;
-   char* playCommand1;
-   char* playCommand2;
-   Song* playingInMain;
-   Song* playingInMonitor;
    SongIndex *dataRoot;
    int filterBpm;
-   double monitorTempo;
    int nextTagLine;
    QLabel *tagLines[MAXTAGS];
    QCheckBox *tagInclude[MAXTAGS];
@@ -84,7 +76,6 @@ class SongSelectorLogic: public SongSelector
    int colornotondisk_item;
  public:
    static int    itemcount;
-   static double mainTempo;
    static bool   color_range;
    static bool   color_played;
    static bool   color_notondisk;
@@ -93,6 +84,12 @@ class SongSelectorLogic: public SongSelector
    void injectDataSet(SongIndex *data);
    void addTag(const char* tag);
    void findTags(Song* song);
+   // timer functions
+   void resetCounter();
+   // process functions
+   void updateProcessView();
+   // tag functionality
+   void parseTags(char* tags);
  private:
    void updateItemList();
    void toggleItem(int which);
@@ -109,27 +106,27 @@ class SongSelectorLogic: public SongSelector
    void checkfile(const char* filename, ScanningProgress * progress);
    void scandir(const char* filename,const char* checkname, ScanningProgress * progress);
    void songEdit(QListViewItem* song);
-   void measureBpm(QListViewItem* song);
    const char * askDir();
-   void parseTags(char* tags);
  protected:
    bool filter(Song * item);
  public slots:
    virtual void selectAllButTagged();
-   virtual void clearMonitor();
-   virtual void switchMonitorToMain();
-   virtual void timerTick();
-   virtual void selectSong(QListViewItem* song);
-   virtual void doPreferences();
-   virtual void doAbout();
-   virtual void doFilterChanged();
-   virtual void fetchSelection();
-   virtual void checkDisc();
-   virtual void exportPlayList();
-   virtual void selectionAddTags();
-   virtual void selectionDelTags();
-   virtual void doMarkDups();
-   virtual void quitButton();
+ // a signal from the UI to notify a forced switch
+ virtual void switchMonitorToMain();
+ 
+ virtual void timerTick();
+ virtual void selectSong(QListViewItem* song);
+ virtual void doPreferences();
+ virtual void doAbout();
+ virtual void doFilterChanged();
+ virtual void fetchSelection();
+ virtual void checkDisc();
+ virtual void exportPlayList();
+ virtual void selectionAddTags();
+ virtual void selectionDelTags();
+ virtual void doMarkDups();
+ virtual void quitButton();
+
    virtual void toggle_neglectdirstruct();
    virtual void toggle_notyetplayed();
    virtual void toggle_coloralreadyplayed();
@@ -137,15 +134,17 @@ class SongSelectorLogic: public SongSelector
    virtual void toggle_colorinrange();
    virtual void toggle_onlyondisk();
    virtual void toggle_colornotondisk();
-   virtual void findsimilarnames();
-   virtual void findsimilarnames(const char* name, const char* fullname);
-   virtual void findallsimilarnames();
-   virtual void findallsimilarnamesindir(const char*dirname);
-   virtual void importMp3s();
-   virtual void measureBpms();
-   virtual void doHelp();
-   virtual void selectionMenu();
-   virtual void findWrongIdxNames();
-   virtual void findWrongMp3Names();
-   virtual void findWrongNames(const char* dir, RenamerLogic *renamer);
+   
+ virtual void findsimilarnames();
+ virtual void findsimilarnames(const char* name, const char* fullname);
+ virtual void findallsimilarnames();
+ virtual void findallsimilarnamesindir(const char*dirname);
+ virtual void importMp3s();
+ virtual void measureBpms();
+ virtual void doHelp();
+ virtual void doOnlineHelp();
+ virtual void selectionMenu();
+ virtual void findWrongIdxNames();
+ virtual void findWrongMp3Names();
+ virtual void findWrongNames(const char* dir, RenamerLogic *renamer);
 };

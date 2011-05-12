@@ -1,0 +1,8 @@
+#!/bin/bash
+
+echo tar -cvf ~/yeah.tar
+
+for a in *.tofetch; do
+  echo tar --append "\""`cat $a`"\"" -f "~/yeah.tar"
+  done
+

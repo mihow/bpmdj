@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include "songselector.logic.h"
 #include "qsongviewitem.h"
+#include "process-manager.h"
 
 QSongViewItem::QSongViewItem(QListViewItem* parent, Song* content) : QListViewItem(parent,"","","","","","","")
 {
@@ -39,48 +40,48 @@ QSongViewItem::QSongViewItem(QListView* parent, Song* content) : QListViewItem(p
 
 void QSongViewItem::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid, int align)
 {
-   /* if the song is already played we color it red
-    * if the song is in range, we color it green
-    * if the song is not on the disk, we add some blue 
-    */
-   int nogreen_value=255;
-   if ((!SongSelectorLogic::color_range) && (!SongSelectorLogic::color_played))
-     {
-	if (SongSelectorLogic::color_notondisk && !song->song_ondisk)
-	  {
-	     QColorGroup ncg(cg);
-	     ncg.setColor(QColorGroup::Base,QColor(0,0,255));
-	     QListViewItem::paintCell(p,ncg,col,wid,align);
-	  }
-	else
-	  {
-	     QListViewItem::paintCell(p,cg,col,wid,align);
-	  }
-	return;
-     }
-   if (SongSelectorLogic::color_played && song->song_played)
-     {
-	QColorGroup ncg(cg);
-	ncg.setColor(QColorGroup::Base,QColor(255,0,0));
-	QListViewItem::paintCell(p,ncg,col,wid,align);
-	return;
-     }
-   if (SongSelectorLogic::color_range && (SongSelectorLogic::mainTempo!=0) && song->song_tempo)
-     {
-	double t=atof(song->song_tempo);
-	if (t>SongSelectorLogic::mainTempo*0.94 && t<SongSelectorLogic::mainTempo*1.06)
-	  nogreen_value=(int)(fabs(t/SongSelectorLogic::mainTempo-1.0)*255.0/0.06);
-     }
-   QColorGroup ncg(cg);
-   if (SongSelectorLogic::color_notondisk && !song->song_ondisk)
-     {
-	ncg.setColor(QColorGroup::Base,QColor(255-nogreen_value,255-nogreen_value,255));
-     }
-   else
-     {
-	ncg.setColor(QColorGroup::Base,QColor(nogreen_value,255,nogreen_value));
-     }
-   QListViewItem::paintCell(p,ncg,col,wid,align);
+  /* if the song is already played we color it red
+   * if the song is in range, we color it green
+   * if the song is not on the disk, we add some blue 
+   */
+  int nogreen_value=255;
+  if ((!SongSelectorLogic::color_range) && (!SongSelectorLogic::color_played))
+    {
+      if (SongSelectorLogic::color_notondisk && !song->song_ondisk)
+	{
+	  QColorGroup ncg(cg);
+	  ncg.setColor(QColorGroup::Base,QColor(0,0,255));
+	  QListViewItem::paintCell(p,ncg,col,wid,align);
+	}
+      else
+	{
+	  QListViewItem::paintCell(p,cg,col,wid,align);
+	}
+      return;
+    }
+  if (SongSelectorLogic::color_played && song->song_played)
+    {
+      QColorGroup ncg(cg);
+      ncg.setColor(QColorGroup::Base,QColor(255,0,0));
+      QListViewItem::paintCell(p,ncg,col,wid,align);
+      return;
+    }
+  if (SongSelectorLogic::color_range && (ProcessManager::mainTempo!=0) && song->song_tempo)
+    {
+      double t=atof(song->song_tempo);
+      if (t>ProcessManager::mainTempo*0.94 && t<ProcessManager::mainTempo*1.06)
+	nogreen_value=(int)(fabs(t/ProcessManager::mainTempo-1.0)*255.0/0.06);
+    }
+  QColorGroup ncg(cg);
+  if (SongSelectorLogic::color_notondisk && !song->song_ondisk)
+    {
+      ncg.setColor(QColorGroup::Base,QColor(255-nogreen_value,255-nogreen_value,255));
+    }
+  else
+    {
+      ncg.setColor(QColorGroup::Base,QColor(nogreen_value,255,nogreen_value));
+    }
+  QListViewItem::paintCell(p,ncg,col,wid,align);
 }
 
 QString QSongViewItem::text(int i) const

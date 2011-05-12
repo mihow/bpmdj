@@ -1,1 +1,1 @@
-shlibs:Depends=libc6 (>= 2.2.5-13), libqt2 (>= 3:2.3.1-1), libstdc++2.10-glibc2.2 (>= 1:2.95.4-0.010810)
+shlibs:Depends=libc6 (>= 2.3.1-1), libqt2 (>= 3:2.3.1-1), libstdc++2.10-glibc2.2 (>= 1:2.95.4-15)

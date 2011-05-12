@@ -718,9 +718,14 @@ void read_write_loop()
 	  {
 	     // sleeptime is uitgedrukt in WAVRATE ticks. 
 	     unsigned8 sleeptime = selfplaycount - cc;
+	     // how many seconds
 	     waiting.tv_sec = sleeptime / WAVRATE;
+	     // how many ticks at WAVRATE remain ?
 	     sleeptime = sleeptime % WAVRATE;
-	     sleeptime *= 1000000000L/(unsigned8)WAVRATE;
+	     // convert to nanoseconds
+	     sleeptime *= (unsigned8)1000000000L/(unsigned8)WAVRATE;
+	     // store the sleeptime in the structure
+	     waiting.tv_nsec=sleeptime;
 	     nanosleep(&waiting,NULL);
 	  };
 	selfplaycount++;

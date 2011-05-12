@@ -8,6 +8,8 @@
 
 int main(int argc, char**argv)
 {
+   int loops;
+   int clock_freq;
    clock_t start,stop;
    start=times(NULL);
    sleep(2);
@@ -23,5 +25,23 @@ int main(int argc, char**argv)
 	return;
      }
    printf("#define CLOCK_FREQ %d\n",stop);
+   clock_freq=stop;
+   // measure nanosleeptime..
+   // we measure how many full seconds we need to sleep to reach 5 seconds...
+   
+   start=times(NULL);
+   loops=0;
+/*   while(times(NULL)-start < clock_freq*5)
+     {
+	struct timespec req;
+	struct timespec rem;
+	req.tv_sec=0;
+	req.tv_nsec=999999999;
+	nanosleep(&req,&rem);
+	loops++;
+     }
+ */  
+   printf("// loops = %d\n",loops);
    return 0;
+
 }

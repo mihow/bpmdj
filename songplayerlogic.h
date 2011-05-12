@@ -19,6 +19,7 @@
 ****/
 
 #include <qtimer.h>
+#include <qbutton.h>
 #include "songplayer.h"
 
 class BpmCountDialog;
