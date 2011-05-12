@@ -1,3 +1,5 @@
+4.1pl1:
+        - modifications to the taglist could crash the selector
 4.1:
 	+ faster drawing of main songlist
 	- if you had songs that were analyzed and marked as 'Empty' due to 

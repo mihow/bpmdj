@@ -23,6 +23,7 @@
 using namespace std;
 #line 1 "do-printer.h++"
 #include <string>
+#include <stdio.h>
 #include <vector>
 #include "stdarg.h"
 typedef vector<string> outputbuf;
