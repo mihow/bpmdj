@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,9 +16,10 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
-#ifndef SONG_METRIC_H
-#define SONG_METRIC_H
+#ifndef __BPMDJ___SONG_METRIC_H__
+#define __BPMDJ___SONG_METRIC_H__
+using namespace std;
+#line 1 "song-metric.h++"
 #include <qstring.h>
 #include <time.h>
 #include <qcolor.h>
@@ -90,5 +91,4 @@ class SongMetriek: public Metriek
  public:
   static SongMetriek std;
 };
-
 #endif

@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
+using namespace std;
+#line 1 "kbpm-dj.c++"
 #include <dirent.h>
 #include <qapplication.h>
 #include <qlistview.h>
@@ -46,9 +47,7 @@
 #include "embedded-files.h"
 #include "histogram-property.h"
 #include "smallhistogram-type.h"
-#include "avltree.cpp"
-#include "growing-array.cpp"
-#include "signals-template.cpp"
+#include "signals.h"
 
 /*-------------------------------------------
  *         Templates we need
@@ -63,20 +62,6 @@ template class histogram_property<96>;
 // signals
 template double normalize_abs_max<double>(double*, long);
 template double find_abs_max<double>(double*, long);
-
-// trees
-template class AvlTree<QString>;
-template class Node<QString>;
-template class AvlTree<Song*>;
-template class Node<Song*>;
-template class Sentinel<QString>;
-template class Sentinel<Song*>;
-
-// arrays
-template class GrowingArray<Song*>;
-template class GrowingArray<int>;
-template class GrowingArray<BasicProcessManager*>;
-template class GrowingArray<QString>;
 
 // qt based templates
 template class QIntCache<QPixmap>;

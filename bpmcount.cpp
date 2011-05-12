@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
+using namespace std;
+#line 1 "bpmcount.c++"
 #include <stdlib.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -42,14 +43,14 @@
 #include "memory.h"
 #include "bpm.h"
 #include "files.h"
-#include "signals-template.cpp"
+#include "signals.h"
 
 template double normalize_abs_max<double>(double*, long);
 template double find_abs_max<double>(double*, long);
 
 int main(int argc, char *argv[])
 {
-  printf("bpmcount v"VERSION" (c) Werner Van Belle 2000-2006, all rights reserved\n");
+  printf("bpmcount v"VERSION" (c) Werner Van Belle 2000-2007, all rights reserved\n");
   printf("http://bpmdj.sourceforge.net/\n");
   printf("_________________________________________________________________\n");
 

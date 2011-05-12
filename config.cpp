@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
+using namespace std;
+#line 1 "config.c++"
 #include <qlineedit.h>
 #include <qfile.h>
 #include <qdatastream.h>
@@ -334,6 +335,108 @@ bool Config::load()
 	  return false;
 	}
       else if (magic == MAGIC_3_0)
+	{
+	  s >> w; set_file_count (w);
+	  s >> w; set_yellowTime (w);
+	  s >> w; set_orangeTime (w);
+	  s >> w; set_redTime (w);
+	  s >> w; set_filterBpm (w);
+	  s >> b; color_range.state=b;
+	  s >> b; color_played.state=b;
+	  s >> b; color_authorplayed.state=b;
+	  s >> b; color_ondisk.state=b;
+	  s >> b; color_cues.state=b;
+	  s >> b; color_dcolor.state=b;
+	  s >> b; color_spectrum.state=b;
+	  s >> b; set_authorDecay(b);
+	  s >> b; limit_ondisk.state=b;
+	  s >> b; limit_nonplayed.state=b;
+	  s >> b; limit_uprange.state=b;
+	  s >> b; limit_downrange.state=b;
+	  s >> b; limit_indistance.state=b;
+	  for(int i = 0 ; i < 4 ; i ++)
+	    {
+	      s >> w;   players[i].setCommand((SongProcess::command_type)w);
+	      s >> str; players[i].setName(str);
+	      s >> str; players[i].setRemote(str);
+	    }
+	  s >> fl; set_distance_temposcale(fl);
+	  s >> fl; set_distance_spectrumweight(fl);
+	  s >> b; limit_authornonplayed.state=b;
+	  s >> b; set_shown_aboutbox(b);
+	  s >> str; set_mixer_command(str);
+	  s >> b; // open_mixer.set(b);
+	  s >> b; ask_mix.set(b);
+	  s >> b; auto_popqueue.set(b);
+	  s >> str; set_record_command(str);
+	  s >> str; set_replay_command(str);
+	  s >> str; set_record_mixer_command(str);
+	  s >> clr; set_color_tempo44(clr);
+	  s >> clr; set_color_tempo54(clr);
+	  s >> clr; set_color_tempo64(clr);
+	  s >> clr; set_color_tempo74(clr);
+	  s >> clr; set_color_tempo84(clr);
+	  s >> b; set_show_tempo54(b);
+	  s >> b; set_show_tempo64(b);
+	  s >> b; set_show_tempo74(b);
+	  s >> b; set_show_tempo84(b);
+	  s >> b; set_show_unknown_tempo(b);
+	  s >> clr; set_color_green_time(clr);
+	  s >> clr; set_color_yellow_time(clr);
+	  s >> clr; set_color_orange_time(clr);
+	  s >> clr; set_color_red_time(clr);
+	  s >> b; set_color_main_window(b);
+	  s >> b; set_log_spectrum_distance(b);
+	  s >> clr; set_color_played_song(clr);
+	  s >> clr; set_color_played_author(clr);
+	  s >> clr; set_color_unavailable(clr);
+	  s >> clr; set_color_dcolor_col(clr);
+	  s >> w; set_color_cluster_depth (w);
+	  s >> str; set_bpm_mixer_command(str);
+	  s >> b; open_bpmmixer.set(b);
+	  // read tag data
+	  s >> w; 
+	  while(w-->0)
+	    {
+	      QString t;
+	      Q_INT8 i,m,e;
+	      s >> t;
+	      s >> i; 
+	      s >> m; 
+	      s >> e; 
+	      new QListViewItem(get_taglist(), t, i ? TAG_TRUE : TAG_FALSE,
+				m ? TAG_TRUE : TAG_FALSE,
+				e ? TAG_TRUE : TAG_FALSE);
+	    }
+	  // read header
+	  s >> w; 
+	  for(int i = 0 ; i < w ; i++)
+	    get_header()->addLabel("");
+	  for(int i = 0 ; i < w ; i++)
+	    {
+	      Q_UINT16 m1,m2; s >> m1; s >> m2;
+	      realize_mapping(get_header(),i,m1,m2);
+	    }
+	  float F;
+	  s >> F; set_distance_tempoweight(F);
+	  s >> F; set_distance_echoweight(F);
+	  s >> F; set_distance_rythmweight(F);
+	  s >> F; set_distance_compositionweight(F);
+	  s >> w; set_max_songs(w);
+	  s >> clr; set_color_unchecked(clr);
+	  for(int i = 0 ; i < 8 ; i ++)
+	    {
+	      s >> w;   analyzers[i].setCommand((SongProcess::command_type)w);
+	      s >> str; analyzers[i].setName(str);
+	      s >> str; analyzers[i].setRemote(str);
+	    }
+	  s >> fl;  set_anal_bpm_from(fl);
+	  s >> fl;  set_anal_bpm_to(fl);
+	  s >> w;   set_anal_bpm_technique(w);
+	  s >> b;   color_songs_based_on_history.set(b);
+	  s >> clr; set_color_alltime(clr);
+	}
+      else if (magic == MAGIC_3_3)
 	{
 	  s >> w; set_file_count (w);
 	  s >> w; set_yellowTime (w);

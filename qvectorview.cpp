@@ -1,9 +1,6 @@
 /****
- A QVectorView suitable for BpmDj.
- This is a huge stripdown from trolltechs QListView class.
-
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -19,12 +16,11 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
+using namespace std;
+#line 1 "qvectorview.c++"
+// A QVectorView suitable for BpmDj.
+// This is a huge stripdown from trolltechs QListView class.
 // TODO: move totalheight from QVectorViewData to QVectorView
-// TODO: double buffering is not enabled currently. Maybe we will need 
-//       this back again some day
-
-#ifndef QT_NO_VECTORVIEW
 #include <qtimer.h>
 #include <qheader.h>
 #include <qscrollview.h>
@@ -48,7 +44,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include "qvectorview.h"
-#include "growing-array.h"
+#include "vector-iterator.h"
 
 class ItemColumnInfo
 {
@@ -152,7 +148,7 @@ void QVectorView::init()
     d_h->installEventFilter( this );
     d_focusItem = -1;
     d_oldFocusItem = -1;
-    dirty_items.init();
+    dirty_items.clear();
     d_dirtyItemTimer = new QTimer( this );
     d_visibleTimer = new QTimer( this );
     d_margin = 1;
@@ -227,7 +223,7 @@ QVectorView::ResizeMode QVectorView::resizeMode() const
 QVectorView::~QVectorView()
 {
   d_focusItem = -1;
-  dirty_items.reset();
+  dirty_items.clear();
   delete d_vci;
   d_vci = 0;
 }
@@ -243,12 +239,12 @@ void QVectorView::drawContentsOffset( QPainter * p, int ox, int oy,
   
   buildDrawableList();
   
-  if ( dirty_items.count>0 ) 
+  if ( dirty_items.size()>0 ) 
     {
       QRect br( cx - ox, cy - oy, cw, ch );
-      for(int j = 0; j < dirty_items.count ; j++)
+      for(unsigned int j = 0; j < dirty_items.size() ; j++)
 	{
-	  int i = dirty_items.elements[j];
+	  int i = dirty_items[j];
 	  QRect ir = itemRect( i ).intersect( viewport()->rect() );
 	  // if the rectangle of the dirty item is outside the viewport
 	  // or if it is within the area we will paint anyway, then we
@@ -257,11 +253,13 @@ void QVectorView::drawContentsOffset( QPainter * p, int ox, int oy,
 	    {
 	      // removal consists of swapping with the last
 	      // and decreasing the number of items
-	      dirty_items.swap_del(j);
-	      assert(dirty_items.count>=0);
+	      assert(dirty_items.size()>=0);
+	      vector<int>::iterator le=--dirty_items.end();
+	      dirty_items[j]=*le;
+	      dirty_items.erase(le);
 	    }
 	}
-      if ( dirty_items.count>0 ) 
+      if (dirty_items.size()>0) 
 	// there are still dirty items left which we will not paint now
 	// however we restart the timer
 	d_dirtyItemTimer->start( 0, TRUE );
@@ -588,11 +586,11 @@ void QVectorView::handleSizeChange( int section, int os, int ns )
 
 void QVectorView::updateDirtyItems()
 {
-  if ( d_timer->isActive() || !dirty_items.count ) return;
+  if ( d_timer->isActive() || !dirty_items.size() ) return;
   QRect ir; // rectangle to be repainted
-  for(int j = 0 ; j < dirty_items.count ; j ++)
+  for(unsigned int j = 0 ; j < dirty_items.size() ; j ++)
     {
-      int i = dirty_items.elements[j];
+      int i = dirty_items[j];
       ir = ir.unite( itemRect(i) );
     }
   if ( !ir.isEmpty() ) 
@@ -1413,12 +1411,10 @@ void QVectorView::repaintItem( int item )
 {
   if ( item<0 || item >= item_container->vectorSize() ) return;
   d_dirtyItemTimer->start( 0, TRUE );
-  for (int i =0 ; i < dirty_items.count ; i ++)
-    {
-      if (dirty_items.elements[i]==item)
-	return; // its already there
-    }
-  dirty_items.add(item);
+  vectorIterator<int> i(dirty_items); ITERATE_OVER(i)
+    if (i.val()==item) return; // its already there
+  }
+  dirty_items.push_back(item);
 }
 
 QSize QVectorView::sizeHint() const
@@ -1472,7 +1468,7 @@ QHeader * QVectorView::header() const
 
 void QVectorView::showEvent( QShowEvent * )
 {
-  dirty_items.count=0;
+  dirty_items.clear();
   d_dirtyItemTimer->stop();
   d_fullRepaintOnComlumnChange = TRUE;
   updateGeometries();
@@ -1644,5 +1640,3 @@ void QVectorView::adjustColumn( int col )
 {
   d_h->isStretchEnabled( col );
 }
-
-#endif

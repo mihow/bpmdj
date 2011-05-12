@@ -1,6 +1,6 @@
 /****
- BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Om-Data
+ Copyright (C) 2005-2006 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -17,65 +17,99 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-#ifndef TYPES_BH
-#define TYPES_BH
+#ifndef OM_TYPE_H
+#define OM_TYPE_H
+#include <typeinfo>
+#include <qstring.h>
 
-#include "tempo-type.h"
-#include "period-type.h"
-#include "stereo-sample2.h"
-#include "histogram-type.h"
-#include "synced-stereo-sample2.h"
-#include "sample4-type.h"
-#include "power-type.h"
-#include "spectrum-type.h"
-#include "tag-type.h"
+// #define SHORT_ONE  // can be used to limit the maximum array size to 4 dimensions
 
-// period_type      - describes the length of a period in the index file, normalized to 44100 Hz
-// quad_period_type - describes the length of a measure in the player, depending on different wavrates
-// tempo_type       - describes the BPM of the song, given a period_type
+//===============================================================
+//                         Data Types
+//===============================================================
+//---------------------------------------------------------------
+//                            Forwards
+//---------------------------------------------------------------
+class DataTexter;
+class Token;
+class Symbol;
+class Data;
+class String;
+class QStringLesser;
+class DataVisitor;
 
-inline tempo_type period_to_tempo(period_type a)
-{
-  tempo_type b;
-  if (a.period > 0)
-    b.tempo = 4.0*11025.0*60.0/(double)a.period;
-  return b;
-}
+template <int D, class T> class Array;
+template <class T, bool S, char L> class  IntegerClass;
+template <class T, char L> class FloatClass;
 
-inline period_type tempo_to_period(tempo_type a)
-{
-  period_type b;
-  if (a.tempo > 0)
-    b.period = (int)(4.0*11025.0*60.0/(double)a.tempo);
-  return b;
-}
+//---------------------------------------------------------------
+//                     Typedefs & Typelists
+//---------------------------------------------------------------
+#define BASIC_TYPES \
+BASIC_TYPE(signed            char, signed1,   Signed1) \
+BASIC_TYPE(signed       short int, signed2,   Signed2) \
+BASIC_TYPE(signed        long int, signed4,   Signed4) \
+BASIC_TYPE(signed   long long int, signed8,   Signed8) \
+BASIC_TYPE(unsigned          char, unsigned1, Unsigned1) \
+BASIC_TYPE(unsigned     short int, unsigned2, Unsigned2) \
+BASIC_TYPE(unsigned      long int, unsigned4, Unsigned4) \
+BASIC_TYPE(unsigned long long int, unsigned8, Unsigned8) \
+BASIC_TYPE(                 float, float4,    Float4) \
+BASIC_TYPE(                double, float8,    Float8) 
 
-inline quad_period_type period_to_quad(period_type a)
-{
-  return quad_period_type(a.period * 4);
-}
+#define BASIC_TYPE(WHAT, NAME, CLASS) typedef WHAT NAME;
+BASIC_TYPES
+#undef BASIC_TYPE
 
-inline tempo_type between_tempos(tempo_type a, tempo_type b, float percent)
-{
-  return tempo_type((b.tempo-a.tempo)*percent+a.tempo);
-}
+typedef IntegerClass<signed1,true,'b'>    Signed1;
+typedef IntegerClass<signed2,true,'w'>    Signed2;
+typedef IntegerClass<signed4,true,'i'>    Signed4;
+typedef IntegerClass<signed8,true,'l'>    Signed8;
+typedef IntegerClass<unsigned1,false,'b'> Unsigned1;
+typedef IntegerClass<unsigned2,false,'w'> Unsigned2;
+typedef IntegerClass<unsigned4,false,'i'> Unsigned4;
+typedef IntegerClass<unsigned8,false,'l'> Unsigned8;
+typedef FloatClass<float4,'f'>   Float4;
+typedef FloatClass<float8,'d'>   Float8;
 
-inline spectrum_type * between_spectra(spectrum_type *a, spectrum_type *b, float percent)
-{
-  if (a==no_spectrum) return no_spectrum;
-  if (b==no_spectrum) return no_spectrum;
-  spectrum_type * result = new spectrum_type();
-  for (int i = 0; i < spectrum_size ; i++)
-    result->set_band(i,a->band(i)*percent + b->band(i)*(1.0-percent));
-  return result;
-}
-
-inline int compare_tempo(tempo_type a, tempo_type b)
-{
-  if (a.tempo > b.tempo) return 1;
-  if (a.tempo < b.tempo) return -1;
-  return 0;
-}
+// A list of useful array types
+#ifdef SHORT_ONE
+#define ARRAY_TYPES \
+ARRAY_TYPE(1,signed1)   ARRAY_TYPE(2,signed1)   ARRAY_TYPE(3,signed1)   ARRAY_TYPE(4,signed1) \
+ARRAY_TYPE(1,signed2)   ARRAY_TYPE(2,signed2)   ARRAY_TYPE(3,signed2)   ARRAY_TYPE(4,signed2) \
+ARRAY_TYPE(1,signed4)   ARRAY_TYPE(2,signed4)   ARRAY_TYPE(3,signed4)   ARRAY_TYPE(4,signed4) \
+ARRAY_TYPE(1,signed8)   ARRAY_TYPE(2,signed8)   ARRAY_TYPE(3,signed8)   ARRAY_TYPE(4,signed8) \
+ARRAY_TYPE(1,unsigned1) ARRAY_TYPE(2,unsigned1) ARRAY_TYPE(3,unsigned1) ARRAY_TYPE(4,unsigned1) \
+ARRAY_TYPE(1,unsigned2) ARRAY_TYPE(2,unsigned2) ARRAY_TYPE(3,unsigned2) ARRAY_TYPE(4,unsigned2) \
+ARRAY_TYPE(1,unsigned4) ARRAY_TYPE(2,unsigned4) ARRAY_TYPE(3,unsigned4) ARRAY_TYPE(4,unsigned4) \
+ARRAY_TYPE(1,unsigned8) ARRAY_TYPE(2,unsigned8) ARRAY_TYPE(3,unsigned8) ARRAY_TYPE(4,unsigned8) \
+ARRAY_TYPE(1,float4)    ARRAY_TYPE(2,float4)    ARRAY_TYPE(3,float4)    ARRAY_TYPE(4,float4) \
+ARRAY_TYPE(1,float8)    ARRAY_TYPE(2,float8)    ARRAY_TYPE(3,float8)    ARRAY_TYPE(4,float8) \
+ARRAY_TYPE(1,Data)      ARRAY_TYPE(2,Data)      ARRAY_TYPE(3,Data)      ARRAY_TYPE(4,Data) 
+#else
+#define ARRAY_TYPES \
+ARRAY_TYPE(1,signed1)   ARRAY_TYPE(2,signed1)   ARRAY_TYPE(3,signed1)   ARRAY_TYPE(4,signed1) \
+ARRAY_TYPE(5,signed1)   ARRAY_TYPE(6,signed1)   ARRAY_TYPE(7,signed1)   ARRAY_TYPE(8,signed1) \
+ARRAY_TYPE(1,signed2)   ARRAY_TYPE(2,signed2)   ARRAY_TYPE(3,signed2)   ARRAY_TYPE(4,signed2) \
+ARRAY_TYPE(5,signed2)   ARRAY_TYPE(6,signed2)   ARRAY_TYPE(7,signed2)   ARRAY_TYPE(8,signed2) \
+ARRAY_TYPE(1,signed4)   ARRAY_TYPE(2,signed4)   ARRAY_TYPE(3,signed4)   ARRAY_TYPE(4,signed4) \
+ARRAY_TYPE(5,signed4)   ARRAY_TYPE(6,signed4)   ARRAY_TYPE(7,signed4)   ARRAY_TYPE(8,signed4) \
+ARRAY_TYPE(1,signed8)   ARRAY_TYPE(2,signed8)   ARRAY_TYPE(3,signed8)   ARRAY_TYPE(4,signed8) \
+ARRAY_TYPE(5,signed8)   ARRAY_TYPE(6,signed8)   ARRAY_TYPE(7,signed8)   ARRAY_TYPE(8,signed8) \
+ARRAY_TYPE(1,unsigned1) ARRAY_TYPE(2,unsigned1) ARRAY_TYPE(3,unsigned1) ARRAY_TYPE(4,unsigned1) \
+ARRAY_TYPE(5,unsigned1) ARRAY_TYPE(6,unsigned1) ARRAY_TYPE(7,unsigned1) ARRAY_TYPE(8,unsigned1) \
+ARRAY_TYPE(1,unsigned2) ARRAY_TYPE(2,unsigned2) ARRAY_TYPE(3,unsigned2) ARRAY_TYPE(4,unsigned2) \
+ARRAY_TYPE(5,unsigned2) ARRAY_TYPE(6,unsigned2) ARRAY_TYPE(7,unsigned2) ARRAY_TYPE(8,unsigned2) \
+ARRAY_TYPE(1,unsigned4) ARRAY_TYPE(2,unsigned4) ARRAY_TYPE(3,unsigned4) ARRAY_TYPE(4,unsigned4) \
+ARRAY_TYPE(5,unsigned4) ARRAY_TYPE(6,unsigned4) ARRAY_TYPE(7,unsigned4) ARRAY_TYPE(8,unsigned4) \
+ARRAY_TYPE(1,unsigned8) ARRAY_TYPE(2,unsigned8) ARRAY_TYPE(3,unsigned8) ARRAY_TYPE(4,unsigned8) \
+ARRAY_TYPE(5,unsigned8) ARRAY_TYPE(6,unsigned8) ARRAY_TYPE(7,unsigned8) ARRAY_TYPE(8,unsigned8) \
+ARRAY_TYPE(1,float4)    ARRAY_TYPE(2,float4)    ARRAY_TYPE(3,float4)    ARRAY_TYPE(4,float4) \
+ARRAY_TYPE(5,float4)    ARRAY_TYPE(6,float4)    ARRAY_TYPE(7,float4)    ARRAY_TYPE(8,float4) \
+ARRAY_TYPE(1,float8)    ARRAY_TYPE(2,float8)    ARRAY_TYPE(3,float8)    ARRAY_TYPE(4,float8) \
+ARRAY_TYPE(5,float8)    ARRAY_TYPE(6,float8)    ARRAY_TYPE(7,float8)    ARRAY_TYPE(8,float8) \
+ARRAY_TYPE(1,Data)      ARRAY_TYPE(2,Data)      ARRAY_TYPE(3,Data)      ARRAY_TYPE(4,Data) \
+ARRAY_TYPE(5,Data)      ARRAY_TYPE(6,Data)      ARRAY_TYPE(7,Data)      ARRAY_TYPE(8,Data)
+#endif
 
 #endif 
-

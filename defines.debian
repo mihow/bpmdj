@@ -1,29 +1,8 @@
-# DEBIAN 
-
-# The following programs and packages are necessary, 
-#  - libqt3-mt-dev
-#  - qt3-designer
-#  - qt3-dev-tool
-#  - libqt3c102-mt
-#  - fftw3
-#  - make
-#  - alsa-headers (for alsa support)
-
-CPP = distcc g++ -g -O0 -Wall
-CC  = distcc gcc -g -O0 -Wall
-
-UIC = uic
-MOC = moc
-STRIP = strip
-INSTALL = install
-
-# -D COMPILE_OSS = include OSS drivers
-# -D COMPILE_ALSA = include ALSA drivers
-# -D EFENCE = include electric fence debugging code
-# -D NDEBUG = remove all asserts
-
-CFLAGS+= -D COMPILE_OSS -D COMPILE_ALSA -D QT_THREAD_SUPPORT
-LDFLAGS+= -lpthread -lm -lasound -lrt -lfftw3
-QT_INCLUDE_PATH=-I/usr/include/qt3/
-QT_LIBRARY_PATH=
-QT_LIBS= -lqt-mt
+CPP             = g++ -g -O3 -Wall
+UIC             = uic
+MOC             = moc
+CFLAGS         += -D COMPILE_OSS -D COMPILE_ALSA -D COMPILE_JACK -D QT_THREAD_SUPPORT 
+LDFLAGS        += -lpthread -lm -lasound -lrt -lfftw3
+QT_INCLUDE_PATH = -I/usr/include/qt3/
+QT_LIBRARY_PATH =
+QT_LIBS         = -lqt-mt

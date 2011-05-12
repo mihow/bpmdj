@@ -1,5 +1,17 @@
+                               DEPENDENCIES
 
-      COMPILING BPMDJ
+BpmDj relies on
+ - libqt3-mt-dev
+ - qt3-designer
+ - qt3-dev-tool
+ - libqt3c102-mt
+ - fftw3
+ - make
+ - alsa-headers (for alsa support)
+
+
+
+                               COMPILING BPMDJ
   
 If you want to compile this package you need to create a defines
 file. The defines file is a file that contains a number of definitions of
@@ -13,7 +25,12 @@ can be used:
 If you are running another distribution please take a look at one of these
 defines files and adapt where necessary. The file format is self explanatory !
 After creating such a file be sure to send it to me
-(werner.van.belle@itek.norut.no) so I can include it in the next release.
+(werner.van.belle@gmail.com) so I can include it in the next release.
+
+Creating the defines file can be done by copying one of the examples to
+the file name defines (thereby overwriting the current defines). Furthermore you 
+need lame, oggenc, libasound2-dev, fftw3-dev and maybe some other libraries
+I forgoet to mention.
 
 Some compile time flags:
  
@@ -25,9 +42,29 @@ Some compile time flags:
     add to the CFLAGS '-D COMPILE_ALSA' to include native support for alsalib. 
     Don't forget to add -lasound to the LDFLAGS !
 
-These defines files probably include distcc and ccache. These two programs are 
-of course not strictly necessary. Removing these words from the defines file 
-should fix problems related to these.
+  COMPILE_JACK
+    add to the CFLAGS '-D COMPILE_JACK' to include native support for jackd.
 
--- Werner Van Belle (werner.van.belle@itek.norut.no)
+  EFENCE 
+    links in tghe efence code to debug bpmdj memory allocations
+
+  NDEBUG 
+    removes assert statements, which could lead to faster code. But if it crashes
+    we have no idea where it happened.
+
+These defines files probably include distcc. This programs is of course not strictly
+necessary. Removing the word distcc will resolve the problem. Also remember to create
+a suitable defines file in the Data directory.
+
+
+
+
+       	   	    	       DEVELOPERS
+
+For developers wanting to join the BpmDj party: You will need a cvs login for the
+Data modules. You can ask access for these to werner.van.belle@gmail.com (or provide 
+me with your public ssh key). These modules are not part of the standard BpmDj CVS 
+since I use them at various places.
+
+-- Werner Van Belle (werner.van.belle@gmail.com)
 

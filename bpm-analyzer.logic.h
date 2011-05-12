@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,7 +16,10 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
+#ifndef __BPMDJ___BPM_ANALYZER_LOGIC_H__
+#define __BPMDJ___BPM_ANALYZER_LOGIC_H__
+using namespace std;
+#line 1 "bpm-analyzer.logic.h++"
 #include <qstring.h>
 #include "kbpm-play.h"
 #include "analyzer.h"
@@ -25,7 +28,7 @@
 
 typedef double fft_type;
 
-class BpmAnalyzerDialog : public CountDialog, ThreadedAnalyzer
+class BpmAnalyzerDialog : public CountDialog, public Analyzer
 {
   Q_OBJECT
 private:
@@ -60,8 +63,6 @@ private:
    void          fft_draw(QPainter &p, int xs, int ys, int shifter, double bpm_divisor);
    void          autocorrelate_draw(QPainter &p, int xs, int ys, int shifter);
             // finding the error fit of a curve
-   unsigned long phasefit_mult(unsigned long i);
-   unsigned long phasefit_diff(unsigned long i);
    unsigned long phasefit(unsigned long i);
    unsigned long phasefit(unsigned long i, unsigned long clip);
    void          rayshoot_scan();
@@ -69,33 +70,27 @@ private:
    void          readAudio();                    // reads the file in memory
    void          readAudioBlock(int blocksize);  // reads the file in memory divided by blocks
  private:
-   // some functions that linkt he analyzer to qt visualisation functions
-   // these are necessary because Qt requries that all the qt depended functions
-   // are accessed from the same thread (or that any other thread holds a lock)
    void status(QString text);
    void set_labels();
+   void updateReadingProgress(int);
+   void updateProcessingProgress(int);
+   void updateInfo();
  public:
    void          setBpmBounds(long start, long stop);
    void          getMd5();     // retrieves MD5 sum
    void          writeAudio(); // writes audio to disk
-   void          run();
+   void          analyze();
    void          rangeCheck();
    void          removeRaw();
    SongPlayer *  player;
    BpmAnalyzerDialog(SongPlayer*parent=0, const char * name=0, bool modal=FALSE, WFlags f=0);
+   virtual void started();
+   virtual void stop();
+   virtual void stopped();
  public slots:
    virtual void startStopButton();
-   virtual void startAnalyzer();
-   virtual void stopAnalyzer();
-   virtual void stoppedAnalyzing();
-   virtual void timerTick();
-   
-   // call this if you want to stop the current process
    virtual void finish();
-   
-   // user interface responses
    virtual void tap();
    virtual void reset();
-   virtual void incBpm();
-   virtual void decBpm();
 };
+#endif

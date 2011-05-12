@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>273</width>
-            <height>162</height>
+            <width>241</width>
+            <height>142</height>
         </rect>
     </property>
     <property name="caption">
@@ -25,22 +25,6 @@
         <property name="spacing">
             <number>0</number>
         </property>
-        <widget class="QCheckBox" row="1" column="0">
-            <property name="name">
-                <cstring>mpg321</cstring>
-            </property>
-            <property name="text">
-                <string>mpg321</string>
-            </property>
-        </widget>
-        <widget class="QCheckBox" row="0" column="0">
-            <property name="name">
-                <cstring>mpg123059r</cstring>
-            </property>
-            <property name="text">
-                <string>mpg123 0.59r</string>
-            </property>
-        </widget>
         <widget class="QCheckBox" row="3" column="0">
             <property name="name">
                 <cstring>mplayer1pre6</cstring>
@@ -63,6 +47,22 @@
             </property>
             <property name="text">
                 <string>ogg123</string>
+            </property>
+        </widget>
+        <widget class="QCheckBox" row="1" column="0">
+            <property name="name">
+                <cstring>mpg321</cstring>
+            </property>
+            <property name="text">
+                <string>mpg321</string>
+            </property>
+        </widget>
+        <widget class="QCheckBox" row="0" column="0">
+            <property name="name">
+                <cstring>mpg123059r</cstring>
+            </property>
+            <property name="text">
+                <string>mpg123 0.59r/0.60</string>
             </property>
         </widget>
     </grid>

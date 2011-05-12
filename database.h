@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,13 +16,12 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
-#ifndef DATABASE_H
-#define DATABASE_H
-
+#ifndef __BPMDJ___DATABASE_H__
+#define __BPMDJ___DATABASE_H__
+using namespace std;
+#line 1 "database.h++"
+#include <vector>
 #include "basic-database.h"
-#include "avltree.h"
-#include "growing-array.h"
 
 class Song;
 class SongMetriek;
@@ -32,7 +31,7 @@ class QVectorView;
 class DataBase: public BasicDataBase
 {
   private:
-    GrowingArray<Song*> cache;
+    vector<Song*> cache;
     bool *      and_include;
     bool *      or_include;
     bool        and_includes_checked;
@@ -63,6 +62,4 @@ class DataBase: public BasicDataBase
     int      getSelection(SongSelectorLogic* selector, Song* main, QVectorView* target, int nr = 0);
     Song * * closestSongs(SongSelectorLogic * selector,Song * target1, float weight1, Song * target2, float weight2, SongMetriek * metriek, int maximum, int &count);
 };
-
 #endif
-

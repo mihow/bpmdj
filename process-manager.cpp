@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
+using namespace std;
+#line 1 "process-manager.c++"
 #include "songselector.logic.h"
 #include "process-manager.h"
 #include "scripts.h"
@@ -122,7 +123,8 @@ bool ProcessManager::startSong(Song *song)
     }
 
   start(nextSlot,song);
-  // if there is no main song playing. Place it in the main, otherwise, try the monitor
+  // if there is no main song playing:
+  // Place it in the main, otherwise, try the monitor
   if (!main_song)
     {
       main_song = song;

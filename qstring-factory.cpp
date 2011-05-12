@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,11 +16,12 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
+using namespace std;
+#line 1 "qstring-factory.c++"
 #include <stdlib.h>
 #include <stdio.h>
-#include "songtree.h"
-#include "avltree.h"
+#include <set>
+#include "qstring-factory.h"
 
 const QString TRUE_TEXT("Yes");
 const QString FALSE_TEXT("No");
@@ -47,35 +48,26 @@ QString tonumber(const float f)
   return QString::number(f);
 }
 
-AvlTree<QString> QStringFactory::tree;
+set<QString*,PtrQStringLesser> QStringFactory::tree;
 bool QStringFactory::killed = false;
 
 QString QStringFactory::create(QString newly_allocated)
 {
-  if (killed) return newly_allocated;
-  if (newly_allocated.isEmpty()) return QString::null;
+  if (killed) 
+    return newly_allocated;
+  if (newly_allocated.isEmpty())
+    return QString::null;
   
-  QStringNode * found = (QStringNode*) tree.search(newly_allocated);
-  if (found)
-    {
-      return found->content;
-      // the newly allocated string will be destroyed at the moment
-      // this function returns. The data stored in the found content
-      // will be refered an extra time.
-    }
-  else
-    {
-      tree.add(new QStringNode(newly_allocated));
-      // we add this newly allocated string, the object located in 
-      // this method will be removed, however, the content will be passed 
-      // on to the result and in the tree.
-      return newly_allocated;
-    }
+  set<QString*,PtrQStringLesser>::iterator found;
+  found = tree.find(&newly_allocated);
+  if (found!=tree.end())
+    return **found;
+  QString * text = new QString(newly_allocated);
+  tree.insert(text);
+  return *text;
 }
 
 void QStringFactory::kill()
 {
-  // printf("Advantage by using QString factory = %d\n",winst);
-  tree.purge();
   killed=true;
 }

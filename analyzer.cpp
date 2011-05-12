@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,95 +16,55 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
+using namespace std;
+#line 1 "analyzer.c++"
 #include <pthread.h>
 #include <stdio.h>
 #include "analyzer.h"
 
-Analyzer::Analyzer()
+void Analyzer::run()
 {
+  if (working) return;
+  started();
+  analyze();
+  stopped();
 }
 
-ThreadedAnalyzer::ThreadedAnalyzer(): 
-  Analyzer()
+void Analyzer::started()
 {
-  working = false;
-  stop_signal = false;
-}
+  working = true;
+  stop_signal=false;
+};
 
-ReentrantAnalyzer::ReentrantAnalyzer(): 
-  Analyzer()
-{
-  working = false;
-}
-
-void ThreadedAnalyzer::startStopAnalyzer()
+void Analyzer::toggle()
 {
   if (working)
-    {
-      stopAnalyzer();
-    }
+    stop();
   else
-    {
-      startAnalyzer();
-    }
+    start();
 }
 
-void ThreadedAnalyzer::doit()
-{
-  run();
-  working=false;
-  stoppedAnalyzing();
-}
-
-void* doit(void* anal)
-{
-  ((ThreadedAnalyzer*)anal)->doit();
-  return NULL;
-}
-
-void Analyzer::startAnalyzer()
-{
-  run();
-  stoppedAnalyzing();
-}
-
-void ReentrantAnalyzer::startAnalyzer()
-{
-  if (working) return;
-  working=true;
-  Analyzer::startAnalyzer();
-  working=false;
-}
-
-void ThreadedAnalyzer::startAnalyzer()
-{
-  if (working) return;
-  working=true;
-  stop_signal=false;
-  pthread_t y;
-  pthread_create(&y,NULL,::doit,(void*)this);
-}
-
-
-void Analyzer::stopAnalyzer()
-{
-}
-
-void ThreadedAnalyzer::stopAnalyzer()
+void Analyzer::stop()
 {
   if (!working) return;
   stop_signal=true;
   while(working) ;
 }
 
-void Analyzer::stoppedAnalyzing()
+void* doit(void* anal)
 {
+  ((Analyzer*)anal)->run();
+  return NULL;
 }
 
-void Analyzer::finish()
+void Analyzer::start(bool own_thread)  
 {
-  stopAnalyzer();
-  store();
+  if (own_thread)
+    {
+      if (working) return;
+      pthread_t y;
+      pthread_create(&y,NULL,::doit,(void*)this);
+    }
+  else
+    run(); 
 }
-

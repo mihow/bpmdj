@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,62 +16,35 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
-#ifndef ANALYZER_H
-#define ANALYZER_H
-
+#ifndef __BPMDJ___ANALYZER_H__
+#define __BPMDJ___ANALYZER_H__
+using namespace std;
+#line 1 "analyzer.h++"
 class Analyzer
 {
- public:
-  Analyzer();
-  virtual void startAnalyzer();
-  // call this to start the analyzer
-  virtual void stopAnalyzer();
-  // call this to start the analyzer
-  virtual void stoppedAnalyzing();
-  // called when analyzer has been stopped
-  virtual void finish();
-  // call to finish the entire analyzing process
-  virtual void run() = 0;
-  // fill this in with appropriate logic
-  virtual void store() {};
-  // fill in with appropriate index store logic
-  virtual ~Analyzer() {};
-};
-
-/**
- * The reentrant analyzer will only start a new process if the old one died
- * already.
- */
-
-class ReentrantAnalyzer: public Analyzer
-{
- protected:
+protected:
+  // keeps track of the current running state
   volatile bool working;
- public:
-  ReentrantAnalyzer();
-  virtual void startAnalyzer();
-};
-
-class ThreadedAnalyzer: public Analyzer
-{
- protected:
-  volatile bool working;
+  // true when the process should voluntarily stop
   volatile bool stop_signal;
- public:
-  void doit();
-  //  void doitwrapper();
- public:
-  ThreadedAnalyzer();
-  virtual void startStopAnalyzer();
+public:
+  Analyzer(): working(false), stop_signal(false) {};
+  // call to start the analyzer
+  virtual void start(bool own_thread = false);
+  // call to stop the analyzer. The method will wait until the 
+  // analyzer has stopped.
+  virtual void stop();
   // call this to start/stop analyzer depending on its current state
-  virtual void startAnalyzer();
-  // call this to start the analyzer
-  virtual void stopAnalyzer();
-  // call this to stop the analyzer
-  
-  virtual void run() = 0;
-  // fill this in with appropriate logic
+  virtual void toggle();
+  // called when analyzer has been started
+  virtual void started();
+  // called to analyze the process, should be filled in 
+  // with some appropriate logic
+  virtual void analyze() = 0;
+  // called when analyzer has been stopped
+  virtual void stopped() { working = false; };
+  // a method that will call started(), analyze() and stopped()
+  virtual void run();
+  virtual ~Analyzer() { stop(); };
 };
-
 #endif

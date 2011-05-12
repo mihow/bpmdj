@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
+using namespace std;
+#line 1 "bpm.c++"
 #include <stdio.h>
 #include <stdlib.h>
 #include <fftw3.h>
@@ -61,7 +62,8 @@ void BpmCounter::init(unsigned4 slen, sample_type *blk, int inrate, double lower
   else
     {
       if (log) 
-	fprintf(log,"Information: The first analysis might take a long time due to calibration of the fftw lib\n");
+	fprintf(log,"Information: The first analysis might take a long time (>15 minutes)"
+		    "due to calibration of the fftw lib\n");
     }
   
   en = bpmdj_allocate(measured, double);
@@ -72,11 +74,6 @@ void BpmCounter::init(unsigned4 slen, sample_type *blk, int inrate, double lower
   forward = fftw_plan_r2r_1d(measured, &(audio[0]), en, FFTW_R2HC, FFTW_MEASURE);
   backward = fftw_plan_r2r_1d(measured, ts, co, FFTW_HC2R, FFTW_MEASURE);
   
-  
-  /**
-   * The fftw wisdom things 
-   */
-  
   wisdom_file = fopen(".bpmdj_fftw_wisdom","wb");
   if (wisdom_file)
     {
@@ -84,10 +81,6 @@ void BpmCounter::init(unsigned4 slen, sample_type *blk, int inrate, double lower
       fftw_export_wisdom_to_file(wisdom_file);
       fclose(wisdom_file);
     }
-  
-  /**
-   * The boundaries
-   */	
   
   double freq = higher_boundary/60.0;
   b1 = 4 * (int)(measure_rate / freq);

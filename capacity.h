@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,10 +16,11 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
-#ifndef CAPACITY_H
-#define CAPACITY_H
-#include "Data/om-data.h"
+#ifndef __BPMDJ___CAPACITY_H__
+#define __BPMDJ___CAPACITY_H__
+using namespace std;
+#line 1 "capacity.h++"
+#include "om-data.h"
 
 /**
  * Capacities specify which programs are available and which 
@@ -29,12 +30,13 @@
  * in future versions
  */
 #define CAPACITY_MPG123059R   0x01  // 1
+// works also for mp123 v060
 #define CAPACITY_MPG321       0x02  // 2
 #define CAPACITY_OGG123       0x04  // 3
 #define CAPACITY_MPLAYER1PRE6 0x08  // 4
 #define CAPACITY_MPLAYER1PRE7 0x10  // 5
 //---
-#define CAPACITY_LAST         0x10  
+#define CAPACITY_LAST         0x10
 
 typedef unsigned2   Capacity;
 typedef Capacity    capacity_type;
@@ -63,5 +65,4 @@ class PlayerConfig;
 class Index;
 // Set the environment before calling bpmdj-raw
 int set_decoder_environment(PlayerConfig * config, Index * idx);
-
 #endif

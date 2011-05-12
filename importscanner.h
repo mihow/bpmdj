@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,11 +16,13 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
+#ifndef __BPMDJ___IMPORTSCANNER_H__
+#define __BPMDJ___IMPORTSCANNER_H__
+using namespace std;
+#line 1 "importscanner.h++"
 #include "scanningprogress.h"
 #include "songselector.logic.h"
 #include "dirscanner.h"
-#include "avltree.h"
 
 class QString;
 
@@ -29,14 +31,17 @@ class ImportScanner:
   public ScanningProgress
 {
   SongSelectorLogic * selector;
-  AvlTree<QString>* database;
- protected:
+  map<QString,Song*> database;
+protected:
   virtual void recursing(const QString dirname);
   virtual void checkfile(const QString pathname, const QString filename);
   virtual bool matchextension(const QString filename);
- public:
+public:
   ImportScanner(SongSelectorLogic* sroot);
   virtual void scan(const QString dirname) 
-    { scan(dirname,NULL); };
+  { 
+    scan(dirname,NULL); 
+  };
   virtual void scan(const QString filename, const QString checkname);
 };
+#endif

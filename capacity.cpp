@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
+using namespace std;
+#line 1 "capacity.c++"
 #include <qcheckbox.h>
 #include <qstring.h>
 #include "capacity-widget.h"
@@ -27,7 +28,7 @@
 Capacity get_ext_disabled_capacities(QString ext)
 {
   ext = ext.lower();
-  if (ext.endsWith(".mp3"))  return CAPACITY_OGG123                                        ;
+  if (ext.endsWith(".mp3"))  return CAPACITY_OGG123                                                             ;
   if (ext.endsWith(".ogg"))  return                   CAPACITY_MPG123059R | CAPACITY_MPG321;
   if (ext.endsWith(".m4a"))  return CAPACITY_OGG123 | CAPACITY_MPG123059R | CAPACITY_MPG321;
   if (ext.endsWith(".flac")) return                   CAPACITY_MPG123059R | CAPACITY_MPG321;

@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,11 +16,15 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
+#ifndef __BPMDJ___FILES_H__
+#define __BPMDJ___FILES_H__
+using namespace std;
+#line 1 "files.h++"
 #include <stdio.h>
-#include "Data/array.h"
+#include "array.h"
 
 long   fsize(FILE * f);
 long   readsamples(void* target, int count, FILE* file);
 long   readsamples(Array<1,float4>& target, FILE* file);
 long   writesamples(void* target, int count, FILE* file);
+#endif

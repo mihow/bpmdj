@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
+using namespace std;
+#line 1 "wavelet-analyzer.logic.c++"
 #include <qapplication.h>
 #include <qlineedit.h>
 #include <qpixmap.h>
@@ -55,58 +56,57 @@
 #include "version.h"
 #include "scripts.h"
 #include "signals.h"
-#include "Data/data.h"
-#include "SignalProcessing/normalize.h"
+#include "data.h"
 
 static float lineabsmax[1024];
 
 void normalize_draw_decompose(Array<1,float4>& block, QPainter &p, int y, int sx, int depth)
 {
-  //  normalize(block);
-  int w = block.size(0);
-  QColor col;
-  float divisor = lineabsmax[y];
-  for(int x = 0 ; x < sx ; x ++)
-    {
-      int a = x*w/sx;
-      float d = block[a];
-      float ad = fabs(d);
-      if (ad>divisor)
-	lineabsmax[y]=divisor=ad;
-      d/=divisor;
-      ad/=divisor;
-      int h = (int)(240.0-240*ad);
-      //      int v = (int)(255.0*fabs(block[a]));
-      int v = (int)(255*ad*2);
-      if (v<0) v = 0;
-      if (v>255) v = 255;
-      col.setHsv(h,255.0,v);
-      p.setPen(col);
-      p.drawPoint(x,y);
-    }
-  if(depth==0) return;
-  // decompose the sucker in two pieces
-  Array<1,float4> lo(w/2),hi(w/2);
-  float prev  = 0.0;
-  hi[0]=lo[0]=0;
-  int target = 0;
-  Array<1,float4>::values it(block);
-  float twoago = 0;
-  while(it.more())
-    {
-      float here;
-      prev = *it;
-      it++;
-      here = *it;
-      hi[target]=here-twoago;
-      lo[target]=twoago+2*prev+here;
-      it++;
-      twoago= prev;
-      target ++;
-    }
-  int height = (1<<depth)-1;
-  normalize_draw_decompose(hi, p, y+1,        sx, depth-1);
-  normalize_draw_decompose(lo, p, y+1+height, sx, depth-1);
+   //  normalize(block);
+   int w = block.size(0);
+   QColor col;
+   float divisor = lineabsmax[y];
+   for(int x = 0 ; x < sx ; x ++)
+     {
+	int a = x*w/sx;
+	float d = block[a];
+	float ad = fabs(d);
+	if (ad>divisor)
+	  lineabsmax[y]=divisor=ad;
+	d/=divisor;
+	ad/=divisor;
+	int h = (int)(240.0-240*ad);
+	//      int v = (int)(255.0*fabs(block[a]));
+	int v = (int)(255*ad*2);
+	if (v<0) v = 0;
+	if (v>255) v = 255;
+	col.setHsv(h,255,v);
+	p.setPen(col);
+	p.drawPoint(x,y);
+     }
+   if(depth==0) return;
+   // decompose the sucker in two pieces
+   Array<1,float4> lo(w/2),hi(w/2);
+   float prev  = 0.0;
+   hi[0]=lo[0]=0;
+   int target = 0;
+   Array<1,float4>::values it(block);
+   float twoago = 0;
+   while(it.more())
+     {
+	float here;
+	prev = *it;
+	it++;
+	here = *it;
+	hi[target]=here-twoago;
+	lo[target]=twoago+2*prev+here;
+	it++;
+	twoago= prev;
+	target ++;
+     }
+   int height = (1<<depth)-1;
+   normalize_draw_decompose(hi, p, y+1,        sx, depth-1);
+   normalize_draw_decompose(lo, p, y+1+height, sx, depth-1);
 }
 
 void SpectrumDialogLogic::fetchSpectrum_wavelet()

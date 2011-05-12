@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,10 +16,10 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
-#ifndef ECHO_PROPERTY_H
-#define ECHO_PROPERTY_H
-
+#ifndef __BPMDJ___ECHO_PROPERTY_H__
+#define __BPMDJ___ECHO_PROPERTY_H__
+using namespace std;
+#line 1 "echo-property.h++"
 #include "histogram-property.h"
 
 #define echo_prop_sx 96
@@ -33,6 +33,4 @@ class echo_property: public histogram_property<echo_prop_sx>
     {
     }
 };
-
 #endif
-

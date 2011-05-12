@@ -405,7 +405,4 @@
     <tabstop>pushButton10</tabstop>
 </tabstops>
 <layoutdefaults spacing="6" margin="11"/>
-<includehints>
-    <includehint>capacitywidget.h</includehint>
-</includehints>
 </UI>

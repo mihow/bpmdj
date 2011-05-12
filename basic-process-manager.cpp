@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
+using namespace std;
+#line 1 "basic-process-manager.c++"
 #include <unistd.h>
 #include <dirent.h>
 #include <ctype.h>
@@ -36,7 +37,7 @@
 #include "basic-process-manager.h"
 #include "scripts.h"
 #include "memory.h"
-#include "growing-array.h"
+#include "vector-iterator.h"
 
 /**
  * The died processes class keeps track of all processes which returned
@@ -49,7 +50,7 @@ class DiedProcesses
 {
 public:
   int died_pids[MAX_PROCESSES];
-  GrowingArray<BasicProcessManager*> *listeners;
+  vector<BasicProcessManager*> *listeners;
   bool sigs_installed;
   void init(BasicProcessManager * l);
   void check();
@@ -68,11 +69,9 @@ void DiedProcesses::check()
       if (tmp!=-1)
 	{
 	  died_pids[i]=-1;
-	  for(int i = 0 ; i < listeners->count ; i++)
-	    {
-	      BasicProcessManager * listener = listeners->elements[i];
-	      listener->processDied(tmp);
-	    }
+	  vectorIterator<BasicProcessManager*> listener(listeners); ITERATE_OVER(listener)
+	    listener.val()->processDied(tmp);
+	  }
 	}
     }
 }
@@ -98,7 +97,8 @@ void DiedProcesses::init(BasicProcessManager * l)
   if (!sigs_installed)
     {
       sigs_installed = true;
-      listeners = new GrowingArray<BasicProcessManager*>();
+      listeners = new vector<BasicProcessManager*>();
+      listeners->reserve(10);
       // clear the dead array
       for(int i = 0 ; i < MAX_PROCESSES ; i ++)
 	died_pids[i]=-1;
@@ -112,7 +112,7 @@ void DiedProcesses::init(BasicProcessManager * l)
       // ignore sigchlds
       // signal(SIGCHLD,SIG_IGN);
     };
-  listeners->add(l);
+  listeners->push_back(l);
 }
 
 BasicProcessManager::BasicProcessManager(int count)
@@ -165,9 +165,8 @@ void BasicProcessManager::start(int id,const char* command, QString logname, boo
   // fork the command and once it exits stop immediatelly 
   if (!(active_pids[id]=bpmdj_fork()))
     { 
-      // we first 
       execute(tostart);
-      //      kill(getppid(),SIGUSR1);
+      //  kill(getppid(),SIGUSR1);
       /**
        * If we use exit instead of _exit our own static data structures
        * will be destroyed !

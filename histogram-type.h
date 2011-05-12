@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,10 +16,11 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
-#ifndef HISTOGRAM_TYPE_H
-#define HISTOGRAM_TYPE_H
-#include "Data/types.h"
+#ifndef __BPMDJ___HISTOGRAM_TYPE_H__
+#define __BPMDJ___HISTOGRAM_TYPE_H__
+using namespace std;
+#line 1 "histogram-type.h++"
+#include "types.h"
 #include "common.h"
 
 class histogram_type
@@ -48,5 +49,4 @@ class histogram_type
   double cor_dist(histogram_type *a);
   void halve();
 };
-
 #endif

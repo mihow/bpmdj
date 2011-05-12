@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
+using namespace std;
+#line 1 "player-core.c++"
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
@@ -37,10 +38,10 @@
 #include "scripts.h"
 #include "version.h"
 #include "dsp-drivers.h"
-#include "fourier.h"
 #include "energy-analyzer.h"
 #include "player-config.h"
 #include "capacity.h"
+//#include "resampler.h"
 
 using namespace std;
 
@@ -191,75 +192,6 @@ unsigned4 wave_max()
   return fsize(wave_file)/4;
 }
 
-void wave_process(stereo_sample2 *wave_buffer, int size)
-  // this contrast enhancing works quite well, except that the 'mean curve' 
-  // is certainly not good. Short beats will sound stronger in the end result
-  // than long sounds, which is not what is required
-  // 
- {
-  static double *tot_energy = NULL;
-  static int count = 0;
-  static double *amp;
-  static double *co;
-  static double *si;
-  static double *dl;
-
-  if (!tot_energy)
-    {
-      tot_energy = bpmdj_allocate(size,double);
-      for(int i = 0 ; i < size ; i ++)
-	tot_energy[i]=0;
-      amp = bpmdj_allocate(size,double);
-      co = bpmdj_allocate(size,double);
-      si = bpmdj_allocate(size,double);
-      dl = bpmdj_allocate(size,double);
-    }
-  for(int i = 0 ; i < size ; i ++)
-    {
-      amp[i] = wave_buffer[i].left;
-      amp[i]/=32768.0;
-    }
-  fft_double(size,0,amp,NULL,co,si);
-  count++;
-  if (count % 100 == 0)
-    {
-      for(int i = 0 ; i < size ; i ++)
-	printf("%g  ",tot_energy[i]);
-      printf("\n");
-    }
-  for(int i = 0 ; i < size ; i ++)
-    {
-      double e = co[i]*co[i]+si[i]*si[i];
-      double ea = sqrt(e);
-      double an = atan2(si[i],co[i]);
-      e = tot_energy[i]+=ea/count;
-      
-      ea/=e;
-      if (ea<1)
-	{
-	  if (ea<0) ea = -sqrt(ea)/3;
-	  else ea=sqrt(ea)/3;
-	  //if (ea<0) ea = -ea*ea;
-	  // else ea*=ea;
-	  ea*=ea;
-	}
-      ea*=e;
-      
-      co[i]=ea*cos(an);
-      si[i]=ea*sin(an);
-    }
-  fft_double(size,1,co,si,amp,dl);
-  for(int i = 0 ; i < size ; i ++)
-    wave_buffer[i].left = (short int)(amp[i]*32768.0);
-}
-
-void wave_process()
-{
-  const int size = 512;
-  for(int i = 0 ; i < wave_bufsize ; i+=size)
-    wave_process(wave_buffer+i,size);
-}
-
 int wave_read(unsigned4 pos, stereo_sample2 *val)
 {
   if (pos<wave_bufferpos || pos-wave_bufferpos>=wave_bufsize)
@@ -275,17 +207,50 @@ int wave_read(unsigned4 pos, stereo_sample2 *val)
 	  return 0;
 	}
       wave_bufferpos=pos;
+      if (wave_bufferpos<0) wave_bufferpos=0;
       fseek(wave_file,pos*4,SEEK_SET);
       int r = fread(wave_buffer,4,wave_bufsize,wave_file);
       if (r>-1 && r < wave_bufsize)
 	for(int i = r ; i < wave_bufsize ; i ++)
 	  wave_buffer[i].value(0);
-      //wave_process();
     }
   *val=wave_buffer[pos-wave_bufferpos];
   return 0;
 }
 
+/*-------------------------------------------
+ *         Resampling read
+ *-------------------------------------------*/
+/*int resample_read(unsigned4 pos, stereo_sample2 *val)
+{
+  static int musthave=640;
+  // we need at least 64 samples available whole the time
+  if (pos<wave_bufferpos || pos+musthave-wave_bufferpos>=wave_bufsize)
+    {
+      // we only stop one second later than necessary
+      if (pos>=wave_max()+44100L) return -1;
+      if (pos>=wave_max())
+	{
+	  wave_bufferpos=pos;
+	  for(int i = 0 ; i < wave_bufsize ; i ++)
+	    wave_buffer[i].value(0);
+	  val->value(0);
+	  return 0;
+	}
+      wave_bufferpos=pos;
+      if (wave_bufferpos<0) wave_bufferpos=0;
+      fseek(wave_file,pos*4,SEEK_SET);
+      int r = fread(wave_buffer,4,wave_bufsize,wave_file);
+      if (r>-1 && r < wave_bufsize)
+	for(int i = r ; i < wave_bufsize ; i ++)
+	  wave_buffer[i].value(0);
+    }
+  // here we have an array with values starting at 
+  stereo_sample2 * sixtyfour=wave_buffer+pos-wave_bufferpos;
+  *val = resampler.resample(sixtyfour);
+  return 0;
+}
+ */
 
 /*-------------------------------------------
  *         Volume Synth operations
@@ -883,7 +848,7 @@ void unpause_playing()
  *-------------------------------------------*/ 
 void copyright()
 {
-  printf("BpmDj Player v%s, Copyright (c) 2001-2006 Werner Van Belle\n",VERSION);
+  printf("BpmDj Player v%s, Copyright (c) 2001-2007 Werner Van Belle\n",VERSION);
   printf("This software is distributed under the GPL2 license. See copyright.txt\n");
   printf("--------------------------------------------------------------------\n");
   fflush(stdout);

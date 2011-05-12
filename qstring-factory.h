@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,9 +16,12 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
+#ifndef __BPMDJ___QSTRING_FACTORY_H__
+#define __BPMDJ___QSTRING_FACTORY_H__
+using namespace std;
+#line 1 "qstring-factory.h++"
 #include <qstring.h>
-#include "avltree.h"
+#include <set>
 
 extern const QString TRUE_TEXT;
 extern const QString FALSE_TEXT;
@@ -34,12 +37,21 @@ extern const QString ANAL_NEC;
 QString tonumber(const int b);
 QString tonumber(const float f);
 
+struct PtrQStringLesser
+{
+  bool operator()(QString *s1, QString *s2) const 
+  {
+    return (*s1)<(*s2);
+  };
+};
+
 class QStringFactory
 {
  private:
     static bool killed;
-    static AvlTree<QString> tree;
+    static set<QString*,PtrQStringLesser> tree;
  public:
     static QString create(QString str);
     static void kill();
 };
+#endif

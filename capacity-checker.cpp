@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
+using namespace std;
+#line 1 "capacity-checker.c++"
 #include <qfile.h>
 #include "capacity-checker.h"
 #include "embedded-files.h"
@@ -96,8 +97,10 @@ bool Mpg123Decoder::checkProgram(QString filename)
   bool check1=false;
   bool check2=false;
   while(!(line=stream.readLine()).isNull())
-   {
+    {
       if (line.find("0.59r")>=0) check1=true;
+      if (line.find("0.60")>=0) check1=true;
+      if (line.find("0.61")>=0) check1=true;
       if (line.find("Michael Hipp")>=0) check2=true;
     }
   logfile.close();

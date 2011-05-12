@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,17 +16,19 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
-#ifndef DSP_DRIVERS
-#define DSP_DRIVERS
+#ifndef __BPMDJ___DSP_DRIVERS_H__
+#define __BPMDJ___DSP_DRIVERS_H__
+using namespace std;
+#line 1 "dsp-drivers.h++"
 #include "common.h"
 #include "stereo-sample2.h"
 #include "player-config.h"
 #ifndef COMPILE_OSS
 #ifndef COMPILE_ALSA
 #error -------------------------------------------
-#error Should at least compile one dsp driver !!! 
-#error Try using -D COMPILE_OSS, -D COMPILE_ALSA 
+#error Should at least compile one dsp driver !!!
+#error Try using -D COMPILE_OSS, -D COMPILE_ALSA
+#error -D COMPILE_JACK
 #error -------------------------------------------
 #endif
 #endif
@@ -56,6 +58,4 @@ class dsp_driver
   virtual ~dsp_driver() {};
   static dsp_driver * get_driver(PlayerConfig * cfg);
 };
-
-
 #endif

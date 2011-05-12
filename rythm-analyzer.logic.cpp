@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
+using namespace std;
+#line 1 "rythm-analyzer.logic.c++"
 #include <qapplication.h>
 #include <qlineedit.h>
 #include <qpixmap.h>
@@ -53,12 +54,11 @@
 #include "memory.h"
 #include "rythm-analyzer.logic.h"
 #include "rythm-property.h"
-#include "fourier.h"
 #include "kbpm-play.h"
 #include "version.h"
 #include "scripts.h"
 #include "pca.h"
-#include "Data/types.h"
+#include "types.h"
 
 RythmDialogLogic::RythmDialogLogic(SongPlayer*parent, const char*name, bool modal, WFlags f) :
   RythmDialog(0,name,modal,f)
@@ -75,7 +75,7 @@ RythmDialogLogic::RythmDialogLogic(SongPlayer*parent, const char*name, bool moda
 
 static double tovol(double a)
 {
-  double r = 10*log(a)/log(10);
+  double r = 10.0*log(a)/log(10.0);
   if (isnan(r)) return 0;
   if (r<-30) return 0;
   return r+30;
@@ -353,7 +353,7 @@ void write_out_projection(long slice_size, unsigned4* phases, int maximum_slice,
     for(unsigned4 x = 0 ; x + frame_size < l ; x+=frame_size)
       printf("%g %g\n",target_m[(x/frame_size)+1][1],target_m[(x/frame_size)+1][2]);
   fflush(stdout);
-  exit(0);
+  _exit(0);
 }  
 
 /**
@@ -406,7 +406,7 @@ void write_out_projection_hald_working(unsigned long slice_size, unsigned4* phas
       // and write it out
       out.writeSamples(curr_frame,frame_size/8);
     }
-  exit(0);
+  _exit(0);
 }  
 
 // deconvolution really messes it up because we need to describe all the
@@ -467,7 +467,7 @@ void write_out_projection_old(long slice_size, unsigned4* phases, int maximum_sl
       frame.multiply(32767);
       out.writeSamples(frame,window_size);
     }
-  exit(0);
+  _exit(0);
   
   // when we have the pattern array, 
   // we convert it to its frequency domain, 
@@ -1038,6 +1038,3 @@ void RythmDialogLogic::calculateRythmPattern2()
   status_bar->setText("Done");
   free_bark_fft2();
 }
-
-
-

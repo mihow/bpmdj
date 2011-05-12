@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,7 +16,10 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
+#ifndef __BPMDJ___ALBUMITEM_H__
+#define __BPMDJ___ALBUMITEM_H__
+using namespace std;
+#line 1 "albumitem.h++"
 #include "config.h"
 #include "cluster.h"
 #include "data.h"
@@ -28,14 +31,12 @@
 #define ALBUM_INDEX 4
 #define ALBUM_FILE 5
 
-class AlbumItem: 
-  public QListViewItem
+class AlbumItem: public QListViewItem
 {
   accessors(Song*, song, NULL);
  public:
   AlbumItem(const char* name, QListView * parent);
   AlbumItem(int nr, Song *song, QListViewItem * parent);
-  //    virtual void paintCell(QPainter *p, const QColorGroup &cg, int col, int wid, int align);
-  // virtual QString text(int i) const;
   void fixNr();
 };
+#endif

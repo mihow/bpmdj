@@ -1,0 +1,15 @@
+UIS     = ${shell ls *.ui 2>/dev/null}
+include defines
+.ui-forms: $(UIS:%.ui=%.h) $(UIS:%.ui=%.cpp) 
+
+%.moc.cpp: %.h
+	@echo "  [moc] "$@
+	@$(MOC) -o $@ $<
+
+%.cpp: %.ui
+	@echo "  [uic] "$@
+	@$(UIC) -i `basename $< .ui`.h -o $@ $<
+
+%.h: %.ui
+	@echo "  [uic] "$@
+	@$(UIC) -o `basename $< .ui`.h $<

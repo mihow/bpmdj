@@ -1,0 +1,87 @@
+BIN = kbpm-play kbpm-dj kbpm-merge kbpm-mix bpmcount 
+
+tgz: source.tgz-dist doc.tgz-dist bin.tgz-dist bpmdj-support.tgz
+	@echo Finished
+	@mv bpmdj-support.tgz ../bpmdj-$(VERSION).support.tgz
+	@mv *$(VERSION)*tgz ..
+	@rm *.tgz
+
+.PHONY: files
+files:
+	@echo " [file] list"
+	@rm -rf tmp 2>/dev/null; exit 0
+	@find -H ./* -iname "*" | grep -v ^\./index | grep -v ^\./music > existing_files # list of existing files
+	@grep \  existing_files > problem_files; exit 0 # problematic files
+	@test ! -s problem_files
+	@gawk '{print $$1}' files >known_files # list of known files
+	@grep -vxFf known_files existing_files >unknown_files; exit 0 # unknown files
+	@gawk '{print $$1"  ---"}' unknown_files >>files # attach these to the files
+	@gawk '{if ($$2=="---") print $1}' files >untagged_files; exit 0 # find files missing tags
+	@if test -s untagged_files; then cat untagged_files; exit 1; fi
+
+source_files: files
+	@echo " [file] source"
+	@gawk '{if (index($$2,"source")) print $$1}' files >source_files 
+
+install_files: files
+	@echo " [file] install"
+	@gawk '{if (index($$2,"install")) print $$1}' files >install_files
+
+documentation_files: files
+	@echo " [file] documentation"
+	@gawk '{if (index($$2,"doc")) print $$1}' files >documentation_files 
+
+support_files: files
+	@echo " [file] support"
+	@gawk '{if (index($$2,"support")) print $$1}' files >support_files
+
+temp_files: files
+	@echo " [file] temporary"
+	@gawk '{if (index($$2,"temp")) print $$1}' files >temp_files
+
+bpmdj-source.tgz: source_files
+	@echo "  [tgz] source"
+	@tar -czh --no-recursion --ignore-failed-read -T source_files -f bpmdj-source.tgz  2>/dev/null 
+
+bpmdj-bin.tgz: install_files $(BIN)
+	@echo "[strip] "$(BIN)
+	@strip $(BIN) 2>/dev/null; exit 0
+	@echo "  [tgz] install"
+	@tar -czh --no-recursion --ignore-failed-read -T install_files -f bpmdj-bin.tgz 2>/dev/null 
+
+bpmdj-doc.tgz: documentation_files
+	@echo "  [tgz] documentation"
+	@tar -czh --no-recursion --ignore-failed-read -T documentation_files -f bpmdj-doc.tgz 2>/dev/null 
+
+bpmdj-support.tgz: support_files
+	@echo "  [tgz] support"
+	@tar -czh --no-recursion --ignore-failed-read -T support_files -f bpmdj-support.tgz 2>/dev/null 
+
+install: bpmdj-bin.tgz
+	mkdir -p $(DESTDIR)/bpmdj;
+	cp bpmdj-bin.tgz $(DESTDIR)/bpmdj
+	cd $(DESTDIR)/bpmdj; tar -xzf bpmdj-bin.tgz
+	rm $(DESTDIR)/bpmdj/bpmdj-bin.tgz
+
+source.tgz-dist: bpmdj-source.tgz
+	@echo "  [tgz] "bpmdj-$(VERSION).source.tgz
+	@mkdir bpmdj-$(VERSION)
+	@cd bpmdj-$(VERSION); tar -xzf ../bpmdj-source.tgz
+	@tar -czf bpmdj-$(VERSION).source.tgz bpmdj-$(VERSION)
+	@$(RM) -r bpmdj-$(VERSION)
+
+
+bin.tgz-dist: bpmdj-bin.tgz
+	@echo "  [tgz] "bpmdj-$(VERSION).bin.tgz
+	@mkdir bpmdj-$(VERSION)
+	@cd bpmdj-$(VERSION); tar -xzf ../bpmdj-bin.tgz
+	@tar -czf bpmdj-$(VERSION).bin.tgz bpmdj-$(VERSION)
+	@$(RM) -r bpmdj-$(VERSION)
+
+
+doc.tgz-dist: bpmdj-doc.tgz
+	@echo "  [tgz] "bpmdj-$(VERSION).doc.tgz
+	@mkdir bpmdj-$(VERSION)
+	@cd bpmdj-$(VERSION); tar -xzf ../bpmdj-doc.tgz
+	@tar -czf bpmdj-$(VERSION).doc.tgz bpmdj-$(VERSION)
+	@$(RM) -r bpmdj-$(VERSION)

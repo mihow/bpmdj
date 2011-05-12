@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
+using namespace std;
+#line 1 "merger.c++"
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
@@ -33,23 +34,7 @@
 #include "player-config.h"
 #include "histogram-property.h"
 #include "smallhistogram-type.h"
-#include "signals-template.cpp"
-
-/*-------------------------------------------
- *         Templates we need
- *-------------------------------------------*/
-
-/*
-// types
-template class smallhistogram_type<32>;
-template class smallhistogram_type<96>;
-template class histogram_property<32>;
-template class histogram_property<96>;
-
-// signals
-template double normalize_abs_max<double>(double*, long);
-template double find_abs_max<double>(double*, long);
-*/
+#include "signals.h"
 
 /*-------------------------------------------
  *         Vars
@@ -61,7 +46,7 @@ PlayerConfig * config;      // will be the standard configuration
  *-------------------------------------------*/
 void options_failure(char* err)
 {
-  printf("BpmDj Merger v%s, Copyright (c) 2001-2006 Werner Van Belle\n",VERSION);
+  printf("BpmDj Merger v%s, Copyright (c) 2001-2007 Werner Van Belle\n",VERSION);
   printf("This software is distributed under the GPL2 license. See copyright.txt\n\n");
   printf("Usage:  kbpm-merge <options> [old-song] new-song\n\n"
 	 "  --mix         nbr  how many measures should be used to create the mix\n" 
@@ -79,7 +64,7 @@ void options_failure(char* err)
 	 "    --number         number every part of the split process\n"
 	 "  old-song           the index file of the last song\n"
 	 "  new-song           the index file of the new song\n\n%s\n\n",err);
-  exit(1);
+  _exit(1);
 }
 
 static char * old_index = NULL;
@@ -445,7 +430,8 @@ void readTail(signed8 measures)
   if (length_a * 4 > filelength_a)
     {
       printf("Error: not enough data in file...\n");
-      exit(50);
+      fflush(stdout);
+      _exit(50);
     }
   position_a = filelength_a-(length_a*4);
   position_a /= 4;

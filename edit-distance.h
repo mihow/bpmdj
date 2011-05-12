@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,9 +16,12 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
+#ifndef __BPMDJ___EDIT_DISTANCE_H__
+#define __BPMDJ___EDIT_DISTANCE_H__
+using namespace std;
+#line 1 "edit-distance.h++"
 #include <assert.h>
-
 int ndist(const char* title, const char* author, const char* other);
 void dist_init();
 void dist_done();
+#endif

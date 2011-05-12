@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,15 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
-/**
- * The next step we need here is the ability to get a list of songnames,
- * two operators and the possibility to get back a set of actions. The question
- * now is whether we want to realize the renaming immediatelly or not.
- * Probably it is best to select them and use them immediatelly as input into 
- * the full renamer box...
- */
-
+using namespace std;
+#line 1 "renamer.logic.c++"
 #include <assert.h>
 #include <ctype.h>
 #include <qlineedit.h>

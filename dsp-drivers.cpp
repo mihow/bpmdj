@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
+using namespace std;
+#line 1 "dsp-drivers.c++"
 #include <assert.h>
 #include <qdialog.h>
 #include <qstring.h>
@@ -24,24 +25,34 @@
 #include "dsp-alsa.h"
 #include "dsp-none.h"
 #include "dsp-mixed.h"
+#include "dsp-jack.h"
 
 #ifndef COMPILE_OSS
 #ifndef COMPILE_ALSA
+#ifndef COMPILE_JACK
 #error -------------------------------------------
 #error Should at least compile one dsp driver !!! 
 #error Try using -D COMPILE_OSS or -D COMPILE_ALSA
+#error or -D COMPILE_JACK
 #error -------------------------------------------
+#endif
 #endif
 #endif
 
 dsp_driver * dsp_driver::get_driver(PlayerConfig * cfg)
 {
-  switch (cfg->get_player_dsp())
-    {
-    case 0 : return new dsp_none ( * cfg ) ;
-    case 1 : return new dsp_oss  ( * cfg ) ;
-    case 2 : return new dsp_alsa ( * cfg ) ;
-    case 3 : return new dsp_mixed( * cfg ) ;
-    }
-  return new dsp_none( * cfg );
+   switch (cfg->get_player_dsp())
+     {
+      case 0 : return new dsp_none ( * cfg ) ;
+      case 1 : return new dsp_oss  ( * cfg ) ;
+      case 2 : return new dsp_alsa ( * cfg ) ;
+      case 3 : return new dsp_mixed( * cfg ) ;
+#ifdef INCOMPLETE_FEATURES
+#ifdef COMPILE_JACK
+      case 4 : return new dsp_jack ( * cfg ) ;
+#endif
+#endif
+      default: return new dsp_none ( * cfg ) ;
+     }
+   return new dsp_none( * cfg );
 }

@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,10 +16,10 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
-#ifndef COMPOSITION_PROPERTY_H
-#define COMPOSITION_PROPERTY_H
-
+#ifndef __BPMDJ___COMPOSITION_PROPERTY_H__
+#define __BPMDJ___COMPOSITION_PROPERTY_H__
+using namespace std;
+#line 1 "composition-property.h++"
 #include "memory.h"
 #include "histogram-property.h"
 
@@ -51,5 +51,4 @@ class composition_property: public histogram_property<composition_prop_sx>
       bark[y].set_energy(x,s);
     }
 };
-
 #endif

@@ -1,0 +1,134 @@
+BIN = kbpm-play kbpm-dj kbpm-merge kbpm-mix bpmcount 
+AR = ar
+bin: $(BIN)
+include .depend
+
+%.o: %.cpp
+	@echo "  [cpp] "$@
+	@$(CPP) -c $< $(CFLAGS) -o $@ $(QT_INCLUDE_PATH)
+
+%.moc.cpp: %.h
+	@echo "  [moc] "$@
+	@$(MOC) -o $@ $<
+
+# BpmDj contains a number of embedded files. Instead of loading images
+# as huge pixmaps that require parsing, we insert the .png and .wav files
+# straight into the data segment of the program.
+%.ogg: %.wav
+	@echo "  [ogg] "$@
+	@oggenc $< >/dev/null 2>/dev/null
+
+%.mp3: %.wav
+	@echo "  [mp3] "$@
+	@lame $< $@ >/dev/null 2>/dev/null
+
+%.flac: %.wav
+	flac $<
+
+%-ogg.o: %.ogg
+	@echo "  [obj] "$@
+	@objcopy -I binary -B i386 -O elf32-i386 \
+		--rename-section .data=.rodata,alloc,load,readonly,data,contents \
+		 $< $@
+
+%-mp3.o: %.mp3
+	@echo "  [obj] "$@
+	@objcopy -I binary -B i386 -O elf32-i386 \
+		--rename-section .data=.rodata,alloc,load,readonly,data,contents \
+		 $< $@
+
+%-png.o: %.png
+	@echo "  [obj] "$@
+	@objcopy -I binary -B i386 -O elf32-i386 \
+		--rename-section .data=.rodata,alloc,load,readonly,data,contents \
+		 $< $@
+
+DATA_OBJECTS = data.o data-lexer.o data-syntax.o data-io.o \
+        data-visitor.o array-creator.o symbol.o token.o string.o \
+        null.o set.o
+
+KPLAY_OBJECTS = about.o aboutbox.o about.moc.o power-type.o songplayer.o \
+	songplayer.moc.o memory.o sample4-type.o player-core.o dsp-oss.o \
+	dsp-alsa.o dsp-none.o dsp-mixed.o dsp-drivers.o spectrum-type.o \
+	files.o noise-ogg.o noise-mp3.o song-information.o song-information.moc.o \
+	pca.o capacity.o index.o kbpm-play.o analyzer.o signals.o player-config.o \
+	$(DATA_OBJECTS) capacity-checker.o embedded-files.o logo-png.o types.o \
+	wavelet-analyzer.logic.o songplayer.logic.o \
+	songplayer.logic.moc.o capacity-widget.o capacity-widget.moc.o \
+	md5-analyzer.o efence.o page.o efence-print.o energy-analyzer.o \
+	bpmcounter.o bpmcounter.moc.o bpm-analyzer.logic.o bpm-analyzer.logic.moc.o \
+	spectrum-analyzer.o  spectrum-analyzer.moc.o  spectrum-analyzer.logic.o \
+	spectrum-analyzer.logic.moc.o beatgraph-widget.o beatgraph-widget.moc.o \
+	beatgraph-analyzer.logic.o beatgraph-analyzer.logic.moc.o rythm-analyzer.o \
+	rythm-analyzer.moc.o rythm-analyzer.logic.o rythm-analyzer.logic.moc.o\
+	histogram-type.o common.o dsp-jack.o scripts.o bpm.o
+
+BPM_LIB = bpm.o memory.o	
+BPMCOUNT_OBJECTS = bpmcount.o files.o signals.o bpm.a 
+
+KMIX_OBJECTS = mixerdialog.o mixerdialog.moc.o mixerdialog.logic.o mixerdialog.logic.moc.o\
+	kbpm-mix.o dsp-oss.o dsp-alsa.o dsp-none.o memory.o dsp-drivers.o files.o \
+	efence.o page.o efence-print.o signals.o spectrum-type.o \
+	types.o dsp-mixed-none.o player-config.o scripts.o $(DATA_OBJECTS) dsp-jack.o
+
+KCOUNT_OBJECTS = bpmcounter.o bpmcounter.moc.o index.o kbpm-count.o kbpm-count.moc.o\
+	scripts.o merger.o
+
+KSEL_OBJECTS = qstring-factory.o tags.o aboutbox.o logo-png.o capacity.o \
+	capacity-widget.o capacity-widget.moc.o renamerstart.o renamerstart.moc.o \
+	heap.o pixmap-cache.o song-process.o song-process.moc.o noise-ogg.o noise-mp3.o \
+	spectrum-type.o scripts.o cluster.o pca.o about.o about.moc.o\
+	loader.o loader.moc.o histogram-type.o\
+	qvectorview.o qvectorview.moc.o freq-mapping.o freq-mapping.moc.o\
+	albumbox.o albumbox.moc.o memory.o analyzer.o \
+	types.o config.moc.o existence-scanner.o \
+	song-information.o song-information.moc.o sample4-type.o embedded-files.o\
+	scanningprogress.o scanningprogress.moc.o power-type.o analyzers-manager.o\
+	basic-process-manager.o \
+	database.o dirscanner.o importscanner.o efence.o page.o efence-print.o\
+	songselector.o songselector.moc.o songselector.logic.o songselector.logic.moc.o\
+	process-manager.o basic-database.o\
+	preferences.o preferences.moc.o preferences.logic.o preferences.logic.moc.o\
+	song.o qsong.o queuedsong.o historysong.o signals.o\
+	index-reader.o index.o history.o albumitem.o files.o\
+	setupwizard.moc.o setupwizard.o kbpm-dj.o edit-distance.o\
+	renamer.o renamer.moc.o renamer.logic.o renamer.logic.moc.o\
+	similars.o similars.moc.o similarscanner.o similarscanner.moc.o\
+	config.o merger-dialog.o merger-dialog.moc.o common.o installbpmplay.o installbpmplay.moc.o\
+	song-statistics.o statistics.o statistics.moc.o song-metric.o \
+	metric-widget.o metric-widget.moc.o cluster-dialog.o cluster-dialog.moc.o \
+	log-viewer.o log-viewer.moc.o log-viewer.logic.o log-viewer.logic.moc.o \
+	$(DATA_OBJECTS)
+
+MERGER_OBJECTS = merger.o index.o common.o scripts.o song-information.o song-information.moc.o\
+	capacity.o capacity-widget.o capacity-widget.moc.o types.o player-config.o\
+	efence.o page.o efence-print.o memory.o sample4-type.o power-type.o spectrum-type.o \
+	signals.o files.o histogram-type.o $(DATA_OBJECTS)
+
+kbpm-play: $(KPLAY_OBJECTS)
+	@echo " [link] "$@
+	@$(LINK) $(KPLAY_OBJECTS) -o kbpm-play
+
+bpmcount: $(BPMCOUNT_OBJECTS)
+	@echo " [link] "$@
+	@$(LINK) $(BPMCOUNT_OBJECTS) -o bpmcount
+
+kbpm-mix: $(KMIX_OBJECTS)
+	@echo " [link] "$@
+	@$(LINK) $(KMIX_OBJECTS) -o kbpm-mix
+
+bpm.a:  $(BPM_LIB)
+	@echo "   [ar] "$@
+	@$(AR) r $@ $(BPM_LIB) >/dev/null 2>/dev/null 
+
+kbpm-dj: $(KSEL_OBJECTS) 
+	@echo " [link] "$@
+	@$(LINK)  $(KSEL_OBJECTS) -o kbpm-dj
+
+profile-clock: profile-clock.o
+	@echo " [link] "$@
+	@$(CPP) $(LDFLAGS) profile-clock.o -o profile-clock
+
+kbpm-merge: $(MERGER_OBJECTS)
+	@echo " [link] "$@
+	@$(LINK)  $(MERGER_OBJECTS) -o kbpm-merge

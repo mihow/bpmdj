@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
+using namespace std;
+#line 1 "energy-analyzer.c++"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -63,7 +64,7 @@ float4 normalization_factor(signed2 min, signed2 max, signed2 mean)
   return 32767.0 / c;
 }
 
-void EnergyAnalyzer::run()
+void EnergyAnalyzer::analyze()
 {
   readAudio();
   // fetch the mean values

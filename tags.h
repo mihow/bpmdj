@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,38 +16,32 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
+#ifndef __BPMDJ___TAGS_H__
+#define __BPMDJ___TAGS_H__
+using namespace std;
+#line 1 "tags.h++"
 #include <qstring.h>
+#include <map>
+#include <vector>
 #include "common.h"
-#include "avltree.h"
-#include "growing-array.h"
 #include "tag-type.h"
-
-class Tag2Index: public Node<QString>
-{
- public:
-  QString  tag;
-  int      index;
-  virtual QString getKey() { return tag ; };
-  virtual int compareAddData(Node<QString>* other);
-  virtual int compareSearchData(QString key);
-  virtual void print() {};
-  Tag2Index(QString t, int nr);
-  virtual ~Tag2Index() {};
-};
 
 class Tags
 {
-  private:
-    static AvlTree   <QString> tree;
-    static QString   find_tag(tag_type tag);
-    static tag_type  add_tag(QString tag);
-  public:
-    static GrowingArray <QString> tag_names;
-    static bool      new_tags;
-    static void      init();
-    static tag_type  find_tag(QString tag);
-    static tag_type  find_tag_create_if_necessary(QString tag);
-    static tags_type parse_tags(QString tag_string);
-    static QString   full_string(tags_type tags);
+ private:
+  static map<QString,int> tree;
+  static QString   find_tag(tag_type tag);
+  static tag_type  add_tag(QString tag);
+ public:
+  static vector<QString> tag_names;
+  static bool      new_tags;
+  static void      init();
+  static tag_type  find_tag(QString tag)
+  {
+    return tree[tag];
+  }
+  static tag_type  find_tag_create_if_necessary(QString tag);
+  static tags_type parse_tags(QString tag_string);
+  static QString   full_string(tags_type tags);
 };
+#endif

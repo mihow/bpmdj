@@ -1,3 +1,10 @@
+3.3:
+  kplay + started on a resampler
+  kplay + added possibility for a jack implementation.	
+  ksel  + reorganized analyzer classes
+  ksel  - fixed bug in threaded analyzer: bpm countstop hung
+  ksel  + recogniwez mpg123 v0.60 as well
+  code  + removed AvlTree and GrowingArray and replaced them with map and vector instead
 3.2:
   ksel  + graceful resolve/wait when we cannot fork
   ksel  + no longer require SIGUSR to signal a dead process. We use SIGCHLD now	

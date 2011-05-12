@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,12 +16,13 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
-#ifndef BPM_EVENT_H
-#define BPM_EVENT_H
+#ifndef __BPMDJ___CUSTOM_EVENT_H__
+#define __BPMDJ___CUSTOM_EVENT_H__
+using namespace std;
+#line 1 "custom-event.h++"
 #include <qevent.h>
 
-enum {BpmPlayCustom = QEvent::User, BpmDjCustom};
+enum {BpmPlayCustom = QEvent::User, BpmDjCustom, CommonEvent};
 
 class BpmEvent: public QCustomEvent
 {
@@ -30,6 +31,4 @@ class BpmEvent: public QCustomEvent
     {
     }
 };
-
 #endif
-

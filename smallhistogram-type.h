@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,14 +16,15 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
-#ifndef SMALLHISTOGRAM_TYPE_H
-#define SMALLHISTOGRAM_TYPE_H
+#ifndef __BPMDJ___SMALLHISTOGRAM_TYPE_H__
+#define __BPMDJ___SMALLHISTOGRAM_TYPE_H__
+using namespace std;
+#line 1 "smallhistogram-type.h++"
 #include <stdlib.h>
 #include <assert.h>
 #include <math.h>
 #include "common.h"
-#include "Data/om-data.h"
+#include "om-data.h"
 #include "histogram-type.h"
 #include "common.h"
 #include "memory.h"
@@ -131,5 +132,4 @@ void smallhistogram_type<smallhistogram_size>::set_data(Data& data)
     for(int i = 0 ; i < smallhistogram_size ; i++)
       bin[i]=a[i];
 }
-
 #endif

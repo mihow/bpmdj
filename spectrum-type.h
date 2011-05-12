@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,15 +16,15 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
-#ifndef SPECTRUM_TYPE_H
-#define SPECTRUM_TYPE_H
-
+#ifndef __BPMDJ___SPECTRUM_TYPE_H__
+#define __BPMDJ___SPECTRUM_TYPE_H__
+using namespace std;
+#line 1 "spectrum-type.h++"
 #include <math.h>
 #include "common.h"
 #include "signals.h"
 #include "files.h"
-#include "Data/om-data.h"
+#include "om-data.h"
 
 #define spectrum_size 24
 #define barksize spectrum_size
@@ -76,5 +76,4 @@ class spectrum_type
   Data get_data() const;
   void set_data(Data &data);
 };
-
 #endif

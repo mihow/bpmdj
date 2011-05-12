@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
+using namespace std;
+#line 1 "player-config.c++"
 #include <qstring.h>
 #include <qfile.h>
 #include <qlineedit.h>
@@ -65,10 +66,13 @@ void PlayerConfig::init()
   init_oss_verbose();
   init_oss_nolatencyaccounting();
   init_oss_latency();
-  init_mixed_channel();
+  init_bpm_channel();
   init_player_rms();
   init_player_rms_target();
   init_disabled_capacities();
+  init_jack_dev();
+  init_jack_verbose();
+  init_jack_latency();
 }
 
 /**
@@ -127,14 +131,16 @@ void PlayerConfig::save()
   s << (Q_INT8)get_oss_verbose();
   s << (Q_INT8)get_oss_nolatencyaccounting();
   s << (Q_UINT16)get_oss_latency();
-  s << (Q_UINT16)get_mixed_channel();
+  s << (Q_UINT16)get_bpm_channel();
   s << (Q_INT8)get_player_rms();
   s << get_player_rms_target();
   s << (Q_UINT16)get_disabled_capacities();
   s << (Q_UINT16)get_ui_posx();
   s << (Q_UINT16)get_ui_posy();
+  s << get_jack_dev();
+  s << (Q_UINT16)get_jack_latency();
+  s << (Q_INT8)get_jack_verbose();
 }
-
 
 void PlayerConfig::load()
 {
@@ -161,7 +167,7 @@ void PlayerConfig::load()
 	  s >> b; set_oss_verbose(b);
 	  s >> b; set_oss_nolatencyaccounting(b);
 	  s >> w; set_oss_latency(w);
-	  s >> w; set_mixed_channel(w);
+	  s >> w; set_bpm_channel(w);
 	  s >> b; set_player_rms(b);
 	  s >> fl; set_player_rms_target(fl);
 	  s >> w; set_disabled_capacities(w);
@@ -181,13 +187,36 @@ void PlayerConfig::load()
 	  s >> b; set_oss_verbose(b);
 	  s >> b; set_oss_nolatencyaccounting(b);
 	  s >> w; set_oss_latency(w);
-	  s >> w; set_mixed_channel(w);
+	  s >> w; set_bpm_channel(w);
 	  s >> b; set_player_rms(b);
 	  s >> fl; set_player_rms_target(fl);
 	  s >> w; set_disabled_capacities(w);
 	  s >> w; set_ui_posx(w);
 	  s >> w; set_ui_posy(w);
 	}
+   else if (magic == MAGIC_3_3)
+     {
+	s >> str; set_core_rawpath(str);
+	s >> w; set_player_dsp(w);
+	s >> w; set_alsa_latency(w);
+	s >> b; set_alsa_verbose(b);
+	s >> str; set_alsa_dev(str);
+	s >> str; set_oss_dsp(str);
+	s >> b; set_oss_init_fragments(b);
+	s >> w; set_oss_fragments(w);
+	s >> b; set_oss_verbose(b);
+	s >> b; set_oss_nolatencyaccounting(b);
+	s >> w; set_oss_latency(w);
+	s >> w; set_bpm_channel(w);
+	s >> b; set_player_rms(b);
+	s >> fl; set_player_rms_target(fl);
+	s >> w; set_disabled_capacities(w);
+	s >> w; set_ui_posx(w);
+	s >> w; set_ui_posy(w);
+	s >> str; set_jack_dev(str);
+	s >> w;  set_jack_latency(w);
+	s >> b; set_jack_verbose(b);
+     }
   else
     Error(true,"Kbpm-play wrong config file format\n");
 }

@@ -2,16 +2,8 @@ CPP=g++ -O3 -Wall -pipe
 CC=gcc -O3 -Wall -pipe
 CFLAGS+=-D COMPILE_ALSA -D COMPILE_OSS -D QT_THREAD_SUPPORT
 LDFLAGS+= -lpthread -lm -lasound -lrt
-
-CP = cp
-MV = mv
-TAR = tar
-MKDIR = mkdir
 UIC = uic
 MOC = moc
-STRIP = strip
-INSTALL = install
-
 QT_INCLUDE_PATH= -I ${QTDIR}/include/
 QT_LIBRARY_PATH= -L ${QTDIR}/lib/
 QT_LIBS= -lqt

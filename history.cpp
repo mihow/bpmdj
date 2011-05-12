@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,10 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
-#endif
+using namespace std;
+#line 1 "history.c++"
 #include <stdio.h>
 #include <string.h>
 #include <fcntl.h>
@@ -36,6 +34,7 @@
 #include "history.h"
 #include "common.h"
 #include "scripts.h"
+#include "vector-iterator.h"
 
 Song * History::t_2 = NULL;
 Song * History::t_1 = NULL;
@@ -109,16 +108,14 @@ void History::clear_history(DataBase * db)
   fclose(f);
   f=fopen(history_filename,"wb");
   // clear memory marks
-  GrowingArray<Song*> *songs = db->getAllSongs();
-  for(int i = 0 ; i < songs->count ; i++)
+  const vector<Song*> &songs = db->getAllSongs();
+  constVectorIterator<Song*> song(songs); ITERATE_OVER(song)
+    if (song.val())
     {
-      Song * song = songs->elements[i];
-      if (song)
-	{
-	  song->init_played_author_at_time();
-	  song->init_played();
- 	}
+      song.val()->init_played_author_at_time();
+      song.val()->init_played();
     }
+  }
 }
 
 void History::this_is_playing(Song * main_now)
@@ -131,7 +128,6 @@ void History::this_is_playing(Song * main_now)
       fflush(f);
       mark_as_played(main_now);
     }
-  
   // check the history and update records as necessary...
   // t_1 its prev should point to t_2
   // t_1 its next should point to t_0
@@ -141,28 +137,25 @@ void History::this_is_playing(Song * main_now)
   if (t_1)
     {
       Index i(t_1->get_storedin());
-      QString info;
       HistoryField * f;
       if (t_0) 
 	{
 	  f = i.add_next_song(t_0->get_file());
-	  info = f -> comment;
+	  QString info = f -> comment;
 	  if (Config::ask_mix)
 	    {
 	      bool ok;
+	      QString from_text = t_1->get_title() + "[" + t_1->get_author()+"]" + t_1->get_version();
+	      QString to_text = t_0->get_title() + "[" + t_0->get_author() + "]" + t_0->get_version();
 	      QString mixinfo = QInputDialog::getText("How did the mix go ?",
-						      "From : " + t_1->get_title() + "[" + t_1->get_author()+"]" + t_1->get_version() + "\n"+
-						      "To: " + t_0->get_title() + "[" + t_0->get_author() + "]" + t_0->get_version() + "\n",QLineEdit::Normal,
-						      info,&ok);
-	      if (ok) f-> comment = strdup(mixinfo);
+						      "From : " + from_text + "\n"+
+						      "To: " + to_text + "\n",
+						      QLineEdit::Normal,info,&ok);
+	      if (ok) f->comment = strdup(mixinfo);
 	    }
 	}
       if (t_2) 
-	{
-	  f = i.add_prev_song(t_2->get_file());
-	  // if (info.isNull()) f -> comment = strdup("");
-	  // else f -> comment = strdup(info);
-	}
+	f = i.add_prev_song(t_2->get_file());
       i.write_idx();
     }
 }

@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,12 +16,12 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
-#ifndef BDATABASE_H
-#define BDATABASE_H
-
-#include "avltree.h"
-#include "growing-array.h"
+#ifndef __BPMDJ___BASIC_DATABASE_H__
+#define __BPMDJ___BASIC_DATABASE_H__
+using namespace std;
+#line 1 "basic-database.h++"
+#include <map>
+#include <vector>
 
 class Song;
 class SongMetriek;
@@ -30,21 +30,28 @@ class QVectorView;
 
 class BasicDataBase
 {
-  protected:
-    GrowingArray<Song*> all;
-    AvlTree<QString>* file_tree;
-    virtual void init();
-    virtual void clear();
-  public:
-    BasicDataBase();
-    virtual ~BasicDataBase();
-    void     reset();
-    void     add(Song*);
-    Song *   find(QString song_filename);
-    GrowingArray<Song*> * getAllSongs() { return &all;};
-    AvlTree<QString> * getFileTreeRef();
-    AvlTree<QString> * getFileTreeCopy();
+protected:
+  vector<Song*> all;
+  map<QString,Song*> file2song;
+  virtual void init();
+  virtual void clear();
+public:
+  BasicDataBase();
+  virtual ~BasicDataBase();
+  void     reset();
+  void     add(Song*);
+  Song *   find(QString song_filename);
+  const vector<Song*>& getAllSongs() 
+  { 
+    return all;
+  };
+  map<QString,Song*> *getFileTreeRef()
+  {
+    return &file2song;
+  }
+  map<QString,Song*> getFileTreeCopy()
+  {
+    return file2song;
+  }
 };
-
 #endif
-

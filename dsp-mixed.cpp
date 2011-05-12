@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
+using namespace std;
+#line 1 "dsp-mixed.c++"
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
@@ -62,7 +63,7 @@ int        dsp_mixed::mix_dev = 0;
 
 dsp_mixed::dsp_mixed(const PlayerConfig & config) : dsp_driver(config)
 {
-  mix_dev = config.get_mixed_channel();
+  mix_dev = config.get_bpm_channel();
 }
 
 void dsp_mixed::start()
@@ -129,7 +130,8 @@ int dsp_mixed::open()
     {
       printf("Could not map shared area into memory\n");
       printf("Error is %s\n",strerror(errno));
-      exit(50);
+      fflush(stdout);
+      _exit(50);
     }
   audiosize = shared->size;;
   int buffersize = audiosize * sizeof(struct synced_stereo_sample2) + sizeof(struct mixarea);
@@ -142,7 +144,8 @@ int dsp_mixed::open()
     {
       printf("Could not remap shared area into memory\n");
       printf("Error is %s\n",strerror(errno));
-      exit(51);
+      fflush(stdout);
+      _exit(51);
     }
   return err_none;
 }

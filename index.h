@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,19 +16,20 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
-#ifndef NEW_INDEX_H
-#define NEW_INDEX_H
-
+#ifndef __BPMDJ___INDEX_H__
+#define __BPMDJ___INDEX_H__
+using namespace std;
+#line 1 "index.h++"
 #include <stdio.h>
 #include "common.h"
+#include "type-operations.h"
 #include "types.h"
 #include "spectrum-type.h"
 #include "echo-property.h"
 #include "composition-property.h"
 #include "rythm-property.h"
 #include "capacity.h"
-#include "Data/om-data.h"
+#include "om-data.h"
 
 /*-------------------------------------------
  *          Album Objects

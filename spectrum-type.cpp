@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
+using namespace std;
+#line 1 "spectrum-type.c++"
 #include <assert.h>
 #include <qstring.h>
 #include <stdio.h>
@@ -50,17 +51,3 @@ double barkbounds[barksize+1] =
     6400,7700,9500,12000,
     15500
   };
-
-  /*
-double barkbounds[barksize+1] =
-  {
-    0,50,100,150,200,250,300,350,
-    400,455,510,570,630,700,770,845,
-    920,1000,1080,1175,1270,1375,1480,1600,
-    1720,1860,2000,2190,2380,2540,2700,2925,
-    3150,3425,3700,4050,4400,4850,5300,5850,
-    6400,7050,7700,8600,9500,10750,12000,13750,
-    15500
-  };
-*/
-

@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
+using namespace std;
+#line 1 "songplayer.logic.c++"
 #include <qlcdnumber.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -80,30 +81,39 @@ void fetch_config_from(PlayerConfig * target, const SongPlayerLogic& player)
 			       QMessageBox::Ok,QMessageBox::NoButton);
       target->set_disabled_capacities(cap);
     }
-  
-  target->set_player_dsp(0);
-  if (player.alsa->isChecked())
-    target->set_player_dsp(2);
-  if (player.oss->isChecked())
-    target->set_player_dsp(1);
-  if (player.bpm->isChecked())
-    target->set_player_dsp(3);
-
-  target->set_alsa_latency(player.alsa_latency->value());
-  target->set_alsa_verbose(player.alsa_verbose->isChecked());
-  target->set_alsa_dev(player.alsa_dev->text());
-
-  target->set_oss_dsp(player.oss_dsp->text());
-  target->set_oss_init_fragments(player.oss_opt_fragments->isChecked());
-  target->set_oss_fragments(player.oss_fragments->value());
-  target->set_oss_verbose(player.oss_verbose->isChecked());
-  target->set_oss_nolatencyaccounting(player.oss_nolatency->isChecked());
-  target->set_oss_latency(player.oss_latency->value());
-
-  target->set_mixed_channel(player.bpm_channel->value());
-
-  target->set_player_rms(player.rms_toggle->isChecked());
-  target->set_player_rms_target(atof(player.rms->text()));
+   
+   target->set_player_dsp(0);
+   if (player.alsa->isChecked())
+     target->set_player_dsp(2);
+   if (player.oss->isChecked())
+     target->set_player_dsp(1);
+   if (player.bpm->isChecked())
+     target->set_player_dsp(3);
+   if (player.jack->isChecked())
+    target->set_player_dsp(4);
+ 
+#define BOOL(a) target->set_##a(player.a->isChecked());
+#define NR(a) target->set_##a(player.a->value());
+#define TEXT(a) target->set_##a(player.a->text());
+   NR(alsa_latency);
+   BOOL(alsa_verbose); 
+   TEXT(alsa_dev);
+   TEXT(oss_dsp);
+   BOOL(oss_init_fragments); 
+   NR(oss_fragments);
+   BOOL(oss_verbose); 
+   BOOL(oss_nolatencyaccounting); 
+   NR(oss_latency);
+   NR(jack_latency);
+   BOOL(jack_verbose);
+   NR(bpm_channel);
+   TEXT(jack_dev);
+   NR(bpm_channel);
+#undef TEXT
+#undef NR
+#undef BOOL
+   target->set_player_rms(player.rms_toggle->isChecked());
+   target->set_player_rms_target(atof(player.rms->text()));
 }
 
 void store_config_into(PlayerConfig * from, SongPlayerLogic* player)
@@ -113,21 +123,27 @@ void store_config_into(PlayerConfig * from, SongPlayerLogic* player)
   player->alsa->setChecked(from->get_player_dsp()==2);
   player->oss->setChecked(from->get_player_dsp()==1);
   player->bpm->setChecked(from->get_player_dsp()==3);
-  
-  player->alsa_latency->setValue(from->get_alsa_latency());
-  player->alsa_verbose->setChecked(from->get_alsa_verbose());
-  player->alsa_dev->setText(from->get_alsa_dev());
+  player->jack->setChecked(from->get_player_dsp()==4);
 
-  player->oss_dsp->setText(from->get_oss_dsp());
-  player->oss_opt_fragments->setChecked(from->get_oss_init_fragments());
-  player->oss_fragments->setValue(from->get_oss_fragments());
-  player->oss_verbose->setChecked(from->get_oss_verbose());
-  player->oss_nolatency->setChecked(from->get_oss_nolatencyaccounting());
-  player->oss_latency->setValue(from->get_oss_latency());
-
-  
-  player->bpm_channel->setValue(from->get_mixed_channel());
-
+#define BOOL(a) player->a->setChecked(from->get_##a())
+#define NR(a) player->a->setValue(from->get_##a())
+#define TEXT(a) player->a->setText(from->get_##a())
+  NR(alsa_latency);
+  BOOL(alsa_verbose); 
+  TEXT(alsa_dev);
+  TEXT(oss_dsp);
+  BOOL(oss_init_fragments);
+  NR(oss_fragments);
+  BOOL(oss_verbose); 
+  BOOL(oss_nolatencyaccounting);
+  NR(oss_latency);
+  NR(jack_latency);
+  BOOL(jack_verbose);
+  TEXT(jack_dev);     
+  NR(bpm_channel);
+#undef TEXT
+#undef NR
+#undef BOOL
   player->rms_toggle->setChecked(from->get_player_rms());
   player->rms->setText(QString::number(from->get_player_rms_target()));
   init_capacity_widget(player->capacity,from->get_disabled_capacities());
@@ -445,9 +461,6 @@ void SongPlayerLogic::timerTick()
   // change tempo when necesarry
   if (fade_time>0)
     targetStep();
-  // if visible...
-  if (bpmcounter && bpmcounter->isVisible())
-    bpmcounter->timerTick();
 }
 
 void SongPlayerLogic::setCue()
@@ -1197,32 +1210,42 @@ void SongPlayerLogic::setAlsa()
 {
   oss->setChecked(false);
   bpm->setChecked(false);
+  jack->setChecked(false);
 }
 
 void SongPlayerLogic::setOss()
 {
   alsa->setChecked(false);
   bpm->setChecked(false);
+  jack->setChecked(false);
 }
 
 void SongPlayerLogic::setBpmMixingDesk()
 {
   alsa->setChecked(false);
   oss->setChecked(false);
+  jack->setChecked(false);
+}
+
+void SongPlayerLogic::setJack()
+{
+  alsa->setChecked(false);
+  oss->setChecked(false);
+  bpm->setChecked(false);
 }
 
 void SongPlayerLogic::restartCore()
 {
-  fetch_config_from(config,*this);
-  // printf("Stopping core\n");
-  stopCore();
-  // printf("reassigning dsp device\n");
-  dsp = dsp_driver::get_driver(config);
-  //  printf("Starting core\n");
-  startCore();
-  // printf("Finished applying options\n");
-  config->save();
-  store_config_into(config,this);
+   fetch_config_from(config,*this);
+   // printf("Stopping core\n");
+   stopCore();
+   // printf("reassigning dsp device\n");
+   dsp = dsp_driver::get_driver(config);
+   // printf("Starting core\n");
+   startCore();
+   // printf("Finished applying options\n");
+   config->save();
+   store_config_into(config,this);
 }
 
 void InitAndStart::run(SongPlayerLogic * player)

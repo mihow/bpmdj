@@ -1,9 +1,6 @@
 /****
- A QVectorView suitable for BpmDj.
- This is a stripdown from trolltechs QListView class. 
-
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -19,15 +16,18 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
-#ifndef QVECTORVIEW_H
-#define QVECTORVIEW_H
+#ifndef __BPMDJ___QVECTORVIEW_H__
+#define __BPMDJ___QVECTORVIEW_H__
+using namespace std;
+#line 1 "qvectorview.h++"
+// A QVectorView suitable for BpmDj.
+// This is a stripdown from trolltechs QListView class. 
 
 #ifndef QT_H
 #include <qptrvector.h>
 #include "qscrollview.h"
-#include "growing-array.h"
 #endif
+#include <vector>
 
 #ifndef QT_NO_VECTORVIEW
 
@@ -193,7 +193,7 @@ class Q_EXPORT QVectorView: public QScrollView
   bool clearRange( int from, int to, bool includeFirst = TRUE );
   void doAutoScroll( const QPoint &cursorPos );
  private:	// Disabled copy constructor and operator
-  GrowingArray<int> dirty_items; // items that need repainting
+  vector<int> dirty_items; // items that need repainting
   int bottom_line_number;       // the lowest linenumber to on screen (the highest number)
   int top_line_number;          // the highest linenumber to on screen (the lowest number)
  public:
@@ -234,5 +234,4 @@ class Q_EXPORT QVectorView: public QScrollView
 };
 
 #endif // QT_NO_VECTORVIEW
-
-#endif // QVECTORVIEW_H
+#endif

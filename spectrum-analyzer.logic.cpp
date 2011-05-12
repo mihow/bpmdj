@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
+using namespace std;
+#line 1 "spectrum-analyzer.logic.c++"
 #include <qapplication.h>
 #include <qlineedit.h>
 #include <qpixmap.h>
@@ -52,7 +53,6 @@
 #include "memory.h"
 #include "spectrum-analyzer.logic.h"
 #include "sys/times.h"
-#include "fourier.h"
 #include "kbpm-play.h"
 #include "version.h"
 #include "scripts.h"
@@ -256,4 +256,3 @@ void SpectrumDialogLogic::fetchSpectrum_normal()
   bpmdj_deallocate(fft_in);
   bpmdj_deallocate(block);
 }
-

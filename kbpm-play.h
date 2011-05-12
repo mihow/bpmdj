@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,11 +16,14 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
+#ifndef __BPMDJ___KBPM_PLAY_H__
+#define __BPMDJ___KBPM_PLAY_H__
+using namespace std;
+#line 1 "kbpm-play.h++"
 #include <qapplication.h>
 #include "player-core.h"
 
-#include "Data/data.h"
+#include "data.h"
 #if (DATA_VERSION_MAJOR != 0) || (DATA_VERSION_MINOR != 2)
 #error "OM-DATA has wrong version number"
 #endif
@@ -34,3 +37,4 @@ QString get_rawpath();
 bool show_error(int err, int err2, const char*text);
 void msg_playing_state_changed();
 void msg_writing_finished();
+#endif

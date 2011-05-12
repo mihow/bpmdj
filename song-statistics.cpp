@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
+using namespace std;
+#line 1 "song-statistics.c++"
 #include <assert.h>
 #include <qstring.h>
 #include <stdio.h>
@@ -35,6 +36,7 @@
 #include "statistics.h"
 #include "memory.h"
 #include "pca.h"
+#include "vector-iterator.h"
 
 spectrum_freq devs[spectrum_size] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 spectrum_freq means[spectrum_size] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
@@ -309,23 +311,21 @@ void SongSelectorLogic::openStatistics()
   statistics->status->setText("1- copying all data");
   app->processEvents();
 
-  GrowingArray<Song*> *all = database->getAllSongs();
-  float * * echo_stack = bpmdj_allocate(all->count,float *);
+  const vector<Song*> all = database->getAllSongs();
+  float * * echo_stack = bpmdj_allocate(all.size(),float *);
   int vec_size = spectrum_size*echo_prop_sx;
   int nr = 0;
-  for(int i = 0 ; i < all->count ; i++)
+  constVectorIterator<Song*> song(all); ITERATE_OVER(song)
+    echo_property echo = song.val()->get_histogram();
+    if (!echo.empty())
     {
-      Song * song = all->elements[i];
-      echo_property echo = song->get_histogram();
-      if (!echo.empty())
-	{
-	  echo_stack[nr] = bpmdj_allocate(vec_size,float);
-	  for(int x = 0 ; x < echo_prop_sx ; x++)
-	    for(int y = 0 ; y < spectrum_size ; y++)
-	      echo_stack[nr][x+y*echo_prop_sx]=echo.get_freq_energy_probability_scaled(y,x);
-	  nr++;
-	}
+      echo_stack[nr] = bpmdj_allocate(vec_size,float);
+      for(int x = 0 ; x < echo_prop_sx ; x++)
+	for(int y = 0 ; y < spectrum_size ; y++)
+	  echo_stack[nr][x+y*echo_prop_sx]=echo.get_freq_energy_probability_scaled(y,x);
+      nr++;
     }
+  }
   echo_stack = bpmdj_reallocate(echo_stack,nr,float*);
   printf("   we have %d elements\n",nr);
 

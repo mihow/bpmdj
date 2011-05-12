@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,49 +16,21 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
+using namespace std;
+#line 1 "tags.c++"
+#include <assert.h>
 #include "tags.h"
 #include "memory.h"
-#include "avltree.h"
 #include "qstring-factory.h"
-#include "growing-array.h"
 
-Tag2Index::Tag2Index(QString pt, int idx) :
-  Node<QString>()
-{
-  assert(!pt.isNull());
-  index = idx;
-  tag = pt;
-};
-
-int Tag2Index::compareAddData(Node<QString>* n)
-{
-  Tag2Index *other = (Tag2Index*)n;
-  return compareSearchData(other->tag);
-}
-
-int Tag2Index::compareSearchData(QString b)
-{
-  QString a = tag;
-  assert(!a.isNull());
-  assert(!b.isNull());
-  // if (a.isNull() && b.isNull()) return 0;
-  // if (a.isNull()) return -1;
-  // if (b.isNull()) return 1;
-  if (a<b) return -1;
-  if (a==b) return 0;
-  if (a>b) return 1;
-  return 1;
-}
-
-AvlTree<QString>      Tags::tree;
-GrowingArray<QString> Tags::tag_names;
-bool                  Tags::new_tags;
+map<QString,int> Tags::tree;
+vector<QString>  Tags::tag_names;
+bool             Tags::new_tags;
 
 void Tags::init()
 {
-  tree.init();
-  tag_names.init();
+  // WVB -- tree.init();
+  tag_names.clear();
   new_tags=false;
   int t = add_tag(EMPTY);
   assert(t==tag_end);
@@ -66,36 +38,27 @@ void Tags::init()
 
 QString Tags::find_tag(tag_type idx)
 {
-  if (idx >=tag_names.count)
+  if (idx >=tag_names.size())
     {
       printf("Didnt find tag id %d\n",idx);
       fflush(stdout);
-      assert(idx<tag_names.count);
+      assert(idx<tag_names.size());
     }
-  return tag_names.elements[idx];
-}
-
-tag_type Tags::find_tag(QString tag)
-{
-  Tag2Index * found;
-  found = (Tag2Index*)tree.search(tag);
-  assert(found);
-  return found->index;
+  return tag_names[idx];
 }
 
 tag_type Tags::add_tag(QString tag)
 {
-  Tag2Index * found = (Tag2Index*)tree.search(tag);
-  if (!found)
+  if (tree.find(tag)==tree.end())
     {
       new_tags=true;
-      int nr = tag_names.add(tag);
+      tag_names.push_back(tag);
+      int nr = tag_names.size()-1;
       assert(nr<256);
-      found=new Tag2Index(tag,nr);
-      tree.add(found);
-      // printf("Adding tag :%s(%d)\n",(const char*)tag,found->index);
+      tree[tag]=nr;
+      return nr;
     }
-  return found->index;
+  return tree[tag];
 }
 
 tag_type Tags::find_tag_create_if_necessary(QString tag)
@@ -116,7 +79,7 @@ QString Tags::full_string(tags_type tags)
 tags_type Tags::parse_tags(QString tagstring)
 {
   tags_type result = NULL;
-  // first we should somehow count the number of tags. 
+  // first we should somehow count the number of tags.
   // Afterward we can insert them one by one
   int count = 0;
   char * original = strdup(tagstring);

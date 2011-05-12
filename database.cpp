@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
+using namespace std;
+#line 1 "database.c++"
 #include <qlabel.h>
 #include <pthread.h>
 #include "history.h"
@@ -25,9 +26,7 @@
 #include "qsong.h"
 #include "songselector.logic.h"
 #include "process-manager.h"
-#include "songtree.h"
-#include "avltree.h"
-#include "growing-array.h"
+#include "vector-iterator.h"
 #include "tags.h"
 #include "heap.h"
 #include "song-statistics.h"
@@ -37,7 +36,7 @@
 /**
  * The database cache contains items that are visible when only considereing the taglist
  */
-DataBase::DataBase() : cache()
+DataBase::DataBase() 
 {
   init();
 }
@@ -49,7 +48,7 @@ DataBase::~DataBase()
 void DataBase::init()
 {
   BasicDataBase::init();
-  cache.reset();
+  cache.clear();
   and_include = NULL;
   or_include = NULL;
   exclude = NULL;
@@ -61,7 +60,7 @@ void DataBase::init()
 void DataBase::clear()
 {
   BasicDataBase::clear();
-  cache.reset();
+  cache.clear();
   bpmdj_deallocate(and_include);
   bpmdj_deallocate(or_include);
   bpmdj_deallocate(exclude);
@@ -70,7 +69,7 @@ void DataBase::clear()
 
 void DataBase::start_existence_check()
 {
-  (new ExistenceScanner(all))->startAnalyzer();
+  (new ExistenceScanner(all))->start(true);
 }
 
 bool DataBase::cacheValid(SongSelectorLogic * selector)
@@ -151,13 +150,11 @@ void DataBase::updateCache(SongSelectorLogic* selector)
   if (cacheValid(selector)) return;
   rebuild_cache = false;
   copyTags(selector);
-  cache.reset();
-  for(int i = 0 ; i < all.count ; i ++)
-    {
-      Song * song = all.elements[i];
-      bool vis = tagFilter(song);
-      if (vis) cache.add(song);
-    }
+  cache.clear();
+  vectorIterator<Song*> song(all); ITERATE_OVER(song)
+    bool vis = tagFilter(song.val());
+    if (vis) cache.push_back(song.val());
+  }
 }
 
 /* WVB -- the thing below can be further optimized
@@ -203,14 +200,11 @@ int DataBase::get_unheaped_selection(SongSelectorLogic* selector, Song* main, QV
   // to get an appropriate selection we allocate the nessary vector
   int itemcount=0;
   updateCache(selector);
-  Song * * show = bpmdj_allocate(cache.count,Song*);
-  for(int i = 0; i < cache.count ; i ++)
-    {
-      Song *song = cache.elements[i];
-      bool vis = filter(selector,song,main,1.0);
-      if (vis)
-	show[itemcount++] = song;
-    }
+  Song * * show = bpmdj_allocate(cache.size(),Song*);
+  vectorIterator<Song*> song(cache); ITERATE_OVER(song)
+    bool vis = filter(selector,song.val(),main,1.0);
+    if (vis) show[itemcount++] = song.val();
+  }
   return set_answer(show,itemcount,target);
 }
 
@@ -270,13 +264,10 @@ int DataBase::getSelection(SongSelectorLogic* selector, Song* main, QVectorView*
   Song * * show = bpmdj_allocate(count,Song*);
   SongHeap heap(count);
   if (Config::limit_indistance) heap.maximum = 1.0;
-  for(int i = 0; i < cache.count ; i ++)
-    {
-      Song *song = cache.elements[i];
-      bool vis = filter(selector,song,main, heap.maximum);
-      if (vis)
-	heap.add(song);
-    }
+  vectorIterator<Song*> song(cache); ITERATE_OVER(song)
+    bool vis = filter(selector,song.val(),main, heap.maximum);
+    if (vis) heap.add(song.val());
+  }
   int itemcount = heap.copy_to(show);
   assert(itemcount<=count);
   itemUpdateingCount--;
@@ -298,31 +289,28 @@ Song * * DataBase::closestSongs(SongSelectorLogic * selector,
       minima[i]=-1;
     }
   updateCache(selector);
-  for(i = 0 ; i < cache.count; i ++)
-    {
-      Song * song = cache.elements[i];
-      // standard checks: tags completed and ondisk 
-      if (!song->get_ondisk()) continue;
-      if (!tagFilter(song)) continue;
-      // measure distance, gegeven de metriek
-      double d = song->distance(target1,weight1,target2,weight2,metriek);
-      // find the best position to insert the item..
-      for (j = 0 ; j < count ; j++)
-	if (minima[j]>d) 
-	  break;
-      if (j==count && count < maximum)
-	count++;
-      // insert the item
-      if (j<count)
-	{
-	  for(int k = maximum - 1 ; k > j ; k --)
-	    {
-	      minima[k]=minima[k-1];
-	      entries[k]=entries[k-1];
-	    }
-	  minima[j]=d;
-	  entries[j]=song;
-	}
-    }
+  vectorIterator<Song*> song(cache); ITERATE_OVER(song)
+    // standard checks: tags completed and ondisk 
+    if (!song.val()->get_ondisk()) continue;
+    if (!tagFilter(song.val())) continue;
+    // measure distance, gegeven de metriek
+    double d = song.val()->distance(target1,weight1,target2,weight2,metriek);
+    // find the best position to insert the item..
+    for (j = 0 ; j < count ; j++)
+      if (minima[j]>d) break;
+    if (j==count && count < maximum)
+      count++;
+    // insert the item
+    if (j<count)
+      {
+	for(int k = maximum - 1 ; k > j ; k --)
+	  {
+	    minima[k]=minima[k-1];
+	    entries[k]=entries[k-1];
+	  }
+	minima[j]=d;
+	entries[j]=song.val();
+      }
+  }
   return entries;
 }

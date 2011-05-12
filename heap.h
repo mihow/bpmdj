@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 1995-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,20 +16,41 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
-/**
- * This heap will only contaion a maximum amount of songs
- * As soon as a new song comes in the largest song is thrown 
- * out.
- */
-
-#ifndef HEAP_H
-#define HEAP_H
+#ifndef __BPMDJ___HEAP_H__
+#define __BPMDJ___HEAP_H__
+using namespace std;
+#line 1 "heap.h++"
 #include <assert.h>
-#include "avltree.h"
+#include <set>
 
 class Song;
-class SongHeap: private AvlTree<Song*>
+class SongDistComparator
+{
+public: 
+  bool operator()(Song* song, Song* other) const
+  {
+    /**
+     * Important !
+     * The order in which we compare the distances is important because
+     * if we compare A with B we might get that A is smaller than B but
+     * if we compare B with A we don't get that B is bigger than A because
+     * the equality was checked first !
+     */      
+    unsigned4 a = (unsigned4)(song->get_color_distance() * 1000000.0);
+    unsigned4 b = (unsigned4)(other->get_color_distance() * 1000000.0);
+    if ( a < b ) return -1;
+    if ( a > b ) return 1;
+    if (song<other) return -1;
+    if (song==other) return 0;
+    return 1;
+  }
+};
+
+/**
+ * This heap contains a maximum number of songs
+ * When there are too many songs, the largest ones are removed.
+ */
+class SongHeap: set<Song*,SongDistComparator>
 {
   int maxsize;
  public:

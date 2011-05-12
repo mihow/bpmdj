@@ -1,0 +1,4 @@
+Suse pacakges are available at 
+http://packman.links2linux.de/ 
+and maintained by oc2pus@arcor.de
+

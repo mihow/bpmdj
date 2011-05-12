@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,11 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
-/*********************************/
-/* Principal Components Analysis */
-/*********************************/
-
+using namespace std;
+#line 1 "pca.c++"
 /*********************************************************************/
 /* Principal Components Analysis or the Karhunen-Loeve expansion is a
    classical method for dimensionality reduction or exploratory data
@@ -36,7 +33,7 @@
    Internet:     murtagh@scivax.stsci.edu
    F. Murtagh, Munich, 6 June 1989                                   */   
 /*********************************************************************/
-// WVB -- modified by Werner van belle to incorporate it into bpmdj
+// WVB -- modified to incorporate it into bpmdj
 // WVB -- added DUMP_INFO variable to print out data
 // WVB -- modified malloc to allocate
 // WVB -- added progressbar support..
@@ -179,7 +176,8 @@ int old_main(int argc, char *argv[])
       printf(" option   -- R (recommended) for correlation analysis,\n");
       printf("             V for variance/covariance analysis\n");
       printf("             S for SSCP analysis.)\n");
-      exit(1);
+      fflush(stdout);
+      _exit(1);
     }
   
   n = atoi(argv[2]);              /* # rows */
@@ -194,7 +192,8 @@ int old_main(int argc, char *argv[])
       fprintf(stderr, "Program %s : cannot open file %s\n",
 	      argv[0], argv[1]);
       fprintf(stderr, "Exiting to system.");
-      exit(1);
+      fflush(stderr);
+      _exit(1);
       /* Note: in versions of DOS prior to 3.0, argv[0] contains the
          string "C". */
     }
@@ -265,7 +264,8 @@ int old_main(int argc, char *argv[])
       printf("For option, please type R, V, or S\n");
       printf("(upper or lower case).\n");
       printf("Exiting to system.\n");
-      exit(1);
+      fflush(stdout);
+      _exit(1);
       break;
     }
   

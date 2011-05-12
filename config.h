@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,16 +16,17 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
-#ifndef _CONFIG_H
-#define _CONFIG_H
-
+#ifndef __BPMDJ___CONFIG_H__
+#define __BPMDJ___CONFIG_H__
+using namespace std;
+#line 1 "config.h++"
 #include <qlistview.h>
 #include <qcolor.h>
 #include <qheader.h>
 #include <qpopupmenu.h>
 #include "data.h"
 #include "song-process.h"
+#include "accessors.h"
 
 // constants that should not be modified
 const QString MusicDir = "./music";
@@ -206,5 +207,4 @@ class Config
   static void save();
   static bool load();
 };
-
 #endif

@@ -1716,7 +1716,4 @@
     <slot>modifyAlltimeColor()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
-<includehints>
-    <includehint>metric-widget.h</includehint>
-</includehints>
 </UI>

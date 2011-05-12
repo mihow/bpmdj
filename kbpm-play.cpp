@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
+using namespace std;
+#line 1 "kbpm-play.c++"
 #include <qapplication.h>
 #include <qmessagebox.h>
 #include <qlistview.h>
@@ -57,7 +58,7 @@
 #include "memory.h"
 #include "player-core.h"
 #include "scripts.h"
-#include "signals-template.cpp"
+#include "signals.h"
 #include "histogram-property.h"
 #include "smallhistogram-type.h"
 #include "kbpm-play.h"
@@ -320,7 +321,7 @@ bool show_error(int err, int err2, const char*text)
  * this should be done when the applicaion is initialized and the event
  * loop running (otherwise we cannot give error boxes). Therefore we
  * post an event to the player_window which will be received as soon
- * as the event loop is running 
+ * as the event loop starts running 
  */
 void setup_start()
 {
@@ -398,14 +399,14 @@ void batch_start()
   if (!playing->get_md5sum() || strcmp(playing->get_md5sum(),"")==0)
     {
       Md5Analyzer * md5_analyzer = new Md5Analyzer();
-      md5_analyzer->run();
+      md5_analyzer->start();
       Info("%d. Md5 sum: %s",nr++,(const char*)playing->get_md5sum());
     }
   // 2. energy levels
   if (!playing->fully_defined_energy() || opt_energy)
     {
       EnergyAnalyzer * energy_analyzer = new EnergyAnalyzer();
-      energy_analyzer->run();
+      energy_analyzer->start();
       Info("%d. Min, max : (L: %d, R: %d), (L: %d, R: %d)",nr++,
 	   (int)playing->get_min().left,
 	   (int)playing->get_min().right,
@@ -428,8 +429,7 @@ void batch_start()
 	  else if (arg_bpm==3) counter->enveloppeSpectrum->setChecked(true);
 	  else if (arg_bpm==4) counter->fullAutoCorrelation->setChecked(true);
 	  else if (arg_bpm==5) counter->weightedEnvCor->setChecked(true);
-	  counter->run();
-	  counter->finish();
+	  counter->start();
 	  Info("%d. Bpm count: %s",nr++,playing->get_tempo().get_charstr());
 	}
       else
@@ -450,7 +450,7 @@ void batch_start()
       if (playing->get_time_in_seconds()<760)
 	{
 	  RythmDialogLogic *r = new RythmDialogLogic();
-	  r->calculate();
+	  r->start();
 	  Info("%d. Rythm",nr++);
 	}
       else

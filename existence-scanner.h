@@ -1,6 +1,6 @@
 /****
  BpmDj: Free Dj Tools
- Copyright (C) 2001-2006 Werner Van Belle
+ Copyright (C) 2001-2007 Werner Van Belle
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -16,36 +16,33 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
-
-#ifndef EXISTENCE_SCANNER_H
-#define EXISTENCE_SCANNER_H
-#include "growing-array.h"
+#ifndef __BPMDJ___EXISTENCE_SCANNER_H__
+#define __BPMDJ___EXISTENCE_SCANNER_H__
+using namespace std;
+#line 1 "existence-scanner.h++"
+#include <vector>
 #include "analyzer.h"
 #include "bpmdj-event.h"
 class Song;
 
-class ExistenceScanner : public ThreadedAnalyzer
+class ExistenceScanner : public Analyzer
 {
-  GrowingArray<Song*> * all;
- public:
-  ExistenceScanner(const GrowingArray<Song*> &i) : all(i.deepCopy())
-    {
-    };
-  virtual void run();
-  virtual void stoppedAnalyzing();
-  virtual ~ExistenceScanner();
+  vector<Song*> all;
+public:
+  ExistenceScanner(const vector<Song*> &i) : all(i)
+  {
+  };
+  virtual void analyze();
+  virtual void stopped();
 };
-
 
 class ExistenceScannerFinished: public BpmDjEvent
 {
   ExistenceScanner * thread;
- public:
+public:
   ExistenceScannerFinished(ExistenceScanner *c) : thread(c)
-    {
-    }
+  {
+  }
   virtual void run(SongSelectorLogic * song_selector_window);
 };
-
 #endif
-

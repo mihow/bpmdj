@@ -1,4 +1,4 @@
-This program is a fully automatic BPM counter ! Given an MP3 file it will
+This program is a fully automatic BPM counter. Given an MP3 file it will
 automatically find the tempo. The package contains a bpm-counter, a song-player
 which uses this information to play a song at a different tempo and a file 
 selector that offers the possibility to manage a large amount of mp3's.
@@ -11,4 +11,4 @@ In case you don't have internet access, download the documentation package
 and unzip it.
 
 --
-author: werner.van.belle@itek.norut.no
+author: werner.van.belle@gmail.com, werner@onlinux.be
