@@ -36,6 +36,8 @@
 #include "albumitem.h"
 #include "qvectorview.h"
 #include "freq-mapping.h"
+#include "process-manager.h"
+
 #define TAGS_TEXT 0
 #define TAGS_OR 1
 #define TAGS_AND 2
@@ -49,7 +51,7 @@ class ProcessManager;
 class QSong;
 
 class SongSelectorLogic: 
-  public SongSelector
+public SongSelector, public ProcessChanged
 {
     Q_OBJECT
   private:
@@ -77,6 +79,7 @@ class SongSelectorLogic:
     int auto_popq_item;
     int auto_askmix_item;
     int auto_mixer_item;
+    int auto_bpmmixer_item;
     QPopupMenu *view;
     QPopupMenu *autom;
   public:
@@ -88,10 +91,9 @@ class SongSelectorLogic:
     void findAllAlbums();
     void acceptNewSong(Song* song);
     void addTag(const QString tag);
-    // timer functions
-    void resetCounter();
     // process functions
-    void updateProcessView();
+    virtual void resetCounter();
+    virtual void updateProcessView();
     // tag functionality
     void findsimilarnames(const QString & name, const QString & fullname);
     void initialize_using_config();
@@ -121,6 +123,7 @@ class SongSelectorLogic:
     virtual void selectSong(int i);
     virtual void doPreferences();
     virtual void openMixer();
+    virtual void openBpmMixer();
     virtual void openRecorder();
     virtual void openRecordMixer();
     virtual void openReplay();
@@ -167,6 +170,7 @@ class SongSelectorLogic:
     virtual void toggle_autopop();
     virtual void toggle_askmix();
     virtual void toggle_openmixer();
+    virtual void toggle_openbpmmixer();
     
     virtual void show_freq_shaping_dialog();
 

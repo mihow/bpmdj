@@ -23,11 +23,11 @@
 
 #include <stdio.h>
 #include "common.h"
+#include "types.h"
 
 /*-------------------------------------------
  *         Index operations
  *-------------------------------------------*/
-
 class AlbumField
 {
  public:
@@ -60,8 +60,7 @@ class Index
   bool              meta_changed;      // true when data in memory has changed
   bool              meta_inbib;        // true when data is stored in a .bib file
   // song information
-  int               index_period;      // the period of the song
-  char            * index_tempo;       // the tempo of the song
+  period_type       index_period;      // the period of the song
   unsigned long     index_cue;         // cues...
   unsigned long     index_cue_z;
   unsigned long     index_cue_x;
@@ -83,6 +82,12 @@ class Index
   HistoryField   ** prev;         // contains all the songs after which this song has been played
   HistoryField   ** next;         // contains all the songs before which this song has been played
   AlbumField     ** albums;       // list of albums containing this song
+  // information only available from v2.6 on
+ public:
+  sample_type       index_min;   // min value (below zero line) of both channels
+  sample_type       index_max;   // max value 
+  sample_type       index_mean;  // mean value
+  power_type        index_power; // rms
  private:
   // some conversion functions from old versions
   bool fix_tagline();
@@ -99,8 +104,9 @@ class Index
   void read_idx(const char*);
   // reading an index stored in a .bib (.bib)
   void read_v23_field();
+  void read_v261_field();
   void read_bib_field(const char* name);
-  void write_v23_field(FILE * file);
+  void write_v261_field(FILE * file);
  public:
   bool fix_tar_info();
   static void init_bib_batchread(const char* name);
@@ -131,10 +137,16 @@ class Index
   HistoryField * * get_prev_songs ()        {return prev;};
   HistoryField * * get_next_songs ()        {return next;};
   // tempo accessors
-  int              get_period()             { return index_period; };
-  void             set_period(int t, bool update_on_disk = true);
-  double           get_tempo()              { return index_period > 0 ? 4.0*11025.0*60.0/(double)index_period : no_tempo; };
-  char           * get_tempo_str()          { return index_tempo; };
+  period_type      get_period()             { return index_period; };
+  void             set_period(period_type t, bool update_on_disk = true);
+  tempo_type       get_tempo()              { return period_to_tempo( index_period ); };
+  // statistical accessors
+  bool             fully_defined_energy();  
+  void             clear_energy();
+  sample_type      get_min()                { return index_min; };
+  sample_type      get_max()                { return index_max; };
+  sample_type      get_mean()               { return index_mean; };
+  power_type       get_power()              { return index_power; };
   // album accessors
   void             add_album(AlbumField *);
   void             delete_album(const char * name);

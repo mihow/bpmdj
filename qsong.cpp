@@ -23,7 +23,6 @@
 #include <math.h>
 #include <qpainter.h>
 #include <stdlib.h>
-#include "qstring-factory.h"
 #include "songselector.logic.h"
 #include "qsong.h"
 #include "process-manager.h"
@@ -31,23 +30,23 @@
 #include "dirscanner.h"
 #include "spectrum.h"
 #include "tags.h"
+#include "memory.h"
 
-QSong *QSong::global = NULL;
-Song **QSong::songs = NULL;
-bool  *QSong::selected = NULL;
-int    QSong::song_count = 0;
-int    QSong::compare_col = LIST_TEMPO;
-bool   QSong::compare_asc = true;
+init_singleton_var(QSong,selected,bool*,NULL);
+init_singleton_var(QSong,compare_col,int,LIST_TEMPO);
+init_singleton_var(QSong,compare_asc,bool,true);
+init_singleton_var(QSong,songs,Song**,NULL);
+init_singleton_var(QSong,song_count,int,0);
 
 void QSong::setVector(Song**arr, int cnt)
 {
-  if (songs) deallocate(songs);
-  if (selected) deallocate(selected);
-  songs = arr;
-  song_count = cnt;
-  selected = allocate(song_count,bool);
+  if (get_songs()) deallocate(get_songs());
+  if (get_selected()) deallocate(get_selected());
+  set_songs(arr);
+  set_song_count(cnt);
+  set_selected(allocate(get_song_count(),bool));
   for(int i = 0 ; i < cnt ; i ++)
-    selected[i]=false;
+    set_selected(i,false);
   assert(cnt>=0 &&
 	 (cnt>0 ? arr!=NULL : arr==NULL));
   Sort();
@@ -55,7 +54,7 @@ void QSong::setVector(Song**arr, int cnt)
 
 int QSong::vectorSize() const
 {
-  return song_count;
+  return get_song_count();
 }
 
 QSong::QSong() : QVectorViewData()
@@ -79,7 +78,7 @@ QColor * QSong::colorOfTempoCol(Song* main, Song* song)
 {
   if (!Config::color_range) return NULL;
   if (!main) return NULL;
-  if (song->tempo==no_tempo) return NULL;
+  if (song->get_tempo().none()) return NULL;
   double d = song->tempo_distance(main);
   if ( d <= 1 )
     return mixColor(Config::color_tempo44,d,Qt::white);
@@ -118,7 +117,7 @@ QColor * QSong::colorOfTempoCol(Song* main, Song* song)
 QColor * QSong::colorOfAuthorCol(Song* song)
 {
   if (!Config::color_authorplayed) return NULL;
-  int played_author_songs_ago = Played::songs_played - song->played_author_at_time;
+  int played_author_songs_ago = Played::songs_played - song->get_played_author_at_time();
   if (played_author_songs_ago < Config::authorDecay)
     return mixColor(Config::color_played_author, (float)played_author_songs_ago/(float)Config::authorDecay ,Qt::white);
   return NULL;
@@ -127,19 +126,19 @@ QColor * QSong::colorOfAuthorCol(Song* song)
 QColor * QSong::colorOfdColorCol(Song* song)
 {
   if (!Config::color_dcolor) return NULL;
-  if (song->color_distance > 1.0) return NULL;
-  return mixColor(Config::color_dcolor_col, song -> color_distance, Qt::white);
+  if (song->get_color_distance() > 1.0) return NULL;
+  return mixColor(Config::color_dcolor_col, song -> get_color_distance(), Qt::white);
 }
 
 void QSong::paintCell(QVectorView* vv, int i, QPainter *p,const QColorGroup &cg, int col, int wid, int align)
 {
   Song * main = ProcessManager::playingInMain();
-  Song * song = songs[i];
+  Song * song = get_songs(i);
   QColor *color;
   switch(col)
     {
     case LIST_CUES:
-      if (Config::color_cues && !song->has_cues)
+      if (Config::color_cues && !song->get_has_cues())
 	{
 	  QColorGroup ncg(cg);
 	  ncg.setColor(QColorGroup::Base,QColor(0,0,255));
@@ -160,7 +159,7 @@ void QSong::paintCell(QVectorView* vv, int i, QPainter *p,const QColorGroup &cg,
       break;
       
     case LIST_TITLE:
-      if (Config::color_played && song->played)
+      if (Config::color_played && song->get_played())
 	{
 	  QColorGroup ncg(cg);
 	  ncg.setColor(QColorGroup::Base,Config::color_played_song);
@@ -193,10 +192,10 @@ void QSong::paintCell(QVectorView* vv, int i, QPainter *p,const QColorGroup &cg,
       
     case LIST_SPECTRUM:
       if (Config::color_spectrum)
-	if (song->spectrum!=no_spectrum)
+	if (song->get_spectrum()!=no_spectrum)
 	  {
 	    QColorGroup ncg(cg);
-	    ncg.setColor(QColorGroup::Base,song->color);
+	    ncg.setColor(QColorGroup::Base,song->get_color());
 	    QVectorViewData::paintCell(vv,i,p,ncg,col,wid,align);
 	    return;
 	  }
@@ -204,7 +203,7 @@ void QSong::paintCell(QVectorView* vv, int i, QPainter *p,const QColorGroup &cg,
     }
   
   // the normal color depends wether the song is on the disk or not
-  if (Config::color_ondisk && !song->ondisk)
+  if (Config::color_ondisk && !song->get_ondisk())
     {
       QColorGroup ncg(cg);
       ncg.setColor(QColorGroup::Base,Config::color_unavailable);
@@ -219,22 +218,34 @@ QString QSong::Text(Song * j, int i)
   switch (i)
     {
     case LIST_TEMPO : return j->tempo_str();
-    case LIST_VERSION : return j->version;
-    case LIST_TITLE : return j->title;
-    case LIST_AUTHOR : return j->author;
-    case LIST_INDEX : return j->storedin;
-    case LIST_TAGS : return Tags::full_string(j->tags);
-    case LIST_TIME : return j->time;
-    case LIST_MD5SUM : return j->md5sum;
-    case LIST_DCOLOR : return j->distance_string;
-    case LIST_SPECTRUM : return j->spectrum_string;
-    case LIST_FILE : return j->file;
+    case LIST_VERSION : return j->get_version();
+    case LIST_TITLE : return j->get_title();
+    case LIST_AUTHOR : return j->get_author();
+    case LIST_INDEX : return j->get_storedin();
+    case LIST_TAGS : return Tags::full_string(j->get_tags());
+    case LIST_TIME : return j->get_time();
+    case LIST_MD5SUM : return j->get_md5sum();
+    case LIST_DCOLOR : return j->get_distance_string();
+    case LIST_SPECTRUM : return j->get_spectrum_string();
+    case LIST_FILE : return j->get_file();
     case LIST_ONDISK :
-      if (j->ondisk) return TRUE_TEXT;
-      else           return FALSE_TEXT;
+      if (j->get_ondisk()) return TRUE_TEXT;
+      else                 return FALSE_TEXT;
     case LIST_CUES :
-      if (j->has_cues) return TRUE_TEXT;
-      else             return FALSE_TEXT;
+      if (j->get_has_cues()) return TRUE_TEXT;
+      else                   return FALSE_TEXT;
+    case LIST_MIN: 
+      if (!j->get_min_amp().fully_defined()) return EMPTY;
+      return QString::number(j->get_min_amp().left)+" / "+QString::number(j->get_min_amp().right);
+    case LIST_MAX: 
+      if (!j->get_max_amp().fully_defined()) return EMPTY;
+      return QString::number(j->get_max_amp().left)+" / "+QString::number(j->get_max_amp().right);
+    case LIST_MEAN:
+      if (!j->get_mean_amp().fully_defined()) return EMPTY;
+      return QString::number(j->get_mean_amp().left)+" / "+QString::number(j->get_mean_amp().right);
+    case LIST_POWER: 
+      if (!j->get_power().fully_defined()) return EMPTY;
+      return QString::number(j->get_power().left)+" / "+QString::number(j->get_power().right);
     }
 }
 
@@ -246,11 +257,10 @@ static int compare_songs_text(const void * a, const void * b)
   Song * B = *((Song **)b);
   assert(A);
   assert(B);
-  QString AT = QSong::Text(A,QSong::compare_col);
-  QString BT = QSong::Text(B,QSong::compare_col);
+  QString AT = QSong::Text(A,QSong::get_compare_col());
+  QString BT = QSong::Text(B,QSong::get_compare_col());
   return clip(QString::compare(AT,BT));
 }
-
 
 static int compare_songs_tempo(const void * a, const void * b)
 {
@@ -260,42 +270,58 @@ static int compare_songs_tempo(const void * a, const void * b)
   Song * B = *((Song **)b);
   assert(A);
   assert(B);
-  if (A->tempo > B->tempo)
+  return compare_tempo(A->get_tempo(),B->get_tempo());
+}
+
+static int compare_songs_power(const void * a, const void * b)
+{
+  assert(a);
+  assert(b);
+  Song * A = *((Song **)a);
+  Song * B = *((Song **)b);
+  assert(A);
+  assert(B);
+  float8 pa = A->get_power().left + A->get_power().right;
+  float8 pb = B->get_power().left + B->get_power().right;
+  if (pa > pb)
     return 1;
-  else if (A->tempo < B->tempo)
+  else if (pa < pb)
     return -1;
   return 0;
 }
 
 void QSong::sort(int col, bool ascending)
 {
-  compare_col = col;
-  compare_asc = ascending;
+  set_compare_col(col);
+  set_compare_asc(ascending);
   Sort();
 }
 
 void QSong::Sort()
 {
-  if (compare_col<0 || !songs || song_count<=0)
+  if (get_compare_col()<0 || !get_songs() || get_song_count()<=0)
     return;
-  if (compare_col==LIST_TEMPO)
+  if (get_compare_col()==LIST_TEMPO)
     {
-      // printf("Sorting according to tempo column\n");
-      qsort(songs,song_count,sizeof(Song*),compare_songs_tempo);
+      printf("Sorting according to tempo column\n");
+      qsort(get_songs(),get_song_count(),sizeof(Song*),compare_songs_tempo);
+    }
+  else if (get_compare_col()==LIST_POWER)
+    {
+      qsort(get_songs(),get_song_count(),sizeof(Song*),compare_songs_power);
     }
   else 
     {
       // printf("Sorting according to column %d\n",compare_col);
-      qsort(songs,song_count,sizeof(Song*),compare_songs_text);
+      qsort(get_songs(),get_song_count(),sizeof(Song*),compare_songs_text);
     }
-  if (!compare_asc)
+  if (!get_compare_asc())
     {
-      // printf("Inverting sort\n");
-      for(int i = 0 ; i <song_count / 2 ; i++)
+      for(int i = 0 ; i <get_song_count() / 2 ; i++)
 	{
-	  Song * tmp = songs[i];
-	  songs[i]=songs[song_count-1-i];
-	  songs[song_count-1-i]=tmp;
+	  Song * tmp = get_songs(i);
+	  set_songs(i,get_songs(get_song_count()-1-i));
+	  set_songs(get_song_count()-1-i,tmp);
 	}
     }
   // printf("Done sorting\n");
@@ -303,7 +329,7 @@ void QSong::Sort()
 
 Song * QSong::songEssence(int i) 
 {
-  if (i<0 || i >=song_count) return NULL; 
-  else return songs[i];
+  if (i<0 || i >=get_song_count()) return NULL; 
+  else return get_songs(i);
 };
 

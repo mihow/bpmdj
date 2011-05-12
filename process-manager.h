@@ -17,29 +17,31 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
+#ifndef PROCESS_MGR_H
+#define PROCESS_MGR_H
 
+#include "basic-process-manager.h"
 #include "config.h"
 
-class ProcessManager
+class ProcessManager:
+  public BasicProcessManager
 {
   public:
-    // WVB -- TOFIX: maybe we should make this whole class static 
-    int player_pids[4];
-    int died_pids[4];
-    static Song* playing_songs[4];
+    static Song* *playing_songs;
+    SongSelectorLogic * selector;
   private:
     int monitorPlayCommand;
-    void processDied(int pid);
-    SongSelectorLogic* selector;
+    inline SongSelectorLogic* get_selector() { return selector; };
+    virtual void clearId(int id);
   public:
     static inline Song* playingInMain() {return playing_songs[0];};
     static inline bool monitorFree() {return playing_songs[1]==NULL;};
     ProcessManager(SongSelectorLogic *sel);
-    virtual ~ProcessManager();
     void clearPlayer(int id, bool update=true);
     void switchMonitorToMain();
     void setMainSong(Song * song);
-    void checkSignals();
     void startSong(Song *song);
     void startExtraSong(int id, Song *song);
 };
+
+#endif

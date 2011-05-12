@@ -49,6 +49,7 @@
 #include <assert.h>
 #include <math.h>
 #include <pthread.h>
+#include "memory.h"
 #include "spectrumanalyzer.logic.h"
 #include "sys/times.h"
 #include "fourier.h"

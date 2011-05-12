@@ -22,54 +22,8 @@
 #include <errno.h>
 #include <string.h>
 #include <math.h>
-#include "malloc.h"
 #include "dirscanner.h"
 #include "common.h"
-#include "efence.h"
-
-void myfree(void* a)
-{
-#ifdef EFENCE
-  if (!efence_free(a))
-#endif
-    free(a);
-}
-
-void* myalloc(int length, char* file, int line)
-{
-  void * result;
-  // printf("%s(%d): allocating %d bytes\n",file,line,length);
-  assert(length>=0);
-#ifdef EFENCE
-  result = efence_malloc(length);
-#else
-  result = malloc(length);
-#endif
-#ifdef COUNT_ALLOCATIONS
-  static int nrallocs = 0;
-  nrallocs++;
-  if (nrallocs%100==0)
-    printf("%d allocs ",nrallocs);
-#endif
-  if (!result)
-    printf("Error: %s(%d): unable to allocate %d bytes \n",file,line,length);
-  assert(result);
-  return result;
-}
-
-void* myrealloc(void* thing, int size)
-{
-  void * result;
-  assert(size);
-#ifdef EFENCE
-  result = efence_realloc(thing,size);
-#else
-  result = realloc(thing,size);
-#endif
-  assert(result);
-  return result;
-}
-
 long fsize(FILE * f)
 {
    long answer, pos;
@@ -87,6 +41,8 @@ void common_init()
    assert(sizeof(signed2)==2);
    assert(sizeof(signed4)==4);
    assert(sizeof(signed8)==8);
+   assert(sizeof(float8)==8);
+   assert(sizeof(float4)==4);
 }
 
 long readsamples(void* target, int count, FILE* file)
@@ -175,14 +131,6 @@ double abs_minimum(double a, double b)
   else return b;
 }
 
-static int atof_called=0;
-double atod(const char* str)
-{
-  if ((++atof_called%10000)==0)
-    printf("atof calls %d\n",atof_called);
-  return atof(str);
-}
-
 char * tohex(long i)
 {
   char r[9];
@@ -223,3 +171,10 @@ int clip(int val)
   if (val>0) return +1;
   return 0;
 }
+
+void file_long(long i, FILE * f)
+{
+  int written = fwrite(&i,4,1,f);
+  assert(written==1);
+}
+

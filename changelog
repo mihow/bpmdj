@@ -1,30 +1,50 @@
-all files should have a tag:
-	- include in source
-	- include in distribution
-
-2.5:	! segfaults on exit (why this time ???)
-	! tagging system heeft nog een aantal belangrijk errors zie asus, sometimes ' ' tags appear in the taglist
-	  waarschinlijk bij tags die meer dan 1 spatie hebben...
-	! crash op pattern scanning van bepaalde songs...
-  ksel  - importing songs gave until the next reload the wrong title/author information
+2.6:    
+  doc   + wrote a section about the kbpm-mix program
+  ksel  + can start songs with the keyboard (ctrl-enter)	
+  ksel  + recognizes .flac files	
+  kplay - fixed crash after hitting 'stop sequence' two times	
+  kmix  + improved the mixer for two soundcards in the same machine	
+  doc   + wrote a section about 'remote' setup and remote analysis
+  ksel  + added distributed analysis
+  build - removed bug in build system. Sometimes binary tgz was empty	
+  kplay + can normalize the volume based on the power statistics	 
+  ksel  + remote playing is possible now with --remote option
+  kmix  + added a mixer for single soundcard systems.. Automatically
+          synchronizes	
+  ksel  - history list had bug. When the index of a song was no longer known,
+          it crashed	
+  anal  + added min, max, mean and power statistics.
+  ksel  - fixed bug in batch script writer. Sometimes garbage could occur
+  ksel  - fixed crashing history bug when music or index files have been 
+          removed
+  tool  ~ increase readability of makefile and its output
+2.5:	
+  ksel  - importing songs gave until the next reload the wrong title/author 
+          information
   ksel  + saving of songlist header, tags and other new preferences
-  kplay + increased response speed of measure shift buttons and connect -1/2B button
-  kplay + metronome can be switched of by clicking the same button again	
+  kplay + increased response speed of measure shift buttons and connect -1/2B 
+          button
+  kplay + metronome can be switched of by clicking the same button again
   kplay + fixed metronome distortion problem	
   tool  + added the electric fence library but with selective protection checks
   kplay - removed subtle pointer bug from rayshoot technique (overflow :)
-  ksel  + when starting, automatic selection empty tag when no other is selected
+  ksel  + when starting, automatic selection empty tag when no other is
+          selected
   ksel  + selectallbuttagged modified to avoid removing ' ' tag.
   ksel  + improved layout of songselector
   ksel  ~ fixed dates of copyright	
   ksel  ~ removed unimportant features such as the filter creation	
   kplay - when error 'cannot open DSP device', raw file was not removed
-  ksel  + added frequency dialog that shows how to map the old to the new frequency to the new	
+  ksel  + added frequency dialog that shows how to map the old to the new 
+          frequency to the new	
   ksel  + added clustering algorithm
-  kplay + added bpmdj version check to avoid interface mismatches between bpmdj and bpmplay
+  kplay + added bpmdj version check to avoid interface mismatches between 
+          bpmdj and bpmplay
   kplay - removed useless COMPILE_NONE option
-  kplay - removed bug in option scanning. Without supplying a DSP device the thing crashes
-  kplay + improved beatgraph using haar wavelet and written a little documentation about it
+  kplay - removed bug in option scanning. Without supplying a DSP device the 
+          thing crashes
+  kplay + improved beatgraph using haar wavelet and written a little
+          documentation about it
   kplay + added fragment sequencer
   ksel  + added GrowingArray to avoid code duplication
   ksel  + improved internal tag representation
@@ -33,8 +53,8 @@ all files should have a tag:
           problems later on. The reason I do this is because the qlistview
 	  takes too much memory and is in general too slow. I must mold my
 	  entire program around the listview, which is getting quite
-	  redicilous. A cache, with song pointers to qsongs, which again links to
-	  the songs to find the differences between what should be shown and
+	  redicilous. A cache, with song pointers to qsongs, which again links 
+	  to the songs to find the differences between what should be shown and
 	  what is shown within the qlistview ...
   ksel  + added more version information when loading
   ksel  + added modification of dColor column color
@@ -68,8 +88,9 @@ all files should have a tag:
   kplay + added the 'none' audio driver
   kplay - removed manual dispatching in dsp_drivers.cpp	
   kplay - removed bad md5-scanning bug
-  ksel  + reduced memory usage by avoiding allocations of similar strings	
-  ksel  - removed useless .ui files and replaced them with simply QInputDialogs
+  ksel  + reduced memory usage by avoiding allocations of similar strings
+  ksel  - removed useless .ui files and replaced them with simply 
+          QInputDialogs
   ksel  - a index file also present in the .bib was not automatically updated.
   ksel  + added record functionality (if you have enough sound cards of
           course:)

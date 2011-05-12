@@ -37,8 +37,9 @@ extension=${songname##*.}
 
 # now check the filename extension
 case $extension in 
-  (MP3) mpg123 -s "$songlocation" >"$rawname" 2>/dev/null;;
-  (mp3) mpg123 -s "$songlocation" >"$rawname" 2>/dev/null;;
-  (ogg) ogg123 -q -d raw -f "$rawname" "$songlocation";;
+  (MP3)  mpg123 -s "$songlocation" >"$rawname" 2>/dev/null;;
+  (mp3)  mpg123 -s "$songlocation" >"$rawname" 2>/dev/null;;
+  (ogg)  ogg123 -q -d raw -f "$rawname" "$songlocation";;
+  (flac) ogg123 -q -d raw -f "$rawname" "$songlocation";;
 esac;
 

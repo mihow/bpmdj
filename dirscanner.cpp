@@ -35,14 +35,14 @@ bool DirectoryScanner::goodExtension(QString ext)
   // important !!!
   // opgelet met extenties langer dan 4 tekens !!!
   return (ext.endsWith(".mp3") || 
-	  ext.endsWith(".ogg"));
+	  ext.endsWith(".ogg") || 
+	  ext.endsWith(".flac"));
 }
 
 bool DirectoryScanner::goodName(QString name)
 {
   // must end on .idx or a song extension
-  QString trail = name.right(4);
-  if (!goodExtension(trail) && trail!=".idx")
+  if (!goodExtension(name) && name.right(4)!=".idx")
     return false;
   // no spaces or any special characters
   // should occur anywhere in the filename

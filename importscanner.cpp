@@ -24,6 +24,7 @@
 #include "qsong.h"
 #include "kbpm-dj.h"
 #include "avltree.cpp"
+#include "memory.h"
 
 void ImportScanner::recursing(const QString  dirname)
 {

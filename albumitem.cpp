@@ -23,7 +23,6 @@
 #include <math.h>
 #include <stdlib.h>
 #include <qlistview.h>
-#include "qstring-factory.h"
 #include "songselector.logic.h"
 #include "qsong.h"
 #include "process-manager.h"
@@ -37,7 +36,7 @@ AlbumItem::AlbumItem(const char* name, QListView* parent) :
 }
 
 AlbumItem::AlbumItem(int nr, Song * s, QListViewItem* parent) :
-  QListViewItem(parent,QString::number(nr),s->title,s->author,s->time,s->storedin,s->file)
+  QListViewItem(parent,QString::number(nr),s->get_title(),s->get_author(),s->get_time(),s->get_storedin(),s->get_file())
 {
   song = s;
   setRenameEnabled(0,true);

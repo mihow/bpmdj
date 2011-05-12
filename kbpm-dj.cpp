@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
 {
   Tags::init();
 
-  printf("Loading  bpmdj v"VERSION"\n"); fflush(stdout);
+  printf("Loading bpmdj v"VERSION"\n"); fflush(stdout);
   QApplication application(argc,argv);
   SongSelectorLogic main_window;
   app = &application;
@@ -164,6 +164,8 @@ int main(int argc, char* argv[])
   // 5b. startup mixers ?
   if (Config::open_mixer)
     main_window.openMixer();
+  if (Config::open_bpmmixer)
+    main_window.openBpmMixer();
   
   // 6. start the application
   main_window.show();

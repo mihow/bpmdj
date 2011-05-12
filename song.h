@@ -24,13 +24,11 @@
 #include <time.h>
 #include <qcolor.h>
 #include <qpixmap.h>
-//#include <qlistview.h>
 #include "qvectorview.h"
+#include "data.h"
 #include "config.h"
 #include "cluster.h"
 #include "index.h"
-
-//#define SONGLIST_SET 0
 
 class QSong;
 QString tonumber(const int b);
@@ -51,33 +49,35 @@ class SongMetriek:
 
 class Song: public Point
 {
- public:
-    // stored in the index files
-    QString title;
-    QString author;
-    QString version;
-    QString storedin;
-    QString file;
-    QString time;
-    QString md5sum;
-    tempo_type    tempo;
-    spectrum_type spectrum;
-    tags_type     tags;
-    
+    // taken from the index file
+    accessors(QString, title,"");
+    accessors(QString, author,"");
+    accessors(QString,version,"");
+    accessors(QString,storedin,"");
+    accessors(QString,file,"");
+    accessors(QString,md5sum,"");
+    accessors(QString,time,"");
+    accessors(tempo_type,tempo,tempo_type());
+    accessors(spectrum_type,spectrum,no_spectrum); 
+    accessors(tags_type,tags,NULL);
+    accessors(sample_type, max_amp,sample_type());
+    accessors(sample_type,min_amp,sample_type());
+    accessors(sample_type,mean_amp,sample_type());
+    accessors(power_type,power,power_type());
     // calculated as necessary
-    QColor  color;
-    QString spectrum_string;  // the spectrum column text
-    QString distance_string;  // the dcolor column text
-    float   color_distance;   // the dcolor distance value
-    AlbumField ** albums;     
-    bool    played;
-    bool    ondisk;
-    int     has_cues;
-    int     played_author_at_time;
+    accessors(QColor,color,QColor(127,127,127));
+    accessors(QString,spectrum_string,"");
+    accessors(QString,distance_string,QString::null);
+    accessors(float,color_distance,0);
+    accessors(AlbumField**,albums,NULL);
+    accessors(bool,played,false);
+    accessors(bool,ondisk,true);
+    accessors(int,has_cues,0);
+    accessors(int,played_author_at_time,-100);
   private:
     void init(const QString fullname, bool checkondisk);
     void clearFloatingFields();
-  public: // accessors
+  public: 
     QString  tempo_str();
   public:
     Song();

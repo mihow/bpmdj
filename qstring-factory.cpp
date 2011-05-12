@@ -20,7 +20,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "qstring-factory.h"
 #include "songtree.h"
 
 const QString TRUE_TEXT("Yes");

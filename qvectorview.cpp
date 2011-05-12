@@ -28,6 +28,7 @@
 #ifndef QT_NO_VECTORVIEW
 #include <qtimer.h>
 #include <qheader.h>
+#include <qscrollview.h>
 #include <qpainter.h>
 #include <qcursor.h>
 #include <qptrstack.h>
@@ -1175,8 +1176,16 @@ void QVectorView::keyPressEvent( QKeyEvent * e )
       break;
     case Key_Enter:
     case Key_Return:
-      e->ignore();
-      emit returnPressed( currentItem() );
+      if ( e->state() & ControlButton ) 
+	{
+	  e->ignore();
+	  emit ctrlReturnPressed( currentItem() );
+	}
+      else
+	{
+	  e->ignore();
+	  emit returnPressed( currentItem() );
+	}
       // do NOT accept.  QDialog.
       return;
     case Key_Down:

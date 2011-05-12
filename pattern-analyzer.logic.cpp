@@ -58,6 +58,8 @@
 #include "fourier.h"
 #include "version.h"
 #include "scripts.h"
+#include "memory.h"
+#include "signals.h"
 
 #define COLLAPSE 4
 #define COLLAPSE_HAAR 4
@@ -379,6 +381,104 @@ void getBandColor(int band, QColor &color, float val)
     }
 }
 
+void PatternAnalyzerLogic::distribution(float *bank, 
+					long bank_size, 
+					float *distri, 
+					long distribution_size, 
+					float lower, 
+					float upper)
+{
+  for(int i = 0 ; i < bank_size ; i++)
+    {
+      float v = bank[i];
+      v/=upper;
+      v*=(distribution_size-1);
+      if (v>=distribution_size)
+	{
+	  printf("v = %g ds = %d\n",v,distribution_size);
+	  assert(0);
+	}
+      if (v<0)
+	assert(0);
+      distri[(int)v]++;
+    }
+}
+
+void PatternAnalyzerLogic::distribution(float *bank, long size, QPixmap &pm, int slice)
+{
+  float min=0;
+  float max=0;
+  for(int i = 0 ; i< size ; i ++)
+    if (bank[i]>max) max=bank[i];
+  int ds = pm.height();
+  array(distri,ds,float);
+  for(int i = 0 ; i < ds ; i ++)
+    distri[i]=0;
+  distribution(bank,size,distri,ds,min,max);
+
+  //  if (slice==8)
+    {
+      FILE * data = fopen("d.t","ab");
+      //for(int i = 1 ; i < ds ; i++)
+      //distri[i]=distri[i+1]-distri[i];
+      for(int i = 0 ; i < ds ; i++)
+	fprintf(data,"%d %d %g\n",slice,i,distri[i]);
+      fclose(data);
+    }
+
+  //  for(int i = 0 ; i < ds ; i++)
+  //    distri[i]*=i;
+  //for(int i = (int)(mean*ds/max) ; i >= 0 ; i--)
+  //distri[i]=0;
+  
+  float mean=0;
+  int hit=0;
+  for(int i = 0 ; i < ds ; i++)
+    mean+=distri[i];
+  mean/=ds;
+  float mm=0;
+  for(int i=0 ; i < ds ; i++)
+    if(distri[i]>mean)
+      {
+	mm+=distri[i];
+	hit++;
+      }
+  mm/=hit;
+  float dev=0;
+  hit=0;
+  for(int i = 0 ; i < ds ; i++)
+    {
+      if(distri[i]>mm)
+	{
+	  float v = distri[i]-mm;
+	  dev+=v*v;
+	  hit++;
+	}
+    }
+  dev/=hit;
+  dev=sqrt(dev);
+  for(int i = 0 ; i < ds ; i++)
+    {
+      distri[i]-=mean;
+      distri[i]/=dev;
+      //   distri[i]+=0.5;
+    }
+  QPainter p;
+  p.begin(&pm);
+  for(int i = 0 ; i < ds ; i++)
+    {
+      float value = distri[i];
+      if (value<0) value=0;
+      if (value>1) value=1;
+      QColor c;
+      getBandColor(maxslice-slice,c,value);
+      p.setPen(c);
+      p.drawPoint(slice,i);
+    }
+  free(distri);
+  p.end();
+}
+
 void PatternAnalyzerLogic::showHaarVersion2()
 { 
   // we should have sopme technique to reduce the smoothness of things. We want to increase
@@ -393,6 +493,7 @@ void PatternAnalyzerLogic::showHaarVersion2()
   int dc = color->value();
   assert(window_ysize>0);
   QPixmap *pm = new QPixmap(window_xsize,window_ysize);
+  QPixmap *distri_map = new QPixmap(maxslice,window_ysize);
   QPainter p;
   p.begin(pm);
   // first we calculate a number of layers, based on the audio-stream...
@@ -413,21 +514,43 @@ void PatternAnalyzerLogic::showHaarVersion2()
 	{
 	  filtered = bank[filter] = allocate(haar_size+1, float);
 	  filtered[haar_size]=0;
-	  for(int y = 0 ; y < haar_size ; y ++)
-	    {
-	      int d = y * window_size;
-	      float mean = 0;
-	      for(int x = 0 ; x < window_size ; x++)
-		mean += signed_data[x+d];
-	      mean /= (float)window_size;
-	      filtered[y] = mean;
-	      for(int x = 0 ; x < window_size ; x++)
-		signed_data[x+d]-=mean;
-	    }
+	  if (!power->isChecked())
+	    for(int y = 0 ; y < haar_size ; y ++)
+	      {
+		int d = y * window_size;
+		float mean = 0;
+		for(int x = 0 ; x < window_size ; x++)
+		  mean += signed_data[x+d];
+		mean /= (float)window_size;
+		filtered[y] = mean;
+		for(int x = 0 ; x < window_size ; x++)
+		  signed_data[x+d]-=mean;
+	      }
+	  else // to show the power we must calculate the block content differently
+	    for(int y = 0 ; y < haar_size ; y ++)
+	      {
+		int d = y * window_size;
+		float mean = 0;
+		float power = 0;
+		for(int x = 0 ; x < window_size ; x++)
+		  {
+		    float v = signed_data[x+d];
+		    mean += v;
+		    power += v*v;
+		  }
+		mean /= (float)window_size;
+		power /= (float)window_size;
+		power = sqrt(power);
+		filtered[y] = power;
+		for(int x = 0 ; x < window_size ; x++)
+		  signed_data[x+d]-=mean;
+	      }
 	}
-
+      
       for(int y = 0 ; y < haar_size ; y++)
 	filtered[y]=fabs(filtered[y]);
+      
+      distribution(filtered,haar_size,*distri_map,filter);
       
       if (logarithmic->isChecked())
 	{
@@ -478,16 +601,21 @@ void PatternAnalyzerLogic::showHaarVersion2()
 	}
       
       // find the mean of this bank entry
+      // RMS power of this bank = square root of the mean of the squared amplitude
       double mean=0;
       double max =0;
+      double power = 0;
       for(int y = 0 ; y < haar_size ; y++)
 	{
 	  float v = filtered[y];
 	  mean += v;
+	  power += v*v;
 	  if (v>max)
 	    max = v;
 	}
       mean/=haar_size;
+      power = sqrt(power/haar_size);
+      printf("power of bank %d is %g\n",filter,power);
       
       if (th2)
 	{
@@ -665,6 +793,7 @@ void PatternAnalyzerLogic::showHaarVersion2()
     p.drawLine(0,row,window_xsize-1,row);
   p.end(); 
   pattern->setPixmap(*pm);
+  projection->setPixmap(*distri_map);
   signed4 maximum=0;
   //  for(int row = 0 ; row < window_ysize ; row ++)
     //if (project[row]>maximum)
@@ -683,6 +812,253 @@ void PatternAnalyzerLogic::showHaarVersion2()
   //    }
   l.end();
   //  projection->setPixmap(*sm);
+}
+
+
+void fatten1(float * data, long size)
+{
+  // remove DC offset
+  double mean=0;
+  for(int i = 0 ; i < size ; i++)
+    mean+=data[i];
+  mean/=size;
+  for(int i = 0 ; i < size ; i++)
+    data[i]-=mean;
+  array(output,size,float);
+  for(int i = 0 ; i < size ; i ++)
+    output[i]=0;
+  for(int nr = 10 ; nr >= 0 ; nr --)
+    {
+      int block_size = 1 << nr;
+      int channel_size = size / block_size;
+      printf("Channel %d\n",nr);
+      if (nr==0)
+	{
+	  // copy result to target
+	  for(int y = 0 ; y < channel_size ; y++)
+	    data[y]+=output[y];
+	}
+      else
+	{
+	  // remove frequency band from data 
+	  // and store new representation in output
+	  for(int y = 0 ; y < channel_size ; y ++)
+	    {
+	      int offset = y * block_size;
+	      float mean = 0, power = 0;
+	      for(int x = 0 ; x < block_size ; x++)
+		{
+		  float v = data[x+offset];
+		  mean += v;
+		  power += v*v;
+		}
+	      mean  /= (float)block_size;
+	      power /= (float)block_size;
+	      power  = sqrt(power);
+	      for(int x = 0 ; x < block_size ; x++)
+		data[x+offset]-=mean;
+	      power/4;
+	      for(int x = 0 ; x < block_size ; x++)
+		{
+		  int a = offset+x;
+		  float b = a;
+		  float c = block_size;
+		  float v = sin(b*M_2_PI/c); 
+		  v+=sin(b*1.125*M_2_PI/c);
+		  v+=sin(b*1.25*M_2_PI/c);
+		  v+=sin(b*1.375*M_2_PI/c);
+		  v+=sin(b*1.5*M_2_PI/c);
+		  v+=sin(b*1.625*M_2_PI/c);
+		  v+=sin(b*1.75*M_2_PI/c);
+		  v+=sin(b*1.875*M_2_PI/c);
+		  v+=sin(b*2*M_2_PI/c);
+		  v*=power/9;
+		  output[a]+=v;
+		}
+	    }
+	}
+    }
+  free(output);
+}
+
+void fatten2(float * data, long size)
+{
+  // Copy all the data
+  long length = higher_power_of_two(size);
+  printf("Copying all data %d\n",length);
+  double * data_r = allocate(length,double);
+  for(long i = 0 ; i < size ; i ++)
+    data_r[i]=data[i];
+  for(long i = size ; i < length ; i ++)
+    data_r[i]=0;
+  // Calculate fourier analysis of data
+  printf("10.Obtaining frequency spectrum\n");
+  double * fft_r = allocate(length,double);
+  double * fft_i = allocate(length,double);
+  fft_double(length,false,data_r,NULL,fft_r,fft_i);
+  // Calculate fourier analysis of autocorrelation 
+  printf("9.Obtaining power spectrum\n");
+  double * fft_c = allocate(length,double);
+  for(int i = 0 ; i < length ; i ++)
+    fft_c[i]=fft_r[i]*fft_r[i]+fft_i[i]*fft_i[i];
+  // Calculate autocorrelation
+  printf("8.Obtaining autocorrelation\n");
+  double * cor_r = allocate(length,double);
+  double * cor_i = allocate(length,double);
+  fft_double(length,true,fft_c, NULL, cor_r, cor_i);
+  deallocate(fft_c);
+  // Normalize autocorrelation
+  printf("7.Normalize autocorrelation\n");
+  double energy = sqrt(cor_r[0]*cor_r[0]+cor_i[0]*cor_i[0]);
+  for(int i = 0 ; i < length ; i ++)
+    cor_r[i] /= energy;
+  for(int i = 0 ; i < length ; i ++)
+    cor_i[i] /= energy;
+  // Calculate inverse FFT of gain response (impulse response)
+  printf("6.Calculating impulse response\n");
+  double * h = allocate(length,double);
+  for(int i = 0 ; i < length ; i ++)
+    if (i<44100/50)
+      h[i] = sqrt(cor_r[i]*cor_r[i]+cor_i[i]*cor_i[i]);
+    else
+      h[i] = sqrt(cor_r[i]*cor_r[i]+cor_i[i]*cor_i[i]);
+  deallocate(cor_r);
+  deallocate(cor_i);
+  // Calculate fft of impulse response
+  printf("5.Calculating frequency response\n");
+  double * fft_h = allocate(length,double);
+  double * fft_g = allocate(length,double);
+  fft_double(length,false,h,NULL,fft_h,fft_g);
+  deallocate(h);
+  for(int i = 0 ; i < length ; i ++)
+    fft_h[i]=sqrt(fft_h[i]*fft_h[i]+fft_g[i]*fft_g[i]);
+  deallocate(fft_g);
+  // Normalize gain thing
+  printf("4.Normalizing gain\n");
+  normalize_abs_max(fft_h,length);
+  //  for(int i = 50*length/44100 ; i < length ; i ++)
+  //    fft_h[i]=1;
+  // Use this gain reponse to modify strength of original signal
+  printf("3.Modifying frequency spectrum original data\n");
+  for(int i = 0 ; i < length ; i ++)
+    fft_r[i] *= fft_h[i];
+  for(int i = 0 ; i < length ; i ++)
+    fft_i[i] *= fft_h[i];
+  deallocate(fft_h);
+  // Do inverse transofrm to bring back to audible audio
+  printf("2.Converting back to the amplitude domain\n");
+  double * data_i = allocate(length,double);
+  fft_double(length,true,fft_r,fft_i, data_r, data_i);
+  deallocate(data_i);
+  deallocate(fft_r);
+  deallocate(fft_i);
+  // Normalize the end result
+  printf("1.Normalizing data\n");
+  normalize_abs_max(data_r,length);
+  // Put it back
+  for(int i = 0 ; i < size ; i++)
+    data[i]=(short int)(data_r[i]*32767.0);  
+  deallocate(data_r);
+  printf("0.Done\n");
+}
+
+
+void fatten(float * data, long size)
+{
+  // Copy all the data
+  long length = higher_power_of_two(size);
+  printf("7.Copying all data %d\n",length);
+  double * data_r = allocate(length,double);
+  for(long i = 0 ; i < size ; i ++)
+    data_r[i]=data[i];
+  for(long i = size ; i < length ; i ++)
+    data_r[i]=0;
+  // Calculate fourier analysis of data
+  printf("6.Obtaining frequency spectrum\n");
+  double * fft_r = allocate(length,double);
+  double * fft_i = allocate(length,double);
+  fft_double(length,false,data_r,NULL,fft_r,fft_i);
+  // Calculate fourier analysis of autocorrelation 
+  printf("5.Obtaining power spectrum\n");
+  double * fft_c = allocate(length,double);
+  for(int i = 0 ; i < length ; i ++)
+    fft_c[i]=fft_r[i]*fft_r[i]+fft_i[i]*fft_i[i];
+  // Normalize autocorrelation
+  printf("4.Normalize powerspectrum\n");
+  normalize_abs_max(fft_c,length);
+  // Use this to modify strength of original signal
+  printf("3.Modifying frequency spectrum original data\n");
+  for(int i = 0 ; i < length; i ++)
+    fft_r[i] /= fft_c[i] ;
+  for(int i = 0 ; i < length ; i ++)
+    fft_i[i] /= fft_c[i] ;
+  // Do inverse transofrm to bring back to audible audio
+  printf("2.Converting back to the amplitude domain\n");
+  double * data_i = allocate(length,double);
+  fft_double(length,true,fft_r,fft_i, data_r, data_i);
+  deallocate(data_i);
+  deallocate(fft_r);
+  deallocate(fft_i);
+  // Normalize the end result
+  printf("1.Normalizing data\n");
+  normalize_abs_max(data_r,length);
+  // Put it back
+  for(int i = 0 ; i < size ; i++)
+    data[i]=(short int)(data_r[i]*32767.0);  
+  deallocate(data_r);
+  printf("0.Done\n");
+}
+
+void PatternAnalyzerLogic::fatten()
+{ 
+  // read the file in memory
+  int data; // to avoid using the incorrect data set
+  long int bufsize = 65536;
+  FILE * raw=openRawFile(playing,arg_rawpath);
+  signed8 audiosize=fsize(raw)/4;
+  audiosize/=8; // just to test our algorithms
+  if (audiosize == 0) return;
+  signed4 pos = 0;
+  fseek(raw,pos,SEEK_SET);
+  array(left_right,audiosize,longtrick);
+  while(pos<audiosize)
+    {
+      long toread = audiosize - pos;
+      if (toread>bufsize) toread = bufsize;
+      long count=readsamples(left_right+pos,toread,raw);
+      pos+=count;
+    }
+  fclose(raw);
+  // create dataset
+  array(left,audiosize,float);
+  array(right,audiosize,float);
+  for(long i = 0 ; i < audiosize ; i++)
+    {
+      left[i]=left_right[i].leftright.left;
+      right[i]=left_right[i].leftright.right;
+    }
+  // fix both sets
+  ::fatten(left,audiosize);
+  //::fatten(right,audiosize);
+  // combine and write out
+  for(long i = 0 ; i < audiosize ; i++)
+    {
+      left_right[i].leftright.left=(signed2)left[i];
+      left_right[i].leftright.right=(signed2)right[i];
+    }
+  raw = fopen("fattened.raw","wb");
+  pos = 0;
+  while(pos<audiosize)
+    {
+      long toread = audiosize - pos;
+      if (toread>bufsize) toread = bufsize;
+      long count=writesamples(left_right+pos,toread,raw);
+      pos+=count;
+    }
+  fclose(raw);
+  free(left);
+  free(right);
+  free(left_right);
 }
 
 void PatternAnalyzerLogic::showHaarVersion3()

@@ -23,6 +23,7 @@
 #include <qmessagebox.h>
 #include <qcolordialog.h>
 #include <qpushbutton.h>
+#include <qspinbox.h>
 #include "preferences.logic.h"
 #include "playercommandwizard.h"
 
@@ -144,19 +145,32 @@ QString PreferencesLogic::getCommand()
   
   // the common options
   QString options = "kbpm-play ";
-  QString text = commandCreator.latency->text();
-  if (!text.isNull())
-    options+="-L "+text+" ";
-  text = commandCreator.x->text();
+  if (!commandCreator.remote->text().isEmpty())
+    options += "--remote "+commandCreator.remote->text()+" ";
+
+  QString text = commandCreator.x->text();
   if (!text.isNull())
     options+="-p "+text+" "+commandCreator.y->text()+" ";
-  if (commandCreator.verbose->isChecked())
-    options+="-v ";
+
+  if (!commandCreator.rms->text().isEmpty())
+    options+="--rms "+commandCreator.rms->text()+" ";
   
   // the player specific options
   if (commandCreator.none->isChecked())
     {
       options+="--none ";
+    }
+  else if (commandCreator.bpm->isChecked())
+    {
+      options+="--mixed "+commandCreator.bpmchannel->text()+" ";
+      if (!commandCreator.remote->text().isEmpty())
+	QMessageBox::information(NULL,
+				 "kbpm-mix / remote conflict",
+				 "You filled in a remote option (Remote)\n"
+				 "and also selected a local bpm mixer (Bpm Local Mix)\n"
+				 "These two are incompatible since the player will send\n" 
+				 "data to the remote local channel",
+				 QMessageBox::Ok,QMessageBox::NoButton);
     }
   else if (commandCreator.oss->isChecked())
     {
@@ -182,6 +196,14 @@ QString PreferencesLogic::getCommand()
       QMessageBox::message(NULL,"please select an OSS or ALSA driver\n");
       return "";
     }
+
+  // some more common options
+  text = commandCreator.latency->text();
+  if (!text.isNull())
+    options+="-L "+text+" ";
+  if (commandCreator.verbose->isChecked())
+    options+="-v ";
+
   // creation of the command line
   options+="-r \"%s\" -m \"%s\" \"%s\"";
   return options;

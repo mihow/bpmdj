@@ -23,6 +23,7 @@
 #include <ctype.h>
 #include "common.h"
 #include <assert.h>
+#include "memory.h"
 
 static int * * d;
 

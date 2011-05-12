@@ -43,6 +43,7 @@
 #include "bpm-analyzer.logic.h"
 #include "pattern-analyzer.logic.h"
 #include "spectrumanalyzer.logic.h"
+#include "memory.h"
 #include "about.h"
 
 static int test=0;

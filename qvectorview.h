@@ -89,6 +89,7 @@ class Q_EXPORT QVectorView: public QScrollView
  signals:
   void doubleClicked( int i );
   void returnPressed( int i );
+  void ctrlReturnPressed( int i);
   void rightButtonPressed( int, const QPoint&, int );
  public:
   ~QVectorView();

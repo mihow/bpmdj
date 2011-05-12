@@ -5,7 +5,7 @@ CC=gcc -O9 -Wall
 #CPP=g++ -O9 -fprofile-arcs
 #CC=gcc -O9 -fprofile-arcs
 CFLAGS+=-D COMPILE_OSS -D COMPILE_ALSA
-LDFLAGS+= -lpthread -lm -lasound
+LDFLAGS+= -lpthread -lm -lasound -lrt
 
 CP = cp
 MV = mv

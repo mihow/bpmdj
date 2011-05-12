@@ -51,12 +51,12 @@ class SongSortedByFile: public SongNode
 {
  public:
   SongSortedByFile(Song* s) : SongNode(s) {};
-  QString getKey() {return song->file;}
+  QString getKey() {return song->get_file();}
 };
 
 class SongSortedByIndex: public SongNode
 {
  public:
   SongSortedByIndex(Song* s) : SongNode(s) {};
-  QString getKey() {return song->storedin;}
+  QString getKey() {return song->get_storedin();}
 };

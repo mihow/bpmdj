@@ -86,6 +86,8 @@ QColor Config::color_dcolor_col(255,255,0);
 int    Config::color_cluster_depth = 3;
 QListView * Config::taglist = NULL;
 QHeader   * Config::header = NULL;
+QString Config::bpm_mixer_command = "kbpm-mix --alsa";
+bool    Config::open_bpmmixer = true;
 
 void Config::save()
 {
@@ -148,6 +150,8 @@ void Config::save()
   s << color_unavailable;
   s << color_dcolor_col;
   s << (Q_UINT16)color_cluster_depth;
+  s << bpm_mixer_command;
+  s << (Q_INT8) open_bpmmixer;
   // export the taglist... tricky thing (tm)
   Q_UINT16 nr = taglist->childCount();
   s << nr;
@@ -190,7 +194,7 @@ void Config::load()
       s >> magic;
       if (magic == MAGIC_1_6)
 	{
-	  printf("Loading config v1.6\n");
+	  printf("Config v1.6\n");
 	  s >> w; file_count = w;
 	  s >> w; yellowTime = w;
 	  s >> w; orangeTime = w;
@@ -205,7 +209,7 @@ void Config::load()
 	}
       else if (magic == MAGIC_1_7)
 	{
-	  printf("Loading config v1.7\n");
+	  printf("Config v1.7\n");
 	  s >> w; file_count = w;
 	  s >> w; yellowTime = w;
 	  s >> w; orangeTime = w;
@@ -232,7 +236,7 @@ void Config::load()
 	}
       else if (magic == MAGIC_1_8)
 	{
-	  printf("Loading config v1.8\n");
+	  printf("Config v1.8\n");
 	  s >> w; file_count = w;
 	  s >> w; yellowTime = w;
 	  s >> w; orangeTime = w;
@@ -258,7 +262,7 @@ void Config::load()
 	}
       else if (magic == MAGIC_1_9)
 	{
-	  printf("Loading config v1.9\n");
+	  printf("Config v1.9\n");
 	  s >> w; file_count = w;
 	  s >> w; yellowTime = w;
 	  s >> w; orangeTime = w;
@@ -288,7 +292,7 @@ void Config::load()
 	}
       else if (magic == MAGIC_2_1)
 	{
-	  printf("Loading config v2.1\n");
+	  printf("Config v2.1\n");
 	  s >> w; file_count = w;
 	  s >> w; yellowTime = w;
 	  s >> w; orangeTime = w;
@@ -321,7 +325,7 @@ void Config::load()
 	}
       else if (magic == MAGIC_2_2)
 	{
-	  printf("Loading config v2.2\n");
+	  printf("Config v2.2\n");
 	  s >> w; file_count = w;
 	  s >> w; yellowTime = w;
 	  s >> w; orangeTime = w;
@@ -356,7 +360,7 @@ void Config::load()
 	}
       else if (magic == MAGIC_2_4)
 	{
-	  printf("Loading config v2.4\n");
+	  printf("Config v2.4\n");
 	  s >> w; file_count = w;
 	  s >> w; yellowTime = w;
 	  s >> w; orangeTime = w;
@@ -394,7 +398,7 @@ void Config::load()
 	}
       else if (magic == MAGIC_2_5)
 	{
-	  printf("Loading config v2.5\n");
+	  printf("Config v2.5\n");
 	  s >> w; file_count = w;
 	  s >> w; yellowTime = w;
 	  s >> w; orangeTime = w;
@@ -474,6 +478,90 @@ void Config::load()
 	      s >> m; header->resizeSection(i,m);
 	    }
 	}
+      else if (magic == MAGIC_2_6)
+	{
+	  printf("Config v2.6\n");
+	  s >> w; file_count = w;
+	  s >> w; yellowTime = w;
+	  s >> w; orangeTime = w;
+	  s >> w; redTime = w;
+	  s >> w; filterBpm = w;
+	  s >> b; color_range = b;
+	  s >> b; color_played = b;
+	  s >> b; color_authorplayed = b;
+	  s >> b; color_ondisk = b;
+	  s >> b; color_cues = b;
+	  s >> b; color_dcolor = b;
+	  s >> b; color_spectrum = b;
+	  s >> b; authorDecay = b;
+	  s >> b; limit_ondisk = b;
+	  s >> b; limit_nonplayed = b;
+	  s >> b; limit_uprange = b;
+	  s >> b; limit_downrange = b;
+	  s >> b; limit_indistance = b;
+	  s >> playCommand1;
+	  s >> playCommand2;
+	  s >> playCommand3;
+	  s >> playCommand4;
+	  s >> fl; distance_temposcale = fl;
+	  s >> fl; distance_spectrumscale = fl;
+	  s >> b; limit_authornonplayed = b;
+	  s >> b; shown_aboutbox = b;
+	  s >> tmp_directory;
+	  s >> mixer_command;
+	  s >> b; open_mixer = b;
+	  s >> b; ask_mix = b;
+	  s >> b; auto_popqueue = b;
+	  s >> record_command;
+	  s >> replay_command;
+	  s >> record_mixer_command;
+	  s >> color_tempo44;
+	  s >> color_tempo54;
+	  s >> color_tempo64;
+	  s >> color_tempo74;
+	  s >> color_tempo84;
+	  s >> b; show_tempo54 = b;
+	  s >> b; show_tempo64 = b;
+	  s >> b; show_tempo74 = b;
+	  s >> b; show_tempo84 = b;
+	  s >> b; show_unknown_tempo = b;
+	  s >> color_green_time;
+	  s >> color_yellow_time;
+	  s >> color_orange_time;
+	  s >> color_red_time;
+	  s >> b; color_main_window = b;
+	  s >> b; log_spectrum_distance = b;
+	  s >> color_played_song;
+	  s >> color_played_author;
+	  s >> color_unavailable;
+	  s >> color_dcolor_col;
+	  s >> w; color_cluster_depth = w;
+	  s >> bpm_mixer_command;
+	  s >> b; open_bpmmixer = b;
+	  // read tag data
+	  s >> w; 
+	  while(w-->0)
+	    {
+	      QString t;
+	      Q_INT8 i,m,e;
+	      s >> t;
+	      s >> i; 
+	      s >> m; 
+	      s >> e; 
+	      new QListViewItem(taglist, t, i ? TAG_TRUE : TAG_FALSE,
+				m ? TAG_TRUE : TAG_FALSE,
+				e ? TAG_TRUE : TAG_FALSE);
+	    }
+	  // read header
+	  s >> w; 
+	  for(int i = 0 ; i < w ; i++)
+	    {
+	      Q_UINT16 m;
+	      header->addLabel("");
+	      s >> m; header->moveSection(i,m);
+	      s >> m; header->resizeSection(i,m);
+	    }
+	}
       else
 	printf("Wrong config file format\n");
       if (magic != MAGIC_NOW)
@@ -510,6 +598,7 @@ void Config::openUi()
   preferences.orangeTimeColor -> setPaletteBackgroundColor( color_orange_time );
   preferences.redTimeColor -> setPaletteBackgroundColor( color_red_time );
   preferences.color_main_window -> setChecked(color_main_window);
+  
   preferences.authorDecay  -> setValue ( authorDecay ) ;
   preferences.tempoSpin    -> setValue ( (int)(distance_temposcale*100.0) ) ;
   preferences.spectrumSpin -> setValue ( (int)(distance_spectrumscale*100.0) );
@@ -539,6 +628,8 @@ void Config::openUi()
   preferences.colordColorCol -> setPaletteBackgroundColor( color_dcolor_col );
 
   preferences.clusterDepth -> setValue (color_cluster_depth );
+
+  preferences.bpmmixcmd -> setText( bpm_mixer_command );
 
   if (preferences.exec()==QDialog::Accepted)
     {
@@ -584,11 +675,8 @@ void Config::openUi()
       color_dcolor_col = preferences.colordColorCol -> paletteBackgroundColor( );
       color_cluster_depth = preferences.clusterDepth -> value();
       
+      bpm_mixer_command = preferences.bpmmixcmd -> text();
+
       save();
     }
 }
-
-
-// the problem we have is that the taglist is possibly destroyed before 
-// the configurator can save it. The results is that we must copy it before,
-// womething I would rather not like to do...

@@ -20,14 +20,17 @@
 
 #ifndef COMMON_H
 #define COMMON_H
-
 #include <stdio.h>
+#include <string.h>
+
 typedef signed   long long  int signed8;
 typedef unsigned long long  int unsigned8;
 typedef signed        long  int signed4;
 typedef unsigned      long  int unsigned4;
 typedef signed        short int signed2;
 typedef unsigned      short int unsigned2;
+typedef                   float float4;
+typedef                  double float8;
 
 typedef union
 {
@@ -39,15 +42,6 @@ typedef union
   } leftright;
 } longtrick;
 
-// memory
-#define allocate(size, type) (type*)myalloc(sizeof(type)*(size), __FILE__, __LINE__)
-#define array(name,size,type) type * name = allocate(size,type)
-#define reallocate(thing, size, type) (type*)myrealloc(thing,sizeof(type)*(size))
-#define deallocate(thing) myfree(thing);
-
-// tempo typering
-typedef         float   tempo_type;
-const      tempo_type   no_tempo = -1;
 // spectrum typering
 const             int   spectrum_size=24;
 typedef         float   spectrum_freq;
@@ -75,4 +69,7 @@ double atod(const char* str);
 char * tohex(long i);
 long   toint(const char* name);
 int    clip(int val);
+void file_long(long i, FILE * f);
+inline bool option(char* arg, char* name) { return strcmp(arg,name)==0; };
+inline bool option(char* arg, char* namea, char* nameb) { return (strcmp(arg,namea)==0 || strcmp(arg,nameb)==0); };
 #endif

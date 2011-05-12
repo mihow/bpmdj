@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>629</width>
-            <height>603</height>
+            <height>607</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -20,6 +20,13 @@
             <verstretch>0</verstretch>
         </sizepolicy>
     </property>
+    <property name="paletteBackgroundColor">
+        <color>
+            <red>255</red>
+            <green>178</green>
+            <blue>231</blue>
+        </color>
+    </property>
     <property name="palette">
         <palette>
             <active>
@@ -29,29 +36,29 @@
                     <blue>0</blue>
                 </color>
                 <color>
-                    <red>233</red>
-                    <green>230</green>
-                    <blue>171</blue>
+                    <red>223</red>
+                    <green>138</green>
+                    <blue>233</blue>
                 </color>
                 <color>
-                    <red>255</red>
-                    <green>255</green>
+                    <red>254</red>
+                    <green>245</green>
                     <blue>255</blue>
                 </color>
                 <color>
-                    <red>244</red>
-                    <green>242</green>
-                    <blue>213</blue>
+                    <red>238</red>
+                    <green>191</green>
+                    <blue>244</blue>
                 </color>
                 <color>
-                    <red>116</red>
-                    <green>114</green>
-                    <blue>85</blue>
+                    <red>111</red>
+                    <green>69</green>
+                    <blue>116</blue>
                 </color>
                 <color>
-                    <red>155</red>
-                    <green>153</green>
-                    <blue>114</blue>
+                    <red>149</red>
+                    <green>92</green>
+                    <blue>155</blue>
                 </color>
                 <color>
                     <red>0</red>
@@ -74,9 +81,9 @@
                     <blue>255</blue>
                 </color>
                 <color>
-                    <red>233</red>
-                    <green>213</green>
-                    <blue>60</blue>
+                    <red>255</red>
+                    <green>178</green>
+                    <blue>231</blue>
                 </color>
                 <color>
                     <red>0</red>
@@ -111,29 +118,29 @@
                     <blue>128</blue>
                 </color>
                 <color>
-                    <red>233</red>
-                    <green>230</green>
-                    <blue>171</blue>
+                    <red>223</red>
+                    <green>138</green>
+                    <blue>233</blue>
                 </color>
                 <color>
-                    <red>255</red>
-                    <green>255</green>
+                    <red>254</red>
+                    <green>245</green>
                     <blue>255</blue>
                 </color>
                 <color>
-                    <red>255</red>
-                    <green>252</green>
-                    <blue>199</blue>
+                    <red>246</red>
+                    <green>163</green>
+                    <blue>255</blue>
                 </color>
                 <color>
-                    <red>116</red>
-                    <green>114</green>
-                    <blue>85</blue>
+                    <red>111</red>
+                    <green>69</green>
+                    <blue>116</blue>
                 </color>
                 <color>
-                    <red>155</red>
-                    <green>153</green>
-                    <blue>114</blue>
+                    <red>149</red>
+                    <green>92</green>
+                    <blue>155</blue>
                 </color>
                 <color>
                     <red>128</red>
@@ -156,9 +163,9 @@
                     <blue>255</blue>
                 </color>
                 <color>
-                    <red>233</red>
-                    <green>213</green>
-                    <blue>60</blue>
+                    <red>255</red>
+                    <green>178</green>
+                    <blue>231</blue>
                 </color>
                 <color>
                     <red>0</red>
@@ -193,29 +200,29 @@
                     <blue>0</blue>
                 </color>
                 <color>
-                    <red>233</red>
-                    <green>230</green>
-                    <blue>171</blue>
+                    <red>223</red>
+                    <green>138</green>
+                    <blue>233</blue>
                 </color>
                 <color>
-                    <red>255</red>
-                    <green>255</green>
+                    <red>254</red>
+                    <green>245</green>
                     <blue>255</blue>
                 </color>
                 <color>
-                    <red>255</red>
-                    <green>252</green>
-                    <blue>199</blue>
+                    <red>246</red>
+                    <green>163</green>
+                    <blue>255</blue>
                 </color>
                 <color>
-                    <red>116</red>
-                    <green>114</green>
-                    <blue>85</blue>
+                    <red>111</red>
+                    <green>69</green>
+                    <blue>116</blue>
                 </color>
                 <color>
-                    <red>155</red>
-                    <green>153</green>
-                    <blue>114</blue>
+                    <red>149</red>
+                    <green>92</green>
+                    <blue>155</blue>
                 </color>
                 <color>
                     <red>0</red>
@@ -238,9 +245,9 @@
                     <blue>255</blue>
                 </color>
                 <color>
-                    <red>233</red>
-                    <green>213</green>
-                    <blue>60</blue>
+                    <red>255</red>
+                    <green>178</green>
+                    <blue>231</blue>
                 </color>
                 <color>
                     <red>0</red>
@@ -2224,7 +2231,7 @@
         <sender>ButtonPlus1M</sender>
         <signal>pressed()</signal>
         <receiver>SongPlayer</receiver>
-        <slot>nudgeMinus1M()</slot>
+        <slot>nudgePlus1M()</slot>
     </connection>
     <connection>
         <sender>ButtonPlus4M</sender>

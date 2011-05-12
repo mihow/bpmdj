@@ -37,7 +37,8 @@ const QString IndexDir = "./index";
 #define MAGIC_2_2 0xBDE5
 #define MAGIC_2_4 0xBDE6
 #define MAGIC_2_5 0xBDE7
-#define MAGIC_NOW MAGIC_2_5
+#define MAGIC_2_6 0xBDE8
+#define MAGIC_NOW MAGIC_2_6
 
 class Config
 {
@@ -108,6 +109,9 @@ class Config
     static int     color_cluster_depth;
     static QListView *taglist;
     static QHeader   *header;
+    // 2.6
+    static QString bpm_mixer_command;
+    static bool    open_bpmmixer;
  public:
     static void openUi();
     static void save();

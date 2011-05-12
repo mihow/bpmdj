@@ -30,6 +30,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
+#include "memory.h"
 #include "cluster.h"
 
 float    ** Cluster::similarity = NULL;

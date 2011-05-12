@@ -48,97 +48,47 @@
 #include "qsong.h"
 #include "config.h"
 #include "scripts.h"
+#include "memory.h"
 
-ProcessManager* processManager = NULL;
-
-Song* ProcessManager::playing_songs[4] = {NULL,NULL,NULL,NULL};
+Song* *ProcessManager::playing_songs = NULL;
 
 // when a process stops this method is called
 // normally it will immidatelly invoke the one and
 // only process manager.
 
-void ToSwitchOrNotToSwitchSignal(int sig, siginfo_t *info, void* hu)
+ProcessManager::ProcessManager(SongSelectorLogic * sel) :
+  BasicProcessManager(4,sel)
 {
-  int blah;
-  waitpid(info->si_pid,&blah,0);
-  for(int i = 0 ; i < 4 ; i ++)
-    if (processManager->died_pids[i]==-1)
-      {
-	processManager->died_pids[i] = info->si_pid;
-	return;
-      }
-  assert(0);
-}
-
-ProcessManager::~ProcessManager()
-{
-}
-
-ProcessManager::ProcessManager(SongSelectorLogic * sel)
-{
-  // the process manager is a singleton
-  assert(processManager==NULL);
-  assert(sel);
-  processManager = this;
-  selector = sel;
-  // initialise fields
   monitorPlayCommand=1;
-  for(int i =0; i <4;i++)
-    {
-      died_pids[i]=-1;
-      player_pids[i]=0;
-      playing_songs[i]=NULL;
-    }
-  // catch signals
-  struct sigaction *act;
-  act=allocate(1,struct sigaction);
-  act->sa_sigaction=ToSwitchOrNotToSwitchSignal;
-  act->sa_flags=SA_SIGINFO;
-  sigaction(SIGUSR1,act,NULL);
-  // ignore sigchlds
-  // signal(SIGCHLD,SIG_IGN);
+  selector = sel;
+  playing_songs = allocate(pid_count,Song*);
+  for(int i = 0; i < pid_count; i++)
+    playing_songs[i]=NULL;
 };
 
 void ProcessManager::setMainSong(Song* song)
 {
   song->realize();
   playing_songs[0]=song;
-  selector->updateProcessView();
+  get_selector()->updateProcessView();
 }
 
-void ProcessManager::processDied(int pid)
+void ProcessManager::clearId(int id)
 {
-  if (pid==player_pids[1])
-    clearPlayer(1);
-  else if (pid==player_pids[0])
+  if (id == 0)
     switchMonitorToMain();
-  else if (pid==player_pids[2])
-    clearPlayer(2);
-  else if (pid==player_pids[3])
-    clearPlayer(3);
-  else 
-    assert(0);
-}
-
-void ProcessManager::checkSignals()
-{
-  int tmp;
-  for(int i = 0 ; i < 4 ; i ++)
-    if ((tmp=died_pids[i])!=-1)
-      {
-	died_pids[i]=-1;
-	processDied(tmp);
-      }
+  else
+    clearPlayer(id,true);
 }
 
 void ProcessManager::clearPlayer(int id, bool update)
 {
   if(!playing_songs[id]) return;
   playing_songs[id]->reread();
-  player_pids[id] = 0;
+  active_pids[id] = 0;
   playing_songs[id]=NULL;
   if (update)
-    selector->updateProcessView();
+    get_selector()->updateProcessView();
 }
 
 void ProcessManager::switchMonitorToMain()
@@ -146,16 +96,16 @@ void ProcessManager::switchMonitorToMain()
   // clear the playing song
   clearPlayer(0,false);
   // clear the monitor
-  player_pids[0]=player_pids[1];
-  player_pids[1]=0;
+  active_pids[0]=active_pids[1];
+  active_pids[1]=0;
   // the song is already playing, now use the next command next time
   monitorPlayCommand=(monitorPlayCommand == 1 ? 2 : 1);
   playing_songs[0]=playing_songs[1];
   playing_songs[1]=NULL;
   // write playing sucker to disk
   Played::Play(playing_songs[0]);
-  selector->resetCounter();
-  selector->updateProcessView();
+  get_selector()->resetCounter();
+  get_selector()->updateProcessView();
 }
 
 void ProcessManager::startExtraSong(int id, Song *song)
@@ -171,16 +121,10 @@ void ProcessManager::startExtraSong(int id, Song *song)
 	  (const char*)(id == 3 ? Config::playCommand4
 			: Config::playCommand3),
 	  (const char*)Config::tmp_directory,
-	  (const char*)matchWith->storedin, 
-	  (const char*)song->storedin);
-  // fork the command and once the player exists immediatelly stop
-  if (!(player_pids[id]=fork()))
-    { 
-      execute(playercommand);
-      kill(getppid(),SIGUSR1);
-      exit(0);
-    }
-  selector->updateProcessView();
+	  (const char*)matchWith->get_storedin(), 
+	  (const char*)song->get_storedin());
+  start(id,playercommand);
+  get_selector()->updateProcessView();
 }
 
 void ProcessManager::startSong(Song *song)
@@ -191,7 +135,7 @@ void ProcessManager::startSong(Song *song)
   Song *matchWith;
   char playercommand[500];
   // if there is still a song playing in the monitor, don't go
-  if (player_pids[1]!=0)
+  if (active_pids[1]!=0)
     {
       const QString a=QString("Error");
       const QString b=QString("Cannot start playing in monitor, other monitor song still playing !");
@@ -206,18 +150,13 @@ void ProcessManager::startSong(Song *song)
   sprintf(playercommand, 
 	  (const char*)player, 
 	  (const char*)Config::tmp_directory,
-	  (const char*)matchWith->storedin, 
-	  (const char*)playing_songs[1]->storedin);
+	  (const char*)matchWith->get_storedin(), 
+	  (const char*)playing_songs[1]->get_storedin());
   // fork the command and once the player exists immediatelly stop
-  if (!(player_pids[1]=fork()))
-    { 
-      execute(playercommand);
-      kill(getppid(),SIGUSR1);
-      exit(0);
-    }
+  start(1,playercommand);
   // if there is no main song playing. Place it main, otherwise, try the monitor
   if (!playingInMain())
     switchMonitorToMain();
   // update the process view of course
-  selector->updateProcessView();
+  get_selector()->updateProcessView();
 }

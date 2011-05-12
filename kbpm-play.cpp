@@ -43,6 +43,7 @@
 #include <math.h>
 #include <pthread.h>
 #include "songplayer.logic.h"
+#include "energy-analyzer.h"
 #include "bpm-analyzer.logic.h"
 #include "spectrumanalyzer.logic.h"
 #include "pattern-analyzer.logic.h"
@@ -51,20 +52,26 @@
 #include "dsp-oss.h"
 #include "dsp-alsa.h"
 #include "dsp-none.h"
+#include "dsp-mixed.h"
+#include "memory.h"
 #include "player-core.h"
 #include "scripts.h"
 
 /*-------------------------------------------
  *         Constants & Variables
  *-------------------------------------------*/
-static int   opt_batch = 0;
-static int   opt_bpm = 0;
-static int   opt_color = 0;
-static int   opt_create = 0;
-static char* arg_posx = NULL;
-static char* arg_posy = NULL;
-static int   arg_low = 80;
-static int   arg_high = 160;
+static int    opt_batch = 0;
+static int    opt_bpm = 0;
+static int    arg_bpm = 0;
+static int    opt_color = 0;
+static int    opt_create = 0;
+static int    opt_energy = 0;
+static int    arg_posx = -1;
+static int    arg_posy = -1;
+static int    arg_low = 80;
+static int    arg_high = 160;
+static bool   opt_remote = false;
+static char * arg_remote = "";
 
 /*-------------------------------------------
  *         Parsing arguments 
@@ -92,8 +99,8 @@ void terminal_start()
 {
   pthread_t *y = allocate(1,pthread_t);
   player_window = new SongPlayerLogic();
-  if (arg_posx && arg_posy)
-    player_window->move(atoi(arg_posx),atoi(arg_posy));
+  if (arg_posx >=0 && arg_posy >=0)
+     player_window->move(arg_posx,arg_posy);
   app->setMainWidget(player_window);
   player_window->show();
   pthread_create(y,NULL,go,NULL);
@@ -116,23 +123,12 @@ void options_failure(char* err)
 	 "   -q          --quiet               be quiet\n"
 	 "   -m arg      --match arg           song to match tempo with\n"
 	 "   -p nbr nbr  --position nbr nbr    position to place the window\n"
-	 "   -v          --verbose             be verbose with respect to latency\n"
-	 "   -L nbr      --latency nbr         required latency in ms (default = 744)\n"
-#ifdef COMPILE_OSS
-	 "  --oss-driver---------------------------------\n"
-	 "               --oss                 use OSS driver\n"
-	 "   -d arg      --dsp arg             dsp device to use (default = /dev/dsp)\n" 
-	 //	  "   -x arg      --mixer arg           mixer device to use (default = /dev/mixer)\n"
-	 "   -F nbr      --fragments nbr       the number of fragments used to play audio.\n" 
-	 "   -X          --nolatencyaccounting does not take into account the latency when marking a cue\n"
-#endif 
-	 "  --none-driver---------------------------------\n"
-	 "               --none                 use no sound driver\n"
-#ifdef COMPILE_ALSA
-	 "  --alsa-driver---------------------------------\n"
-	 "               --alsa                 use ALSA sound driver\n"
-	 "               --dev arg              device to use (default = hw:0,0)\n" 
-#endif
+	 "               --rms float           noramlize to rms value\n"
+	 "               --remote user@host    copy necessary files (requires ssh & scp)\n"
+	 OSS_OPTION_HELP
+	 NONE_OPTION_HELP
+	 MIXED_OPTION_HELP
+	 ALSA_OPTION_HELP
 	 "  --analysis------------------------------------\n"
 	 "   -b          --batch               no ui output, md5sum is automatically checked\n"
 	 "               --bpm [1,2,3,4]       measure bpm with specified technique (default = 1)\n"
@@ -140,14 +136,23 @@ void options_failure(char* err)
 	 "   -l nbr      --low nbr             lowest bpm to look for (default = 120)\n"
 	 "   -h nbr      --high nbr            highest bpm to look for (default = 160)\n"
 	 "               --spectrum            obtain color at cue-point, no sound, quit imm\n"
+	 "   -e          --energy              measure energy levels\n"
 	 "   -r arg      --rawpath arg         path that .raw temp files are stored in\n"
 	 "   argument                          the index file of the song to handle\n\n%s\n\n",err);
   exit(1);
 }
 
+#define next_arg if (++i>=argc) options_failure("missing argument to last option");
+#define arg_int(name) next_arg name=atoi(argv[i]);
+#define arg_str(name) next_arg name=argv[i];
+#define arg_float(name) next_arg name=atof(argv[i]);
+
 void process_options(int argc, char* argv[])
 {
-  int i=1;
+  int i = 1 ;
+  int used = 0;
+  bool dsp_chosen = false;
+  dsp = new dsp_none();
   for(i = 1 ; i < argc ; i ++)
     {
       if (argv[i][0]=='-')
@@ -159,110 +164,85 @@ void process_options(int argc, char* argv[])
 	  else if (argv[i][1]==0 || argv[i][2]!=0)
 	    options_failure("option neither short or long");
 	  else arg=argv[i]+1;
-	  // check value
-	  if (strcmp(arg,"quiet")==0 ||
-	      strcmp(arg,"q")==0)
-	       opt_quiet=1;
-	  else if (strcmp(arg,"batch")==0 ||
-		   strcmp(arg,"b")==0)
+	  
+	  // check option
+	  if (dsp && (used = dsp->parse_option(arg, argv[i+1])))
 	    {
-	      opt_batch=1;
+	      i+=used-1;
 	    }
-	  else if (strcmp(arg,"bpm")==0)
+	  else if (option(arg,"quiet","q"))
 	    {
-	      if (++i>=argc)
-		options_failure("bpm analysis techinque scanning error");
-	      opt_bpm=atoi(argv[i]);
-	      if (opt_bpm<1) 
-		options_failure("selected bpm analyzing technique too low (starts with 1)\n");
-	      if (opt_bpm>4)
-		options_failure("selected bpm analyzing technique too hi (ends with 4)\n");
+	      opt_quiet = true;
 	    }
-	  //	  else if (strcmp(arg,"pattern")==0)
-	  // opt_pattern=1;
-	  else if (strcmp(arg,"verbose")==0 ||
-		   strcmp(arg,"v")==0)
-	    opt_dspverbose=1;
-	  else if (strcmp(arg,"latency")==0 ||
-		   strcmp(arg,"L")==0)
+	  else if (option(arg,"batch","b"))
 	    {
-	      opt_latency=1;
-	      if (++i>=argc)
-		options_failure("latency argument scanning error");
-	      arg_latency=argv[i];
+	      dsp_chosen = true;
+	      opt_batch=true;
 	    }
-#ifdef COMPILE_OSS
-	  else if (strcmp(arg,"dsp")==0 ||
-		   strcmp(arg,"d")==0)
+	  else if (option(arg,"energy","e"))
 	    {
-	      if (++i>=argc) 
-		options_failure("dsp argument scanning error");
-	      dsp_oss::arg_dsp=argv[i];
-	    }
-	  else if (strcmp(arg,"fragments")==0 ||
-		   strcmp(arg,"F")==0)
+	      opt_energy=true;
+	    } 
+	  else if (option(arg,"bpm"))
 	    {
-	      dsp_oss::opt_fragments=1;
-	      if (++i>=argc)
-		options_failure("fragments argument scanning error");
-	      dsp_oss::arg_fragments = argv[i];
+	      opt_bpm=true; 
+	      arg_int(arg_bpm);
 	    }
-	  else if (strcmp(arg,"nolatencyaccounting")==0 ||
-		   strcmp(arg,"L")==0)
-	    dsp_oss::opt_nolatencyaccounting=1;
-	  else if (strcmp(arg,"oss")==0)
+	  else if (option(arg,"rms"))
 	    {
-	      dsp = new dsp_oss();
-	    }
-#endif
-	  else if (strcmp(arg,"none")==0)
+	      opt_rms=true;
+	      arg_float(arg_rms);
+	    } 
+	  else if (option(arg,"none"))
 	    {
 	      dsp = new dsp_none();
+	      dsp_chosen = true;
 	    }
-#ifdef COMPILE_ALSA
-	  else if (strcmp(arg,"dev")==0)
+	  else if (option(arg,"remote"))
 	    {
-	      if (++i>=argc) 
-		options_failure("dsp argument scanning error");
-	      dsp_alsa::arg_dev=argv[i];
+	      opt_remote=true;
+	      arg_str(arg_remote);
+	      argv[i]=argv[i-1]="";
+	    } 
+	  else if (option(arg,"mixed"))
+	    {
+	      arg_int(dsp_mixed::mix_dev);
+	      dsp = new dsp_mixed();
+	      dsp_chosen = true;
 	    }
-	  else if (strcmp(arg,"alsa")==0)
+#ifdef COMPILE_OSS
+	  else if (option(arg,"oss"))
 	    {
-	      dsp = new dsp_alsa();
-	      if (!opt_latency)
-		arg_latency = "150";
+	      dsp = new dsp_oss();
+	      dsp_chosen = true;
 	    }
 #endif
-	  else if (strcmp(arg,"create")==0 ||
-		   strcmp(arg,"c")==0)
-	    opt_create=1;
-	  else if (strcmp(arg,"spectrum")==0)
-	    opt_color=1;
-	  else if (strcmp(arg,"rawpath")==0 ||
-		   strcmp(arg,"r")==0)
+#ifdef COMPILE_ALSA
+	  else if (option(arg,"alsa"))
 	    {
-	      if (++i>=argc) 
-		options_failure("rawpath argument scanning error");
-	      arg_rawpath=argv[i];
+	      dsp = new dsp_alsa();
+	      dsp_chosen = true;
 	    }
-	  else if (strcmp(arg,"low")==0 ||
-		   strcmp(arg,"l")==0)
+#endif
+	  else if (option(arg,"create","c"))
+	    opt_create=true;
+	  else if (option(arg,"spectrum"))
+	    opt_color = true;
+	  else if (option(arg,"rawpath","r"))
 	    {
-	      if (++i>=argc) 
-		options_failure("low argument scanning error");
-	      arg_low=atoi(argv[i]);
+	      arg_str(arg_rawpath);
 	    }
-	  else if (strcmp(arg,"high")==0 ||
-		   strcmp(arg,"h")==0)
+	  else if (option(arg,"low","l"))
 	    {
-	      if (++i>=argc)
-		options_failure("high argument scanning error");
-	      arg_high=atoi(argv[i]);
+	      arg_int(arg_low);
 	    }
-	  else if (strcmp(arg,"check-version")==0)
+	  else if (option(arg,"high","h"))
 	    {
-	      if (++i>=argc)
-		options_failure("impossible to check version");
+	      arg_int(arg_high);
+	    }
+	  else if (option(arg,"check-version"))
+	    {
+	      next_arg;
 	      if (strcmp(argv[i],VERSION)!=0)
 		{
 		  char err[5000];
@@ -272,49 +252,34 @@ void process_options(int argc, char* argv[])
 		  exit(1);
 		}
 	      exit(0);
-	    }
-	  else if (strcmp(arg,"match")==0 ||
-		   strcmp(arg,"m")==0)
+	    } 
+	  else if (option(arg,"match","m"))
+	    { 
+	      opt_match=true;
+	      arg_str(arg_match); 
+	    } 
+	  else if (option(arg,"position","p"))
 	    {
-	      opt_match=1;
-	      if (++i>=argc) 
-		options_failure("match argument scanning error");
-	      arg_match=argv[i];
-	    }
-	  /*	  else if (strcmp(arg,"mixer")==0 ||
-		   strcmp(arg,"x")==0)
-	    {
-	      if (++i>=argc)
-		options_failure("mixer argument scanning error");
-	      arg_mixer=argv[i];
-	    }
-	  */
-	  else if (strcmp(arg,"position")==0 ||
-		   strcmp(arg,"p")==0)
-	    {
-	      if (++i>=argc)
-		options_failure("position x argument scanning error");
-	      arg_posx=argv[i];
-	      if (++i>=argc)
-		options_failure("position y argument scanning error");
-	      arg_posy=argv[i];
+	      arg_int(arg_posx); 
+	      arg_int(arg_posy); 
 	    }
 	}
       else
 	argument = argv[i];
     }
-  if (argument==NULL)
-    {
-      options_failure("requires at least one argument");
-    }
-  if (!dsp)
-    {
-      dsp = new dsp_none();
-    }
-  if ((opt_color || opt_bpm) && !opt_batch)
-    {
-      options_failure("to start an analyzer, you need to supply the --batch option");
-    }
+   if (argument==NULL)
+     options_failure("requires at least one argument");
+   if (!dsp_chosen)
+     options_failure("please select a dsp device\n");
+   if (opt_bpm)
+     {
+	if (arg_bpm<1) 
+	  options_failure("selected bpm analyzing technique too low (starts with 1)\n");
+	if (arg_bpm>4)
+	  options_failure("selected bpm analyzing technique too hi (ends with 4)\n");
+     }
+   if ((opt_color || opt_bpm || opt_energy) && !opt_batch)
+     options_failure("to start an analyzer, you need to supply the --batch option");
 }
 
 bool show_error(int err, int err2, const char*text)
@@ -364,26 +329,42 @@ void batch_start()
       md5_analyzer->run();
       printf("%d. Md5 sum: %s\n",nr++,playing->get_md5sum());
     }
-  // 2. bpm
+  // 2. energy levels
+  if (!playing->fully_defined_energy() || opt_energy)
+    {
+      EnergyAnalyzer * energy_analyzer = new EnergyAnalyzer();
+      energy_analyzer->run();
+      printf("%d. Min, max : (L: %d, R: %d), (L: %d, R: %d)\n",nr++,
+	     playing->get_min().left,
+	     playing->get_min().right,
+	     playing->get_max().left,
+	     playing->get_max().right);
+      printf("%d. Mean, RMS : (L: %d, R: %d), (L: %g, R: %g)\n",nr++,
+	     playing->get_mean().left,
+	     playing->get_mean().right,
+	     playing->get_power().left,
+	     playing->get_power().right);
+    }
+  // 3. bpm
   if (opt_bpm)
     {
       BpmAnalyzerDialog *counter = new BpmAnalyzerDialog();
       counter->setBpmBounds(arg_low,arg_high);
-      if (opt_bpm==2) counter->ultraLongFFT->setChecked(true);
-      else if (opt_bpm==3) counter->enveloppeSpectrum->setChecked(true);
-      else if (opt_bpm==4) counter->fullAutoCorrelation->setChecked(true);
+      if (arg_bpm==2) counter->ultraLongFFT->setChecked(true);
+      else if (arg_bpm==3) counter->enveloppeSpectrum->setChecked(true);
+      else if (arg_bpm==4) counter->fullAutoCorrelation->setChecked(true);
       counter->run();
       counter->finish();
-      printf("%d. Bpm count: %s\n",nr++,playing->get_tempo_str());
+      printf("%d. Bpm count: %s\n",nr++,playing->get_tempo().get_charstr());
     }
-  // 3. spectrum
+  // 4. spectrum
   if (opt_color)
     {
       SpectrumDialogLogic *counter = new SpectrumDialogLogic();
       counter->fetchSpectrum();
       printf("%d. Spectrum\n",nr++);
     }
-  // 4. pattern
+  // 5. pattern
   /*  if (opt_pattern)
     {
       PatternAnalyzerLogic *pattern = new PatternAnalyzerLogic(false);
@@ -395,10 +376,77 @@ void batch_start()
   core_done();
 }
 
+// The escaping necessary for ssh to work is ridicoulous..
+// An ordinary containement within " ... " does not work, so we must
+// escape every character on its own. Especially the & is important
+// because this spawns a background procses :)
+char * escape(char * in)
+{
+  char escaped[2048];
+  int c;
+  int i=0;
+  while((c=*(in++)) && i < 2048)
+    {
+      if (c=='\n' || c=='&' || c=='\\' || c==' ' || c=='(' || c==')' || c=='\'')
+	{
+	  escaped[i++]='\\';
+	}
+      escaped[i++]=c;
+    }
+  assert(i<2048);
+  escaped[i]=0;
+  return strdup(escaped);
+}
+
+
+bool to_remote(char* filename)
+{
+  return vexecute(" ssh %s  mkdir -p %s",arg_remote,escape(escape(dirname(strdup(filename)))))
+    && vexecute(" scp -q %s %s:%s",escape(filename),arg_remote,escape(escape(dirname(strdup(filename)))));
+}
+
+bool from_remote(char* filename)
+{
+  return vexecute(" scp -q %s:%s %s ",arg_remote,escape(escape(filename)),escape(filename));
+}
+
+bool delete_remote(char* filename)
+{
+  return vexecute(" ssh %s rm %s",arg_remote,escape(escape(filename)));
+}
+
+int remote(int argc, char* argv[])
+{
+  Index * toplay = new Index(argument);
+  printf("[-> data   ------------------------------------]\n");
+  char mp3[2000];
+  sprintf(mp3,"./music/%s",toplay->get_filename());
+  if (!to_remote(mp3)) return 1;
+  if (!to_remote(argument)) return 2;
+  if (opt_match && strcmp(arg_match,argument)) if (!to_remote(arg_match)) return 3;
+  char newcmd[2000];
+  sprintf(newcmd," ssh -X %s ",arg_remote);
+  for(int i = 0 ; i < argc ; i ++)
+    {
+      strcat(newcmd,escape(escape(argv[i])));
+      strcat(newcmd," ");
+    }
+  printf("[* execute ------------------------------------]\n");
+  if (!execute(newcmd)) return 4;
+  printf("[<- data   ------------------------------------]\n");
+  if (!from_remote(argument)) return 5;
+  if (!delete_remote(argument)) return 6;
+  if (!delete_remote(mp3)) return 7;
+  if (opt_match && strcmp(arg_match,argument)) if (!delete_remote(arg_match)) return 8;
+  return 0;
+}
+
 int main(int argc, char *argv[])
 {
   app = new QApplication(argc,argv);
   process_options(argc,argv);
+  if (opt_remote)
+    return remote(argc,argv);
   // if we need to create an index file we'll make it.
   if (opt_create)
     {

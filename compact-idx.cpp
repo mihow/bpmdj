@@ -73,12 +73,12 @@ void SongSelectorLogic::compactIdxDirectory()
 	switch(type)
 	  {
 	  case SPLIT_ARTIST:
-	    if (!tree->search(song->author))
-	      tree->add(new QStringNode(song->author));
+	    if (!tree->search(song->get_author()))
+	      tree->add(new QStringNode(song->get_author()));
 	    break;
 	  case SPLIT_TAGS:
-	    if (!tree->search(Tags::full_string(song->tags)))
-	      tree->add(new QStringNode(Tags::full_string(song->tags)));
+	    if (!tree->search(Tags::full_string(song->get_tags())))
+	      tree->add(new QStringNode(Tags::full_string(song->get_tags())));
 	    break;
 	  }
       }
@@ -115,17 +115,17 @@ void SongSelectorLogic::compactIdxDirectory()
 	  switch (type)
 	    {
 	    case SPLIT_ARTIST:
-	      handlethisone = song->author == key;
+	      handlethisone = song->get_author() == key;
 	      break;
 	    case SPLIT_TAGS:
-	      handlethisone = Tags::full_string(song->tags) == key;
+	      handlethisone = Tags::full_string(song->get_tags()) == key;
 	      break;
 	    case SPLIT_ONEFILE:
 	      handlethisone=true;
 	    }
 	  if (handlethisone)
 	    {
-	      QString indexfilename = song->storedin;
+	      QString indexfilename = song->get_storedin();
 	      Index index(indexfilename);
 	      if (index.can_be_stored_in_bib())
 		{

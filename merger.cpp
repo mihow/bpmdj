@@ -23,15 +23,19 @@
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>
+#include "index.h"
 #include <ctype.h>
 #include "unistd.h"
-#include "index.h"
 #include "common.h"
+#include "memory.h"
 #include "scripts.h"
+#include "version.h"
 
 void options_failure(char* err)
 {
-  printf("Usage:  kbpm-play <options> [old-song] new-song\n\n"
+  printf("BpmDj Merger v%s, Copyright (c) 2001-2004 Werner Van Belle\n",VERSION);
+  printf("This software is distributed under the GPL2 license. See copyright.txt\n\n");
+  printf("Usage:  kbpm-merge <options> [old-song] new-song\n\n"
 	 "  --mix         nbr  how many measures should be used to create the mix\n" 
 	 "  --slide       nbr  how many measures should be used to fiond the best match\n"
 	 "  --temposwitch nbr  how many measures should be used to switch tempos\n" 
@@ -370,7 +374,7 @@ bool createFiles(char* a, char* b)
 {
   Index idx_b(b);
   filename_b = strdup(idx_b.get_filename());
-  period_b = idx_b.get_period()*4;
+  period_b = period_to_quad(idx_b.get_period());
   printf("Decoding %s\n",b);
   if (!vexecute(CREATERAW_CMD,"./",filename_b))
     exit(100);
@@ -382,7 +386,7 @@ bool createFiles(char* a, char* b)
 
   Index idx_a(a);
 
-  period_a = idx_a.get_period()*4;
+  period_a = period_to_quad(idx_a.get_period());
   
   file_a=fopen(BPMMIXED_NAME,"r+b");
   if (file_a)

@@ -37,7 +37,6 @@
 #include "database.h"
 #include "songtree.h"
 #include "avltree.cpp"
-#include "qstring-factory.h"
 
 static int songs_already_in_database = 0;
 

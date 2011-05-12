@@ -2,7 +2,7 @@ CPP = g++ -O3 -Wall
 CC = gcc -O3 -Wall
 
 CFLAGS += -D COMPILE_OSS -D COMPILE_ALSA
-LDFLAGS+= -lpthread -lm -lasound
+LDFLAGS+= -lpthread -lm -lasound -lrt
 
 CP = cp
 MV = mv
@@ -15,4 +15,4 @@ INSTALL = install
 
 QT_INCLUDE_PATH= -I ${QTDIR}/include/
 QT_LIBRARY_PATH= -L ${QTDIR}/lib/
-QT_LIBS= -lqt
+QT_LIBS= -lqt 

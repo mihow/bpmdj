@@ -1,4 +1,4 @@
-<!DOCTYPE UI><UI version="3.2" stdsetdef="1">
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
 <class>PatternDialog</class>
 <widget class="QDialog">
     <property name="name">
@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>710</width>
-            <height>451</height>
+            <width>812</width>
+            <height>469</height>
         </rect>
     </property>
     <property name="sizePolicy">
@@ -36,7 +36,7 @@
         <property name="spacing">
             <number>6</number>
         </property>
-        <widget class="QSlider" row="4" column="2" rowspan="1" colspan="9">
+        <widget class="QSlider" row="4" column="2" rowspan="1" colspan="10">
             <property name="name">
                 <cstring>color</cstring>
             </property>
@@ -80,7 +80,7 @@
                 <number>4</number>
             </property>
         </widget>
-        <spacer row="2" column="3">
+        <spacer row="2" column="3" rowspan="1" colspan="2">
             <property name="name">
                 <cstring>spacer1</cstring>
             </property>
@@ -97,7 +97,7 @@
                 </size>
             </property>
         </spacer>
-        <widget class="QSlider" row="1" column="9">
+        <widget class="QSlider" row="1" column="10">
             <property name="name">
                 <cstring>periodDelta</cstring>
             </property>
@@ -117,7 +117,7 @@
                 <number>100</number>
             </property>
         </widget>
-        <widget class="QSlider" row="1" column="10">
+        <widget class="QSlider" row="1" column="11">
             <property name="name">
                 <cstring>periodDelta10</cstring>
             </property>
@@ -143,7 +143,7 @@
                 <number>100</number>
             </property>
         </widget>
-        <widget class="QLabel" row="0" column="0" rowspan="1" colspan="11">
+        <widget class="QLabel" row="0" column="0" rowspan="1" colspan="12">
             <property name="name">
                 <cstring>textLabel1_3</cstring>
             </property>
@@ -159,7 +159,7 @@
                 <set>WordBreak|AlignVCenter</set>
             </property>
         </widget>
-        <widget class="QLabel" row="1" column="1" rowspan="1" colspan="8">
+        <widget class="QLabel" row="1" column="1" rowspan="1" colspan="9">
             <property name="name">
                 <cstring>pattern</cstring>
             </property>
@@ -203,7 +203,7 @@
                 <bool>true</bool>
             </property>
         </widget>
-        <widget class="QLayoutWidget" row="2" column="5" rowspan="2" colspan="1">
+        <widget class="QLayoutWidget" row="2" column="6" rowspan="2" colspan="1">
             <property name="name">
                 <cstring>layout4</cstring>
             </property>
@@ -235,7 +235,7 @@
                 </widget>
             </vbox>
         </widget>
-        <widget class="QLayoutWidget" row="2" column="6" rowspan="2" colspan="1">
+        <widget class="QLayoutWidget" row="2" column="7" rowspan="2" colspan="1">
             <property name="name">
                 <cstring>layout2</cstring>
             </property>
@@ -267,7 +267,7 @@
                 </widget>
             </vbox>
         </widget>
-        <widget class="QPushButton" row="2" column="7">
+        <widget class="QPushButton" row="2" column="8">
             <property name="name">
                 <cstring>updateButton</cstring>
             </property>
@@ -275,7 +275,7 @@
                 <string>Update</string>
             </property>
         </widget>
-        <widget class="QPushButton" row="2" column="8" rowspan="1" colspan="3">
+        <widget class="QPushButton" row="2" column="9" rowspan="1" colspan="3">
             <property name="name">
                 <cstring>pushButton4</cstring>
             </property>
@@ -283,7 +283,7 @@
                 <string>Set Tempo</string>
             </property>
         </widget>
-        <widget class="QPushButton" row="3" column="7" rowspan="1" colspan="4">
+        <widget class="QPushButton" row="3" column="8" rowspan="1" colspan="4">
             <property name="name">
                 <cstring>pushButton2</cstring>
             </property>
@@ -291,7 +291,7 @@
                 <string>Ok</string>
             </property>
         </widget>
-        <widget class="QCheckBox" row="2" column="4">
+        <widget class="QCheckBox" row="2" column="5">
             <property name="name">
                 <cstring>decay</cstring>
             </property>
@@ -302,12 +302,37 @@
                 <string>decay</string>
             </property>
         </widget>
-        <widget class="QCheckBox" row="3" column="0" rowspan="1" colspan="5">
+        <widget class="QCheckBox" row="3" column="5">
+            <property name="name">
+                <cstring>power</cstring>
+            </property>
+            <property name="enabled">
+                <bool>true</bool>
+            </property>
+            <property name="text">
+                <string>power</string>
+            </property>
+            <property name="toolTip" stdset="0">
+                <string>show the power per block instead of the mean amplitude</string>
+            </property>
+        </widget>
+        <widget class="QCheckBox" row="3" column="0" rowspan="1" colspan="4">
             <property name="name">
                 <cstring>haar</cstring>
             </property>
             <property name="text">
                 <string>Wavelet based</string>
+            </property>
+        </widget>
+        <widget class="QPushButton" row="3" column="4">
+            <property name="name">
+                <cstring>pushButton53</cstring>
+            </property>
+            <property name="enabled">
+                <bool>false</bool>
+            </property>
+            <property name="text">
+                <string>fatten/clean ?</string>
             </property>
         </widget>
     </grid>
@@ -355,6 +380,12 @@
         <receiver>PatternDialog</receiver>
         <slot>slantChanged()</slot>
     </connection>
+    <connection>
+        <sender>pushButton53</sender>
+        <signal>clicked()</signal>
+        <receiver>PatternDialog</receiver>
+        <slot>fatten()</slot>
+    </connection>
 </connections>
 <tabstops>
     <tabstop>periodDelta</tabstop>
@@ -378,6 +409,7 @@
     <slot>dumpPatternToIdx()</slot>
     <slot>filterChanged()</slot>
     <slot>calculateRythmPattern()</slot>
+    <slot>fatten()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

@@ -66,7 +66,7 @@ Played::Played(const QString filename)
 bool Played::IsPlayed(Song * which)
 {
   for(int i = 0 ; i < names.count ; i++)
-    if (names.elements[i]==which->file) 
+    if (names.elements[i]==which->get_file()) 
       return true;
   return false;
 }
@@ -76,12 +76,12 @@ void Played::Play(Song * main_now)
   if (main_now)
     {
       // write to disk..
-      const QString name = main_now->file;
+      const QString name = main_now->get_file();
       fprintf(f,"%s\n",(const char*)name);
       fflush(f);
       // increase counter
       songs_played++;
-      main_now->played = true;
+      main_now->set_played(true);
     }
   // check the history and update records as necessary...
   // t_1 its prev should point to t_2
@@ -91,26 +91,26 @@ void Played::Play(Song * main_now)
   t_0 = main_now;
   if (t_1)
     {
-      Index i(t_1->storedin);
+      Index i(t_1->get_storedin());
       QString info;
       HistoryField * f;
       if (t_0) 
 	{
-	  f = i.add_next_song(t_0->file);
+	  f = i.add_next_song(t_0->get_file());
 	  info = f -> comment;
 	  if (Config::ask_mix)
 	    {
 	      bool ok;
 	      QString mixinfo = QInputDialog::getText("How did the mix go ?",
-						      "From : " + t_1->title + "[" + t_1->author+"]" + t_1->version + "\n"+
-						      "To: " + t_0->title + "[" + t_0->author + "]" + t_0->version + "\n",QLineEdit::Normal,
+						      "From : " + t_1->get_title() + "[" + t_1->get_author()+"]" + t_1->get_version() + "\n"+
+						      "To: " + t_0->get_title() + "[" + t_0->get_author() + "]" + t_0->get_version() + "\n",QLineEdit::Normal,
 						      info,&ok);
 	      if (ok) f-> comment = strdup(mixinfo);
 	    }
 	}
       if (t_2) 
 	{
-	  f = i.add_prev_song(t_2->file);
+	  f = i.add_prev_song(t_2->get_file());
 	  // if (info.isNull()) f -> comment = strdup("");
 	  // else f -> comment = strdup(info);
 	}

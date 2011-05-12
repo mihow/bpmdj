@@ -54,6 +54,7 @@
 #include "player-core.h"
 #include "fourier.h"
 #include "scripts.h"
+#include "memory.h"
 
 //#define PROFILER
 
@@ -1116,7 +1117,7 @@ void BpmAnalyzerDialog::set_measured_period(QString technique, int p)
 	 (const char*) technique, p, running_time, playing->get_time());
 #else
   playing->set_period(p/4);
-  normalperiod=playing->get_period()*4;
+  normalperiod=period_to_quad(playing->get_period());
   currentperiod=normalperiod;
 #endif
 }
@@ -1229,12 +1230,12 @@ void BpmAnalyzerDialog::peak_scan()
   StatusLabel->setText("Ready");
   
   playing->set_period(global_minimum_at);
-  normalperiod=playing->get_period()*4;
+  normalperiod=period_to_quad(playing->get_period());
   currentperiod=normalperiod;
   if (WAVRATE==22050)
     {
-      currentperiod/=2;
-      normalperiod/=2;
+      currentperiod=currentperiod.halved();
+      normalperiod=normalperiod.halved();
     }
   
   // draw vertical lines at 1/4; 2/4; 3/4
@@ -1335,42 +1336,41 @@ void BpmAnalyzerDialog::tap()
       p *= 11025*4;
       p /= CLOCK_FREQ;
       playing->set_period(p,false);
-      normalperiod=playing->get_period()*4;
+      normalperiod=period_to_quad(playing->get_period());
       currentperiod=normalperiod;
       if (WAVRATE==22050)
 	{
-	  currentperiod/=2;
-	  normalperiod/=2;
+	  currentperiod=currentperiod.halved();
+	  normalperiod=normalperiod.halved();
 	}
-      double tempo = playing->get_tempo();
-      setBpmBounds((long)(tempo-10.0),(long)(tempo+10.0));
+      tempo_type tempo = playing->get_tempo();
+      setBpmBounds(tempo.lower(10),tempo.higher(10));
     }
   TapLcd->display(tapcount);
 }
 
 void BpmAnalyzerDialog::incBpm()
 {
-  int p = playing->get_period()-10;
-  if(p < 100) p=100;
+  period_type p = playing->get_period().lower(10);
   playing->set_period(p);
-  normalperiod=playing->get_period() * 4;
+  normalperiod=period_to_quad(playing->get_period());
   currentperiod=normalperiod;
   if (WAVRATE==22050)
     {
-      currentperiod/=2;
-      normalperiod/=2;
+      currentperiod=currentperiod.halved();
+      normalperiod=normalperiod.halved();
     }
 }
 
 void BpmAnalyzerDialog::decBpm()
 {
-  int p = playing->get_period()+10;
+  period_type p = playing->get_period().higher(10);
   playing->set_period(p);
-  normalperiod=playing->get_period() * 4;
+  normalperiod=period_to_quad(playing->get_period());
   currentperiod=normalperiod;
   if (WAVRATE==22050)
     {
-      currentperiod/=2;
-      normalperiod/=2;
+      currentperiod=currentperiod.halved();
+      normalperiod=normalperiod.halved();
     }
 }

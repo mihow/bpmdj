@@ -32,6 +32,7 @@
 #include <assert.h>
 #include "kbpm-dj.h"
 #include "pca.h"
+#include "memory.h"
 #include "common.h"
 
 #define SIGN(a, b) ( (b) < 0 ? -fabs(a) : fabs(a) )

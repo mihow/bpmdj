@@ -18,8 +18,11 @@
 ****/
 
 #include "version.h"
-
 #include "common.h"
+
+#define NONE_OPTION_HELP \
+"  --none-driver---------------------------------\n"\
+"               --none                use no sound driver (default)\n"
 
 class dsp_none: public dsp_driver
 {
@@ -29,5 +32,6 @@ class dsp_none: public dsp_driver
   signed8 latency();
   int     open();
   void    close();
+  int     parse_option(char* arg, char* argument);
 };
 

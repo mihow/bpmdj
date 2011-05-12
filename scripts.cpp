@@ -26,6 +26,7 @@
 #include "index.h"
 #include "scripts.h"
 #include "stdarg.h"
+#include "memory.h"
 
 char *getRawFilename(const char * rawpath, const char * n)
 {
@@ -97,7 +98,7 @@ int execute(const char* script)
 {
   if (system(script)<=256) 
     {
-      //      printf("Information: started %s\n",script);
+      // printf("Information: started %s\n",script);
       return 1;
     }
   printf("Error: couldn't execute %s\n",script);

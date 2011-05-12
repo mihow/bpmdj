@@ -25,7 +25,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <qpainter.h>
-#include "qstring-factory.h"
 #include "songselector.logic.h"
 #include "qsong.h"
 #include "process-manager.h"
@@ -33,48 +32,53 @@
 #include "dirscanner.h"
 #include "spectrum.h"
 #include "tags.h"
+#include "memory.h"
 
 void Song::refill(Index &reader, bool allowed_to_write)
 {
   if (allowed_to_write && reader.changed())
     reader.write_idx();
   /* copy everything to object */
-  storedin = QStringFactory::create(reader.get_storedin());
-  tempo = reader.get_tempo();
-  file = QStringFactory::create(reader.get_filename());
-  tags = Tags::parse_tags(reader.get_tags());
-  time = QStringFactory::create(reader.get_time());
-  md5sum = QStringFactory::create(reader.get_md5sum());
-  if (spectrum!=no_spectrum) deallocate(spectrum);
-  spectrum = reader.get_spectrum_copy();
-  title = QStringFactory::create(reader.get_display_title());
-  author = QStringFactory::create(reader.get_display_author());
-  version = QStringFactory::create(reader.get_display_version());
-  albums = reader.copy_albums();
+  set_storedin(QStringFactory::create(reader.get_storedin()));
+  set_tempo(reader.get_tempo());
+  set_file(QStringFactory::create(reader.get_filename()));
+  set_tags(Tags::parse_tags(reader.get_tags()));
+  set_time(QStringFactory::create(reader.get_time()));
+  set_md5sum(QStringFactory::create(reader.get_md5sum()));
+  if (get_spectrum()!=no_spectrum) deallocate(get_spectrum());
+  set_spectrum(reader.get_spectrum_copy());
+  set_title(QStringFactory::create(reader.get_display_title()));
+  set_author(QStringFactory::create(reader.get_display_author()));
+  set_version(QStringFactory::create(reader.get_display_version()));
+  set_albums(reader.copy_albums());
+  set_min_amp(reader.get_min());
+  set_max_amp(reader.get_max());
+  set_mean_amp(reader.get_mean());
+  set_power(reader.get_power());
   /* are there any cues stored */
-  has_cues = reader.get_cue_z() + reader.get_cue_x() + reader.get_cue_c() + reader.get_cue_v();
+  set_has_cues(reader.get_cue_z() + reader.get_cue_x() + reader.get_cue_c() + reader.get_cue_v());
 }
 
 void Song::checkondisk()
 {
-  QString songfilename = MusicDir + "/" + file;
-  ondisk = exists(songfilename);
+  QString songfilename = MusicDir + "/" + get_file();
+  set_ondisk(exists(songfilename));
 }
 
 void Song::clearFloatingFields()
 {
-  played=Played::IsPlayed(this);
-  played_author_at_time = -100;
-  color_distance = 0;
-  spectrum_string = "";
-  distance_string = QString::null;
+  set_played(Played::IsPlayed(this));
+  init_played_author_at_time();
+  init_color_distance();
+  init_spectrum_string();
+  init_distance_string();
 }
 
 bool Song::contains_tag(const tag_type tag)
 {
   if (tag==tag_end) 
     return true;
-  tag_type *tagp = tags;
+  tag_type *tagp = get_tags();
   while(*tagp!=tag_end)
     if (*(tagp++)==tag) 
       return true;
@@ -83,41 +87,45 @@ bool Song::contains_tag(const tag_type tag)
 
 Song::Song()
 {
-  title = "";
-  author = "";
-  version = "";
-  tempo = no_tempo;
-  storedin = "";
-  file = "";
-  time = "";
-  md5sum = "";
-  spectrum = no_spectrum;
-  color.setRgb(127,127,127);
-  spectrum_string = "";
-  distance_string = QString::null;
-  played = false;
-  ondisk = true;
-  has_cues = false;
-  tags = NULL;
-  played_author_at_time = -100;
+  init_title();
+  init_author();
+  init_version();
+  init_tempo();
+  init_storedin();
+  init_file();
+  init_time();
+  init_md5sum();
+  init_spectrum();
+  init_color();
+  init_spectrum_string();
+  init_distance_string();
+  init_played();
+  init_ondisk();
+  init_has_cues();
+  init_tags();
+  init_min_amp();
+  init_max_amp();
+  init_mean_amp();
+  init_power();
+  init_played_author_at_time();
 }
 
 Song::Song(Index * idx, bool allowwrite, bool check_ondisk, bool accountspectrum)
 {
-  ondisk = false;
-  tags = NULL;
-  spectrum = no_spectrum;
+  init_ondisk();
+  init_tags();
+  init_spectrum();
   refill(*idx, allowwrite);
   clearFloatingFields();
   if (accountspectrum)
-    new_spectrum(spectrum);
+    new_spectrum(get_spectrum());
   if (check_ondisk)
     checkondisk();
 }
 
 void Song::reread()
 {
-  Index reader((const char*)storedin);
+  Index reader((const char*)get_storedin());
   // if (reader.changed()) reader.write_idx();
   refill(reader);
 }
@@ -126,17 +134,17 @@ void Song::reread()
 void Song::realize()
 {
   // wat we hier doen is een nieuwe index file creeeren en deze op disk schrijven. Dit vereist natuurlijk een unieke naam :)
-  if (storedin.endsWith(".bib"))
+  if (get_storedin().endsWith(".bib"))
     {
-      Index transfer(storedin);
+      Index transfer(get_storedin());
       char * proposal = transfer.readable_description();
       char fullprop[500];
       sprintf(fullprop,"%s.idx",proposal);
       char * uniquename = findUniqueName(fullprop);
       printf("Debug: realizing song %s as %s\n",proposal, uniquename);
-      storedin = uniquename;
+      set_storedin(uniquename);
       transfer.nolonger_inbib();
-      transfer.write_idx(storedin);
+      transfer.write_idx(get_storedin());
       deallocate(uniquename);
       deallocate(proposal);
     }
@@ -144,8 +152,8 @@ void Song::realize()
 
 void Song::setColor(QColor transfer)
 {
-  color = transfer;
-  spectrum_string = color.isValid() ? color.name() : QString::null;
+  set_color(transfer);
+  set_spectrum_string(get_color().isValid() ? get_color().name() : QString::null);
 }
 
 void Song::simpledump(int d)
@@ -155,35 +163,40 @@ void Song::simpledump(int d)
 void Song::color_sub_elements(int a, int b, float d)
 {
   // d equals 1 if it is the largest intra distance
+  QColor c;
   if (a==-1)
     {
-      color.setRgb(255,255,255);
-      spectrum_string= EMPTY;
+      c.setRgb(255,255,255);
+      set_spectrum_string(EMPTY);
     }
   else
     {
-      color.setHsv(a*360/b,255-(int)(d*255.0),255);
-      //color.setHsv(a*360/b,255,255);
-      spectrum_string = tonumber(a);
+      c.setHsv(a*360/b,255-(int)(d*255.0),255);
+      set_spectrum_string(tonumber(a));
     }
+  set_color(c);
 }
 
 void Song::determine_color(float hue, float dummy, int dummy2, int dummy3)
 {
-  color.setHsv((int)hue,255,255);
-  spectrum_string = tonumber((int)hue);
+  QColor c;
+  c.setHsv((int)hue,255,255);
+  set_color(c);
+  set_spectrum_string(tonumber((int)hue));
 }
 
 float Song::tempo_n_distance(float harmonic, Song* song)
 {
-  float fa = tempo;
-  float fb = song->tempo;
-  if (fa == no_tempo || fb == no_tempo) return 1000;
-  fa*=harmonic;
-  float sa = fa * Config::distance_temposcale;
-  float sb = fb * Config::distance_temposcale;
+  tempo_type fa = get_tempo();
+  tempo_type fb = song->get_tempo();
+  if (fa.none() || fb.none()) return 1000;
+  float ffa = fa.tempo;
+  float ffb = fb.tempo;
+  ffa*=harmonic;
+  float sa = ffa * Config::distance_temposcale;
+  float sb = ffb * Config::distance_temposcale;
   float s = (sa < sb ? sa : sb);
-  return (fa-fb)/s;
+  return (ffa-ffb)/s;
 }
 
 float Song::tempo_distance(float harmonic, Song* song)
@@ -198,16 +211,14 @@ float Song::tempo_distance(Song* song)
 
 tempo_type Song::tempo_between(Song* song,  float percent)
 {
-  float ta = tempo;
-  float tb = song->tempo;
-  return (tb-ta)*percent+ta;
+  return between_tempos(get_tempo(),song->get_tempo(),percent);
 }
 
 float Song::spectrum_distance(Song* song)
 {
-  if (spectrum==no_spectrum || song->spectrum==no_spectrum)
+  if (get_spectrum()==no_spectrum || song->get_spectrum()==no_spectrum)
     return 1000000;
-  spectrum_type b = song->spectrum;
+  spectrum_type b = song->get_spectrum();
   spectrum_freq distance=0;
   if (Config::log_spectrum_distance)
     {
@@ -217,7 +228,7 @@ float Song::spectrum_distance(Song* song)
       for (int i = 0; i < spectrum_size ; i ++ )
 	{
 	  spectrum_freq mismatch = 0;
-	  if (b[i] > 0 && spectrum[i] > 0 && ((mismatch = spectrum[i]/b[i]) > 0)) // assignment intended
+	  if (b[i] > 0 && get_spectrum()[i] > 0 && ((mismatch = get_spectrum()[i]/b[i]) > 0)) // assignment intended
 	    {
 	      mean += 10.0*log(mismatch);
 	      cnt++;
@@ -232,9 +243,9 @@ float Song::spectrum_distance(Song* song)
       for (int i = 0; i < spectrum_size ; i ++ )
 	{
 	  spectrum_freq mismatch = 0;
-	  if (b[i] > 0 && spectrum[i] > 0)
+	  if (b[i] > 0 && get_spectrum()[i] > 0)
 	    {
-	      mismatch = spectrum[i]/b[i];
+	      mismatch = get_spectrum()[i]/b[i];
 	      if (mismatch>0)
 		mismatch = 10.0*log(mismatch) - mean;
 	      else
@@ -248,7 +259,7 @@ float Song::spectrum_distance(Song* song)
     {
       for (int i = 0; i < spectrum_size ; i ++ )
 	{
-	  spectrum_freq mismatch = spectrum[i]-b[i];
+	  spectrum_freq mismatch = get_spectrum()[i]-b[i];
 	  mismatch*=scales[i]; // to normalize the weight of this band
 	  mismatch*=mismatch;
 	  distance+=mismatch;
@@ -262,20 +273,20 @@ float Song::spectrum_distance(Song* song)
 
 spectrum_type Song::spectrum_between(Song* song, float percent)
 {
-  if (spectrum == no_spectrum) return no_spectrum;
-  spectrum_type b = song->spectrum;
+  if (get_spectrum() == no_spectrum) return no_spectrum;
+  spectrum_type b = song->get_spectrum();
   if (b == no_spectrum) return no_spectrum;
   spectrum_type result=allocate_spectrum();
   assert(percent>=0.0 && percent <=1.0);
   for (int i = 0; i < spectrum_size ; i++)
-    result[i] = spectrum[i]*(1.0-percent) + b[i]*percent;
+    result[i] = get_spectrum()[i]*(1.0-percent) + b[i]*percent;
   return result;
 }
 
 QColor Song::color_between(Song* song, float percent)
 {
-  QColor a = color;
-  QColor b = song->color;
+  QColor a = get_color();
+  QColor b = song->get_color();
   QColor result;
   int r1,g1,b1;
   int r2,g2,b2;
@@ -319,11 +330,11 @@ Point* Song::percentToward(Point * other, Metriek * dp, float percent)
   assert(other);
   assert(measure);
   Song * result = new Song();
-  if (measure->tempo != no_tempo)
-    result->tempo = tempo_between(song,percent);
+  if (measure->tempo)
+    result->set_tempo(tempo_between(song,percent));
   if (measure->spectrum)
     {
-      result -> spectrum = spectrum_between(song,percent);
+      result -> set_spectrum ( spectrum_between(song,percent) );
       result -> setColor(color_between(song,percent));
     }
   return result;
@@ -333,15 +344,15 @@ static SongMetriek spectrum_distance(0.0,1.0);
 
 bool Song::getDistance()
 {
-  color_distance=2;
-  if (spectrum!=no_spectrum)
+  set_color_distance(2);
+  if (get_spectrum()!=no_spectrum)
     if (ProcessManager::playingInMain())
-      color_distance = distance(ProcessManager::playingInMain(),&::spectrum_distance);
-  if (color_distance>1.0)
-    distance_string = QString::null;
+      set_color_distance(distance(ProcessManager::playingInMain(),&::spectrum_distance));
+  if (get_color_distance()>1.0)
+    set_distance_string(QString::null);
   else
-    distance_string = tonumber((int)(color_distance*256));
-  return color_distance<=1.0;
+    set_distance_string(tonumber((int)(get_color_distance()*256)));
+  return get_color_distance()<=1.0;
 }
 
 Song::~Song()
@@ -351,20 +362,14 @@ Song::~Song()
 QString Song::getDisplayTitle()
 {
   QString result  = "";
-  if (!title.isNull())
-    result+=title;
-  if (!author.isNull())
-    result+=QString("[")+author+QString("]");
+  if (!get_title().isNull())
+    result+=get_title();
+  if (!get_author().isNull())
+    result+=QString("[")+get_author()+QString("]");
   return result;
 }
 
 QString Song::tempo_str()
 {
-  // we don't use the factory here because these are only numbers and creating
-  // them would simply fill up the factory for nothing: after their usage
-  // in listviewitems these are destroyed again
-  if (tempo==no_tempo) return slash;
-  else if (tempo>=100.0) return QString::number(tempo);
-  else if (tempo>0) return zero+QString::number(tempo);
-  return QString::number(tempo);
+  return get_tempo().qstring();
 }

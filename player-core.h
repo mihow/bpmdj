@@ -39,9 +39,9 @@
  *-------------------------------------------*/ 
 #define  wave_bufsize (32L*1024L)
 // one period is the length of 1 measure
-extern  signed8 targetperiod;
-extern  signed8 currentperiod;
-extern  signed8 normalperiod;
+extern  quad_period_type targetperiod;
+extern  quad_period_type currentperiod;
+extern  quad_period_type normalperiod;
 // x is the data position in the raw file (thus at normal tempo)
 // y is the position in the playing file (thus at target tempo)
 extern  signed8 y,x;
@@ -112,13 +112,11 @@ void map_set(signed2 map_size, map_data m, unsigned8 size, signed8 exit, bool lo
 void map_loop_set(bool l);
 void map_stop();
 
+extern int    opt_rms;
+extern float8 arg_rms;
 extern int   opt_quiet;
 extern int   opt_match;
 extern char* arg_match;
-extern int   opt_dspverbose;
-extern int   opt_latency;
-extern char* arg_latency;
-//extern char* arg_mixer;
 extern char* arg_rawpath;
 extern char* argument;
 

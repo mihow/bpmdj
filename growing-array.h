@@ -28,7 +28,7 @@ template <class T> class GrowingArray
     int   allocated;
   public:
     int   count;
-      T * elements;
+    T * elements;
     GrowingArray();
     void init();
     int  add(T e);

@@ -57,3 +57,27 @@ int dsp_none::open()
 void dsp_none::close()
 {
 }
+
+extern void options_failure(char * err);
+int dsp_none::parse_option(char* arg, char* argument)
+{
+  if (option(arg,"dev")             )
+    {
+      options_failure("The --dev option is dependent on the alsa driver\n"
+		      "as such it should come _after_ the --alsa option\n");
+      return 1;
+    }
+  if (option(arg,"verbose","v")    )
+    {
+      options_failure("The -v option is dependent on a dsp driver,\n"
+		      "as such it should come _after_ a dsp selection\n"
+		      "(--alsa, --oss,...)\n");
+    } 
+  if (option(arg,"latency","L")) 
+    {
+      options_failure("The latency option is dependent on a dsp driver\n"
+		      "as such it should come _after_ a dsp selection \n"
+		      "(--alsa, --oss,...)\n");
+    } 
+  return 0;
+}

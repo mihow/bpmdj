@@ -80,12 +80,12 @@ void DataBase::clear()
 void DataBase::add(Song* song)
 {
   all.add(song);
-  if (file_tree->search(song->file))
+  if (file_tree->search(song->get_file()))
     {
-      printf("Fatal: The song %s occurs at least two times in different index files\n",(const char*)song->file);
-      printf("The first index file is %s\n",(const char*)song->storedin);
-      song = ((SongSortedByFile*)(file_tree->search(song->file)))->song;
-      printf("The second index file is %s\n",(const char*)song->storedin);
+      printf("Fatal: The song %s occurs at least two times in different index files\n",(const char*)song->get_file());
+      printf("The first index file is %s\n",(const char*)song->get_storedin());
+      song = ((SongSortedByFile*)(file_tree->search(song->get_file())))->song;
+      printf("The second index file is %s\n",(const char*)song->get_storedin());
       exit(0);
     }
   file_tree->add(new SongSortedByFile(song));
@@ -192,24 +192,24 @@ void DataBase::updateCache(SongSelectorLogic* selector)
  */
 bool DataBase::filter(SongSelectorLogic* selector, Song *item, Song* main)
 {
-  if (main!=NULL && main->author==item->author)
-    item->played_author_at_time=Played::songs_played;
+  if (main!=NULL && main->get_author()==item->get_author())
+    item->set_played_author_at_time(Played::songs_played);
   // we must obtain the distance first because this value is updated on the fly
   bool indistance = item->getDistance();
   if (Config::limit_indistance && !indistance)
     return false;
   // song on disk ?
-  if (Config::limit_ondisk && !item->ondisk)
+  if (Config::limit_ondisk && !item->get_ondisk())
     return false;
   // song played ?
-  if (Config::limit_nonplayed && item->played)
+  if (Config::limit_nonplayed && item->get_played())
     return false;
   // okay, no similar authors please..
   if (Config::limit_authornonplayed && 
-      Played::songs_played - item->played_author_at_time < Config::authorDecay)
+      Played::songs_played - item->get_played_author_at_time() < Config::authorDecay)
     return false;
   
-  if (item->tempo && main && (Config::limit_uprange || Config::limit_downrange))
+  if (item->get_tempo().valid() && main && (Config::limit_uprange || Config::limit_downrange))
     {
       double d = item->tempo_n_distance(1,main);
       if (Config::show_unknown_tempo && d == 1000) goto tempo_has_reason_to_show;
@@ -252,8 +252,8 @@ bool DataBase::filter(SongSelectorLogic* selector, Song *item, Song* main)
   const QString lookingfor = selector -> searchLine -> text();
   if (strcmp(lookingfor,"")!=0)
     {
-      QString title=item->title.upper();
-      QString author=item->author.upper();
+      QString title=item->get_title().upper();
+      QString author=item->get_author().upper();
       if (title.contains(lookingfor)+author.contains(lookingfor)==0)
 	return false;
     }
@@ -264,7 +264,7 @@ AvlTree<QString>* DataBase::getFileTreeCopy()
 {
   AvlTree<QString> * file_tree = new AvlTree<QString>();
   for(int i = 0 ; i < all.count ; i ++)
-    if (!file_tree->search(all.elements[i]->file))
+    if (!file_tree->search(all.elements[i]->get_file()))
       file_tree->add(new SongSortedByFile(all.elements[i]));
   return file_tree;
 }
@@ -314,7 +314,7 @@ Song * * DataBase::closestSongs(SongSelectorLogic * selector, Song * target, Son
     {
       Song * song = cache.elements[i];
       // standard checks: tags completed and ondisk 
-      if (!song->ondisk) continue;
+      if (!song->get_ondisk()) continue;
       if (!tagFilter(song)) continue;
       // measure distance, gegeven de metriek
       double d = song->distance(target,metriek);

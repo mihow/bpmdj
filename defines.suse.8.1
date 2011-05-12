@@ -2,7 +2,7 @@
 CPP=g++ -O3 -Wall
 CC=gcc -O3 -Wall
 CFLAGS+=-D COMPILE_ALSA -D COMPILE_OSS
-LDFLAGS+= -lpthread -lm -lasound
+LDFLAGS+= -lpthread -lm -lasound -lrt
 
 CP = cp
 MV = mv

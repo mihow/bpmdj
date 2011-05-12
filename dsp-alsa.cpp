@@ -29,15 +29,11 @@
 #include "player-core.h"
 #include "version.h"
 #include "dsp-alsa.h"
+#include "memory.h"
 
 /*-------------------------------------------
  *         Dsp operations
  *-------------------------------------------*/ 
-char            * dsp_alsa::arg_dev = "hw:0,0";
-snd_pcm_t       * dsp_alsa::dsp;
-snd_pcm_uframes_t dsp_alsa::buffer_size;
-snd_pcm_uframes_t dsp_alsa::period_size;
-
 void dsp_alsa::start()
 {
   int err = 0;
@@ -110,8 +106,6 @@ void dsp_alsa::wwrite(unsigned4 *value)
     }
 }
 
-static unsigned4 *buffer;
-static unsigned4  filled = 0;
 void dsp_alsa::write(unsigned4 *value)
 {
   buffer[filled]=*value;
@@ -154,13 +148,40 @@ signed8 dsp_alsa::latency()
       return 0;
     }
   assert(err==0);
-  printf("delay = %d\n",(int)delay);
+  if (verbose)
+    printf("delay = %d\n",(int)delay);
   assert(delay >= 0 && (unsigned4)delay <= buffer_size);
   return delay + filled;
 }
 
+dsp_alsa::dsp_alsa() : dsp_driver()
+{
+  arg_dev = "hw:0,0";
+  dsp = NULL;
+  filled = 0;
+  buffer_size = 0;
+  period_size = 0;
+  arg_latency = "150";
+}
+
+int dsp_alsa::parse_option(char* arg, char* argument)
+{
+  if (option(arg,"dev"))
+    {
+      arg_dev=argument;
+      return 2;
+    }
+  if (option(arg,"latency","L")) 
+    {
+      arg_latency=argument;
+      return 2;
+    } 
+  return dsp_driver::parse_option(arg,argument);
+}
+
 int dsp_alsa::open()
 {
+
   int err;
   unsigned int buffer_time, period_time;
   //  snd_pcm_hw_params_t *hparams;
@@ -326,7 +347,7 @@ int dsp_alsa::open()
   // then we might remove this feature
   //  can_pause = snd_pcm_hw_params_can_pause(hparams);
   
-  if (opt_dspverbose)
+  if (verbose)
     snd_pcm_dump(dsp,output);
 
   // allocate buffer of correct size

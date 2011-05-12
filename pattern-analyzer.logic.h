@@ -32,6 +32,9 @@ class PatternAnalyzerLogic : public PatternDialog
 {
   Q_OBJECT
 private:
+  void distribution(float *bank, long bank_size, float *distri, 
+		    long distribution_size, float lower, float upper);
+  void distribution(float *bank, long size, QPixmap &p, int slice);
   void showPatternVersion1();
   void showPatternVersion2();
   void showHaarVersion1();
@@ -54,6 +57,7 @@ public slots:
   virtual void setTempo();
   virtual void showFilter();
   virtual void calculateRythmPattern();
+  virtual void fatten();
 
 #ifdef FILTER
 private:

@@ -23,7 +23,6 @@
 #include <math.h>
 #include <stdlib.h>
 #include <qlistview.h>
-#include "qstring-factory.h"
 #include "songselector.logic.h"
 #include "qsong.h"
 #include "process-manager.h"
@@ -55,7 +54,7 @@ void HistorySong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid,
   switch(col)
     {
     case HISTORY_CUES:
-      if (Config::color_cues && !song->has_cues)
+      if (Config::color_cues && !song->get_has_cues())
 	{
 	  QColorGroup ncg(cg);
 	  ncg.setColor(QColorGroup::Base,QColor(0,0,255));
@@ -79,7 +78,7 @@ void HistorySong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid,
       }
 
     case HISTORY_TITLE:
-      if (Config::color_played && song->played)
+      if (Config::color_played && song->get_played())
 	{
 	  QColorGroup ncg(cg);
 	  ncg.setColor(QColorGroup::Base,Config::color_played_song);
@@ -112,17 +111,17 @@ void HistorySong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid,
       
     case HISTORY_SPECTRUM:
       if (Config::color_spectrum)
-	if (song->spectrum!=no_spectrum)
+	if (song->get_spectrum()!=no_spectrum)
 	  {
 	    QColorGroup ncg(cg);
-	    ncg.setColor(QColorGroup::Base,song->color);
+	    ncg.setColor(QColorGroup::Base,song->get_color());
 	    QListViewItem::paintCell(p,ncg,col,wid,align);
 	    return;
 	  }
       break;
     }
   
-  if (Config::color_ondisk && !song->ondisk)
+  if (Config::color_ondisk && !song->get_ondisk())
     {
       QColorGroup ncg(cg);
       ncg.setColor(QColorGroup::Base,Config::color_unavailable);
@@ -138,24 +137,20 @@ QString HistorySong::text(int i) const
     {
     case HISTORY_MAINRELATION : return relation;
     case HISTORY_COMMENT : return comment;
-    case HISTORY_VERSION : return song->version;
-    case HISTORY_TITLE : return song->title;
-    case HISTORY_AUTHOR : return song->author;
+    case HISTORY_VERSION : return song->get_version();
+    case HISTORY_TITLE : return song->get_title();
+    case HISTORY_AUTHOR : return song->get_author();
     case HISTORY_TEMPO : return song->tempo_str();
-    case HISTORY_TAGS : return Tags::full_string(song->tags);
-    case HISTORY_TIME : return song->time;
-    case HISTORY_DCOLOR : return song->distance_string;
-    case HISTORY_SPECTRUM : return song->spectrum_string;
+    case HISTORY_TAGS : return Tags::full_string(song->get_tags());
+    case HISTORY_TIME : return song->get_time();
+    case HISTORY_DCOLOR : return song->get_distance_string();
+    case HISTORY_SPECTRUM : return song->get_spectrum_string();
     case HISTORY_ONDISK :
-      if (song->ondisk) 
-	return TRUE_TEXT;
-      else 
-	return FALSE_TEXT;
+      if (song->get_ondisk()) 	return TRUE_TEXT;
+      else 	return FALSE_TEXT;
     case HISTORY_CUES :
-      if (song->has_cues) 
-	return TRUE_TEXT;
-      else 
-	return FALSE_TEXT;
+      if (song->get_has_cues())  return TRUE_TEXT;
+      else 	return FALSE_TEXT;
     }
   return QString::null;
 }

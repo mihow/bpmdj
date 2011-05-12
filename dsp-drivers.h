@@ -20,7 +20,6 @@
 #ifndef DSP_DRIVERS
 #define DSP_DRIVERS
 #include "common.h"
-
 #ifndef COMPILE_OSS
 #ifndef COMPILE_ALSA
 #error -------------------------------------------
@@ -35,13 +34,19 @@
  *-------------------------------------------*/
 class dsp_driver
 {
-  public:
+ protected:
+  bool verbose;
+ public:
+  // playing
+  dsp_driver() { verbose = false; };
   virtual void start() = 0;
   virtual void pause() = 0;
   virtual void write(unsigned4 *value) = 0;
   virtual signed8 latency() = 0;
   virtual int  open() = 0;
   virtual void close() = 0;
+  // options
+  virtual int parse_option(char* option, char* argument);
 };
 
 #endif

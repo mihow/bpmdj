@@ -19,25 +19,40 @@
 
 #include "version.h"
 
+#define ALSA_OPTION_HELP ""
+
 #ifdef COMPILE_ALSA
 #include <alsa/asoundlib.h>
 #include "dsp-drivers.h"
 
+#undef ALSA_OPTION_HELP
+#define ALSA_OPTION_HELP \
+"  --alsa-driver---------------------------------\n" \
+"               --alsa                use ALSA sound driver\n"\
+"               --dev arg             device to use (default = hw:0,0)\n" \
+"   -v          --verbose             be verbose with respect to latency\n"\
+"   -L nbr      --latency nbr         required latency in ms (default = 744)\n"
+
 class dsp_alsa: public dsp_driver
 {
  private:
-  static snd_pcm_t     *dsp;
-  static snd_pcm_uframes_t buffer_size;
-  static snd_pcm_uframes_t period_size;
+  snd_pcm_t *dsp;
+  snd_pcm_uframes_t buffer_size;
+  snd_pcm_uframes_t period_size;
+  unsigned4 * buffer;
+  unsigned4 filled;
   void    wwrite(unsigned4 *value);
  public:
-  static  char * arg_dev;
-  
+  char *     arg_dev;
+  char *     arg_latency;
+  dsp_alsa();
   void    start();
   void    pause();
   void    write(unsigned4 *value);
   signed8 latency();
   int     open();
   void    close();
+  int     parse_option(char* option, char* argument);
 };
+
 #endif

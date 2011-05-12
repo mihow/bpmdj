@@ -35,6 +35,8 @@
 #include "scripts.h"
 #include "version.h"
 #include "dsp-drivers.h"
+#include "energy-analyzer.h"
+#include "memory.h"
 
 // WVB -- testing variable for the impulse characeteristic
 //#define IMPULSE_PANNING
@@ -46,17 +48,15 @@
 volatile int stop = 0;
 volatile int finished = 0;
 volatile int paused = 0;
-signed8 targetperiod;
-signed8 currentperiod;
-signed8 normalperiod;
+quad_period_type targetperiod;
+quad_period_type currentperiod;
+quad_period_type normalperiod;
 signed8 y,x=0;
+int    opt_rms = 0;
+float8 arg_rms = 0;
 int     opt_quiet = 0;
 int     opt_match = 0;
 char*   arg_match = 0;
-int     opt_latency = 0;
-int     opt_dspverbose = 0;
-char*   arg_latency = "300";
-//char*   arg_mixer = "/dev/mixer";
 char*   arg_rawpath = "./";
 char*   argument;
 Index*  playing = NULL;
@@ -167,8 +167,8 @@ int wave_read(unsigned4 pos, unsigned4 *val)
 /*-------------------------------------------
  *         Volume Synth operations
  *-------------------------------------------*/
-unsigned8   lfo_phase=0;
-signed8   lfo_period=0;
+unsigned8        lfo_phase=0;
+quad_period_type lfo_period=0;
 _lfo_   lfo_do;
 
 void jumpto(signed8, int);
@@ -181,7 +181,7 @@ _lfo_ lfo_get()
 void lfo_set(char* name, _lfo_ l, unsigned8 freq, unsigned8 phase)
 {
   /* if paused, unpause and set phase */
-  lfo_period=4*currentperiod/freq;
+  lfo_period=currentperiod.muldiv(4,freq);
   lfo_do=l;
   if (paused)
     {
@@ -492,11 +492,14 @@ unsigned8 map_active(unsigned8 a)
   
 void map_stop()
 {
-  x = map_active(x);
-  y = y_normalise(x);
-  map_do=false;
-  if (map) deallocate(map);
-  map=NULL;
+  if (map_do)
+    {
+      x = map_active(x);
+      y = y_normalise(x);
+      map_do=false;
+      if (map) deallocate(map);
+      map=NULL;
+    }
 }
 
 void map_set(signed2 size, map_data inmap, unsigned8 msize, signed8 mexit, bool l)
@@ -622,6 +625,54 @@ void cue_read()
 }
 
 /*-------------------------------------------
+ *         RMS Normalization
+ *-------------------------------------------*/
+static float4 left_sub;
+static float4 left_fact;
+static float4 right_sub;
+static float4 right_fact;
+
+void rms_init()
+{
+  sample_type min = playing->get_min();
+  sample_type max = playing->get_max();
+  sample_type mean = playing->get_mean();
+  power_type pow = playing->get_power();
+  if (!min.fully_defined() || !max.fully_defined() || 
+      !mean.fully_defined() || !pow.fully_defined())
+    {
+      printf("Switching of rms normalisation, this song has no known "
+	     "energy levels\n");
+      opt_rms=0;
+      return;
+    }
+  // obtain amplitude maximisation factor factor 
+  left_sub = mean.left;
+  left_fact = normalization_factor(min.left,max.left,mean.left);
+  right_sub = mean.right;
+  right_fact = normalization_factor(min.right,max.right,mean.right);
+  // take into account the rms
+  left_fact *= arg_rms;
+  left_fact /= pow.left;
+  right_fact *= arg_rms;
+  right_fact /= pow.right;
+}
+
+void rms_normalize(longtrick *l)
+{
+  // left
+  float v = l->leftright.left;
+  v -= left_sub;
+  v *= left_fact;
+  l->leftright.left=(signed2)v;
+  // right
+  v = l->leftright.right;
+  v -= right_sub;
+  v *= right_fact;
+  l->leftright.right=(signed2)v;
+}
+
+/*-------------------------------------------
  *         Loop operations
  *-------------------------------------------*/
 const signed8 loop_off = 0x7FFFFFFFFFFFFFFFLL;
@@ -666,12 +717,12 @@ void help();
 
 void doubleperiod()
 {
-  playing->set_period(playing->get_period()*2);
+  playing->set_period(playing->get_period().doubled());
 }
 
 void halveperiod()
 {
-  playing->set_period(playing->get_period()/2);
+  playing->set_period(playing->get_period().halved());
 }
 
 void changetempo(signed8 period)
@@ -724,7 +775,7 @@ void jumpto(signed8 mes, int txt)
     }
 }
 
-void read_write_loop()
+void read_write_bare_loop()
 {
   unsigned4 value[1];
   unsigned8 m;
@@ -758,6 +809,55 @@ void read_write_loop()
     }
 }
 
+void read_write_normalize_loop()
+{
+  unsigned4 value[1];
+  unsigned8 m;
+  rms_init();
+  if (!opt_rms)
+    {
+      read_write_bare_loop();
+      return;
+    }
+  lfo_init();
+  map_init();
+  dsp->start();
+  while(!stop)
+    {
+      // wait for pause
+      if (paused)
+	dsp->pause();
+      // calculate value
+      x = y * normalperiod/currentperiod;
+      if (x>loop_at)
+	loop_jump();
+      if (map_do)
+	m = map_active( x );
+      else
+	m = x;
+      if (wave_read(m,value)<0)
+	{
+	  printf("End of song, pausing\n");
+	  paused = 1;
+	  value[0] = 0L;
+	};
+      rms_normalize((longtrick*)value);
+      value[0]=lfo_do(value[0]);
+      y=y+1;
+      
+      // write value
+      dsp->write(value);
+    }
+}
+
+void read_write_loop()
+{
+  if (opt_rms)
+    read_write_normalize_loop();
+  else
+    read_write_bare_loop();
+}  
+
 /*-------------------------------------------
  *         Startup code
  *-------------------------------------------*/ 
@@ -768,9 +868,9 @@ void line()
 
 void copyright()
 {
-   printf("BpmDj Player v%s, Copyright (c) 2001-2004 Werner Van Belle\n",VERSION);
-   printf("This software is distributed under the GPL2 license. See copyright.txt\n");
-   line();
+  printf("BpmDj Player v%s, Copyright (c) 2001-2004 Werner Van Belle\n",VERSION);
+  printf("This software is distributed under the GPL2 license. See copyright.txt\n");
+  line();
 }
 
 int core_init(int sync)
@@ -782,13 +882,13 @@ int core_init(int sync)
   if (opt_match)
     {
       Index target(arg_match);
-      targetperiod=target.get_period()*4;
+      targetperiod=period_to_quad(target.get_period());
     }
   if ( strstr(argument,".idx")==NULL || strcmp(strstr(argument,".idx"),".idx")!=0)
     return err_needidx;
   playing = new Index(argument);
   
-  normalperiod=playing->get_period()*4;
+  normalperiod=period_to_quad(playing->get_period());
   if (!opt_match) targetperiod=normalperiod;
   if (normalperiod<=0 && targetperiod>0) normalperiod=targetperiod;
   else if (normalperiod>0 && targetperiod<=0) targetperiod=normalperiod;
@@ -796,9 +896,9 @@ int core_init(int sync)
   
   if (WAVRATE==22050)
     {
-      currentperiod/=2;
-      normalperiod/=2;
-      targetperiod/=2;
+      currentperiod=currentperiod.halved();
+      normalperiod=normalperiod.halved();
+      targetperiod=targetperiod.halved();
     }
   if (!opt_quiet)
     {

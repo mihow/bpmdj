@@ -1,4 +1,4 @@
-<!DOCTYPE UI><UI version="3.2" stdsetdef="1">
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
 <class>ScanningProgress</class>
 <widget class="QDialog">
     <property name="name">
@@ -8,12 +8,12 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>777</width>
-            <height>598</height>
+            <width>855</width>
+            <height>775</height>
         </rect>
     </property>
     <property name="caption">
-        <string>Importing Mp3's</string>
+        <string>Importing Songs</string>
     </property>
     <property name="sizeGripEnabled">
         <bool>true</bool>
@@ -28,7 +28,25 @@
         <property name="spacing">
             <number>6</number>
         </property>
-        <widget class="QLabel" row="4" column="0" rowspan="1" colspan="2">
+        <widget class="QLabel" row="2" column="0" rowspan="1" colspan="2">
+            <property name="name">
+                <cstring>TextLabel2</cstring>
+            </property>
+            <property name="text">
+                <string>Created index files :</string>
+            </property>
+        </widget>
+        <widget class="QMultiLineEdit" row="1" column="0" rowspan="1" colspan="2">
+            <property name="name">
+                <cstring>Log</cstring>
+            </property>
+        </widget>
+        <widget class="QMultiLineEdit" row="3" column="0" rowspan="1" colspan="2">
+            <property name="name">
+                <cstring>Created</cstring>
+            </property>
+        </widget>
+        <widget class="QLabel" row="0" column="0" rowspan="1" colspan="2">
             <property name="name">
                 <cstring>TextLabel1</cstring>
             </property>
@@ -44,7 +62,7 @@
                 <string>Scanning :</string>
             </property>
         </widget>
-        <widget class="QLabel" row="0" column="0" rowspan="1" colspan="2">
+        <widget class="QLabel" row="5" column="0" rowspan="1" colspan="2">
             <property name="name">
                 <cstring>TextLabel5</cstring>
             </property>
@@ -56,13 +74,19 @@
                     <verstretch>0</verstretch>
                 </sizepolicy>
             </property>
-            <property name="font">
-                <font>
-                    <bold>1</bold>
-                </font>
-            </property>
             <property name="text">
-                <string>After importing mp3's, a set of empty index files is created, tagged as 'New'. Before they are usefull, you should select them in the selector and choose Selection|MeasureBpm...</string>
+                <string>&lt;b&gt;After importing mp3's, a set of empty index files is created, tagged as 'New'. Before they are usefull, you should select them in the selector and choose Selection|MeasureBpm...&lt;/b&gt;
+&lt;br&gt;&lt;br&gt;
+Index files can be renamed and moved around within the ./index directory. When using a special index-filename convention, the program will be able to retrieve title, author, remix and version of the song. The file format used by the author (and as such, understood by the program) is:
+&lt;br&gt;&lt;br&gt;
+    title{remix}[author]version.idx
+&lt;br&gt;&lt;br&gt;
+Eg: LandOfFreedom{HappyPeopleRemix}[Transwave]3.idx
+&lt;br&gt;&lt;br&gt;
+Note: If you have a large amount of songs to import, which have correct meta-information, you might have a look at the two scripts &lt;font color="#ff0505"&gt;bpmdj-import-mp3.pl&lt;/font&gt; and &lt;font color="#ff0000"&gt;bpmdj-import-ogg.pl&lt;/font&gt;. Nevertheless, when you want to use these scripts do not import data with this dialogbox</string>
+            </property>
+            <property name="textFormat">
+                <enum>RichText</enum>
             </property>
             <property name="alignment">
                 <set>WordBreak|AlignTop|AlignLeft</set>
@@ -72,80 +96,24 @@
             <property name="wordwrap" stdset="0">
             </property>
         </widget>
-        <widget class="Line" row="1" column="0" rowspan="1" colspan="2">
+        <spacer row="4" column="0">
             <property name="name">
-                <cstring>Line1</cstring>
-            </property>
-            <property name="frameShape">
-                <enum>HLine</enum>
-            </property>
-            <property name="frameShadow">
-                <enum>Sunken</enum>
+                <cstring>spacer1</cstring>
             </property>
             <property name="orientation">
                 <enum>Horizontal</enum>
             </property>
-        </widget>
-        <widget class="QLabel" row="2" column="0" rowspan="1" colspan="2">
-            <property name="name">
-                <cstring>TextLabel6</cstring>
+            <property name="sizeType">
+                <enum>Expanding</enum>
             </property>
-            <property name="text">
-                <string>Index files can be renamed and moved around within the ./index directory. When using a special index-filename convention, the program will be able to retrieve title, author, remix and version of the song. The file format used by the author (and as such, understood by the program) is:
-
-    &lt;title&gt;{&lt;remix&gt;}[&lt;author&gt;]&lt;version&gt;.idx
-
-Eg: LandOfFreedom{HappyPeopleRemix}[Transwave]3.idx</string>
+            <property name="sizeHint">
+                <size>
+                    <width>660</width>
+                    <height>20</height>
+                </size>
             </property>
-            <property name="alignment">
-                <set>WordBreak|AlignTop|AlignLeft</set>
-            </property>
-            <property name="vAlign" stdset="0">
-            </property>
-            <property name="wordwrap" stdset="0">
-            </property>
-        </widget>
-        <widget class="Line" row="3" column="0" rowspan="1" colspan="2">
-            <property name="name">
-                <cstring>Line1_2</cstring>
-            </property>
-            <property name="frameShape">
-                <enum>HLine</enum>
-            </property>
-            <property name="frameShadow">
-                <enum>Sunken</enum>
-            </property>
-            <property name="orientation">
-                <enum>Horizontal</enum>
-            </property>
-        </widget>
-        <widget class="QMultiLineEdit" row="5" column="0" rowspan="1" colspan="2">
-            <property name="name">
-                <cstring>Log</cstring>
-            </property>
-        </widget>
-        <widget class="QLabel" row="6" column="0" rowspan="1" colspan="2">
-            <property name="name">
-                <cstring>TextLabel2</cstring>
-            </property>
-            <property name="text">
-                <string>Created index files :</string>
-            </property>
-        </widget>
-        <widget class="QMultiLineEdit" row="7" column="0" rowspan="1" colspan="2">
-            <property name="name">
-                <cstring>Created</cstring>
-            </property>
-        </widget>
-        <widget class="QLabel" row="8" column="0" rowspan="1" colspan="2">
-            <property name="name">
-                <cstring>textLabel1</cstring>
-            </property>
-            <property name="text">
-                <string>Note: If you have a large amount of songs to import, which have correct meta-information, you might have a look at the two scripts &lt;font color="#ff0505"&gt;bpmdj-import-mp3.pl&lt;/font&gt; and &lt;font color="#ff0000"&gt;bpmdj-import-ogg.pl&lt;/font&gt;.</string>
-            </property>
-        </widget>
-        <widget class="QPushButton" row="9" column="1">
+        </spacer>
+        <widget class="QPushButton" row="4" column="1">
             <property name="name">
                 <cstring>Okay</cstring>
             </property>
@@ -164,23 +132,6 @@ Eg: LandOfFreedom{HappyPeopleRemix}[Transwave]3.idx</string>
                 <string>Okay</string>
             </property>
         </widget>
-        <spacer row="9" column="0">
-            <property name="name">
-                <cstring>spacer1</cstring>
-            </property>
-            <property name="orientation">
-                <enum>Horizontal</enum>
-            </property>
-            <property name="sizeType">
-                <enum>Expanding</enum>
-            </property>
-            <property name="sizeHint">
-                <size>
-                    <width>660</width>
-                    <height>20</height>
-                </size>
-            </property>
-        </spacer>
     </grid>
 </widget>
 <connections>

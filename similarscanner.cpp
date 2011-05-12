@@ -136,20 +136,20 @@ void SimilarScanner::findSimilarNames(QString text, QString fullname)
   QVectorView *songList = selector->songList;
   similarnames = false;
   char exact[1024];
-  for(int it1 = 0 ; it1 < QSong::song_count ; it1 ++)
+  for(int it1 = 0 ; it1 < QSong::get_song_count() ; it1 ++)
     {
       app->processEvents();
       Song * song = QSong::songEssence(it1);
       if (song)
 	{
-	  const char * t = song->title;
-	  const char * a = song->author;
+	  const char * t = song->get_title();
+	  const char * a = song->get_author();
 	  unsigned int val=ndist(t,a,text);
 	  if ( val < (text.length()/10)+3)
 	    {
 	      sprintf(exact,"%s[%s]",t,a);
-	      similarNameFound(text,song->title+"["+song->author+"]",
-			       fullname,song->file,
+	      similarNameFound(text,song->get_title()+"["+song->get_author()+"]",
+			       fullname,song->get_file(),
 			       (strcasecmp(exact,(const char*)text)==0) ? 
 			       ((strcmp(a,"")==0) ? -1 : -2) : val);
 	    }

@@ -23,7 +23,6 @@
 #include <math.h>
 #include <stdlib.h>
 #include <qlistview.h>
-#include "qstring-factory.h"
 #include "songselector.logic.h"
 #include "qsong.h"
 #include "process-manager.h"
@@ -78,7 +77,7 @@ void QueuedSong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid, 
 	}
       break;
     case QUEUED_CUES:
-      if (Config::color_cues && !song->has_cues)
+      if (Config::color_cues && !song->get_has_cues())
 	{
 	  QColorGroup ncg(cg);
 	  ncg.setColor(QColorGroup::Base,QColor(0,0,255));
@@ -91,7 +90,7 @@ void QueuedSong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid, 
       break;
       
     case QUEUED_TITLE:
-      if (Config::color_played && song->played)
+      if (Config::color_played && song->get_played())
 	{
 	  QColorGroup ncg(cg);
 	  ncg.setColor(QColorGroup::Base,Config::color_played_song);
@@ -127,17 +126,16 @@ void QueuedSong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid, 
       
     case QUEUED_SPECTRUM:
       if (Config::color_spectrum)
-	if (song->spectrum!=no_spectrum)
+	if (song->get_spectrum()!=no_spectrum)
 	  {
 	    QColorGroup ncg(cg);
-	    ncg.setColor(QColorGroup::Base,song->color);
+	    ncg.setColor(QColorGroup::Base,song->get_color());
 	    QListViewItem::paintCell(p,ncg,col,wid,align);
 	    return;
 	  }
       break;
     }
-  
-  if (Config::color_ondisk && !song->ondisk)
+  if (Config::color_ondisk && !song->get_ondisk())
     {
       QColorGroup ncg(cg);
       ncg.setColor(QColorGroup::Base,Config::color_unavailable);
@@ -153,26 +151,22 @@ QString QueuedSong::text(int i) const
     return QString::null;
   switch (i)
     {
-    case QUEUED_VERSION : return song->version;
-    case QUEUED_TITLE : return song->title;
-    case QUEUED_AUTHOR : return song->author;
-    case QUEUED_INDEX : return song->storedin;
-    case QUEUED_TAGS : return Tags::full_string(song->tags);
-    case QUEUED_TIME : return song->time;
-    case QUEUED_MD5SUM : return song->md5sum;
+    case QUEUED_VERSION : return song->get_version();
+    case QUEUED_TITLE : return song->get_title();
+    case QUEUED_AUTHOR : return song->get_author();
+    case QUEUED_INDEX : return song->get_storedin();
+    case QUEUED_TAGS : return Tags::full_string(song->get_tags());
+    case QUEUED_TIME : return song->get_time();
+    case QUEUED_MD5SUM : return song->get_md5sum();
     case QUEUED_DLINE : return QString::number(distance,'f',3);
-    case QUEUED_SPECTRUM : return song->spectrum_string;
-    case QUEUED_FILE : return song->file;
+    case QUEUED_SPECTRUM : return song->get_spectrum_string();
+    case QUEUED_FILE : return song->get_file();
     case QUEUED_ONDISK :
-      if (song->ondisk) 
-	return TRUE_TEXT;
-      else 
-	return FALSE_TEXT;
+      if (song->get_ondisk()) return TRUE_TEXT;
+      else                    return FALSE_TEXT;
     case QUEUED_CUES :
-      if (song->has_cues) 
-	return TRUE_TEXT;
-      else 
-	return FALSE_TEXT;
+      if (song->get_has_cues()) return TRUE_TEXT;
+      else 	return FALSE_TEXT;
     case QUEUED_ANKER : 
       return tonumber(pos);
     }
