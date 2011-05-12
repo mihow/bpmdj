@@ -48,6 +48,7 @@ class QSong:
     QColor  color() const {return song->color;};
     QString file() const {return song->file;};
     QString tempo() const {return song->tempo;};
+    // QPixmap *getPixmap(int width, int height, const QColorGroup &cg) const {return song->getPixmap(width, height, cg);}
     void    playedAuthorAtTime(int t) const {song->played_author_at_time = t;};
     // Inherited
     void reread() 

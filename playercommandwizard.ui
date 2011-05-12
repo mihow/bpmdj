@@ -1,0 +1,434 @@
+<!DOCTYPE UI><UI version="3.1" stdsetdef="1">
+<class>PlayerCommandWizard</class>
+<widget class="QDialog">
+    <property name="name">
+        <cstring>PlayerCommandWizard</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>558</width>
+            <height>378</height>
+        </rect>
+    </property>
+    <property name="sizePolicy">
+        <sizepolicy>
+            <hsizetype>3</hsizetype>
+            <vsizetype>3</vsizetype>
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+        </sizepolicy>
+    </property>
+    <property name="caption">
+        <string>Player Command</string>
+    </property>
+    <grid>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <widget class="QButtonGroup" row="0" column="0">
+            <property name="name">
+                <cstring>buttonGroup1</cstring>
+            </property>
+            <property name="title">
+                <string>Device Driver</string>
+            </property>
+            <property name="exclusive">
+                <bool>true</bool>
+            </property>
+            <grid>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QCheckBox" row="0" column="0">
+                    <property name="name">
+                        <cstring>oss</cstring>
+                    </property>
+                    <property name="text">
+                        <string>OSS</string>
+                    </property>
+                    <property name="checked">
+                        <bool>true</bool>
+                    </property>
+                </widget>
+                <widget class="QCheckBox" row="1" column="0">
+                    <property name="name">
+                        <cstring>alsa</cstring>
+                    </property>
+                    <property name="text">
+                        <string>ALSA</string>
+                    </property>
+                </widget>
+            </grid>
+        </widget>
+        <widget class="QButtonGroup" row="0" column="1" rowspan="1" colspan="3">
+            <property name="name">
+                <cstring>buttonGroup2</cstring>
+            </property>
+            <property name="title">
+                <string>Common</string>
+            </property>
+            <grid>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QLabel" row="1" column="0" rowspan="1" colspan="2">
+                    <property name="name">
+                        <cstring>textLabel4</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Screen Position</string>
+                    </property>
+                </widget>
+                <widget class="QCheckBox" row="2" column="0">
+                    <property name="name">
+                        <cstring>verbose</cstring>
+                    </property>
+                    <property name="text">
+                        <string>verbose</string>
+                    </property>
+                </widget>
+                <widget class="QLabel" row="0" column="0">
+                    <property name="name">
+                        <cstring>textLabel3</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Latency (ms)</string>
+                    </property>
+                </widget>
+                <widget class="QLineEdit" row="0" column="1" rowspan="1" colspan="2">
+                    <property name="name">
+                        <cstring>latency</cstring>
+                    </property>
+                </widget>
+                <widget class="QComboBox" row="0" column="3">
+                    <item>
+                        <property name="text">
+                            <string>50</string>
+                        </property>
+                    </item>
+                    <item>
+                        <property name="text">
+                            <string>100</string>
+                        </property>
+                    </item>
+                    <item>
+                        <property name="text">
+                            <string>150</string>
+                        </property>
+                    </item>
+                    <item>
+                        <property name="text">
+                            <string>200</string>
+                        </property>
+                    </item>
+                    <item>
+                        <property name="text">
+                            <string>250</string>
+                        </property>
+                    </item>
+                    <item>
+                        <property name="text">
+                            <string>300</string>
+                        </property>
+                    </item>
+                    <property name="name">
+                        <cstring>comboBox5</cstring>
+                    </property>
+                </widget>
+                <widget class="QComboBox" row="1" column="3">
+                    <item>
+                        <property name="text">
+                            <string>0</string>
+                        </property>
+                    </item>
+                    <item>
+                        <property name="text">
+                            <string>400</string>
+                        </property>
+                    </item>
+                    <item>
+                        <property name="text">
+                            <string>800</string>
+                        </property>
+                    </item>
+                    <property name="name">
+                        <cstring>comboBox7</cstring>
+                    </property>
+                </widget>
+                <widget class="QLayoutWidget" row="1" column="2">
+                    <property name="name">
+                        <cstring>layout1</cstring>
+                    </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QLineEdit">
+                            <property name="name">
+                                <cstring>x</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>5</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="minimumSize">
+                                <size>
+                                    <width>64</width>
+                                    <height>0</height>
+                                </size>
+                            </property>
+                            <property name="text">
+                                <string>0</string>
+                            </property>
+                        </widget>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>textLabel5</cstring>
+                            </property>
+                            <property name="text">
+                                <string>,</string>
+                            </property>
+                        </widget>
+                        <widget class="QLineEdit">
+                            <property name="name">
+                                <cstring>y</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>5</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="minimumSize">
+                                <size>
+                                    <width>64</width>
+                                    <height>0</height>
+                                </size>
+                            </property>
+                        </widget>
+                    </hbox>
+                </widget>
+            </grid>
+        </widget>
+        <widget class="QButtonGroup" row="2" column="0" rowspan="1" colspan="4">
+            <property name="name">
+                <cstring>buttonGroup4</cstring>
+            </property>
+            <property name="title">
+                <string>ALSA options</string>
+            </property>
+            <grid>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QLabel" row="0" column="0">
+                    <property name="name">
+                        <cstring>textLabel9</cstring>
+                    </property>
+                    <property name="text">
+                        <string>ALSA device to use</string>
+                    </property>
+                </widget>
+                <widget class="QLineEdit" row="0" column="1">
+                    <property name="name">
+                        <cstring>dev</cstring>
+                    </property>
+                </widget>
+                <widget class="QComboBox" row="0" column="2">
+                    <item>
+                        <property name="text">
+                            <string>hw:0,0</string>
+                        </property>
+                    </item>
+                    <item>
+                        <property name="text">
+                            <string>hw:1,0</string>
+                        </property>
+                    </item>
+                    <property name="name">
+                        <cstring>comboBox2</cstring>
+                    </property>
+                </widget>
+            </grid>
+        </widget>
+        <widget class="QButtonGroup" row="1" column="0" rowspan="1" colspan="4">
+            <property name="name">
+                <cstring>buttonGroup3</cstring>
+            </property>
+            <property name="title">
+                <string>OSS options</string>
+            </property>
+            <grid>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QLabel" row="0" column="0">
+                    <property name="name">
+                        <cstring>textLabel6</cstring>
+                    </property>
+                    <property name="text">
+                        <string>DSP device to use</string>
+                    </property>
+                </widget>
+                <widget class="QLineEdit" row="0" column="1">
+                    <property name="name">
+                        <cstring>dsp</cstring>
+                    </property>
+                </widget>
+                <widget class="QLineEdit" row="1" column="1">
+                    <property name="name">
+                        <cstring>fragments</cstring>
+                    </property>
+                </widget>
+                <widget class="QLabel" row="1" column="0">
+                    <property name="name">
+                        <cstring>textLabel7</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Fragment count</string>
+                    </property>
+                </widget>
+                <widget class="QCheckBox" row="2" column="0" rowspan="1" colspan="2">
+                    <property name="name">
+                        <cstring>nolatency</cstring>
+                    </property>
+                    <property name="text">
+                        <string>no latency accounting</string>
+                    </property>
+                </widget>
+                <widget class="QComboBox" row="0" column="2">
+                    <item>
+                        <property name="text">
+                            <string>/dev/dsp</string>
+                        </property>
+                    </item>
+                    <item>
+                        <property name="text">
+                            <string>/dev/dsp1</string>
+                        </property>
+                    </item>
+                    <item>
+                        <property name="text">
+                            <string>/dev/dsp2</string>
+                        </property>
+                    </item>
+                    <property name="name">
+                        <cstring>comboBox3</cstring>
+                    </property>
+                </widget>
+                <widget class="QComboBox" row="1" column="2">
+                    <item>
+                        <property name="text">
+                            <string>16</string>
+                        </property>
+                    </item>
+                    <item>
+                        <property name="text">
+                            <string>8</string>
+                        </property>
+                    </item>
+                    <item>
+                        <property name="text">
+                            <string>4</string>
+                        </property>
+                    </item>
+                    <item>
+                        <property name="text">
+                            <string>2</string>
+                        </property>
+                    </item>
+                    <property name="name">
+                        <cstring>comboBox4</cstring>
+                    </property>
+                </widget>
+            </grid>
+        </widget>
+        <spacer row="3" column="0" rowspan="1" colspan="2">
+            <property name="name">
+                <cstring>spacer4</cstring>
+            </property>
+            <property name="orientation">
+                <enum>Horizontal</enum>
+            </property>
+            <property name="sizeType">
+                <enum>Expanding</enum>
+            </property>
+            <property name="sizeHint">
+                <size>
+                    <width>460</width>
+                    <height>20</height>
+                </size>
+            </property>
+        </spacer>
+        <widget class="QPushButton" row="3" column="2">
+            <property name="name">
+                <cstring>pushButton7</cstring>
+            </property>
+            <property name="text">
+                <string>Ok</string>
+            </property>
+        </widget>
+        <widget class="QPushButton" row="3" column="3">
+            <property name="name">
+                <cstring>pushButton8</cstring>
+            </property>
+            <property name="text">
+                <string>Cancel</string>
+            </property>
+        </widget>
+    </grid>
+</widget>
+<connections>
+    <connection>
+        <sender>comboBox2</sender>
+        <signal>activated(const QString&amp;)</signal>
+        <receiver>dev</receiver>
+        <slot>setText(const QString&amp;)</slot>
+    </connection>
+    <connection>
+        <sender>comboBox3</sender>
+        <signal>activated(const QString&amp;)</signal>
+        <receiver>dsp</receiver>
+        <slot>setText(const QString&amp;)</slot>
+    </connection>
+    <connection>
+        <sender>comboBox4</sender>
+        <signal>activated(const QString&amp;)</signal>
+        <receiver>fragments</receiver>
+        <slot>setText(const QString&amp;)</slot>
+    </connection>
+    <connection>
+        <sender>comboBox5</sender>
+        <signal>activated(const QString&amp;)</signal>
+        <receiver>latency</receiver>
+        <slot>setText(const QString&amp;)</slot>
+    </connection>
+    <connection>
+        <sender>pushButton7</sender>
+        <signal>clicked()</signal>
+        <receiver>PlayerCommandWizard</receiver>
+        <slot>accept()</slot>
+    </connection>
+    <connection>
+        <sender>pushButton8</sender>
+        <signal>clicked()</signal>
+        <receiver>PlayerCommandWizard</receiver>
+        <slot>reject()</slot>
+    </connection>
+    <connection>
+        <sender>comboBox7</sender>
+        <signal>activated(const QString&amp;)</signal>
+        <receiver>y</receiver>
+        <slot>setText(const QString&amp;)</slot>
+    </connection>
+</connections>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

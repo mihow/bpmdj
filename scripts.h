@@ -34,7 +34,7 @@
 #define RM "rm -- "
 #define CP "cp -- "
 #define MV "mv -i -- "
-#define CREATERAW_CMD "bpmdj-raw \"%s\"\n" 
+#define CREATERAW_CMD "bpmdj-raw \"%s\" \"%s\"\n"
 #define ENCODE "bladeenc -del *.wav"
 #define RAW2WAV "sox -r 44100 -s -w -c 2 "
 #define BPLAY "bplay -s 44100 -S -b 16 "
@@ -52,12 +52,12 @@
 #define HEADDUMP_NAME "head.raw"
 #define BPMMIXED_NAME "bpm-mixed.raw"
 
-char * getRawFilename(const char* name);
-FILE * openRawFile();
+char * getRawFilename(const char* dir, const char* name);
+FILE * openRawFile(const char* dir);
 FILE * openScriptFile(const char* name);
-FILE * openRawFileForWriting();
-void   removeRawFile();
-void   removeAllRaw();
+FILE * openRawFileForWriting(const char* dir);
+void   removeRawFile(const char* dir);
+void   removeAllRaw(const char* dir);
 void   dumpAudio(const char* fname, unsigned4 * buffer, long length);
 void   spawn(const char* script);
 int    execute(const char* script);

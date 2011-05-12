@@ -8,7 +8,7 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>983</width>
+            <width>828</width>
             <height>326</height>
         </rect>
     </property>
@@ -36,7 +36,7 @@
         <property name="spacing">
             <number>6</number>
         </property>
-        <widget class="QButtonGroup" row="1" column="0" rowspan="2" colspan="2">
+        <widget class="QButtonGroup" row="1" column="0" rowspan="1" colspan="2">
             <property name="name">
                 <cstring>ButtonGroup4</cstring>
             </property>
@@ -664,23 +664,6 @@
                 </widget>
             </grid>
         </widget>
-        <widget class="QPushButton" row="2" column="4">
-            <property name="name">
-                <cstring>PushButton32</cstring>
-            </property>
-            <property name="text">
-                <string>Quit</string>
-            </property>
-            <property name="accel">
-                <string>Q</string>
-            </property>
-            <property name="toolTip" stdset="0">
-                <string>Key: 'q'</string>
-            </property>
-            <property name="whatsThis" stdset="0">
-                <string></string>
-            </property>
-        </widget>
         <widget class="QButtonGroup" row="0" column="1">
             <property name="name">
                 <cstring>buttonGroup6</cstring>
@@ -777,7 +760,172 @@
                 </widget>
             </grid>
         </widget>
-        <widget class="QButtonGroup" row="1" column="3" rowspan="2" colspan="1">
+        <widget class="QButtonGroup" row="1" column="2">
+            <property name="name">
+                <cstring>ButtonGroup1</cstring>
+            </property>
+            <property name="title">
+                <string>LFO</string>
+            </property>
+            <property name="exclusive">
+                <bool>true</bool>
+            </property>
+            <property name="layoutMargin" stdset="0">
+            </property>
+            <property name="layoutSpacing" stdset="0">
+            </property>
+            <grid>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <property name="margin">
+                    <number>5</number>
+                </property>
+                <property name="spacing">
+                    <number>1</number>
+                </property>
+                <widget class="QPushButton" row="1" column="0">
+                    <property name="name">
+                        <cstring>PushButton28</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Slow Saw</string>
+                    </property>
+                    <property name="accel">
+                        <string>S</string>
+                    </property>
+                    <property name="toggleButton">
+                        <bool>true</bool>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Key:'S'</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="1" column="1">
+                    <property name="name">
+                        <cstring>PushButton29</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Fast Saw</string>
+                    </property>
+                    <property name="accel">
+                        <string>Alt+S</string>
+                    </property>
+                    <property name="toggleButton">
+                        <bool>true</bool>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Key: 'ALT-S'</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="2" column="0">
+                    <property name="name">
+                        <cstring>PushButton30</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Slow rSaw</string>
+                    </property>
+                    <property name="accel">
+                        <string>R</string>
+                    </property>
+                    <property name="toggleButton">
+                        <bool>true</bool>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Key: 'R'</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="2" column="1">
+                    <property name="name">
+                        <cstring>PushButton31</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Fast rSaw</string>
+                    </property>
+                    <property name="accel">
+                        <string>Alt+R</string>
+                    </property>
+                    <property name="toggleButton">
+                        <bool>true</bool>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Key: 'ALT-R'</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="3" column="1">
+                    <property name="name">
+                        <cstring>PushButton39</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Normal</string>
+                    </property>
+                    <property name="accel">
+                        <string>N</string>
+                    </property>
+                    <property name="toggleButton">
+                        <bool>true</bool>
+                    </property>
+                    <property name="on">
+                        <bool>true</bool>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Key: 'N'</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="3" column="0">
+                    <property name="name">
+                        <cstring>PushButton42</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Break</string>
+                    </property>
+                    <property name="accel">
+                        <string>B</string>
+                    </property>
+                    <property name="toggleButton">
+                        <bool>true</bool>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Key: 'B'</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="0" column="1">
+                    <property name="name">
+                        <cstring>PushButton27</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Fast Pan</string>
+                    </property>
+                    <property name="accel">
+                        <string>Alt+P</string>
+                    </property>
+                    <property name="toggleButton">
+                        <bool>true</bool>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Key: 'ALT-P'</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="0" column="0">
+                    <property name="name">
+                        <cstring>PushButton26</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Slow Pan</string>
+                    </property>
+                    <property name="accel">
+                        <string>P</string>
+                    </property>
+                    <property name="toggleButton">
+                        <bool>true</bool>
+                    </property>
+                    <property name="toolTip" stdset="0">
+                        <string>Key: 'P'</string>
+                    </property>
+                </widget>
+            </grid>
+        </widget>
+        <widget class="QButtonGroup" row="1" column="3">
             <property name="name">
                 <cstring>cueGroup</cstring>
             </property>
@@ -866,20 +1014,6 @@
                     </property>
                     <property name="toolTip" stdset="0">
                         <string>Key: '}'</string>
-                    </property>
-                </widget>
-                <widget class="QPushButton" row="3" column="2" rowspan="1" colspan="2">
-                    <property name="name">
-                        <cstring>PushButton41</cstring>
-                    </property>
-                    <property name="text">
-                        <string>Metronome</string>
-                    </property>
-                    <property name="accel">
-                        <string>M</string>
-                    </property>
-                    <property name="toolTip" stdset="0">
-                        <string>Key: 'm'</string>
                     </property>
                 </widget>
                 <widget class="QPushButton" row="1" column="0">
@@ -1247,280 +1381,38 @@
                         <string>Key: 'ALT+Z'</string>
                     </property>
                 </widget>
-            </grid>
-        </widget>
-        <widget class="QButtonGroup" row="1" column="2" rowspan="2" colspan="1">
-            <property name="name">
-                <cstring>ButtonGroup1</cstring>
-            </property>
-            <property name="title">
-                <string>LFO</string>
-            </property>
-            <property name="exclusive">
-                <bool>true</bool>
-            </property>
-            <property name="layoutMargin" stdset="0">
-            </property>
-            <property name="layoutSpacing" stdset="0">
-            </property>
-            <grid>
-                <property name="name">
-                    <cstring>unnamed</cstring>
-                </property>
-                <property name="margin">
-                    <number>5</number>
-                </property>
-                <property name="spacing">
-                    <number>1</number>
-                </property>
-                <widget class="QPushButton" row="1" column="0">
+                <widget class="QPushButton" row="3" column="2">
                     <property name="name">
-                        <cstring>PushButton28</cstring>
+                        <cstring>PushButton41</cstring>
                     </property>
                     <property name="text">
-                        <string>Slow Saw</string>
+                        <string>Metronome</string>
                     </property>
                     <property name="accel">
-                        <string>S</string>
-                    </property>
-                    <property name="toggleButton">
-                        <bool>true</bool>
+                        <string>M</string>
                     </property>
                     <property name="toolTip" stdset="0">
-                        <string>Key:'S'</string>
+                        <string>Key: 'm'</string>
                     </property>
                 </widget>
-                <widget class="QPushButton" row="1" column="1">
+                <widget class="QPushButton" row="3" column="3">
                     <property name="name">
-                        <cstring>PushButton29</cstring>
+                        <cstring>PushButton32</cstring>
                     </property>
                     <property name="text">
-                        <string>Fast Saw</string>
+                        <string>Quit</string>
                     </property>
                     <property name="accel">
-                        <string>Alt+S</string>
-                    </property>
-                    <property name="toggleButton">
-                        <bool>true</bool>
+                        <string>Q</string>
                     </property>
                     <property name="toolTip" stdset="0">
-                        <string>Key: 'ALT-S'</string>
+                        <string>Key: 'q'</string>
                     </property>
-                </widget>
-                <widget class="QPushButton" row="2" column="0">
-                    <property name="name">
-                        <cstring>PushButton30</cstring>
-                    </property>
-                    <property name="text">
-                        <string>Slow rSaw</string>
-                    </property>
-                    <property name="accel">
-                        <string>R</string>
-                    </property>
-                    <property name="toggleButton">
-                        <bool>true</bool>
-                    </property>
-                    <property name="toolTip" stdset="0">
-                        <string>Key: 'R'</string>
-                    </property>
-                </widget>
-                <widget class="QPushButton" row="2" column="1">
-                    <property name="name">
-                        <cstring>PushButton31</cstring>
-                    </property>
-                    <property name="text">
-                        <string>Fast rSaw</string>
-                    </property>
-                    <property name="accel">
-                        <string>Alt+R</string>
-                    </property>
-                    <property name="toggleButton">
-                        <bool>true</bool>
-                    </property>
-                    <property name="toolTip" stdset="0">
-                        <string>Key: 'ALT-R'</string>
-                    </property>
-                </widget>
-                <widget class="QPushButton" row="3" column="1">
-                    <property name="name">
-                        <cstring>PushButton39</cstring>
-                    </property>
-                    <property name="text">
-                        <string>Normal</string>
-                    </property>
-                    <property name="accel">
-                        <string>N</string>
-                    </property>
-                    <property name="toggleButton">
-                        <bool>true</bool>
-                    </property>
-                    <property name="on">
-                        <bool>true</bool>
-                    </property>
-                    <property name="toolTip" stdset="0">
-                        <string>Key: 'N'</string>
-                    </property>
-                </widget>
-                <widget class="QPushButton" row="3" column="0">
-                    <property name="name">
-                        <cstring>PushButton42</cstring>
-                    </property>
-                    <property name="text">
-                        <string>Break</string>
-                    </property>
-                    <property name="accel">
-                        <string>B</string>
-                    </property>
-                    <property name="toggleButton">
-                        <bool>true</bool>
-                    </property>
-                    <property name="toolTip" stdset="0">
-                        <string>Key: 'B'</string>
-                    </property>
-                </widget>
-                <widget class="QPushButton" row="0" column="1">
-                    <property name="name">
-                        <cstring>PushButton27</cstring>
-                    </property>
-                    <property name="text">
-                        <string>Fast Pan</string>
-                    </property>
-                    <property name="accel">
-                        <string>Alt+P</string>
-                    </property>
-                    <property name="toggleButton">
-                        <bool>true</bool>
-                    </property>
-                    <property name="toolTip" stdset="0">
-                        <string>Key: 'ALT-P'</string>
-                    </property>
-                </widget>
-                <widget class="QPushButton" row="0" column="0">
-                    <property name="name">
-                        <cstring>PushButton26</cstring>
-                    </property>
-                    <property name="text">
-                        <string>Slow Pan</string>
-                    </property>
-                    <property name="accel">
-                        <string>P</string>
-                    </property>
-                    <property name="toggleButton">
-                        <bool>true</bool>
-                    </property>
-                    <property name="toolTip" stdset="0">
-                        <string>Key: 'P'</string>
+                    <property name="whatsThis" stdset="0">
+                        <string></string>
                     </property>
                 </widget>
             </grid>
-        </widget>
-        <widget class="QGroupBox" row="0" column="4" rowspan="2" colspan="1">
-            <property name="name">
-                <cstring>GroupBox1</cstring>
-            </property>
-            <property name="sizePolicy">
-                <sizepolicy>
-                    <hsizetype>5</hsizetype>
-                    <vsizetype>5</vsizetype>
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                </sizepolicy>
-            </property>
-            <property name="title">
-                <string>Volume</string>
-            </property>
-            <property name="layoutMargin" stdset="0">
-            </property>
-            <property name="layoutSpacing" stdset="0">
-            </property>
-            <widget class="QSlider">
-                <property name="name">
-                    <cstring>Slider3</cstring>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>5</x>
-                        <y>40</y>
-                        <width>26</width>
-                        <height>211</height>
-                    </rect>
-                </property>
-                <property name="maxValue">
-                    <number>100</number>
-                </property>
-                <property name="lineStep">
-                    <number>1</number>
-                </property>
-                <property name="pageStep">
-                    <number>1</number>
-                </property>
-                <property name="orientation">
-                    <enum>Vertical</enum>
-                </property>
-                <property name="tickmarks">
-                    <enum>Both</enum>
-                </property>
-                <property name="tickInterval">
-                    <number>5</number>
-                </property>
-            </widget>
-            <widget class="QSlider">
-                <property name="name">
-                    <cstring>Slider4</cstring>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>46</x>
-                        <y>40</y>
-                        <width>26</width>
-                        <height>211</height>
-                    </rect>
-                </property>
-                <property name="pageStep">
-                    <number>1</number>
-                </property>
-                <property name="orientation">
-                    <enum>Vertical</enum>
-                </property>
-                <property name="tickmarks">
-                    <enum>Both</enum>
-                </property>
-                <property name="tickInterval">
-                    <number>5</number>
-                </property>
-            </widget>
-            <widget class="QLabel">
-                <property name="name">
-                    <cstring>TextLabel2</cstring>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>46</x>
-                        <y>20</y>
-                        <width>34</width>
-                        <height>18</height>
-                    </rect>
-                </property>
-                <property name="text">
-                    <string>Dsp</string>
-                </property>
-            </widget>
-            <widget class="QLabel">
-                <property name="name">
-                    <cstring>TextLabel1</cstring>
-                </property>
-                <property name="geometry">
-                    <rect>
-                        <x>5</x>
-                        <y>20</y>
-                        <width>39</width>
-                        <height>18</height>
-                    </rect>
-                </property>
-                <property name="text">
-                    <string>Main</string>
-                </property>
-            </widget>
         </widget>
     </grid>
 </widget>
@@ -1760,18 +1652,6 @@
         <slot>nudgeMinus8M()</slot>
     </connection>
     <connection>
-        <sender>Slider3</sender>
-        <signal>valueChanged(int)</signal>
-        <receiver>SongPlayer</receiver>
-        <slot>mainVolume(int)</slot>
-    </connection>
-    <connection>
-        <sender>Slider4</sender>
-        <signal>valueChanged(int)</signal>
-        <receiver>SongPlayer</receiver>
-        <slot>pcmVolume(int)</slot>
-    </connection>
-    <connection>
         <sender>pushButton46</sender>
         <signal>clicked()</signal>
         <receiver>SongPlayer</receiver>
@@ -1861,8 +1741,6 @@
     <tabstop>PushButton20</tabstop>
     <tabstop>PushButton21</tabstop>
     <tabstop>PushButton32</tabstop>
-    <tabstop>Slider4</tabstop>
-    <tabstop>Slider3</tabstop>
 </tabstops>
 <slots>
     <slot>openAbout()</slot>

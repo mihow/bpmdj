@@ -1,7 +1,7 @@
 /****************************************************************************
-** Form interface generated from reading ui file 'patternanalyzer.ui'
+** Form interface generated from reading ui file 'pattern-analyzer.ui'
 **
-** Created: Sun Jul 13 15:59:12 2003
+** Created: Sun Sep 14 13:38:46 2003
 **      by: The User Interface Compiler ($Id: qt/main.cpp   3.1.2   edited Dec 19 11:45 $)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -38,8 +38,8 @@ public:
     QPushButton* pushButton4;
     QPushButton* pushButton2;
     QLabel* projection;
-    QPushButton* pushButton51;
-    QSpinBox* measures;
+    QPushButton* updateButton;
+    QSpinBox* beats;
     QLabel* textLabel1_3;
 
 public slots:
@@ -52,6 +52,7 @@ public slots:
     virtual void fixPhases();
     virtual void setTempo();
     virtual void balanceChanged();
+    virtual void dumpPatternToIdx();
 
 protected:
     QGridLayout* PatternDialogLayout;

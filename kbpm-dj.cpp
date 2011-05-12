@@ -69,7 +69,7 @@ public:
   };
   virtual void scan()
   { 
-    DirectoryScanner::scan(".",NULL); 
+    DirectoryScanner::scan(Config::tmp_directory,NULL); 
   };
 };
 
@@ -108,19 +108,20 @@ int main(int argc, char* argv[])
 			   "program is installed in your PATH");
       exit(0);
     }
-  // 1.c checking left over raw files
+
+  // 2. read the configuration
+  loader->config->setEnabled(true);
+  app->processEvents();
+  Config::load();
+
+  // 1.c checking left over raw files (deze komt laatst omdat tmp_directory het kuiste pad bevat)
   RawScanner raw;
   raw.scan();
   if (!raw.result.isNull())
     if (QMessageBox::warning(NULL,RAW_EXT " files check",
 			     "There are some left over "RAW_EXT" files. These are:\n"+raw.result,
 			     "Remove", "Ignore", 0, 0, 1)==0)
-      removeAllRaw();
-  
-  // 2. read the configuration
-  loader->config->setEnabled(true);
-  app->processEvents();
-  Config::load();
+      removeAllRaw(Config::tmp_directory);  
   
   // 3. read all the files in memory
   IndexReader *indexReader;
@@ -141,7 +142,20 @@ int main(int argc, char* argv[])
   app->processEvents();
   test.findAllTags();
   delete loader;
-  // start the test app
+  
+  // 5. Some extra version dependent blurb...
+  if (!Config::shown_aboutbox)
+    {
+      if (MAGIC_NOW == MAGIC_2_1)
+	{
+	  QMessageBox::message(NULL,"The player now supports OSS and ALSA, together\n"
+			       "with an extra (obligatory) parameter to specify where the\n"
+			       ".raw files are to be stored. Therefore, please go to\n"
+			       "Preferences and create suitable player commands");
+	}
+    }
+  
+  // 6. start the application
   test.show();
   int result = app->exec();
   if (!Config::shown_aboutbox)

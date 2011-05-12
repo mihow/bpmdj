@@ -102,6 +102,7 @@ class SongSelectorLogic:
     virtual void timerTick();
     virtual void selectSong(QListViewItem* song);
     virtual void doPreferences();
+    virtual void openMixer();
     virtual void doAbout();
     virtual void doLegende();
     virtual void doLicense();

@@ -42,6 +42,7 @@ class SongPlayerLogic :
    BpmAnalyzerDialog * bpmcounter;
  protected:
    virtual void done(int r);
+   void checkCueNonZero();
  public:
    SongPlayerLogic::SongPlayerLogic(QWidget*parent=0,const char*name=0, bool modal=FALSE,WFlags f=0);
  public slots:
@@ -88,8 +89,8 @@ class SongPlayerLogic :
    // finish window
    virtual void accept();
    // volumes
-   virtual void pcmVolume(int volume);
-   virtual void mainVolume(int volume);
+   //   virtual void pcmVolume(int volume);
+   //   virtual void mainVolume(int volume);
    // LFO functions
    virtual void fastSaw();
    virtual void slowSaw();

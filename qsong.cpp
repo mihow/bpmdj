@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <math.h>
+#include <qpainter.h>
 #include <stdlib.h>
 #include "qstring-factory.h"
 #include "songselector.logic.h"
@@ -30,6 +31,7 @@
 #include "dirscanner.h"
 #include "spectrum.h"
 
+//#define LIST_PATTERN 2
 #define LIST_DCOLOR 2
 #define LIST_TITLE 5
 #define LIST_AUTHOR 6
@@ -136,6 +138,20 @@ void QSong::paintCell(QPainter *p,const QColorGroup &cg, int col, int wid, int a
 	    return;
 	  }
       break;
+      
+      /*    case LIST_PATTERN:
+      {
+	const QRect size = p->viewport();
+	const QPixmap *pattern = getPixmap(listView()->columnWidth(LIST_PATTERN),height(),cg);
+	if (pattern)
+	  {
+	    p->drawPixmap(0,0,*pattern);
+	    delete(pattern);
+	    return;
+	  }
+	break;
+      }
+      */
       
     case LIST_ONDISK:
       if (Config::color_ondisk && !song->ondisk)

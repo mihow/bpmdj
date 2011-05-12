@@ -56,14 +56,6 @@ Warning: If the process is killed when you close kbpm-dj. Start analyze.sh manua
                             <set>WordBreak|AlignVCenter</set>
                         </property>
                     </widget>
-                    <widget class="QCheckBox" row="3" column="0">
-                        <property name="name">
-                            <cstring>spectrumAnalyzer</cstring>
-                        </property>
-                        <property name="text">
-                            <string>Spectrum Analyzer</string>
-                        </property>
-                    </widget>
                     <spacer row="1" column="0">
                         <property name="name">
                             <cstring>spacer2</cstring>
@@ -87,6 +79,22 @@ Warning: If the process is killed when you close kbpm-dj. Start analyze.sh manua
                         </property>
                         <property name="text">
                             <string>Tempo Analyzer</string>
+                        </property>
+                    </widget>
+                    <widget class="QCheckBox" row="3" column="0">
+                        <property name="name">
+                            <cstring>spectrumAnalyzer</cstring>
+                        </property>
+                        <property name="text">
+                            <string>Spectrum Analyzer</string>
+                        </property>
+                    </widget>
+                    <widget class="QCheckBox" row="4" column="0">
+                        <property name="name">
+                            <cstring>patternAnalyzer</cstring>
+                        </property>
+                        <property name="text">
+                            <string>Pattern Analyzer</string>
                         </property>
                     </widget>
                 </grid>

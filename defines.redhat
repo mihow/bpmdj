@@ -1,0 +1,19 @@
+CPP=g++ -O9
+CC=gcc -O9
+
+CP = cp
+MV = mv
+TAR = tar
+UIC = uic
+MOC = moc
+MKDIR = mkdir
+STRIP = strip
+
+CFLAGS+= -D COMPILE_ALSA -D COMPILE_OSS
+LDFLAGS+= -lpthread -lm -lasound
+
+QT_INCLUDE_PATH=-I/usr/lib/qt3/include
+QT_LIBRARY_PATH=-L/usr/lib/qt
+QT_LIBS= -lqt
+
+UIC = /usr/bin/uic

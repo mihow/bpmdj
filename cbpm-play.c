@@ -27,12 +27,12 @@
 #include <termios.h>
 #include <fcntl.h>
 #include <libgen.h>
-#include <linux/soundcard.h>
 #include <signal.h>
 #include <time.h>
 #include <math.h>
 #include <unistd.h>
 #include "player-core.h"
+#include "dsp-oss.h"
 #include "scripts.h"
 
 /*-------------------------------------------
@@ -259,6 +259,7 @@ void options_failure(char* err)
 	  "   -q       --quiet          be quiet\n"
 	  "   -d arg   --dsp arg        dsp device to use (default = /dev/dsp)\n"
 	  "   -m arg   --match arg      song to match tempo with\n"
+	  "   -r arg   --rawpath arg    patrh that .raw files are stored in (default = ./)\n"
 	  "   -l nbr   --latency nbr    required latency in ms (default = 744)\n"
 	  "   argument                  the index file of the song to play\n\n%s\n\n",err);
    exit(1);
@@ -267,7 +268,7 @@ void options_failure(char* err)
 void process_options(int argc, char* argv[])
 {
    // run trough all the arguments
-   int i=1;
+   int i;
    for(i = 1 ; i < argc ; i ++)
      {
 	if (argv[i][0]=='-')
@@ -277,12 +278,13 @@ void process_options(int argc, char* argv[])
 	     if (argv[i][1]=='-')
 	       arg=argv[i]+2;
 	     else if (argv[i][1]==0 || argv[i][2]!=0)
-	       options_failure("option neither short or long");
+	       options_failure("option neither short nor long");
 	     else arg=argv[i]+1;
 	     // check value
 	     if (strcmp(arg,"quiet")==0 ||
 		      strcmp(arg,"q")==0)
 	       opt_quiet=1;
+#ifdef COMPILE_OSS
 	     else if (strcmp(arg,"dsp")==0 ||
 		      strcmp(arg,"d")==0)
 	       {
@@ -290,6 +292,7 @@ void process_options(int argc, char* argv[])
 		    options_failure("dsp argument scanning error");
 		  arg_dsp=argv[i];
 	       }
+#endif
 	     else if (strcmp(arg,"match")==0 ||
 		      strcmp(arg,"m")==0)
 	       {
@@ -305,6 +308,13 @@ void process_options(int argc, char* argv[])
 		  if (++i>=argc)
 		    options_failure("latency argument scanning error");
 		  arg_latency=argv[i];
+	       }
+	     else if (strcmp(arg,"rawpath")==0 ||
+		      strcmp(arg,"r")==0)
+	       {
+		 if (++i>=argc)
+		   options_failure("raw path argument scanning error");
+		 arg_rawpath = argv[i];
 	       }
 	  }
 	else
@@ -342,14 +352,15 @@ int main(int argc, char *argv[])
      }
    // open core 
    err = core_open();
-   if (err == err_mixer)
+   //   if (err == err_mixer)
+   //     {
+   //       printf("Unable to open mixer device %s\n",arg_mixer);
+   //       exit(err);
+   //     }
+   //else
+   if (err == err_dsp)
      {
-       printf("Unable to open mixer device %s\n",arg_mixer);
-       exit(err);
-     }
-   else if (err == err_dsp)
-     {
-       printf("Unable to open dsp device %s\n",arg_dsp);
+       printf("Unable to open dsp device\n");
        exit(err);
      }
    terminal_start();

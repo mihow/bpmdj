@@ -8,13 +8,12 @@ Package: bpmdj
 Architecture: any
 Depends: ${shlibs:Depends}, mpg123
 Description: Measure the BPM count for mp3's (+ player)
- Start with kbpm-dj !!!! The program is a very accurate BPM (Beats Per Minute)
+ Start with kbpm-dj ! The program is a very accurate BPM (Beats Per Minute)
  counter for mp3's. The counter (cbpm-count) generates an index file. This
  index file can be used with cbpm-play or kbpm-play to play the mp3 at a 
  correct tempo. The player allows nudging, persistent cue points, shifting by 
  measures and other nice things. If you want to do beat mixing of mp3's
  you will need two pc's or two sound cards. Before using the program please
  read the documenation in /usr/share/bpmdj/beatmixing.html. (online at
- http://bpmdj.sourceforge.net/). cbpm-play is a command line player
- kbpm-play is a qt (kde) based player.
+ http://bpmdj.sourceforge.net/).
  

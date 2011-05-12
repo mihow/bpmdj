@@ -18,8 +18,9 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
+#ifndef PLAYER_CORE_H
+#define PLAYER_CORE_H
 #include "common.h"
-
 
 /*-------------------------------------------
  *         Wavrate conversion routines
@@ -61,10 +62,10 @@ void      jumpto(signed8, int);
 signed8   dsp_latency();
 void      changetempo(signed8);
 void      cue_shift(char*, signed8);
-void      mixer_set_main(int percent);
-void      mixer_set_pcm(int percent);
-int       mixer_get_main();
-int       mixer_get_pcm();
+//void      mixer_set_main(int percent);
+//void      mixer_set_pcm(int percent);
+//int       mixer_get_main();
+//int       mixer_get_pcm();
 void      doubleperiod();
 void      halveperiod();
 
@@ -76,7 +77,7 @@ void      halveperiod();
 #define   err_nospawn 3
 int       core_init(int synchronous);
 // opens the playing device
-#define   err_mixer   4
+// #define   err_mixer   4
 #define   err_dsp     5
 int       core_open();
 // plays until asked to stop
@@ -99,16 +100,13 @@ void lfo_set(char* name, _lfo_ l, unsigned8 freq, unsigned8 phase);
 int  loop_set(unsigned8 jumpback);
 
 extern int   opt_quiet;
-extern char* arg_dsp;
 extern int   opt_match;
 extern char* arg_match;
 extern int   opt_dspverbose;
 extern int   opt_latency;
 extern char* arg_latency;
-extern int   opt_fragments;
-extern char* arg_fragments;
-extern int   opt_nolatencyaccounting;
-extern char* arg_mixer;
+//extern char* arg_mixer;
+extern char* arg_rawpath;
 extern char* argument;
 
 void line();
@@ -117,3 +115,4 @@ extern int app_init(int argc, char *argv[]);
 extern void process_options(int argc,char *argv[]);
 extern void msg_slowdown(int c);
 extern void msg_speedup(int c);
+#endif

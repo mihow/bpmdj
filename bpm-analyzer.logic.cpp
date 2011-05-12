@@ -42,7 +42,6 @@
 #include <qspinbox.h>
 #include <unistd.h>
 #include <libgen.h>
-#include <linux/soundcard.h>
 #include <time.h>
 #include <sys/times.h>
 #include <math.h>
@@ -145,7 +144,7 @@ void BpmAnalyzerDialog::timerTick()
 
 void BpmAnalyzerDialog::readAudio()
 {
-  FILE * raw = openRawFile();
+  FILE * raw = openRawFile(arg_rawpath);
   
   // read complete file shrunken down into memory
   audiosize=fsize(raw);

@@ -40,6 +40,7 @@ typedef union
 } longtrick;
 
 #define allocate(size, type) (type*)myalloc(sizeof(type)*(size), __FILE__, __LINE__)
+#define array(name,size,type) type * name = allocate(size,type)
 #define reallocate(thing, size, type) (type*)myrealloc(thing,sizeof(type)*(size))
 void  common_init();
 void* myalloc(int size, char* file, int line);

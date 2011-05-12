@@ -1,7 +1,6 @@
-CPP=g++ -O3 -Wall 
-CC=gcc -O3 -Wall
-
-CFLAGS += -D COMPILE_OSS -D COMPILE_ALSA
+CPP=g++ -O3 -Wall -pipe
+CC=gcc -O3 -Wall -pipe
+CFLAGS+=-D COMPILE_ALSA -D COMPILE_OSS
 LDFLAGS+= -lpthread -lm -lasound
 
 CP = cp

@@ -66,6 +66,11 @@ void IndexReader::validateCache()
     }
 };
 
+void IndexReader::recursing(const QString dirname)
+{
+  loader->readingDir->setText(dirname);
+}
+
 void IndexReader::checkfile(const QString prefix, const QString  filename)
 {
   // If the index does not exist remove the song from the database

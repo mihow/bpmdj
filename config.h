@@ -32,7 +32,8 @@ const QString IndexDir = "./index";
 #define MAGIC_1_7 0xBDE1
 #define MAGIC_1_8 0xBDE2
 #define MAGIC_1_9 0xBDE3
-#define MAGIC_NOW MAGIC_1_9
+#define MAGIC_2_1 0xBDE4
+#define MAGIC_NOW MAGIC_2_1
 
 class Config
 {
@@ -68,6 +69,9 @@ class Config
     static float distance_spectrumscale;
     static bool limit_authornonplayed;
     static bool shown_aboutbox;
+    // version 2.1
+    static QString tmp_directory;
+    static QString mixer_command;
  public:
     static void openUi();
     static void save();

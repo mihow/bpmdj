@@ -23,6 +23,7 @@
 #include <qstring.h>
 #include <time.h>
 #include <qcolor.h>
+#include <qpixmap.h>
 #include "config.h"
 #include "cluster.h"
 
@@ -34,24 +35,27 @@ class SongMetriek:
   public: 
     // which properties needs to be taken into account
     bool tempo;
+    bool pattern;
     bool tempo_weight;
     bool spectrum;  
     // standard metrics
     static SongMetriek SPECTRUM;
     static SongMetriek TEMPO;
+    static SongMetriek PATTERN;
     static SongMetriek ALL;
     static SongMetriek ALL_WITHOUT_TEMPO_WEIGHT;
     // constructor
-    SongMetriek(bool t, bool t2, bool s)
+    SongMetriek(bool t, bool t2, bool s, bool p)
       {
-	tempo=t;
-	tempo_weight=t2;
-	spectrum=s;
+	tempo = t;
+	tempo_weight = t2;
+	spectrum = s;
+	pattern  = p;
       };
 };
 
 class Song:
-  public Point
+public Point
 {
   public:
     // stored in the index files
@@ -65,6 +69,8 @@ class Song:
     QString time;
     QString md5sum;
     QString spectrum;
+    // unsigned char* pattern;
+    // int            pattern_size;
     // necessary for the cache invalidation
     time_t  modification_time;
     // calculated as necessary
@@ -86,6 +92,7 @@ class Song:
     void checkondisk();
     void setColor(QColor c);
     void invertColor(bool r, bool g, bool b);
+    // QPixmap *getPixmap(int width, int height, const QColorGroup &cg);
     bool getDistance();
     bool containsTag(const QString which);
     QString tempo_between(Song*, float);
@@ -93,6 +100,7 @@ class Song:
     QString spectrum_between(Song*, float);
     QColor  color_between(Song* song, float percent);
     float   spectrum_distance(Song* song);
+    // float   pattern_distance(Song* song);
     virtual float   distance(Point* point, Metriek* dp);
     virtual Point* percentToward(Point * other, Metriek * dp, float percent);
     virtual void simpledump(int d);

@@ -1,0 +1,18 @@
+## SuSe 8.1
+CPP=g++ -O3 -Wall
+CC=gcc -O3 -Wall
+CFLAGS+=-D COMPILE_ALSA -D COMPILE_OSS
+LDFLAGS+= -lpthread -lm -lasound
+
+CP = cp
+MV = mv
+TAR = tar
+MKDIR = mkdir
+UIC = /usr/lib/qt3/bin/uic
+MOC = /usr/lib/qt3/bin/moc
+STRIP = strip
+INSTALL = install
+
+QT_INCLUDE_PATH= -I /usr/lib/qt3/include
+QT_LIBRARY_PATH= -L /usr/lib/qt3/lib
+QT_LIBS= -lqt-mt

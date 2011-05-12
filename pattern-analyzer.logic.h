@@ -28,15 +28,15 @@ class PatternAnalyzerLogic : public PatternDialog
 public:
   long period;
   long audiosize;
-  int  *phases;
-  int  phasesize;
   compressed * data;
-  PatternAnalyzerLogic(SongPlayer*parent=0, const char * name=0, bool modal=FALSE, WFlags f=0);
-  void readFile();
+  PatternAnalyzerLogic(bool showreaderprogress, SongPlayer*parent=0, const char * name=0, bool modal=FALSE, WFlags f=0);
+  void readFile(bool showreaderprogress);
+  // virtual void run();
 public slots:
   virtual void showPattern();
   virtual void balanceChanged();
   virtual void slantChanged();
-  virtual void fixPhases();
   virtual void setTempo();
+  // virtual void dumpPatternToIdx();
+  // run will calculate the projection of the pattern and dump it into the index file...
 };

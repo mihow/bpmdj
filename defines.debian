@@ -1,20 +1,29 @@
-CPP=distcc ccache g++ -O9
-CC=distcc ccache gcc -O9
+# DEBIAN 
+
+# The following packages are necessary, 
+#  - qt3-mt
+#  - qt3-designer
+#  - qt3-mt-headers
+#  - qt3-mt-dev
+#  - mpg123
+#  - gcc
+#  - make
+#  - alsa-headers (for alsa support)
+
+CPP = g++ -O9
+CC = gcc -O9
 
 CP = cp
 MV = mv
 TAR = tar
 UIC = uic
 MOC = moc
-LYX = lyx
-LATEX = latex
-DVIPS = dvips
 MKDIR = mkdir
 STRIP = strip
 INSTALL = install
 
-CFLAGS+=
-LDFLAGS+= -lpthread -lm
+CFLAGS+= -D COMPILE_ALSA -D COMPILE_OSS
+LDFLAGS+= -lpthread -lm -lasound
 
 QT_INCLUDE_PATH=-I/usr/include/qt3/
 QT_LIBRARY_PATH=

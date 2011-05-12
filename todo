@@ -1,10 +1,21 @@
+- converting bpmdj to only a file selector while xmms keeps the playlist
+  mainplayer om te monitoren
+  xmms --queue om toe te voegen
+  morgen eens proberen...
+- alsa drivers in orde brengen...
+  2 verschillende drivers... Maakt het wel moeilijk omdat deze posities nu net
+  toch wel vrij vaak opgeroepen worden. Dus afhankelijk van de driver moeten we een andere routine aansturen... Dus eigenlijk diegene die we het meest gebruiken mogen we niet wegabstraheren... De andere kan me niet zoveel bommen.
+  op de commandline moeten we wel opgeven hoe we de boel uitlezen...
+- patches van verschillende mensen er aan toevoegen...
+
+
 2.0:
   audiosize == 0 in pattern-analyzer crashed
 - Q: dubbel klikken als de monitor nog aan het spelen is brengt het nieuwe nummer in de queue
   Q: als de queue leeg is nemen we natuurlijk de huidige main-song.
      dan kunnen we een aantal songs er tussen proppen die
   - similar name scanner 
-    - stop button
+  - stop button
   - renamer:
     - isMix in orde brengen
     - fast wizards laten werken

@@ -27,9 +27,9 @@
 #include <termios.h>
 #include <fcntl.h>
 #include <libgen.h>
-#include <linux/soundcard.h>
 #include <ctype.h>
 #include <signal.h>
+#include <assert.h>
 #include <time.h>
 #include "common.h"
 #include "version.h"
@@ -111,6 +111,8 @@ char   * index_tags;
 char   * index_md5sum;
 char   * index_time;
 char   * index_spectrum;
+//unsigned char * index_pattern;
+// int     index_pattern_size;
  int     index_changed;
  int     index_bpmcount_from;
  int     index_bpmcount_to;
@@ -141,7 +143,9 @@ void index_init()
    index_cue_c=0;
    index_cue_v=0;
    index_cue=0;
-   index_spectrum=NULL;
+   index_spectrum = NULL;
+   //   index_pattern = NULL;
+   //   index_pattern_size = 0;
 }
 
 void index_setversion()
@@ -163,6 +167,7 @@ void index_free()
    if (index_md5sum) free(index_md5sum);
    if (index_time) free(index_time);
    if (index_spectrum) free(index_spectrum);
+   // if (index_pattern) free(index_pattern);
 }
 
 void index_write()
@@ -195,6 +200,11 @@ void index_write()
    if (index_remark) fprintf(f,"remark   : %s\n",index_remark);
    if (index_time) fprintf(f,"time : %s\n",index_time);
    if (index_spectrum) fprintf(f,"spectrum : %s\n",index_spectrum);
+   //if (index_pattern_size>0 && index_pattern)
+   //{
+   //fprintf(f,"pattern : %d\n",index_pattern_size);
+   //fwrite(index_pattern,1,index_pattern_size,f);
+   //}
    fclose(f);
 }
 
@@ -333,6 +343,16 @@ void index_read(const char* indexn)
       else if(strcmp(field,"cue-v")==0) index_cue_v=atol(value);
       else if(strcmp(field,"md5sum")==0) index_md5sum=strldup(value,end-value);
       else if(strcmp(field,"spectrum")==0) index_spectrum=strldup(value,end-value);
+      else if(strcmp(field,"pattern")==0) 
+	{
+	  int index_pattern_size=atol(value);
+	  assert(index_pattern_size>0);
+	  // index_pattern=allocate(index_pattern_size,unsigned char);
+	  for(read = 0 ; read < index_pattern_size ; read++)
+	    // index_pattern[read] =      
+	      nextchar();
+	  index_changed = 1;
+	}
       else if(strcmp(field,"tag")==0) 
 	{
 	  if (!index_tags) index_tags=strldup(value,end-value);

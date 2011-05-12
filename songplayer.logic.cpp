@@ -26,6 +26,7 @@
 #include <qlabel.h>
 #include <math.h>
 #include <qslider.h>
+#include <qmessagebox.h>
 #include <sys/times.h>
 #include "version.h"
 #include "kbpm-play.h"
@@ -72,8 +73,8 @@ SongPlayerLogic::SongPlayerLogic(QWidget*parent,const char*name, bool modal,WFla
   normalReached(currentperiod==normalperiod);
   
   // set volume sliders
-  Slider3->setValue(100-mixer_get_main());
-  Slider4->setValue(100-mixer_get_pcm());
+  //  Slider3->setValue(100-mixer_get_main());
+  //  Slider4->setValue(100-mixer_get_pcm());
 }
 
 
@@ -297,50 +298,64 @@ void SongPlayerLogic::stop()
 
 void SongPlayerLogic::retrieveZ()
 {
-   cue_retrieve("Z-",0);
-   jumpto(0,0);
+  cue_retrieve("Z-",0);
+  jumpto(0,0);
 }
 
 void SongPlayerLogic::retrieveX()
 {
-   cue_retrieve("X-",1);
-   jumpto(0,0);
+  cue_retrieve("X-",1);
+  jumpto(0,0);
 }
 
 void SongPlayerLogic::retrieveC()
 {
-   cue_retrieve("C-",2);
-   jumpto(0,0);
+  cue_retrieve("C-",2);
+  jumpto(0,0);
 }
 
 void SongPlayerLogic::retrieveV()
 {
-   cue_retrieve("V-",3);
-   jumpto(0,0);
+  cue_retrieve("V-",3);
+  jumpto(0,0);
 }
 
 void SongPlayerLogic::storeZ()
 {
-   cue_store("Z-",0);
-   redrawCues();
+  checkCueNonZero();
+  cue_store("Z-",0);
+  redrawCues();
 }
 
 void SongPlayerLogic::storeX()
 {
-   cue_store("X-",1);
-   redrawCues();
+  checkCueNonZero();
+  cue_store("X-",1);
+  redrawCues();
 }
 
 void SongPlayerLogic::storeC()
 {
-   cue_store("Z-",2);
-   redrawCues();
+  checkCueNonZero();
+  cue_store("Z-",2);
+  redrawCues();
 }
 
 void SongPlayerLogic::storeV()
 {
-   cue_store("V-",3);
-   redrawCues();
+  checkCueNonZero();
+  cue_store("V-",3);
+  redrawCues();
+}
+
+void SongPlayerLogic::checkCueNonZero()
+{
+  if (::cue==0)
+    QMessageBox::warning(this,"Cue Zero ?",
+			 "If you want to store the current playing position in a cue,\n"
+			 "you must first create a cue. You can do this by selecting\n"
+			 "'set Cue' (or pressing '/') at that point. Afterwards you can\n"
+			 "store it in any of the 4 positions");
 }
 
 #define knick 15
@@ -483,15 +498,15 @@ void SongPlayerLogic::nudgeCueForward8M()
    cue_shift("Shifting cue 8 measure forward",8*normalperiod);
 }
 
-void SongPlayerLogic::mainVolume(int v)
-{
-   mixer_set_main(100-v);
-}
+//void SongPlayerLogic::mainVolume(int v)
+//{
+//   mixer_set_main(100-v);
+//}
 
-void SongPlayerLogic::pcmVolume(int v)
-{
-   mixer_set_pcm(100-v);
-}
+//void SongPlayerLogic::pcmVolume(int v)
+//{
+//   mixer_set_pcm(100-v);
+//}
 
 void SongPlayerLogic::fastSaw()
 {
@@ -554,7 +569,7 @@ void SongPlayerLogic::openSpectrumAnalyzer()
 
 void SongPlayerLogic::openPatternAnalyzer()
 {
-  PatternAnalyzerLogic analyzer;
+  PatternAnalyzerLogic analyzer(true);
   // ImpulseAnalyzerLogic analyzer;
   // TempoLineAnalyzerLogic analyzer;
   analyzer.exec();

@@ -44,7 +44,6 @@
 #include <unistd.h>
 #include <libgen.h>
 #include <qslider.h>
-#include <linux/soundcard.h>
 #include <time.h>
 #include <sys/times.h>
 #include <math.h>
@@ -62,45 +61,43 @@ extern "C"
 }
 
 #define COLLAPSE 4
-PatternAnalyzerLogic::PatternAnalyzerLogic(SongPlayer*parent, const char*name, bool modal, WFlags f) :
+PatternAnalyzerLogic::PatternAnalyzerLogic(bool showreaderprogress, SongPlayer*parent, const char*name, bool modal, WFlags f) :
   PatternDialog(0,name,modal,f)
 {
   period=normalperiod;
   data = NULL;
-  readFile();
+  readFile(showreaderprogress);
   showPattern();
 }
 
-void PatternAnalyzerLogic::readFile()
+void PatternAnalyzerLogic::readFile(bool showreaderprogress)
 {
   if (data)
     return;
   long int bufsize = 65536;
   longtrick buffer[bufsize];
   // read in memory and shrink it 
-  FILE * raw=openRawFile();
+  FILE * raw=openRawFile(arg_rawpath);
   audiosize=fsize(raw)/4;
   signed4 pos = 0;
   fseek(raw,pos,SEEK_SET);
   data = allocate(audiosize/COLLAPSE,compressed);
-  phasesize = audiosize;
-  phasesize /= normalperiod;
-  phases = allocate(phasesize,int);
   
-  QProgressDialog * progress = new QProgressDialog();
-  progress->setTotalSteps(audiosize/bufsize);
-  progress->show();
-  
-  for(int i = 0 ; i <phasesize; i ++)
-    phases[i]=0;
-  
+  QProgressDialog * progress = NULL;
+  if (showreaderprogress) 
+    {
+      progress = new QProgressDialog();
+      progress->setTotalSteps(audiosize/bufsize);
+      progress->show();
+    }
+
   while(pos<audiosize)
     {
       long toread = audiosize - pos;
       if (toread>bufsize) toread = bufsize;
       long count=readsamples((unsigned4*)buffer,toread,raw);
       
-      progress->setProgress(pos/bufsize);
+      if (progress) progress->setProgress(pos/bufsize);
       app->processEvents();
 
       for(int i = 0 ; i<count/COLLAPSE; i++)
@@ -118,7 +115,7 @@ void PatternAnalyzerLogic::readFile()
 	}
       pos+=count;
     }
-
+  
   fclose(raw);
   delete(progress);
   
@@ -133,147 +130,118 @@ void PatternAnalyzerLogic::readFile()
 
 void PatternAnalyzerLogic::showPattern()
 { 
-  int meass = measures->value();
-  unsigned4 period2 = period/COLLAPSE;
-  unsigned4 size = audiosize/COLLAPSE;
-  int X = size/(period2*meass)-1;
-  int Y = pattern->contentsRect().height();
+  int beats_per_column = beats->value() ;
+  unsigned4 collapsed_period = period  / COLLAPSE ;
+  collapsed_period *= beats_per_column;
+  collapsed_period /= 4;
+  unsigned4 collapsed_size = audiosize / COLLAPSE ;
+  int window_xsize = collapsed_size / collapsed_period - 1 ;
+  int window_ysize = pattern->contentsRect().height();
   int dc = color->value();
-  
-  QPixmap *pm = new QPixmap(X,Y);
+  assert(window_ysize>0);
+  QPixmap *pm = new QPixmap(window_xsize,window_ysize);
   QPainter p;
   p.begin(pm);
-  QRect r(QRect(0,0,pm->width(),pm->height()));
-  p.fillRect(r,Qt::white);
-  
-  float yscale = meass*period2;
-  yscale/=Y;
-
-  signed4 *project;
-  project = allocate(Y,signed4);
-  assert(project);
-  
-  for(int y =  0 ; y < Y ; y ++)
-    project[y]=0;
-  
-  for(int x = 0 ; x < X ; x++)
+  float yscale = collapsed_period - 1 ;
+  yscale /= window_ysize;
+  array(project, window_ysize, signed4);
+  for(int row =  0 ; row < window_ysize ; row ++)
+    project[row]=0;
+  for(int column = 0 ; column < window_xsize ; column++)
     {
-      bool red = false;
-      unsigned4 idx = x * period2 * meass;
-      idx += phases[x];
-      if (::x/(normalperiod*meass) == x)
-	red = true;
-      if (red)
-	for(int y = 0 ; y < Y ; y++)
+      unsigned4 idx = column * collapsed_period;
+      if (::x/(normalperiod*beats_per_column/4) == column)
+	for(int row = 0 ; row < window_ysize ; row++)
 	  {
-	    unsigned4 idx2 = (int)((float)y*yscale);
+	    unsigned4 idx2 = (int)((float)row*yscale);
+	    assert(idx+idx2<collapsed_size);
 	    int val = data[idx+idx2];
-	    project[y]+=val;
+	    project[row]+=val;
 	    val+=dc;
 	    val%=256;
 	    p.setPen(QColor(val,0,0));
-	    p.drawPoint(x,y);
+	    p.drawPoint(column,row);
 	  }
       else
-	for(int y = 0 ; y < Y ; y++)
+	for(int row = 0 ; row < window_ysize ; row++)
 	  {
-	    unsigned4 idx2 = (int)((float)y*yscale);
+	    unsigned4 idx2 = (int)((float)row*yscale);
+	    assert(idx+idx2<collapsed_size);
 	    int val = data[idx+idx2];
-	    project[y]+=val;
+	    project[row]+=val;
 	    val+=dc;
 	    val%=256;
 	    p.setPen(QColor(val,val,val));
-	    p.drawPoint(x,y);
+	    p.drawPoint(column,row);
 	  }
     }
   p.setPen(QColor(0,(128+dc)%256,0));
-  for(int y = 0 ; y < Y ; y+=Y/8)
-    p.drawLine(0,y,X-1,y);
+  for(int row = 0 ; row < window_ysize ; row+=window_ysize/8)
+    p.drawLine(0,row,window_xsize-1,row);
   p.end(); 
   pattern->setPixmap(*pm);
-  
   signed4 maximum=0;
-  for(int y = 0 ; y < Y ; y ++)
-    if (project[y]>maximum)
-      maximum=project[y];
-  for(int y = 0 ; y < Y ; y ++)
-    project[y]=((signed8)project[y])*(signed8)255/(signed8)maximum;
-  
-  QPixmap *sm = new QPixmap(1,Y);
+  for(int row = 0 ; row < window_ysize ; row ++)
+    if (project[row]>maximum)
+      maximum=project[row];
+  for(int row = 0 ; row < window_ysize ; row ++)
+    project[row]=((signed8)project[row])*(signed8)255/(signed8)maximum;
+  QPixmap *sm = new QPixmap(1,window_ysize);
   QPainter l;
   l.begin(sm);
-  for(int y = 0 ; y < Y ; y++)
+  for(int row = 0 ; row < window_ysize ; row++)
     {
       int val;
-      val = project[y];
+      val = project[row];
       l.setPen(QColor(val,val,val));
-      l.drawPoint(0,y);
+      l.drawPoint(0,row);
     }
   l.end();
   projection->setPixmap(*sm);
 }
 
-void PatternAnalyzerLogic::fixPhases()
-{
-  printf("FIXING PHASES !!\n");
-  int meass = measures->value();
-  unsigned4 period2 = period/COLLAPSE;
-  unsigned4 size = audiosize/COLLAPSE;
-  int X = size/(period2*meass)-1;
-  int x = 1;
-  unsigned4 last = 0;
-  unsigned4 db = period2 * meass / 32;
-  // first we create the projection...
-  signed4 *project;
-  project = allocate(period2*meass,signed4);
-  for(unsigned int x = 0 ; x < period2 * meass ; x ++)
-    project[x]=0;
-  for(unsigned int x = 0 ; x < size ; x ++)
-    project[x%(period2*meass)]+=data[x];
-  
-  // signed4 maximum=0;
-  // for(int y = 0 ; y < period2 * meass ; y ++)
-  // if (project[y]>maximum)
-  // maximum=project[y];
-  // for(int y = 0 ; y < period2 * meass ; y ++)
-  //project[y]=((signed8)project[y])*(signed8)255/(signed8)maximum;
-
-  for(unsigned int y = 0 ; y < period2 * meass ; y ++)
-    project[y]/=X;
-  
-  // for every period...
-  while(x<phasesize)
-    {
-      unsigned4 now = last + period2 * meass;
-      unsigned4 lo_now = now - db;
-      unsigned4 hi_now = now + db;
-      if (hi_now+period2*meass>size)
-	break;
-      // find best phasephit
-      signed4 mindiffat = 0;
-      unsigned4 mindiff = (unsigned4)-1;
-      for(unsigned int d = lo_now ; d < hi_now; d ++)
-	{
-	  unsigned4 diff = 0;
-	  for(unsigned int y = 0 ; y < period2 * meass ; y ++)
-	    diff += abs((signed int)data[d+y]-
-			(signed int)project[y]);  //data[last+y]);
-	  if (diff<mindiff)
-	    {
-	      mindiff=diff;
-	      mindiffat = d;
-	    }
-	}
-      // assign best phasephit to delta...
-      phases[x] = mindiffat - period2 * meass * x;
-      // now we should be able to dump it again...
-      printf("Fitting column %d : %d\n",x,phases[x]);
-      fflush(stdout);
-      last = mindiffat;
-      x++;
-    }
-  showPattern();
+/*void PatternAnalyzerLogic::run()
+{ 
+  unsigned int row, beats_per_column = beats->value() ;
+  unsigned4 collapsed_period = period;
+  collapsed_period *= beats_per_column;
+  collapsed_period /= 4 * COLLAPSE;
+  unsigned4 collapsed_size = audiosize / COLLAPSE ;
+  array(pattern,collapsed_period, double);
+  for(row =  0 ; row < collapsed_period ; row ++)
+    pattern[row]=0;
+  for(unsigned4 pos = 0 ; pos < collapsed_size ; pos ++)
+    pattern[pos%collapsed_period]+=data[pos];
+  double maximum = 0;
+  for(row = 0 ; row < collapsed_period ; row ++)
+    if (fabs(pattern[row])>maximum) maximum = fabs(pattern[row]);
+  for(row = 0 ; row < collapsed_period ; row ++)
+    pattern[row]=fabs(pattern[row]*255.0/maximum);
+  for(row = 0 ; row < collapsed_period ; row ++)
+    if (pattern[row]==255.0)
+      break;
+  int phase = row;
+*/
+  // hier zitten we met het probleem van de boel op te slaan op disk...
+  // we willen dat zo klein mogelijk...
+  // en toch zoveel mogelijk nuttige informatie behouden...
+  // die textfiles 
+  // in karakters kan ik het misschien der nog bijproppen
+/*  array(pattern_for_index,collapsed_period , unsigned char);
+  for(row = 0 ; row < collapsed_period ; row ++)
+    pattern_for_index[row]=(unsigned char)pattern[(phase+row)%collapsed_period];
+  index_pattern = pattern_for_index;
+  index_pattern_size = collapsed_period;
+  index_changed = 1;
+  index_write();
 }
+
+void PatternAnalyzerLogic::dumpPatternToIdx()
+{
+  run();
+}
+
+*/
 
 void PatternAnalyzerLogic::slantChanged()
 {

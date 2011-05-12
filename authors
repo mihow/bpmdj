@@ -4,10 +4,14 @@ BpmDj: Free Dj Tools
  Copyright (C) 2001 Werner Van Belle
  See 'beatmixing.ps' for more information
 
- BPM-code : Werner Van Belle (werner.van.belle@vub.ac.be)
- FFT-code : Don Cross (dcross@intersrv.com)
- PCA-code : F. Murtagh (murtagh@scivax.stsci.edu)
-
-Until version 1.0: 
-  program: Werner Van Belle <werner.van.belle@vub.ac.be>
-  building environment: Thomas Steudten <thomas@steudten.com>
+ BPM-code         : Werner Van Belle (werner.van.belle@vub.ac.be)
+ FFT-code         : Don Cross (dcross@intersrv.com)
+ PCA-code         : F. Murtagh (murtagh@scivax.stsci.edu)
+ defines.mandrake : Romanin Gianluca (contact@openjay.org)
+ defines.slackware: Erik (erik@cpuhookup.com)
+ defines.redhat   : Ray B. Morris (support@webmastersguide.com)
+ defines.redhat9  : Peter Lawler (yaluser@pacific.net.au)
+ defines.suses.8.1: Johan Fabry (johan.fabry@vub.ac.be)
+ minor patches    : James Gerken (phlegm@mib.org)
+ windows port     : Luciano Genero (luciano.genero@softway.it)
+ pre-1.0 buildenv : Thomas Steudten <thomas@steudten.com>

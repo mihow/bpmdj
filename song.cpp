@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <qpainter.h>
 #include "qstring-factory.h"
 #include "songselector.logic.h"
 #include "qsong.h"
@@ -53,10 +54,11 @@ extern "C"
 
 //float SongMetriek::tempo_scale = 0.06; 
 //float SongMetriek::spectrum_scale = 1.0/512.0;
-SongMetriek SongMetriek::SPECTRUM(false,false,true);
-SongMetriek SongMetriek::TEMPO(true,true,false);
-SongMetriek SongMetriek::ALL(true,true,true);
-SongMetriek SongMetriek::ALL_WITHOUT_TEMPO_WEIGHT(true,false,true);
+SongMetriek SongMetriek::SPECTRUM(false,false,true,false);
+SongMetriek SongMetriek::TEMPO(true,true,false,false);
+SongMetriek SongMetriek::ALL(true,true,true,false);
+SongMetriek SongMetriek::ALL_WITHOUT_TEMPO_WEIGHT(true,false,true,false);
+SongMetriek SongMetriek::PATTERN(false,false,false,true);
 
 void Song::reread(bool checkfileonline)
 {
@@ -77,6 +79,13 @@ void Song::reread(bool checkfileonline)
   time = index_time;
   md5sum = index_md5sum;
   spectrum = index_spectrum;
+  // pattern_size = index_pattern_size;
+  // pattern = NULL;
+  // if (pattern_size > 0)
+  //{
+  //pattern = allocate(pattern_size,unsigned char);
+  // memcpy(pattern,index_pattern,pattern_size);
+  //}
   /* are there any cues stored */
   has_cues = index_cue_z + index_cue_x + index_cue_c + index_cue_v;
   /* free all */
@@ -271,6 +280,43 @@ float Song::spectrum_distance(Song* song)
   return distance*Config::distance_spectrumscale/512.0;
 }
 
+/*float Song::pattern_distance(Song* song)
+{
+  if (pattern_size==0 || song->pattern_size==0)
+    return 1000000;
+  if (pattern_size > song->pattern_size)
+    return song->pattern_distance(this);
+    // pattern_size is de grootste van de twee
+  int phase = 0;
+  long minimum=0;
+  for(long position = 0; position < pattern_size; position ++)
+    {
+      long pos2 = position * song->pattern_size/pattern_size;
+      long d = (int)pattern[position]-(int)pattern[pos2];
+      minimum += d*d;
+    }
+  assert(pattern_size>=200);
+  for(phase = pattern_size/200; phase < pattern_size/4 ; phase += pattern_size/200)
+    {
+      long mismatch = 0;
+      long position, pos1, pos2;
+      for(position = 0; position < pattern_size && mismatch < minimum; position ++)
+	{
+	  pos1 = (position+phase)%pattern_size;
+	  pos2 = position * song->pattern_size/pattern_size;
+	  int d = (int)pattern[pos1]-(int)pattern[pos2];
+	  mismatch += d*d;
+	}
+      if (minimum==-1 || mismatch<minimum)
+	minimum = mismatch;
+    }
+  minimum/=pattern_size;
+  minimum/=8;
+  printf("mismatch = %ld\n",minimum);
+  return minimum;
+}
+*/
+
 QString Song::spectrum_between(Song* song, float percent)
 {
   QString result="                        ";
@@ -327,6 +373,12 @@ float Song::distance(Point* point, Metriek* dp)
     {
       d=spectrum_distance(song);
       sum+=d*d;
+    }
+  if (measure->pattern)
+    {
+      assert(0);
+      // d=pattern_distance(song);
+      // sum+=d*d;
     }
   return sum;
 }
@@ -421,3 +473,86 @@ bool Song::modifiedOnDisk()
   new_modification_time = status.st_mtime;
   return new_modification_time!=modification_time;
 }
+
+/*
+QPixmap *Song::getPixmap(int width, int height, const QColorGroup &cg)
+{
+  if (pattern_size==0) 
+    return NULL;
+  QPixmap *result = new QPixmap(width,height);
+  QPainter p;
+  p.begin(result);
+  QRect r(QRect(0,0,width,height));
+  Song* main = ProcessManager::playingInMain();
+  if (main)
+    {
+      int d = (int)pattern_distance(main);
+      if (d>255) d = 255;
+      p.fillRect(r,QColor(255,d,d));
+    }
+  else
+    p.fillRect(r,cg.base());
+  p.setPen(cg.text());
+  for(int i = 0 ; i < width ; i++)
+    {
+      int start = i * pattern_size / width;
+      int stop = (i+1) * pattern_size / width;
+      double value = 0;
+      for(int j = start ; j < stop ; j ++)
+	value+=(double)pattern[j];
+      value/=(double)(stop-start);
+      value*=height-1;
+      value/=255.0;
+      p.drawPoint(i,height-1-(int)value);
+    }
+  p.end();
+  return result;
+}
+*/
+
+
+/*QPixmap *Song::getPixmap(int width, int height, const QColorGroup &cg)
+{
+  if (pattern_size==0) 
+    return NULL;
+  QPixmap *result = new QPixmap(width,height);
+  QPainter p;
+  p.begin(result);
+  unsigned char* other_pattern = NULL;
+  Song* main = ProcessManager::playingInMain();
+  if (main)
+    other_pattern=main->pattern;
+  for(int d = 0, i = 0 ; i < width ; i++)
+    {
+      int start = i * pattern_size / width;
+      int stop = (i+1) * pattern_size / width;
+      double value = 0;
+      
+      for(int j = start ; j < stop ; j ++)
+	value+=(double)pattern[j];
+      value/=(double)(stop-start);
+      
+      if (other_pattern)
+	{
+	  double value2=0;
+	  start = i * main->pattern_size / width;
+	  stop = (i+1) * main->pattern_size / width;
+	  for(int j = start ; j < stop ; j ++)
+	    value2+=(double)other_pattern[j];
+	  value2/=(double)(stop-start);
+	  d = (int)fabs(value2-value);
+	  value = d;
+	  d *= d;
+	  d /= 256;
+	}
+      value*=height-1;
+      value/=255.0;
+      p.setPen(QColor(255,255-d,255-d));
+      p.drawLine(i,0,i,height-1);
+      p.setPen(cg.text());
+      p.drawPoint(i,height-1-(int)value);
+    }
+  p.end();
+  return result;
+}
+*/

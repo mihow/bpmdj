@@ -18,6 +18,18 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-void do_pca(int rows, int columns, float**data, char* &error_msg);
-float ** matrix(int rows, int columns);
-void free_matrix(float **data, int rows, int columns);
+#include "preferences.h"
+
+class PreferencesLogic : 
+  public PreferencesDialog
+{
+   Q_OBJECT
+ public:
+   PreferencesLogic::PreferencesLogic(QWidget*parent=0,const char*name=0, bool modal=FALSE,WFlags f=0);
+   QString getCommand();
+ public slots:
+   virtual void createPlayerOne();
+   virtual void createPlayerTwo();
+   virtual void createPlayerThree();
+   virtual void createPlayerFour();
+};

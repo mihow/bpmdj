@@ -1,8 +1,4 @@
 #!/bin/bash
-#cd ../cBpmDj
-#konsole -e ./cbpm-play $@
-echo $1 >tmp/ch
-cd ../kBpmDj
 cat $3 | grep file | awk -F ": " '{print "xmms -e \"" $2 "\""}' >/tmp/filename
 cat /tmp/filename
 cd music

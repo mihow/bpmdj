@@ -21,6 +21,7 @@
 // WVB -- added DUMP_INFO variable to print out data
 // WVB -- modified malloc to allocatre
 // WVB -- added progressbar support..
+// WVB -- added better error handling...
 
 #include <stdio.h>
 #include <string.h>
@@ -28,6 +29,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <assert.h>
 #include "kbpm-dj.h"
 #include "pca.h"
 
@@ -40,17 +42,18 @@ static void corcol(float **data, int n, int m, float **symmat);
 static void covcol(float **data, int n, int m, float **symmat);
 static float *vector(int n);
 static void tred2(float **a, int n, float *d, float *e);
-static void tqli(float d[], float e[], int n, float ** z);
+static void tqli(float d[], float e[], int n, float ** z, char* &error_msg);
 static void free_vector(float *v, int n);
 static void scpcol(float **data, int n, int m, float **symmat);
 
 
 // WVB -- this function is a modified version of the original code
 // !!! data will be modified !!!
-void do_pca(int n, int m, float** data)
+void do_pca(int n, int m, float** data, char* &error_msg)
 {
   int  i, j, k, k2;
   float **symmat, **symmat2, *evals, *interm;
+  assert(!error_msg);
   
   symmat = matrix(m, m);  /* Allocation of correlation (etc.) matrix */
   
@@ -71,7 +74,8 @@ void do_pca(int n, int m, float** data)
     }
   }
   tred2(symmat, m, evals, interm);  /* Triangular decomposition */
-  tqli(evals, interm, m, symmat);   /* Reduction of sym. trid. matrix */
+  tqli(evals, interm, m, symmat, error_msg);   /* Reduction of sym. trid. matrix */
+  if (error_msg) return;
   
   /* evals now contains the eigenvalues,
      columns of symmat now contain the associated eigenvectors. */
@@ -129,6 +133,7 @@ int old_main(int argc, char *argv[])
   float **data, **symmat, **symmat2, *evals, *interm;
   float in_value;
   char option;
+  char * error_msg = NULL;
   
   /*********************************************************************
    Get from command line:
@@ -252,7 +257,8 @@ int old_main(int argc, char *argv[])
     }
   }
   tred2(symmat, m, evals, interm);  /* Triangular decomposition */
-  tqli(evals, interm, m, symmat);   /* Reduction of sym. trid. matrix */
+  tqli(evals, interm, m, symmat, error_msg);   /* Reduction of sym. trid. matrix */
+  assert(!error_msg);
   /* evals now contains the eigenvalues,
      columns of symmat now contain the associated eigenvectors. */
   
@@ -442,25 +448,12 @@ void scpcol(float **data, int n, int m, float **symmat)
       }
 }
 
-/**  Error handler  **************************************************/
-
-void erhand(char err_msg[])
-{
-  fprintf(stderr,"Run-time error:\n");
-  fprintf(stderr,"%s\n", err_msg);
-  fprintf(stderr,"Exiting to system.\n");
-  exit(1);
-}
-
-/**  Allocation of vector storage  ***********************************/
 /* Allocates a float vector with range [1..n]. */
 float *vector(int n)
 {
   float * v = allocate(n,float);
   return v-1;
 }
-
-/**  Allocation of float matrix storage  *****************************/
 
 /* Allocate a float matrix with range [1..n][1..m]. */
 float **matrix(int n,int m)
@@ -474,7 +467,6 @@ float **matrix(int n,int m)
   for (i = 1; i <= n; i++)
     {
       mat[i] = allocate(m,float);
-      if (!mat[i]) erhand("Allocation failure 2 in matrix().");
       mat[i] -= 1;
     }
   /* Return pointer to array of pointers to rows. */
@@ -586,7 +578,7 @@ static void tred2(float **a, int n, float *d, float *e)
 }
 
 /**  Tridiagonal QL algorithm -- Implicit  **********************/
-static void tqli(float d[], float e[], int n, float ** z)
+static void tqli(float d[], float e[], int n, float ** z, char* &error_occured)
 {
   int m, l, iter, i, k;
   float s, r, p, g, f, dd, c, b;
@@ -606,7 +598,11 @@ static void tqli(float d[], float e[], int n, float ** z)
 	    }
           if (m != l)
 	    {
-	      if (iter++ == 30) erhand("No convergence in TLQI.");
+	      if (iter++ == 30) 
+		{
+		  error_occured = "No convergence in TQLI";
+		  return;
+		}
 	      g = (d[l+1] - d[l]) / (2.0 * e[l]);
 	      r = sqrt((g * g) + 1.0);
 	      g = d[m] - d[l] + e[l] / (g + SIGN(r, g));

@@ -1,3 +1,16 @@
+2.1:
+  ksel  + added a palyer command creator wizard
+  kplay + added native alsa driver	 
+  kplay + removed mixer interface, because this is essentially useless and a whole bunch of other (and better) 
+	  programs exist to manipûlate the volumes of a mixer device
+  kplay + added -r command line switch
+  ksel  + added tmp_directory	 
+  www   + added faq: port to windows ?	 
+  ksel  + added pattern projection visualisation	 
+  kplay + added pattern_analyzer projection dump	 
+  kplay + pattern analyzer can now work with beats instead of measures	 
+  kplay - pattern analyzer overflow bug deruit gehaald
+  ksel  - pca scanner bug (no convergence crash) deruit gehaald
 2.0:
   ksel  + improved analyzer code
   ksel  + improved import scanner. very very fast now

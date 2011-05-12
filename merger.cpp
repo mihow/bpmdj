@@ -140,7 +140,7 @@ char * split_raw(int nr, signed8 lastpos)
   entry[idx]=0;
   if (entry[0]==0)
     return NULL;
-  // parse entry as good as possible
+  // parse entry as well as possible
   signed8 position = 0;
   idx=0;
   while(isdigit(entry[idx]))
@@ -224,7 +224,7 @@ void process_options(int argc, char* argv[])
 	  if (argv[i][1]=='-')
 	    arg=argv[i]+2;
 	  else if (argv[i][1]==0 || argv[i][2]!=0)
-	    options_failure("option neither short or long");
+	    options_failure("option neither short nor long");
 	  else arg=argv[i]+1;
 	  // check value
 	  if (strcmp(arg,"dumpraw")==0)
@@ -374,10 +374,10 @@ bool createFiles(char* a, char* b)
   filename_b = strdup(index_file);
   period_b = index_period*4;
   printf("Decoding %s\n",b);
-  if (!vexecute(CREATERAW_CMD,filename_b))
+  if (!vexecute(CREATERAW_CMD,"./",filename_b))
     exit(100);
   
-  file_b=openRawFileForWriting();
+  file_b=openRawFileForWriting("./");
   index_free();
   
   if (normalize)
@@ -773,7 +773,7 @@ void closeFiles()
 {
   fclose(file_a);
   fclose(file_b);
-  char* rawname = getRawFilename(filename_b);
+  char* rawname = getRawFilename("./",filename_b);
   if (verbose)
     printf("Removing %s\n",rawname);
   remove(rawname);

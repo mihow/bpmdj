@@ -96,6 +96,7 @@ SongSelectorLogic::SongSelectorLogic(QWidget * parent, const QString name) :
   // file menu
   file->insertItem("&Preferences",this,SLOT(doPreferences()));
   file->insertItem("&Switch Monitor To Main",this,SLOT(switchMonitorToMain()));
+  file->insertItem("&Mixer", this, SLOT (openMixer()));
   file->insertItem("&Quit",this,SLOT(quitButton()));
   
   // help menu
@@ -361,8 +362,6 @@ void SongSelectorLogic::updateItemList()
   int itemcount = database -> getSelection(this,main,songList);
   songList->repaint();
   countLcd->display(itemcount);
-  for(int i = 0 ; i < songList -> columns() ; i ++)
-    songList->setColumnWidth(i,0);
   // nothing selected ?
   if (itemcount==0 && !alreadygavefilterwarning)
     {
@@ -562,6 +561,14 @@ void SongSelectorLogic::checkDisc()
   execute(EJECT_CDROM);
 }
 
+void SongSelectorLogic::openMixer()
+{
+  if (Config::mixer_command.isNull())
+    QMessageBox::message(NULL,"Please insert an appropriate command in the preferences dialog\n");
+  else
+    spawn(Config::mixer_command);
+}
+
 void SongSelectorLogic::doSpectrumPca(bool fulldatabase)
 {
   int count = 0;
@@ -621,7 +628,14 @@ void SongSelectorLogic::doSpectrumPca(bool fulldatabase)
     }
 
   // 2. do principal component analysis
-  do_pca(count,24,data);
+  char * error_msg = NULL;
+  do_pca(count,24,data,error_msg);
+  if (error_msg)
+    {
+      QMessageBox::warning(this,"Principal Component Analysis", "An error occured, aborting pca");
+      return;
+    }
+  
   float minx=0,miny=0,minz=0;
   float maxx=0,maxy=0,maxz=0;
   float dx,dy,dz;
@@ -901,6 +915,7 @@ void SongSelectorLogic::batchAnalyzing()
 {
   char tempoLine[2048];
   char spectrumLine[2048];
+  char patternLine[2048];
   ChooseAnalyzers *bounds = new ChooseAnalyzers(this,0,true);
   int res = bounds->exec();
   if (res==QDialog::Rejected) return;
@@ -917,6 +932,8 @@ void SongSelectorLogic::batchAnalyzing()
     }
   if (bounds->spectrumAnalyzer->isChecked())
     sprintf(spectrumLine,"--spectrum");
+  if (bounds->patternAnalyzer->isChecked())
+    sprintf(patternLine,"--pattern");
   // write out executable batch processing for every line
   FILE* script=openScriptFile(PROCESS_ANALYZERS);
   QListViewItemIterator it2(songList);
@@ -933,8 +950,10 @@ void SongSelectorLogic::batchAnalyzing()
       QSong *svi=(QSong*)it1.current();
       if (svi->isSelected()  && svi->isVisible()) 
 	{
-	  fprintf(script,"echo ======= %d / %d ==============\n",nr++,count);
-	  fprintf(script,"kbpm-play -q --batch %s %s \"%s\"\n",tempoLine,spectrumLine,(const char*)svi->index());
+	  fprintf(script,"echo ======= %d / %d ==============\n",nr++,count-1);
+	  fprintf(script,"kbpm-play -q --batch %s %s %s \"%s\"\n",
+		  tempoLine,spectrumLine,patternLine,
+		  (const char*)svi->index());
 	}
     }
   fclose(script);

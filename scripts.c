@@ -27,17 +27,17 @@
 #include "scripts.h"
 #include "stdarg.h"
 
-char *getRawFilename(const char * n)
+char *getRawFilename(const char * rawpath, const char * n)
 {
   char d[2048];
-  sprintf(d,"%s.raw",basename((char*)n));
+  sprintf(d,"%s/%s.raw",rawpath,basename((char*)n));
   return (char*)strdup(d);
 }
 
-FILE * openRawFile()
+FILE * openRawFile(const char * rawpath)
 {
   FILE * raw;
-  char * name = getRawFilename(index_file);
+  char * name = getRawFilename(rawpath, index_file);
   assert(name);
   raw = fopen(name,"rb");
   if (!raw)
@@ -49,10 +49,10 @@ FILE * openRawFile()
   return raw;
 }
 
-FILE * openRawFileForWriting()
+FILE * openRawFileForWriting(const char *d)
 {
   FILE * raw;
-  char * name = getRawFilename(index_file);
+  char * name = getRawFilename(d,index_file);
   assert(name);
   raw = fopen(name,"r+b");
   if (!raw)
@@ -64,16 +64,16 @@ FILE * openRawFileForWriting()
   return raw;
 }
 
-void removeRaw()
+void removeRaw(char* d)
 {
-  char * name = getRawFilename(index_file);
+  char * name = getRawFilename(d,index_file);
   remove(name);
   free(name);
 }
 
-void removeAllRaw()
+void removeAllRaw(const char* d)
 {
-  execute(RM"*"RAW_EXT);
+  vexecute(RM"%s/*"RAW_EXT,d);
 }
 
 void dumpAudio(const char* fname, unsigned4 *buffer, long length)

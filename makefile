@@ -1,4 +1,4 @@
-VERSION = 2.0
+VERSION = 2.1
 include defines
 
 BIN = cbpm-play kbpm-play kbpm-dj merger bpmdj-raw rbpm-play xmms-play
@@ -41,8 +41,8 @@ all: $(BIN)
 # Cleanup section
 #############################################################################
 rc: 
-	killall mpg123
 	$(RM) *.raw
+	killall mpg123
 
 clean: 
 	$(RM) a.out core *.o *.log *.tex.dep *.toc *.dvi *.aux
@@ -88,6 +88,7 @@ nancy: nens
 nens:
 	tar -cvzf index.tgz index
 	scp index.tgz root@tnm:/home/nens/
+	mv index.tgz ..
 
 #############################################################################
 # Dependencies
@@ -97,7 +98,7 @@ version.h: profile-clock
 	./profile-clock >>version.h
 
 depend: $(UIS:%.ui=%.h) $(UIS:%.ui=%.cpp) version.h
-	$(CPP) $(QT_INCLUDE_PATH) $(QT_LIBRARY_PATH) -MM *.cpp *.c >depend
+	$(CPP) $(CFLAGS) $(QT_INCLUDE_PATH) $(QT_LIBRARY_PATH) -MM *.cpp *.c >depend
 include depend
 
 
@@ -106,7 +107,7 @@ include depend
 #############################################################################
 KPLAY_OBJECTS = about.o about.moc.o\
 	songplayer.o songplayer.moc.o\
-	player-core.o\
+	player-core.o dsp-drivers.o dsp-oss.o dsp-alsa.o\
 	cbpm-index.o\
 	kbpm-play.o analyzer.o\
 	songplayer.logic.o songplayer.logic.moc.o\
@@ -140,8 +141,9 @@ KSEL_OBJECTS = 	avltree.o songtree.o qstring-factory.o spectrum.o\
 	choose-analyzers.o choose-analyzers.moc.o\
 	database.o dirscanner.o importscanner.o\
 	songselector.o songselector.moc.o songselector.logic.o songselector.logic.moc.o\
-	process-manager.o\
-	preferences.o preferences.moc.o song.o qsong.o queuedsong.o\
+	process-manager.o playercommandwizard.o playercommandwizard.moc.o\
+	preferences.o preferences.moc.o preferences.logic.o preferences.logic.moc.o\
+	song.o qsong.o queuedsong.o\
 	index-reader.o cbpm-index.o kbpm-played.o\
 	setupwizard.moc.o setupwizard.o kbpm-dj.o edit-distance.o\
 	renamer.o renamer.moc.o renamer.logic.o renamer.logic.moc.o\
@@ -153,8 +155,8 @@ MERGER_OBJECTS = merger.o cbpm-index.o common.o scripts.o
 #############################################################################
 # Binaries
 #############################################################################
-cbpm-play: cbpm-play.o cbpm-index.o player-core.o common.o scripts.o
-	$(CC) $(LDFLAGS) $^ -o $@
+cbpm-play: cbpm-play.o cbpm-index.o player-core.o common.o scripts.o dsp-drivers.o dsp-oss.o dsp-alsa.o
+	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
 
 kbpm-play: $(KPLAY_OBJECTS)
 	$(CC) $(KPLAY_OBJECTS) -o kbpm-play\

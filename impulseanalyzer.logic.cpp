@@ -44,7 +44,6 @@
 #include <unistd.h>
 #include <libgen.h>
 #include <qslider.h>
-#include <linux/soundcard.h>
 #include <time.h>
 #include <sys/times.h>
 #include <math.h>
@@ -68,7 +67,7 @@ ImpulseAnalyzerLogic::ImpulseAnalyzerLogic(SongPlayer*parent, const char*name, b
 {
   long int bufsize = 65536;
   // read in memory and shrink it 
-  FILE * raw=openRawFile();
+  FILE * raw=openRawFile(arg_rawpath);
   audiosize=fsize(raw)/4;
   signed4 pos = 0;
   fseek(raw,pos,SEEK_SET);

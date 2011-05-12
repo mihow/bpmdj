@@ -43,7 +43,6 @@
 #include <unistd.h>
 #include <libgen.h>
 #include <qslider.h>
-#include <linux/soundcard.h>
 #include <time.h>
 #include <sys/times.h>
 #include <math.h>
@@ -136,7 +135,7 @@ void SpectrumDialogLogic::fetchSpectrum()
   fftfreqi = allocate(blocksize,double);
   // hieronder x 2 omdat we zowel links als rechts binnen krijgen
   data=allocate((blocksize+slidesize)*2 ,signed short);
-  FILE * raw = openRawFile();
+  FILE * raw = openRawFile(arg_rawpath);
   // reset the fftfreq
   long pos;
   for(pos=0;pos<blocksize/2;pos++)

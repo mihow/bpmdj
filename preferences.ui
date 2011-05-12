@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>579</width>
-            <height>293</height>
+            <width>683</width>
+            <height>405</height>
         </rect>
     </property>
     <property name="caption">
@@ -43,25 +43,20 @@
                     <property name="name">
                         <cstring>unnamed</cstring>
                     </property>
-                    <widget class="QLabel" row="0" column="0" rowspan="1" colspan="2">
+                    <widget class="QLabel" row="0" column="0" rowspan="1" colspan="4">
                         <property name="name">
                             <cstring>TextLabel3</cstring>
                         </property>
                         <property name="text">
-                            <string>Every commandline must have two %s placeholders. The first placeholder is replaced by the song to match with. The second placeholder is replaced by the song to play.</string>
+                            <string>Every commandline must have three %s placeholders. 
+- The first placeholder is replaced with the directory to store raw files in
+- The second placeholder is replaced by the song to match with. 
+- The third placeholder is replaced by the song to play.</string>
                         </property>
                         <property name="alignment">
                             <set>WordBreak|AlignVCenter|AlignLeft</set>
                         </property>
                         <property name="wordwrap" stdset="0">
-                        </property>
-                    </widget>
-                    <widget class="QLabel" row="1" column="0">
-                        <property name="name">
-                            <cstring>TextLabel1</cstring>
-                        </property>
-                        <property name="text">
-                            <string>First Monitor/Main Player</string>
                         </property>
                     </widget>
                     <widget class="QLabel" row="2" column="0">
@@ -70,6 +65,22 @@
                         </property>
                         <property name="text">
                             <string>Second Monitor/Main Player</string>
+                        </property>
+                    </widget>
+                    <widget class="QLabel" row="5" column="0">
+                        <property name="name">
+                            <cstring>textLabel1_3</cstring>
+                        </property>
+                        <property name="text">
+                            <string>Directory to store .raw files</string>
+                        </property>
+                    </widget>
+                    <widget class="QLabel" row="1" column="0">
+                        <property name="name">
+                            <cstring>TextLabel1</cstring>
+                        </property>
+                        <property name="text">
+                            <string>First Monitor/Main Player</string>
                         </property>
                     </widget>
                     <widget class="QLabel" row="3" column="0">
@@ -88,24 +99,89 @@
                             <string>Second Extra Player</string>
                         </property>
                     </widget>
-                    <widget class="QLineEdit" row="4" column="1">
+                    <widget class="QLabel" row="6" column="0">
                         <property name="name">
-                            <cstring>playerCommand4</cstring>
+                            <cstring>textLabel1_4</cstring>
+                        </property>
+                        <property name="text">
+                            <string>Open Mixer Command</string>
                         </property>
                     </widget>
-                    <widget class="QLineEdit" row="3" column="1">
+                    <widget class="QLineEdit" row="5" column="1" rowspan="1" colspan="3">
                         <property name="name">
-                            <cstring>playerCommand3</cstring>
+                            <cstring>tmpDirectory</cstring>
                         </property>
                     </widget>
-                    <widget class="QLineEdit" row="2" column="1">
+                    <widget class="QLineEdit" row="1" column="1" rowspan="1" colspan="2">
+                        <property name="name">
+                            <cstring>playerCommand1</cstring>
+                        </property>
+                    </widget>
+                    <widget class="QLineEdit" row="2" column="1" rowspan="1" colspan="2">
                         <property name="name">
                             <cstring>playerCommand2</cstring>
                         </property>
                     </widget>
-                    <widget class="QLineEdit" row="1" column="1">
+                    <widget class="QLineEdit" row="3" column="1" rowspan="1" colspan="2">
                         <property name="name">
-                            <cstring>playerCommand1</cstring>
+                            <cstring>playerCommand3</cstring>
+                        </property>
+                    </widget>
+                    <widget class="QPushButton" row="2" column="3">
+                        <property name="name">
+                            <cstring>pushButton4</cstring>
+                        </property>
+                        <property name="text">
+                            <string>create</string>
+                        </property>
+                    </widget>
+                    <widget class="QPushButton" row="1" column="3">
+                        <property name="name">
+                            <cstring>pushButton3</cstring>
+                        </property>
+                        <property name="text">
+                            <string>create</string>
+                        </property>
+                    </widget>
+                    <widget class="QPushButton" row="3" column="3">
+                        <property name="name">
+                            <cstring>pushButton5</cstring>
+                        </property>
+                        <property name="text">
+                            <string>create</string>
+                        </property>
+                    </widget>
+                    <widget class="QLineEdit" row="4" column="1" rowspan="1" colspan="2">
+                        <property name="name">
+                            <cstring>playerCommand4</cstring>
+                        </property>
+                    </widget>
+                    <widget class="QPushButton" row="4" column="3">
+                        <property name="name">
+                            <cstring>pushButton6</cstring>
+                        </property>
+                        <property name="text">
+                            <string>create</string>
+                        </property>
+                    </widget>
+                    <widget class="QLineEdit" row="6" column="1">
+                        <property name="name">
+                            <cstring>mixerCommand</cstring>
+                        </property>
+                    </widget>
+                    <widget class="QComboBox" row="6" column="2" rowspan="1" colspan="2">
+                        <item>
+                            <property name="text">
+                                <string>kmix</string>
+                            </property>
+                        </item>
+                        <item>
+                            <property name="text">
+                                <string>alsamixergui</string>
+                            </property>
+                        </item>
+                        <property name="name">
+                            <cstring>comboBox6</cstring>
                         </property>
                     </widget>
                 </grid>
@@ -332,6 +408,36 @@
         <receiver>PreferencesDialog</receiver>
         <slot>reject()</slot>
     </connection>
+    <connection>
+        <sender>pushButton3</sender>
+        <signal>clicked()</signal>
+        <receiver>PreferencesDialog</receiver>
+        <slot>createPlayerOne()</slot>
+    </connection>
+    <connection>
+        <sender>pushButton4</sender>
+        <signal>clicked()</signal>
+        <receiver>PreferencesDialog</receiver>
+        <slot>createPlayerTwo()</slot>
+    </connection>
+    <connection>
+        <sender>pushButton5</sender>
+        <signal>clicked()</signal>
+        <receiver>PreferencesDialog</receiver>
+        <slot>createPlayerThree()</slot>
+    </connection>
+    <connection>
+        <sender>pushButton6</sender>
+        <signal>clicked()</signal>
+        <receiver>PreferencesDialog</receiver>
+        <slot>createPlayerFour()</slot>
+    </connection>
+    <connection>
+        <sender>comboBox6</sender>
+        <signal>activated(const QString&amp;)</signal>
+        <receiver>mixerCommand</receiver>
+        <slot>setText(const QString&amp;)</slot>
+    </connection>
 </connections>
 <tabstops>
     <tabstop>playerCommand1</tabstop>
@@ -342,5 +448,11 @@
     <tabstop>PushButton12</tabstop>
     <tabstop>PushButton13</tabstop>
 </tabstops>
+<slots>
+    <slot>createPlayerOne()</slot>
+    <slot>createPlayerTwo()</slot>
+    <slot>createPlayerThree()</slot>
+    <slot>createPlayerFour()</slot>
+</slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

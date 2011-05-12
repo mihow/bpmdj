@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Form implementation generated from reading ui file 'choose-analyzers.ui'
 **
-** Created: Sun Aug 10 14:06:56 2003
+** Created: Fri Aug 15 14:21:37 2003
 **      by: The User Interface Compiler ($Id: qt/main.cpp   3.1.2   edited Dec 19 11:45 $)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -45,16 +45,20 @@ ChooseAnalyzers::ChooseAnalyzers( QWidget* parent, const char* name, bool modal,
     textLabel1->setAlignment( int( QLabel::WordBreak | QLabel::AlignVCenter ) );
 
     tabLayout->addWidget( textLabel1, 0, 0 );
-
-    spectrumAnalyzer = new QCheckBox( tab, "spectrumAnalyzer" );
-
-    tabLayout->addWidget( spectrumAnalyzer, 3, 0 );
     QSpacerItem* spacer = new QSpacerItem( 20, 30, QSizePolicy::Minimum, QSizePolicy::Expanding );
     tabLayout->addItem( spacer, 1, 0 );
 
     tempoAnalyzer = new QCheckBox( tab, "tempoAnalyzer" );
 
     tabLayout->addWidget( tempoAnalyzer, 2, 0 );
+
+    spectrumAnalyzer = new QCheckBox( tab, "spectrumAnalyzer" );
+
+    tabLayout->addWidget( spectrumAnalyzer, 3, 0 );
+
+    patternAnalyzer = new QCheckBox( tab, "patternAnalyzer" );
+
+    tabLayout->addWidget( patternAnalyzer, 4, 0 );
     tabWidget2->insertTab( tab, QString("") );
 
     tab_2 = new QWidget( tabWidget2, "tab_2" );
@@ -129,8 +133,9 @@ void ChooseAnalyzers::languageChange()
     textLabel1->setText( tr( "This process starts a number of analyzers on a song. Below you can choose which analyzers you want to apply. Once you press the 'Start Batch' button a backgroundprocess will be started. \n"
 "\n"
 "Warning: If the process is killed when you close kbpm-dj. Start analyze.sh manually (certain bashes kills childs without parent)." ) );
-    spectrumAnalyzer->setText( tr( "Spectrum Analyzer" ) );
     tempoAnalyzer->setText( tr( "Tempo Analyzer" ) );
+    spectrumAnalyzer->setText( tr( "Spectrum Analyzer" ) );
+    patternAnalyzer->setText( tr( "Pattern Analyzer" ) );
     tabWidget2->changeTab( tab, tr( "Analyzers" ) );
     TextLabel1->setText( tr( "From :" ) );
     TextLabel2->setText( tr( "To :" ) );

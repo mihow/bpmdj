@@ -46,6 +46,7 @@
 #include "kbpm-dj.h"
 #include "process-manager.h"
 #include "qsong.h"
+#include "config.h"
 
 extern "C" {
 #include "scripts.h"
@@ -171,9 +172,10 @@ void ProcessManager::startExtraSong(int id, Song *song)
   if (!matchWith) 
     matchWith=song;
   playing_songs[id]=song;
-  sprintf(playercommand, 
+  sprintf(playercommand,
 	  (const char*)(id == 3 ? Config::playCommand3
 			: Config::playCommand4),
+	  (const char*)Config::tmp_directory,
 	  (const char*)matchWith->index, 
 	  (const char*)song->index);
   // fork the command and once the player exists immediatelly stop
@@ -205,7 +207,11 @@ void ProcessManager::startSong(Song *song)
   matchWith=playingInMain();
   if (!matchWith) matchWith=playing_songs[1];
   player = monitorPlayCommand == 1 ? Config::playCommand1 : Config::playCommand2;
-  sprintf(playercommand, (const char*)player, (const char*)matchWith->index, (const char*)playing_songs[1]->index);
+  sprintf(playercommand, 
+	  (const char*)player, 
+	  (const char*)Config::tmp_directory,
+	  (const char*)matchWith->index, 
+	  (const char*)playing_songs[1]->index);
   // fork the command and once the player exists immediatelly stop
   if (!(player_pids[1]=fork()))
     { 

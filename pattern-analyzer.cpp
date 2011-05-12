@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Form implementation generated from reading ui file 'pattern-analyzer.ui'
 **
-** Created: Sun Aug 10 06:12:59 2003
+** Created: Sun Sep 14 13:38:46 2003
 **      by: The User Interface Compiler ($Id: qt/main.cpp   3.1.2   edited Dec 19 11:45 $)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -42,8 +42,6 @@ PatternDialog::PatternDialog( QWidget* parent, const char* name, bool modal, WFl
     periodDelta->setTickInterval( 100 );
 
     PatternDialogLayout->addWidget( periodDelta, 1, 8 );
-    QSpacerItem* spacer = new QSpacerItem( 110, 20, QSizePolicy::Expanding, QSizePolicy::Minimum );
-    PatternDialogLayout->addItem( spacer, 2, 3 );
 
     periodDelta10 = new QSlider( this, "periodDelta10" );
     periodDelta10->setMinValue( -1000 );
@@ -93,31 +91,35 @@ PatternDialog::PatternDialog( QWidget* parent, const char* name, bool modal, WFl
 
     PatternDialogLayout->addWidget( projection, 1, 0 );
 
-    pushButton51 = new QPushButton( this, "pushButton51" );
+    updateButton = new QPushButton( this, "updateButton" );
 
-    PatternDialogLayout->addWidget( pushButton51, 2, 4 );
+    PatternDialogLayout->addWidget( updateButton, 2, 5 );
 
-    measures = new QSpinBox( this, "measures" );
-    measures->setMaxValue( 32 );
-    measures->setMinValue( 1 );
+    beats = new QSpinBox( this, "beats" );
+    beats->setMaxValue( 32 );
+    beats->setMinValue( 1 );
+    beats->setValue( 4 );
 
-    PatternDialogLayout->addWidget( measures, 2, 2 );
+    PatternDialogLayout->addWidget( beats, 2, 2 );
 
     textLabel1_3 = new QLabel( this, "textLabel1_3" );
     textLabel1_3->setAlignment( int( QLabel::WordBreak | QLabel::AlignVCenter ) );
 
     PatternDialogLayout->addMultiCellWidget( textLabel1_3, 0, 0, 0, 9 );
+    QSpacerItem* spacer = new QSpacerItem( 100, 20, QSizePolicy::Expanding, QSizePolicy::Minimum );
+    PatternDialogLayout->addItem( spacer, 2, 3 );
     languageChange();
     resize( QSize(674, 437).expandedTo(minimumSizeHint()) );
     clearWState( WState_Polished );
 
     // signals and slots connections
-    connect( pushButton51, SIGNAL( clicked() ), this, SLOT( showPattern() ) );
+    connect( updateButton, SIGNAL( clicked() ), this, SLOT( showPattern() ) );
     connect( pushButton2, SIGNAL( clicked() ), this, SLOT( accept() ) );
     connect( periodDelta, SIGNAL( valueChanged(int) ), this, SLOT( slantChanged() ) );
     connect( pushButton4, SIGNAL( clicked() ), this, SLOT( setTempo() ) );
     connect( periodDelta10, SIGNAL( valueChanged(int) ), this, SLOT( slantChanged() ) );
     connect( color, SIGNAL( valueChanged(int) ), this, SLOT( balanceChanged() ) );
+    connect( beats, SIGNAL( valueChanged(int) ), this, SLOT( slantChanged() ) );
 }
 
 /*
@@ -135,11 +137,11 @@ PatternDialog::~PatternDialog()
 void PatternDialog::languageChange()
 {
     setCaption( tr( "Pattern Analyzer" ) );
-    textLabel1->setText( tr( "Measures" ) );
+    textLabel1->setText( tr( "Beats" ) );
     textLabel1_2->setText( tr( "Balance" ) );
     pushButton4->setText( tr( "Set Tempo" ) );
     pushButton2->setText( tr( "Ok" ) );
-    pushButton51->setText( tr( "Update" ) );
+    updateButton->setText( tr( "Update" ) );
     textLabel1_3->setText( tr( "Horinzontally, this graph shows the measures of the song. Vertically, the content of one such measure is visualized. If the tempo of the song is correct, the song should contain distinctive visual horizontal lines. If the tempo is slightly incorrect these lines should be slanted. By using the two sliders at the right, the tempo of the song can be fine tuned. When this is done select 'set Tempo'. " ) );
 }
 
@@ -186,5 +188,10 @@ void PatternDialog::setTempo()
 void PatternDialog::balanceChanged()
 {
     qWarning( "PatternDialog::balanceChanged(): Not implemented yet" );
+}
+
+void PatternDialog::dumpPatternToIdx()
+{
+    qWarning( "PatternDialog::dumpPatternToIdx(): Not implemented yet" );
 }
 

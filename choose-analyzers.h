@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Form interface generated from reading ui file 'choose-analyzers.ui'
 **
-** Created: Sun Aug 10 14:06:56 2003
+** Created: Fri Aug 15 14:21:37 2003
 **      by: The User Interface Compiler ($Id: qt/main.cpp   3.1.2   edited Dec 19 11:45 $)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -35,8 +35,9 @@ public:
     QTabWidget* tabWidget2;
     QWidget* tab;
     QLabel* textLabel1;
-    QCheckBox* spectrumAnalyzer;
     QCheckBox* tempoAnalyzer;
+    QCheckBox* spectrumAnalyzer;
+    QCheckBox* patternAnalyzer;
     QWidget* tab_2;
     QLabel* TextLabel1;
     QLabel* TextLabel2;

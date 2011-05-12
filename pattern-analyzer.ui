@@ -56,23 +56,6 @@
                 <number>100</number>
             </property>
         </widget>
-        <spacer row="2" column="3">
-            <property name="name">
-                <cstring>spacer1</cstring>
-            </property>
-            <property name="orientation">
-                <enum>Horizontal</enum>
-            </property>
-            <property name="sizeType">
-                <enum>Expanding</enum>
-            </property>
-            <property name="sizeHint">
-                <size>
-                    <width>110</width>
-                    <height>20</height>
-                </size>
-            </property>
-        </spacer>
         <widget class="QSlider" row="1" column="9">
             <property name="name">
                 <cstring>periodDelta10</cstring>
@@ -104,7 +87,7 @@
                 <cstring>textLabel1</cstring>
             </property>
             <property name="text">
-                <string>Measures</string>
+                <string>Beats</string>
             </property>
         </widget>
         <widget class="QLabel" row="1" column="1" rowspan="1" colspan="7">
@@ -186,9 +169,9 @@
                 <bool>true</bool>
             </property>
         </widget>
-        <widget class="QPushButton" row="2" column="4">
+        <widget class="QPushButton" row="2" column="5">
             <property name="name">
-                <cstring>pushButton51</cstring>
+                <cstring>updateButton</cstring>
             </property>
             <property name="text">
                 <string>Update</string>
@@ -196,13 +179,16 @@
         </widget>
         <widget class="QSpinBox" row="2" column="2">
             <property name="name">
-                <cstring>measures</cstring>
+                <cstring>beats</cstring>
             </property>
             <property name="maxValue">
                 <number>32</number>
             </property>
             <property name="minValue">
                 <number>1</number>
+            </property>
+            <property name="value">
+                <number>4</number>
             </property>
         </widget>
         <widget class="QLabel" row="0" column="0" rowspan="1" colspan="10">
@@ -216,11 +202,28 @@
                 <set>WordBreak|AlignVCenter</set>
             </property>
         </widget>
+        <spacer row="2" column="3">
+            <property name="name">
+                <cstring>spacer1</cstring>
+            </property>
+            <property name="orientation">
+                <enum>Horizontal</enum>
+            </property>
+            <property name="sizeType">
+                <enum>Expanding</enum>
+            </property>
+            <property name="sizeHint">
+                <size>
+                    <width>100</width>
+                    <height>20</height>
+                </size>
+            </property>
+        </spacer>
     </grid>
 </widget>
 <connections>
     <connection>
-        <sender>pushButton51</sender>
+        <sender>updateButton</sender>
         <signal>clicked()</signal>
         <receiver>PatternDialog</receiver>
         <slot>showPattern()</slot>
@@ -255,6 +258,12 @@
         <receiver>PatternDialog</receiver>
         <slot>balanceChanged()</slot>
     </connection>
+    <connection>
+        <sender>beats</sender>
+        <signal>valueChanged(int)</signal>
+        <receiver>PatternDialog</receiver>
+        <slot>slantChanged()</slot>
+    </connection>
 </connections>
 <slots>
     <slot>slantChanged()</slot>
@@ -266,6 +275,7 @@
     <slot>fixPhases()</slot>
     <slot>setTempo()</slot>
     <slot>balanceChanged()</slot>
+    <slot>dumpPatternToIdx()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

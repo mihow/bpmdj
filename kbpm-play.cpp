@@ -36,7 +36,6 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <libgen.h>
-#include <linux/soundcard.h>
 #include <time.h>
 #include <sys/times.h>
 #include <assert.h>
@@ -45,7 +44,9 @@
 #include "songplayer.logic.h"
 #include "bpm-analyzer.logic.h"
 #include "spectrumanalyzer.logic.h"
+#include "pattern-analyzer.logic.h"
 #include "md5-analyzer.h"
+#include "dsp-drivers.h"
 
 extern "C"
 {
@@ -59,6 +60,7 @@ extern "C"
  *-------------------------------------------*/
 static int   opt_batch = 0;
 static int   opt_bpm = 0;
+// static int   opt_pattern = 0;
 static int   opt_color = 0;
 static int   opt_create = 0;
 static char* arg_posx = NULL;
@@ -107,19 +109,31 @@ void options_failure(char* err)
    printf("Usage:  kbpm-play <options> argument\n\n"
           "   -c          --create              create an index file if none exists\n"
 	  "   -q          --quiet               be quiet\n"
-	  "   -d arg      --dsp arg             dsp device to use (default = /dev/dsp)\n" 
-	  "   -x arg      --mixer arg           mixer device to use (default = /dev/mixer)\n"
 	  "   -m arg      --match arg           song to match tempo with\n"
+	  "   -p nbr nbr  --position nbr nbr    position to place the window\n"
 	  "   -v          --verbose             be verbose with respect to latency\n"
 	  "   -L nbr      --latency nbr         required latency in ms (default = 744)\n"
+#ifdef COMPILE_OSS
+	  "  --oss-driver---------------------------------\n"
+          "               --oss                 use OSS driver (default)\n"
+	  "   -d arg      --dsp arg             dsp device to use (default = /dev/dsp)\n" 
+	  //	  "   -x arg      --mixer arg           mixer device to use (default = /dev/mixer)\n"
 	  "   -F nbr      --fragments nbr       the number of fragments used to play audio.\n" 
 	  "   -X          --nolatencyaccounting does not take into account the latency when marking a cue\n"
-	  "   -p nbr nbr  --position nbr nbr    position to place the window\n"
+#endif 
+#ifdef COMPILE_ALSA
+	  "  --alsa-driver---------------------------------\n"
+          "               --alsa                 use OSS driver (default)\n"
+	  "               --dev arg              device to use (default = hw:0,0)\n" 
+#endif
+	  "  --analysis------------------------------------\n"
 	  "   -b          --batch               no ui output, md5sum is automatically checked\n"
 	  "               --bpm                 measure bpm\n"
+	  //	  "               --pattern             dump pattern\n"
 	  "   -l nbr      --low nbr             lowest bpm to look for (default = 120)\n"
 	  "   -h nbr      --high nbr            highest bpm to look for (default = 160)\n"
 	  "               --spectrum            obtain color at cue-point, no sound, quit imm\n"
+	  "   -r arg      --rawpath arg         path that .raw temp files are stored in\n"
 	  "   argument                          the index file of the song to handle\n\n%s\n\n",err);
    exit(1);
 }
@@ -147,20 +161,68 @@ void process_options(int argc, char* argv[])
 	    opt_batch=1;
 	  else if (strcmp(arg,"bpm")==0)
 	    opt_bpm=1;
+	  //	  else if (strcmp(arg,"pattern")==0)
+	  // opt_pattern=1;
 	  else if (strcmp(arg,"verbose")==0 ||
 		   strcmp(arg,"v")==0)
 	    opt_dspverbose=1;
-	  else if (strcmp(arg,"create")==0 ||
-		   strcmp(arg,"c")==0)
-	    opt_create=1;
-	  else if (strcmp(arg,"spectrum")==0)
-	    opt_color=1;
+	  else if (strcmp(arg,"latency")==0 ||
+		   strcmp(arg,"L")==0)
+	    {
+	      opt_latency=1;
+	      if (++i>=argc)
+		options_failure("latency argument scanning error");
+	      arg_latency=argv[i];
+	    }
+#ifdef COMPILE_OSS
 	  else if (strcmp(arg,"dsp")==0 ||
 		   strcmp(arg,"d")==0)
 	    {
 	      if (++i>=argc) 
 		options_failure("dsp argument scanning error");
 	      arg_dsp=argv[i];
+	    }
+	  else if (strcmp(arg,"fragments")==0 ||
+		   strcmp(arg,"F")==0)
+	    {
+	      opt_ossfragments=1;
+	      if (++i>=argc)
+		options_failure("fragments argument scanning error");
+	      arg_ossfragments = argv[i];
+	    }
+	  else if (strcmp(arg,"nolatencyaccounting")==0 ||
+		   strcmp(arg,"L")==0)
+	    opt_oss_nolatencyaccounting=1;
+	  else if (strcmp(arg,"oss")==0)
+	    {
+	      dsp_driver=dsp_oss;
+	    }
+#endif
+#ifdef COMPILE_ALSA
+	  else if (strcmp(arg,"dev")==0)
+	    {
+	      if (++i>=argc) 
+		options_failure("dsp argument scanning error");
+	      arg_dev=argv[i];
+	    }
+	  else if (strcmp(arg,"alsa")==0)
+	    {
+	      dsp_driver=dsp_alsa;
+	      if (!opt_latency)
+		arg_latency = "150";
+	    }
+#endif
+	  else if (strcmp(arg,"create")==0 ||
+		   strcmp(arg,"c")==0)
+	    opt_create=1;
+	  else if (strcmp(arg,"spectrum")==0)
+	    opt_color=1;
+	  else if (strcmp(arg,"rawpath")==0 ||
+		   strcmp(arg,"r")==0)
+	    {
+	      if (++i>=argc) 
+		options_failure("rawpath argument scanning error");
+	      arg_rawpath=argv[i];
 	    }
 	  else if (strcmp(arg,"low")==0 ||
 		   strcmp(arg,"l")==0)
@@ -184,32 +246,14 @@ void process_options(int argc, char* argv[])
 		options_failure("match argument scanning error");
 	      arg_match=argv[i];
 	    }
-	  else if (strcmp(arg,"latency")==0 ||
-		   strcmp(arg,"L")==0)
-	    {
-	      opt_latency=1;
-	      if (++i>=argc)
-		options_failure("latency argument scanning error");
-	      arg_latency=argv[i];
-	    }
-	  else if (strcmp(arg,"fragments")==0 ||
-		   strcmp(arg,"F")==0)
-	    {
-	      opt_fragments=1;
-	      if (++i>=argc)
-		options_failure("fragments argument scanning error");
-	      arg_fragments = argv[i];
-	    }
-	  else if (strcmp(arg,"nolatencyaccounting")==0 ||
-		   strcmp(arg,"L")==0)
-	    opt_nolatencyaccounting=1;
-	  else if (strcmp(arg,"mixer")==0 ||
+	  /*	  else if (strcmp(arg,"mixer")==0 ||
 		   strcmp(arg,"x")==0)
 	    {
 	      if (++i>=argc)
 		options_failure("mixer argument scanning error");
 	      arg_mixer=argv[i];
 	    }
+	  */
 	  else if (strcmp(arg,"position")==0 ||
 		   strcmp(arg,"p")==0)
 	    {
@@ -255,7 +299,7 @@ void normal_start()
 
   err = core_open();
   show_error(err, err_dsp, "Unable to open dsp device\n");
-  show_error(err, err_mixer, "Unable to open mixer device\n");
+  //  show_error(err, err_mixer, "Unable to open mixer device\n");
   
   terminal_start();
   core_play();
@@ -293,6 +337,14 @@ void batch_start()
       counter->fetchSpectrum();
       printf("%d. Spectrum\n",nr++);
     }
+  // 4. pattern
+  /*  if (opt_pattern)
+    {
+      PatternAnalyzerLogic *pattern = new PatternAnalyzerLogic(false);
+      pattern->run();
+      printf("%d. Pattern\n",nr++);
+    }
+  */
   // 99. finish the core -> remove the raw file
   core_done();
 }

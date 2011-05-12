@@ -34,6 +34,7 @@ class IndexReader:
  protected:
   Loader * loader;
   virtual void checkfile(const QString prefix, const QString filename);
+  virtual void recursing(const QString dirname);
   DataBase * database;
   AvlTree<QString> tree;
  public:

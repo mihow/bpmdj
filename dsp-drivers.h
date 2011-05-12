@@ -1,7 +1,6 @@
 /****
  BpmDj: Free Dj Tools
  Copyright (C) 2001 Werner Van Belle
- See 'BeatMixing.ps' for more information
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -18,6 +17,30 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ****/
 
-void do_pca(int rows, int columns, float**data, char* &error_msg);
-float ** matrix(int rows, int columns);
-void free_matrix(float **data, int rows, int columns);
+#include "common.h"
+#include "dsp-oss.h"
+#include "dsp-alsa.h"
+
+extern int dsp_oss;
+extern int dsp_alsa;
+extern int dsp_driver;
+/*-------------------------------------------
+ *         Dsp operations
+ *-------------------------------------------*/
+void dsp_start();
+void dsp_pause();
+void dsp_write(unsigned4 *value);
+signed8 dsp_latency();
+int dsp_open();
+void dsp_close();
+
+/*-------------------------------------------
+ *         Mixer operations
+ *-------------------------------------------*/
+/*int mixer_open();
+void mixer_close();
+int mixer_get_main();
+int mixer_get_pcm();
+void mixer_set_main(int v);
+void mixer_set_pcm(int v);
+*/
