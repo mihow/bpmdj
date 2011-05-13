@@ -1,4 +1,4 @@
-VERSION = 4.2b
+VERSION = 4.1pl2
 DEMOS = index-demo idx2txt bos
 BIN =  $(DEMOS) bpmplay bpmmerge bpmcount bpmclock bpmdj
 .EXPORT_ALL_VARIABLES:
