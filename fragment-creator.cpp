@@ -32,7 +32,7 @@ elementResult ActiveFragmentCreator::createOneFor(Song* song)
     QString::number((intptr_t)(void*)song)+".wav";
   Index index(song->get_storedin());
   unsigned8 pos = index.get_cue();
-  int startsec=pos/44100;
+  int startsec=pos/metarate;
   startsec--;
   if (startsec<=0) // we start @ 25 % of the song if no cues
     startsec = index.get_time_in_seconds()/4;

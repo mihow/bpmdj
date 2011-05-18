@@ -45,6 +45,17 @@ using namespace std;
 #endif
 #endif
 
+dsp_driver::dsp_driver(const PlayerConfig & config) 
+{ 
+  stopped = true;
+  stop_request = false;
+  paused = true;
+  starting=false;
+  playrate=0;
+  verbose = config.get_dsp_verbose();
+  playrate=config.get_dsp_playrate();
+};
+
 void dsp_driver::init()
 {
 }

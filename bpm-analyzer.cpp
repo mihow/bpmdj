@@ -113,8 +113,8 @@ void map_output(float4* target, int startfreq, int count, double* hcfreq, int wi
 	thus to pick out frequency the bin is given by
 	bin=freq*windowsuze/wavrate;
       */
-      int bina=freqa*winsize/WAVRATE;
-      int binb=freqb*winsize/WAVRATE;
+      int bina=freqa*winsize/diskrate;
+      int binb=freqb*winsize/diskrate;
       assert(bina<winsize/2);
       assert(binb<winsize/2);
       if (binb==bina) binb=bina+1;
@@ -151,8 +151,8 @@ void spectrum_to_bark(fftw_complex* in, int window_size, double* out)
       int c = (int)barkbounds[b+1];
       a *= window_size;
       c *= window_size;
-      a /= WAVRATE;
-      c /= WAVRATE;
+      a /= diskrate;
+      c /= diskrate;
       if (c==a)
 	{
 	  printf("a = %d; b=%d, c=%d\n",a,b,c);
@@ -337,7 +337,7 @@ void BpmAnalyzerDialog::experimental_scan()
   for(int channel=0; channel<channel_count; channel++)
     {
       const int target_window_length_ms=1000;
-      int samples_for_ms=target_window_length_ms*WAVRATE/1000;
+      int samples_for_ms=target_window_length_ms*diskrate/1000;
       int block_window_size=samples_for_ms/stride;
       int n=block_count;
       float* c=bpmdj_allocate(n,float);
@@ -466,7 +466,7 @@ void BpmAnalyzerDialog::experimental_scan()
     }
 
 #ifdef FFT_MIN_SINK
-  double bpmperbin=60.0*WAVRATE/(stride*block_count);
+  double bpmperbin=60.0*diskrate/(stride*block_count);
   int fb1=startbpm/bpmperbin;
   int fb2=stopbpm/bpmperbin;
   fb2*=4; 
@@ -525,7 +525,7 @@ void BpmAnalyzerDialog::experimental_scan()
       
       if (i<block_count/2)
 	{
-	  fprintf(g,"%g",60.0*i*WAVRATE/(stride*block_count));
+	  fprintf(g,"%g",60.0*i*diskrate/(stride*block_count));
 	  for(int c = 0 ; c < channel_count; c++)
 	    fprintf(g,"\t%g",blocks[i][c]);
 	  fprintf(g,"\n");
@@ -566,10 +566,10 @@ void BpmAnalyzerDialog::experimental_scan()
    * The start_bpm and stopbpm should be converted to the best matching period
    * which in this case is in blocks of stride size
    */
-  int pscan_stop=((WAVRATE*60.0/startbpm) // samplecount per beat
+  int pscan_stop=((diskrate*60.0/startbpm) // samplecount per beat
 		  *4                      // samples per bar
 		  /stride);               // blocks per bar
-  int pscan_start=((WAVRATE*60.0/stopbpm) // samplecount per beat
+  int pscan_start=((diskrate*60.0/stopbpm) // samplecount per beat
 		   *4                     // samples per bar
 		   /stride);              // blocks per bar
   if(pscan_start>2) pscan_start--;        // ensure we certainly cover the stopbpm;
@@ -828,7 +828,7 @@ void BpmAnalyzerDialog::experimental_scan()
 	}
       // the calculation of period to tempo is conducted as follows
       double tempo=minerrat*stride/4;
-      tempo=(WAVRATE/tempo)*60.0;
+      tempo=(diskrate/tempo)*60.0;
       fprintf(f,"%d\t%g\n",note,tempo);
       printf("%d\t%g\n",note,tempo);
     }
@@ -991,9 +991,9 @@ void BpmAnalyzerDialog::experimental_scan()
   
   // the calculation of period to tempo is conducted as follows
   double tempo=minerrat*stride/4;
-  tempo=(WAVRATE/tempo)*60.0;
+  tempo=(diskrate/tempo)*60.0;
   printf("Tempo is %g\n",tempo);
-  set_measured_period("Melodic Rayshooting",minerrat*stride);
+  set_measured_period_diskrate("Melodic Rayshooting",minerrat*stride);
   
   f=fopen("mismatch.txt","wb");
   for(int p = 1; p<pscan_stop; p++)
@@ -1001,7 +1001,7 @@ void BpmAnalyzerDialog::experimental_scan()
       // the calculation of period to tempo is conducted as follows
       double tempo=p*stride  // samples for 1 measure
 	/4;                  // samples per beat
-      tempo=(WAVRATE/tempo)  // beats per second
+      tempo=(diskrate/tempo)  // beats per second
 	*60.0;               // beats per minute
       unsigned8 v1=0;
 #ifdef MULTILEVEL
@@ -1375,8 +1375,8 @@ void BpmAnalyzerDialog::experimental_scan()
 		   }
 		// here we extract the frequency content and store it into the result array
 		// band0 goes to 100 Hz, band 2 goes to 880 Hz, band 3 is evertyhing higher
-		int hz100=window_size*100/WAVRATE;
-		int hz880=window_size*880/WAVRATE;
+		int hz100=window_size*100/diskrate;
+		int hz880=window_size*880/diskrate;
 		double lo=0,mid=0,hi=0;
 		for(int j=0; j < hz100; j++)
 		  lo+=out[j][0];
@@ -1577,7 +1577,7 @@ void BpmAnalyzerDialog::readAudio()
   signed4 stoppercent=audiosize;
   stoppercent-=stoppercent%4;
   audiosize=stoppercent-startpercent;
-  audiosize/=(4*(WAVRATE/audiorate));
+  audiosize/=(4*(diskrate/audiorate));
   audio=bpmdj_allocate(audiosize+1,unsigned1);
   status("Reading");
   unsigned4 pos=0;
@@ -1591,18 +1591,18 @@ void BpmAnalyzerDialog::readAudio()
       unsigned4 *trgt = (unsigned4*)(void*)buffer;
       count = readsamples(trgt,bufsiz/2,raw);
       updateReadingProgress(pos*100/audiosize);
-      for (i = 0 ; i < count * 2 ; i += 2 * (WAVRATE/audiorate) )
+      for (i = 0 ; i < count * 2 ; i += 2 * (diskrate/audiorate) )
 	{
 	  signed4 left, right,mean;
 	  left=abs(buffer[i]);
 	  right=abs(buffer[i+1]);
 	  mean=(left+right)/2;
 	  redux=abs(mean)/128;
-	  if (pos+i/(2*(WAVRATE/audiorate))>=(unsigned4)audiosize) break;
-	  assert(pos+i/(2*(WAVRATE/audiorate))<(unsigned4)audiosize);
-	  audio[pos+i/(2*(WAVRATE/audiorate))]=(unsigned1)redux;
+	  if (pos+i/(2*(diskrate/audiorate))>=(unsigned4)audiosize) break;
+	  assert(pos+i/(2*(diskrate/audiorate))<(unsigned4)audiosize);
+	  audio[pos+i/(2*(diskrate/audiorate))]=(unsigned1)redux;
 	}
-      pos+=count/(WAVRATE/audiorate);
+      pos+=count/(diskrate/audiorate);
     }
   fclose(raw);
   if (stop_signal)
@@ -1696,7 +1696,7 @@ fft_type index2autocortempo(signed4 i)
 {
   assert(i);
   fft_type measure_period_in_ticks = i<<spectrum_shifter;
-  fft_type measure_period_in_secs  = measure_period_in_ticks/(fft_type)WAVRATE;
+  fft_type measure_period_in_secs  = measure_period_in_ticks/(fft_type)diskrate;
   fft_type measure_frequency_in_hz = 1/measure_period_in_secs;
   fft_type measure_frequency_in_bpm = measure_frequency_in_hz*60.0;
   fft_type beat_frequency_in_bpm = measure_frequency_in_bpm*4.0;
@@ -1774,9 +1774,9 @@ signed4 shifter, float8 bpm_divisor)
   for(signed4 i = 0 ; i <windowsize/2; i ++)
     {
       // calculate BPM
-      float8 bpm = Index_to_frequency(windowsize,i);  // relative wrt WAVRATE
-      bpm*=(float8)WAVRATE;                // in Hz tov non collapsed WAVRATE
-      for(signed4 j = 0 ; j < shifter; j ++) bpm/=2.0;  // collapsed WAVRATE
+      float8 bpm = Index_to_frequency(windowsize,i);  // relative wrt diskrate
+      bpm*=(float8)diskrate;                // in Hz tov non collapsed diskrate
+      for(signed4 j = 0 ; j < shifter; j ++) bpm/=2.0;  // collapsed diskrate
       bpm*=60.0/bpm_divisor;                                      // in BPM.
       // calculate position
       signed4 x = (signed4)((float8)xs*(bpm-startbpm)/(stopbpm-startbpm));
@@ -1864,11 +1864,11 @@ void BpmAnalyzerDialog::fft()
       for(signed4 i = 0 ; i <halfwindow ; i ++)
 	{
 	  // obtain bpm
-	  // uitgedruk relatief tov WAVRATE
+	  // uitgedruk relatief tov diskrate
 	  float8 bpm = Index_to_frequency(windowsize,i);
-	  // uitgedrukt in Hz tov non collapsed WAVRATE
-	  bpm*=(float8)WAVRATE;                           
-	  // uitgedrukt in collapsed WAVRATE
+	  // uitgedrukt in Hz tov non collapsed diskrate
+	  bpm*=(float8)diskrate;                           
+	  // uitgedrukt in collapsed diskrate
 	  for(signed4 j = 0 ; j < shifter; j ++) bpm/=2.0;  
 	  // uitgedrukt in BPM.
 	  bpm*=60.0;                         
@@ -1890,11 +1890,11 @@ void BpmAnalyzerDialog::fft()
       for(signed4 i = 0 ; i <halfwindow ; i ++)
 	{
 	  // obtain BPM
-	  // uitgedruk relatief tov WAVRATE
+	  // uitgedruk relatief tov diskrate
 	  float8 bpm = Index_to_frequency(windowsize,i);         
-	  // uitgedrukt in Hz tov non collapsed WAVRATE
-	  bpm*=(float8)WAVRATE;            
-	  // uitgedrukt in collapsed WAVRATE
+	  // uitgedrukt in Hz tov non collapsed diskrate
+	  bpm*=(float8)diskrate;            
+	  // uitgedrukt in collapsed diskrate
 	  for(signed4 j = 0 ; j < shifter; j ++) bpm/=2.0;
 	  // uitgedrukt in BPM.
 	  bpm*=60.0;                        
@@ -1942,9 +1942,9 @@ void BpmAnalyzerDialog::enveloppe_spectrum()
   fft_type min = -1.0;
   for(signed4 i = 0 ; i <windowsize/2 ; i ++)
     {
-      fft_type bpm = Index_to_frequency(windowsize,i); // tov WAVRATE
-      bpm*=(fft_type)WAVRATE;      // in Hz tov non collapsed WAVRATE
-      // uitgedrukt in collapsed WAVRATE
+      fft_type bpm = Index_to_frequency(windowsize,i); // tov diskrate
+      bpm*=(fft_type)diskrate;      // in Hz tov non collapsed diskrate
+      // uitgedrukt in collapsed diskrate
       for(signed4 j = 0 ; j < spectrum_shifter; j ++) bpm/=2.0; 
       bpm*=60.0;                                      // uitgedrukt in BPM.
       if (bpm<startbpm) continue;
@@ -1971,11 +1971,11 @@ void BpmAnalyzerDialog::enveloppe_spectrum()
       fft_type  energy = 0, at = 0;
       for(signed4 i = 0 ; i <windowsize/2 ; i ++)
 	{
-	  // tov WAVRATE
+	  // tov diskrate
 	  fft_type bpm = Index_to_frequency(windowsize,i); 
-	  // in Hz tov non collapsed WAVRATE
-	  bpm*=(fft_type)WAVRATE; 
-	  // uitgedrukt in collapsed WAVRATE
+	  // in Hz tov non collapsed diskrate
+	  bpm*=(fft_type)diskrate; 
+	  // uitgedrukt in collapsed diskrate
 	  for(signed4 j = 0 ; j < spectrum_shifter; j ++) bpm/=2.0;
 	  bpm*=60.0;                                      // uitgedrukt in BPM.
 	  // skip or break ?
@@ -1994,16 +1994,16 @@ void BpmAnalyzerDialog::enveloppe_spectrum()
       peak_energy[j]=energy;
       printf("Peak %d at %g with strength %g\n",j,at,energy);
       if (j == 0) 
-	set_measured_period("Envelope",(signed4)(4.0*11025.0*60.0*4.0/at));
+	set_measured_period_diskrate("Envelope",(signed4)(4.0*11025.0*60.0*4.0/at));
       
       // clear neighbors
       for(signed4 i = 0 ; i <windowsize/2 ; i ++)
 	{
 	  // obtain BPM
-	  // relatief tov WAVRATE
+	  // relatief tov diskrate
 	  fft_type bpm = Index_to_frequency(windowsize,i);
-	  bpm*=(float8)WAVRATE;             // in Hz tov non collapsed WAVRATE
-	  // in collapsed WAVRATE
+	  bpm*=(float8)diskrate;             // in Hz tov non collapsed diskrate
+	  // in collapsed diskrate
 	  for(signed4 j = 0 ; j < spectrum_shifter; j ++) bpm/=2.0;    
 	  bpm*=60.0;                                      // in BPM.
 	  if (bpm>=at-range && bpm<=at+range)
@@ -2117,8 +2117,8 @@ void BpmAnalyzerDialog::autocorrelate_spectrum()
       peak_bpm[j]=at;
       peak_energy[j]=energy;
       if (j == 0)
-	set_measured_period("Autocorrelation",
-			    (signed4)(4.0*11025.0*60.0*4.0/at));
+	set_measured_period_diskrate("Autocorrelation",
+				     (signed4)(4.0*11025.0*60.0*4.0/at));
       printf("Peak %d at %g with strength %g\n",j,at,energy);
       
       // clear neighbors
@@ -2142,10 +2142,10 @@ void BpmAnalyzerDialog::wec()
 						 MAP_SHARED,fd,0);
   assert(audio!=MAP_FAILED);
   assert(audio);
-  BpmCounter bc(stderr,audio,map_length/4,WAVRATE,startbpm,stopbpm);
+  BpmCounter bc(stderr,audio,map_length/4,diskrate,startbpm,stopbpm);
   tempo_type result(bc.measure());
   munmap(audio,map_length);
-  set_measured_period("Wec",tempo_to_period(result).period*4);
+  set_measured_period_diskrate("Wec",tempo_to_period(result).period*4);
 }
 
 void BpmAnalyzerDialog::set_labels()
@@ -2413,14 +2413,14 @@ void BpmAnalyzerDialog::rayshoot_scan()
   else
     {
       status("Ready");
-      set_measured_period("Rayshooting",minimum_at);
+      set_measured_period_diskrate("Rayshooting",minimum_at);
     }
 }
 
-void BpmAnalyzerDialog::set_measured_period(QString technique, signed4 p, 
+void BpmAnalyzerDialog::set_measured_period_diskrate(QString technique, signed4 p, 
 bool update_on_disk)
 {
-  set_normalperiod(p,update_on_disk);
+  set_normalperiod_metarate(diskrate_to_metarate(p),update_on_disk);
 }
 
 void BpmAnalyzerDialog::peak_scan()
@@ -2529,7 +2529,7 @@ void BpmAnalyzerDialog::peak_scan()
   processing_progress = 100;
   status("Ready");
   
-  set_measured_period("Peak Scanning",global_minimum_at*4);
+  set_measured_period_diskrate("Peak Scanning",global_minimum_at*4);
 
   QPixmap *pm = new QPixmap(IMAGE_XS,IMAGE_YS);
   QPainter p;
@@ -2618,8 +2618,8 @@ void BpmAnalyzerDialog::tap()
        * time passed counts for only one beat.
        */
       signed8 p = (((signed8)times(NULL)-(signed8)starttime)/(tapcount-1));
-      p *= normalperiod;
-      p /= currentperiod;
+      p *= normalperiod_metarate;
+      p /= currentperiod_metarate;
       p /= SkipBox->value();
       p *= 11025*4;
       p /= CLOCK_FREQ;
@@ -2633,10 +2633,10 @@ void BpmAnalyzerDialog::tap()
        * the currentperiod so that it plays equally fast after the 
        * change in the native tempo.
        */
-      signed8 oldcurrentperiod=currentperiod;
-      signed8 oldnormalperiod=normalperiod;
-      set_measured_period("Tap measurement",period_to_quad(p),false);
-      ::metronome->changetempo(normalperiod*oldcurrentperiod/oldnormalperiod);
+      signed8 oldcurrentperiod_metarate=currentperiod_metarate;
+      signed8 oldnormalperiod_metarate=normalperiod_metarate;
+      set_measured_period_diskrate("Tap measurement",period_to_quad(p),false);
+      ::metronome->changetempo(normalperiod_metarate*oldcurrentperiod_metarate/oldnormalperiod_metarate);
       
       tempo_type tempo = playing->get_tempo();
       setBpmBounds(tempo.lower(10),tempo.higher(10));
@@ -2791,7 +2791,7 @@ void BpmAnalyzerDialog::experimental_scan_varia()
       
       if (i<block_count/2)
 	{
-	  fprintf(g,"%g",60.0*i*WAVRATE/(stride*block_count));
+	  fprintf(g,"%g",60.0*i*diskrate/(stride*block_count));
 	  for(int c = 0 ; c < channel_count; c++)
 	    fprintf(g,"\t%g",blocks[i][c]);
 	  fprintf(g,"\n");
@@ -2827,10 +2827,10 @@ void BpmAnalyzerDialog::experimental_scan_varia()
    * The start_bpm and stop_bpm should be converted to the best matching period
    * which in this case is in blocks of stride size
    */
-  int pscan_stop=((WAVRATE*60.0/startbpm) // samplecount per beat
+  int pscan_stop=((diskrate*60.0/startbpm) // samplecount per beat
 		  *4                      // samples per bar
 		  /stride);               // blocks per bar
-  int pscan_start=((WAVRATE*60.0/stopbpm) // samplecount per beat
+  int pscan_start=((diskrate*60.0/stopbpm) // samplecount per beat
 		   *4                     // samples per bar
 		   /stride);              // blocks per bar
   if(pscan_start>2) pscan_start--;        // ensure we certainly cover the stopbpm;
@@ -2961,7 +2961,7 @@ void BpmAnalyzerDialog::experimental_scan_varia()
    * - so each bin reflects around 9.9BPM if we only use pscan_stop. So we should go further than that
    *   and measure to very low frequencies then our accuracy increases.
    */
-  int start_block=60*WAVRATE/startbpm/stride;
+  int start_block=60*diskrate/startbpm/stride;
   start_block++;
   int start_bin=mismatch2nd_cnt/start_block;
   
@@ -2975,7 +2975,7 @@ void BpmAnalyzerDialog::experimental_scan_varia()
       double R=mismatch_2nd_freq[i][0];
       double I=mismatch_2nd_freq[i][1];
       double A=sqrt(R*R+I*I);
-      double tempo=i*WAVRATE*60/mismatch2nd_cnt/stride;      
+      double tempo=i*diskrate*60/mismatch2nd_cnt/stride;      
       fprintf(g,"%g\t%d\t%g\t%g\n",tempo,i,mismatch_2nd[i],A);
       mismatch_2nd[i]=A;
     }
@@ -2988,7 +2988,7 @@ void BpmAnalyzerDialog::experimental_scan_varia()
   max=0;
   for(int i = start_bin ; i < mismatch2nd_cnt/2; i++)
     {
-      double tempo=i*WAVRATE*60/mismatch2nd_cnt/stride;      
+      double tempo=i*diskrate*60/mismatch2nd_cnt/stride;      
       if (tempo<startbpm || tempo>stopbpm) continue;
       double A=mismatch_2nd[i];
       if (A>max)
@@ -3017,10 +3017,10 @@ void BpmAnalyzerDialog::experimental_scan_varia()
   /**
    * Calculate the tempo and check the bounds
    */
-  double tempo=freqbin*WAVRATE*60/mismatch2nd_cnt/stride;
+  double tempo=freqbin*diskrate*60/mismatch2nd_cnt/stride;
   if (tempo<startbpm || tempo>stopbpm) tempo=-1;
   printf("Tempo is %g\n",tempo);
-  set_measured_period("Melodic Rayshooting",(int)((double)WAVRATE*60.*4./tempo));
+  set_measured_period_diskrate("Melodic Rayshooting",(int)((double)diskrate*60.*4./tempo));
   
   f=fopen("mismatch.txt","wb");
   for(int p = 1; p<pscan_stop; p++)
@@ -3028,7 +3028,7 @@ void BpmAnalyzerDialog::experimental_scan_varia()
       // the calculation of period to tempo is conducted as follows
       double tempo=p*stride  // samples for 1 measure
 	/4;                  // samples per beat
-      tempo=(WAVRATE/tempo)  // beats per second
+      tempo=(diskrate/tempo)  // beats per second
 	*60.0;               // beats per minute
       double v1=mismatch_2nd[p];
       double v2=array_exp[p];

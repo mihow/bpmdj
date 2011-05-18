@@ -58,14 +58,14 @@ void PlayerConfig::init()
   init_ui_posx();
   init_ui_posy();
   init_core_rawpath();
+  init_dsp_verbose();
+  init_dsp_playrate();
   init_player_dsp();
   init_alsa_latency();
-  init_alsa_verbose();
   init_alsa_dev(); 
   init_oss_dsp();
   init_oss_init_fragments();
   init_oss_fragments();
-  init_oss_verbose();
   init_oss_nolatencyaccounting();
   init_oss_latency();
   init_bpm_channel();
@@ -75,7 +75,6 @@ void PlayerConfig::init()
   init_jack_dev();
   init_jack_lout();
   init_jack_rout();
-  init_jack_verbose();
 }
 
 /**
@@ -127,12 +126,11 @@ void PlayerConfig::save()
   s << get_core_rawpath();
   s << (quint16)get_player_dsp();
   s << (quint16)get_alsa_latency();
-  s << (qint8)get_alsa_verbose();
+  s << (qint8)get_dsp_verbose();
   s << get_alsa_dev();
   s << get_oss_dsp();
   s << (qint8)get_oss_init_fragments();
   s << (quint16)get_oss_fragments();
-  s << (qint8)get_oss_verbose();
   s << (qint8)get_oss_nolatencyaccounting();
   s << (quint16)get_oss_latency();
   s << (quint16)get_bpm_channel();
@@ -142,9 +140,9 @@ void PlayerConfig::save()
   s << (quint16)get_ui_posx();
   s << (quint16)get_ui_posy();
   s << get_jack_dev();
-  s << (qint8)get_jack_verbose();
   s << get_jack_lout();
   s << get_jack_rout();
+  s << (quint16)get_dsp_playrate();
 }
 
 void PlayerConfig::load()
@@ -164,12 +162,12 @@ void PlayerConfig::load()
 	  s >> str; set_core_rawpath(str);
 	  s >> w; set_player_dsp(w);
 	  s >> w; set_alsa_latency(w);
-	  s >> b; set_alsa_verbose(b);
+	  s >> b; set_dsp_verbose(b);
 	  s >> str; set_alsa_dev(str);
 	  s >> str; set_oss_dsp(str);
 	  s >> b; set_oss_init_fragments(b);
 	  s >> w; set_oss_fragments(w);
-	  s >> b; set_oss_verbose(b);
+	  s >> b; // set_oss_verbose(b);
 	  s >> b; set_oss_nolatencyaccounting(b);
 	  s >> w; set_oss_latency(w);
 	  s >> w; set_bpm_channel(w);
@@ -184,12 +182,12 @@ void PlayerConfig::load()
 	  s >> str; set_core_rawpath(str);
 	  s >> w; set_player_dsp(w);
 	  s >> w; set_alsa_latency(w);
-	  s >> b; set_alsa_verbose(b);
+	  s >> b; set_dsp_verbose(b);
 	  s >> str; set_alsa_dev(str);
 	  s >> str; set_oss_dsp(str);
 	  s >> b; set_oss_init_fragments(b);
 	  s >> w; set_oss_fragments(w);
-	  s >> b; set_oss_verbose(b);
+	  s >> b; // set_oss_verbose(b);
 	  s >> b; set_oss_nolatencyaccounting(b);
 	  s >> w; set_oss_latency(w);
 	  s >> w; set_bpm_channel(w);
@@ -204,12 +202,12 @@ void PlayerConfig::load()
 	s >> str; set_core_rawpath(str);
 	s >> w; set_player_dsp(w);
 	s >> w; set_alsa_latency(w);
-	s >> b; set_alsa_verbose(b);
+	s >> b; set_dsp_verbose(b);
 	s >> str; set_alsa_dev(str);
 	s >> str; set_oss_dsp(str);
 	s >> b; set_oss_init_fragments(b);
 	s >> w; set_oss_fragments(w);
-	s >> b; set_oss_verbose(b);
+	s >> b; // set_oss_verbose(b);
 	s >> b; set_oss_nolatencyaccounting(b);
 	s >> w; set_oss_latency(w);
 	s >> w; set_bpm_channel(w);
@@ -220,19 +218,19 @@ void PlayerConfig::load()
 	s >> w; set_ui_posy(w);
 	s >> str; set_jack_dev(str);
 	s >> w;  set_jack_latency(w);
-	s >> b; set_jack_verbose(b);
+	s >> b; // set_jack_verbose(b);
      }
    else if (magic == MAGIC_3_4)
      {
 	s >> str; set_core_rawpath(str);
 	s >> w; set_player_dsp(w);
 	s >> w; set_alsa_latency(w);
-	s >> b; set_alsa_verbose(b);
+	s >> b; set_dsp_verbose(b);
 	s >> str; set_alsa_dev(str);
 	s >> str; set_oss_dsp(str);
 	s >> b; set_oss_init_fragments(b);
 	s >> w; set_oss_fragments(w);
-	s >> b; set_oss_verbose(b);
+	s >> b; //set_oss_verbose(b);
 	s >> b; set_oss_nolatencyaccounting(b);
 	s >> w; set_oss_latency(w);
 	s >> w; set_bpm_channel(w);
@@ -243,19 +241,19 @@ void PlayerConfig::load()
 	s >> w; set_ui_posy(w);
 	s >> str; set_jack_dev(str);
 	s >> w;  set_jack_latency(w);
-	s >> b; set_jack_verbose(b);
+	s >> b; //set_jack_verbose(b);
      }
    else if (magic == MAGIC_3_5)
      {
 	s >> str; set_core_rawpath(str);
 	s >> w; set_player_dsp(w);
 	s >> w; set_alsa_latency(w);
-	s >> b; set_alsa_verbose(b);
+	s >> b; set_dsp_verbose(b);
 	s >> str; set_alsa_dev(str);
 	s >> str; set_oss_dsp(str);
 	s >> b; set_oss_init_fragments(b);
 	s >> w; set_oss_fragments(w);
-	s >> b; set_oss_verbose(b);
+	s >> b; // set_oss_verbose(b);
 	s >> b; set_oss_nolatencyaccounting(b);
 	s >> w; set_oss_latency(w);
 	s >> w; set_bpm_channel(w);
@@ -266,19 +264,19 @@ void PlayerConfig::load()
 	s >> w; set_ui_posy(w);
 	s >> str; set_jack_dev(str);
 	s >> w;  set_jack_latency(w);
-	s >> b; set_jack_verbose(b);
+	s >> b; // set_jack_verbose(b);
      }
    else if (magic == MAGIC_3_6)
      {
 	s >> str; set_core_rawpath(str);
 	s >> w; set_player_dsp(w);
 	s >> w; set_alsa_latency(w);
-	s >> b; set_alsa_verbose(b);
+	s >> b; set_dsp_verbose(b);
 	s >> str; set_alsa_dev(str);
 	s >> str; set_oss_dsp(str);
 	s >> b; set_oss_init_fragments(b);
 	s >> w; set_oss_fragments(w);
-	s >> b; set_oss_verbose(b);
+	s >> b; // set_oss_verbose(b);
 	s >> b; set_oss_nolatencyaccounting(b);
 	s >> w; set_oss_latency(w);
 	s >> w; set_bpm_channel(w);
@@ -289,20 +287,20 @@ void PlayerConfig::load()
 	s >> w; set_ui_posy(w);
 	s >> str; set_jack_dev(str);
 	s >> w;  set_jack_latency(w);
-	s >> b; set_jack_verbose(b);
-	s >> b; /* set_jack_lowlatency(b); */
+	s >> b; // set_jack_verbose(b);
+	s >> b; // set_jack_lowlatency(b);
      }
    else if (magic == MAGIC_3_7 || magic == MAGIC_4_0)
      {
        s >> str; set_core_rawpath(str);
        s >> w; set_player_dsp(w);
        s >> w; set_alsa_latency(w);
-       s >> b; set_alsa_verbose(b);
+       s >> b; set_dsp_verbose(b);
        s >> str; set_alsa_dev(str);
        s >> str; set_oss_dsp(str);
        s >> b; set_oss_init_fragments(b);
        s >> w; set_oss_fragments(w);
-       s >> b; set_oss_verbose(b);
+       s >> b; // set_oss_verbose(b);
        s >> b; set_oss_nolatencyaccounting(b);
        s >> w; set_oss_latency(w);
        s >> w; set_bpm_channel(w);
@@ -313,19 +311,19 @@ void PlayerConfig::load()
        s >> w; set_ui_posy(w);
        s >> str; set_jack_dev(str);
        s >> w;  set_jack_latency(w);
-       s >> b; set_jack_verbose(b);
+       s >> b; // set_jack_verbose(b);
      }
    else if (magic == MAGIC_4_1 || magic==MAGIC_4_1b)
      {
        s >> str; set_core_rawpath(str);
        s >> w; set_player_dsp(w);
        s >> w; set_alsa_latency(w);
-       s >> b; set_alsa_verbose(b);
+       s >> b; set_dsp_verbose(b);
        s >> str; set_alsa_dev(str);
        s >> str; set_oss_dsp(str);
        s >> b; set_oss_init_fragments(b);
        s >> w; set_oss_fragments(w);
-       s >> b; set_oss_verbose(b);
+       s >> b; // set_oss_verbose(b);
        s >> b; set_oss_nolatencyaccounting(b);
        s >> w; set_oss_latency(w);
        s >> w; set_bpm_channel(w);
@@ -335,9 +333,32 @@ void PlayerConfig::load()
        s >> w; set_ui_posx(w);
        s >> w; set_ui_posy(w);
        s >> str; set_jack_dev(str);
-       s >> b; set_jack_verbose(b);
+       s >> b; // set_jack_verbose(b);
        s >> str; set_jack_lout(str);
        s >> str; set_jack_rout(str);
+     }
+   else if (magic == MAGIC_4_2)
+     {
+       s >> str; set_core_rawpath(str);
+       s >> w; set_player_dsp(w);
+       s >> w; set_alsa_latency(w);
+       s >> b; set_dsp_verbose(b);
+       s >> str; set_alsa_dev(str);
+       s >> str; set_oss_dsp(str);
+       s >> b; set_oss_init_fragments(b);
+       s >> w; set_oss_fragments(w);
+       s >> b; set_oss_nolatencyaccounting(b);
+       s >> w; set_oss_latency(w);
+       s >> w; set_bpm_channel(w);
+       s >> b; set_player_rms(b);
+       s >> fl; set_player_rms_target(fl);
+       s >> w; set_disabled_capacities(w);
+       s >> w; set_ui_posx(w);
+       s >> w; set_ui_posy(w);
+       s >> str; set_jack_dev(str);
+       s >> str; set_jack_lout(str);
+       s >> str; set_jack_rout(str);
+       s >> w; set_dsp_playrate(w);
      }
    else
     Error(true,"bpmplay wrong configuration file format\n");

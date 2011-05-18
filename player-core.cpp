@@ -104,7 +104,7 @@ void writer_died()
   // if it differs from the length in the .ini file we update it
   // get length;
   writing = false;
-  unsigned8 sec = samples2s(wave_max());
+  unsigned8 sec = samples2s(wave_max(),diskrate);
   unsigned8 min; 
   if (wave_file) 
     {
@@ -211,7 +211,7 @@ int wave_read(unsigned4 pos, stereo_sample2 *val)
   if (pos<wave_bufferpos || pos-wave_bufferpos>=wave_bufsize)
     {
       // we only stop one second later than necessary
-      if (pos>=wave_max()+(long)WAVRATE) return -1;
+      if (pos>=wave_max()+(long)diskrate) return -1;
       if (pos>=wave_max())
 	{
 	  wave_bufferpos=pos;
@@ -235,11 +235,11 @@ int wave_read(unsigned4 pos, stereo_sample2 *val)
 /*-------------------------------------------
  *         Volume Synth operations
  *-------------------------------------------*/
-unsigned8        lfo_phase=0;
-quad_period_type lfo_period=0;
+unsigned8        lfo_phase_playrate=0;
+quad_period_type lfo_period_playrate=0;
 _lfo_   lfo_do;
 
-void jumpto(signed8, int);
+void jumpto(signed8);
 
 _lfo_ lfo_get()
 {
@@ -249,17 +249,17 @@ _lfo_ lfo_get()
 void lfo_set(const char* name, _lfo_ l, unsigned8 freq, unsigned8 phase)
 {
   /* if paused, unpause and set phase */
-  lfo_period=currentperiod.muldiv(4,freq);
+  lfo_period_playrate=currentperiod_metarate.muldiv(4*dsp->playrate,freq*metarate);
   lfo_do=l;
   if (dsp->get_paused())
     {
-      jumpto(0,0);
-      lfo_phase=y;
+      jumpto(0);
+      lfo_phase_playrate=y_playrate;
       unpause_playing();
     }
   else
     {
-      lfo_phase=phase;
+      lfo_phase_playrate=phase;
     }
 }
 
@@ -280,11 +280,11 @@ stereo_sample2 lfo_metronome(stereo_sample2 x)
 {
    float8 val;
    signed8 diff;
-   diff=(signed8)y-(signed8)lfo_phase;
-   diff=diff%lfo_period;
+   diff=(signed8)y_playrate-(signed8)lfo_phase_playrate;
+   diff=diff%lfo_period_playrate;
    /* say ping */
-   val=sin(6.28*diff*(float8)(WAVRATE)/440.0)*4096.0*(1.0-(float8)diff
-						      /(float8)lfo_period);
+   val=sin(6.28*diff*(float8)(dsp->playrate)/440.0)*4096.0
+     *(1.0-(float8)diff/(float8)lfo_period_playrate);
    /* mix them */
    stereo_sample2 a =  x.muldiv(7,8);
    return a.add((signed4)val,(signed4)val);
@@ -296,9 +296,9 @@ stereo_sample2 lfo_pan(stereo_sample2 x)
 {
   signed8 diff;
   signed4 quart;
-  diff=(signed8)y-(signed8)lfo_phase;
-  diff=diff%lfo_period;
-  quart=lfo_period/4;
+  diff=(signed8)y_playrate-(signed8)lfo_phase_playrate;
+  diff=diff%lfo_period_playrate;
+  quart=lfo_period_playrate/4;
   // at position 0, center 
   if (diff<quart)
     return lfo_volume(x,quart-diff,quart,1,1);
@@ -318,17 +318,17 @@ stereo_sample2 lfo_pan(stereo_sample2 x)
 stereo_sample2 lfo_saw(stereo_sample2 x)
 {
    signed8 diff;
-   diff=(signed8)y-(signed8)lfo_phase;
-   diff=diff%lfo_period;
-   return lfo_volume(x,diff,lfo_period,diff,lfo_period);
+   diff=(signed8)y_playrate-(signed8)lfo_phase_playrate;
+   diff=diff%lfo_period_playrate;
+   return lfo_volume(x,diff,lfo_period_playrate,diff,lfo_period_playrate);
 }
 
 stereo_sample2 lfo_break(stereo_sample2 x)
 {
   signed8 diff;
-  diff=(signed8)y-(signed8)lfo_phase;
-  diff=diff%lfo_period;
-  if (diff>lfo_period*95/100) 
+  diff=(signed8)y_playrate-(signed8)lfo_phase_playrate;
+  diff=diff%lfo_period_playrate;
+  if (diff>lfo_period_playrate*95/100) 
     return stereo_sample2();
   else 
     return x;
@@ -337,12 +337,12 @@ stereo_sample2 lfo_break(stereo_sample2 x)
 stereo_sample2 lfo_revsaw(stereo_sample2 x)
 {
   signed8 diff;
-  diff=(signed8)y-(signed8)lfo_phase;
-  while (diff<0 && lfo_period) 
-    diff+=lfo_period;
-  diff=diff%lfo_period;
-  diff=lfo_period-diff;
-  return lfo_volume(x,diff,lfo_period,diff,lfo_period);
+  diff=(signed8)y_playrate-(signed8)lfo_phase_playrate;
+  while (diff<0 && lfo_period_playrate) 
+    diff+=lfo_period_playrate;
+  diff=diff%lfo_period_playrate;
+  diff=lfo_period_playrate-diff;
+  return lfo_volume(x,diff,lfo_period_playrate,diff,lfo_period_playrate);
 }
 
 void lfo_init()
@@ -353,10 +353,10 @@ void lfo_init()
 /*-------------------------------------------
  *         Mapping Synth operations
  *-------------------------------------------*/
-unsigned8   map_start_pos = 0;
-unsigned8   map_stop_pos = 0;
+unsigned8   map_start_pos_diskrate = 0;
+unsigned8   map_stop_pos_diskrate = 0;
 bool        map_loop = false;
-signed8     map_exit_pos = 0;
+signed8     map_exit_pos_diskrate = 0;
 bool        map_do;
 map_data    bpmdj_map = NULL;
 signed2     map_size = 0;
@@ -369,39 +369,39 @@ void map_loop_set(bool l)
 unsigned8 map_active(unsigned8 a)
 {
   // out of range ?
-  if (a<map_start_pos) return a;
-  if (a>=map_stop_pos) 
+  if (a<map_start_pos_diskrate) return a;
+  if (a>=map_stop_pos_diskrate) 
     {
       if (map_loop)
 	{
-	  a=map_start_pos;
-	  x = map_start_pos;
-	  y = y_normalise(x);
+	  a=map_start_pos_diskrate;
+	  x_diskrate = map_start_pos_diskrate;
+	  y_playrate = y_normalise(x_diskrate);
 	}
       else
 	{
 	  volume = 100;
-	  if (map_exit_pos == map_exit_stop)
+	  if (map_exit_pos_diskrate == map_exit_stop)
 	    {
-	      x = map_start_pos;
+	      x_diskrate = map_start_pos_diskrate;
 	      pause_playing();
 	    }
-	  if (map_exit_pos == map_exit_restart)
-	    x = map_start_pos;
-	  else if (map_exit_pos == map_exit_continue)
-	    x = map_stop_pos;
+	  if (map_exit_pos_diskrate == map_exit_restart)
+	    x_diskrate = map_start_pos_diskrate;
+	  else if (map_exit_pos_diskrate == map_exit_continue)
+	    x_diskrate = map_stop_pos_diskrate;
 	  else 
-	    x = map_exit_pos;
-	  y = y_normalise(x);
-	  map_set(0,NULL,0,map_exit_restart,false);
-	  return x;
+	    x_diskrate = map_exit_pos_diskrate;
+	  y_playrate = y_normalise(x_diskrate);
+	  map_set_diskrate(0,NULL,0,map_exit_restart,false);
+	  return x_diskrate;
 	}
     }
   
   // determine fine grained relative position of 'wants to play'
-  unsigned8 dx = a - map_start_pos;
+  unsigned8 dx = a - map_start_pos_diskrate;
   // determine segment of 'wants to play'
-  signed2 segment = dx*map_size/(map_stop_pos-map_start_pos);
+  signed2 segment = dx*map_size/(map_stop_pos_diskrate-map_start_pos_diskrate);
 #ifdef DEBUG_SEGSEQ
   static int last_segment = -1;
   if (segment!=last_segment)
@@ -412,7 +412,7 @@ unsigned8 map_active(unsigned8 a)
   assert(segment<map_size);
 #endif
   // determine offset w.r.t. actual segment start
-  unsigned8 segment_start = segment * (map_stop_pos-map_start_pos) / map_size;
+  unsigned8 segment_start = segment * (map_stop_pos_diskrate-map_start_pos_diskrate) / map_size;
   unsigned8 segment_offset = dx - segment_start;
   // obtain segment of new position
   signed2 new_segment = bpmdj_map[segment].take_from;
@@ -422,41 +422,41 @@ unsigned8 map_active(unsigned8 a)
     * ((signed4)bpmdj_map[segment].speed_mult) 
     / ((signed4)bpmdj_map[segment].speed_div);
   if (new_segment < 0)
-    return map_stop_pos;
+    return map_stop_pos_diskrate;
   // transfer volume
   volume = bpmdj_map[segment].volume;
   // obtain new segment start position
   unsigned8 new_segment_start = new_segment 
-    * (map_stop_pos-map_start_pos) / map_size;
+    * (map_stop_pos_diskrate-map_start_pos_diskrate) / map_size;
   // fix should play position with actual map_start_pos and fine 
   // grained segment offset
-  return new_segment_start+segment_offset+map_start_pos;
+  return new_segment_start+segment_offset+map_start_pos_diskrate;
 }
   
 void map_stop()
 {
   if (map_do)
     {
-      x = map_active(x);
-      y = y_normalise(x);
+      x_diskrate = map_active(x_diskrate);
+      y_playrate = y_normalise(x_diskrate);
       map_do=false;
       if (bpmdj_map) bpmdj_deallocate(bpmdj_map);
       bpmdj_map=NULL;
     }
 }
 
-void map_set(signed2 size, map_data inmap, unsigned8 msize, signed8 mexit, 
-	     bool l)
+void map_set_diskrate(signed2 size, map_data inmap, unsigned8 msize, signed8 mexit, 
+		      bool l)
 {
   // if paused we start at the last cue position
   unsigned8 mstart;
   unsigned8 mstop;
   if (size > 0  && dsp->get_paused())
-    mstart = cue;
+    mstart = metarate_to_diskrate(cue_metarate);
   else
-    mstart = x_normalise(::y - dsp->latency());
+    mstart = x_normalise(::y_playrate - dsp->latency());
   mstop = mstart + msize;
-  map_exit_pos = mexit;
+  map_exit_pos_diskrate = mexit;
   map_data old_map = bpmdj_map;
   // should we inactivate it ?
   if (size<=0) map_do=false;
@@ -464,15 +464,15 @@ void map_set(signed2 size, map_data inmap, unsigned8 msize, signed8 mexit,
   // this is important because the map is still in use !
   if (size>map_size)
     {
-      map_start_pos = mstart;
-      map_stop_pos = mstop;
+      map_start_pos_diskrate = mstart;
+      map_stop_pos_diskrate = mstop;
       bpmdj_map=inmap;
       map_size=size;
     }
   else
     {
-      map_start_pos = mstart;
-      map_stop_pos = mstop;
+      map_start_pos_diskrate = mstart;
+      map_stop_pos_diskrate = mstop;
       map_size=size;
       bpmdj_map=inmap;
     }
@@ -484,7 +484,7 @@ void map_set(signed2 size, map_data inmap, unsigned8 msize, signed8 mexit,
   // unpause ?
   if (dsp->get_paused())
     {
-      jumpto(0,0);
+      jumpto(0);
       unpause_playing();
     }
 }
@@ -498,18 +498,18 @@ void map_init()
  *         Cues
  *-------------------------------------------*/
 static cue_info cue_before = 0;
-cue_info cue = 0;
-cue_info cues[4] = {0,0,0,0};
+cue_info cue_metarate = 0;
+cue_info cues_metarate[4] = {0,0,0,0};
 
 void cue_set()
 {
-  cue=x_normalise(y-dsp->latency());
+  cue_metarate=diskrate_to_metarate(x_normalise(y_playrate-dsp->latency()));
 }
 
-void cue_shift(signed8 whence)
+void cue_shift_metarate(signed8 whence)
 {
-  if (whence < 0 && (unsigned8)(-whence) > cue) cue=0;
-  else cue+=whence;
+  if (whence < 0 && (unsigned8)(-whence) > cue_metarate) cue_metarate=0;
+  else cue_metarate+=whence;
   if (!dsp->get_paused())
     pause_playing();
 }
@@ -519,7 +519,7 @@ void cue_shift(signed8 whence)
  */
 void cue_store(int nr)
 {
-  cues[nr]=cue;
+  cues_metarate[nr]=cue_metarate;
 }
 
 /**
@@ -530,18 +530,18 @@ void cue_store(int nr)
  */
 void cue_retrieve(int nr)
 {
-  cue=cues[nr];
+  cue_metarate=cues_metarate[nr];
 }
 
 void cue_write()
 {
   if (playing)
     {
-      playing->set_cue(cue);
-      playing->set_cue_z(cues[0]);
-      playing->set_cue_x(cues[1]);
-      playing->set_cue_c(cues[2]);
-      playing->set_cue_v(cues[3]);
+      playing->set_cue(cue_metarate);
+      playing->set_cue_z(cues_metarate[0]);
+      playing->set_cue_x(cues_metarate[1]);
+      playing->set_cue_c(cues_metarate[2]);
+      playing->set_cue_v(cues_metarate[3]);
     }
 }
 
@@ -549,16 +549,16 @@ void cue_read()
 {
   if (playing)
     {
-      cue_before=cue=playing->get_cue();
-      cues[0]=playing->get_cue_z();
-      cues[1]=playing->get_cue_x();
-      cues[2]=playing->get_cue_c();
-      cues[3]=playing->get_cue_v();
+      cue_before=cue_metarate=playing->get_cue();
+      cues_metarate[0]=playing->get_cue_z();
+      cues_metarate[1]=playing->get_cue_x();
+      cues_metarate[2]=playing->get_cue_c();
+      cues_metarate[3]=playing->get_cue_v();
     }
   else
     {
       cue_before = 0;
-      cues[0]=cues[1]=cues[2]=cues[3]=0;
+      cues_metarate[0]=cues_metarate[1]=cues_metarate[2]=cues_metarate[3]=0;
     }
 }
 
@@ -626,48 +626,47 @@ void rms_normalize(stereo_sample2 *l)
  *         Loop operations
  *-------------------------------------------*/
 const signed8 loop_off = 0x7FFFFFFFFFFFFFFFLL;
-      signed8 loop_at = loop_off;
-      signed8 loop_restart = 0;
+      signed8 loop_at_diskrate = loop_off;
+      signed8 loop_restart_diskrate = 0;
 
-int loop_set(unsigned8 jumpback)
+int loop_set_diskrate(unsigned8 jumpback)
 {
   if (dsp->get_paused())
     {
-      loop_at = cue;
-      if (loop_at<0) 
-	loop_at = loop_off;
+      loop_at_diskrate = metarate_to_diskrate(cue_metarate);
+      if (loop_at_diskrate<0) 
+	loop_at_diskrate = loop_off;
       unpause_playing();
     }
-  if (loop_at == loop_off)
+  if (loop_at_diskrate == loop_off)
     {
-      loop_at=x;
+      loop_at_diskrate=x_diskrate;
     }
   if (jumpback==0)
-    loop_at=loop_off;
+    loop_at_diskrate=loop_off;
   else
-    if ((signed8)jumpback<=loop_at)
-      loop_restart=loop_at-jumpback;
+    if ((signed8)jumpback<=loop_at_diskrate)
+      loop_restart_diskrate=loop_at_diskrate-jumpback;
     else
-      loop_at=loop_off;
-  return loop_at!=loop_off;
+      loop_at_diskrate=loop_off;
+  return loop_at_diskrate!=loop_off;
 }
 
 void loop_jump()
 {
-  x=loop_restart;
-  y=y_normalise(x);
+  x_diskrate=loop_restart_diskrate;
+  y_playrate=y_normalise(x_diskrate);
 }
 
 /*-------------------------------------------
  *         Program logic
  *-------------------------------------------*/
-void jumpto(signed8 mes, int txt)
+void jumpto(signed8 mes)
 {
   if (dsp->get_paused())
     {
       unpause_playing();
-      y=y_normalise(cue);
-      if (txt) printf("Restarted at cue ");
+      y_playrate=y_normalise(metarate_to_diskrate(cue_metarate));
     }
   else
     {
@@ -680,20 +679,11 @@ void jumpto(signed8 mes, int txt)
       //   a difference
       // - we can fix this difference to fit a measure
       // - this fixed difference is added to gotopos
-      signed8 gotopos=y_normalise(cue)-currentperiod*mes;
-      // signed8 difference=gotopos-y+dsp->latency();
-      signed8 difference=gotopos-y;
-      signed8 fixeddiff=(difference/currentperiod)*currentperiod;
-      y+=fixeddiff;
-      if (txt) printf("Started at cue ");
-    }
-
-  if (txt)
-    {
-      if (mes)
-	printf("-%d measures\n",(int)mes);
-      else
-	printf("\n");
+      signed8 currentperiod_playrate=currentperiod_metarate*dsp->playrate/metarate;
+      signed8 gotopos_playrate=y_normalise(metarate_to_diskrate(cue_metarate))-currentperiod_playrate*mes;
+      signed8 difference_playrate=gotopos_playrate-y_playrate;
+      signed8 fixeddiff=(difference_playrate/currentperiod_playrate)*currentperiod_playrate;
+      y_playrate+=fixeddiff;
     }
 }
 
@@ -704,13 +694,14 @@ class source_template: public audio_source
   unsigned8 m;
   virtual stereo_sample2 read()
   {
-    x = y * normalperiod/currentperiod;
-    if (x>loop_at)
+    x_diskrate = y_playrate * normalperiod_metarate * diskrate
+      / (currentperiod_metarate * dsp->playrate);
+    if (x_diskrate>loop_at_diskrate)
       loop_jump();
     if (map_do)
-      m = map_active( x );
+      m = map_active( x_diskrate );
     else
-      m = x;
+      m = x_diskrate;
     if (wave_read(m,&value)<0)
       {
 	pause_playing();
@@ -719,7 +710,7 @@ class source_template: public audio_source
     if (RMS)
       rms_normalize(&value);
     value=lfo_do(value);
-    y++;
+    y_playrate++;
     return value;
   }
 };
@@ -766,17 +757,17 @@ int core_meta_init()
   if (opt_match)
     {
       Index target(arg_match);
-      targetperiod=period_to_quad(target.get_period());
+      targetperiod_metarate=period_to_quad(target.get_period());
     }
   int L = strlen(argument);
   if (L<4 || strcmp(argument+L-4,".idx")!=0)
     return err_needidx;
   playing = new Index(argument);
-  normalperiod=period_to_quad(playing->get_period());
-  if (!opt_match) targetperiod=normalperiod;
-  if (normalperiod<=0 && targetperiod>0) normalperiod=targetperiod;
-  else if (normalperiod>0 && targetperiod<=0) targetperiod=normalperiod;
-  currentperiod=targetperiod;
+  normalperiod_metarate=period_to_quad(playing->get_period());
+  if (!opt_match) targetperiod_metarate=normalperiod_metarate;
+  if (normalperiod_metarate<=0 && targetperiod_metarate>0) normalperiod_metarate=targetperiod_metarate;
+  else if (normalperiod_metarate>0 && targetperiod_metarate<=0) targetperiod_metarate=normalperiod_metarate;
+  currentperiod_metarate=targetperiod_metarate;
   cue_read();
   return err_none;
 }
@@ -847,10 +838,10 @@ void core_stop()
 
 extern clock_driver* metronome;
 
-void set_normalperiod(quad_period_type newnormalperiod, bool update_on_disk)
+void set_normalperiod_metarate(quad_period_type newnormalperiod, bool update_on_disk)
 {
   assert(metronome);
-  metronome->set_normalperiod(newnormalperiod);
+  metronome->set_normalperiod_metarate(newnormalperiod);
   playing->set_period(newnormalperiod/4,update_on_disk);
 }
 #endif // __loaded__player_core_cpp__

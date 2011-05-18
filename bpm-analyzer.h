@@ -54,7 +54,7 @@ private:
   signed4  * peak_fit;
   signed4    windowsize;
   signed4    peaks;
-  void set_measured_period(QString technique, signed4 period, 
+  void set_measured_period_diskrate(QString technique, signed4 period, 
 			   bool update_on_disk=true);
   // Weighted envelope and autocorrelation
   void          wec();

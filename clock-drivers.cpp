@@ -23,11 +23,12 @@ using namespace std;
 #include "clock-drivers.h"
 #include "player-core.h"
 
-quad_period_type targetperiod;
-quad_period_type currentperiod;
-quad_period_type normalperiod;
-signed8 x=0;
-signed8 y=0;
+quad_period_type targetperiod_metarate;
+quad_period_type currentperiod_metarate;
+quad_period_type normalperiod_metarate;
+signed8 x_diskrate=0;
+signed8 y_playrate=0;
+// int diskrate=44100;
 clock_driver *metronome = NULL;
 
 void clock_driver::changetempo(signed8 period)
@@ -38,18 +39,21 @@ void clock_driver::changetempo(signed8 period)
    * x = y * normalperiod / currentperiod
    * y = x * currentperiod / normalperiod
    */
-  currentperiod = period;
-  y = x * currentperiod / normalperiod; 
+  currentperiod_metarate = period;
+  assert(dsp);
+  y_playrate = x_diskrate * dsp->playrate * currentperiod_metarate / (normalperiod_metarate * diskrate); 
 }
 
-signed8 x_normalise(signed8 y)
+signed8 x_normalise(signed8 y_playrate)
 {
-  return y*normalperiod/currentperiod;
+  assert(dsp);
+  return y_playrate*diskrate*normalperiod_metarate/(currentperiod_metarate*dsp->playrate);
 }
 
-signed8 y_normalise(signed8 x)
+signed8 y_normalise(signed8 x_diskrate)
 {
-  return x*currentperiod/normalperiod;
+  assert(dsp);
+  return x_diskrate*dsp->playrate*currentperiod_metarate/(normalperiod_metarate*diskrate);
 }
 
 #endif // __loaded__clock_drivers_cpp__

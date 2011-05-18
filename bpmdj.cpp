@@ -223,15 +223,6 @@ int main(int argc, char* argv[])
   metronome->init();
   
   application.exec();
-  if (!Config::get_shown_aboutbox())
-    {
-      Config::set_shown_aboutbox(true);
-      QMessageBox::information(NULL,
-       "Support BpmDj",
-       "If you use this software regularly, then it would be nice to place\n"
-       "a link to http://bpmdj.yellowcouch.org/ on your homepage.\n"
-       "(together with some nice words of course :)");
-    }
   taglist2config(main_window.tagList);
   
   /**

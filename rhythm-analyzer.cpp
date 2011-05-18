@@ -70,8 +70,8 @@ void fft_to_bark(float8 * in_r, int window_size, spectrum_type &out)
       int c = (int)barkbounds[b+1];
       a *= window_size;
       c *= window_size;
-      a /= WAVRATE;
-      c /= WAVRATE;
+      a /= diskrate;
+      c /= diskrate;
       if (c==a)
 	{
 	  printf("a = %d; b=%d, c=%d\n",a,b,c);
@@ -138,7 +138,7 @@ static void free_bark_fft2()
 
 void RhythmAnalyzer::calculateRhythmPattern2()
 {
-  if (!normalperiod)
+  if (!normalperiod_metarate)
     { 
       QMessageBox::critical(NULL,
 	    "Rhythm analyzer",
@@ -150,7 +150,7 @@ void RhythmAnalyzer::calculateRhythmPattern2()
   const int window_size = 2048;
   const int view_xs = 640;
   // how many frames will go into the period of the song
-  int slice_samples = normalperiod * beats->value() / 4;
+  int slice_samples = metarate_to_diskrate(normalperiod_metarate * beats->value() / 4);
   int slice_frames = 192;
   // allocate arrays
   stereo_sample2 * slice_audio = bpmdj_allocate(slice_samples,stereo_sample2);

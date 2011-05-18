@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'ui-player.ui'
 **
-** Created: Mon May 16 18:44:31 2011
+** Created: Wed May 18 22:34:36 2011
 **      by: Qt User Interface Compiler version 4.7.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -189,30 +189,40 @@ public:
     QLabel *textLabel1_3;
     CapacityWidget *capacity;
     QLineEdit *raw_directory;
-    QWidget *alsatab;
+    QWidget *tab_2;
     QGridLayout *gridLayout8;
+    QLabel *label_7;
+    QSpacerItem *verticalSpacer_2;
+    QHBoxLayout *horizontalLayout_14;
+    QLabel *label_8;
+    QLabel *dsp_exactrate;
+    QHBoxLayout *horizontalLayout_13;
+    QLabel *label_6;
+    QSpinBox *dsp_playrate;
+    QCheckBox *dsp_verbose;
+    QWidget *alsatab;
+    QGridLayout *gridLayout9;
     QLabel *textLabel9;
     QSpinBox *alsa_latency;
     QSpacerItem *spacerItem1;
-    QCheckBox *alsa_verbose;
     QLabel *textLabel3;
     QCheckBox *alsa;
     QLineEdit *alsa_dev;
     QComboBox *comboBox2;
     QWidget *osstab;
-    QGridLayout *gridLayout9;
-    QSpacerItem *spacerItem2;
-    QLabel *textLabel7;
-    QCheckBox *oss_verbose;
-    QLabel *textLabel6;
-    QCheckBox *oss_init_fragments;
+    QGridLayout *gridLayout_4;
     QCheckBox *oss;
+    QLabel *textLabel6;
+    QLineEdit *oss_dsp;
+    QComboBox *comboBox3;
+    QCheckBox *oss_init_fragments;
+    QLabel *textLabel7;
+    QSpinBox *oss_fragments;
     QLabel *textLabel3_3;
     QSpinBox *oss_latency;
-    QLineEdit *oss_dsp;
-    QSpinBox *oss_fragments;
     QCheckBox *oss_nolatencyaccounting;
-    QComboBox *comboBox3;
+    QLabel *label_9;
+    QSpacerItem *spacerItem2;
     QWidget *jacktab;
     QGridLayout *subgridLayout;
     QCheckBox *jack;
@@ -228,14 +238,13 @@ public:
     QHBoxLayout *horizontalLayoutLR;
     QLineEdit *jack_rout;
     QComboBox *jackroutcombo;
-    QCheckBox *jack_verbose;
     QSpacerItem *verticalSpacer;
 
     void setupUi(QDialog *SongPlayer)
     {
         if (SongPlayer->objectName().isEmpty())
             SongPlayer->setObjectName(QString::fromUtf8("SongPlayer"));
-        SongPlayer->resize(648, 408);
+        SongPlayer->resize(582, 366);
         QSizePolicy sizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -1237,17 +1246,75 @@ public:
         gridLayout7->addWidget(raw_directory, 2, 2, 1, 1);
 
         tabWidget->addTab(decodingtab, QString());
+        tab_2 = new QWidget();
+        tab_2->setObjectName(QString::fromUtf8("tab_2"));
+        gridLayout8 = new QGridLayout(tab_2);
+        gridLayout8->setSpacing(6);
+        gridLayout8->setContentsMargins(11, 11, 11, 11);
+        gridLayout8->setObjectName(QString::fromUtf8("gridLayout8"));
+        label_7 = new QLabel(tab_2);
+        label_7->setObjectName(QString::fromUtf8("label_7"));
+        label_7->setWordWrap(true);
+
+        gridLayout8->addWidget(label_7, 0, 0, 1, 1);
+
+        verticalSpacer_2 = new QSpacerItem(535, 179, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        gridLayout8->addItem(verticalSpacer_2, 1, 0, 1, 1);
+
+        horizontalLayout_14 = new QHBoxLayout();
+        horizontalLayout_14->setSpacing(6);
+        horizontalLayout_14->setObjectName(QString::fromUtf8("horizontalLayout_14"));
+        label_8 = new QLabel(tab_2);
+        label_8->setObjectName(QString::fromUtf8("label_8"));
+
+        horizontalLayout_14->addWidget(label_8);
+
+        dsp_exactrate = new QLabel(tab_2);
+        dsp_exactrate->setObjectName(QString::fromUtf8("dsp_exactrate"));
+
+        horizontalLayout_14->addWidget(dsp_exactrate);
+
+
+        gridLayout8->addLayout(horizontalLayout_14, 2, 0, 1, 1);
+
+        horizontalLayout_13 = new QHBoxLayout();
+        horizontalLayout_13->setSpacing(6);
+        horizontalLayout_13->setObjectName(QString::fromUtf8("horizontalLayout_13"));
+        label_6 = new QLabel(tab_2);
+        label_6->setObjectName(QString::fromUtf8("label_6"));
+
+        horizontalLayout_13->addWidget(label_6);
+
+        dsp_playrate = new QSpinBox(tab_2);
+        dsp_playrate->setObjectName(QString::fromUtf8("dsp_playrate"));
+        dsp_playrate->setMinimum(8192);
+        dsp_playrate->setMaximum(96000);
+        dsp_playrate->setSingleStep(100);
+        dsp_playrate->setValue(44100);
+
+        horizontalLayout_13->addWidget(dsp_playrate);
+
+
+        gridLayout8->addLayout(horizontalLayout_13, 3, 0, 1, 1);
+
+        dsp_verbose = new QCheckBox(tab_2);
+        dsp_verbose->setObjectName(QString::fromUtf8("dsp_verbose"));
+
+        gridLayout8->addWidget(dsp_verbose, 4, 0, 1, 1);
+
+        tabWidget->addTab(tab_2, QString());
         alsatab = new QWidget();
         alsatab->setObjectName(QString::fromUtf8("alsatab"));
-        gridLayout8 = new QGridLayout(alsatab);
-        gridLayout8->setSpacing(6);
-        gridLayout8->setContentsMargins(9, 9, 9, 9);
-        gridLayout8->setObjectName(QString::fromUtf8("gridLayout8"));
+        gridLayout9 = new QGridLayout(alsatab);
+        gridLayout9->setSpacing(6);
+        gridLayout9->setContentsMargins(9, 9, 9, 9);
+        gridLayout9->setObjectName(QString::fromUtf8("gridLayout9"));
         textLabel9 = new QLabel(alsatab);
         textLabel9->setObjectName(QString::fromUtf8("textLabel9"));
         textLabel9->setWordWrap(false);
 
-        gridLayout8->addWidget(textLabel9, 1, 0, 1, 1);
+        gridLayout9->addWidget(textLabel9, 1, 0, 1, 1);
 
         alsa_latency = new QSpinBox(alsatab);
         alsa_latency->setObjectName(QString::fromUtf8("alsa_latency"));
@@ -1256,22 +1323,17 @@ public:
         alsa_latency->setSingleStep(10);
         alsa_latency->setValue(150);
 
-        gridLayout8->addWidget(alsa_latency, 2, 1, 1, 2);
+        gridLayout9->addWidget(alsa_latency, 2, 1, 1, 2);
 
         spacerItem1 = new QSpacerItem(20, 149, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
-        gridLayout8->addItem(spacerItem1, 4, 1, 1, 1);
-
-        alsa_verbose = new QCheckBox(alsatab);
-        alsa_verbose->setObjectName(QString::fromUtf8("alsa_verbose"));
-
-        gridLayout8->addWidget(alsa_verbose, 3, 0, 1, 3);
+        gridLayout9->addItem(spacerItem1, 3, 1, 1, 1);
 
         textLabel3 = new QLabel(alsatab);
         textLabel3->setObjectName(QString::fromUtf8("textLabel3"));
         textLabel3->setWordWrap(false);
 
-        gridLayout8->addWidget(textLabel3, 2, 0, 1, 1);
+        gridLayout9->addWidget(textLabel3, 2, 0, 1, 1);
 
         alsa = new QCheckBox(alsatab);
         alsa->setObjectName(QString::fromUtf8("alsa"));
@@ -1281,62 +1343,71 @@ public:
         alsa->setFont(font1);
         alsa->setChecked(true);
 
-        gridLayout8->addWidget(alsa, 0, 0, 1, 3);
+        gridLayout9->addWidget(alsa, 0, 0, 1, 3);
 
         alsa_dev = new QLineEdit(alsatab);
         alsa_dev->setObjectName(QString::fromUtf8("alsa_dev"));
 
-        gridLayout8->addWidget(alsa_dev, 1, 1, 1, 1);
+        gridLayout9->addWidget(alsa_dev, 1, 1, 1, 1);
 
         comboBox2 = new QComboBox(alsatab);
         comboBox2->setObjectName(QString::fromUtf8("comboBox2"));
 
-        gridLayout8->addWidget(comboBox2, 1, 2, 1, 1);
+        gridLayout9->addWidget(comboBox2, 1, 2, 1, 1);
 
         tabWidget->addTab(alsatab, QString());
         osstab = new QWidget();
         osstab->setObjectName(QString::fromUtf8("osstab"));
-        gridLayout9 = new QGridLayout(osstab);
-        gridLayout9->setSpacing(6);
-        gridLayout9->setContentsMargins(9, 9, 9, 9);
-        gridLayout9->setObjectName(QString::fromUtf8("gridLayout9"));
-        spacerItem2 = new QSpacerItem(20, 51, QSizePolicy::Minimum, QSizePolicy::Expanding);
+        gridLayout_4 = new QGridLayout(osstab);
+        gridLayout_4->setSpacing(6);
+        gridLayout_4->setContentsMargins(11, 11, 11, 11);
+        gridLayout_4->setObjectName(QString::fromUtf8("gridLayout_4"));
+        oss = new QCheckBox(osstab);
+        oss->setObjectName(QString::fromUtf8("oss"));
+        oss->setFont(font1);
 
-        gridLayout9->addItem(spacerItem2, 7, 0, 1, 2);
-
-        textLabel7 = new QLabel(osstab);
-        textLabel7->setObjectName(QString::fromUtf8("textLabel7"));
-        textLabel7->setWordWrap(false);
-
-        gridLayout9->addWidget(textLabel7, 3, 0, 1, 1);
-
-        oss_verbose = new QCheckBox(osstab);
-        oss_verbose->setObjectName(QString::fromUtf8("oss_verbose"));
-
-        gridLayout9->addWidget(oss_verbose, 6, 0, 1, 3);
+        gridLayout_4->addWidget(oss, 0, 0, 1, 2);
 
         textLabel6 = new QLabel(osstab);
         textLabel6->setObjectName(QString::fromUtf8("textLabel6"));
         textLabel6->setWordWrap(false);
 
-        gridLayout9->addWidget(textLabel6, 1, 0, 1, 1);
+        gridLayout_4->addWidget(textLabel6, 1, 0, 1, 1);
+
+        oss_dsp = new QLineEdit(osstab);
+        oss_dsp->setObjectName(QString::fromUtf8("oss_dsp"));
+
+        gridLayout_4->addWidget(oss_dsp, 1, 1, 1, 1);
+
+        comboBox3 = new QComboBox(osstab);
+        comboBox3->setObjectName(QString::fromUtf8("comboBox3"));
+
+        gridLayout_4->addWidget(comboBox3, 1, 2, 1, 1);
 
         oss_init_fragments = new QCheckBox(osstab);
         oss_init_fragments->setObjectName(QString::fromUtf8("oss_init_fragments"));
 
-        gridLayout9->addWidget(oss_init_fragments, 2, 0, 1, 3);
+        gridLayout_4->addWidget(oss_init_fragments, 2, 0, 1, 2);
 
-        oss = new QCheckBox(osstab);
-        oss->setObjectName(QString::fromUtf8("oss"));
-        oss->setFont(font1);
+        textLabel7 = new QLabel(osstab);
+        textLabel7->setObjectName(QString::fromUtf8("textLabel7"));
+        textLabel7->setWordWrap(false);
 
-        gridLayout9->addWidget(oss, 0, 0, 1, 3);
+        gridLayout_4->addWidget(textLabel7, 3, 0, 1, 1);
+
+        oss_fragments = new QSpinBox(osstab);
+        oss_fragments->setObjectName(QString::fromUtf8("oss_fragments"));
+        oss_fragments->setMinimum(1);
+        oss_fragments->setMaximum(100);
+        oss_fragments->setValue(16);
+
+        gridLayout_4->addWidget(oss_fragments, 3, 1, 1, 1);
 
         textLabel3_3 = new QLabel(osstab);
         textLabel3_3->setObjectName(QString::fromUtf8("textLabel3_3"));
         textLabel3_3->setWordWrap(false);
 
-        gridLayout9->addWidget(textLabel3_3, 4, 0, 1, 1);
+        gridLayout_4->addWidget(textLabel3_3, 4, 0, 1, 1);
 
         oss_latency = new QSpinBox(osstab);
         oss_latency->setObjectName(QString::fromUtf8("oss_latency"));
@@ -1345,30 +1416,21 @@ public:
         oss_latency->setSingleStep(25);
         oss_latency->setValue(300);
 
-        gridLayout9->addWidget(oss_latency, 4, 1, 1, 2);
-
-        oss_dsp = new QLineEdit(osstab);
-        oss_dsp->setObjectName(QString::fromUtf8("oss_dsp"));
-
-        gridLayout9->addWidget(oss_dsp, 1, 1, 1, 1);
-
-        oss_fragments = new QSpinBox(osstab);
-        oss_fragments->setObjectName(QString::fromUtf8("oss_fragments"));
-        oss_fragments->setMinimum(1);
-        oss_fragments->setMaximum(100);
-        oss_fragments->setValue(16);
-
-        gridLayout9->addWidget(oss_fragments, 3, 1, 1, 2);
+        gridLayout_4->addWidget(oss_latency, 4, 1, 1, 1);
 
         oss_nolatencyaccounting = new QCheckBox(osstab);
         oss_nolatencyaccounting->setObjectName(QString::fromUtf8("oss_nolatencyaccounting"));
 
-        gridLayout9->addWidget(oss_nolatencyaccounting, 5, 0, 1, 3);
+        gridLayout_4->addWidget(oss_nolatencyaccounting, 5, 0, 1, 2);
 
-        comboBox3 = new QComboBox(osstab);
-        comboBox3->setObjectName(QString::fromUtf8("comboBox3"));
+        label_9 = new QLabel(osstab);
+        label_9->setObjectName(QString::fromUtf8("label_9"));
 
-        gridLayout9->addWidget(comboBox3, 1, 2, 1, 1);
+        gridLayout_4->addWidget(label_9, 9, 0, 1, 3);
+
+        spacerItem2 = new QSpacerItem(20, 51, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        gridLayout_4->addItem(spacerItem2, 8, 0, 1, 1);
 
         tabWidget->addTab(osstab, QString());
         jacktab = new QWidget();
@@ -1456,15 +1518,9 @@ public:
 
         subgridLayout->addLayout(horizontalLayoutLR, 3, 1, 1, 2);
 
-        jack_verbose = new QCheckBox(jacktab);
-        jack_verbose->setObjectName(QString::fromUtf8("jack_verbose"));
-        jack_verbose->setEnabled(true);
-
-        subgridLayout->addWidget(jack_verbose, 4, 0, 1, 3);
-
         verticalSpacer = new QSpacerItem(20, 124, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
-        subgridLayout->addItem(verticalSpacer, 5, 2, 1, 1);
+        subgridLayout->addItem(verticalSpacer, 4, 2, 1, 1);
 
         tabWidget->addTab(jacktab, QString());
 
@@ -1822,8 +1878,13 @@ public:
         textLabel1_3->setText(QApplication::translate("SongPlayer", "Directory to store .raw files", 0, QApplication::UnicodeUTF8));
         raw_directory->setText(QApplication::translate("SongPlayer", "./", 0, QApplication::UnicodeUTF8));
         tabWidget->setTabText(tabWidget->indexOf(decodingtab), QApplication::translate("SongPlayer", "Decoding", 0, QApplication::UnicodeUTF8));
+        label_7->setText(QApplication::translate("SongPlayer", "The playing sample rate of the DSP device you choose can be set here. Note that there is a difference between requesting the soundcard to deliver a certain speed and getting it. If there are problems in this area use the verbose button and check the console output when pressing apply.", 0, QApplication::UnicodeUTF8));
+        label_8->setText(QApplication::translate("SongPlayer", "Rate choosen by device", 0, QApplication::UnicodeUTF8));
+        dsp_exactrate->setText(QApplication::translate("SongPlayer", "<unknown>", 0, QApplication::UnicodeUTF8));
+        label_6->setText(QApplication::translate("SongPlayer", "Aim for playing samplerate", 0, QApplication::UnicodeUTF8));
+        dsp_verbose->setText(QApplication::translate("SongPlayer", "verbose", 0, QApplication::UnicodeUTF8));
+        tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("SongPlayer", "Common DSP", 0, QApplication::UnicodeUTF8));
         textLabel9->setText(QApplication::translate("SongPlayer", "ALSA device to use", 0, QApplication::UnicodeUTF8));
-        alsa_verbose->setText(QApplication::translate("SongPlayer", "verbose", 0, QApplication::UnicodeUTF8));
         textLabel3->setText(QApplication::translate("SongPlayer", "Latency (ms)", 0, QApplication::UnicodeUTF8));
         alsa->setText(QApplication::translate("SongPlayer", "use ALSA driver", 0, QApplication::UnicodeUTF8));
         alsa_dev->setText(QApplication::translate("SongPlayer", "hw:0", 0, QApplication::UnicodeUTF8));
@@ -1836,20 +1897,20 @@ public:
          << QApplication::translate("SongPlayer", "default", 0, QApplication::UnicodeUTF8)
         );
         tabWidget->setTabText(tabWidget->indexOf(alsatab), QApplication::translate("SongPlayer", "Alsa", 0, QApplication::UnicodeUTF8));
-        textLabel7->setText(QApplication::translate("SongPlayer", "Fragment count", 0, QApplication::UnicodeUTF8));
-        oss_verbose->setText(QApplication::translate("SongPlayer", "verbose", 0, QApplication::UnicodeUTF8));
-        textLabel6->setText(QApplication::translate("SongPlayer", "DSP device to use", 0, QApplication::UnicodeUTF8));
-        oss_init_fragments->setText(QApplication::translate("SongPlayer", "Set buffer properties", 0, QApplication::UnicodeUTF8));
         oss->setText(QApplication::translate("SongPlayer", "use OSS sound driver", 0, QApplication::UnicodeUTF8));
-        textLabel3_3->setText(QApplication::translate("SongPlayer", "Latency (ms)", 0, QApplication::UnicodeUTF8));
+        textLabel6->setText(QApplication::translate("SongPlayer", "DSP device to use", 0, QApplication::UnicodeUTF8));
         oss_dsp->setText(QApplication::translate("SongPlayer", "/dev/dsp", 0, QApplication::UnicodeUTF8));
-        oss_nolatencyaccounting->setText(QApplication::translate("SongPlayer", "No latency accounting", 0, QApplication::UnicodeUTF8));
         comboBox3->clear();
         comboBox3->insertItems(0, QStringList()
          << QApplication::translate("SongPlayer", "/dev/dsp", 0, QApplication::UnicodeUTF8)
          << QApplication::translate("SongPlayer", "/dev/dsp1", 0, QApplication::UnicodeUTF8)
          << QApplication::translate("SongPlayer", "/dev/dsp2", 0, QApplication::UnicodeUTF8)
         );
+        oss_init_fragments->setText(QApplication::translate("SongPlayer", "Set buffer properties", 0, QApplication::UnicodeUTF8));
+        textLabel7->setText(QApplication::translate("SongPlayer", "Fragment count", 0, QApplication::UnicodeUTF8));
+        textLabel3_3->setText(QApplication::translate("SongPlayer", "Latency (ms)", 0, QApplication::UnicodeUTF8));
+        oss_nolatencyaccounting->setText(QApplication::translate("SongPlayer", "No latency accounting", 0, QApplication::UnicodeUTF8));
+        label_9->setText(QApplication::translate("SongPlayer", "Please read http://bpmdj.yellowcouch.org/sound-drivers.html !", 0, QApplication::UnicodeUTF8));
         tabWidget->setTabText(tabWidget->indexOf(osstab), QApplication::translate("SongPlayer", "Oss", 0, QApplication::UnicodeUTF8));
         jack->setText(QApplication::translate("SongPlayer", "use Jack device", 0, QApplication::UnicodeUTF8));
         outputchannel_label->setText(QApplication::translate("SongPlayer", "Outputchannel", 0, QApplication::UnicodeUTF8));
@@ -1879,7 +1940,6 @@ public:
          << QApplication::translate("SongPlayer", "system:playback_3", 0, QApplication::UnicodeUTF8)
          << QApplication::translate("SongPlayer", "system:playback_4", 0, QApplication::UnicodeUTF8)
         );
-        jack_verbose->setText(QApplication::translate("SongPlayer", "Verbose", 0, QApplication::UnicodeUTF8));
         tabWidget->setTabText(tabWidget->indexOf(jacktab), QApplication::translate("SongPlayer", "Jack", 0, QApplication::UnicodeUTF8));
         tab->setTabText(tab->indexOf(setupTab), QApplication::translate("SongPlayer", "Setup", 0, QApplication::UnicodeUTF8));
     } // retranslateUi

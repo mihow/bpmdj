@@ -94,23 +94,27 @@ void dsp_alsa::write(stereo_sample2 value)
     }
 }
 
+/**
+ * Because the latency call access the device from a concurrent thread 
+ * (the other one is the sound pusher thread), it might happen that the
+ * return value of the snd_pcm_delay call is crap. In that case we simply
+ * try again.
+ */
 signed8 dsp_alsa::latency()
 {
+  
   snd_pcm_sframes_t delay;
-  int err = snd_pcm_delay(dsp,&delay);
-  if (err<0)
+  while(true)
     {
-      Warning("error obtaining latency:%d %s",err,snd_strerror(err));
-      return 0;
+      int err = snd_pcm_delay(dsp,&delay);
+      if (err<0)
+	{
+	  Warning("error obtaining latency:%d %s",err,snd_strerror(err));
+	  return 0;
+	}
+      if (delay >= 0 && (unsigned4)delay <= buffer_size)
+	return delay + filled;
     }
-  assert(err==0);
-  if (verbose)
-    Info("delay = %d",(int)delay);
-  if (delay < 0 || (unsigned4)delay > buffer_size)
-    Fatal("dsp-alsa latency call returned weird values %ld, buffersize: %ld",
-	  delay,buffer_size);
-  assert(delay >= 0 && (unsigned4)delay <= buffer_size);
-  return delay + filled;
 }
 
 dsp_alsa::dsp_alsa(const PlayerConfig & config) : dsp_driver(config)
@@ -124,7 +128,6 @@ dsp_alsa::dsp_alsa(const PlayerConfig & config) : dsp_driver(config)
   buffer_size = 0;
   period_size = 0;
   arg_latency = config.get_alsa_latency();
-  verbose = config.get_alsa_verbose();
 }
 
 int dsp_alsa::open(bool ui)
@@ -186,20 +189,22 @@ int dsp_alsa::open(bool ui)
       return err_dsp;
     }
   
-  unsigned int q = WAVRATE;
+  unsigned int q = playrate;
   err = snd_pcm_hw_params_set_rate_near(dsp, hparams, &q, 0);
   if (err < 0)
     {
       Error(ui,"dsp: setting dsp speed (%d) failed",q);
       return err_dsp;
     }
-  if (q != WAVRATE)
+  if (q != (unsigned)playrate)
+    {
+      playrate=q;
       Warning("dsp: setting dsp speed (%d) failed, resulting rate = %d ",
-	      WAVRATE, q);
-
+	      playrate, q);
+    }
+  
   // playing latency ....
   period_time = arg_latency * 1000;
-  // period_time /=2; // we do this so we can afterward use multiple periods
   buffer_time = period_time *2;
   {
     unsigned int t = buffer_time;

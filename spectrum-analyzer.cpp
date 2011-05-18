@@ -91,8 +91,8 @@ void fft_to_bark(float8 * in_r, int window_size, float8 * out)
       int c = (int)barkbounds[b+1];
       a *= window_size;
       c *= window_size;
-      a /= WAVRATE;
-      c /= WAVRATE;
+      a /= diskrate;
+      c /= diskrate;
       if (c==a)
 	{
 	  printf("a = %d; b=%d, c=%d\n",a,b,c);

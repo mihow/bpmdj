@@ -31,7 +31,7 @@ using namespace std;
 
 /**
  * period_type - describes the length of a period in the index file, 
- *               normalized to 44100 Hz
+ *               normalized to metarate (44100 Hz normally)
  * quad_period_type - describes the length of a measure in the player, 
  *                    depending on different wavrates
  * tempo_type - describes the BPM of the song, given a period_type

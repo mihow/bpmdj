@@ -491,7 +491,7 @@ bool Config::load()
 	  s >> str; set_tag_mustbe(str);
 	  s >> str; set_tag_exclude(str);
 	}
-      else if (magic == MAGIC_4_1b)
+      else if (magic == MAGIC_4_1b || magic == MAGIC_4_2)
 	{
 	  s >> w; set_file_count (w);
 	  s >> w; set_yellowTime (w);

@@ -106,7 +106,7 @@ public:
    * This makes it possible to calculate the current measure
    * based on the current songposition ::x
    */
-  unsigned8 samples_per_column;
+  unsigned8 samples_per_column_diskrate;
   /**
    * Creates a beatgraph label to be used in BpmPlay.
    */

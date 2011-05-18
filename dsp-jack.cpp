@@ -37,8 +37,6 @@ using namespace std;
 #include "memory.h"
 #include "info.h"
 
-pthread_mutex_t thread_lock = PTHREAD_MUTEX_INITIALIZER;
-
 void dsp_jack::start(audio_source* s)
 {
 #ifdef DEBUG_WAIT_STATES
@@ -132,7 +130,6 @@ dsp_jack::dsp_jack(const PlayerConfig & config) : dsp_driver(config)
   arg_dev = strdup(config.get_jack_dev().toAscii().data());
   lout = strdup(config.get_jack_lout().toAscii().data());
   rout = strdup(config.get_jack_rout().toAscii().data());
-  verbose = config.get_jack_verbose();
   bufsize = 0;
   if (verbose)
     Debug("dsp_jack::<constructor> called\n"
@@ -240,12 +237,12 @@ int dsp_jack::open(bool ui)
   if (verbose) 
     Info("engine sample rate: %d",jack_get_sample_rate (client));
   
-  if (jack_get_sample_rate (client) != WAVRATE) 
+  if (jack_get_sample_rate (client) != playrate) 
     {
       Error(ui,"engine sample rate: %d\n"
 	    "Please be sure jackd is running at %d",
 	    jack_get_sample_rate (client),
-	    WAVRATE);
+	    playrate);
       return err_dsp;
     }
   

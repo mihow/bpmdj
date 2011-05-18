@@ -45,12 +45,11 @@ class PlayerConfig
    */
   accessors(int,player_dsp,0);
   accessors(int,alsa_latency,150);      
-  accessors(bool,alsa_verbose,false);
+  accessors(bool,dsp_verbose,false);
   accessors(QString, alsa_dev, "hw:0,0");
   accessors(QString, oss_dsp,"/dev/dsp");
   accessors(bool,oss_init_fragments,false);
   accessors(int,oss_fragments,16);
-  accessors(bool,oss_verbose,true);
   accessors(bool,oss_nolatencyaccounting,false);
   accessors(int,oss_latency,150);
   accessors(int,bpm_channel,1);
@@ -60,10 +59,11 @@ class PlayerConfig
    // version 3.3
   accessors(QString, jack_dev,"");
   accessors(int,jack_latency,150);
-  accessors(bool,jack_verbose,true);
   // version 4.1
   accessors(QString, jack_lout,"");
   accessors(QString, jack_rout,"");
+  // version 4.2
+  accessors(int,dsp_playrate,44100);
   PlayerConfig();
   PlayerConfig(QString configname);
   void load_ui_position(QDialog * dialog);

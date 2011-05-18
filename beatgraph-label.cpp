@@ -68,7 +68,7 @@ void BeatGraphLabel::xorLine(int ox, int&x1, int&x2)
 void BeatGraphLabel::moveRuler(int &x1, int&x2,int &x3, int &x4)
 {
   if (resized.isNull()) return; 
-  int pos = ::x/samples_per_column;
+  int pos = ::x_diskrate/samples_per_column_diskrate;
   x1=x2=x3=x4=-1;
   if (ruler_x==pos) return;
   if (ruler_x>-1)
@@ -109,7 +109,7 @@ void BeatGraphLabel::drawCursor()
 
 void BeatGraphLabel::drawCueText()
 {
-  if (!(resized.width()>1 && samples_per_column>1)) return;
+  if (!(resized.width()>1 && samples_per_column_diskrate>1)) return;
   QPainter paint;
   paint.begin(&resized);
   QColor cue_to_color[5];
@@ -121,14 +121,14 @@ void BeatGraphLabel::drawCueText()
   int tx=resized.width();
   for(int i = -1 ; i < 4 ; i ++)
     {
-      cue_info c = i==-1 ? ::cue : ::cues[i];
+      cue_info c = i==-1 ? ::cue_metarate : ::cues_metarate[i];
       if (c==0) continue;
       QPen cue_pen(cue_to_color[i+1], 2);
       paint.setPen(cue_pen);
-      int x = c/samples_per_column;
-      int y = c-x*samples_per_column;
+      int x = metarate_to_diskrate(c)/samples_per_column_diskrate;
+      int y = metarate_to_diskrate(c)-x*samples_per_column_diskrate;
       x=x*tx/original.width();
-      y=y*resized.height()/samples_per_column;
+      y=y*resized.height()/samples_per_column_diskrate;
       paint.drawLine(x-10,y,x+10,y);
       paint.drawLine(x,y-10,x,y+10);
     }
@@ -138,7 +138,6 @@ void BeatGraphLabel::drawCueText()
 
 void BeatGraphLabel::paintEvent(QPaintEvent *e)
 {
-  // AutoMessage("paintEvent");  
   QMutexLocker _ml(&lock);
   if (resized.isNull())
     {
@@ -153,7 +152,7 @@ void BeatGraphLabel::paintEvent(QPaintEvent *e)
       cues_changed=false;
       if (!original.isNull())
 	{
-	  setImage(original,samples_per_column);
+	  setImage(original,samples_per_column_diskrate);
 	  int a,b,c,d;
 	  moveRuler(a,b,c,d);
 	}
@@ -181,7 +180,7 @@ BeatGraphLabel::BeatGraphLabel(QWidget * parent, const char * name) :
   setAttribute(Qt::WA_OpaquePaintEvent);
   ruler_x=-1;
   cues_changed=false;
-  samples_per_column=1;
+  samples_per_column_diskrate=1;
   connect(&timer,SIGNAL(timeout()),SLOT(drawCursor()));
 };
 
@@ -193,7 +192,7 @@ void BeatGraphLabel::setImage(QImage image, unsigned8 samplespercol)
   resized=original.scaled(size());
   drawCueText();
   ruler_x = -1;
-  samples_per_column=samplespercol;
+  samples_per_column_diskrate=samplespercol;
   timer.start(333);
 }
 

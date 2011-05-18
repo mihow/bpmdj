@@ -77,7 +77,7 @@ BeatGraphAnalyzer::BeatGraphAnalyzer(QWidget * parent, const char* name) :
 {
   setWindowTitle(name);
   setupUi(this);
-  period = 0;
+  period_diskrate = 0;
   audiosize = 0;
   data = NULL;
   bank = NULL;
@@ -168,8 +168,8 @@ void BeatGraphAnalyzer::readFileSigned()
 }
 
 void BeatGraphAnalyzer::showEnergyPattern()
-{ 
-  unsigned4 collapsed_period = period  / COLLAPSE ;
+{
+  unsigned4 collapsed_period = period_diskrate  / COLLAPSE ;
   unsigned4 collapsed_size = audiosize / COLLAPSE ;
   int window_xsize = collapsed_size / collapsed_period - 1 ;
   int samples_per_column = collapsed_period * COLLAPSE;
@@ -195,7 +195,7 @@ void BeatGraphAnalyzer::showEnergyPattern()
   p.setPen(QColor(0,128,0));
   for(int row = 0 ; row < window_ysize ; row+=window_ysize/8)
     p.drawLine(0,row,window_xsize-1,row);
-  p.end(); 
+  p.end();
   pattern->setImage(pm,samples_per_column);
 }
 
@@ -612,7 +612,8 @@ void BeatGraphAnalyzer::calculateF1()
       channels[i]=(unsigned4*)multi_f+j;
     }
   
-  unsigned4 ws = ::normalperiod/(COLLAPSE*4*(1<<maxlevel));
+  unsigned4 normalperiod_diskrate=normalperiod_metarate*diskrate/metarate;
+  unsigned4 ws = normalperiod_diskrate/(COLLAPSE*4*(1<<maxlevel));
   if (ws<1) ws=1;
   Debug("Beatgraph-F1: Energy calculations using a windowsize of %d",ws);
   for(int i = 0 ; i < channelcount ; i++)
@@ -690,7 +691,7 @@ void BeatGraphAnalyzer::calculateF1()
 
 void BeatGraphAnalyzer::showHaarPattern()
 { 
-  unsigned4 collapsed_period = period  / COLLAPSE ;
+  unsigned4 collapsed_period = period_diskrate  / COLLAPSE ;
   unsigned4 collapsed_size = audiosize / COLLAPSE ;
   int window_xsize = collapsed_size / collapsed_period - 1 ;
   int samples_per_column = collapsed_period * COLLAPSE;
@@ -749,7 +750,7 @@ void BeatGraphAnalyzer::showHaarPattern()
 
 void BeatGraphAnalyzer::showF1Pattern()
 { 
-  unsigned4 collapsed_period = period  / COLLAPSE ;
+  unsigned4 collapsed_period = period_diskrate  / COLLAPSE ;
   unsigned4 collapsed_size = audiosize / COLLAPSE ;
   int window_xsize = collapsed_size / collapsed_period - 1 ;
   int samples_per_column = collapsed_period * COLLAPSE;
@@ -790,7 +791,7 @@ void BeatGraphAnalyzer::showF1Pattern()
 
 bool BeatGraphAnalyzer::check_visualisation_conditions(bool file_read)
 {
-  if (!period)
+  if (!period_diskrate)
     {
       QMessageBox::warning(this,"No period estimate",
 	   "No period estimate, hence cannot show the beat graph.\n"
@@ -838,9 +839,9 @@ void BeatGraphAnalyzer::changeVisualisation()
 
 void BeatGraphAnalyzer::getTempo()
 {
-  if (!normalperiod.valid()) period = 0;
-  else period=normalperiod+periodDelta->value()+periodDelta10->value();
-  if (period<=0) period=0;
+  if (!normalperiod_metarate.valid()) period_diskrate = 0;
+  else period_diskrate=(normalperiod_metarate+periodDelta->value()+periodDelta10->value())*diskrate/metarate;
+  if (period_diskrate<=0) period_diskrate=0;
 }
 
 void BeatGraphAnalyzer::slantChanged()
@@ -852,13 +853,13 @@ void BeatGraphAnalyzer::slantChanged()
 void BeatGraphAnalyzer::setTempo()
 {
   if (!playing) return;
-  bool was_normal = normalperiod == currentperiod;
-  bool was_target = targetperiod == currentperiod;
+  bool was_normal = normalperiod_metarate == currentperiod_metarate;
+  bool was_target = targetperiod_metarate == currentperiod_metarate;
   assert(metronome);
-  signed8 newnormalperiod=normalperiod+periodDelta->value()+
+  signed8 newnormalperiod=normalperiod_metarate+periodDelta->value()+
     periodDelta10->value();
   if (newnormalperiod<=0) newnormalperiod = 1;
-  set_normalperiod(newnormalperiod);
+  set_normalperiod_metarate(newnormalperiod);
   periodDelta->setValue(0);
   periodDelta10->setValue(0);
   if (was_target) emit targetTempo();

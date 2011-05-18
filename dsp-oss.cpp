@@ -48,17 +48,16 @@ using namespace std;
 /*-------------------------------------------
  *         Clock operations
  *-------------------------------------------*/
-static clock_t starttick;
-void clock_start()
+void dsp_oss::clock_start()
 {
    starttick=times(NULL);
 }
 
-signed8 clock_ticks()
+signed8 dsp_oss::clock_ticks()
 {
-  // clock ticks are expressed in WAVRATE resolution
+  // clock ticks are expressed in playrate resolution
   signed8 ticks=(signed8)times(NULL)-(signed8)starttick;
-  signed8 answer=ticks*(signed8)WAVRATE/(signed8)CLOCK_FREQ;
+  signed8 answer=ticks*(signed8)playrate/(signed8)CLOCK_FREQ;
   assert(answer>=0);
   return answer;
 }
@@ -74,7 +73,6 @@ dsp_oss::dsp_oss(const PlayerConfig & config) : dsp_driver(config)
   opt_nolatencyaccounting = config.get_oss_nolatencyaccounting();
   dsp_writecount=0;
   arg_latency = config.get_oss_latency();
-  verbose = config.get_oss_verbose();
 }
 
 void dsp_oss::start(audio_source*a)
@@ -140,10 +138,19 @@ int dsp_oss::open(bool ui)
   dsp = ::open(arg_dsp,O_WRONLY);
   if (dsp==-1)
     {
+      Error(ui,"Could not open %s",arg_dsp);
       alarm(0);
       return err_dsp;
     }
   alarm(0);
+
+  // we no longer want cooked devices. If we would want to cook we 
+  // should have bought a kitchen. It seems this is OSS 4 dependent
+  /*  int enabled=0;
+  if (ioctl(fd, SNDCTL_DSP_COOKEDMODE, &enabled)==-1)
+    if (verbose)
+      Info("could not uncook device");
+  */
   
   // set dsp parameters
   p=AFMT_S16_LE;
@@ -152,19 +159,16 @@ int dsp_oss::open(bool ui)
   p=2;
   if (ioctl(dsp,SNDCTL_DSP_CHANNELS,&p)==-1)
     Error(ui,"Setting Oss driver to 2 channels failed");
-  p=WAVRATE;
-  if (ioctl(dsp,SNDCTL_DSP_SPEED,&p)==-1)
+  p=playrate;
+  int r=ioctl(dsp,SNDCTL_DSP_SPEED,&p);
+  if (r==-1)
+    Error(ui,"Setting Oss driver speed (%d) failed.",p);
+  if (playrate!=(unsigned)p)
     {
-      Error(ui,"Setting Oss driver speed (%d) failed",p++);
-      if (ioctl(dsp,SNDCTL_DSP_SPEED,&p)==-1)
-	{
-	  Error(ui,"Setting Oss dsp speed (%d) failed",p);
-	  p+=2;
-	  if (ioctl(dsp,SNDCTL_DSP_SPEED,&p)==-1)
-	    Error(ui,"Setting Oss dsp speed (%d) failed\n",p);
-	}
+      Info("actual playrate is %d, requested playrate was %d\n",p,playrate);
+      playrate=p;
     }
-  
+    
   // set fragment size
   // opt_latency bevat de gevraagde latency. Dus dit omzetten naar
   // hiervan moeten we natuurlijk het logaritme nemen..
@@ -173,7 +177,7 @@ int dsp_oss::open(bool ui)
     int latency_setter;
     int latency_checker;
     p = arg_fragments << 16;
-    latency_setter  = ms2bytes(arg_latency);
+    latency_setter  = ms2bytes(arg_latency,playrate);
     latency_setter /= arg_fragments;
     latency_checker = arg_fragments;
     if (verbose)
@@ -186,7 +190,7 @@ int dsp_oss::open(bool ui)
       }
     ioctl(dsp,SNDCTL_DSP_SETFRAGMENT,&p);
     ioctl(dsp,SNDCTL_DSP_GETOSPACE,&dsp_latency);
-    latency_setter = bytes2ms(dsp_latency.bytes);
+    latency_setter = bytes2ms(dsp_latency.bytes,playrate);
     if (verbose) 
       Info("actually latency will be %d ms",latency_setter);
     if (dsp_latency.bytes != latency_checker)
@@ -195,8 +199,8 @@ int dsp_oss::open(bool ui)
       Info(" fragments = %d\n"
 	   " fragsize = %d ms\n"
 	   " bytes = %d ms",
-	   dsp_latency.fragments, bytes2ms(dsp_latency.fragsize),
-	   bytes2ms(dsp_latency.bytes));
+	   dsp_latency.fragments, bytes2ms(dsp_latency.fragsize,playrate),
+	   bytes2ms(dsp_latency.bytes,playrate));
     
     // now get the capacities
     ioctl(dsp,SNDCTL_DSP_GETCAPS,&p);
@@ -226,7 +230,7 @@ void dsp_oss::close(bool fl)
   if (fl) flush();
   if (verbose)
     Info("Fluffily-measured playing latency when closing = %d ms",
-	 samples2ms(clock_ticks()-latencycheck));
+	 samples2ms(clock_ticks()-latencycheck,playrate));
   ::close(dsp);
 }
 #endif

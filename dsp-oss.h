@@ -27,6 +27,9 @@ using namespace std;
 class dsp_oss: public dsp_driver
 {
  private:
+  clock_t starttick;
+  void clock_start();
+  signed8 clock_ticks();
   int            dsp;
   signed8        dsp_writecount;
   audio_buf_info dsp_latency;

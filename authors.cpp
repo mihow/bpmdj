@@ -16,6 +16,8 @@ const char* authors=
 "\n"
 "Passive\n"
 "-------\n"
+"Bernard Fortz <bernard.fortz@gmail.com>\n"
+"  JACK support, Midi bindings, Gentoo packaging\n"
 "F. Murtagh <murtagh@scivax.stsci.edu>\n"
 "  PCA-code\n"
 "Julius O. Smith <http://www-ccrma.stanford.edu/~jos/>\n"

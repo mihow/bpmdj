@@ -93,6 +93,10 @@ protected:
   audio_source* audio;
 public:
   /**
+   * The playrate for this dsp driver. E.g: 44100 or 48000
+   */
+  unsigned4 playrate;
+  /**
    * A method which will performs a continuous data pull from the core and push
    * it to the driver. This function should be called by nobody but the go2 
    * function in dsp-drivers.cpp
@@ -100,14 +104,7 @@ public:
   void run_pusher_thread();
 public:
   // playing
-  dsp_driver(const PlayerConfig & config) 
-  { 
-    verbose = true;
-    stopped = true;
-    stop_request = false;
-    paused = true;
-    starting=false;
-  };
+  dsp_driver(const PlayerConfig & config);
   /**
    * The normal start routine will spawn a process which will 
    * rely on a synchronous writing of data to the output. The start

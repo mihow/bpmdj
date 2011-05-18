@@ -68,7 +68,7 @@ private:
   void retrieveCue(int nr);
   void retrieveNextCue();
   void cueShift(signed8 dir);
-  void shift_playpos(signed4 direction);
+  void shift_playpos_metarate(signed4 direction);
 protected:
   virtual void done(int r);
   void checkCueNonZero();

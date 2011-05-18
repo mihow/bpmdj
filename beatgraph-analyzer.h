@@ -36,7 +36,7 @@ private:
   uncompressed * signed_data;  // contains audiosize/COLLAPSED samples
   void readFileSigned();
   // the period under which the beatgraph is being visualized
-  signed4 period;
+  signed4 period_diskrate;
   void getTempo();
   bool check_visualisation_conditions(bool file_read=true);
   // energy calculation, storage & visualization

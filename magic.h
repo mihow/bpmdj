@@ -41,5 +41,6 @@ using namespace std;
 #define MAGIC_4_0 0xBDF2
 #define MAGIC_4_1 0xBDF3
 #define MAGIC_4_1b 0xBDF4
-#define MAGIC_NOW MAGIC_4_1b
+#define MAGIC_4_2 0xBDF5
+#define MAGIC_NOW MAGIC_4_2
 #endif // __loaded__magic_h__

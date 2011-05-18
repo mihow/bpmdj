@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'ui-about.ui'
 **
-** Created: Mon May 16 18:44:30 2011
+** Created: Wed May 18 22:34:35 2011
 **      by: Qt User Interface Compiler version 4.7.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -40,9 +40,9 @@ public:
     QWidget *about;
     QGridLayout *gridLayout1;
     QLabel *versionLabel;
-    QLabel *textLabel1_2;
     QLabel *TextLabel11;
     QLabel *TextLabel10;
+    QLabel *textLabel1_2;
     QWidget *license;
     QGridLayout *gridLayout_2;
     QPlainTextEdit *plainTextEdit;
@@ -141,43 +141,22 @@ public:
 
         gridLayout1->addWidget(versionLabel, 0, 0, 1, 1);
 
-        textLabel1_2 = new QLabel(about);
-        textLabel1_2->setObjectName(QString::fromUtf8("textLabel1_2"));
-        sizePolicy.setHeightForWidth(textLabel1_2->sizePolicy().hasHeightForWidth());
-        textLabel1_2->setSizePolicy(sizePolicy);
-        QPalette palette3;
-        QBrush brush7(QColor(85, 255, 0, 255));
-        brush7.setStyle(Qt::SolidPattern);
-        palette3.setBrush(QPalette::Active, QPalette::WindowText, brush7);
-        palette3.setBrush(QPalette::Inactive, QPalette::WindowText, brush7);
-        palette3.setBrush(QPalette::Disabled, QPalette::WindowText, brush3);
-        textLabel1_2->setPalette(palette3);
-        QFont font1;
-        font1.setBold(true);
-        font1.setWeight(75);
-        textLabel1_2->setFont(font1);
-        textLabel1_2->setTextFormat(Qt::RichText);
-        textLabel1_2->setAlignment(Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing);
-        textLabel1_2->setWordWrap(false);
-
-        gridLayout1->addWidget(textLabel1_2, 3, 0, 1, 2);
-
         TextLabel11 = new QLabel(about);
         TextLabel11->setObjectName(QString::fromUtf8("TextLabel11"));
         sizePolicy.setHeightForWidth(TextLabel11->sizePolicy().hasHeightForWidth());
         TextLabel11->setSizePolicy(sizePolicy);
-        QPalette palette4;
-        QBrush brush8(QColor(255, 255, 0, 255));
-        brush8.setStyle(Qt::SolidPattern);
-        palette4.setBrush(QPalette::Active, QPalette::WindowText, brush8);
-        palette4.setBrush(QPalette::Inactive, QPalette::WindowText, brush8);
-        palette4.setBrush(QPalette::Disabled, QPalette::WindowText, brush3);
-        TextLabel11->setPalette(palette4);
-        QFont font2;
-        font2.setPointSize(16);
-        font2.setBold(true);
-        font2.setWeight(75);
-        TextLabel11->setFont(font2);
+        QPalette palette3;
+        QBrush brush7(QColor(255, 255, 0, 255));
+        brush7.setStyle(Qt::SolidPattern);
+        palette3.setBrush(QPalette::Active, QPalette::WindowText, brush7);
+        palette3.setBrush(QPalette::Inactive, QPalette::WindowText, brush7);
+        palette3.setBrush(QPalette::Disabled, QPalette::WindowText, brush3);
+        TextLabel11->setPalette(palette3);
+        QFont font1;
+        font1.setPointSize(16);
+        font1.setBold(true);
+        font1.setWeight(75);
+        TextLabel11->setFont(font1);
         TextLabel11->setTextFormat(Qt::RichText);
         TextLabel11->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
         TextLabel11->setWordWrap(true);
@@ -188,22 +167,43 @@ public:
         TextLabel10->setObjectName(QString::fromUtf8("TextLabel10"));
         sizePolicy.setHeightForWidth(TextLabel10->sizePolicy().hasHeightForWidth());
         TextLabel10->setSizePolicy(sizePolicy);
-        QPalette palette5;
-        QBrush brush9(QColor(255, 170, 0, 255));
-        brush9.setStyle(Qt::SolidPattern);
-        palette5.setBrush(QPalette::Active, QPalette::WindowText, brush9);
-        palette5.setBrush(QPalette::Inactive, QPalette::WindowText, brush9);
-        palette5.setBrush(QPalette::Disabled, QPalette::WindowText, brush3);
-        TextLabel10->setPalette(palette5);
-        QFont font3;
-        font3.setPointSize(20);
-        font3.setBold(true);
-        font3.setWeight(75);
-        TextLabel10->setFont(font3);
+        QPalette palette4;
+        QBrush brush8(QColor(255, 170, 0, 255));
+        brush8.setStyle(Qt::SolidPattern);
+        palette4.setBrush(QPalette::Active, QPalette::WindowText, brush8);
+        palette4.setBrush(QPalette::Inactive, QPalette::WindowText, brush8);
+        palette4.setBrush(QPalette::Disabled, QPalette::WindowText, brush3);
+        TextLabel10->setPalette(palette4);
+        QFont font2;
+        font2.setPointSize(20);
+        font2.setBold(true);
+        font2.setWeight(75);
+        TextLabel10->setFont(font2);
         TextLabel10->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
         TextLabel10->setWordWrap(false);
 
         gridLayout1->addWidget(TextLabel10, 1, 0, 1, 2);
+
+        textLabel1_2 = new QLabel(about);
+        textLabel1_2->setObjectName(QString::fromUtf8("textLabel1_2"));
+        sizePolicy.setHeightForWidth(textLabel1_2->sizePolicy().hasHeightForWidth());
+        textLabel1_2->setSizePolicy(sizePolicy);
+        QPalette palette5;
+        QBrush brush9(QColor(85, 255, 0, 255));
+        brush9.setStyle(Qt::SolidPattern);
+        palette5.setBrush(QPalette::Active, QPalette::WindowText, brush9);
+        palette5.setBrush(QPalette::Inactive, QPalette::WindowText, brush9);
+        palette5.setBrush(QPalette::Disabled, QPalette::WindowText, brush3);
+        textLabel1_2->setPalette(palette5);
+        QFont font3;
+        font3.setBold(true);
+        font3.setWeight(75);
+        textLabel1_2->setFont(font3);
+        textLabel1_2->setTextFormat(Qt::RichText);
+        textLabel1_2->setAlignment(Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing);
+        textLabel1_2->setWordWrap(false);
+
+        gridLayout1->addWidget(textLabel1_2, 3, 0, 1, 2);
 
         pages->addTab(about, QString());
         license = new QWidget();
@@ -275,36 +275,37 @@ public:
         textEdit->setHtml(QApplication::translate("About", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">You can help</p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">- by putting a reference to this work on your webpage</p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">- by publicily acknowledging the use of this software where you use it</p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">- offer the undersigned a hugely paid posi"
-                        "tion in your company</p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">- request support actions from undersigned</p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">- give monetary donations</p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">- helping extend the software (see the webpages)</p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">--</p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">January 2010</p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px"
-                        "; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Werner Van Belle</p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">werner@yellowcouch.org</p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"></p></body></html>", 0, QApplication::UnicodeUTF8));
+"</style></head><body style=\" font-family:'Sans Serif'; font-size:10pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt;\">You can help</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt;\">- by putting a reference to this work on your webpage</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt;\">- by publicily acknowledging the use of this software where you use it</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px"
+                        "; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt;\">- offer the undersigned a hugely paid position in your company</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt;\">- request support actions from undersigned</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt;\">- give monetary donations</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt;\">- helping extend the software (see the webpages)</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt;\">- joining the forum</span></p>\n"
+"<p style=\"-qt-paragraph-type"
+                        ":empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:9pt;\"></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt;\">--</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt;\">May 2011</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt;\">Werner Van Belle</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt;\">werner@yellowcouch.org</span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:9pt;\""
+                        "></p></body></html>", 0, QApplication::UnicodeUTF8));
         pages->setTabText(pages->indexOf(readme), QApplication::translate("About", "Readme", 0, QApplication::UnicodeUTF8));
         versionLabel->setText(QApplication::translate("About", "BpmDj vX.Y", 0, QApplication::UnicodeUTF8));
-        textLabel1_2->setText(QApplication::translate("About", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:'Sans Serif'; font-size:9pt; font-weight:600; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" text-decoration: underline;\">Authors:</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Werner Van Belle<br />Bernard Fortz</p></body></html>", 0, QApplication::UnicodeUTF8));
         TextLabel11->setText(QApplication::translate("About", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:'Sans Serif'; font-size:16pt; font-weight:600; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">(c) Werner Van Belle 2001-2010<br /><span style=\" font-size:small;\">werner@yellowcouch.org </span></p></body></html>", 0, QApplication::UnicodeUTF8));
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">(c) Werner Van Belle 2001-2011<br /><span style=\" font-size:small;\">werner@yellowcouch.org </span></p></body></html>", 0, QApplication::UnicodeUTF8));
         TextLabel10->setText(QApplication::translate("About", "Free Dj Tools", 0, QApplication::UnicodeUTF8));
+        textLabel1_2->setText(QApplication::translate("About", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:'Sans Serif'; font-size:10pt; font-weight:600; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt; text-decoration: underline;\">See authors tab for a full listing of contributors.</span></p></body></html>", 0, QApplication::UnicodeUTF8));
         pages->setTabText(pages->indexOf(about), QApplication::translate("About", "About", 0, QApplication::UnicodeUTF8));
         plainTextEdit->setPlainText(QApplication::translate("About", "		    GNU GENERAL PUBLIC LICENSE\n"
 "		       Version 2, June 1991\n"
