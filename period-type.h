@@ -21,7 +21,6 @@
 using namespace std;
 #line 1 "period-type.h++"
 #include "files.h"
-#include "types.h"
 
 class period_type
 {

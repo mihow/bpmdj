@@ -22,7 +22,7 @@ using namespace std;
 #line 1 "tempo-type.h++"
 #include <qstring.h>
 #include "constants.h"
-#include "types.h"
+#include "flowdb.h"
 
 class tempo_type
 {

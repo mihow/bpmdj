@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #ifndef __DO_FRAGMENT_H
 #define __DO_FRAGMENT_H
 #include <typeinfo>
-#include "./reference-count.h"
+#include "./Data/reference-count.h"
 #include "song.h"
 #include "stereo-sample2.h"
 #include "memory.h"

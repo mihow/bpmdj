@@ -26,7 +26,6 @@ using namespace std;
 #include <qtreewidget.h>
 #include "song.h"
 #include "database.h"
-#include "data.h"
 
 /**
  * A singleton class to keep track of the playing history

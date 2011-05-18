@@ -22,7 +22,6 @@ using namespace std;
 #line 1 "rhythm-analyzer.h++"
 #include "ui-rhythm.h"
 #include "analyzer.h"
-#include "types.h"
 #include "spectrum-type.h"
 
 void fft_to_bark(float8 * in_r, int window_size, spectrum_type &out);

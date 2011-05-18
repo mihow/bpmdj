@@ -41,7 +41,6 @@ using namespace std;
 #include <sys/mman.h>
 #include <syscall.h>
 #include "version.h"
-#include "types.h"
 #include "memory.h"
 #include "bpm.h"
 #include "files.h"

@@ -24,7 +24,7 @@ using namespace std;
 #include <assert.h>
 #include <math.h>
 #include "common.h"
-#include "om-data.h"
+#include "Data/om-data.h"
 #include "histogram-type.h"
 #include "common.h"
 #include "memory.h"
@@ -32,8 +32,6 @@ using namespace std;
 #include "files.h"
 
 class histogram_type;
-extern Symbol key_content;
-extern Symbol key_scale;
 
 template <int smallhistogram_size> class smallhistogram_type
 {
@@ -108,6 +106,9 @@ void smallhistogram_type<smallhistogram_size>::init()
   for(int i = 0 ; i < smallhistogram_size; i++)
     bin[i]=0;
 }
+
+extern Symbol key_content;
+extern Symbol key_scale;
 
 template <int smallhistogram_size> 
 Data smallhistogram_type<smallhistogram_size>::get_data(int version) const

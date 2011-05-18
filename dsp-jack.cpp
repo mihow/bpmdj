@@ -35,7 +35,6 @@ using namespace std;
 #include "player-core.h"
 #include "version.h"
 #include "memory.h"
-#include "lock.h"
 #include "info.h"
 
 pthread_mutex_t thread_lock = PTHREAD_MUTEX_INITIALIZER;

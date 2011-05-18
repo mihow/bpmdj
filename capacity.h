@@ -20,7 +20,7 @@
 #define __loaded__capacity_h__
 using namespace std;
 #line 1 "capacity.h++"
-#include "om-data.h"
+#include "Data/om-data.h"
 
 /**
  * Capacities specify which programs are available and which 

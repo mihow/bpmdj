@@ -22,7 +22,7 @@ using namespace std;
 #line 1 "sample4-type.h++"
 #include <stdlib.h>
 #include <stdio.h>
-#include "om-data.h"
+#include "Data/om-data.h"
 
 class sample4_type
 {

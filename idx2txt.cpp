@@ -21,8 +21,8 @@
 using namespace std;
 #line 1 "idx2txt.c++"
 #include <cstdio>
-#include "data.h"
-#include "data-io.h"
+#include "Data/data.h"
+#include "Data/data-io.h"
 
 int main(int argc, char* argv[])
 {

@@ -20,7 +20,7 @@
 #define __loaded__stereo_sample2_h__
 using namespace std;
 #line 1 "stereo-sample2.h++"
-#include "om-data.h"
+#include "Data/data.h"
 const float4 signed2_sample_max_f =32768.0f;
 
 class stereo_sample2 

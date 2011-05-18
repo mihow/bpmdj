@@ -20,7 +20,6 @@
 #define __loaded__histogram_type_h__
 using namespace std;
 #line 1 "histogram-type.h++"
-#include "types.h"
 #include "common.h"
 
 class histogram_type

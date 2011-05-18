@@ -21,7 +21,7 @@
 using namespace std;
 #line 1 "power-type.h++"
 #include <math.h>
-#include "om-data.h"
+#include "Data/om-data.h"
 
 const float4 no_power = -1.0;
 

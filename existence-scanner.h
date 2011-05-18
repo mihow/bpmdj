@@ -16,7 +16,7 @@
 
 #ifndef __EXISTENCE_SCANNER_H
 #define __EXISTENCE_SCANNER_H
-#include "./active-objects.h"
+#include "./Active/active-objects.h"
 using namespace std;
 #include <vector> 
 #include "song.h"

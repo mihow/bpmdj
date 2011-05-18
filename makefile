@@ -15,6 +15,7 @@ CFLAGS=-DLINUX -DSHORT_ONE
 JOBS=1
 include defines
 LINK =  $(CPP) $(LDFLAGS) $(QT_INCLUDE_PATH) $(QT_LIBRARY_PATH) $(QT_LIBS)
+ACDA = Active Data
 
 # Check all the link targets
 .link-targets:
@@ -34,6 +35,7 @@ LINK =  $(CPP) $(LDFLAGS) $(QT_INCLUDE_PATH) $(QT_LIBRARY_PATH) $(QT_LIBS)
 .PHONY: .source-creator documentation
 .source-creator: sources
 	@echo "Source Files:"
+	@for a in $(ACDA); do make -s -C $$a sources; done
 	@make -s --no-print-directory -f sources .sources
 
 # Create the dependency file if necessary
@@ -45,6 +47,7 @@ LINK =  $(CPP) $(LDFLAGS) $(QT_INCLUDE_PATH) $(QT_LIBRARY_PATH) $(QT_LIBS)
 # Compilation of all source files
 .compile: compile .depend
 	@echo "Compiling: "$(JOBS)" at a time"
+	@for a in $(ACDA); do make -s -C $$a ; done
 	@make -j $(JOBS) -s --no-print-directory -f compile 
 
 # Packaging of the distribution
@@ -94,7 +97,8 @@ check-doc:
 	@echo ============================================================
 
 clean:
-	@echo "[clean]"
+	@for a in $(ACDA); do make -s -C $$a clean; done
+	@echo "[clean] BpmDj"
 	@rm -f *.o *.a *.h *.cpp $(BIN) aoc soc sum.tmp 
 
 check: check-bin check-doc

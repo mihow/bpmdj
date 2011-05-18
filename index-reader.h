@@ -16,7 +16,7 @@
 
 #ifndef __INDEX_READER_H
 #define __INDEX_READER_H
-#include "./active-objects.h"
+#include "./Active/active-objects.h"
 using namespace std;
 class IndexScanner;
 class IndexReader;

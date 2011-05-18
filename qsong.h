@@ -26,7 +26,6 @@ using namespace std;
 #include "config.h"
 #include "cluster.h"
 #include "song.h"
-#include "data.h"
 
 #define LIST_TEMPO 0
 #define LIST_DCOLOR 2

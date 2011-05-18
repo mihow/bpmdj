@@ -26,7 +26,6 @@ using namespace std;
 #include <assert.h>
 #include <qmenu.h>
 #include "qsong.h"
-#include "types.h"
 #include "iterator.h"
 
 /**

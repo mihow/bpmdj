@@ -20,7 +20,7 @@
 #define __loaded__pca_h__
 using namespace std;
 #line 1 "pca.h++"
-#include "types.h"
+#include "Data/types.h"
 void do_pca(int rows, int columns, float4**data, const char* &error_msg);
 float4 ** matrix(int rows, int columns);
 void free_matrix(float4 **data, int rows, int columns);

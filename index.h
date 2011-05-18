@@ -23,13 +23,12 @@ using namespace std;
 #include <stdio.h>
 #include "common.h"
 #include "type-operations.h"
-#include "types.h"
 #include "spectrum-type.h"
 #include "echo-property.h"
 #include "composition-property.h"
 #include "rhythm-property.h"
 #include "capacity.h"
-#include "om-data.h"
+#include "Data/om-data.h"
 
 /*-------------------------------------------
  *          Album Objects

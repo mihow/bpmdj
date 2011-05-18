@@ -26,7 +26,6 @@ using namespace std;
 #include <qlistview.h>
 #include <qcolor.h>
 #include <qheaderview.h>
-#include "data.h"
 #include "song-slot.h"
 #include "accessors.h"
 

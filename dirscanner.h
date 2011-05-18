@@ -24,7 +24,7 @@ using namespace std;
 #include <stdlib.h>
 #include <qstring.h>
 #include <stack>
-#include "types.h"
+#include "Data/types.h"
 
 /**
  * The directory scanner provides the possibility to scan a directory tree 

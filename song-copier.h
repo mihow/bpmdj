@@ -16,10 +16,9 @@
 
 #ifndef __SONG_COPIER_H
 #define __SONG_COPIER_H
-#include "./active-objects.h"
+#include "./Active/active-objects.h"
 using namespace std;
 #include "song.h"
-#include "active-objects.h"
 class SongCopier;
 class ActiveSongCopier;
 #ifdef TRACE_MESSAGES

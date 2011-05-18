@@ -23,7 +23,7 @@ using namespace std;
 #include <stdio.h>
 #include <qstring.h>
 #include <string.h>
-#include "types.h"
+#include "flowdb.h"
 
 void   common_init();
 

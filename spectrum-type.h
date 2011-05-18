@@ -24,7 +24,7 @@ using namespace std;
 #include "common.h"
 #include "signals.h"
 #include "files.h"
-#include "om-data.h"
+#include "Data/om-data.h"
 
 #define spectrum_size 24
 #define barksize spectrum_size

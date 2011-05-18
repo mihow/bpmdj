@@ -22,7 +22,7 @@ using namespace std;
 #line 1 "qstring-factory.h++"
 #include <qstring.h>
 #include <set>
-#include "types.h"
+#include "Data/types.h"
 
 QString tonumber(const float4 f);
 QString tonumber(const unsigned4 b);

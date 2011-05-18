@@ -26,7 +26,6 @@ using namespace std;
 #include <sys/mman.h>
 #include <syscall.h>
 #include <math.h>
-#include "types.h"
 #include "common.h"
 #include "memory.h"
 #include "files.h"

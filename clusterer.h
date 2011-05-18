@@ -16,7 +16,7 @@
 
 #ifndef __CLUSTERER_H
 #define __CLUSTERER_H
-#include "./active-objects.h"
+#include "./Active/active-objects.h"
 using namespace std;
 #include "cluster.h"
 #include "song-metric.h"

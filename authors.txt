@@ -35,7 +35,11 @@ Mic Tamere <oinike@hotmail.fr>
   ubuntu defines 64 bit
 bloody.middlefinger@yellowcouch.org
   Defines for opensuse10.3
-
+Philippe Schelte <dubphil@free.fr>
+  Defines for gentoo
+Stefan Wanje
+  Defines for fedora14
+  
 Donations
 ---------
 Sam Liddicott

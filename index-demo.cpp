@@ -22,7 +22,6 @@ using namespace std;
 #line 1 "index-demo.c++"
 #include <cstdio>
 #include "index.h"
-#include "types.h"
 
 int main(int argc, char* argv[])
 {

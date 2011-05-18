@@ -35,7 +35,7 @@ using namespace std;
 #include <stdarg.h>
 #include <map>
 #include <set>
-#include "lock.h"
+#include "Active/lock.h"
 #include "overseer.h"
 
 /**

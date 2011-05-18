@@ -20,7 +20,6 @@
 #define __loaded__clock_drivers_h__
 using namespace std;
 #line 1 "clock-drivers.h++"
-#include "types.h"
 #include "period-type.h"
 #include "player-core.h"
 

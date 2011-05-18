@@ -16,7 +16,7 @@
 
 #ifndef __SPECTRUM_PCA_H
 #define __SPECTRUM_PCA_H
-#include "./active-objects.h"
+#include "./Active/active-objects.h"
 using namespace std;
 #include <vector>
 #include "selector.h"

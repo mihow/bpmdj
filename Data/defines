@@ -1,0 +1,10 @@
+include ../defines
+INC = -I/usr/include/qt4/QtCore \
+	-I/usr/include/qt4/QtCore \
+	-I/usr/include/qt4/QtNetwork \
+	-I/usr/include/qt4/QtGui \
+	-I/usr/include/qt4/QtSql \
+	-I/usr/include/qt4
+LIBS    = -L/usr/lib -lQtSql -lQtGui -lQtNetwork -lQtCore -lpthread
+
+FLEX = flex

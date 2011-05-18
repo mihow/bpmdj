@@ -29,7 +29,6 @@ using namespace std;
 #include "do-fragment.h"
 #include "fragment-creator.h"
 #include "vector-iterator.h"
-#include "active-objects.h"
 #include "config.h"
 #include "selector.h"
 

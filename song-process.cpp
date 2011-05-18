@@ -42,7 +42,7 @@ using namespace std;
 #include "memory.h"
 #include "vector-iterator.h"
 #include "set-iterator.h"
-#include "lock.h"
+#include "Active/lock.h"
 #include "overseer.h"
 
 static set<SongProcess*> actives;

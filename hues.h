@@ -21,7 +21,7 @@
 using namespace std;
 #line 1 "hues.h++"
 #include <qcolor.h>
-#include "types.h"
+#include "flowdb.h"
 
 /**
  * This files generates a hue bar which has a linear 

@@ -22,7 +22,8 @@ using namespace std;
 #line 1 "files.h++"
 #include <cstdio>
 #include <stdio.h>
-#include "array.h"
+#include <string.h>
+#include <assert.h>
 #include "stereo-sample2.h"
 
 long fsize(FILE * f);
@@ -47,6 +48,5 @@ long readsamples(sample_type* target, int count, FILE* file)
   return result;
 }
 
-long readsamples(Array<1,float4>& target, FILE* file);
 long writesamples(void* target, int count, FILE* file);
 #endif // __loaded__files_h__

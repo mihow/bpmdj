@@ -16,10 +16,9 @@
 
 #ifndef __FRAGMENT_PLAYER_H
 #define __FRAGMENT_PLAYER_H
-#include "./active-objects.h"
+#include "./Active/active-objects.h"
 using namespace std;
 #include "song.h"
-#include "active-objects.h"
 #include "player-config.h"
 #include "dsp-drivers.h"
 #include "do-fragment.h"

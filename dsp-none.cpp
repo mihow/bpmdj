@@ -20,6 +20,7 @@
 #define __loaded__dsp_none_cpp__
 using namespace std;
 #line 1 "dsp-none.c++"
+#include <typeinfo>
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>

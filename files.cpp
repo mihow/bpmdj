@@ -26,8 +26,8 @@ using namespace std;
 #include <assert.h>
 #include "stereo-sample2.h"
 #include "files.h"
-#include "types.h"
 #include "memory.h"
+#include "Data/om-data.h"
 
 long fsize(FILE * f)
 {

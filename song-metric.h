@@ -24,7 +24,6 @@ using namespace std;
 #include <time.h>
 #include <qcolor.h>
 #include <qpixmap.h>
-#include "data.h"
 #include "config.h"
 #include "cluster.h"
 #include "index.h"

@@ -53,9 +53,6 @@ endif
 DATA_OBJECTS = data.o data-lexer.o data-syntax.o data-io.o \
         data-visitor.o array-creator.o symbol.o data-token.o data-string.o \
         null.o set.o
-data.a : $(DATA_OBJECTS)
-	@echo "   [ar] data.a"
-	@$(AR) r $@ $(DATA_OBJECTS) 2>.ignore
 
 DSP_OBJECTS = dsp-drivers.o dsp-oss.o dsp-alsa.o dsp-none.o dsp-jack.o \
 	    info.o scripts.o
@@ -80,43 +77,43 @@ analyzers.a: $(ANALYZERS)
 	@$(AR) r $@ $(ANALYZERS) 2>.ignore
 
 EFENCE_OBJECTS = efence.o efence-print.o page.o
-
-ACTIVE_OBJECTS = ao-scheduler.o lock.o
-BPMPLAY = ao-tracker.o about.moc.o memory.o power-type.o files.o \
-	player.moc.o player.o constants.o $(ACTIVE_OBJECTS) \
+ACTIVE_OBJECTS = Active/ao-tracker.o Active/ao-scheduler.o Active/lock.o
+BPMPLAY = $(ACTIVE_OBJECTS) about.moc.o memory.o power-type.o files.o \
+	player.moc.o player.o constants.o tempo-type.o \
 	sample4-type.o player-core.o spectrum-type.o process.o \
  	song-information.o song-information.moc.o hues.o \
 	pca.o capacity.o index.o bpmplay.o signals.o \
-	player-config.o data.a capacity-checker.o types.o dsp.a \
-	embedded.a $(EFENCE_OBJECTS) rc-player.o clock-drivers.o \
+	player-config.o capacity-checker.o dsp.a \
+	embedded.a rc-player.o clock-drivers.o \
 	analyzers.a histogram-type.o \
-	common.o bpm.o ao-pool.o \
+	common.o bpm.o Data/data.a Active/ao-pool.o \
 	midi-bindings.o qt-helpers.o \
 	no-overseer.o
 
 BPM_LIB = bpm.o memory.o	
-BPMCOUNT_OBJECTS = bpmcount.o files.o signals.o bpm.a data.a $(EFENCE_OBJECTS)
+BPMCOUNT_OBJECTS = bpmcount.o files.o signals.o bpm.a Data/data.a
 
 FRAGMENTS = fragment-player.o fragment-cache.o fragment.o fragment-creator.o fragment-deliverer.o
-BPMDJ_OBJECTS = ao-tracker.o qstring-factory.o tags.o about.moc.o capacity.o \
+BPMDJ_OBJECTS = $(ACTIVE_OBJECTS) tags.o about.moc.o capacity.o \
 	heap.o pixmap-cache.o \
 	song-slot.o song-slot.moc.o spectrum-type.o \
 	scripts.o pca.o process.o histogram-type.o \
-	memory.o analyzer.o qt-helpers.o \
-	types.o config.moc.o existence-scanner.o player-config.o \
+	memory.o analyzer.o qt-helpers.o hues.o \
+	config.moc.o existence-scanner.o \
+	tempo-type.o player-config.o \
 	song-information.o song-information.moc.o sample4-type.o \
 	music-scanner.o music-scanner.moc.o power-type.o analyzers-manager.o\
 	song-process.o spectrum-pca.o user-notification.o database.o \
 	dirscanner.o $(EFENCE_OBJECTS) \
 	selector.o selector.moc.o constants.o \
-	players-manager.o $(FRAGMENTS) $(ACTIVE_OBJECTS) \
+	players-manager.o $(FRAGMENTS) qstring-factory.o \
 	dsp.a bpmdj-pref.o bpmdj-pref.moc.o clock-drivers.o \
 	song.o qsong.o queuedsong.o historysong.o signals.o\
 	index-reader.o index.o history.o albumitem.o files.o \
 	bpmdj.o edit-distance.o renamer.o renamer.moc.o \
-	config.o common.o song-copier.o \
+	config.o common.o song-copier.o Data/data.a \
 	statistics.o statistics.moc.o song-metric.o \
-	log-viewer.o log-viewer.moc.o data.a embedded.a ao-pool.o \
+	log-viewer.o log-viewer.moc.o embedded.a Active/ao-pool.o \
 	overseer.o # Must be last
 
 bpmplay: $(BPMPLAY)
@@ -143,12 +140,12 @@ profile-clock: profile-clock.o
 	@echo " [link] "$@
 	@$(CPP) $(LDFLAGS) profile-clock.o -o profile-clock
 
-idx2txt: idx2txt.o data.a
+idx2txt: idx2txt.o Data/data.a
 	@echo " [link] "$@
 	@$(LINK)  $^ -o idx2txt
 
 index-demo: index-demo.o index.o spectrum-type.o sample4-type.o power-type.o \
-        memory.o data.a types.o common.o song-information.o capacity.o \
-        song-information.moc.o info.o files.o $(EFENCE_OBJECTS)
+	tempo-type.o memory.o Data/data.a common.o song-information.o capacity.o \
+	song-information.moc.o info.o files.o $(EFENCE_OBJECTS)
 	@echo " [link] "$@
 	@$(LINK)  $^ -o $@

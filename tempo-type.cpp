@@ -16,27 +16,10 @@
 
  See the authors.txt for a full list of people involved.
 ****/
-#ifndef __loaded__bpmclock_h__
-#define __loaded__bpmclock_h__
+#ifndef __loaded__tempo_type_cpp__
+#define __loaded__tempo_type_cpp__
 using namespace std;
-#line 1 "bpmclock.h++"
-#include "period-type.h"
-#include <semaphore.h>
-#include <sys/timeb.h>
-
-#define CLOCK_FILE "/bpmclock"
-#define TICK_TIME 100
-
-typedef struct 
-{
-  quad_period_type currentperiod;
-  unsigned8 start;
-  unsigned8 currentframe;
-  unsigned8 last_access;
-  timeb pingtime;
-  sem_t sem;
-  bool master;
-} bpmclock;
-
-bool ping_bpmclock();
-#endif // __loaded__bpmclock_h__
+#line 1 "tempo-type.c++"
+#include "tempo-type.h"
+const float4 tempo_type::no_tempo = -1;
+#endif // __loaded__tempo_type_cpp__

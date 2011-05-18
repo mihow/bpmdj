@@ -27,7 +27,7 @@ using namespace std;
 #include <qlabel.h>
 #include <qstatusbar.h>
 #include <qmutex.h>
-#include "data-version.h"
+#include "Data/data-version.h"
 #include "fragment-player.h"
 #include "spectrum-pca.h"
 #include "existence-scanner.h"

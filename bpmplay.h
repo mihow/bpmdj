@@ -23,7 +23,7 @@ using namespace std;
 #include <Qt/qapplication.h>
 #include "player-core.h"
 
-#include "data.h"
+#include "Data/data.h"
 #if (DATA_VERSION_MAJOR != 0) || (DATA_VERSION_MINOR != 2)
 #error "DATA library has wrong version number"
 #endif

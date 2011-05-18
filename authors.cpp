@@ -38,6 +38,8 @@ const char* authors=
 "  Defines for opensuse10.3\n"
 "Philippe Schelte <dubphil@free.fr>\n"
 "  Defines for gentoo\n"
+"Stefan Wanje\n"
+"  Defines for fedora14\n"
 "  \n"
 "Donations\n"
 "---------\n"
