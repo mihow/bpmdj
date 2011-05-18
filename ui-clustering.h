@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'ui-clustering.ui'
 **
-** Created: Wed May 18 21:52:54 2011
+** Created: Wed May 18 22:19:23 2011
 **      by: Qt User Interface Compiler version 4.7.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!

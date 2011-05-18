@@ -221,7 +221,6 @@ int main(int argc, char* argv[])
    */
   metronome = new clock_driver();
   metronome->init();
-  metronome->attach_clock(false);
   
   application.exec();
   if (!Config::get_shown_aboutbox())

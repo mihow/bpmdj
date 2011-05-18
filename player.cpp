@@ -600,7 +600,6 @@ void Player::start_stop()
       if (!cue) 
 	cue_set();
       pause_playing();
-      ::metronome->become_slave();
       if (!cue_wasset)
 	beatGraphAnalyzer->cuesChanged();
     }
@@ -1283,8 +1282,6 @@ void Player::restartCore()
   startCore(0);
   config->save();
   store_config_into(config,this);
-  if (::metronome) 
-    ::metronome->attach_clock(true);
 }
 
 void InitAndStart::run(Player * player)
@@ -1296,7 +1293,6 @@ void InitAndStart::run(Player * player)
 #endif
   player->startCore();
   ::metronome->init();
-  ::metronome->attach_clock(true);
 }
 
 void PlayingStateChanged::run(Player * player)
@@ -1410,13 +1406,6 @@ void msg_writing_finished()
   if (opt_check || opt_setup) return;
   if (player_window)
     app->postEvent(player_window,new WritingFinished());
-}
-
-void Player::switchClock() 
-{
-  if (::metronome) {
-    ::metronome->switch_sync();
-  }
 }
 
 void Player::loop(unsigned8 beats)

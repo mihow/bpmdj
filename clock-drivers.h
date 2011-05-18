@@ -79,13 +79,9 @@ signed8 y_normalise(signed8 x);
 
 class clock_driver
 {
-protected:
-  signed4 offset;
-  bool verbose;
 public:
   clock_driver()
   { 
-    verbose = true;
   };
   /**
    * Initialize the driver by allocating necessary
@@ -95,24 +91,10 @@ public:
   {
   };
 
-  /**
-   * This is called regularly to sync with the external clock.
-   *
-   */
-  virtual void sync_with_clock() {};
-
-  /**
-   * The clock driver is already running but the user
-   * started from a specific cue again
-   */
-  virtual void cue_start(cue_info cue) {};
-  virtual void cue_set(cue_info cue) {};
-
   virtual void shift(signed4 direction)
   {
     ::y+=direction;
     if (::y<0) ::y=0;
-    offset+=direction;
   }
 
   /*
@@ -140,17 +122,6 @@ public:
 	  ::y = ::x * currentperiod / normalperiod;
       }
   }
-
-  signed4 get_offset() { return offset; }
-  virtual void start_sync() {};
-  virtual void stop_sync() {};
-  virtual void attach_clock(bool s) {};
-  virtual void detach_clock() {};
-  virtual void switch_sync() {};
-  virtual void sync_now() {};
-  virtual void become_master() { };
-  virtual void become_slave() { };
-  virtual void release_master() { };
 };
 
 extern clock_driver *metronome;

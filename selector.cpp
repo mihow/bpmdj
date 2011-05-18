@@ -697,8 +697,6 @@ void SongSelectorLogic::timerTick()
   QMutexLocker _ml(&lock);
   lock.unlock();
   
-  if (::metronome)
-    ::metronome->sync_with_clock();
   mainLCD->display(++mainTicks);
   if (mainTicks==1 
       || mainTicks==Config::get_yellowTime()

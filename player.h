@@ -62,7 +62,6 @@ private:
   void updateTempoColors();
   void redrawCues();
   void normalReached(bool yes);
-  // BpmAnalyzerDialog * bpmcounter;
   void init_tempo_switch_time();
   bool cueKey(QKeyEvent*,int);
   void storeCue(int nr);
@@ -159,8 +158,6 @@ public slots:
   virtual void startCore(int tries=5);
   virtual void stopCore();
   virtual void initCore();
-  // Clock sync functions
-  virtual void switchClock();
   // Midi helpers
   virtual void loop(unsigned8 beats);
   virtual void nudge(unsigned8 dir);

@@ -504,7 +504,6 @@ cue_info cues[4] = {0,0,0,0};
 void cue_set()
 {
   cue=x_normalise(y-dsp->latency());
-  ::metronome->cue_set(cue);
 }
 
 void cue_shift(signed8 whence)
@@ -688,7 +687,6 @@ void jumpto(signed8 mes, int txt)
       y+=fixeddiff;
       if (txt) printf("Started at cue ");
     }
-  ::metronome->cue_start(cue);
 
   if (txt)
     {
@@ -842,8 +840,6 @@ int core_start(bool ui)
 
 void core_stop()
 {
-  if (metronome)
-    metronome->detach_clock();
   if(!finished)
     dsp->stop();
   finished = 1;

@@ -2161,7 +2161,6 @@ void BpmAnalyzerDialog::set_labels()
 
 void BpmAnalyzerDialog::analyze()
 {
-  ::metronome->release_master();
   rangeCheck();
   set_labels();
   if (stop_signal) return;
@@ -2608,10 +2607,10 @@ void BpmAnalyzerDialog::reset()
 
 void BpmAnalyzerDialog::tap()
 {
-  if (++tapcount==1) {
-    starttime=times(NULL);
-    ::metronome->become_master();
-  }
+  if (++tapcount==1) 
+    {
+      starttime=times(NULL);
+    }
   else
     {
       /**
