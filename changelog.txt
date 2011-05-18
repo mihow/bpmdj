@@ -1,5 +1,5 @@
 4.2:
-    - fixed the alsa latency retrieval bug.
+        - fixed the alsa latency retrieval bug.
 	+ allowing different samplerates for the decoded file and soundcard
 	- a division by zero in the fft guided rayshooter
 	- a bug in the mapping from analysis options to the player: the
