@@ -1,0 +1,12 @@
+#include <deque>
+#include "fragment-cache.h"
+
+active FragmentCreator
+{
+  deque<FragmentFile> ready;
+  map<Song*,FragmentFile> created;
+  message createOneFor(Song* song);
+  message terminate();
+  meta deque<FragmentFile> getReadyOnes();
+  bool handle();
+};

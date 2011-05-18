@@ -1,0 +1,22 @@
+#include "song.h"
+#include "player-config.h"
+#include "dsp-drivers.h"
+#include "do-fragment.h"
+#include "fragment-deliverer.h"
+
+active FragmentPlayer
+{
+  FragmentDeliverer delivery;            // the audio_source to deliver the fragment data
+  bool finished = false;                 // true if the current waveform is finished
+  int player_slot = -1;                  // the DSP is taken from this playerslot
+  volatile bool stopped = false;         // true if no samples should be played
+  message playWave(FragmentInMemory fragment);  // starts playing the fragment if possible
+  message delivererFinished();        // called by the deliverer when it finished
+  message stopOutput();	              // closes the DSP and marks the stopped flag
+  message startOutput();              // will start new output if necessary
+  void checkValidDsp();               // closes the DSP if player_slot no longer active
+  void closeDsp();                    // close the DSP and resets related flags
+  meta void waitForStop();            // waits until the fragmentplayer effectively stopped
+  meta void waitForStart();           // waits until the fragmentplayer saw the start command}
+  message terminate();
+};

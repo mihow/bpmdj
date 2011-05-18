@@ -1,0 +1,12 @@
+#include "cluster.h"
+#include "song-metric.h"
+
+active Clusterer
+{ 
+  PointSet tocluster;
+  message reset();
+  message add(Point* p);
+  Couple* agglomerate_allsteps(Metriek* metriek);
+  message agglomerate(SongMetriek metriek);
+  message terminate();
+};

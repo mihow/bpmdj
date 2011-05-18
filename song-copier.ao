@@ -1,0 +1,11 @@
+#include "song.h"
+
+active SongCopier
+{
+  deque<Song*> tocopy;
+  QString target;
+  message setTarget(QString trgt);
+  message fetch(Song* s);
+  message fetchNextSong();
+  message terminate();
+};

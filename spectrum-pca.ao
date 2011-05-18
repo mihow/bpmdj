@@ -1,0 +1,11 @@
+#include <vector>
+#include "selector.h"
+
+active SpectrumPca
+{
+  // the songs must be allocated by the one sending
+  // the message. The pca handler will remove the songs
+  // when finished.
+  message pcaThis(vector<Song*> *songs);
+  message terminate();
+};

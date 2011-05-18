@@ -1,0 +1,11 @@
+class IndexScanner;
+
+active IndexReader
+{
+  IndexScanner *reader = NULL;
+  int total_files = 0;
+  int expected_files = 1;
+  message start(int expected);
+  message thunk();
+  message terminate();
+};

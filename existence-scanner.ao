@@ -1,0 +1,11 @@
+#include <vector> 
+#include "song.h"
+
+active ExistenceScanner
+{
+  vector<Song*> *songs = NULL;
+  unsigned current = 0;
+  message start(vector<Song*> *all);
+  message thunk();
+  message terminate();
+};
