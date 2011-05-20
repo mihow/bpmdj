@@ -1,6 +1,4 @@
-DATA_VERSION_MAJOR = 0
-DATA_VERSION_MINOR = 3
-ECHO = echo 
+ECHO = echo
 RM = rm -f
 CD = cd
 CP = cp
@@ -8,11 +6,11 @@ MV = mv
 MKDIR = mkdir
 
 include defines
-LINK = $(CPP) $(LDFLAGS) $(INC) $(QT_LIBRARY_PATH) $(QT_LIBS)
+LINK = $(CPP) $(LDFLAGS) $(QT_LIBRARY_PATH) $(QT_LIBS)
 
 %.o: %.cpp
 	@$(ECHO) "  [cpp] "$@
-	@$(CPP) $(CFLAGS) $(INC) -o $@ -c $<
+	@$(CPP) $(CFLAGS) $(QT_INCLUDE_PATH) -o $@ -c $<
 
 DATA = data-io.o data.o data-lexer.o data-syntax.o \
 	data-visitor.o array-creator.o symbol.o data-token.o \
@@ -64,7 +62,7 @@ data.a : $(DATA)
 
 data-lexer.cpp: data-lexer.l data-syntax.h
 	@$(ECHO) " [flex] data-lexer.cpp"
-	@$(FLEX) -o data-lexer.cpp data-lexer.l
+	@flex -o data-lexer.cpp data-lexer.l
 
 data-syntax.h: data-syntax.y
 	@$(ECHO) "[bison] data-syntax.h data-syntax.cpp"
@@ -74,23 +72,15 @@ data-syntax.cpp: data-syntax.y
 	@$(ECHO) "[bison] data-syntax.h data-syntax.cpp"
 	@bison --defines=data-syntax.h --output-file=data-syntax.cpp data-syntax.y
 
-DATA_VERSION = $(DATA_VERSION_MAJOR).$(DATA_VERSION_MINOR)
-
-version.h: 
-	@echo "#define DATA_VERSION \""$(DATA_VERSION_MAJOR)"."$(DATA_VERSION_MINOR)"\"" >version.h
-	@echo "#define DATA_VERSION_MAJOR "$(DATA_VERSION_MAJOR) >>version.h
-	@echo "#define DATA_VERSION_MINOR "$(DATA_VERSION_MINOR) >>version.h
-	@echo "#define DATA_VERSION_NR (DATA_VERSION_MAJOR*256+DATA_VERSION_MINOR)" >>version.h
-
 .PHONY: all clean files sources
 
 do-lexer.h: do-lexer.l 
 	@echo " [flex] do-lexer.cpp do-lexer.h"
-	@$(FLEX) --prefix=do --header-file=do-lexer.h -o do-lexer.cpp do-lexer.l
+	@flex --prefix=do --header-file=do-lexer.h -o do-lexer.cpp do-lexer.l
 
 do-lexer.cpp: do-lexer.l do-syntax.h do-lexer.h
 	@echo " [flex] do-lexer.cpp"
-	@$(FLEX) --prefix=do -o do-lexer.cpp do-lexer.l
+	@flex --prefix=do -o do-lexer.cpp do-lexer.l
 
 do-syntax.h: do-syntax.y 
 	@echo "[bison] do-syntax.h do-syntax.cpp"
