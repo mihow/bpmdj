@@ -1,15 +1,8 @@
-ECHO = echo
-RM = rm -f
-CD = cd
-CP = cp
-MV = mv
-MKDIR = mkdir
-
 include defines
 LINK = $(CPP) $(LDFLAGS) $(QT_LIBRARY_PATH) $(QT_LIBS)
 
 %.o: %.cpp
-	@$(ECHO) "  [cpp] "$@
+	@echo "  [cpp] "$@
 	@$(CPP) $(CFLAGS) $(QT_INCLUDE_PATH) -o $@ -c $<
 
 DATA = data-io.o data.o data-lexer.o data-syntax.o \
@@ -18,34 +11,15 @@ DATA = data-io.o data.o data-lexer.o data-syntax.o \
 DATATEST = $(DATA) data-test.o
 ARRAY = array-test.o data.o symbol.o string.o token.o \
 	data-visitor.o null.o
-EXTRA = data-lexer.cpp data-syntax.h data-syntax.cpp
 
 all: data.a doc
+.PHONY: all clean
 
 clean: 
 	@echo "[clean] Data"
 	@rm -f *.o *.a doc
 
-%.h: %.h++ header.txt
-	@echo "  [h++] "$@
-	@"++2--" $< $@
-
-%.cpp: %.c++ header.txt
-	@echo "  [c++] "$@
-	@"++2--" $< $@
-
-HEADERS = ${shell ls *.h++}
-HEADERS+= do-lexer.h
-SOURCES = ${shell ls *.c++}
-
-.sources: $(HEADERS:%.h++=%.h) $(SOURCES:%.c++=%.cpp) 
-	@grep "#include\ *\"" *.h *.cpp >/tmp/t
-	@if ! [ -e .sources ]; then cp /tmp/t .sources; fi
-	@if ! cmp /tmp/t .sources >/dev/null; then mv /tmp/t .sources; fi
-
-sources: .sources doc
-
-.depend: .sources 
+.depend: do-lexer.h data-lexer.cpp
 	@echo " [file] dependencies"
 	@$(TIME) $(CPP) $(CFLAGS) $(INC) -MM *.cpp >.depend
 -include .depend
@@ -57,22 +31,21 @@ data-test: $(DATA)
 	$(LINK) $(DATA) -o $@
 
 data.a : $(DATA)
-	@$(ECHO) "   [ar] data.a"
+	@echo "   [ar] data.a"
 	@ar r $@ $(DATA) 2>.ignore
 
 data-lexer.cpp: data-lexer.l data-syntax.h
-	@$(ECHO) " [flex] data-lexer.cpp"
+	@echo " [flex] data-lexer.cpp"
 	@flex -o data-lexer.cpp data-lexer.l
 
 data-syntax.h: data-syntax.y
-	@$(ECHO) "[bison] data-syntax.h data-syntax.cpp"
+	@echo "[bison] data-syntax.h data-syntax.cpp"
 	@bison --defines=data-syntax.h --output-file=data-syntax.cpp data-syntax.y
 
 data-syntax.cpp: data-syntax.y
-	@$(ECHO) "[bison] data-syntax.h data-syntax.cpp"
+	@echo "[bison] data-syntax.h data-syntax.cpp"
 	@bison --defines=data-syntax.h --output-file=data-syntax.cpp data-syntax.y
 
-.PHONY: all clean files sources
 
 do-lexer.h: do-lexer.l 
 	@echo " [flex] do-lexer.cpp do-lexer.h"

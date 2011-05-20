@@ -35,7 +35,9 @@ ACDA = Active Data
 .PHONY: .source-creator documentation
 .source-creator: sources
 	@echo "Source Files:"
-	@for a in $(ACDA); do make -s -C $$a sources; done
+	@for a in $(ACDA); do make -s -C $$a -f sources; done
+	@make -s -C Active aoc;
+	@make -s -C Data doc;
 	@make -s --no-print-directory -f sources .sources
 
 # Create the dependency file if necessary
@@ -99,7 +101,12 @@ check-doc:
 clean:
 	@for a in $(ACDA); do make -s -C $$a clean; done
 	@echo "[clean] BpmDj"
-	@rm -f *.o *.a *.h *.cpp $(BIN) aoc soc sum.tmp 
+	@rm -f *.o *.a $(BIN) sum.tmp
+
+very-clean: clean
+	@for a in $(ACDA); do make -s -f sources -C $$a clean; done
+	@echo "[clean] BpmDj sources"
+	@rm -f *.h *.cpp
 
 check: check-bin check-doc
 

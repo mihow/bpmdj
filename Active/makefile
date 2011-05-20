@@ -1,53 +1,30 @@
-AO_VERSION_MAJOR = 4
-AO_VERSION_MINOR = 3
-ECHO = echo 
-RM = rm -f
-CD = cd
-MV = mv
-TAR = tar
-MKDIR = mkdir
-AR = ar
-
 include defines
 LINK = $(CPP) $(LDFLAGS) $(QT_LIBRARY_PATH) $(QT_LIBS)
 
-%.h: %.h++ header.txt
-	@$(ECHO) "  [h++] "$@
-	@"++2--" $< $@
-
 %.cpp: %.c++ header.txt
-	@$(ECHO) "  [c++] "$@
+	@echo "  [c++] "$@
 	@"++2--" $< $@
 
 %.o: %.cpp
-	@$(ECHO) "  [cpp] "$@
+	@echo "  [cpp] "$@
 	@$(CPP) $(CFLAGS) $(INC) -o $@ -c $<
 
-HEADERS = ${shell ls *.h++}
-SOURCES = ${shell ls *.c++}
 all: active-objects.h aoc demo1
 
-.sources: $(HEADERS:%.h++=%.h) $(SOURCES:%.c++=%.cpp) 
-	@grep "#include\ *\"" *.h *.cpp >/tmp/t
-	@if ! [ -e .sources ]; then cp /tmp/t .sources; fi
-	@if ! cmp /tmp/t .sources >/dev/null; then mv /tmp/t .sources; fi
+clean: 
+	@echo "[clean] Active"
+	@rm -f message-syntax.cpp message-syntax.h message-lexer.cpp .depend
+	@rm -f array-test message-test borgiv.a
+	@rm -f *.o gmon.out fixname aoc soc demo1
+	@touch .depend .sources
 
-.depend: .sources 
-	@$(ECHO) " [file] dependencies"
+.depend:
+	@echo " [file] dependencies"
 	$(CPP) $(CFLAGS) $(INC) -MM *.cpp >.depend
 
 -include .depend
 
-clean: 
-	@$(ECHO) "[clean] Active"
-	@rm -f message-syntax.cpp message-syntax.h message-lexer.cpp .depend
-	@rm -f array-test message-test borgiv.a
-	@rm -f *.o *.h *.cpp gmon.out fixname aoc soc demo1
-	@touch .depend .sources
-
-.PHONY: all clean files sources
-
-sources: .sources
+.PHONY: all clean
 
 ao-lexer.h: ao-lexer.l 
 	@echo " [flex] ao-lexer.cpp ao-lexer.h"
@@ -80,5 +57,5 @@ ao-pool.cpp: ao-tracker.h
 demo1.cpp: demo1.h
 
 demo1: demo1.o lock.o ao-pool.o ao-tracker.o ao-scheduler.o
-	@$(ECHO) " [link] "$@
+	@echo " [link] "$@
 	@g++ $^ -o $@ -lpthread

@@ -6,17 +6,13 @@ Active
 ------
 Werner Van Belle <werner@yellowcouch.org>
   Fathered the entire project
-Bernard Fortz <bernard.fortz@gmail.com>
-  JACK support, Midi bindings, Gentoo packaging
-Toni Graffy <oc2pus@arcor.de>
-  Suse packaging
-Martin Stolpe <martin.stople@uni-ulm.de>
-  Cmake files
 
 Passive
 -------
 Bernard Fortz <bernard.fortz@gmail.com>
   JACK support, Midi bindings, Gentoo packaging
+Toni Graffy <oc2pus@arcor.de>
+  Suse packaging
 F. Murtagh <murtagh@scivax.stsci.edu>
   PCA-code
 Julius O. Smith <http://www-ccrma.stanford.edu/~jos/>
@@ -41,6 +37,8 @@ Philippe Schelte <dubphil@free.fr>
   Defines for gentoo
 Stefan Wanje
   Defines for fedora14
+Martin Stolpe <martin.stople@uni-ulm.de>
+  Cmake files
   
 Donations
 ---------
