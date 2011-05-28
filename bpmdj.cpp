@@ -237,22 +237,6 @@ int main(int argc, char* argv[])
 /**
  * @mainpage BpmDj
  *
- * This page documents some aspects of the BpmDj code that are worth knowing. 
- * First and foremost is the fact that there exists a subversion repository at 
- * svn+ssh//user@yellowcouch.org/repositories/BpmDj/
- * Of course you need an ssh account which can be provided if necessary. 
- *
- * <b>The Development Tree</b><br>
- * The development tree 
- * of BpmDj is somewhat different from the published (tar.gz) one. In essence, 
- * all the sources are written as c++ or h++ files (as opposed to .cpp and .h 
- * files). Each of those c++/h++ files are then converted to .cpp and .h files,
- * which includes the copyright header and opens the proper namespace. So, if 
- * you want to edit things, you should edit the .c++ and .h++ files. However, 
- * if you want to include a specific header file in a c++ file you should use 
- * the .h file. The development tree should be kept private since it doesn't 
- * contain the proper copyright headers.
- *
  * <b>Debugging</b>
  * This point should be mentioned relatively early. However the background
  * might not be that clear directly. This becomes clear later on. 

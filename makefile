@@ -32,7 +32,7 @@ ACDA = Active Data
 
 # Precompile all the source files
 # The output file is the .source file.
-.PHONY: .source-creator documentation
+.PHONY: .source-creator
 .source-creator: sources
 	@echo "Source Files:"
 	@for a in $(ACDA); do make -s -C $$a -f sources; done
@@ -64,9 +64,6 @@ beta: packager all
 	@md5sum bpmdj-$(VERSION).source.tgz
 	@mv bpmdj-$(VERSION).source.tgz ..
 
-documentation:
-	@echo "Documenting:"
-	@make -s --no-print-directory -f documenter
 
 check-bin: 
 	@make -s --no-print-directory -f packager bpmdj-source.tgz
@@ -119,6 +116,3 @@ tuuster:
 	@scp bpmplay  bpmdj@tuuster:.bin/
 	@scp bpmdj    bpmdj@tuuster:.bin/bpmdj.real
 
-website: documentation
-	@echo "  [web] uploading website"
-	@rsync -xrlptoDvz --delete-excluded --exclude .svn --exclude "*~" documentation/* werner@yellowcouch.org:/home/bpmdj/public_html/
