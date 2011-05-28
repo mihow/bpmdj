@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # BpmDj: Free Dj Tools
-# Copyright (C) 2001-2010 Werner Van Belle
+# Copyright (C) 2001-2011 Werner Van Belle
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -41,8 +41,8 @@ extension=${songname##*.}
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if test $DECODER = "1"; then
     echo "Information: decoder is mpg123"
-    mpg123 -s "$songlocation" >"$rawname" ;
- 
+    mpg123 -r 44100 --stereo -s "$songlocation" >"$rawname" ;
+
 #____________________________________________________________
 # DECODER 2: mpg321 decoder
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -55,7 +55,7 @@ elif test $DECODER = "2"; then
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 elif test $DECODER = "3"; then
     echo "Information: decoder is ogg123"
-    ogg123 -q -d raw -f "$rawname" "$songlocation";
+    ogg123 --audio-buffer 0 -q -d raw -f "$rawname" "$songlocation";
 
 #____________________________________________________________
 # DECODER 4: mplayer 1.0pre6-3.3.5 decoder

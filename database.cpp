@@ -1,6 +1,6 @@
 /****
  BpmDj v4.2: Free Dj Tools
- Copyright (C) 2001-2010 Werner Van Belle
+ Copyright (C) 2001-2011 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -92,7 +92,11 @@ ITERATE_OVER(i)
   bpmdj_deallocate(and_include);
   bpmdj_deallocate(or_include);
   bpmdj_deallocate(exclude);
+  and_include=NULL;
+  or_include=NULL;
+  exclude=NULL;
   delete[] tag;
+  tag=NULL;
 }
 
 bool DataBase::cacheValid(SongSelectorLogic * selector)

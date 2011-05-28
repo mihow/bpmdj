@@ -64,7 +64,6 @@ beta: packager all
 	@md5sum bpmdj-$(VERSION).source.tgz
 	@mv bpmdj-$(VERSION).source.tgz ..
 
-
 check-bin: 
 	@make -s --no-print-directory -f packager bpmdj-source.tgz
 	@echo =========== Entering Compilation Reactor ===================
@@ -115,4 +114,3 @@ tuuster:
 	@scp bpmmerge bpmdj@tuuster:.bin/
 	@scp bpmplay  bpmdj@tuuster:.bin/
 	@scp bpmdj    bpmdj@tuuster:.bin/bpmdj.real
-

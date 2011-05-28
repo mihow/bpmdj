@@ -1,6 +1,6 @@
 /****
  BpmDj v4.2: Free Dj Tools
- Copyright (C) 2001-2010 Werner Van Belle
+ Copyright (C) 2001-2011 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -119,7 +119,7 @@ SongSelectorLogic::SongSelectorLogic(QWidget * parent) :
   status = new QStatusBar(this);
   status -> setSizeGripEnabled(false);
   status -> setFont(QFont("Arial",10,QFont::Normal));
-  status -> showMessage("BpmDj v"VERSION" (c) Werner Van Belle 2000-2010");
+  status -> showMessage("BpmDj v"VERSION" (c) Werner Van Belle 2000-2011");
   layout()->addWidget(status);
 
   songList = new QSong();

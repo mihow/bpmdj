@@ -1,11 +1,11 @@
 BpmDj: Free Dj Tools
-Copyright (C) 2001-2010 Werner Van Belle
+Copyright (C) 2001-2011 Werner Van Belle
 ========================================
 
 Active
 ------
 Werner Van Belle <werner@yellowcouch.org>
-  Fathered the entire project
+  Fathered the project
 
 Passive
 -------

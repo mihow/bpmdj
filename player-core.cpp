@@ -1,6 +1,6 @@
 /****
  BpmDj v4.2: Free Dj Tools
- Copyright (C) 2001-2010 Werner Van Belle
+ Copyright (C) 2001-2011 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
 
@@ -742,7 +742,7 @@ void unpause_playing()
 void copyright()
 {
   printf(
- "BpmDj Player v%s, Copyright (c) 2000-2010 Werner Van Belle\n"
+ "BpmDj Player v%s, Copyright (c) 2000-2011 Werner Van Belle\n"
  "This software is distributed under the GPL2 license. See copyright.txt\n"
  "--------------------------------------------------------------------\n\n\n",
     VERSION);
