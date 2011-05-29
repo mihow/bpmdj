@@ -1,10 +1,6 @@
 include defines
 LINK = $(CPP) $(LDFLAGS) $(QT_LIBRARY_PATH) $(QT_LIBS)
 
-%.cpp: %.c++ header.txt
-	@echo "  [c++] "$@
-	@"++2--" $< $@
-
 %.o: %.cpp
 	@echo "  [cpp] "$@
 	@$(CPP) $(CFLAGS) $(INC) -o $@ -c $<

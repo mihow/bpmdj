@@ -57,13 +57,6 @@ packages: packager all
 	@echo "Packaging:"
 	@make -s --no-print-directory -f packager
 
-beta: packager all
-	@echo "Creating and uploading beta release:"
-	@make -s --no-print-directory -f packager source.tgz-dist
-	@rsync -xavz bpmdj-$(VERSION).source.tgz werner@sigtrans.org:/home/ftp/bpmdj/
-	@md5sum bpmdj-$(VERSION).source.tgz
-	@mv bpmdj-$(VERSION).source.tgz ..
-
 check-bin: 
 	@make -s --no-print-directory -f packager bpmdj-source.tgz
 	@echo =========== Entering Compilation Reactor ===================
