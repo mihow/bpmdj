@@ -198,9 +198,9 @@ int dsp_alsa::open(bool ui)
     }
   if (q != (unsigned)playrate)
     {
-      playrate=q;
       Warning("dsp: setting dsp speed (%d) failed, resulting rate = %d ",
 	      playrate, q);
+      playrate=q;
     }
   
   // playing latency ....

@@ -237,13 +237,13 @@ int dsp_jack::open(bool ui)
   if (verbose) 
     Info("engine sample rate: %d",jack_get_sample_rate (client));
   
-  if (jack_get_sample_rate (client) != playrate) 
+  unsigned int q;
+  q = jack_get_sample_rate(client);
+  if (q != playrate) 
     {
-      Error(ui,"engine sample rate: %d\n"
-	    "Please be sure jackd is running at %d",
-	    jack_get_sample_rate (client),
-	    playrate);
-      return err_dsp;
+      Warning("dsp: setting dsp speed (%d) failed, resulting rate = %d ",
+	      playrate, q);
+      playrate=q;
     }
   
 

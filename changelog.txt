@@ -1,3 +1,6 @@
+4.2-pl1:
+        - dsp-jack did not work with variable playrates
+        - dsp-alsa gave wrong playrate return info	
 4.2:
         - fixed the alsa latency retrieval bug.
 	+ allowing different samplerates for the decoded file and soundcard
