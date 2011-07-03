@@ -19,7 +19,6 @@
 #ifndef __loaded__bpm_analyzer_cpp__
 #define __loaded__bpm_analyzer_cpp__
 using namespace std;
-#line 1 "bpm-analyzer.c++"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -224,7 +223,9 @@ void read_audio(FILE* f,unsigned8 offset, double* target, unsigned4 length)
 // if the tempo is not measured completely accurately that might be a very natural response. 
 void BpmAnalyzerDialog::experimental_scan()
 {
+#ifdef DEBUG_EXPALG
   FILE * f,* g;
+#endif
   /** 
    * load the full data into memory, barring the stereo information
    * that is not so very interesting to consider
@@ -995,7 +996,9 @@ void BpmAnalyzerDialog::experimental_scan()
   printf("Tempo is %g\n",tempo);
   set_measured_period_diskrate("Melodic Rayshooting",minerrat*stride);
   
+#ifdef DEBUG_EXPALG
   f=fopen("mismatch.txt","wb");
+#endif
   for(int p = 1; p<pscan_stop; p++)
     {
       // the calculation of period to tempo is conducted as follows
@@ -1003,6 +1006,7 @@ void BpmAnalyzerDialog::experimental_scan()
 	/4;                  // samples per beat
       tempo=(diskrate/tempo)  // beats per second
 	*60.0;               // beats per minute
+#ifdef DEBUG_EXPALG
       unsigned8 v1=0;
 #ifdef MULTILEVEL
       v1=mismatch_array_min[p];
@@ -1024,9 +1028,12 @@ void BpmAnalyzerDialog::experimental_scan()
        * 6 - rayshoot 2nd batch
        */
       fprintf(f,"%g\t%d\t%g\t%g\t%g\t%lld\n",tempo,p,v4,v5,v6,v1);
+#endif // DEBUG_EXPALG
     }
 #endif // PERNOTE ?
+#ifdef DEBUG_EXPALG
     fclose(f);
+#endif
 
     /**
      * Advantage of rayshooting:
@@ -1144,8 +1151,10 @@ void BpmAnalyzerDialog::experimental_scan()
      * In advance we calculate how many elements we will need. This will always be a power of two.
      */
     unsigned4 measure_period=minerrat;
+#ifdef DEBUG_EXPALG
     g=fopen("beatline.txt","wb");
     // printf("Measure period is %d\n",measure_period);
+#endif
 
     unsigned8 range=block_count;
     unsigned1 powers=0;
@@ -1174,11 +1183,12 @@ void BpmAnalyzerDialog::experimental_scan()
 	    unsigned8 comes_from_1=comesfrom[range-stride];
 	    unsigned8 comes_from_2=comesfrom[range];
 	    
+#ifdef EXPALG
 	    char tmp[100];
 	    sprintf(tmp,"beatline-%d-%d.txt",power,range/stride);
 	    f=fopen(tmp,"wb");
 	    assert(f);
-	    
+#endif	    
 	    assert(remapped_2>remapped_1);
 	    assert(comes_from_2>comes_from_1);  
 	    unsigned8 remapped_center=(remapped_1+remapped_2)/2;
@@ -1239,37 +1249,46 @@ void BpmAnalyzerDialog::experimental_scan()
 		    minerr=mismatch;
 		    minerrat=comes_from_center;
 		  }
+#ifdef DEBUG_EXPALG
 		fprintf(f,"%lld\t%lld\n",comes_from_center-comes_from_old_center,mismatch);
+#endif
 	      }
-	    fclose(f);
 	    comesfrom[range-stride/2]=minerrat;
+#ifdef DEBUG_EXPALG
+	    fclose(f);
 	    fprintf(g,"%lld\t%d\n",remapped_center,minerrat);
+#endif
 	  }
       }
+#ifdef DEBUG_EXPALG
     fclose(g);
-
     g=fopen("beatline-hires.txt","wb");
     assert(g);
+#endif
     stereo_sample2* source=(stereo_sample2*)mmap(NULL,audiosize*4,PROT_READ,MAP_PRIVATE,fileno(raw),0);
     assert(source);
     if (source==MAP_FAILED)
       printf("Source mapping failed: %s\n",strerror(errno));
+#ifdef DEBUG_EXPALG
+    // this dumps the repositioned audio so that we can have a hear
     int targetfd=::open("mappedaudio.raw",O_RDWR|O_CREAT,S_IRWXU);
-    int mappedfd=::open("mappeddoubles.raw",O_RDWR|O_CREAT,S_IRWXU);
     assert(targetfd>0);
-    assert(mappedfd>0);
     ftruncate(targetfd,audiosize*4);
-    ftruncate(mappedfd,audiosize*sizeof(double));
     stereo_sample2* target=(stereo_sample2*)mmap(NULL,audiosize*4,PROT_READ|PROT_WRITE,MAP_SHARED,targetfd,0);
-    double* M=(double*)mmap(NULL,audiosize*sizeof(double),PROT_READ|PROT_WRITE,MAP_SHARED,mappedfd,0);
     assert(target);
-    assert(M);
     if (target==MAP_FAILED)
       printf("Target mapping failed: %s\n",strerror(errno));
-    if (M==MAP_FAILED)
-      printf("Mapped mapping failed: %s\n",strerror(errno));
-    // and now the mess of repositioning all samples in the audio file so that we can plot the
-    // outcome.
+#endif
+
+    char mappeddoublesfn[1000];
+    sprintf(mappeddoublesfn,"mappeddoubles-%d.raw",getpid());
+    int mappedfd=::open(mappeddoublesfn,O_RDWR|O_CREAT,S_IRWXU);
+    assert(mappedfd>0);
+    ftruncate(mappedfd,audiosize*sizeof(double));
+    double* M=(double*)mmap(NULL,audiosize*sizeof(double),PROT_READ|PROT_WRITE,MAP_SHARED,mappedfd,0);
+    assert(M);
+    assert(M!=MAP_FAILED);
+    // and now the mess of repositioning all samples in the audio file so that we can plot the outcome.
     printf("Creating new output file\n");
     for(unsigned8 i = 0 ; i< coors; i++)
       {
@@ -1284,16 +1303,18 @@ void BpmAnalyzerDialog::experimental_scan()
 	    unsigned8 from=from_1 + (to-to_1)*(from_2-from_1)/(to_2-to_1);
 	    assert(from<audiosize);
 	    stereo_sample2 sample=source[from];
+#ifdef DEBUG_EXPALG
 	    target[to]=sample;
+#endif
 	    M[to]=(double)sample.summed()/65536.0;
-	    //if (to%100==0)
-	    //	      fprintf(g,"%lld\t%lld\n",from,to);
 	  }
       }
-    fclose(g);
     munmap(source,audiosize*4);
+#ifdef DEBUG_EXPALG
+    fclose(g);
     munmap(target,audiosize*4);
     ::close(targetfd);
+#endif
     msync(M,audiosize*sizeof(double),MS_SYNC);
 
     /**
@@ -1363,36 +1384,6 @@ void BpmAnalyzerDialog::experimental_scan()
 		
 		double bark_presence[spectrum_size];
 		spectrum_to_bark(out,window_size,bark_presence);
-		
-		/* 
-		   for(int i = 0 ; i < window_size; i++)
-		   {
-		   double a=out[i][0];
-		   double b=out[i][1];
-		   double c=sqrt(a*a+b*b)/(window_size*divisor);
-		   if (isnan(c)) c=0;
-		   out[i][0]=c;
-		   }
-		// here we extract the frequency content and store it into the result array
-		// band0 goes to 100 Hz, band 2 goes to 880 Hz, band 3 is evertyhing higher
-		int hz100=window_size*100/diskrate;
-		int hz880=window_size*880/diskrate;
-		double lo=0,mid=0,hi=0;
-		for(int j=0; j < hz100; j++)
-		  lo+=out[j][0];
-		lo/=hz100;
-		for(int j=hz100; j < hz880; j++)
-		  mid+=out[j][0];
-		mid/=hz880-hz100;
-		for(int j=hz880; j < window_size/2; j++)
-		  hi+=out[j][0];
-		hi/=window_size/2-hz880;
-		// store the results
-		results[offset][0][tick]+=lo;
-		results[offset][1][tick]+=mid;
-		results[offset][2][tick]+=hi;
-		*/
-		
 		for(int b=0; b<spectrum_size; b++)
 		  results[offset][b][tick]+=bark_presence[b]/divisor;
 	      }
@@ -1455,6 +1446,7 @@ void BpmAnalyzerDialog::experimental_scan()
      * Now we need to write the crap to a file so that we can 
      * learn data from it. The targetfilename
      */
+#ifdef DEBUG_EXPALG
     char tmp[1024];
     sprintf(tmp,"%s.re",argument);
     f=fopen(tmp,"wb");
@@ -1466,7 +1458,6 @@ void BpmAnalyzerDialog::experimental_scan()
 	assert(r>=0);
       }
     fclose(f);
-
     /**
      * Dump lovely debugging info
      */
@@ -1479,9 +1470,13 @@ void BpmAnalyzerDialog::experimental_scan()
 	  fprintf(g,"\t%g",results[bestoffset][c][t]);
 	fprintf(g,"\n");
       }
-    
+#endif    
     // the end
     printf("Done\n");
+    // remove the old map
+    munmap(M,audiosize*sizeof(double));
+    ::close(mappedfd);
+    remove(mappeddoublesfn);
     fclose(raw);
 }
 

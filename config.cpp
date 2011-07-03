@@ -685,9 +685,12 @@ bool Config::open_ui(int pane)
    * broke down. So here we now want to set the right button.
    */  
   signed4 nr = get_anal_bpm_technique();
-  if (nr<1 || nr>5)
-    Warning("The BPM analysis technique required doesn't exist. "
-	    "Setting to the first available");
+  if (nr<1 || nr>6)
+    {
+      Warning("The BPM analysis technique required doesn't exist. "
+	      "Setting to nr 6");
+      nr=6;
+    }
   if (nr==1) preferences.resamplingScan->setChecked(true);
   else if (nr==2) preferences.ultraLongFFT->setChecked(true);
   else if (nr==3) preferences.enveloppeSpectrum->setChecked(true);
