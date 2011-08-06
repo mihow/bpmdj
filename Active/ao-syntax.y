@@ -229,7 +229,14 @@ aoheader
 		"    {\n"
 		"      return \"Unknown message\";\n"
 		"    }\n"
-		"};\n\n");
+		"    /**\n"
+		"     * The following is necessary so that child desctructors are invoked\n"
+		"     * when a message is deleted in the handle_message loop.\n"
+		"     */\n"
+		"    virtual ~Active%s_msg_()\n"
+		"    {\n"
+		"    }\n"
+		"};\n\n",$2);
 	  print(meta, 
 		"/**\n"
 		" * Represents the stub that will transform each incoming call (method)\n"

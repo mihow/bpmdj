@@ -1,5 +1,5 @@
 /****
- BpmDj v4.2: Free Dj Tools
+ BpmDj v4.2-pl2: Free Dj Tools
  Copyright (C) 2001-2011 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -19,7 +19,6 @@
 #ifndef __loaded__beatgraph_label_cpp__
 #define __loaded__beatgraph_label_cpp__
 using namespace std;
-#line 1 "beatgraph-label.c++"
 #include <Qt/qpixmap.h>
 #include <QtGui/QPaintEvent>
 #include <iostream>

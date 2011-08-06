@@ -1,5 +1,5 @@
 /****
- BpmDj v4.2: Free Dj Tools
+ BpmDj v4.2-pl2: Free Dj Tools
  Copyright (C) 2001-2011 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -19,7 +19,6 @@
 #ifndef __loaded__bpmplay_cpp__
 #define __loaded__bpmplay_cpp__
 using namespace std;
-#line 1 "bpmplay.c++"
 #include <Qt/qapplication.h>
 #include <Qt/qmessagebox.h>
 #include <Qt/qlistview.h>
@@ -46,7 +45,7 @@ using namespace std;
 #include <pthread.h>
 #include "player.h"
 #include "energy-analyzer.h"
-#include "bpm-analyzer.h"
+#include "bpm-analyzer-dialog.h"
 #include "spectrum-analyzer.h"
 #include "rhythm-analyzer.h"
 #include "md5-analyzer.h"
@@ -66,6 +65,12 @@ using namespace std;
 #include "clock-drivers.h"
 #include "hues.h"
 #include "info.h"
+#include "bpm-analyzer-impl.h"
+#include "bpm-analyzer-env.h"
+#include "bpm-analyzer-autocor.h"
+#include "bpm-analyzer-2010.h"
+#include "bpm-analyzer-2001.h"
+#include "bpm-analyzer-wec.h"
 
 /*-------------------------------------------
  *         Templates we need
@@ -169,13 +174,12 @@ void options_failure(const char* err)
 "      --copymusic           copy music first\n"
 "--analysis----------------------------------------\n"
 " -b     --batch             no ui output, md5sum is automatically checked\n"
-"        --bpm [1,2,3,4,5,6] measure bpm with specified technique (default = 1)\n"
-"                            1: rayshoot block resampling\n"
-"                            2: rayshoot with fft guidance\n"
-"                            3: enveloppe spectrum\n"
+"        --bpm [1,3,4,5,6]   measure bpm with specified technique (default = 1)\n"
+"                            1: autodifference\n"
+"                            3: envelope spectrum\n"
 "                            4: autocorrelation\n"
-"                            5: weighted approach\n"
-"                            6: experimental algorithm\n"
+"                            5: autocorrelation * envelope spectrum\n"
+"                            6: bpm2010\n"
 " -l nbr --low nbr           lowest bpm to look for (default = 120)\n"
 " -h nbr --high nbr          highest bpm to look for (default = 160)\n"
 "        --spectrum          obtain color & echo information\n"
@@ -310,6 +314,8 @@ void process_options(int argc, char* argv[])
 	  if (arg_bpm<1) 
 	    options_failure("selected BPM analyzing technique too low (starts"
 			    " with 1)\n");
+	  if (arg_bpm==2)
+ 	    options_failure("The FFT guided autodifferencer has been removed.\n");
 	  if (arg_bpm>6)
 	    options_failure("selected BPM analyzing technique too hi (ends"
 			    " with 6)\n");
@@ -446,14 +452,39 @@ void batch_start()
 	Info("%d. Bpm count skipped because song is empty",nr++);
       else
 	{
-	  BpmAnalyzerDialog *counter = new BpmAnalyzerDialog();
-	  counter->setBpmBounds(arg_low,arg_high);
-	  if (arg_bpm==2) counter->ultraLongFFT->setChecked(true);
-	  else if (arg_bpm==3) counter->enveloppeSpectrum->setChecked(true);
-	  else if (arg_bpm==4) counter->fullAutoCorrelation->setChecked(true);
-	  else if (arg_bpm==5) counter->weightedEnvCor->setChecked(true);
-	  else if (arg_bpm==6) counter->experimentalAlg->setChecked(true);
-	  counter->start();
+	  BpmAnalyzerImpl* bpmanalimp=NULL;
+	  FILE * file = openCoreRawFile();
+	  assert(file);
+	  int fd = fileno(file);
+	  unsigned4 map_length = fsize(file);
+	  unsigned4 startbpm=arg_low;
+	  unsigned4 stopbpm=arg_high;
+ 	  stereo_sample2* audio = (stereo_sample2*)mmap(NULL,map_length,PROT_READ,MAP_SHARED,fd,0);
+	  assert(audio!=MAP_FAILED);
+	  assert(audio);  
+	  if (arg_bpm==3)
+	    {
+	      assert(diskrate==44100);
+	      bpmanalimp=new BpmAnalyzerEnv(audio,map_length/4,startbpm,stopbpm);
+	    }
+	  else if (arg_bpm==4)
+	    {
+	      assert(diskrate==44100);
+	      bpmanalimp=new BpmAnalyzerAutocor(audio,map_length/4,startbpm,stopbpm);
+	    }
+	  else if (arg_bpm==5) 
+	    bpmanalimp=new BpmAnalyzerWec(audio,map_length/4,diskrate,startbpm,stopbpm);
+	  else if (arg_bpm==6)
+	    bpmanalimp=new BpmAnalyzer2010(audio,map_length/4,diskrate,startbpm,stopbpm);
+	  else if (arg_bpm==1)
+	    {
+	      assert(diskrate==44100);
+	      bpmanalimp=new BpmAnalyzer2001(audio,map_length/4,startbpm,stopbpm);
+	    }
+	  assert(bpmanalimp);
+	  while(bpmanalimp->step()) ;
+	  tempo_type result(bpmanalimp->tempo);
+	  set_normalperiod_metarate(diskrate_to_metarate(tempo_to_period(result).period*4));
 	  Info("%d. Bpm count: %s",nr++,
 	       playing->get_tempo().qstring().toAscii().data());
 	}
@@ -571,6 +602,7 @@ int remote(int argc, char* argv[])
 int main(int argc, char *argv[])
 {
   init_embedded_files();
+
   dsp_driver::init();
   app = new QApplication(argc,argv);
   init_hues();

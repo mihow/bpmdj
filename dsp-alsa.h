@@ -1,5 +1,5 @@
 /****
- BpmDj v4.2: Free Dj Tools
+ BpmDj v4.2-pl2: Free Dj Tools
  Copyright (C) 2001-2011 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -19,7 +19,6 @@
 #ifndef __loaded__dsp_alsa_h__
 #define __loaded__dsp_alsa_h__
 using namespace std;
-#line 1 "dsp-alsa.h++"
 #include "version.h"
 #ifdef COMPILE_ALSA
 #include <alsa/asoundlib.h>
@@ -33,7 +32,7 @@ class dsp_alsa: public dsp_driver
   snd_pcm_uframes_t period_size;
   snd_pcm_hw_params_t *hparams;
   snd_pcm_sw_params_t *sparams;
-  unsigned4 * buffer;
+  stereo_sample2* buffer;
   unsigned4 filled;
   void    wwrite(unsigned4 *value);
   int        arg_latency;

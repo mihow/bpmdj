@@ -1,5 +1,5 @@
 /****
- BpmDj v4.2: Free Dj Tools
+ BpmDj v4.2-pl2: Free Dj Tools
  Copyright (C) 2001-2011 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -19,7 +19,6 @@
 #ifndef __loaded__vector_iterator_h__
 #define __loaded__vector_iterator_h__
 using namespace std;
-#line 1 "vector-iterator.h++"
 #include <vector>
 #include <assert.h>
 #include "iterator.h"

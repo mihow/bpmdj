@@ -1,5 +1,5 @@
 /****
- BpmDj v4.2: Free Dj Tools
+ BpmDj v4.2-pl2: Free Dj Tools
  Copyright (C) 2001-2011 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -19,7 +19,6 @@
 #ifndef __loaded__signals_cpp__
 #define __loaded__signals_cpp__
 using namespace std;
-#line 1 "signals.c++"
 #include <cstdio>
 #include <assert.h>
 #include <stdlib.h>
@@ -247,36 +246,5 @@ void differentiate(float8 * arr, int s)
    for(int i = 0 ; i < s - 1; i ++)
      arr[i]=arr[i+1]-arr[i];
    arr[s-1]=-arr[s-1];
-}
-
-void energize(float8*data, float8 audiosize, unsigned4 fs)
-{
-  assert(fs>0);
-  bpmdj_array(rr,fs,float4);
-  for(unsigned4 i = 0 ; i < fs ; i++)
-    rr[i]=0;
-  float8 M = 0;
-  for(unsigned4 x = 0 ; x < audiosize ; x ++)
-    {
-      M-=rr[x%fs];
-      rr[x%fs]=data[x];
-      M+=data[x];
-      float8 R = M/fs;
-      data[x>=fs ? x - fs : 0 ] -= R;
-    }
-  for(unsigned4 x = 0 ; x < audiosize ; x ++)
-    data[x]*=data[x];
-  for(unsigned4 i = 0 ; i < fs ; i++)
-    rr[i]=0;
-  float8 S = 0;
-  for(unsigned4 x = 0 ; x < audiosize ; x ++)
-    {
-      S-=rr[x%fs];
-      rr[x%fs]=data[x];
-      S+=data[x];
-      float8 R = sqrt(S/fs);
-      data[x>=fs ? x - fs : 0 ] = R;
-    }
-  bpmdj_deallocate(rr);
 }
 #endif // __loaded__signals_cpp__

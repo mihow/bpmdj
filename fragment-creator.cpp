@@ -1,5 +1,5 @@
 /****
- BpmDj v4.2: Free Dj Tools
+ BpmDj v4.2-pl2: Free Dj Tools
  Copyright (C) 2001-2011 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -19,7 +19,6 @@
 #ifndef __loaded__fragment_creator_cpp__
 #define __loaded__fragment_creator_cpp__
 using namespace std;
-#line 1 "fragment-creator.c++"
 #include "bpmdj.h"
 #include "scripts.h"
 #include "selector.h"
@@ -101,6 +100,4 @@ elementResult ActiveFragmentCreator::terminate()
 {
   return deactivate();
 }
-
-FragmentCreator fragmentCreator;
 #endif // __loaded__fragment_creator_cpp__

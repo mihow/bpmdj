@@ -1,5 +1,5 @@
 /****
- BpmDj v4.2: Free Dj Tools
+ BpmDj v4.2-pl2: Free Dj Tools
  Copyright (C) 2001-2011 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -19,7 +19,6 @@
 #ifndef __loaded__pca_h__
 #define __loaded__pca_h__
 using namespace std;
-#line 1 "pca.h++"
 #include "Data/types.h"
 void do_pca(int rows, int columns, float4**data, const char* &error_msg);
 float4 ** matrix(int rows, int columns);

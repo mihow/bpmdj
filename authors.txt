@@ -5,12 +5,12 @@ Copyright (C) 2001-2011 Werner Van Belle
 Active
 ------
 Werner Van Belle <werner@yellowcouch.org>
-  Fathered the project
+  Created the project
+Bernard Fortz <bernard.fortz@gmail.com>
+  JACK support, Midi bindings, Gentoo packaging, External clock
 
 Passive
 -------
-Bernard Fortz <bernard.fortz@gmail.com>
-  JACK support, Midi bindings, Gentoo packaging
 Toni Graffy <oc2pus@arcor.de>
   Suse packaging
 F. Murtagh <murtagh@scivax.stsci.edu>

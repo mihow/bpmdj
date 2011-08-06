@@ -578,9 +578,9 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   147,   147,   148,   151,   152,   153,   155,   154,   334,
-     335,   338,   345,   353,   355,   357,   358,   364,   447,   448,
-     449,   450,   453,   456,   457,   460,   461,   464,   467,   468
+       0,   147,   147,   148,   151,   152,   153,   155,   154,   341,
+     342,   345,   352,   360,   362,   364,   365,   371,   454,   455,
+     456,   457,   460,   463,   464,   467,   468,   471,   474,   475
 };
 #endif
 
@@ -1617,7 +1617,14 @@ yyreduce:
 		"    {\n"
 		"      return \"Unknown message\";\n"
 		"    }\n"
-		"};\n\n");
+		"    /**\n"
+		"     * The following is necessary so that child desctructors are invoked\n"
+		"     * when a message is deleted in the handle_message loop.\n"
+		"     */\n"
+		"    virtual ~Active%s_msg_()\n"
+		"    {\n"
+		"    }\n"
+		"};\n\n",(yyvsp[(2) - (3)].token));
 	  print(meta, 
 		"/**\n"
 		" * Represents the stub that will transform each incoming call (method)\n"
@@ -1679,7 +1686,7 @@ yyreduce:
   case 8:
 
 /* Line 1455 of yacc.c  */
-#line 290 "ao-syntax.y"
+#line 297 "ao-syntax.y"
     {
       if (!pascal)
 	{
@@ -1727,14 +1734,14 @@ yyreduce:
   case 10:
 
 /* Line 1455 of yacc.c  */
-#line 335 "ao-syntax.y"
+#line 342 "ao-syntax.y"
     {;}
     break;
 
   case 11:
 
 /* Line 1455 of yacc.c  */
-#line 339 "ao-syntax.y"
+#line 346 "ao-syntax.y"
     {if (!pascal)
       print(object,"  %s %s;\n",(yyvsp[(1) - (3)].token),(yyvsp[(2) - (3)].token)); 
     else
@@ -1746,7 +1753,7 @@ yyreduce:
   case 12:
 
 /* Line 1455 of yacc.c  */
-#line 346 "ao-syntax.y"
+#line 353 "ao-syntax.y"
     {
     if (!pascal)
       print(object,"  %s %s;\n",(yyvsp[(1) - (5)].token),(yyvsp[(2) - (5)].token));
@@ -1759,28 +1766,28 @@ yyreduce:
   case 13:
 
 /* Line 1455 of yacc.c  */
-#line 354 "ao-syntax.y"
+#line 361 "ao-syntax.y"
     {print(object,"  %s %s %s;\n",(yyvsp[(1) - (4)].token),(yyvsp[(2) - (4)].token),(yyvsp[(3) - (4)].token)); field2init[(yyvsp[(3) - (4)].token)]=""; ;}
     break;
 
   case 14:
 
 /* Line 1455 of yacc.c  */
-#line 356 "ao-syntax.y"
+#line 363 "ao-syntax.y"
     {print(object,"  %s %s %s;\n",(yyvsp[(1) - (6)].token),(yyvsp[(2) - (6)].token),(yyvsp[(3) - (6)].token)); field2init[(yyvsp[(3) - (6)].token)]=(yyvsp[(5) - (6)].token); ;}
     break;
 
   case 15:
 
 /* Line 1455 of yacc.c  */
-#line 357 "ao-syntax.y"
+#line 364 "ao-syntax.y"
     {print(object,"  %s %s(%s);\n",(yyvsp[(1) - (4)].token),(yyvsp[(2) - (4)].token),args2str((yyvsp[(3) - (4)].args)));;}
     break;
 
   case 16:
 
 /* Line 1455 of yacc.c  */
-#line 359 "ao-syntax.y"
+#line 366 "ao-syntax.y"
     {
       print(meta,
 	    "  public:\n"
@@ -1791,7 +1798,7 @@ yyreduce:
   case 17:
 
 /* Line 1455 of yacc.c  */
-#line 365 "ao-syntax.y"
+#line 372 "ao-syntax.y"
     {
       // the object code
       if (!pascal)
@@ -1877,70 +1884,70 @@ yyreduce:
   case 18:
 
 /* Line 1455 of yacc.c  */
-#line 447 "ao-syntax.y"
+#line 454 "ao-syntax.y"
     {(yyval.token)=cat((yyvsp[(1) - (2)].token),"*");;}
     break;
 
   case 20:
 
 /* Line 1455 of yacc.c  */
-#line 449 "ao-syntax.y"
+#line 456 "ao-syntax.y"
     {(yyval.token)=cat(cat((yyvsp[(1) - (4)].token)," < "),cat((yyvsp[(3) - (4)].token)," > ")); ;}
     break;
 
   case 21:
 
 /* Line 1455 of yacc.c  */
-#line 450 "ao-syntax.y"
+#line 457 "ao-syntax.y"
     {(yyval.token)=  cat(cat(cat((yyvsp[(1) - (6)].token), "<"), cat((yyvsp[(3) - (6)].token),",")), cat((yyvsp[(5) - (6)].token),">"));;}
     break;
 
   case 22:
 
 /* Line 1455 of yacc.c  */
-#line 453 "ao-syntax.y"
+#line 460 "ao-syntax.y"
     {(yyval.token)=strdup("volatile");;}
     break;
 
   case 23:
 
 /* Line 1455 of yacc.c  */
-#line 456 "ao-syntax.y"
+#line 463 "ao-syntax.y"
     {(yyval.args)=(yyvsp[(2) - (3)].args);;}
     break;
 
   case 24:
 
 /* Line 1455 of yacc.c  */
-#line 457 "ao-syntax.y"
+#line 464 "ao-syntax.y"
     { (yyval.args)=new vector<s_arg>();;}
     break;
 
   case 25:
 
 /* Line 1455 of yacc.c  */
-#line 460 "ao-syntax.y"
+#line 467 "ao-syntax.y"
     {(yyval.args)=(yyvsp[(1) - (3)].args); (yyval.args)->push_back((yyvsp[(3) - (3)].arg));;}
     break;
 
   case 26:
 
 /* Line 1455 of yacc.c  */
-#line 461 "ao-syntax.y"
+#line 468 "ao-syntax.y"
     {(yyval.args)=new vector<s_arg>(); (yyval.args)->push_back((yyvsp[(1) - (1)].arg));;}
     break;
 
   case 27:
 
 /* Line 1455 of yacc.c  */
-#line 464 "ao-syntax.y"
+#line 471 "ao-syntax.y"
     {(yyval.arg).name = (yyvsp[(2) - (2)].token); (yyval.arg).type=(yyvsp[(1) - (2)].token);;}
     break;
 
 
 
 /* Line 1455 of yacc.c  */
-#line 1944 "ao-syntax.cpp"
+#line 1951 "ao-syntax.cpp"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -2152,6 +2159,6 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 469 "ao-syntax.y"
+#line 476 "ao-syntax.y"
 
 

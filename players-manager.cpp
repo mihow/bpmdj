@@ -1,5 +1,5 @@
 /****
- BpmDj v4.2: Free Dj Tools
+ BpmDj v4.2-pl2: Free Dj Tools
  Copyright (C) 2001-2011 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -19,7 +19,6 @@
 #ifndef __loaded__players_manager_cpp__
 #define __loaded__players_manager_cpp__
 using namespace std;
-#line 1 "players-manager.c++"
 #include "selector.h"
 #include "players-manager.h"
 #include "scripts.h"
@@ -75,8 +74,8 @@ void ProcessManager::start(SongSlot* slot, Song *song)
   Index a(matchWith->get_storedin());
   Index b(song->get_storedin());
   QString playercommand = slot->getPlayCommand(a,b);
-  fragmentPlayer.stopOutput();
-  fragmentPlayer.waitForStop();
+  fragmentPlayer->stopOutput();
+  fragmentPlayer->waitForStop();
   
   SongProcess* proc=new SongProcess(slot,this);
   QString description="Play " + song->getDisplayTitle() 
@@ -84,8 +83,8 @@ void ProcessManager::start(SongSlot* slot, Song *song)
   proc->start(playercommand,description,false);
   slot->start(song,proc);
   
-  fragmentPlayer.startOutput();
-  fragmentPlayer.waitForStart();
+  fragmentPlayer->startOutput();
+  fragmentPlayer->waitForStart();
 }
 
 bool ProcessManager::startSong(Song *song)

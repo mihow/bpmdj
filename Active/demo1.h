@@ -75,6 +75,13 @@ class ActiveDemoSender_msg_
     {
       return "Unknown message";
     }
+    /**
+     * The following is necessary so that child desctructors are invoked
+     * when a message is deleted in the handle_message loop.
+     */
+    virtual ~ActiveDemoSender_msg_()
+    {
+    }
 };
 
 /**
@@ -105,6 +112,13 @@ class ActiveDemoReceiver_msg_
     virtual string declaration()
     {
       return "Unknown message";
+    }
+    /**
+     * The following is necessary so that child desctructors are invoked
+     * when a message is deleted in the handle_message loop.
+     */
+    virtual ~ActiveDemoReceiver_msg_()
+    {
     }
 };
 

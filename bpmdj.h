@@ -1,5 +1,5 @@
 /****
- BpmDj v4.2: Free Dj Tools
+ BpmDj v4.2-pl2: Free Dj Tools
  Copyright (C) 2001-2011 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -19,7 +19,6 @@
 #ifndef __loaded__bpmdj_h__
 #define __loaded__bpmdj_h__
 using namespace std;
-#line 1 "bpmdj.h++"
 #include <qapplication.h>
 #include <qsplashscreen.h>
 #include <qpixmap.h>
@@ -32,6 +31,7 @@ using namespace std;
 #include "spectrum-pca.h"
 #include "existence-scanner.h"
 #include "clock-drivers.h"
+#include "index-reader.h"
 
 #if (DATA_VERSION_MAJOR != 0) || (DATA_VERSION_MINOR != 2)
 #error "DATA has wrong version number"
@@ -43,14 +43,15 @@ extern QStatusBar*    status;
 /**
  * The active object that will play fragments
  */
-extern FragmentPlayer fragmentPlayer;
+extern FragmentPlayer* fragmentPlayer;
 /**
  * The active object that will run a principal component analysis on the 
  * spectrum property.
  */
-extern SpectrumPca    spectrumPca; 
+extern SpectrumPca*     spectrumPca; 
 /**
  * The active object that scans the existence of files
  */
-extern ExistenceScanner existenceScanner;
+extern ExistenceScanner* existenceScanner;
+extern IndexReader*      indexReader;
 #endif // __loaded__bpmdj_h__

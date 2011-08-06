@@ -1,5 +1,5 @@
 /****
- BpmDj v4.2: Free Dj Tools
+ BpmDj v4.2-pl2: Free Dj Tools
  Copyright (C) 2001-2011 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -19,7 +19,6 @@
 #ifndef __loaded__overseer_cpp__
 #define __loaded__overseer_cpp__
 using namespace std;
-#line 1 "overseer.c++"
 #include <cstdio>
 #include <fcntl.h>
 #include <stdlib.h>
@@ -93,9 +92,9 @@ int main_pid;
 /**
  * This one is useful if we want to send signal between processes
  */
-map<int,int> mainpid2realpid;
+map<int,int> mainpid2realpid  __attribute__ ((init_priority(201)));
 #endif
-map<int,int> realpid2mainpid;
+map<int,int> realpid2mainpid  __attribute__ ((init_priority(201)));
 
 vector<ExitStatus>* realpidsdied=NULL;
 vector<ExitStatus>* take_death_pids()
@@ -529,10 +528,8 @@ public:
   ForkQuick()
   {
     init_process_overseer();
-    // printf("Overseer process initialized\n");
   }
 };
 
-ForkQuick order_matters;
- 
+ForkQuick order_matters __attribute__ ((init_priority(202)));
 #endif // __loaded__overseer_cpp__

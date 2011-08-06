@@ -1,5 +1,5 @@
 /****
- BpmDj v4.2: Free Dj Tools
+ BpmDj v4.2-pl2: Free Dj Tools
  Copyright (C) 2001-2011 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -16,15 +16,14 @@
 
  See the authors.txt for a full list of people involved.
 ****/
-#ifndef __loaded__analyzer_cpp__
-#define __loaded__analyzer_cpp__
+#ifndef __loaded__analyzer_runner_cpp__
+#define __loaded__analyzer_runner_cpp__
 using namespace std;
-#line 1 "analyzer.c++"
 #include <pthread.h>
 #include <stdio.h>
-#include "analyzer.h"
+#include "analyzer-runner.h"
 
-void Analyzer::run()
+void AnalyzerRunner::run()
 {
   if (working) return;
   started();
@@ -32,21 +31,13 @@ void Analyzer::run()
   stopped();
 }
 
-void Analyzer::started()
+void AnalyzerRunner::started()
 {
   working = true;
   stop_signal=false;
 };
 
-void Analyzer::toggle()
-{
-  if (working)
-    stop();
-  else
-    start();
-}
-
-void Analyzer::stop()
+void AnalyzerRunner::stop()
 {
   if (!working) return;
   stop_signal=true;
@@ -55,11 +46,11 @@ void Analyzer::stop()
 
 void* doit(void* anal)
 {
-  ((Analyzer*)anal)->run();
+  ((AnalyzerRunner*)anal)->run();
   return NULL;
 }
 
-void Analyzer::start(bool own_thread)  
+void AnalyzerRunner::start(bool own_thread)  
 {
   if (own_thread)
     {
@@ -70,4 +61,4 @@ void Analyzer::start(bool own_thread)
   else
     run(); 
 }
-#endif // __loaded__analyzer_cpp__
+#endif // __loaded__analyzer_runner_cpp__

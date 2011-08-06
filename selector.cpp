@@ -1,5 +1,5 @@
 /****
- BpmDj v4.2: Free Dj Tools
+ BpmDj v4.2-pl2: Free Dj Tools
  Copyright (C) 2001-2011 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -19,7 +19,6 @@
 #ifndef __loaded__selector_cpp__
 #define __loaded__selector_cpp__
 using namespace std;
-#line 1 "selector.c++"
 #include <cstdio>
 #include <unistd.h>
 #include <qinputdialog.h>
@@ -82,7 +81,6 @@ using namespace std;
 #include "historysong.h"
 #include "ui-bpmmerge.h"
 #include "edit-distance.h"
-#include "index-reader.h"
 #include "scripts.h"
 #include "spectrum-type.h"
 #include "tags.h"
@@ -372,12 +370,11 @@ SongSelectorLogic::SongSelectorLogic(QWidget * parent) :
   database->updateCache(this); 
 };
 
-extern IndexReader indexReader;
 void SongSelectorLogic::start_reading_indices()
 {
   QMutexLocker _ml(&lock);
   updateProcessView(false);
-  indexReader.start(Config::get_file_count());
+  indexReader->start(Config::get_file_count());
 }
 
 void SongSelectorLogic::sortByColumn(int col, Qt::SortOrder so)
@@ -470,7 +467,7 @@ void SongSelectorLogic::startExistenceCheck()
 { 
   QMutexLocker _ml(&lock);
   if (database)
-    existenceScanner.start(new vector<Song*>(database->getAllSongs()));
+    existenceScanner->start(new vector<Song*>(database->getAllSongs()));
 }
 
 void SongSelectorLogic::initialize_extras()
@@ -892,7 +889,7 @@ ITERATE_OVER(svic)
       };
     }
   assert(all);
-  spectrumPca.pcaThis(all);
+  spectrumPca->pcaThis(all);
 }
 
 void SongSelectorLogic::exportPlayList()
@@ -2036,7 +2033,7 @@ void SongSelectorLogic::fragmentCreated(FragmentCreated* fc)
 {
   if (!Config::play_fragments) return;
   if (last_fragment_play_request != fc->get_song()) return;
-  fragmentPlayer.playWave(fc->getFragment());
+  fragmentPlayer->playWave(fc->getFragment());
   last_fragment_play_request = NULL;
 }
 #endif // __loaded__selector_cpp__

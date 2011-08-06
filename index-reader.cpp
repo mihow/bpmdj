@@ -1,5 +1,5 @@
 /****
- BpmDj v4.2: Free Dj Tools
+ BpmDj v4.2-pl2: Free Dj Tools
  Copyright (C) 2001-2011 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -19,7 +19,6 @@
 #ifndef __loaded__index_reader_cpp__
 #define __loaded__index_reader_cpp__
 using namespace std;
-#line 1 "index-reader.c++"
 #include <cstdio>
 #include <stdlib.h>
 #include <unistd.h>
@@ -44,7 +43,6 @@ using namespace std;
 class SongSelectorLogic;
 class Song;
 
-IndexReader indexReader;
 bool reading_index = false;
 
 class IndexScanner: public DirectoryScanner

@@ -1,5 +1,5 @@
 /****
- BpmDj v4.2: Free Dj Tools
+ BpmDj v4.2-pl2: Free Dj Tools
  Copyright (C) 2001-2011 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -19,7 +19,6 @@
 #ifndef __loaded__edit_distance_h__
 #define __loaded__edit_distance_h__
 using namespace std;
-#line 1 "edit-distance.h++"
 #include <assert.h>
 int ndist(const char* title, const char* author, const char* other);
 void dist_init();

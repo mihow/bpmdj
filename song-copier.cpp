@@ -1,5 +1,5 @@
 /****
- BpmDj v4.2: Free Dj Tools
+ BpmDj v4.2-pl2: Free Dj Tools
  Copyright (C) 2001-2011 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -19,7 +19,6 @@
 #ifndef __loaded__song_copier_cpp__
 #define __loaded__song_copier_cpp__
 using namespace std;
-#line 1 "song-copier.c++"
 #include <qdir.h>
 #include "scripts.h"
 #include "song-copier.h"
@@ -62,6 +61,4 @@ elementResult ActiveSongCopier::terminate()
   tocopy.clear();
   return deactivate();
 }
-
-SongCopier songCopier;
 #endif // __loaded__song_copier_cpp__

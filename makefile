@@ -1,6 +1,6 @@
-VERSION = 4.2
+VERSION = 4.2-pl2
 DEMOS = index-demo idx2txt
-BIN =  $(DEMOS) bpmplay bpmcount bpmdj
+BIN =  bpmcount bpmplay bpmdj $(DEMOS)
 .EXPORT_ALL_VARIABLES:
 all: .link-targets .ui-forms .rc-files .source-creator .depend .compile 
 
@@ -52,41 +52,6 @@ ACDA = Active Data
 	@for a in $(ACDA); do make -s -C $$a ; done
 	@make -j $(JOBS) -s --no-print-directory -f compile 
 
-# Packaging of the distribution
-packages: packager all
-	@echo "Packaging:"
-	@make -s --no-print-directory -f packager
-
-check-bin: 
-	@make -s --no-print-directory -f packager bpmdj-source.tgz
-	@echo =========== Entering Compilation Reactor ===================
-	@mkdir tmp
-	@echo [unzip]
-	@cd tmp; tar -xzf ../bpmdj-source.tgz
-	@cp -L defines tmp/
-	@cd tmp; make -s
-	@echo [clean] reactor
-	@rm -rf tmp
-	@echo ============================================================
-
-check-doc: 
-	@make -s --no-print-directory -f packager bpmdj-doc.tgz
-	@echo =========== Entering Documentation Reactor =================
-	@echo [unzip]
-	@mkdir tmp
-	@cd tmp; tar -xzf ../bpmdj-doc.tgz
-	@echo " [test] widowed files"
-	@cd tmp/documentation; for a in *.html; do cat $$a >>all; done
-	@cd tmp/documentation; for a in *.png; do echo -n $$a "  :::"; grep -c $$a all; done  >../../count
-	@grep :::0 count >bpmdj-doc-errors.txt; exit 0
-	@echo " [test] widowed links"
-	@linklint -error -root tmp/documentation /@ 2>>bpmdj-doc-errors.txt
-	@echo "[clean] reactor"
-	@rm -rf tmp
-	@test -s bpmdj-doc-errors.txt
-	@echo "Report is in bpmdj-doc-errors.txt"
-	@echo ============================================================
-
 clean:
 	@for a in $(ACDA); do make -s -C $$a clean; done
 	@echo "[clean] BpmDj"
@@ -97,12 +62,8 @@ very-clean: clean
 	@echo "[clean] BpmDj sources"
 	@rm -f *.h *.cpp
 
-check: check-bin check-doc
 
 # Varia
-nens:
-	@~/Administration/bpmdj-to-nens
-
 tuuster: 
 	@scp bpmmerge bpmdj@tuuster:.bin/
 	@scp bpmplay  bpmdj@tuuster:.bin/

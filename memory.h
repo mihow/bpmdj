@@ -1,5 +1,5 @@
 /****
- BpmDj v4.2: Free Dj Tools
+ BpmDj v4.2-pl2: Free Dj Tools
  Copyright (C) 2001-2011 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -19,7 +19,6 @@
 #ifndef __loaded__memory_h__
 #define __loaded__memory_h__
 using namespace std;
-#line 1 "memory.h++"
 #define bpmdj_allocate(size, type) \
   (type*)myalloc(sizeof(type)*(size), __FILE__, __LINE__)
 #define bpmdj_array(name,size,type) \

@@ -1,5 +1,5 @@
 /****
- BpmDj v4.2: Free Dj Tools
+ BpmDj v4.2-pl2: Free Dj Tools
  Copyright (C) 2001-2011 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -19,12 +19,11 @@
 #ifndef __loaded__md5_analyzer_h__
 #define __loaded__md5_analyzer_h__
 using namespace std;
-#line 1 "md5-analyzer.h++"
-#include "analyzer.h"
-class Md5Analyzer: public Analyzer
+#include "analyzer-runner.h"
+class Md5Analyzer: public AnalyzerRunner
 {
  public:
-  Md5Analyzer(): Analyzer() {};
+  Md5Analyzer(): AnalyzerRunner() {};
   virtual void analyze();
 };
 #endif // __loaded__md5_analyzer_h__

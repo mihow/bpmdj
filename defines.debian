@@ -1,4 +1,4 @@
-CPP             = g++ -g -O0 -Wall
+CPP             = g++ -g -O3 -Wall
 RCC             = rcc
 UIC             = uic-qt4
 MOC             = moc-qt4
@@ -6,5 +6,5 @@ CFLAGS         += -D COMPILE_ALSA -D COMPILE_OSS -D COMPILE_JACK
 LDFLAGS        += -pthread -lm -lasound -lrt -lfftw3 -ljack
 QT_INCLUDE_PATH = -I/usr/include/qt4/ -I/usr/include/qt4/Qt/
 QT_LIBRARY_PATH =
-QT_LIBS         = -lQtGui
+QT_LIBS         = -lQtGui -lQtCore
 BITS		= 32

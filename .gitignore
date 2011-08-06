@@ -15,6 +15,7 @@ defines
 idx2txt
 aoc
 bos
+.*
 profile.clock
 bpmdj
 bpmplay
@@ -25,5 +26,4 @@ bpmclock
 *.a
 *.L
 *.o
-.*
-*~
+*.moc.cpp

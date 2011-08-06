@@ -50,10 +50,6 @@ endif
 		--rename-section .data=.rodata,alloc,load,readonly,data,contents \
 		 $< $@
 
-DATA_OBJECTS = data.o data-lexer.o data-syntax.o data-io.o \
-        data-visitor.o array-creator.o symbol.o data-token.o data-string.o \
-        null.o set.o
-
 DSP_OBJECTS = dsp-drivers.o dsp-oss.o dsp-alsa.o dsp-none.o dsp-jack.o \
 	    info.o scripts.o
 dsp.a : $(DSP_OBJECTS)
@@ -65,10 +61,14 @@ embedded.a: $(EMBEDDED)
 	@echo "   [ar] embedded.a"
 	@$(AR) r $@ $(EMBEDDED) 2>.ignore
 
-ANALYZERS = analyzer.o \
+BPM_LIB = bpm-analyzer-wec.o bpm-analyzer-2010.o bpm-analyzer-2001.o \
+	bpm-analyzer-autocor.o bpm-analyzer-env.o \
+	memory.o analyzer-impl.o spectrum-type.o 
+
+ANALYZERS = analyzer-runner.o $(BPM_LIB) \
  	beatgraph-label.o beatgraph-label.moc.o \
         beatgraph-analyzer.o beatgraph-analyzer.moc.o \
-	bpm-analyzer.o bpm-analyzer.moc.o \
+	bpm-analyzer-dialog.o bpm-analyzer-dialog.moc.o \
 	spectrum-analyzer.o spectrum-analyzer.moc.o \
 	rhythm-analyzer.o rhythm-analyzer.moc.o \
 	md5-analyzer.o energy-analyzer.o
@@ -84,21 +84,20 @@ BPMPLAY = $(ACTIVE_OBJECTS) about.moc.o memory.o power-type.o files.o \
  	song-information.o song-information.moc.o hues.o \
 	pca.o capacity.o index.o bpmplay.o signals.o \
 	player-config.o capacity-checker.o dsp.a \
-	embedded.a rc-player.o clock-drivers.o \
-	analyzers.a histogram-type.o \
-	common.o bpm.o Data/data.a Active/ao-pool.o \
+	embedded.a rc-player.o clock-drivers.o analyzer-worker.o \
+	analyzers.a histogram-type.o analyzer-progress-qt.o \
+	common.o Data/data.a Active/ao-pool.o \
 	midi-bindings.o qt-helpers.o \
 	no-overseer.o
 
-BPM_LIB = bpm.o memory.o	
-BPMCOUNT_OBJECTS = bpmcount.o files.o signals.o bpm.a Data/data.a
+BPMCOUNT_OBJECTS = bpmcount.o files.o signals.o bpm.a Data/data.a analyzer-progress-qt.o
 
 FRAGMENTS = fragment-player.o fragment-cache.o fragment.o fragment-creator.o fragment-deliverer.o
 BPMDJ_OBJECTS = $(ACTIVE_OBJECTS) tags.o about.moc.o capacity.o \
 	heap.o pixmap-cache.o \
 	song-slot.o song-slot.moc.o spectrum-type.o \
 	scripts.o pca.o process.o histogram-type.o \
-	memory.o analyzer.o qt-helpers.o hues.o \
+	memory.o analyzer-runner.o qt-helpers.o hues.o \
 	config.moc.o existence-scanner.o \
 	tempo-type.o player-config.o \
 	song-information.o song-information.moc.o sample4-type.o \

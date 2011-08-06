@@ -1,5 +1,5 @@
 /****
- BpmDj v4.2: Free Dj Tools
+ BpmDj v4.2-pl2: Free Dj Tools
  Copyright (C) 2001-2011 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -19,7 +19,6 @@
 #ifndef __loaded__player_cpp__
 #define __loaded__player_cpp__
 using namespace std;
-#line 1 "player.c++"
 #include <cstdio>
 #include <Qt/qlcdnumber.h>
 #include <stdio.h>
@@ -47,7 +46,7 @@ using namespace std;
 #include <Qt/qtabwidget.h>
 #include <Qt/qpainter.h>
 #include "player.h"
-#include "bpm-analyzer.h"
+#include "bpm-analyzer-dialog.h"
 #include "beatgraph-analyzer.h"
 #include "spectrum-analyzer.h"
 #include "rhythm-analyzer.h"
@@ -181,7 +180,8 @@ void Player::done(int r)
   assert(test<2);
   // signal any active counter to stop working
   assert(bpmCounter);
-  bpmCounter->finish();
+  bpmCounter->terminate();
+  aoPool->wait_for_finish();
   core_stop();
   core_done();
   // now finish
@@ -217,7 +217,6 @@ void Player::init_tempo_switch_time()
 Player::Player(): QDialog()
 {
   setupUi(this);
-  bpmCounter->player=this;
   timer = new QTimer(this);
   finetimer = new QTimer(this);
   map = NULL;

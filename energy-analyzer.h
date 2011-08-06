@@ -1,5 +1,5 @@
 /****
- BpmDj v4.2: Free Dj Tools
+ BpmDj v4.2-pl2: Free Dj Tools
  Copyright (C) 2001-2011 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -19,19 +19,18 @@
 #ifndef __loaded__energy_analyzer_h__
 #define __loaded__energy_analyzer_h__
 using namespace std;
-#line 1 "energy-analyzer.h++"
-#include "analyzer.h"
+#include "analyzer-runner.h"
 #include "common.h"
 #include "stereo-sample2.h"
 
 float4 normalization_factor(signed2 mi, signed2 ma, signed2 me);
 
-class EnergyAnalyzer: public Analyzer
+class EnergyAnalyzer: public AnalyzerRunner
 {
  private:
   unsigned8 audiosize;
   stereo_sample2 *audio;
- public:
+public:
   EnergyAnalyzer() {};
   void readAudio();
   virtual void analyze();

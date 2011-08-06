@@ -1,5 +1,5 @@
 /****
- BpmDj v4.2: Free Dj Tools
+ BpmDj v4.2-pl2: Free Dj Tools
  Copyright (C) 2001-2011 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -16,11 +16,10 @@
 
  See the authors.txt for a full list of people involved.
 ****/
-#ifndef __loaded__analyzer_h__
-#define __loaded__analyzer_h__
+#ifndef __loaded__analyzer_runner_h__
+#define __loaded__analyzer_runner_h__
 using namespace std;
-#line 1 "analyzer.h++"
-class Analyzer
+class AnalyzerRunner
 {
 protected:
   // keeps track of the current running state
@@ -28,14 +27,12 @@ protected:
   // true when the process should voluntarily stop
   volatile bool stop_signal;
 public:
-  Analyzer(): working(false), stop_signal(false) {};
+  AnalyzerRunner(): working(false), stop_signal(false) {};
   // call to start the analyzer
   virtual void start(bool own_thread = false);
   // call to stop the analyzer. The method will wait until the 
   // analyzer has stopped.
   virtual void stop();
-  // call this to start/stop analyzer depending on its current state
-  virtual void toggle();
   // called when analyzer has been started
   virtual void started();
   // called to analyze the process, should be filled in 
@@ -45,6 +42,6 @@ public:
   virtual void stopped() { working = false; };
   // a method that will call started(), analyze() and stopped()
   virtual void run();
-  virtual ~Analyzer() { stop(); };
+  virtual ~AnalyzerRunner() { stop(); };
 };
-#endif // __loaded__analyzer_h__
+#endif // __loaded__analyzer_runner_h__

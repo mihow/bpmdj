@@ -1,5 +1,5 @@
 /****
- BpmDj v4.2: Free Dj Tools
+ BpmDj v4.2-pl2: Free Dj Tools
  Copyright (C) 2001-2011 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -19,7 +19,6 @@
 #ifndef __loaded__echo_property_h__
 #define __loaded__echo_property_h__
 using namespace std;
-#line 1 "echo-property.h++"
 #include "histogram-property.h"
 
 #define echo_prop_sx 96

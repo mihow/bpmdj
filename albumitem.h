@@ -1,5 +1,5 @@
 /****
- BpmDj v4.2: Free Dj Tools
+ BpmDj v4.2-pl2: Free Dj Tools
  Copyright (C) 2001-2011 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -19,7 +19,6 @@
 #ifndef __loaded__albumitem_h__
 #define __loaded__albumitem_h__
 using namespace std;
-#line 1 "albumitem.h++"
 #include "historysong.h"
 
 const unsigned4 ALBUM_NR=0;

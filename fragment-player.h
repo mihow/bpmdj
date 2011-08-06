@@ -68,6 +68,13 @@ class ActiveFragmentPlayer_msg_
     {
       return "Unknown message";
     }
+    /**
+     * The following is necessary so that child desctructors are invoked
+     * when a message is deleted in the handle_message loop.
+     */
+    virtual ~ActiveFragmentPlayer_msg_()
+    {
+    }
 };
 
 

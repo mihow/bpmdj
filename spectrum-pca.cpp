@@ -1,5 +1,5 @@
 /****
- BpmDj v4.2: Free Dj Tools
+ BpmDj v4.2-pl2: Free Dj Tools
  Copyright (C) 2001-2011 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -19,7 +19,6 @@
 #ifndef __loaded__spectrum_pca_cpp__
 #define __loaded__spectrum_pca_cpp__
 using namespace std;
-#line 1 "spectrum-pca.c++"
 #include <cstdio>
 #include "vector-iterator.h"
 #include "pca.h"
@@ -118,5 +117,5 @@ elementResult ActiveSpectrumPca::terminate()
   return deactivate();
 }
 
-SpectrumPca spectrumPca;
+SpectrumPca* spectrumPca=NULL;
 #endif // __loaded__spectrum_pca_cpp__

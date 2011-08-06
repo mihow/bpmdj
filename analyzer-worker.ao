@@ -1,0 +1,9 @@
+#include <vector>
+#include "analyzer-impl.h"
+
+active AnalyzerWorker
+{
+  AnalyzerAlg running;
+  message run(AnalyzerAlg a);
+  message terminate();
+};

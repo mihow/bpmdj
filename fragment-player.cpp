@@ -1,5 +1,5 @@
 /****
- BpmDj v4.2: Free Dj Tools
+ BpmDj v4.2-pl2: Free Dj Tools
  Copyright (C) 2001-2011 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -19,7 +19,6 @@
 #ifndef __loaded__fragment_player_cpp__
 #define __loaded__fragment_player_cpp__
 using namespace std;
-#line 1 "fragment-player.c++"
 #include "player-core.h"
 #include "fragment-cache.h"
 #include "fragment-player.h"
@@ -31,9 +30,7 @@ elementResult ActiveFragmentPlayer::playWave(FragmentInMemory fragment)
 {
   if (stopped) return Done;
   checkValidDsp();
-  delivery.reset(fragment);
-  
-  bool just_opened = false;
+  delivery.reset(fragment);  
   if (!dsp)
     {
       SongSlot *free_slot = NULL;
@@ -59,10 +56,7 @@ elementResult ActiveFragmentPlayer::playWave(FragmentInMemory fragment)
 	  dsp=NULL;
 	}
       else
-	{
-	  dsp->start(&delivery);
-	  just_opened=true;
-	}
+	dsp->start(&delivery);
     }
   return Done;
 };
@@ -121,6 +115,4 @@ void FragmentPlayer::waitForStart()
 {
   while(object.stopped) ;
 }
-
-FragmentPlayer fragmentPlayer;
 #endif // __loaded__fragment_player_cpp__

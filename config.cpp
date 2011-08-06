@@ -1,5 +1,5 @@
 /****
- BpmDj v4.2: Free Dj Tools
+ BpmDj v4.2-pl2: Free Dj Tools
  Copyright (C) 2001-2011 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -19,7 +19,6 @@
 #ifndef __loaded__config_cpp__
 #define __loaded__config_cpp__
 using namespace std;
-#line 1 "config.c++"
 #include <qlineedit.h>
 #include <qfile.h>
 #include <qdatastream.h>
@@ -147,7 +146,7 @@ init_singleton_var(Config,color_unchecked,QColor,QColor(219,219,219));
 SongSlot Config::analyzers[8];
 init_singleton_var(Config,anal_bpm_from,float4,90);
 init_singleton_var(Config,anal_bpm_to,float4,160);
-init_singleton_var(Config,anal_bpm_technique,int,1);
+init_singleton_var(Config,anal_bpm_technique,int,6);
 init_singleton_var(Config,color_alltime,QColor,QColor(0,0,255));
 ConfigState Config::play_fragments(false);
 init_singleton_var(Config,tag_include,QString,"");
@@ -588,6 +587,9 @@ bool Config::load()
       // if the magic was smaller than 3_5 we convert the TAGLIST
       if (magic < MAGIC_3_5)
 	taglist2config(taglist);
+      // if the anall bpm technique 
+      if (magic <= MAGIC_4_2 && anal_bpm_technique==2)
+	anal_bpm_technique=6;
     }
   return true;
 }

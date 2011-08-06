@@ -1,5 +1,5 @@
 /****
- BpmDj v4.2: Free Dj Tools
+ BpmDj v4.2-pl2: Free Dj Tools
  Copyright (C) 2001-2011 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -19,7 +19,6 @@
 #ifndef __loaded__type_operations_h__
 #define __loaded__type_operations_h__
 using namespace std;
-#line 1 "type-operations.h++"
 #include "tempo-type.h"
 #include "period-type.h"
 #include "stereo-sample2.h"

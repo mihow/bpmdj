@@ -1,5 +1,5 @@
 /****
- BpmDj v4.2: Free Dj Tools
+ BpmDj v4.2-pl2: Free Dj Tools
  Copyright (C) 2001-2011 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -19,7 +19,6 @@
 #ifndef __loaded__energy_analyzer_cpp__
 #define __loaded__energy_analyzer_cpp__
 using namespace std;
-#line 1 "energy-analyzer.c++"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>

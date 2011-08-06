@@ -1,5 +1,5 @@
 /****
- BpmDj v4.2: Free Dj Tools
+ BpmDj v4.2-pl2: Free Dj Tools
  Copyright (C) 2001-2011 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -19,7 +19,6 @@
 #ifndef __loaded__bpmcount_cpp__
 #define __loaded__bpmcount_cpp__
 using namespace std;
-#line 1 "bpmcount.c++"
 #include <stdlib.h>
 #include <cstdio>
 #include <stdio.h>
@@ -40,9 +39,16 @@ using namespace std;
 #include <stdlib.h>
 #include <sys/mman.h>
 #include <syscall.h>
+#include <qapplication.h>
+#include <qimage.h>
 #include "version.h"
 #include "memory.h"
-#include "bpm.h"
+#include "bpm-analyzer-2001.h"
+#include "bpm-analyzer-2010.h"
+#include "bpm-analyzer-wec.h"
+#include "bpm-analyzer-autocor.h"
+#include "bpm-analyzer-env.h"
+#include "analyzer-progress-qt.h"
 #include "files.h"
 #include "signals.h"
 
@@ -51,21 +57,21 @@ template float8 find_abs_max<float8>(float8*, long);
 
 int main(int argc, char *argv[])
 {
-  printf("bpmcount v"VERSION" (c) Werner Van Belle 2000-2011,"
-	 " all rights reserved\n");
-  printf("http://bpmdj.yellowcouch.org/\n");
-  printf("_________________________________________________________________\n");
-
+  QApplication app(argc,argv);
+  printf("bpmcount v"VERSION" (c) Werner Van Belle 2000-2011\n");
+  printf("http://werner.yellowcouch.org/Papers/bpm10/\n");
+  printf("-----------------------------------------------------------\n");
+  
   if (argc==1)
     {
-      printf("Usage: bpmcount [file]*\n");
-      printf("The fileformat should be uncompressed\n");
-      printf("stereo, 16bit, little endian at 44100 Hz\n");
-      printf("The first run might take a long time due\n");
-      printf("to calibration of the FFTW3 library\n");
+      printf("Usage: bpmcount [file]*\n\n");
+      printf("The fileformat should be raw uncompressed, stereo, 16bit, little endian at 44100 Hz\n");
+      printf("The results are written to stderr\n");
     };
-  int startbpm=60;
+  int startbpm=90;
   int stopbpm=180;
+  TextualAnalyzerProgress printer;
+  QAnalyzerProgress plot;
   for(int i = 1; i < argc; i++)
     {
       char*name=argv[i];
@@ -80,11 +86,21 @@ int main(int argc, char *argv[])
       stereo_sample2 * audio = (stereo_sample2*)mmap(NULL,map_length,
 						     PROT_READ,MAP_SHARED,fd,0);
       assert(audio!=MAP_FAILED);
-      BpmCounter bc(NULL,audio,map_length/4,44100,startbpm,stopbpm);
-      tempo_type result(bc.measure());
+      BpmAnalyzer2010* bpm=new BpmAnalyzer2010(audio,map_length/4,44100,startbpm,stopbpm);
+      // BpmAnalyzerWec* bpm=new BpmAnalyzerWec(audio,map_length/4,44100,startbpm,stopbpm);
+      // BpmAnalyzer2001* bpm=new BpmAnalyzer2001(audio,map_length/4,startbpm,stopbpm);
+      // BpmAnalyzerAutocor* bpm=new BpmAnalyzerAutocor(audio,map_length/4,startbpm,stopbpm);
+      // BpmAnalyzerEnv* bpm=new BpmAnalyzerEnv(audio,map_length/4,startbpm,stopbpm);
+      
+      bpm->attach_progress(&printer);
+      bpm->attach_plot(&plot);
+      while(bpm->step()) ;
       munmap(audio,map_length);
       fclose(file);
-      printf("%g\t%s\n",result.tempo,name);
+      fprintf(stderr,"%g\t%s\n",bpm->tempo,name);
+      QImage image(1024,768,QImage::Format_RGB32);
+      plot.paint(&image);
+      image.save("plot.png");
     }
 }
 #endif // __loaded__bpmcount_cpp__

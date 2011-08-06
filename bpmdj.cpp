@@ -1,5 +1,5 @@
 /****
- BpmDj v4.2: Free Dj Tools
+ BpmDj v4.2-pl2: Free Dj Tools
  Copyright (C) 2001-2011 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -19,7 +19,6 @@
 #ifndef __loaded__bpmdj_cpp__
 #define __loaded__bpmdj_cpp__
 using namespace std;
-#line 1 "bpmdj.c++"
 #include <qtimer.h>
 #include <dirent.h>
 #include <qapplication.h>
@@ -52,10 +51,10 @@ using namespace std;
 #include "song-copier.h"
 #include "info.h"
 
-extern FragmentPlayer  fragmentPlayer;
-extern FragmentCreator fragmentCreator;
-extern IndexReader     indexReader;
-extern SongCopier      songCopier;
+FragmentPlayer* fragmentPlayer=NULL;
+FragmentCreator* fragmentCreator=NULL;
+SongCopier*  songCopier=NULL;
+IndexReader* indexReader=NULL;
 template class smallhistogram_type<32>;
 template class smallhistogram_type<96>;
 template class histogram_property<32>;
@@ -125,14 +124,24 @@ public:
 const char* programname;
 QStatusBar* status = NULL;
 
+void initialize_active_objects()
+{
+  existenceScanner=new ExistenceScanner();
+  fragmentPlayer=new FragmentPlayer();
+  fragmentCreator=new FragmentCreator();
+  indexReader=new IndexReader();
+  songCopier=new SongCopier();
+  spectrumPca=new SpectrumPca();
+}
+
 void terminate_and_quit(int exitcode)
 {
-  songCopier.terminate();
-  existenceScanner.terminate();
-  fragmentPlayer.terminate();
-  fragmentCreator.terminate();
-  spectrumPca.terminate();
-  indexReader.terminate();
+  songCopier->terminate();
+  existenceScanner->terminate();
+  fragmentPlayer->terminate();
+  fragmentCreator->terminate();
+  spectrumPca->terminate();
+  indexReader->terminate();
   aoPool->wait_for_finish();
   exit(exitcode);
 }
@@ -151,6 +160,7 @@ int main(int argc, char* argv[])
   assert(sizeof(float8)==8);
   
   init_embedded_files();
+  initialize_active_objects();
   
   programname = argv[0];
   Tags::init();

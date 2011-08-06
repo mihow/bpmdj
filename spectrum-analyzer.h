@@ -1,5 +1,5 @@
 /****
- BpmDj v4.2: Free Dj Tools
+ BpmDj v4.2-pl2: Free Dj Tools
  Copyright (C) 2001-2011 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -19,14 +19,13 @@
 #ifndef __loaded__spectrum_analyzer_h__
 #define __loaded__spectrum_analyzer_h__
 using namespace std;
-#line 1 "spectrum-analyzer.h++"
 #include "ui-spectrum.h"
-#include "analyzer.h"
+#include "analyzer-runner.h"
 
 class SpectrumAnalyzer : 
   public QWidget, 
   public Ui::SpectrumAnalyzerForm, 
-  public Analyzer
+  public AnalyzerRunner
 {
   Q_OBJECT
 public:

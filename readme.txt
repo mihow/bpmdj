@@ -1,17 +1,20 @@
-This program is a fully automatic BPM counter. Given an MP3 file it will
-automatically find the tempo. The package contains a bpm-counter, a song-player
-which uses this information to play a song at a different tempo and a file 
-selector that offers the possibility to manage a large amount of mp3's.
+BpmDj turns your Linux machine (or cluster) into a DJ system. BpmDj
+plays Mp3's/Ogg's, provides a fully automatic BPM counter, measures
+sound color, recognizes similar rhythms and compositions. Aside from
+music analysis, it also provides the meat each DJ looks for: a full
+fledged QT interface, that will help you navigate your music
+collection. The BpmDj player matches tempos automatically. Its unique
+visualization method, (beatgraphs) helps you to understand the songs
+structure at a glance.
 
 Probably, you will need to compile the package yourself. To do so, read 
-compile.txt. If you encounter any difficulties please contact me.
+compile.txt. If you encounter any difficulties please contact me
+through the forum at http://bpmdj.yellowcouch.org/forum/
 
-There is a complete manual online at http://bpmdj.yellowcouch.org/
-In case you don't have internet access, download the documentation package,
-carry it with you home, and unzip it.
+A manual is online at http://bpmdj.yellowcouch.org/
 
-Suse pacakges are available at http://packman.links2linux.de/ 
-and maintained by oc2pus@arcor.de
+Werner,-
 
 --
-author: werner@yellowcouch.org
+werner@yellowcouch.org
+http://werner.yellowcouch.org/

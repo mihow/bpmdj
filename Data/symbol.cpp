@@ -34,7 +34,7 @@ struct QStringLesser
   bool operator()(QString *s1, QString *s2) const {return (*s1)<(*s2);};
 };
 
-static set<QString> symbol_table;
+static set<QString> symbol_table __attribute__ ((init_priority(30000)));
 
 void Symbol::init(const QString& s)
 {      

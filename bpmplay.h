@@ -1,5 +1,5 @@
 /****
- BpmDj v4.2: Free Dj Tools
+ BpmDj v4.2-pl2: Free Dj Tools
  Copyright (C) 2001-2011 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -19,7 +19,6 @@
 #ifndef __loaded__bpmplay_h__
 #define __loaded__bpmplay_h__
 using namespace std;
-#line 1 "bpmplay.h++"
 #include <Qt/qapplication.h>
 #include "player-core.h"
 
@@ -29,7 +28,6 @@ using namespace std;
 #endif
 
 class Player;
-
 extern QApplication  * app;
 extern PlayerConfig  * config;
 extern Player        * player_window;

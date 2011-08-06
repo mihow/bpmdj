@@ -1,5 +1,5 @@
 /****
- BpmDj v4.2: Free Dj Tools
+ BpmDj v4.2-pl2: Free Dj Tools
  Copyright (C) 2001-2011 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -19,7 +19,6 @@
 #ifndef __loaded__signals_h__
 #define __loaded__signals_h__
 using namespace std;
-#line 1 "signals.h++"
 #include <fftw3.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -266,10 +265,6 @@ float8 unbiased_l2_distance(float8 * a, float8 * b, int size);
 float8 biased_best_abs_circular_distance(float8 *a, float8 *b, int size);
 float8 biased_best_l2_circular_distance(float8 *a, float8 *b, int size);
 /* finds the best circular shift to give the lowest L2 distance */
-
-void energize(float8*what, float8 length, unsigned4 ws);
-/* will replace every element with the RMS value of 
- * the surrounding block of size ws */
 
 float8 Index_to_frequency ( unsigned NumSamples, unsigned Index );
 /* The following function returns an "abstract frequency" of a

@@ -1,5 +1,5 @@
 /****
- BpmDj v4.2: Free Dj Tools
+ BpmDj v4.2-pl2: Free Dj Tools
  Copyright (C) 2001-2011 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -19,9 +19,8 @@
 #ifndef __loaded__rhythm_analyzer_h__
 #define __loaded__rhythm_analyzer_h__
 using namespace std;
-#line 1 "rhythm-analyzer.h++"
 #include "ui-rhythm.h"
-#include "analyzer.h"
+#include "analyzer-runner.h"
 #include "spectrum-type.h"
 
 void fft_to_bark(float8 * in_r, int window_size, spectrum_type &out);
@@ -30,7 +29,7 @@ class SongPlayer;
 class RhythmAnalyzer : 
   public QWidget, 
   public Ui::RhythmAnalyzer, 
-  public Analyzer
+  public AnalyzerRunner
 {
   Q_OBJECT
 public:

@@ -1,5 +1,5 @@
 /****
- BpmDj v4.2: Free Dj Tools
+ BpmDj v4.2-pl2: Free Dj Tools
  Copyright (C) 2001-2011 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -19,7 +19,6 @@
 #ifndef __loaded__dsp_alsa_cpp__
 #define __loaded__dsp_alsa_cpp__
 using namespace std;
-#line 1 "dsp-alsa.c++"
 #ifdef COMPILE_ALSA
 #include <stdlib.h>
 #include <stdio.h>
@@ -63,11 +62,11 @@ void dsp_alsa::internal_unpause()
 
 void dsp_alsa::write(stereo_sample2 value)
 {
-  buffer[filled]=value.value();
+  buffer[filled]=value;
   if (++filled>=period_size)
     {
       int err;
-      unsigned4* buf= buffer;
+      unsigned4* buf= (unsigned4*)buffer;
       do 
 	{
 	  err = snd_pcm_writei(dsp,buf,filled);
@@ -285,7 +284,7 @@ int dsp_alsa::open(bool ui)
     }
   if (verbose)
     snd_pcm_dump(dsp,output);
-  buffer = bpmdj_allocate(period_size,unsigned4);
+  buffer = bpmdj_allocate(period_size,stereo_sample2);
   return err_none;
 }
 

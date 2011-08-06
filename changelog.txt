@@ -1,6 +1,9 @@
 4.2-pl2:
+	+ added a better working (but quite somewhat slower) tempo measurement
+	  algorithm in bpmcount.
 	- removed unnecessary configuration warning regarding algnr 6
 	- removed debugging output from the experimental algorithm
+	- solved a object ordering error with the new gcc 4.6
 4.2-pl1:
         - dsp-jack did not work with variable playrates
         - dsp-alsa gave wrong playrate return info	

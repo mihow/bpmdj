@@ -1,5 +1,5 @@
 /****
- BpmDj v4.2: Free Dj Tools
+ BpmDj v4.2-pl2: Free Dj Tools
  Copyright (C) 2001-2011 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -19,7 +19,6 @@
 #ifndef __loaded__magic_h__
 #define __loaded__magic_h__
 using namespace std;
-#line 1 "magic.h++"
 #define MAGIC_1_6 0xBDE0
 #define MAGIC_1_7 0xBDE1
 #define MAGIC_1_8 0xBDE2

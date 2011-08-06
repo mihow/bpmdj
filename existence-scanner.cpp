@@ -1,5 +1,5 @@
 /****
- BpmDj v4.2: Free Dj Tools
+ BpmDj v4.2-pl2: Free Dj Tools
  Copyright (C) 2001-2011 Werner Van Belle
 
  http://bpmdj.yellowcouch.org/
@@ -19,7 +19,6 @@
 #ifndef __loaded__existence_scanner_cpp__
 #define __loaded__existence_scanner_cpp__
 using namespace std;
-#line 1 "existence-scanner.c++"
 #include "existence-scanner.h"
 #include "bpmdj.h"
 #include "vector-iterator.h"
@@ -64,5 +63,5 @@ elementResult ActiveExistenceScanner::terminate()
   return Done;
 }
 
-ExistenceScanner existenceScanner;
+ExistenceScanner* existenceScanner=NULL;
 #endif // __loaded__existence_scanner_cpp__
