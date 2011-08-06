@@ -1,0 +1,11 @@
+# Written by Ewald Van Belle (bloody.middlefinger@yellowcouch.org)
+BITS	        = 64
+CPP             = g++ -g -O2 -Wall
+RCC             = rcc
+UIC             = uic
+MOC             = moc
+CFLAGS         += -D COMPILE_ALSA
+LDFLAGS        += -pthread -lm -lasound -lrt -lfftw3
+QT_INCLUDE_PATH = -I/usr/include/Qt
+QT_LIBRARY_PATH =
+QT_LIBS         = -lQtGui
