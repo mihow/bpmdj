@@ -588,8 +588,8 @@ bool Config::load()
       if (magic < MAGIC_3_5)
 	taglist2config(taglist);
       // if the anall bpm technique 
-      if (magic <= MAGIC_4_2 && anal_bpm_technique==2)
-	anal_bpm_technique=6;
+      if (magic <= MAGIC_4_2 && get_anal_bpm_technique()==2)
+	set_anal_bpm_technique(6);
     }
   return true;
 }
