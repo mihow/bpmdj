@@ -9,6 +9,8 @@ const char* authors=
 "  Created the project\n"
 "Bernard Fortz <bernard.fortz@gmail.com>\n"
 "  JACK support, Midi bindings, Gentoo packaging, External clock\n"
+"Ewald Van Belle <bloody.middlefinger@yellowcouch.org>\n"
+"  RPM Packaging\n"
 "\n"
 "Passive\n"
 "-------\n"

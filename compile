@@ -148,3 +148,13 @@ index-demo: index-demo.o index.o spectrum-type.o sample4-type.o power-type.o \
 	song-information.moc.o info.o files.o $(EFENCE_OBJECTS)
 	@echo " [link] "$@
 	@$(LINK)  $^ -o $@
+
+MERGER_OBJECTS = bpmmerge.o no-overseer.o process.o index.o common.o \
+	scripts.o song-information.o song-information.moc.o capacity.o \
+	player-config.o $(EFENCE_OBJECTS) memory.o \
+	sample4-type.o power-type.o spectrum-type.o signals.o files.o \
+	histogram-type.o info.o Data/data.a
+
+bpmmerge: $(MERGER_OBJECTS)
+	@echo " [link] "$@
+	@$(LINK)  $(MERGER_OBJECTS) -o bpmmerge

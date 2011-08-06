@@ -370,10 +370,10 @@ p, li { white-space: pre-wrap; }
               <item>
                <widget class="QRadioButton" name="resamplingScan">
                 <property name="text">
-                 <string>Rayshoot, Resampling</string>
+                 <string>Autodifferencing</string>
                 </property>
                 <property name="checked">
-                 <bool>true</bool>
+                 <bool>false</bool>
                 </property>
                </widget>
               </item>
@@ -387,7 +387,10 @@ p, li { white-space: pre-wrap; }
               <item>
                <widget class="QRadioButton" name="experimentalAlg">
                 <property name="text">
-                 <string>Experimental</string>
+                 <string>Bpm 2010</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
@@ -396,26 +399,16 @@ p, li { white-space: pre-wrap; }
             <item>
              <layout class="QVBoxLayout" name="verticalLayout_2">
               <item>
-               <widget class="QRadioButton" name="ultraLongFFT">
-                <property name="text">
-                 <string>Rayshoot, FFT Guidance</string>
-                </property>
-                <property name="checked">
-                 <bool>false</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
                <widget class="QRadioButton" name="fullAutoCorrelation">
                 <property name="text">
-                 <string>Full Autocorrelation</string>
+                 <string>Amplitude Autocorrelation</string>
                 </property>
                </widget>
               </item>
               <item>
                <widget class="QRadioButton" name="weightedEnvCor">
                 <property name="text">
-                 <string>Weighted</string>
+                 <string>Autocorrelation * Energy Envelope</string>
                 </property>
                </widget>
               </item>

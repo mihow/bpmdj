@@ -1,4 +1,7 @@
 4.2-pl2:
+	+ reorganized various analysis algorithm structure
+	- removed ultralongfft bpm algorithm
+	+ readded the automixer in response to a request by someone
 	+ added a better working (but quite somewhat slower) tempo measurement
 	  algorithm in bpmcount.
 	- removed unnecessary configuration warning regarding algnr 6

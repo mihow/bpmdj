@@ -1075,8 +1075,7 @@ void SongSelectorLogic::startSong(const QModelIndex& i)
   QMutexLocker _ml(&lock);
   Song * song = QSong::songEssence(i);
   if (!song) return;
-  if (Config::players[0].isEmpty() ||
-      Config::players[1].isEmpty())
+  if (Config::players[0].isEmpty())
     {
       QMessageBox::information(this,
            "Player commands",

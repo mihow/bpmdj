@@ -8,6 +8,8 @@ Werner Van Belle <werner@yellowcouch.org>
   Created the project
 Bernard Fortz <bernard.fortz@gmail.com>
   JACK support, Midi bindings, Gentoo packaging, External clock
+Ewald Van Belle <bloody.middlefinger@yellowcouch.org>
+  RPM Packaging
 
 Passive
 -------

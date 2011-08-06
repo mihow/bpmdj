@@ -694,7 +694,6 @@ bool Config::open_ui(int pane)
       nr=6;
     }
   if (nr==1) preferences.resamplingScan->setChecked(true);
-  else if (nr==2) preferences.ultraLongFFT->setChecked(true);
   else if (nr==3) preferences.enveloppeSpectrum->setChecked(true);
   else if (nr==4) preferences.fullAutoCorrelation->setChecked(true);
   else if (nr==5) preferences.weightedEnvCor->setChecked(true);
@@ -752,7 +751,6 @@ bool Config::open_ui(int pane)
   
   nr=0;
   if (preferences.resamplingScan->isChecked()) nr=1;
-  if (preferences.ultraLongFFT->isChecked()) nr=2;
   if (preferences.enveloppeSpectrum->isChecked()) nr=3;
   if (preferences.fullAutoCorrelation->isChecked()) nr=4;
   if (preferences.weightedEnvCor->isChecked()) nr=5;
