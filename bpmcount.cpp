@@ -55,6 +55,7 @@ using namespace std;
 template float8 normalize_abs_max<float8>(float8*, long);
 template float8 find_abs_max<float8>(float8*, long);
 
+#define WITH_PLOT
 int main(int argc, char *argv[])
 {
   QApplication app(argc,argv);
@@ -71,7 +72,9 @@ int main(int argc, char *argv[])
   int startbpm=90;
   int stopbpm=180;
   TextualAnalyzerProgress printer;
+#ifdef WITH_PLOT
   QAnalyzerProgress plot;
+#endif
   for(int i = 1; i < argc; i++)
     {
       char*name=argv[i];
@@ -93,14 +96,18 @@ int main(int argc, char *argv[])
       // BpmAnalyzerEnv* bpm=new BpmAnalyzerEnv(audio,map_length/4,startbpm,stopbpm);
       
       bpm->attach_progress(&printer);
+#ifdef WITH_PLOT
       bpm->attach_plot(&plot);
+#endif
       while(bpm->step()) ;
       munmap(audio,map_length);
       fclose(file);
       fprintf(stderr,"%g\t%s\n",bpm->tempo,name);
+#ifdef WITH_PLOT
       QImage image(1024,768,QImage::Format_RGB32);
       plot.paint(&image);
       image.save("plot.png");
+#endif
     }
 }
 #endif // __loaded__bpmcount_cpp__
