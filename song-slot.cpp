@@ -195,6 +195,7 @@ QString SongSlot::getPlayCommand(Index& match_with_index,
       return result;
     }
   assert(0);
+  return "";
 }
 
 QString SongSlot::getAnalCommand(bool tempo, int technique, 

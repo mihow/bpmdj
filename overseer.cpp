@@ -80,23 +80,27 @@ using namespace std;
 #define PROCESS_LOG_STOP
 
 //------------------------------------------------------------------------
-//     Overseer side
+//     Globals declarations & forward class globals
 //------------------------------------------------------------------------
-int from_main;
-int to_main;
-int to_overseer;
-int from_overseer;
-int main_pid;
-
+static int from_main;
+static int to_main;
+static int to_overseer;
+static int from_overseer;
+static int main_pid;
+static unsigned int next_child_id=1;
 #ifdef LID2PID
-/**
- * This one is useful if we want to send signal between processes
- */
-map<int,int> mainpid2realpid  __attribute__ ((init_priority(201)));
+extern map<int,int> mainpid2realpid;
 #endif
-map<int,int> realpid2mainpid  __attribute__ ((init_priority(201)));
+extern map<int,int> realpid2mainpid;
+static vector<ExitStatus>* realpidsdied;
+extern PollDelay overseer_delay;
+extern struct sigaction child_died_signal;
+extern struct sigaction pipe_signal;
+extern map<int,Process*> processes;
+extern Lock pulling;
+class ForkQuick;
+extern ForkQuick order_matters;
 
-vector<ExitStatus>* realpidsdied=NULL;
 vector<ExitStatus>* take_death_pids()
 {
   vector<ExitStatus>* result;
@@ -234,7 +238,6 @@ void process_main_request(char* str)
     }
 }
 
-PollDelay overseer_delay(0,5000,250000);
 void check_death_pids()
 {
   process_death_pids();
@@ -277,9 +280,6 @@ void listen_to_main_requests()
   while(true);
 }
 
-struct sigaction child_died_signal;
-struct sigaction pipe_signal;
-
 void overseer_child_died(int sig, siginfo_t *info, void* hu)
 {
   ExitStatus es;
@@ -312,9 +312,6 @@ void send_overseer_request(char* str)
   write(to_overseer,str,strlen(str)+1);
 }
 
-map<int,Process*> processes;
-
-Lock pulling;
 bool poll_death()
 {
   // get all pids that are reported to be death.
@@ -367,7 +364,6 @@ bool poll_death()
   return res;
 }
 
-static unsigned int next_child_id=1;
 int request_spawn(const char* str, Process* target)
 {
   char tmp[4096];
@@ -404,14 +400,12 @@ void Process::command(const char* script, const char* desc)
   description=strdup(desc);
 }
 
-
 void Process::spawn()
 {
   assert(cmd);
   assert(!exitstatus.pid);
   exitstatus.pid=::spawn(cmd,description,this);
 }
-
 
 /**
  * Performs a synchronous execution of the exec process
@@ -444,6 +438,7 @@ ExitStatus Process::exec(const char* e, const char* d)
   command(e,d);
   return exec();
 }
+
 void Process::spawn(const char* str, const char* desc)
 {
   command(str,desc);
@@ -531,5 +526,17 @@ public:
   }
 };
 
-ForkQuick order_matters __attribute__ ((init_priority(202)));
+//------------------------------------------------------------------------
+//     Globals Objects
+//------------------------------------------------------------------------
+#ifdef LID2PID
+map<int,int> __attribute__ ((init_priority(201)))      mainpid2realpid;
+#endif
+map<int,int> __attribute__ ((init_priority(201)))      realpid2mainpid;
+PollDelay __attribute__ ((init_priority(201)))         overseer_delay(0,5000,250000);
+struct sigaction __attribute__ ((init_priority(201)))  child_died_signal;
+struct sigaction __attribute__ ((init_priority(201)))  pipe_signal;
+map<int,Process*> __attribute__ ((init_priority(201))) processes;
+Lock __attribute__ ((init_priority(201)))              pulling;
+ForkQuick __attribute__ ((init_priority(202)))         order_matters;
 #endif // __loaded__overseer_cpp__

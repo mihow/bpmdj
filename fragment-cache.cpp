@@ -37,12 +37,9 @@ void FragmentCreated::run()
   selector->fragmentCreated(this);
 }
 
-extern FragmentCreator fragmentCreator;
-FragmentCache fragmentCache;
-
 void FragmentCache::get(Song* song)
 {
-  deque<FragmentFile> ready = fragmentCreator.getReadyOnes();
+  deque<FragmentFile> ready = fragmentCreator->getReadyOnes();
   while (!ready.empty())
     {
       FragmentFile ff = ready.front();
@@ -51,7 +48,7 @@ void FragmentCache::get(Song* song)
     }
   FragmentFile ff = song2fragment[song];
   if (ff.isEmpty())
-    fragmentCreator.createOneFor(song);
+    fragmentCreator->createOneFor(song);
   else
     if (app) 
       app->postEvent(selector,new FragmentCreated(ff));

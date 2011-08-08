@@ -2024,7 +2024,7 @@ void SongSelectorLogic::playFragment(const QModelIndex& idx)
   QMutexLocker _ml(&lock);
   Song * song = QSong::songEssence(idx);
   if (!song) return;
-  fragmentCache.get(song);
+  fragmentCache->get(song);
   last_fragment_play_request = song;
 }
 

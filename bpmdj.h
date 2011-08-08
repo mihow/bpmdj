@@ -32,6 +32,8 @@ using namespace std;
 #include "existence-scanner.h"
 #include "clock-drivers.h"
 #include "index-reader.h"
+#include "fragment-cache.h"
+#include "fragment-creator.h"
 
 #if (DATA_VERSION_MAJOR != 0) || (DATA_VERSION_MINOR != 2)
 #error "DATA has wrong version number"
@@ -43,7 +45,10 @@ extern QStatusBar*    status;
 /**
  * The active object that will play fragments
  */
-extern FragmentPlayer* fragmentPlayer;
+extern FragmentPlayer*   fragmentPlayer;
+extern FragmentCache*    fragmentCache;
+extern FragmentCreator*  fragmentCreator;
+
 /**
  * The active object that will run a principal component analysis on the 
  * spectrum property.

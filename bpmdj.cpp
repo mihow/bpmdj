@@ -52,6 +52,7 @@ using namespace std;
 #include "info.h"
 
 FragmentPlayer* fragmentPlayer=NULL;
+FragmentCache* fragmentCache=NULL;
 FragmentCreator* fragmentCreator=NULL;
 SongCopier*  songCopier=NULL;
 IndexReader* indexReader=NULL;
@@ -132,6 +133,8 @@ void initialize_active_objects()
   indexReader=new IndexReader();
   songCopier=new SongCopier();
   spectrumPca=new SpectrumPca();
+  // this is strictly speaking not an active object
+  fragmentCache=new FragmentCache();
 }
 
 void terminate_and_quit(int exitcode)
@@ -143,6 +146,11 @@ void terminate_and_quit(int exitcode)
   spectrumPca->terminate();
   indexReader->terminate();
   aoPool->wait_for_finish();
+
+  // the non active objects
+  delete fragmentCache;
+  fragmentCache=NULL;
+
   exit(exitcode);
 }
 

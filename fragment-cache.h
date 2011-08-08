@@ -59,5 +59,5 @@ public:
   void get(Song* song);
 };
 
-extern FragmentCache fragmentCache;
+extern FragmentCache* fragmentCache;
 #endif // __loaded__fragment_cache_h__
