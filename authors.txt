@@ -41,6 +41,8 @@ Stefan Wanje
   Defines for fedora14
 Martin Stolpe <martin.stople@uni-ulm.de>
   Cmake files
+Josiah Boothby (josiahb@gmail.com)
+  Defines file for slackware
   
 Donations
 ---------

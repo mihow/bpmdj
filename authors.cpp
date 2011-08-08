@@ -42,6 +42,8 @@ const char* authors=
 "  Defines for fedora14\n"
 "Martin Stolpe <martin.stople@uni-ulm.de>\n"
 "  Cmake files\n"
+"Josiah Boothby (josiahb@gmail.com)\n"
+"  Defines file for slackware\n"
 "  \n"
 "Donations\n"
 "---------\n"
