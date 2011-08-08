@@ -57,8 +57,8 @@ void QAnalyzerProgress::paint(QPaintDevice* target)
       int lineheight=painter.fontMetrics().height();
       int space_needed_bottom=lineheight*2*horizontals.size();  // twice because we want to print the axis description as well
       int space_needed_left=0;
-      int sx=target->width()-space_needed_left;
-      int sy=target->height()-space_needed_bottom;
+      int sx=target->width()-space_needed_left-1;
+      int sy=target->height()-space_needed_bottom-1;
       int bottomline=sy;
       int leftline=space_needed_left;
       // draw the grid 
@@ -98,11 +98,7 @@ void QAnalyzerProgress::paint(QPaintDevice* target)
 		painter.drawText(QRect(leftline,bottomline+lineheight*(1+2*axis_no),sx,lineheight),Qt::AlignTop|Qt::AlignRight,QString(A->description.c_str()));
 	    }
 	}
-
-      // draw border around plot
-      painter.setPen(Qt::black);
-      painter.drawRect(QRect(leftline,0,sx,sy));
-      
+     
       // then in the remaining area we can draw our curves
       painter.setPen(Qt::SolidLine);
       int min_z=line_xy.begin()->first;
@@ -153,9 +149,10 @@ void QAnalyzerProgress::paint(QPaintDevice* target)
 	  painter.drawText(QRect(leftline,currentline,sx,lineheight),Qt::AlignRight|Qt::AlignVCenter,QString(it->second.description.c_str()));
 	  currentline+=lineheight;
 	}
-      // painter.drawText(arearect,Qt::AlignCenter,"test");
-      // QString("(%1,%2)").arg(min_x).arg(min_y));
-      // painter.drawText(arearect,Qt::AlignRight|Qt::AlignTop,QString("(%1,%2)").arg(max_x).arg(max_y));
+
+      // draw border around plot
+      painter.setPen(Qt::black);
+      painter.drawRect(QRect(leftline,0,sx,sy));
     }
   painter.end();
 }

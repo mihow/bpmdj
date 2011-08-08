@@ -346,11 +346,11 @@ void RhythmAnalyzer::calculateRhythmPattern2()
   playing->set_rhythm(R);
 
   // now draw the different distribution on the different axis
-  QPixmap *pm = new QPixmap(view_xs, 24);
-  QPixmap *pr = new QPixmap(view_xs, 1);
+  QPixmap pm(view_xs, 24);
+  QPixmap pr(view_xs, 1);
   QPainter p, q;
-  p.begin(pm);
-  q.begin(pr);
+  p.begin(&pm);
+  q.begin(&pr);
   for(int x = 0 ; x < view_xs ; x++)
     {
       int sum = 0;
@@ -386,8 +386,8 @@ void RhythmAnalyzer::calculateRhythmPattern2()
     }
   p.end(); 
   q.end();
-  rhythm->setPixmap(*pm);
-  projection->setPixmap(*pr);
+  rhythm->setPixmap(pm.scaled(rhythm->rect().size()));
+  projection->setPixmap(pr.scaled(projection->rect().size()));
   
   // normalize the composition bar & draw it
   {
@@ -417,88 +417,91 @@ void RhythmAnalyzer::calculateRhythmPattern2()
   }
 
   // draw the composition bar
-  pm = new QPixmap(max_slices, 24);
-  p.begin(pm);
-  p.fillRect(QRect(0,0,max_slices,24),Qt::white);
-  p.setPen(Qt::black);
-  for(int x = 0 ; x < max_slices ; x++)
-    {
-      for(int y = 0 ; y < 24 ; y ++)
-	{
-	  float8 dB = changes[x].get_bark(y);
-	  QColor col;
-	  dB*=128;
-	  dB+=127;
-	  if (dB<0) dB=0;
-	  col.setHsv(y*240/24,255,(int)dB);
-	  p.setPen(col);
-	  p.drawPoint(x,23-y);
-	}
-    }
-  p.end(); 
-  composition->setPixmap(*pm);
+  {
+    QPixmap pm(max_slices, 24);
+    p.begin(&pm);
+    p.fillRect(QRect(0,0,max_slices,24),Qt::white);
+    p.setPen(Qt::black);
+    for(int x = 0 ; x < max_slices ; x++)
+      {
+	for(int y = 0 ; y < 24 ; y ++)
+	  {
+	    float8 dB = changes[x].get_bark(y);
+	    QColor col;
+	    dB*=128;
+	    dB+=127;
+	    if (dB<0) dB=0;
+	    col.setHsv(y*240/24,255,(int)dB);
+	    p.setPen(col);
+	    p.drawPoint(x,23-y);
+	  }
+      }
+    p.end(); 
+    composition->setPixmap(pm.scaled(composition->rect().size()));
+  }
 
   // calculate the frequency content of the composition
   // we take 33 measures because the first will always be zero
-  const int ps = 33; 
-  int ws = higher_power_of_two(max_slices);
-  if (ps>ws) 
-    ws = higher_power_of_two(ps);
-  float8 * ain = bpmdj_allocate(ws,float8);
-  float8 * aou = bpmdj_allocate(ws,float8);
-  float8 * aio = bpmdj_allocate(ws,float8);
-  float8 * periods = bpmdj_allocate(ps,float8);
-  // int *counts = bpmdj_allocate(ps,int);
-  pm = new QPixmap(ps, 24);
-  p.begin(pm);
-  composition_property cp;
-  cp.init();
-  for(int y = 0 ; y < 24 ; y ++)
-    {
-      for(int x = 0 ; x < max_slices ; x++)
-	ain[x]=changes[x].get_bark(y);
-      for(int x = max_slices - 1; x >=1 ; x--)
-	ain[x]-=ain[x-1];
-      ain[0]=0;
-      for(int x = max_slices - 1; x < ws ; x++)
-	ain[x]=0;
-      unbiased_autocorrelation(ain,ws);
-      for(int pml = 0 ; pml < ps ; pml++)
-	periods[pml]=ain[pml];
-      periods[0]=0;
-      float8 maxed = normalize_abs_max(periods,ps);
-      // printf("%g\n",maxed);
-      // assign the autocorrelation to the composition property
-      cp.set_scale(y,maxed);
-      for(int x = 1 ; x < ps ; x ++)
-	{
-	  float8 val = periods[x];
-	  val*=127;
-	  val+=127;
-	  if (val<0) val = 0;
-	  if (val>255) val = 255;
-	  cp.set_energy(x-1,y,(unsigned1)val);
-	}
-
-      for(int x = 0 ; x < ps ; x++)
-	{
-	  float8 dB = periods[x];
-	  QColor col;
-	  if (dB<0) dB=-dB;
-	  dB*=255;
-	  col.setHsv(y*240/24,255,(int)dB);
-	  p.setPen(col);
-	  p.drawPoint(x,23-y);
-	}
-    }
+  {
+    const int ps = 33; 
+    int ws = higher_power_of_two(max_slices);
+    if (ps>ws) 
+      ws = higher_power_of_two(ps);
+    float8 * ain = bpmdj_allocate(ws,float8);
+    float8 * aou = bpmdj_allocate(ws,float8);
+    float8 * aio = bpmdj_allocate(ws,float8);
+    float8 * periods = bpmdj_allocate(ps,float8);
+    QPixmap pm(ps, 24);
+    p.begin(&pm);
+    composition_property cp;
+    cp.init();
+    for(int y = 0 ; y < 24 ; y ++)
+      {
+	for(int x = 0 ; x < max_slices ; x++)
+	  ain[x]=changes[x].get_bark(y);
+	for(int x = max_slices - 1; x >=1 ; x--)
+	  ain[x]-=ain[x-1];
+	ain[0]=0;
+	for(int x = max_slices - 1; x < ws ; x++)
+	  ain[x]=0;
+	unbiased_autocorrelation(ain,ws);
+	for(int pml = 0 ; pml < ps ; pml++)
+	  periods[pml]=ain[pml];
+	periods[0]=0;
+	float8 maxed = normalize_abs_max(periods,ps);
+	// printf("%g\n",maxed);
+	// assign the autocorrelation to the composition property
+	cp.set_scale(y,maxed);
+	for(int x = 1 ; x < ps ; x ++)
+	  {
+	    float8 val = periods[x];
+	    val*=127;
+	    val+=127;
+	    if (val<0) val = 0;
+	    if (val>255) val = 255;
+	    cp.set_energy(x-1,y,(unsigned1)val);
+	  }
+	
+	for(int x = 0 ; x < ps ; x++)
+	  {
+	    float8 dB = periods[x];
+	    QColor col;
+	    if (dB<0) dB=-dB;
+	    dB*=255;
+	    col.setHsv(y*240/24,255,(int)dB);
+	    p.setPen(col);
+	    p.drawPoint(x,23-y);
+	  }
+      }
+    p.end(); 
+    composition_freq->setPixmap(pm.scaled(composition_freq->rect().size()));
+    bpmdj_deallocate(aio);
+    bpmdj_deallocate(aou);
+    bpmdj_deallocate(ain);
+    playing->set_composition(cp);
+  }
   // the data which we will write out in the index file are the non 
   // absolute periods
-  bpmdj_deallocate(aio);
-  bpmdj_deallocate(aou);
-  bpmdj_deallocate(ain);
-  p.end(); 
-  composition_freq->setPixmap(*pm);
-  playing->set_composition(cp);
   
   status_bar->setText("Done");
   free_bark_fft2();
