@@ -24,8 +24,8 @@ using namespace std;
 #include <qcolor.h>
 #include <qpixmap.h>
 #include "config.h"
-#include "cluster.h"
 #include "index.h"
+#include "metric.h"
 
 class QSong;
 

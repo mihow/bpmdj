@@ -21,7 +21,6 @@
 using namespace std;
 #include "historysong.h"
 #include "config.h"
-#include "cluster.h"
 
 class QueuedSong: public TreeWidgetSong
 {

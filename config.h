@@ -132,7 +132,6 @@ class Config
   singleton_accessors(QColor,color_played_author);
   singleton_accessors(QColor,color_unavailable);
   singleton_accessors(QColor,color_dcolor_col);
-  singleton_accessors(int,color_cluster_depth);
   // singleton_accessors(QStandardItemView*,taglist);
   singleton_accessors(QByteArray,header_state);
   // 2.6

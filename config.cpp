@@ -132,7 +132,7 @@ init_singleton_var(Config,color_played_song,QColor,QColor(255,0,0));
 init_singleton_var(Config,color_played_author,QColor,QColor(255,170,0));
 init_singleton_var(Config,color_unavailable,QColor,QColor(127,127,127));
 init_singleton_var(Config,color_dcolor_col,QColor,QColor(255,255,0));
-init_singleton_var(Config,color_cluster_depth,int,3);
+//init_singleton_var(Config,color_cluster_depth,int,3);
 //init_singleton_var(Config,taglist,QTreeWidget*,NULL);
 init_singleton_var(Config,header_state,QByteArray,NULL);
 //init_singleton_var(Config,bpm_mixer_command,QString,"kbpm-mix --alsa");
@@ -220,10 +220,10 @@ void Config::save()
   s << get_color_played_author();
   s << get_color_unavailable();
   s << get_color_dcolor_col();
-  s << (quint16)get_color_cluster_depth();
+  quint16 nr = 0;
+  s << (quint16)nr; // get_color_cluster_depth();
   s << QString(""); // get_bpm_mixer_command();
   s << (qint8)0 ; // open_bpmmixer;
-  quint16 nr = 0;
   s << nr;
   s << get_header_state();
   s << get_distance_tempoweight();
@@ -335,7 +335,7 @@ bool Config::load()
 	  s >> clr; set_color_played_author(clr);
 	  s >> clr; set_color_unavailable(clr);
 	  s >> clr; set_color_dcolor_col(clr);
-	  s >> w; set_color_cluster_depth (w);
+	  s >> w; // set_color_cluster_depth (w);
 	  s >> str; // set_bpm_mixer_command(str);
 	  s >> b; // open_bpmmixer.set(b);
 	  // read tag data
@@ -441,7 +441,7 @@ bool Config::load()
 	  s >> clr; set_color_played_author(clr);
 	  s >> clr; set_color_unavailable(clr);
 	  s >> clr; set_color_dcolor_col(clr);
-	  s >> w; set_color_cluster_depth (w);
+	  s >> w; // set_color_cluster_depth (w);
 	  s >> str; // set_bpm_mixer_command(str);
 	  s >> b; // open_bpmmixer.set(b);
 	  // read tag data
@@ -548,7 +548,7 @@ bool Config::load()
 	  s >> clr; set_color_played_author(clr);
 	  s >> clr; set_color_unavailable(clr);
 	  s >> clr; set_color_dcolor_col(clr);
-	  s >> w; set_color_cluster_depth (w);
+	  s >> w; // set_color_cluster_depth (w);
 	  s >> str; // set_bpm_mixer_command(str);
 	  s >> b; // open_bpmmixer.set(b);
 	  // read tag data
@@ -669,9 +669,6 @@ bool Config::open_ui(int pane)
     setValue( (int)(0.5+get_distance_compositionweight()*100.0) );
   preferences.max_songs->setValue(get_max_songs());
 
-  preferences.clusterDepth -> setValue (get_color_cluster_depth ());
-
-  // preferences.bpmmixcmd -> setText( get_bpm_mixer_command () );
   preferences.subtabs -> setCurrentIndex( pane );
 
   preferences.From -> setText(get_anal_bpm_from() ? 
@@ -732,7 +729,6 @@ bool Config::open_ui(int pane)
   set_color_unavailable(backgroundColor(preferences.colorUnavailableSong));
   set_color_unchecked(backgroundColor(preferences.colorUncheckedSong));
   set_color_dcolor_col(backgroundColor(preferences.colordColorCol));
-  set_color_cluster_depth(preferences.clusterDepth -> value());
   
   set_distance_tempoweight((float4)(preferences.dColorMetric->
 				    tempoDistanceSpin->value())/100.0);

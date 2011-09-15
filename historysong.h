@@ -21,7 +21,6 @@
 using namespace std;
 #include <qtreewidget.h>
 #include "config.h"
-#include "cluster.h"
 
 class TreeWidgetSong: public QTreeWidgetItem
 {

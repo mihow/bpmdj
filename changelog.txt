@@ -1,4 +1,6 @@
-	- fixing rescaling of rhythm pixmaps
+4.3:
+        - removed a no longer functional feater: clustering
+        - fixing rescaling of rhythm pixmaps
 4.2-pl2:
 	+ reorganized various analysis algorithm structure
 	- removed ultralongfft bpm algorithm

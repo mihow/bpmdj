@@ -110,9 +110,11 @@ T* findOneItem(QTreeWidget* lst, QString text, int pos)
 {
   assert(lst);
   QList<QTreeWidgetItem*> items=lst->findItems(text,Qt::MatchExactly,pos);
+#ifndef NDEBUG
   int l = items.count();
   assert(l==1);
   assert(items[0]);
+#endif
   return dynamic_cast<T*>(items[0]);
 }
 

@@ -19,6 +19,7 @@
 #ifndef __loaded__overseer_h__
 #define __loaded__overseer_h__
 using namespace std;
+#include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/wait.h>

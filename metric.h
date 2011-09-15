@@ -16,20 +16,12 @@
 
  See the authors.txt for a full list of people involved.
 ****/
-#ifndef __loaded__cluster_h__
-#define __loaded__cluster_h__
+#ifndef __loaded__metric_h__
+#define __loaded__metric_h__
 using namespace std;
-#include <set>
-#include <map>
-#include <assert.h>
-#include "common.h"
-
+#line 1 "metric.h++"
 class Metriek
 {
- public:
-  Metriek() 
-  {
-  };
 };
 
 class Point
@@ -54,7 +46,7 @@ public:
     return 0;
   };
   virtual void determine_color(float4 hue_min, float4 hue_max, 
-			       int depth, int stopat) 
+                               int depth, int stopat) 
   {
   };
   virtual unsigned4 elements_count() 
@@ -66,35 +58,4 @@ public:
     return 0;
   };
 };
-
-/**
- * A couple is the aggregation of thwo subclusters or points. 
- * The average of those two points is the new location. A
- * second use of the couples is to remember the distance
- * between two points.
- */
-struct Couple: public Point
-{
-  Point* first;
-  Point* second;
-  Couple(Point* a, Point* b);
-  virtual ~Couple() 
-  {
-  };
-  virtual bool isCouple()
-  {
-    return true;
-  }
-  float4 distance2point(Point* idx, Metriek* metriek);
-  virtual void determine_color(float4 hue_min, float4 hue_max,
-			       int depth, int stopat);
-  virtual unsigned4 elements_count()
-  {
-    return first->elements_count() + 
-      second->elements_count();
-  };
-  float4 distance(Couple * other, Metriek * metriek);
-};
-
-typedef set<Point*> PointSet;
-#endif // __loaded__cluster_h__
+#endif // __loaded__metric_h__

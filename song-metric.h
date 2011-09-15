@@ -24,9 +24,9 @@ using namespace std;
 #include <qcolor.h>
 #include <qpixmap.h>
 #include "config.h"
-#include "cluster.h"
 #include "index.h"
 #include "metric-widget.h"
+#include "metric.h"
 
 class Song;
 

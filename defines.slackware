@@ -1,0 +1,10 @@
+CPP             = g++ -g -O2 -Wall
+RCC             = rcc
+UIC             = uic
+MOC             = moc
+CFLAGS         += -D COMPILE_ALSA -D COMPILE_OSS -D COMPILE_JACK
+LDFLAGS        += -pthread -lm -lasound -lrt -lfftw3 -ljack
+QT_INCLUDE_PATH = -I/usr/lib/qt4/include -I/usr/lib/qt/include/Qt/ -L/usr/lib/qt 
+QT_LIBRARY_PATH =
+QT_LIBS         = -lQtGui
+BITS		        = 32

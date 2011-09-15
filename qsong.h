@@ -23,7 +23,6 @@ using namespace std;
 #include <qtableview.h>
 #include <qcolor.h>
 #include "config.h"
-#include "cluster.h"
 #include "song.h"
 
 #define LIST_TEMPO 0

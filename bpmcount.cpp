@@ -55,7 +55,7 @@ using namespace std;
 template float8 normalize_abs_max<float8>(float8*, long);
 template float8 find_abs_max<float8>(float8*, long);
 
-#define WITH_PLOT
+//#define WITH_PLOT
 int main(int argc, char *argv[])
 {
   QApplication app(argc,argv);
